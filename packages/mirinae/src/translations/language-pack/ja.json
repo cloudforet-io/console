@@ -1,0 +1,108 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "キャンセル",
+		"CLOSE": "閉じる",
+		"CONFIRM": "確認"
+	},
+	"COLLAPSIBLE_PANEL": {
+		"HIDE": "隠す",
+		"SEE_MORE": "もっと見る"
+	},
+	"COLLAPSIBLE_TOGGLE": {
+		"HIDE": "隠す",
+		"SHOW_MORE": "もっと見る"
+	},
+	"CONTEXT_MENU": {
+		"CLEAR_SELECTION": "選択解除",
+		"DONE": "完了",
+		"NO_ITEM": "アイテムがありません",
+		"SELECTED_LIST": "選択された項目",
+		"SHOW_MORE": "詳細"
+	},
+	"COPY_BUTTON": {
+		"COPIED": "コピーされました"
+	},
+	"DATA_LOADER": {
+		"NO_DATA": "データがありません"
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "データがありません"
+	},
+	"DATETIME_PICKER": {
+		"SELECT_DATE": "日付選択",
+		"SELECT_TIME": "時間選択"
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "月",
+		"YEAR": "年"
+	},
+	"DEFINITION_TABLE": {
+		"NO_DATA": "データがありません"
+	},
+	"DOUBLE_CHECK_MODAL": {
+		"INPUT_DESC": "確認のため{text}を入力してください",
+		"INVALID_TEXT": "{text}ではありません"
+	},
+	"EMPTY": {
+		"NO_DATA": "データがありません"
+	},
+	"FIELD_GROUP": {
+		"OPTIONAL": "選択事項"
+	},
+	"FILTERABLE_DROPDOWN": {
+		"ITEMS_SELECTED": "アイテム選択",
+		"PLACEHOLDER": "選擇",
+		"QUERY_PLACEHOLDER": ""
+	},
+	"JSON_SCHEMA_FORM": {
+		"GENERATE": "生成する"
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": "{selectedCount} / {totalCount}"
+	},
+	"PANEL_CONTENT": {
+		"ID": "ID",
+		"NAME": "名前",
+		"STATE": "状態"
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "キャンセル",
+		"CONFIRM": "確認",
+		"NEXT": "次へ",
+		"OPTIONAL": "選択事項",
+		"PREV": "前へ",
+		"STEP": "{step}ステップ"
+	},
+	"QUERY_INPUT": {
+		"PLACEHOLDER": ""
+	},
+	"QUERY_SEARCH": {
+		"HELP": "ヘルプ"
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "お問い合わせ",
+		"FILTER": "フィルター",
+		"HELP": "サポートが必要な場合{contact}",
+		"OPERATOR": "オペレーター",
+		"QUERY_KEY": "検索キー",
+		"STEP_1": "提供される{queryKey}を選択し、値を入力してください",
+		"STEP_2_1": "検索した{filter}を削除、追加して検索範囲を調整しましょう",
+		"STEP_2_2": "同じフィルタの場合ORを検索し、異なるフィルタの場合AND検索をします",
+		"STEP_3": "下記の検索{operator}をサポートします",
+		"TITLE": "検索ガイド"
+	},
+	"QUERY_SEARCH_TAGS": {
+		"CLEAR_ALL": "消す",
+		"FILTER": "フィルター"
+	},
+	"SEARCH": {
+		"PLACEHOLDER": "検索"
+	},
+	"SELECT_DROPDOWN": {
+		"SELECT": "選択"
+	},
+	"TEXT_INPUT": {
+		"HIDE": "隠す",
+		"SHOW": "もっと見る"
+	}
+}

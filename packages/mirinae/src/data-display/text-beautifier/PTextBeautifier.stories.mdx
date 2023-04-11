@@ -1,0 +1,70 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { faker }  from '@faker-js/faker'
+import PTextBeautifier from './PTextBeautifier.vue';
+import {
+    getTextBeautifierArgTypes
+} from "@/data-display/text-beautifier/story-helper";
+
+
+<Meta title='Data Display/Text Beautifier' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} component={PTextBeautifier} argTypes={getTextBeautifierArgTypes()}/>
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    components: {PTextBeautifier},
+    template: `
+        <p-text-beautifier
+            :value="value"
+            :tag="tag"
+        ></p-text-beautifier>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Text Beautifier
+
+The `TextBeautifier` component helps the user to read and detect text easily.<br/>
+For example, when the url pattern is detected in text, `TextBeautifier` component converts it into `a` tag.
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: {PTextBeautifier},
+    template: `
+        <p-text-beautifier :value="value"></p-text-beautifier>
+    `,
+    setup() {
+        return {
+            value: `${faker.lorem.sentence(30)} ${faker.internet.url()} ${faker.lorem.sentence(30)}`
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

@@ -1,0 +1,137 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import { reactive, toRefs } from 'vue';
+
+import {i18n} from '@/translations';
+
+import PDynamicLayout from '../../PDynamicLayout.vue';
+
+import { getDynamicLayoutListArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/list/story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/- List'
+      argTypes={getDynamicLayoutListArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="list"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              totalCount,
+                              timezone,
+                              selectIndex,
+                              selectable,
+                              multiSelect,
+                              invalid,
+                              colCopy,
+                              excelVisible,
+                              settingsVisible,
+                              keyItemSets,
+                              valueHandlerMap
+                          }"
+                          :fetch-options="{
+                              sortBy,
+                              sortDesc,
+                              pageStart,
+                              pageLimit,
+                              queryTags
+                          }"
+                           style="max-height: inherit; width: 90%;"
+                            @fetch="onFetch"
+                            @select="onSelect"
+                            @export="onExport"
+                            @click-settings="onClickSettings"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# List Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | X |
+| markdown | X |
+| layouts | O |
+| search | X |
+| disable_search | X |
+| headers | x |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | O |
+| sortDesc | O |
+| pageStart | O |
+| pageLimit | O |
+| searchText | O |
+| queryTags | O |
+
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | O |
+| timezone | O |
+| selectIndex | O |
+| selectable | O |
+| multiSelect | O |
+| invalid | O |
+| colCopy | O |
+| excelVisible | O |
+| settingsVisible | O |
+| keyItemSets | O |
+| valueHandlerMap | O |
+| language | O |
+| popupVisible | X |
+
+
+## Supported Events
+
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | O |
+| select | O |
+| export | O |
+| click-settings | O |
+| update-popup-visible | X |
+
+list type's event parameters are different: <br/>
+
+`[...arguments,  name of layout(string), index of layout(number)]`
+
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>

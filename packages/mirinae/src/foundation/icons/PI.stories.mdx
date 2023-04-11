@@ -1,0 +1,98 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PI from './PI.vue';
+import { getAllAvailableIcons, getIconsArgTypes } from '@/foundation/icons/story-helper';
+
+<Meta title='Foundation/Graphics/Icons' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A123491'
+    }
+}} argTypes={getIconsArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PI },
+    template: `
+        <p-i v-bind="$props"></p-i>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Icon
+<br/>
+<br/>
+
+
+## All Icons
+
+<Canvas>
+    <Story name="All Icons">
+        {{
+            components: {PI},
+            template: `
+            <div style="width: 100%; padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
+                <div v-for="icon in icons" :key="icon" class="flex flex-col items-center p-4 rounded hover:bg-secondary-2">
+                    <p-i :name="icon" class="flex-shrink-0"/>
+                    <label class="mt-4 whitespace-no-wrap break-words text-xs text-gray-600" >{{icon}}</label>
+                </div>
+            </div>
+`,
+            setup() {
+                return {
+                    icons: getAllAvailableIcons(),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Animation
+
+<Canvas>
+    <Story name="Animation">
+        {{
+            components: {PI},
+            template: `
+        <div style="padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(100px,1fr));">
+            <div v-for="icon in icons" :key="icon" class="flex flex-col items-center p-4 rounded hover:bg-secondary-2">
+                <p-i :name="icon" animation="spin" class="flex-shrink-0"/>
+                <label class="mt-4 whitespace-no-wrap break-words text-xs text-gray-600" >{{icon}}</label>
+            </div>
+        </div>
+`,
+            setup() {
+                return {
+                    icons: [
+                        'ic_gear-filled',
+                        'ic_refresh',
+                        'ic_renew',
+                    ]
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" args={{
+        name: 'root-account',
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

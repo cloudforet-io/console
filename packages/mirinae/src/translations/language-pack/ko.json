@@ -1,0 +1,108 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "취소",
+		"CLOSE": "닫기",
+		"CONFIRM": "확인 "
+	},
+	"COLLAPSIBLE_PANEL": {
+		"HIDE": "숨기기",
+		"SEE_MORE": "더보기"
+	},
+	"COLLAPSIBLE_TOGGLE": {
+		"HIDE": "숨기기",
+		"SHOW_MORE": "더보기"
+	},
+	"CONTEXT_MENU": {
+		"CLEAR_SELECTION": "전체 선택 해제",
+		"DONE": "완료",
+		"NO_ITEM": "아이템이 없습니다. ",
+		"SELECTED_LIST": "선택된 항목",
+		"SHOW_MORE": "더보기"
+	},
+	"COPY_BUTTON": {
+		"COPIED": "복사됨"
+	},
+	"DATA_LOADER": {
+		"NO_DATA": "데이터가 없습니다."
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "데이터가 없습니다."
+	},
+	"DATETIME_PICKER": {
+		"SELECT_DATE": "날짜 선택",
+		"SELECT_TIME": "시간 선택"
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "월 ",
+		"YEAR": "년 "
+	},
+	"DEFINITION_TABLE": {
+		"NO_DATA": "데이터가 없습니다."
+	},
+	"DOUBLE_CHECK_MODAL": {
+		"INPUT_DESC": "확인을 위해 {text}를 입력하세요.",
+		"INVALID_TEXT": "{text}가 아닙니다."
+	},
+	"EMPTY": {
+		"NO_DATA": "데이터가 없습니다."
+	},
+	"FIELD_GROUP": {
+		"OPTIONAL": "선택사항"
+	},
+	"FILTERABLE_DROPDOWN": {
+		"ITEMS_SELECTED": "개의 아이템 선택됨",
+		"PLACEHOLDER": "선택",
+		"QUERY_PLACEHOLDER": ""
+	},
+	"JSON_SCHEMA_FORM": {
+		"GENERATE": "생성하기"
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": "{selectedCount} / {totalCount}"
+	},
+	"PANEL_CONTENT": {
+		"ID": "아이디 ",
+		"NAME": "이름 ",
+		"STATE": "상태 "
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "취소",
+		"CONFIRM": "확인 ",
+		"NEXT": "다음 ",
+		"OPTIONAL": "선택사항",
+		"PREV": "이전 ",
+		"STEP": "{step} 단계"
+	},
+	"QUERY_INPUT": {
+		"PLACEHOLDER": "속성: 값 입력"
+	},
+	"QUERY_SEARCH": {
+		"HELP": "도움말"
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "여기로 문의해주세요",
+		"FILTER": "필터",
+		"HELP": "도움이 필요하면 {contact}",
+		"OPERATOR": "연산자들",
+		"QUERY_KEY": "검색 키",
+		"STEP_1": "제공되는 {queryKey}를 선택하고 값을 입력하세요.",
+		"STEP_2_1": "검색한 {filter}를 삭제, 추가 하면서 원하는 검색 결과의 범위를 좁히세요.",
+		"STEP_2_2": "같은 필터일 경우 OR 검색을 하고, 다른 필터일 경우 AND 검색을 합니다.",
+		"STEP_3": "아래의 검색 {operator}을 지원합니다.",
+		"TITLE": "검색 가이드"
+	},
+	"QUERY_SEARCH_TAGS": {
+		"CLEAR_ALL": "지우기",
+		"FILTER": "필터"
+	},
+	"SEARCH": {
+		"PLACEHOLDER": "검색"
+	},
+	"SELECT_DROPDOWN": {
+		"SELECT": "선택"
+	},
+	"TEXT_INPUT": {
+		"HIDE": "숨기기",
+		"SHOW": "보이기"
+	}
+}

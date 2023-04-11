@@ -1,0 +1,529 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+import { faker }  from '@faker-js/faker'
+
+import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable';
+import PButton from '@/inputs/buttons/button/PButton';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
+import { getDefinitionTableArgTypes } from '@/data-display/tables/definition-table/story-helper';
+
+<Meta title='Data Display/Tables/Definition Table' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
+    }
+}} argTypes={getDefinitionTableArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDefinitionTable },
+    template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+    :loading="loading"
+    :skeleton-rows="skeletonRows"
+    :disable-copy="disableCopy"
+    :style-type="styleType"
+    :block="block"
+/>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Definition Table
+
+<br/>
+<br/>
+<br/>
+
+It uses the [Definition component](?path=/docs/data-display-tables-definition-table-definition--basic) internally. <br/>
+`fields` props is an array of objects whose properties are the set of definition component's props. <br/>
+
+
+
+## Basic
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PDefinitionTable },
+    template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+    :loading="loading"
+/>
+`,
+    setup() {
+        const state = reactive({
+            fields: [
+                { label: 'Id', name: 'collector_id' },
+                { label: 'Name', name: 'name' },
+                { label: 'Provider', name: 'provider' },
+            ],
+            data: {},
+            loading: true
+        });
+        setTimeout(() => {
+            state.data = {
+                collector_id: 'collector-6746d641c98b',
+                    name: 'collector name',
+                provider: 'aws',
+            }
+            state.loading = false
+        }, 2000)
+        return {
+            ...toRefs(state),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## No Data
+<Canvas>
+    <Story name="No Data">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<p-definition-table />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas>
+    <Story name="Loading">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+    loading
+/>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+| Slot name | Description |
+| ---- | ----------- |
+| data | Slot for all definition field value. It has the highest priority among field value slots. |
+| data-{field index} | Slot for definition field value that matched for the field index. It has the second highest priority among field value slots. |
+| data-{field.name} | Slot for definition field value. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. It's useful when field names are duplicated. * Don't use 'data-{field.name}' slot together. It can cause multiple definition field. It has the lowest priority among field value slots. |
+| key | Slot for replacing field key text. |
+| extra | Slot for right space of field value. |
+| loading | Slot for replacing loader. |
+| no-data | Slot for no data case. |
+
+<br/>
+<br/>
+
+### SlotScope(Props)
+
+<br/>
+
+> Except for `no-data` and `loading` slots, all slots provide slot props below:
+
+| Type | Description |
+| ---- | ----------- |
+| name | The name of the item. |
+| label | The label of the item. |
+| data | The data of the item. |
+| value | The actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| items | All field and data items ordered by `fields` props. |
+| index | Current item's index. |
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Slots">
+{{
+    components: { PDefinitionTable, PButton },
+    template: `
+<div>
+    <p class="mb-4 text-lg font-bold">Slot: data</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data="{value}">
+            <span class="text-secondary-dark">{{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="mb-4 text-lg font-bold">Slot: data-{field.name}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data-name="{value}">
+            <span class="text-secondary-dark">{{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="mb-4 text-lg font-bold">Slot: data-{field index}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data-name="{index, value}">
+            <span class="text-secondary-dark">{{index}}. {{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: key</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #key="{label}">
+            <span class="text-secondary-dark">{{label}}</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: extra</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #extra="{label}">
+            <div class="text-peacock mr-4 w-full text-right"><p-button style-type="highlight" size="sm">Edit</p-button></div>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: loading</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        loading
+    >
+        <template #loading>
+            <span class="text-secondary-dark">Loading...</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: no-data</p>
+    <p-definition-table
+        :fields="fields"
+        :data="{}"
+    >
+        <template #no-data>
+            <span class="text-secondary-dark">No Data</span>
+        </template>
+    </p-definition-table>
+</div>
+<!--<div>-->
+`,
+    setup() {
+        const state = reactive({
+            fields: [
+                { label: 'Id', name: 'collector_id' },
+                { label: 'Name', name: 'name' },
+                { label: 'Provider', name: 'provider' },
+            ],
+            data: {
+                collector_id: 'collector-6746d641c98b',
+                name: 'collector name',
+                provider: 'aws',
+            }
+        });
+        return {
+            ...toRefs(state),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Disable Copy
+
+If you give `true` to `disableCopy` props, it globally off all copy buttons. <br/>
+If you want to off the specific row(field), set `disableCopy` property with `true` to that field's object. <br/>
+
+e.g.<br/>
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', disableCopy: true }, // will be hide copy button to this field
+]
+```
+
+
+<Canvas>
+    <Story name="Disable Copy">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<div>
+    <p class="text-xl mb-4">Globally disable copy button</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        disable-copy
+    />
+    <p class="text-xl my-4">Disable specific row(field)'s copy button</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider', disableCopy: true },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Copy Value
+
+You can customize the value to be copied by giving ```copyValue``` or ```copyValueFormatter``` properties to each field item. <br/>
+```copyValueFormatter``` has higher priority than ```copyValue```.<br/>
+
+<Canvas>
+    <Story name="Custom Copy Value">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<div>
+    <p class="text-xl mb-4">Fields:</p>
+    <pre class="mb-4">
+    [
+        { label: 'Name', name: 'name', copyValueFormatter: () => data.collector_id },
+        { label: 'Provider', name: 'provider', copyValue: 'AWS' },
+    ]
+    </pre>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Name', name: 'name', copyValueFormatter: () => state.data.collector_id },
+                        { label: 'Provider', name: 'provider', copyValue: 'AWS' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Block
+
+If you give `true` to `block` props, it will make all value column's width full. <br/>
+If you want to make block the specific row(field), set `block` property with `true` to that field's object. <br/>
+It is useful when you give something into extra slot and want to align it to the right. <br/>
+
+e.g.
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', block: true }, // will be make block to only this field
+]
+```
+
+
+<Canvas>
+    <Story name="Block">
+        {{
+            components: { PDefinitionTable, PButton },
+            template: `
+<div>
+    <p class="text-xl mb-4">Make all value columns expand</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        block
+    >
+        <template #extra>
+            <p-button style-type="highlight" size="sm">Edit</p-button>
+        </template>
+    </p-definition-table>
+    <p class="text-xl my-4">Make specific row(field)'s value column expand</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #extra>
+            <p-button style-type="highlight" size="sm">Edit</p-button>
+        </template>
+    </p-definition-table>
+</div>
+<!-- <div> -->
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider', block: true },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Style Types
+
+<Canvas>
+    <Story name="Style Types">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<div>
+    <p class="mb-4 text-lg font-bold">Style Type: {{DEFINITION_TABLE_STYLE_TYPE.primary}}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        :style-type="DEFINITION_TABLE_STYLE_TYPE.primary"
+    />
+    <p class="mb-4 text-lg font-bold">Style Type: {{DEFINITION_TABLE_STYLE_TYPE.white}}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        :style-type="DEFINITION_TABLE_STYLE_TYPE.white"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                    DEFINITION_TABLE_STYLE_TYPE
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## UI Structure and CSS
+
+```css
+.p-definition-table(class=styleType style="position: relative; min-height: 11.25rem;")
+    .no-data(style="min-height: 11.25rem;")
+        slot(name="no-data")
+    table(style="table-layout: fixed;")
+        tbody
+            .p-definition(class="def-row")
+                slot(name="data")
+                    slot(name="data-{item.name}")
+                        slot(name="data-{index}")
+                slot(name="key")
+                slot(name="extra")
+    }
+    .loading-backdrop(style="position: absolute; top: 0; z-index: 1;")
+    .loading(style="position: absolute; top: 0; z-index: 2; max-height: 10rem;")
+```
+
+## Playground
+<Canvas>
+    <Story name="Playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />
+
+<br/>
+
+
+

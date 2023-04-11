@@ -1,0 +1,220 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import {
+    reactive, toRefs
+} from 'vue';
+
+import PTextEditor from './PTextEditor.vue';
+import PButton from "@/inputs/buttons/button/PButton";
+
+import { getTextEditorArgTypes, sampleCode } from '@/inputs/text-editor/story-helper';
+import { getJsonObject } from "@/inputs/text-editor/mock";
+
+
+
+<Meta title='Inputs/Text Editor' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182308'
+    }
+}} argTypes={getTextEditorArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextEditor },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="code"
+            :folded="folded"
+            :read-only="readOnly" :loading="loading"
+            :highlight-lines="highlightLines"
+            :disable-auto-reformat="disableAutoReformat"
+        />
+    </div>
+    `,
+});
+
+
+# Text Editor
+<br/>
+<br/>
+
+
+## Basic
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded />
+    </div>
+    `,
+        setup() {
+            const state = reactive({
+                sampleCode: sampleCode,
+            });
+            return {
+                ...toRefs(state),
+            }
+        }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Loading">
+        {{
+            components: { PTextEditor, PButton },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :loading="loading" :code="sampleCode" folded />
+        <p-button class="mt-4" @click="changeCode">Load Code!</p-button>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode: undefined,
+                    loading: false
+                });
+                const changeCode = async () => {
+                    state.loading = true;
+                    state.sampleCode = await new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(getJsonObject())
+                        }, 1500)
+                    })
+                    state.loading = false;
+                }
+                return {
+                    ...toRefs(state),
+                    changeCode
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Highlight Lines
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Highlight Lines">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded :highlight-lines="[2,3,4]" />
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode: getJsonObject(),
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Change Code
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Change Code">
+        {{
+            components: { PTextEditor },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded />
+        <button @click="handleChangeCode">Change Code!</button>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode: getJsonObject(),
+                });
+                const handleChangeCode = () => {
+                    state.sampleCode = JSON.stringify(getJsonObject(), null, 2);
+                };
+                return {
+                    ...toRefs(state),
+                    handleChangeCode,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Auto Reformat on Code Change (string only)
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Auto Reformat on Code Change (string only)">
+        {{
+            components: { PTextEditor, PButton },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-text-editor :code="sampleCode" folded :disable-auto-reformat="disableAutoReformat" class="mb-4" />
+        <p-button @click="handleChangeCode(false)">Change Code & Reformat (default)</p-button>
+        <p-button style-type="highlight" @click="handleChangeCode(true)">Change Code & Do not Reformat Automatically</p-button>
+       <p class="text-red-600 font-bold mt-4">This feature works only when the code prop's type is string</p>
+    </div>
+<!--<div>-->
+    `,
+            setup() {
+                const state = reactive({
+                    sampleCode,
+                    disableAutoReformat: false
+                });
+                const handleChangeCode = (disableAutoReformat) => {
+                    state.disableAutoReformat = disableAutoReformat;
+                    state.sampleCode = JSON.stringify(getJsonObject(), null, 0);
+                };
+                return {
+                    ...toRefs(state),
+                    handleChangeCode,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

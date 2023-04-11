@@ -1,0 +1,187 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PNotificationBar from './PNotificationBar.vue';
+import { faker }  from '@faker-js/faker'
+import { styleTypes } from './config';
+
+<Meta title='Feedbacks/Notification Bar' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8791%3A189001',
+    },
+}} component={PNotificationBar} argTypes={{
+    visible: {
+        name: 'visible',
+        type: {name: 'boolean', required: true},
+        description: 'Switch props for show or hide a notification bar.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    styleType: {
+        name: 'styleType',
+        type: {name: 'string',},
+        description: `Style type of notification bar.<br/>
+                      \`${styleTypes}\` are available.`,
+        defaultValue: 'dark',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `'dark'`
+            },
+        },
+        control: {
+            type: 'select',
+            options: styleTypes
+        }
+    },
+    'v-model': {
+        name: 'v-model',
+        type: {name: 'boolean', required: false},
+        description: 'Two way binding for `visible` props with `update:visible` event.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'model',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: null
+    },
+    default: {
+        name: 'default',
+        description: 'Slot for notification contents',
+        defaultValue: faker.lorem.lines(5),
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    onClose: {
+        name: 'close',
+        description: `Event emitted when the close button is clicked`,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes).filter(d => d !== 'visible'),
+    components: { PNotificationBar, PButton },
+    template: `
+        <div class="w-full h-full">
+            <p-button :style-type="visible ? 'primary' : 'highlight'"
+                      @click="visible = !visible;">
+                {{visible ? 'close' : 'open' }}
+            </p-button>
+            <p-notification-bar v-model="visible"
+                                :style-type="styleType"
+                                class="mt-4 flex-grow"
+                                @close="onClose"
+            >
+                {{$props.default}}
+            </p-notification-bar>
+            <div class="flex items-center justify-center bg-primary3" style="height: 300px;">
+                BODY
+            </div>
+        </div>
+    `,
+    setup() {
+        const state = reactive({
+            visible: true,
+        })
+        return {
+            ...toRefs(state),
+        }
+    }
+});
+
+export const Playground = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PNotificationBar },
+    template: `
+            <p-notification-bar :visible="visible"
+                                class="mt-4 flex-grow"
+                                @close="onClose"
+            >
+                {{$props.default}}
+            </p-notification-bar>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Notification Bar
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="basic">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Contents
+
+<Canvas>
+    <Story name="long contents" args={{
+        default: faker.lorem.lines(30)
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Playground.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

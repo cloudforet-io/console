@@ -1,0 +1,245 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import {i18n} from '@/translations'
+import { getDynamicLayoutSimpleTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/story-helper';
+import { faker }  from '@faker-js/faker'
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/- [Table] Simple Table'
+      argTypes={getDynamicLayoutSimpleTableArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="simple-table"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              timezone,
+                              colCopy,
+                          }"
+                          :fetch-options="{
+                          }"
+                           class="w-full"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+# Simple Table Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | O |
+| markdown | X |
+| search | X |
+| disable_search | X |
+| headers | x |
+| layout | X |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | X |
+| sortDesc | X |
+| pageStart | X |
+| pageLimit | X |
+| searchText | X |
+| queryTags | X |
+
+## Type Options
+
+| Name | Type |
+| ---- | ---- |
+| loading | boolean |
+| timezone | string |
+| colCopy | boolean |
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | X |
+| timezone | O |
+| selectIndex | X |
+| selectable | X |
+| multiSelect | X |
+| invalid | X |
+| colCopy | O |
+| excelVisible | X |
+| settingsVisible | X |
+| keyItemSets | X |
+| valueHandlerMap | X |
+| language | X |
+| popupVisible | X |
+
+
+## Supported Events
+
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | X |
+| select | X |
+| export | X |
+| click-settings | X |
+| update-popup-visible | X |
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground"  args={{
+        options: {
+            root_path: 'data.security_groups.security_group_rules',
+            fields: [
+                {
+                    name: 'Security Group Name',
+                    key: 'security_group_name',
+                    type: 'text',
+                },
+                {
+                    name: 'Security Group ID',
+                    type: 'text',
+                    reference: {
+                        resource_type: 'inventory.CloudService',
+                        reference_key: 'reference.resource_id',
+                    },
+                    key: 'security_group_id',
+                },
+                {
+                    type: 'enum',
+                    key: 'direction',
+                    name: 'Direction',
+                    options: {
+                        egress: {
+                            options: {
+                                background_color: 'indigo.500',
+                            },
+                            type: 'badge',
+                        },
+                        ingress: {
+                            type: 'badge',
+                            options: {
+                                background_color: 'coral.600',
+                            },
+                        },
+                    },
+                },
+                {
+                    type: 'text',
+                    name: 'Type',
+                    key: 'ethertype',
+                },
+                {
+                    name: 'Start',
+                    type: 'text',
+                    key: 'port_range_min',
+                },
+                {
+                    name: 'End',
+                    type: 'text',
+                    key: 'port_range_max',
+                },
+                {
+                    name: 'Protocol',
+                    key: 'protocol',
+                    type: 'enum',
+                    options: {
+                        udp: {
+                            options: {
+                                background_color: 'peacock.500',
+                            },
+                            type: 'badge',
+                        },
+                        icmp: {
+                            options: {
+                                background_color: 'green.500',
+                            },
+                            type: 'badge',
+                        },
+                        tcp: {
+                            type: 'badge',
+                            options: {
+                                background_color: 'indigo.500',
+                            },
+                        },
+                        all: {
+                            options: {
+                                background_color: 'coral.600',
+                            },
+                            type: 'badge',
+                        },
+                    },
+                },
+                {
+                    type: 'text',
+                    name: 'Remote',
+                    key: 'remote_ip_prefix',
+                },
+                {
+                    key: 'created_at',
+                    name: 'Created',
+                    type: 'datetime',
+                },
+            ],
+        },
+        data: {
+            data: {
+                id: faker.datatype.uuid(),
+                name: faker.lorem.sentence(2),
+                security_groups: [
+                    {
+                        security_group_rules: Array.from(Array(10).keys()).map(() => ({
+                            direction: 'ingress',
+                            port_range_min: 1,
+                            created_at: '2021-06-30T04:33:40.000000+0000',
+                            security_group_id: faker.datatype.uuid(),
+                            protocol: 'tcp',
+                            id: faker.datatype.uuid(),
+                            ethertype: 'IPv4',
+                            remote_ip_prefix: '0.0.0.0/0',
+                            security_group_name: 'default',
+                            port_range_max: 65535,
+                            external_link: null,
+                            region_name: null,
+                        })),
+                        name: 'default',
+                        description: 'Default security group',
+                        created_at: '2021-06-28T06:33:28.000000+0000',
+                        external_link: null,
+                        updated_at: '2021-06-30T06:07:53.000000+0000',
+                        id: faker.datatype.uuid(),
+                        tenant_id: faker.datatype.uuid(),
+                        region_name: 'RegionOne',
+                        project_id: faker.datatype.uuid(),
+                    },
+                ],
+            },
+        },
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>

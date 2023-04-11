@@ -1,0 +1,237 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PCheckbox from './PCheckbox.vue';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Checkbox' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064'
+    }
+}} argTypes={getCheckboxArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PCheckbox },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-checkbox :value="value"
+                        v-model="proxySelected"
+                        :disabled="disabled"
+                        :predicate="predicate"
+                        :invalid="invalid"
+                        @change="onChange"
+            >
+                <span v-html="defaultSlot" />
+                <template #icon>
+                    <span v-if="iconSlot" v-html="iconSlot"/>
+                </template>
+            </p-checkbox>
+        </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Checkbox
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PCheckbox },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-checkbox v-for="value in values" v-model="selected" :value="value" :key="value">
+                    This is checkbox for {{value}}
+                </p-checkbox>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: [],
+                    values: [0, 1, 2, 3]
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Simple Boolean
+
+<Canvas>
+    <Story name="Simple Boolean">
+        {{
+            components: { PCheckbox },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-checkbox v-model="selected">
+                    simple boolean checkbox
+                </p-checkbox>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: false,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled">
+        {{
+            components: { PCheckbox },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-checkbox v-model="notSelected" disabled>
+                    you can't select disabled checkbox.
+                </p-checkbox>
+                <p-checkbox v-model="selected" disabled>
+                    checked disabled
+                </p-checkbox>
+            </div>
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    notSelected: false,
+                    selected: true,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PCheckbox },
+            template: `
+         <div>
+            <div class="flex flex-col mb-8">
+                <p class="mb-4">At least, one item must be selected.</p>
+                <p-checkbox v-for="value in values" :key="value"
+                            v-model="selected"
+                            :value="value"
+                            :invalid="selected.length === 0"
+>
+                    {{value}}
+                </p-checkbox>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: [],
+                    values: [0, 1, 2, 3]
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Advanced
+
+<Canvas>
+    <Story name="Advanced">
+        {{
+            components: { PCheckbox },
+            template: `
+         <div>
+            <div class="flex flex-col mb-8">
+                <p-checkbox v-for="value in values" :key="value.key"
+                            v-model="selected"
+                            :value="value"
+                            :predicate="predicate"
+>
+                    {{value.name}}
+                </p-checkbox>
+            </div>
+            selected : <pre>{{selected}}</pre>
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: [],
+                    values: [
+                        {key: 'hello', name: 'Hello'},
+                        {key: 'world', name: 'World!'},
+                        {key: 'spaceone', name: 'SpaceONE'},
+                    ]
+                })
+                const predicate = (value, current) => {
+                    return value.key === current.key
+                }
+                return {
+                    ...toRefs(state),
+                    predicate
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

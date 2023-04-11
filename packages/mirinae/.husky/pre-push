@@ -1,0 +1,9 @@
+##!/bin/sh
+#. "$(dirname "$0")/_/husky.sh"
+#
+#if [ "$SKIP_PRE_PUSH" -eq 1 ]
+#then
+#  echo "Skip pre-push hook"
+#else
+#  npx lint-staged
+#fi

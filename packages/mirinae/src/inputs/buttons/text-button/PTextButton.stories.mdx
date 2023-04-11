@@ -1,0 +1,179 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
+import { TEXT_BUTTON_STYLE, TEXT_BUTTON_SIZE } from '@/inputs/buttons/text-button/type';
+import { getTextButtonArgTypes } from '@/inputs/buttons/text-button/story-helper';
+import { reactive, toRefs } from 'vue';
+
+<Meta title='Inputs/Buttons/Text Button' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=5023%3A360207'
+    }
+}} component={PTextButton} argTypes={getTextButtonArgTypes()}/>
+
+export const Template = (args, {argTypes})=>({
+    props: Object.keys(argTypes),
+    components: {PTextButton},
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <p-text-button
+                @click="handleClick"
+                :styleType="styleType"
+                :size="size"
+                :disabled="disabled"
+                :loading="loading"
+                :icon-left="iconLeft"
+                :icon-right="iconRight"
+                :readonly="readonly"
+            >
+                {{$props.default}}
+            </p-text-button>
+        </div>`
+})
+
+# Text Button
+
+<br/>
+<br/>
+<br/>
+
+## Sizes
+<Canvas>
+    <Story name='Sizes'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; background-color: white">
+                    <p-text-button v-for="size in buttonSizes" style-type="default" style="margin-right: 20px" :size="size">
+                        {{ size }}
+                    </p-text-button>
+                </div>`,
+            setup() {
+                const state = reactive({
+                    buttonSizes: Object.values(TEXT_BUTTON_SIZE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## With Icon
+<Canvas>
+    <Story name='With Icon'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div>
+                    <div style="display:flex; align-items:center; justify-content:center; background-color: white">
+                        <p-text-button v-for="size in buttonSizes" style-type="default" style="margin-right: 20px" :size="size" icon-left="ic_plus_bold">
+                            {{ size }}
+                        </p-text-button>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                        <p-text-button v-for="size in buttonSizes" style-type="default" style="margin-right: 20px" :size="size" icon-right="ic_plus_bold">
+                            {{ size }}
+                        </p-text-button>
+                    </div>
+                </div>
+`,
+            setup() {
+                const state = reactive({
+                    buttonSizes: Object.values(TEXT_BUTTON_SIZE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Style Types
+<Canvas>
+    <Story name='Style Types'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div style="display: flex; align-items: center; justify-content: center">
+                    <p-text-button style-type="default">
+                        default
+                    </p-text-button>
+                    <p-text-button style-type="highlight">
+                        highlight
+                    </p-text-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Loading
+<Canvas>
+    <Story name='Loading'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-text-button :loading="true">
+                        button
+                    </p-text-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Readonly & Disabled
+<Canvas>
+    <Story name='Readonly & Disabled'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div class="flex flex-col">
+                    <div class="py-4">
+                        <p class="mb-3 font-bold">default style type: </p>
+                        <div class="flex items-center gap-4">
+                            <p-text-button>
+                                normal
+                            </p-text-button>
+                            <p-text-button disabled>
+                                disabled
+                            </p-text-button>
+                            <p-text-button readonly>
+                                readonly
+                            </p-text-button>
+                        </div>
+                    </div>
+                    <div class="py-4">
+                        <p class="mb-3 font-bold">highlight style type: </p>
+                       <div class="flex items-center gap-4">
+                           <p-text-button style-type="highlight">
+                               normal
+                           </p-text-button>
+                           <p-text-button disabled style-type="highlight">
+                               disabled
+                           </p-text-button>
+                           <p-text-button readonly style-type="highlight">
+                               readonly
+                           </p-text-button>
+                        </div>
+                    </div>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />
+

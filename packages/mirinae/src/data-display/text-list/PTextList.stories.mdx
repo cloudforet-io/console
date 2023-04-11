@@ -1,0 +1,72 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PTextList from './PTextList.vue';
+import { getTextListArgTypes } from '@/data-display/text-list/story-helper';
+import { ref } from 'vue';
+import { faker } from '@faker-js/faker';
+
+
+<Meta title='Data Display/Text List' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} component={PTextList} argTypes={getTextListArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextList },
+    template: `
+        <PTextList
+            :items="items"
+            :delimiter="delimiter"
+            :sub-key="subKey"
+            :link="link"
+            :link-target="linkTarget"
+        />
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Text List
+
+<br/>
+<br/>
+
+## Object Array
+<Canvas>
+    <Story name="Object Array">
+        {{
+            components: { PTextList },
+            template: `
+                <PTextList :items="items" />
+    `,
+            setup() {
+                const items = ref(faker.datatype.array(10).map(() => ({
+                    name: faker.name.firstName(),
+                    phone: faker.phone.number(),
+                    group: faker.helpers.arrayElement([undefined, faker.random.word()]),
+                })));
+                return {
+                    items,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

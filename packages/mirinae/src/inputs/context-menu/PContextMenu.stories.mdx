@@ -1,0 +1,674 @@
+import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs, watch } from 'vue';
+import {debounce} from "lodash";
+import { faker } from '@faker-js/faker';
+
+import PContextMenu from './PContextMenu.vue';
+import PEmpty from '@/data-display/empty/PEmpty';
+import PI from '@/foundation/icons/PI.vue';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+import PButton from "@/inputs/buttons/button/PButton.vue";
+import PTextEditor from "@/inputs/text-editor/PTextEditor";
+import {getTextHighlightRegex} from "@/utils/helpers";
+
+import {contextMenuSlots, getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
+import {menuItems, longMenuItems, getContextMenuItems} from '@/inputs/context-menu/mock';
+
+
+<Meta title='Inputs/Context Menu' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133521'
+    }
+}} argTypes={getContextMenuArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PContextMenu },
+    template: `
+    <div class="h-full overflow p-8">
+        <p-context-menu
+            :menu="menu"
+            :loading="loading"
+            :selected="selected"
+            :multi-selectable="multiSelectable"
+            :show-select-marker="showSelectMarker"
+            :item-height-fixed="itemHeightFixed"
+            :highlight-term="highlightTerm"
+            :no-select-indication="noSelectIndication"
+            :show-select-header="showSelectHeader"
+            :show-clear-selection="showClearSelection"
+            :readonly="readonly"
+        />
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Context Menu
+<br/>
+<br/>
+
+## Menu Item Properties
+
+Context Menu's `menu` props is an `array` of `MenuItem`.
+`MenuItem` is an `object` that includes following properties:
+
+<br/>
+
+|Properties|Description|Type|
+|-|-|-|
+|name|The key of the corresponding item. must be UNIQUE.|`string`|
+|label|Value to be displayed|`string`|
+|type|The type of item |`['divider', 'header', 'item', 'button', 'showMore']`|
+|disabled|Whether to disable the selection|`boolean`|
+|link|A value given when it is necessary to move to a specific link when pressed. In this case, the corresponding item is displayed as a tag.|`string`|
+|target|When the link property is assigned to the corresponding item, it is bound to the a tag attribute together. |`string`|
+|icon|An icon name that will be displayed on left side of the button. (It only works with button and item type.)|`string`|
+|imageUrl|An image url that will be displayed on left side of the context menu item. (It only works with item type.)|`string`|
+
+<br/>
+
+### Item Types
+
+Each `MenuItem` has the following type to represent it:
+
+<br/>
+
+|Type|Description|
+|-|-|
+|item|Default type. Selectable and Focusable. If no value is given to the type property of `MenuItem`, it is regarded as this type.|
+|divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties.|
+|header|Use it when you want to group items among related items and display the category of items. Not selectable, Not focusable.|
+|button|Button. Useful with icon property. 'click-button' event will be emitted when the button is clicked.|
+|showMore|Show more button. 'click-show-more' event will be emitted when the button is clicked.|
+
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu"/>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas>
+    <Story name="Loading" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" loading />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## No Data
+
+<Canvas>
+    <Story name="No Data" args={{menu: menuItems}} height={'4rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="[]" />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multi Selectable & Show Select Marker
+
+<Canvas>
+    <Story name=" Multi Selectable & Show Select Marker" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div>
+            <p class="text-label-lg font-bold mb-3">Single select without marker</p>
+            <p-context-menu :menu="menu" :selected.sync="singleSelected"/>
+            <br/>
+            <p class="text-label-lg font-bold mb-3">Single select with marker</p>
+            <p-context-menu :menu="menu" :selected.sync="singleSelected" show-select-marker />
+            <br/>
+            <p class="text-label-lg font-bold mb-3">Mutli select without marker</p>
+            <p-context-menu :menu="menu" :selected.sync="multiSelected" multi-selectable />
+            <br/>
+            <p class="text-label-lg font-bold mb-3">Mutli select with marker</p>
+            <p-context-menu :menu="menu" :selected.sync="multiSelected" multi-selectable show-select-marker />
+            <br/>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    singleSelected: [],
+                    multiSelected: [],
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Slots
+
+<Description markdown={`
+Context Menu have the slots below: \n
+|Slot|Description|
+|-|-|
+${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join('\n')}
+`}/>
+
+<br/>
+
+
+### No Data Slot
+
+<Canvas>
+    <Story name="No Data Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PEmpty, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>no-data-format</strong> slot</h2>
+                <p-context-menu :menu="[]">
+                    <template #no-data-format>No Data</template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Menu Slot
+
+<Canvas>
+    <Story name="Menu Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>menu</strong> slot</h2>
+                <p-context-menu :menu="menu">
+                    <template #menu="{menu}">
+                        <template v-for="(m, i) in menu">
+                            <div v-if="m.type === undefined || m.type === 'item'" :key="i"
+                                 class="border-b border-blue-200 py-1 text-center text-xs"
+                            >
+                                {{m.label}}
+                            </div>
+                        </template>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #menu="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Item Slots
+
+<Canvas>
+    <Story name="Item Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PI, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>item--format</strong> slot</h2>
+                <p-context-menu :menu="menu">
+                    <template #item--format="{item}">
+                        <div>
+                            <p-i name="ic_favorite-filled" width="1rem" height="1rem" />
+                            {{item.label}}
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">The last item's Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #item--format="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+### Header Slots
+
+<Canvas>
+    <Story name="Header Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PI, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>header-{item.name}</strong> slot</h2>
+                <p-context-menu :menu="menu">
+                    <template #header-others="{item}">
+                        <div>
+                            <p-i name="ic_favorite-filled" width="1rem" height="1rem" />
+                            This is custom header for <strong>{{item.label}}</strong>
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+        <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #header-others="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Bottom Slot
+
+<Canvas>
+    <Story name="Bottom Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <p-context-menu :menu="menu">
+                    <template #bottom><div class="border border-coral-300">This is bottom slot.</div></template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Search Slots
+
+<Canvas>
+    <Story name="Search Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PEmpty, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>search slots</strong></h2>
+                <p-context-menu :menu="menu" searchable>
+                    <template #search-left>
+                        <div class="p-1 bg-peacock-100 text-peacock-600">Left</div>
+                    </template>
+                    <template #search-default>
+                         <div class="p-1 bg-coral-100 w-full text-coral-600"><input v-model="searchText"/></div>
+                    </template>
+                    <template #search-right>
+                        <div class="p-1 bg-yellow-100 text-yellow-700">Right</div>
+                    </template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    searchText: 'Default'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Items Height Fixed
+
+<Canvas>
+    <Story name="Items Height Fixed" args={{menu: longMenuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" item-height-fixed/>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Highlight Term & Item Text List Slot
+
+<Canvas>
+    <Story name="Highlight Term & Item Text List Slot" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PTextEditor },
+            template: `
+        <div>
+            <p class="text-lg my-4">highlight term: 'o'</p>
+            <p-context-menu :menu="menu" highlight-term="o"/>
+            <p class="text-lg my-4">item-text-list slot case of having highlight term: 'o'</p>
+            <p-context-menu :menu="menu" highlight-term="o">
+                <template #item-text-list="{text, matched}">
+                    <span :class="matched ? 'text-peacock-700' : 'text-peacock-500'">{{text}}</span>
+                </template>
+            </p-context-menu>
+            <p class="text-lg my-4">The last item's <strong>Slot Props</strong> for <strong>item-text-list</strong> slot with highlight term: 'o'</p>
+            <p-text-editor v-if="slotPropsText" read-only :code="slotPropsText" folded style="font-size: 12px;" />
+            <p-context-menu v-show="false" :menu="menu" highlight-term="o">
+                <template #item-text-list="slotProps">
+                    <pre ref="slotPropsRef">{{slotProps}}</pre>
+                </template>
+            </p-context-menu>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Selection Header
+
+It works only in multi select case.
+
+<Canvas>
+    <Story name="Show Selection Header" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" show-select-header multi-selectable />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Show Clear Selection
+
+It works only in multi select case.
+
+<Canvas>
+    <Story name="Show Clear Selection" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" show-clear-selection multi-selectable show-select-marker />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show More
+
+<Canvas>
+    <Story name="Show More" height={'18rem'}>
+        {{
+            components: { PContextMenu, PButton, PToggleButton},
+            template: `
+<div>
+    <div class="mb-4 flex gap-4 items-center">
+        <p-button style-type="secondary" @click="handleClickReset" >Reset</p-button>
+        <div>
+            Next items exist: <p-toggle-button :value="hasMore" @change-toggle="hasMore = !hasMore"/>
+        </div>
+    </div>
+    <p-context-menu :menu="menu" show-clear-selection multi-selectable show-select-marker
+        :loading="loading"
+        @click-show-more="handleClickShowMore"
+    />
+</div>
+`,
+    setup() {
+        const headerItem = {type: 'header', label: 'Names', name: 'names-header'};
+        const showMoreItem = {type: 'showMore', name: 'show-more'};
+        const state = reactive({
+            menu: [headerItem, ...getContextMenuItems(), showMoreItem],
+            loading: false,
+            hasMore: true
+        });
+        const handleClickReset = () => {
+         state.menu = [headerItem, ...getContextMenuItems(), showMoreItem]
+        }
+        const handleClickShowMore = async () => {
+            state.loading = true;
+            state.menu = await new Promise(resolve => {
+                setTimeout(() => {
+                    let items = state.menu;
+                    // remove show more item
+                    items.pop();
+                    // add menu items
+                    items = items.concat(getContextMenuItems());
+                    // append show more item if next items exist
+                    if (state.hasMore) items.push(showMoreItem);
+                    resolve(items)
+                }, 1000)
+            })
+            state.loading = false;
+        }
+        return {
+            ...toRefs(state),
+            handleClickReset,
+            handleClickShowMore
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Searchable
+
+<Canvas>
+    <Story name="Searchable" height={'18rem'}>
+        {{
+            components: { PContextMenu},
+            template: `
+<div>
+    <div class="my-2"><span class="font-bold">searchText:</span> {{searchText}}</div>
+    <p-context-menu :menu="menu"
+        searchable
+        :search-text.sync="searchText"
+        :loading="loading"
+        @update:search-text="handleUpdateSearchInput"
+    />
+</div>
+`,
+            setup() {
+                const headerItem = {type: 'header', label: 'Names', name: 'names-header'};
+                const allItems = [headerItem, ...getContextMenuItems()]
+                const state = reactive({
+                    menu: allItems,
+                    loading: false,
+                    searchText: 'a'
+                });
+                const handleUpdateSearchInput = async (value) => {
+                    state.loading = true;
+                    state.menu = await new Promise(resolve => {
+                        setTimeout(() => {
+                            const regex = getTextHighlightRegex(value);
+                            resolve(allItems.filter(item => {
+                                // check only item type
+                                if (!item.type || item.type === 'item') return regex.test(item.label)
+                                return true;
+                            }))
+                        }, 200)
+                    })
+                    state.loading = false;
+                }
+                return {
+                    ...toRefs(state),
+                    handleUpdateSearchInput
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Readonly
+
+<Canvas>
+    <Story name="Readonly" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" readonly show-clear-selection multi-selectable show-select-marker />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height={'18rem'} args={{menu: menuItems}}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

@@ -1,0 +1,251 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from './PDynamicLayout.vue';
+import {i18n} from '@/translations'
+import { getDynamicLayoutArgTypes } from './story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/0. Documentation'
+      argTypes={getDynamicLayoutArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+            <p-dynamic-layout :name="name" :type="type"
+                              :options="options"
+                              :data="data"
+                              :type-options="{
+                                  loading,
+                                  totalCount,
+                                  timezone,
+                                  selectIndex,
+                                  selectable,
+                                  multiSelect,
+                                  invalid,
+                                  colCopy,
+                                  excelVisible,
+                                  settingsVisible,
+                                  keyItemSets,
+                                  valueHandlerMap,
+                                  language,
+                                  popupVisible,
+                              }"
+                              :fetch-options="{
+                                  sortBy,
+                                  sortDesc,
+                                  pageStart,
+                                  pageLimit,
+                                  queryTags,
+                                  searchText
+                              }"
+                              class="w-full"
+                              @fetch="onFetch"
+                              @select="onSelect"
+                              @export="onExport"
+                              @click-settings="onClickSettings"
+                              @click-row="onClickRow"
+                              @update-popup-visible="onUpdatePopupVisible"
+            >
+            </p-dynamic-layout>
+    `,
+});
+
+
+# Dynamic Layout
+<br/>
+<br/>
+
+## Supported Types
+
+| Type | Description |
+| ---- | ----------- |
+| item | key / value |
+| simple-table | table without search and pagination |
+| table | table view (keyword search) |
+| raw-table | table view with .csv data (keyword search) |
+| query-search-table | table view (query search) |
+| raw | - |
+| markdown | - |
+| html | - |
+| popup | modal view |
+| list | list(<dynamic_layout>) |
+
+<br/>
+<br/>
+
+
+## Options by Types
+| Type | Options Properties |
+| ---- | ----------- |
+| item | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| simple-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| raw-table | ```root_path?: string translation_id?: string``` |
+| query-search-table | ```root_path?: string, translation_id?: string, fields: DynamicField[], search: SearchSchema``` |
+| raw | ```root_path?: string translation_id?: string``` |
+| markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
+| html | ```root_path?: string, translation_id?: string``` |
+| popup | ```sub_key?: string, layout?: DynamicLayout``` |
+| list | ```root_path?: string, layouts: DynamicLayout[]``` |
+
+
+
+## Fetch Options by Types
+| Type | Fetch Options Properties |
+| ---- | ----------- |
+| item | - |
+| simple-table | - |
+| table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
+| raw-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
+| query-search-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```queryTags``` |
+| raw | - |
+| markdown | - |
+| html | - |
+| popup | - |
+| list | The fetch options required for all layouts in the list are applied collectively. |
+
+<br/>
+<br/>
+
+```typescript
+interface DynamicLayoutFetchOptions {
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    searchText?: string;
+}
+```
+
+## Components by Types
+Each type of dynamic layout corresponds to each component as the table below.<br/>
+
+| Type | Component |
+| ---- | ----------- |
+| item | DefinitionTable |
+| simple-table | DataTable |
+| table | ToolboxTable |
+| raw-table | ToolboxTable |
+| query-search-table | ToolboxTable |
+| raw | Raw |
+| markdown | Markdown |
+| html | - |
+| popup | ButtonModal |
+| list | - |
+
+<br/>
+<br/>
+
+## TypeOptions by Types
+| Type | Type Options Properties |
+| ---- | ----------- |
+| item | ```loading```, ```timezone``` |
+| simple-table | ```loading```, ```timezone```, ```colCopy``` |
+| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```,  ```excelVisible```, ```settingsVisible``` |
+| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible```  |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible``` , ```keyItemSets```, ```valueHandlerMap``` |
+| raw | ```loading``` |
+| markdown | ```language``` |
+| html | - |
+| popup | ```popupVisible``` |
+| list | all |
+
+<br/>
+<br/>
+
+## Type Options Description
+| Name | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| loading | boolean | ```false``` | Displays loading spinner. |
+| totalCount | number | ```0``` | Calculate pagination, displaying count next to the title. |
+| timezone | string |```'UTC'``` | Display datetime. |
+| selectIndex | number[] |```[]``` | Initiate selectIndex of tables. Works only when 'selectable' is ```true```. |
+| selectable | boolean | ```false``` | Make tables selectable. |
+| multiSelect | boolean | ```true``` | Make tables multi-selectable. Works only when 'selectable' is ```true```. |
+| invalid | boolean | ```false``` | Display invalid style. |
+| colCopy | boolean | ```false``` | Determine whether to each column copiable or not. |
+| excelVisible | boolean | ```false``` | Determine whether to show export button or not. |
+| settingsVisible | boolean | ```false``` | Determine whether to show settings button or not. |
+| keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
+| valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
+| language | string | ```'en'``` | NOT supported yet except markdown type. |
+| popupVisible | boolean | ```false``` | Determine whether to show popup modal or not. Supported only for `popup` type. |
+
+```typescript
+interface DynamicLayoutTypeOptions {
+    loading?: boolean;
+    totalCount?: number;
+    timezone?: string;
+    selectIndex?: number[];
+    selectable?: boolean;
+    colCopy?: boolean;
+    multiSelect?: boolean;
+    invalid?: boolean;
+    excelVisible?: boolean;
+    settingsVisible?: boolean;
+    keyItemSets?: KeyItemSet[];
+    valueHandlerMap?: ValueHandlerMap;
+    language?: string;
+    popupVisible?: boolean;
+}
+```
+
+
+## Event Description
+| Event Name | Description |
+| ---------- | ----------- |
+| fetch | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
+| select | Emitted when row(item) has been selected. |
+| export | Emitted when clicked export button. |
+| click-settings | Emitted when clicked settings button. |
+| click-row | Emitted when clicked row. |
+| update-popup-visible | Emitted when popupVisible typeOptions is updated. |
+
+<br/>
+<br/>
+
+## Event Handlers and Event Parameters
+
+```typescript
+interface DynamicLayoutEventListeners {
+    fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-row': (selectIndex: number[]) => void|Promise<void>;
+    'update-popup-visible': (popupVisible?: boolean) => void|Promise<void>;
+}
+```
+
+| Event Parameter Name | Description |
+| ---------- | ----------- |
+| options | All layout fetch options. Different by layout types. |
+| selectIndex | Selected row(item) indexes. |
+| layoutName | Name props. Only provided when layout type is 'list'. |
+| layoutIndex | Layout index. Only provided when layout type is 'list'. |
+| popupVisible | Is popup visible or not. |
+
+<br/>
+<br/>
+
+## Supported Events by Types
+| Type | Type Options Properties |
+| ---- | ----------- |
+| item | - |
+| simple-table | - |
+| table | fetch, select, export |
+| raw-table | fetch, select, export |
+| query-search-table | fetch, select, export, click-row, click-settings |
+| raw | - |
+| markdown | - |
+| html | - |
+| popup | update-popup-visible |
+| list | fetch, select, export |
+
+<br/>
+<br/>
+
+
+<ArgsTable story="Playground" />

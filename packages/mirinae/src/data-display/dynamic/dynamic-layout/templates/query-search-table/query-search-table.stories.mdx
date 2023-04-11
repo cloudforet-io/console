@@ -1,0 +1,232 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import {i18n} from '@/translations'
+import { reactive, toRefs } from 'vue';
+import { faker }  from '@faker-js/faker'
+import {range} from 'lodash'
+import { getDynamicLayoutQuerySearchTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/- [Table] Query Search Table'
+      argTypes={getDynamicLayoutQuerySearchTableArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="query-search-table"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              totalCount,
+                              timezone,
+                              selectIndex,
+                              selectable,
+                              multiSelect,
+                              invalid,
+                              colCopy,
+                              excelVisible,
+                              settingsVisible,
+                              keyItemSets,
+                              valueHandlerMap
+                          }"
+                          :fetch-options="{
+                              sortBy,
+                              sortDesc,
+                              pageStart,
+                              pageLimit,
+                              queryTags
+                          }"
+                           style="max-height: inherit; width: 90%;"
+                            @fetch="onFetch"
+                            @select="onSelect"
+                            @export="onExport"
+                            @click-settings="onClickSettings"
+                            @click-row="onClickRow"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Query Search Table Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | O |
+| markdown | X |
+| search | O |
+| disable_search | O |
+| headers | x |
+| layout | X |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | O |
+| sortDesc | O |
+| pageStart | O |
+| pageLimit | O |
+| searchText | X |
+| queryTags | O |
+
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | O |
+| timezone | O |
+| selectIndex | O |
+| selectable | O |
+| multiSelect | O |
+| invalid | O |
+| colCopy | O |
+| excelVisible | O |
+| settingsVisible | O |
+| keyItemSets | O |
+| valueHandlerMap | O |
+| language | O |
+| popupVisible | X |
+
+
+## Supported Events
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | O |
+| select | O |
+| export | O |
+| click-settings | O |
+| click-row | O |
+| update-popup-visible | X |
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+    <p-dynamic-layout
+        type="query-search-table"
+        :options="options"
+        :data="data"
+        :type-options="typeOptions"
+        :fetch-options="{}"
+        style="max-height: inherit; width: 90%;"
+        @fetch="fetchData"
+        >
+    </p-dynamic-layout>
+    `,
+    setup() {
+        const state = reactive({
+            typeOptions: {
+                loading: true,
+                totalCount: 0
+            },
+            options: {
+                fields: [{
+                    name: 'Instance ID',
+                    key: 'server_id',
+                }, {
+                    name: 'Region',
+                    key: 'data.compute.region',
+                }, {
+                    name: 'Changed Jobs',
+                    key: 'data.collection_info.change_history.job_id',
+                }, {
+                    name: 'Instance State',
+                    key: 'data.compute.instance_state',
+                    type: 'enum',
+                    options: {
+                        ACTIVE: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_check',
+                                    color: 'green.500',
+                                },
+                            },
+                        },
+                        DISCONNECTED: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_plug-filled',
+                                },
+                            },
+                        },
+                    },
+                }],
+            },
+            data: null
+        })
+        const fetchData = async (options = {}) => {
+            state.typeOptions.loading = true;
+            state.data = await new Promise((resolve) => {
+                setTimeout(() => {
+                    state.typeOptions.totalCount = faker.datatype.number({ min: 0 });
+                    resolve(range(options.pageLimit || 15)
+                        .map(d => ({
+                            // eslint-disable-next-line camelcase
+                            server_id: faker.datatype.uuid(),
+                            data: {
+                                compute: {
+                                    region: faker.random.word(),
+                                    // eslint-disable-next-line camelcase
+                                    instance_state: faker.helpers.arrayElements(['ACTIVE', 'DISCONNECTED']),
+                                },
+                                collection_info: {
+                                    change_history: range(faker.datatype.number({ min: 0, max: 10 })).map(d => ({job_id: faker.datatype.uuid()}))
+                                }
+                            },
+                        })))
+                }, 1000);
+            });
+            state.typeOptions.loading = false;
+        };
+        fetchData();
+        return {
+            ...toRefs(state),
+            fetchData,
+        }
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+

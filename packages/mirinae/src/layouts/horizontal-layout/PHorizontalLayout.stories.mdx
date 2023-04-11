@@ -1,0 +1,82 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PHorizontalLayout from '@/layouts/horizontal-layout/PHorizontalLayout.vue';
+import {
+    getHorizontalLayoutArgTypes
+} from '@/layouts/horizontal-layout/story-helper';
+
+
+<Meta title='Layouts/Horizontal Layout' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228226&t=GVsFwo5txLv6VtoA-4'
+    }
+}} argTypes={getHorizontalLayoutArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: {
+        PHorizontalLayout
+    },
+    template: `
+        <p-horizontal-layout
+            :height="height"
+            :min-height="minHeight"
+            :max-height="maxHeight"
+            class="h-50 w-50"
+        >
+            <template #container="{ height }">
+                <div :style="{height: height + 'px'}"
+                     class="flex justify-center items-center bg-primary2 text-white font-bold text-lg"
+                >
+                    <span>This is contents</span>
+                </div>
+            </template>
+        </p-horizontal-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Horizontal Layout
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: {
+                PHorizontalLayout
+            },
+            template: `
+                <p-horizontal-layout class="h-50 w-50">
+                    <template #container="{ height }">
+                        <div :style="{height: height + 'px'}"
+                             class="flex justify-center items-center bg-primary2 text-white font-bold text-lg"
+                        >
+                            <span>This is contents</span>
+                        </div>
+                    </template>
+                </p-horizontal-layout>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

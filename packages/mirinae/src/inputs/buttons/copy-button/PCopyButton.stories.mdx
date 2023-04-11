@@ -1,0 +1,149 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+
+import { copyAnyData } from '@/utils/helpers';
+
+import PTextarea from '@/inputs/textarea/PTextarea';
+import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
+import { getCopyButtonArgTypes } from '@/inputs/buttons/copy-button/story-helper'; import {
+    SIZE
+} from "@/inputs/buttons/copy-button/type";
+import {reactive, toRefs} from "vue";
+
+
+
+<Meta title='Inputs/Buttons/Copy Button' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235'
+    }
+}} argTypes={getCopyButtonArgTypes()}/>
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    components: { PCopyButton },
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <p-copy-button
+                :value="value"
+                :size="size"
+                :auto-hide-icon="autoHideIcon"
+                :copy-manually="copyManually"
+                @copy="onCopy"
+                @copied="onCopied"
+            >
+                {{ defaultSlot }}
+            </p-copy-button>
+        </div>`,
+});
+
+# Copy Button
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+    components: { PCopyButton },
+    template: `
+    <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+        <p-copy-button>
+            Hello, World!
+        </p-copy-button>
+    </div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+
+<Canvas>
+    <Story name="Size">
+        {{
+            components: { PCopyButton },
+            template: `
+    <div style="display:flex; align-items:center; height:150px; column-gap: 10px;">
+        <p-copy-button v-for="size in sizes" :size="size" >
+            Hello, World!
+        </p-copy-button>
+    </div>`,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Auto Hide Icon
+
+<Canvas>
+    <Story name="Auto Hide Icon">
+        {{
+            components: { PCopyButton },
+            template: `
+    <div style="height:150px;">
+        <p class="mb-4 text-xl">Has text to copy:
+            <p-copy-button auto-hide-icon>
+                Hello, World!
+            </p-copy-button>
+        </p>
+        <p class="my-4 text-xl">Has NO text to copy:
+            <p-copy-button auto-hide-icon></p-copy-button>
+        </p>
+    </div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Copy Manually
+
+<Canvas>
+    <Story name="Copy Manually">
+        {{
+            components: { PCopyButton, PTextarea },
+            template: `
+    <div style="height:150px;">
+        <p class="mb-4 text-xl">Check copied text.</p>
+        <p-textarea class="mb-4" />
+        <p-copy-button copy-manually @copy="onCopy">Hello, World!</p-copy-button>
+    </div>`,
+            setup() {
+                return {
+                    onCopy() {
+                        copyAnyData('This is copied text!')
+                    }
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />

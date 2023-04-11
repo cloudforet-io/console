@@ -1,0 +1,216 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {
+    reactive, toRefs
+} from 'vue';
+import { range } from 'lodash'
+import { getSelectButtonArgTypes } from '@/inputs/select-button/story-helper';
+import PSelectButton from './PSelectButton.vue';
+import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Select Button' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13512%3A300523'
+    }
+}} argTypes={getSelectButtonArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PSelectButton },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-button :value="value"
+            v-model="proxySelected"
+            :predicate="predicate"
+            :multi-selectable="multiSelectable"
+            :style-type="styleType"
+            @change="onChange"
+        >
+            <span v-if="defaultSlot" v-html="defaultSlot" />
+        </p-select-button>
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Select Button
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PSelectButton },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-button v-for="value in values" :key="value"
+            :value="value"
+            v-model="selected"
+            class="mr-2"
+        >
+            {{value}}
+        </p-select-button>
+    </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    selected: undefined,
+                    values: range(8),
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multi Select
+
+<Canvas>
+    <Story name="Multi Select">
+        {{
+            components: { PSelectButton },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-button v-for="value in values" :key="value"
+            multi-selectable
+            :value="value"
+            v-model="selected"
+            class="mr-2"
+        >
+            {{value}}
+        </p-select-button>
+    </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    selected: [],
+                    values: range(8),
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Style Types & Sizes
+
+<Canvas>
+    <Story name=" Style Types & Sizes">
+        {{
+            components: { PSelectButton },
+            template: `
+    <div class="w-full overflow p-8">
+        <div v-for="size in sizes" :key="size" class="flex flex-wrap mb-8">
+            <h2 class="mb-4 text-xl font-bold">Size: {{size}}</h2>
+            <div v-for="styleType in styleTypes" :key="styleType" class="w-full flex flex-wrap mb-4">
+                <h2 class="mr-2">{{styleType}}</h2>
+                <p-select-button v-for="value in values" :key="value"
+                        :size="size"
+                        :style-type="styleType"
+                        :value="value"
+                        v-model="selected"
+                        class="mr-2"
+                >
+                    {{value}}
+                </p-select-button>
+            </div>
+        </div>
+    </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    selected: undefined,
+                    values: range(8),
+                    sizes: Object.values(SELECT_BUTTON_SIZE),
+                    styleTypes: Object.values(SELECT_BUTTON_STYLE_TYPE)
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+
+## Advanced
+
+<Canvas>
+    <Story name="Advanced">
+        {{
+            components: { PSelectButton },
+            template: `
+    <div class="w-full overflow p-8 grid gap-4 grid-cols-3">
+        <p-select-button v-for="value in values" :key="value.key"
+            v-model="selected"
+            :value="value"
+            :predicate="predicate"
+            class="mb-4"
+        >
+            {{value.name}}
+        </p-select-button>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: undefined,
+                    values: [
+                        {key: 'hello', name: 'Hello'},
+                        {key: 'world', name: 'World!'},
+                        {key: 'spaceone', name: 'SpaceONE'},
+                    ]
+                })
+                const predicate = (value, current) => {
+                    return current && value.key === current.key
+                }
+                return {
+                    ...toRefs(state),
+                    predicate
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

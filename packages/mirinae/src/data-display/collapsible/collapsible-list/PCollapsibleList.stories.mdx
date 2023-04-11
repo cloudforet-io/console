@@ -1,0 +1,292 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+import { range } from 'lodash';
+import { faker } from '@faker-js/faker';
+
+import { i18n } from '@/translations';
+
+import PCollapsibleList from './PCollapsibleList.vue';
+import { getCollapsibleListArgTypes } from '@/data-display/collapsible/collapsible-list/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Data Display/Collapsible/Collapsible List' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13560%3A296687'
+    }
+}} argTypes={getCollapsibleListArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PCollapsibleList },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-collapsible-list
+            :items="items"
+            v-model="proxyUnfoldedIndices"
+            :line-clamp="lineClamp"
+            :multi-unfoldable="multiUnfoldable"
+            :toggle-position="togglePosition"
+            :toggle-type="toggleType"
+            :theme="theme"
+            @update:unfoldedIndices="onUpdateUnfoldedIndices"
+        >
+            <template v-if="titleSlot" #title>
+                <div v-html="titleSlot" />
+            </template>
+            <div v-if="defaultSlot" v-html="defaultSlot" />
+        </p-collapsible-list>
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state= reactive({
+            proxyUnfoldedIndices: useProxyValue('unfoldedIndices', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Collapsible List
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PCollapsibleList },
+    i18n,
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-collapsible-list :items="items" v-model="unfolded"></p-collapsible-list>
+    </div>
+    `,
+    setup() {
+        const state = reactive({
+            items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+            unfolded: [0]
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multi Unfoldable
+
+<Canvas>
+    <Story name="Multi Unfoldable">
+        {{
+            components: { PCollapsibleList },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-collapsible-list :items="items" v-model="unfolded" multi-unfoldable></p-collapsible-list>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+                    unfolded: [0, 1]
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Toggle Positions
+
+<Canvas>
+    <Story name="Toggle Positions">
+        {{
+            components: { PCollapsibleList },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <div>
+            <p class="text-xl font-bold mb-4">Toggle Position: title</p>
+            <p-collapsible-list :items="items" toggle-position="title" />
+        </div>
+        <div class="mt-6">
+            <p class="text-xl font-bold mb-4">Toggle Position: contents</p>
+            <p-collapsible-list :items="items" toggle-position="contents" />
+        </div>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Line Clamp
+
+<Canvas>
+    <Story name="Line Clamp">
+        {{
+            components: { PCollapsibleList },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p class="italic mb-4">Line Clamp works only when the toggle position is contents.</p>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-2">Line Clamp: 5</p>
+            <p-collapsible-list :items="items" toggle-position="contents" :line-clamp="5" />
+        </div>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-2">Line Clamp: 1 </p>
+            <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="1" />
+        </div>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-2">Line Clamp: 0</p>
+            <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="0" />
+        </div>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-2">Line Clamp: -1</p>
+            <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="-1" />
+        </div>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Themes
+
+<Canvas>
+    <Story name="Themes">
+        {{
+            components: { PCollapsibleList },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-6">Theme: plain</p>
+            <p-collapsible-list :items="items" theme="plain" />
+        </div>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-6">Theme: card</p>
+            <p-collapsible-list :items="items" theme="card"  />
+        </div>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+<Canvas>
+    <Story name="Slots">
+        {{
+            components: { PCollapsibleList },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <div>
+            <p class="text-xl font-bold mb-4">Title Slot</p>
+            <p-collapsible-list :items="items">
+                <template #title={title}>
+                    <span class="text-xl font-bold text-secondary">
+                        <{{title}}>
+                    </span>
+                </template>
+            </p-collapsible-list>
+        </div>
+        <div class="mt-6">
+            <p class="text-xl font-bold mb-4">Default Slot</p>
+            <p-collapsible-list :items="items" toggle-position="contents">
+                <template #default="{data}">
+                    <strong class="text-peacock">{{data}}</strong>
+                </template>
+            </p-collapsible-list>
+        </div>
+        <div class="mt-6">
+            <p class="text-xl font-bold mb-4">Slot Props</p>
+            <pre>
+            {
+                data: string;
+                title?: string;
+                index: number;
+                isCollapsed: boolean;
+            }
+            </pre>
+        </div>
+    </div>
+<!--<div>-->
+    `,
+            setup() {
+                const state = reactive({
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.datatype.number({min: 30, max: 200})) })),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

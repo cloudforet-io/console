@@ -1,0 +1,159 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { gray } from '@/styles/colors.cjs';
+import PSkeleton from "@/feedbacks/loading/skeleton/PSkeleton";
+
+<Meta title='Feedbacks/Loading/Skeleton' component={PSkeleton} argTypes={{
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        description: 'Loading when true',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    animation: {
+        name: 'animation',
+        type: {name: 'boolean'},
+        description: 'Animate when true',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    duration: {
+        name: 'duration',
+        type: {name: 'number'},
+        description: 'Duration of animation',
+        defaultValue: 2,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 2,
+            }
+        },
+        control: {
+            type: 'number'
+        }
+    },
+    width: {
+        name: 'width',
+        type: {name: 'string'},
+        description: 'Width of skeleton',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'text',
+        }
+    },
+    height: {
+        name: 'height',
+        type: {name: 'string'},
+        description: 'Width of skeleton',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'text',
+        }
+    },
+    tag: {
+        name: 'tag',
+        type: {name: 'string'},
+        description: 'Tag of skeleton',
+        defaultValue: 'span',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'span',
+            }
+        },
+        control: {
+            type: 'text',
+        }
+    },
+    opacity: {
+        name: 'opacity',
+        type: {name: 'number'},
+        description: 'Opacity of skeleton',
+        defaultValue: 0.4,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0.4
+            },
+        },
+        control: {
+            type: 'number',
+        }
+    }
+}}/>
+
+export const Template = (args,{argTypes})=>({
+    props: Object.keys(argTypes),
+    components: {PSkeleton},
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <div style="width: 500px; ">
+                <PSkeleton v-bind="$props">text</PSkeleton>
+            </div>
+        </div>`
+})
+
+# Skeleton
+
+<br/>
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

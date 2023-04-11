@@ -1,0 +1,169 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PLazyImg from './PLazyImg.vue';
+import PButton from '@/inputs/buttons/button/PButton';
+import PI from '@/foundation/icons/PI';
+import { reactive, toRefs } from 'vue';
+import { faker } from '@faker-js/faker';
+import {getLazyImgArgTypes} from '@/feedbacks/loading/lazy-img/story-helper';
+
+<Meta title='Feedbacks/Loading/Lazy Image' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
+    }
+}} argTypes={getLazyImgArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PLazyImg },
+    template: `
+        <p-lazy-img
+            :height="height"
+            :width="width"
+            :src="src"
+            :errorIcon="errorIcon"
+            :errorIconColor="errorIconColor"
+            :loading="loading"
+            :alt="alt"
+        ></p-lazy-img>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Lazy Image
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" args={{
+        src: faker.image.image(100, 100, true)
+    }} >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Failed to Load Image
+
+<Canvas>
+    <Story name="Failed to Load Image">
+        {{
+            components: { PLazyImg },
+            template: `
+    <div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Default: </h2>
+            <p-lazy-img src="" />
+        </div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Custom Error Icon Color: </h2>
+            <p-lazy-img src="" error-icon-color="red white" />
+        </div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Custom Error Icon: </h2>
+            <p-lazy-img src="" error-icon="img_avatar_admin" />
+        </div>
+        <div class="flex items-center">
+            <h2 class=" mr-4">Using Error Slot: </h2>
+            <p-lazy-img src="">
+                <template #error>
+                    <img :src="errorImage"/>
+                </template>
+            </p-lazy-img>
+        </div>
+    </div>
+`,
+            setup() {
+                return {
+                    errorImage: faker.image.image(100, 100, true)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Loader
+
+<Canvas>
+    <Story name="Custom Loader">
+        {{
+            components: { PLazyImg, PI },
+            template: `
+    <p-lazy-img loading>
+        <template #preloader>
+            <p-i name="ic_settings-filled" animation="spin" :size="2"></p-i>
+        </template>
+    </p-lazy-img>
+`
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Manual Control
+
+<Canvas>
+    <Story name="Manual Control">
+        {{
+            components: {
+                PLazyImg,
+                PButton
+            },
+            template: `
+    <div class="flex items-center">
+        <p-button class="mr-4" @click="getData">Load Image</p-button>
+        <p-lazy-img :src="src"
+            :loading="loading"
+        />
+    </div>
+`,
+            setup() {
+                const state = reactive({
+                    src: '',
+                    loading: false
+                })
+                const getData = () => {
+                    state.src = '';
+                    state.loading = true
+                    setTimeout(() => {
+                        state.src = faker.image.image(100, 100, true)
+                        state.loading = false;
+                    }, 2000)
+                }
+                return {
+                    ...toRefs(state),
+                    getData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

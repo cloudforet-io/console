@@ -1,0 +1,592 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PTree from './PTree.vue';
+import PI from '@/foundation/icons/PI.vue'
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue'
+import PButton from '@/inputs/buttons/button/PButton.vue'
+import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
+import PRadio from '@/inputs/radio/PRadio.vue'
+import { reactive, toRefs, computed } from 'vue';
+import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo, getPermissionInfo} from './mock';
+import { faker } from '@faker-js/faker';
+import './PTree.stories.pcss'
+import { getTreeArgTypes } from '@/data-display/tree/story-helper';
+
+
+<Meta title='Data Display/Tree'
+argTypes={getTreeArgTypes()}
+/>
+
+export const ExpertTemplate = (args, { argTypes }) => ({
+    components: { PTree, PButton, PTextInput, PI, PIconButton, PRadio },
+    template: `
+        <div class="h-full w-full p-4 overflow-auto">
+            <div class="mb-4">
+                <p-button style-type="substitutive" @click="refresh">Refresh</p-button>
+                <p-button style-type="highlight" @click="add">Add node to root</p-button>
+                <p-button style-type="positive" @click="onClickEdit">
+                    {{editMode ? 'Done' : 'Edit' }}
+                </p-button>
+                <p-button @click="find">Find node</p-button>
+                <div class="mt-4">
+                    <p-text-input v-model="target"/>
+                    <p-button style-type="secondary" @click="fetchAndFind">Fetch and find node</p-button>
+                </div>
+                <div class="mt-4">
+                    <p-text-input v-model="editText"/>
+                    <p-button style-type="negative-primary" @click="updateData">Update selected node</p-button>
+                </div>
+            </div>
+            <p-tree :edit-options="editOptions"
+                    :drag-options="dragOptions"
+                    :select-options="selectOptions"
+                    :toggle-options="toggleOptions"
+                    :data-getter="dataGetter"
+                    :data-setter="dataSetter"
+                    :data-fetcher="dataFetcher"
+                    :get-class-names="getClassNames"
+                    fetch-on-init
+                    @init="onInit"
+                    @change-select="onChangeSelect"
+                    @start-drag="onStartDrag"
+                    @drop="onDrop"
+                    @end-drag="onEndDrag"
+                    @finish-edit="onFinishEdit"
+            >
+                <template #data="{node}">
+                        {{ node.data.name }} ({{node.data.id}})
+                </template>
+                <template #toggle="{node, path, selected}">
+                    <p-radio v-if="node.data.item_type === 'PROJECT'"
+                             :selected="selected"
+                             :value="true"
+                             @click.stop="changeSelectState(node, path)"
+                    />
+                </template>
+                <template #toggle-right>
+                    <p-i name="ic_favorite-filled"
+                         width="1rem" height="1rem"
+                         color="inherit"
+                    />
+                </template>
+                <template #icon="{node}">
+                    <template v-if="editMode">
+                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'"
+                             :name="permissionInfo[node.data.id] ? 'ic_folder-filled' : 'ic_lock-filled'"
+                             width="1rem" height="1rem" color="inherit"
+                        />
+                    </template>
+                    <p-i v-else :name="node.data.item_type === 'PROJECT' ? 'ic_document-filled' : 'ic_folder-filled'"
+                         width="1rem" height="1rem" color="inherit"
+                    />
+                </template>
+                <template #right-extra="{node, path}">
+                    <p-icon-button v-if="editMode && permissionInfo[node.data.id]" name="ic_minus"
+                                   color="inherit transparent"
+                                   size="sm"
+                                   @click.stop="deleteNode(path)"
+                    />
+                    <p-icon-button v-else name="ic_plus"
+                                   class="add-btn"
+                                   size="sm"
+                                   @click.stop="addNode(path, getTreeData())"
+                    />
+                </template>
+            </p-tree>
+        </div>
+    `,
+    setup() {
+        const state = reactive({
+            editOptions: computed(() => ({
+                disabled: !state.editMode,
+                editStartValidator: ({ data }) => {
+                    return !!state.permissionInfo[data.id]
+                },
+                validator: (text) => (text && text.length > 2 && text.length < 40),
+            })),
+            dragOptions: computed(() => ({
+                disabled: !state.editMode,
+                dragValidator(node, dragNodeParent) {
+                    return !!state.permissionInfo[node.data.id]
+                },
+                dropValidator(node, oldParent, parent) {
+                    if (oldParent === parent) return true;
+                    return !!state.permissionInfo[parent?.data?.id]
+                }
+            })),
+            editMode: false,
+            permissionInfo: {},
+            target: '',
+            findMode: false,
+            lists: [],
+            listIdx: 0,
+            editText: '',
+            selectedItem: {},
+            dragNode: null,
+        })
+        const selectOptions = {
+                validator({data}) {
+                    if (data.item_type !== 'PROJECT') return false;
+                    return state.editMode ? !!state.permissionInfo[data.id] : true
+                },
+            visibleRado: true
+    }
+        const toggleOptions = {
+            validator: (node) => {
+                return node.data.has_child || node.children.length > 0
+            }
+        }
+        const getClassNames = ({ data }) => {
+            return {'no-permission': state.editMode && !state.permissionInfo[data.id]}
+        }
+        const dataSetter = (text, node) => {
+            node.data.name = text
+        }
+        const dataGetter = (node) => {
+            return node.data.name
+        }
+        const dataFetcher = (node) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    let res;
+                    if (state.findMode) {
+                        res = state.lists[state.listIdx++]
+                    } else {
+                        res = getTreeList()
+                    }
+                    if (state.editMode) {
+                        res.forEach(d => {state.permissionInfo[d.id] = faker.datatype.boolean();})
+                    }
+                    resolve(res)
+                }, 1000)
+            })
+        }
+        const refresh = async () => {
+            if (state.root) {
+                state.root.resetSelect()
+                await state.root.fetchData()
+            }
+        }
+        const onClickEdit = () => {
+            const all = state.root.getAllNodes()
+            state.permissionInfo = {}
+            all.forEach((d) => {state.permissionInfo[d.data.id] = faker.datatype.boolean();})
+            state.editMode = !state.editMode;
+        }
+        const onInit = async (root) => {
+            state.root = root
+        }
+        const add = () => {
+            if (state.root) state.root.addNode(getTreeData())
+        }
+        const find = () => {
+            if (state.root) state.root.findNode((data) => data.name === state.target)
+        }
+        const fetchAndFind = async () => {
+            const {lists, names} = getRecursiveInfo()
+            state.findMode = true;
+            state.lists = lists;
+            state.listIdx = 0;
+            const predicates = names.map(d => (data) => {
+                return data.name === d
+            })
+            state.target = names[names.length - 1];
+            if (state.root) {
+                await state.root.fetchAndFindNode(predicates);
+            }
+            state.findMode = false;
+        }
+        const deleteNode = (path) => {
+            state.root.deleteNodeByPath(path)
+        }
+        const addNode = (path, data) => {
+            state.root.addChildNodeByPath(path, data)
+        }
+        const updateData = () => {
+            if (state.root && state.selectedItem.node) {
+                state.root.updateNodeByPath(state.selectedItem.path, {
+                    ...state.selectedItem.node.data,
+                    name: state.editText
+                })
+            }
+        }
+        const onChangeSelect = (selected) => {
+            state.selectedItem = selected.length > 0 ? selected[0] : {};
+            state.editText = selected.length ? selected[0].node.data.name : ''
+        }
+        const onStartDrag = (node, dragNodeParent) => {
+            console.debug('start drag', node, dragNodeParent)
+            state.dragNode = node
+        }
+        const onDrop = (node, oldParent, parent, rollback) => {
+            console.debug('drop', node, oldParent, parent, rollback)
+            if (Math.random() > 0.5) {
+                alert('Drop Failed! Rollback.');
+                rollback();
+            }
+        }
+        const onEndDrag = (node, parent) => {
+            console.debug('end drag', node, parent)
+            state.dragNode = null
+        }
+        const onFinishEdit = (node, editText) => {
+            console.debug('finish edit', node, editText)
+            if (Math.random() > 0.5) {
+                node.data.name = editText;
+            } else {
+                alert('Failed to update node data!')
+            }
+        }
+        const changeSelectState = (node, path) => {
+            state.root.changeSelectState(node, path)
+        }
+        return {
+            ...toRefs(state),
+            selectOptions,
+            toggleOptions,
+            getClassNames,
+            dataSetter,
+            dataGetter,
+            dataFetcher,
+            refresh,
+            onClickEdit,
+            onInit,
+            add,
+            find,
+            fetchAndFind,
+            getTreeData,
+            deleteNode,
+            addNode,
+            updateData,
+            onChangeSelect,
+            onStartDrag,
+            onDrop,
+            onEndDrag,
+            onFinishEdit,
+            changeSelectState
+        }
+    }
+});
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTree },
+    template: `
+        <div class="h-full w-full p-4 overflow-auto">
+            <div class="mb-4">
+            </div>
+            <p-tree :data-fetcher="treeDataFetcher" fetch-on-init>
+            </p-tree>
+        </div>
+    `,
+    setup() {
+        const treeDataFetcher = () => {
+            return ['A1', 'A2', 'A3']
+        }
+        return {
+            treeDataFetcher,
+        }
+    }
+});
+
+
+# Tree
+<br/>
+<br/>
+
+## Props
+
+```typescript
+
+interface Props {
+    toggleOptions: ToggleOptions;
+    selectOptions: SelectOptions;
+    editOptions: EditOptions;
+    dragOptions: DragOptions;
+    dataGetter: DataGetter;
+    dataSetter: DataSetter;
+    dataFetcher?: DataFetcher;
+    fetchOnInit?: boolean;
+    getClassNames: GetClassNames;
+}
+
+```
+
+### Tree Node
+
+The format of the tree node given as an argument to the validator function of options props or the tree method function.
+
+```typescript
+interface TreeNode<T=any> {
+    data: T;
+    loading: boolean;
+    children: TreeNode<T>[];
+    // he tree vue Node type
+    $hidden?: boolean
+    $branchClass?: any
+    $nodeBackClass?: any
+    $nodeClass?: any
+    $childrenClass?: any
+    $branchStyle?: any
+    $nodeBackStyle?: any
+    $nodeStyle?: any
+    $childrenStyle?: any
+    $folded?: boolean
+    $checked?: boolean
+}
+```
+
+### Tree Path
+
+Identifier of each node. `number[]` type.
+
+### Toggle Options
+
+Options for expanding and folding.
+
+|Name|Description|
+|-|-|
+|disabled|Whether to globally hide toggle button or not. Higher priority than validator.|
+|validator|Whether to hide each node's toggle button or not.|
+|toggleOnNodeClick|Whether to trigger toggle on node click or only trigger when the toggle button is clicked exactly.|
+|removeChildrenOnFold|When the node is folded, Whether to remove children or not. If it is true, data fetcher will be called every time the node is unfolded.|
+
+```typescript
+interface ToggleOptions<T=any> {
+    disabled?: boolean;
+    validator?: (node: TreeNode<T>) => boolean;
+    toggleOnNodeClick?: boolean;
+    removeChildrenOnFold?: boolean;
+}
+```
+
+### Select Options
+
+Options for selecting.
+
+|Name|Description|
+|-|-|
+|disabled|Whether to globally disable node selection or not. Higher priority than validator.|
+|validator|Whether to enable or disable each node's selection.|
+|multiSelectable|Whether to allow multi selection or not.|
+
+```typescript
+interface SelectOptions<T=any> {
+    disabled?: boolean;
+    validator?: (node: TreeNode<T>) => boolean;
+    multiSelectable?: boolean;
+}
+```
+
+### Edit Options
+
+Options for inline editing.
+
+|Name|Description|
+|-|-|
+|disabled|Whether to globally disable inline editing or not. Higher priority than validator.|
+|validator|Input Validator.|
+|editStartValidator|Whether to enable or disable each node's inline editing.|
+|setDataAfterEdit|Whether to set updated data to the node or not.|
+
+```typescript
+interface EditOptions<T=any> {
+    disabled?: boolean;
+    validator?: (editText: string) => boolean;
+    editStartValidator?: (node: TreeNode<T>) => boolean;
+    setDataAfterEdit?: boolean;
+}
+```
+
+### Drag Options
+
+Options for node drag & drop.
+
+|Name|Description|
+|-|-|
+|disabled|Whether to globally disable drag & drop or not. Higher priority than validator.|
+|dragValidator|Whether to enable or disable dragging each node.|
+|dropValidator|Whether to enable or disable dropping each node.|
+|startValidator|Whether to allow dragging of each node and emit `start-drag` event or not.|
+|endValidator|Whether to allow dropping of each node and emit `drop` event or not.|
+
+```typescript
+interface DragOptions {
+    disabled?: boolean;
+    startValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dragValidator?: (node?: TreeNode, dragNodeParent?: null|TreeNode) => boolean;
+    dropValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
+    endValidator?: (node?: TreeNode, oldParent?: null|TreeNode, parent?: null|TreeNode) => boolean;
+}
+```
+
+### Data Getter
+
+Function that returns display data.<br/>
+Used for displaying data and getting text when start editing node.
+
+```typescript
+interface DataGetter<T=any> {
+    (node: TreeNode<T>): T;
+}
+```
+
+### Data Setter
+
+Function for set text to node's data after finish editing node.
+
+```typescript
+interface DataSetter<T=any> {
+    (editText: string, node: TreeNode<T>): void;
+}
+```
+
+### Data Fetcher
+
+Function that fired when the toggle button is expanded. <br/>
+It must return data array.
+
+```typescript
+interface DataFetcher<T=any> {
+    (node: Partial<TreeNode<T>>): Promise<T[]>|T[];
+}
+````
+
+## Events
+
+|Name|Description|
+|-|-|
+|init| Emitted when root tree is ready. Pass `Tree<T>` instance. |
+|click-node| Emitted when click nodes. Pass node and path. |
+|change-select| Emitted when selection items changed. Pass selected items. `TreeItem<T>[]` |
+|start-drag| Emitted when dragging start. Pass dragging node and parent node. |
+|end-drag| Emitted when finished dragging. Pass dragging node, old parent node, and the parent of target node. |
+|drop| Emitted when finished dragging and finally dropped. Pass dropped node, old parent node, and updated parent node, and rollback function. |
+|finish-edit| Emitted when finished inline editing. Pass the node and the input text. |
+
+```typescript
+ interface TreeItem<T=any> {
+    path: number[];
+    node: TreeNode<T>;
+}
+```
+
+## Slots
+
+|Name|Description|
+|-|-|
+|node| Replace each node keeping depth padding. |
+|left-extra| This is used when you want to insert something to the left of the toggle. |
+|toggle| This is used when you want to replace the toggle. It will also hide loading icon. |
+|toggle-right| This is used when you want to insert something to the right of the toggle. |
+|icon| This is used when you want to insert icon to the right of the toggle. It is located to the right of the toggle-right slot. |
+|data| This is used when you want to replace the display data of each node. |
+|right-extra| This is used when you want to insert something to the right of the data. |
+
+
+### Slot Props
+
+```typescript
+{
+    node: TreeNode;
+    path: number[];
+    selected: boolean;
+}
+```
+
+
+## Methods
+
+You can use tree methods by tree instance that passed by `init` event. <br/>
+
+|Name|Description|
+|-|-|
+|fetchData| Fetch data and attach to the node. |
+|changeSelectState| Change node's selection state by value. |
+|addNode| Add node to the root. |
+|findNode| It finds the node by call predicate function. When return value is true, it changes the node's selection state to true. |
+|fetchAndFindNode| It finds the node by findNode method. If there is no matched one, it fetches data and find node in a fetched data. This executes these in a loop, and attaches fetched results to the previous found node, and change the last matched node's state as selected. |
+|fetchAndFindNodes| It finds the multiple nods by fetchAndFindNode method in a loop.|
+|resetSelect| It resets all node's selection states. |
+|getAllNodes| It returns all child nodes as flat array. |
+|getAllItems| It returns all child items as flat array. |
+|deleteNodeByPath| It deletes node by path. |
+|deleteNode| It deletes node by predicate function. |
+|addChildNodeByPath| It adds a single child node or multiple child nodes to the node that found by path. |
+|updateNodeByPath| It updates a data of node that found by path. |
+|updateNode| It updates a data of node that found by predicate function. |
+|toggleNode| It toggles a node that found by path. |
+|getNodeParentByPath| It returns parent node by path. |
+|getNodeByPath| It returns node by path. |
+|walkTreeData| Iterate tree nodes <br/> Arguments: (treeData: TreeNode[](or null), handler: Function, options: {}) <br/> Handler: (node: TreeNode, index: number, parent: TreeNode(or null), path: number[]) <br/> - return false: stop walk <br/> - return 'skip children' <br/> - return 'skip siblings' <br/> Options: {Boolean} reverse|
+|cloneTreeData| Clones tree nodes <br/> options - afterNodeCreated: (newNode, {oldNode: node, index, parent, path}) |
+|fold| Fold node toggle|
+|unfold| Unfold node toggle|
+
+```typescript
+interface Tree<T=any> {
+     fetchData: (node?: TreeNode<T>|null) => Promise<TreeNode<T>[]>;
+    changeSelectState: (node: TreeNode<T>, path: number[], value?: boolean) => void;
+    addNode: (data: T[]|T) => void;
+    findNode: (predicate: Predicate<T>) => TreeNode<T>|null;
+    fetchAndFindNode: (predicates: Predicate<T>[]) => Promise<{node: TreeNode<T>|null; path: number[]}>;
+    fetchAndFindNodes: (predicateList: Predicate<T>[][]) => Promise<{node: TreeNode<T>; path: number[]}[]>;
+    resetSelect: () => void;
+    getAllNodes: (node?: TreeNode<T>|null) => TreeNode<T>[];
+    getAllItems: (node?: TreeNode<T>|null) => TreeItem<T>[];
+    deleteNodeByPath: (path: number[]) => void;
+    deleteNode: (predicate: Predicate<T>) => void;
+    addChildNodeByPath: (path: number[], data: T[]|T, unfold?: boolean) => void;
+    updateNodeByPath: (path: number[], data: T) => void;
+    updateNode: (predicate: Predicate<T>, data: T) => void;
+    toggleNode: (node: TreeNode<T>, path: number[]) => void;
+    // he tree vue api
+    getNodeParentByPath: (path: number[]) => TreeNode<T>|null;
+    getNodeByPath: (path: number[]) => TreeNode<T>;
+    walkTreeData: (treeData: TreeNode<T>[]|null, callback: walkTreeDataCallback, options?: {reverse: boolean}) => void;
+    cloneTreeData(treeData: TreeNode<T>[]|null, options?: cloneTreeDataOptions): TreeNode[];
+    fold(node: TreeNode<T>): void;
+    unfold(node: TreeNode<T>): void;
+}
+
+interface Predicate<T=any> {
+    (data: T): boolean;
+}
+```
+
+## Basic
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Basic">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Expert
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Expert">
+        {ExpertTemplate.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

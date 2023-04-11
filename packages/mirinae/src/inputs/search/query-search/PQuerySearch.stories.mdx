@@ -1,0 +1,573 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+import PQuerySearch from './PQuerySearch.vue';
+import { getQuerySearchArgTypes } from '@/inputs/search/query-search/story-helper';
+import { getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/search/query-search/mock';
+import {
+    getTextHighlightRegex
+} from "@/utils/helpers";
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Search/Query Search' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5952%3A20040'
+    }
+}} component={PQuerySearch} argTypes={getQuerySearchArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PQuerySearch },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-query-search v-model="proxyValue"
+            :keyItemSets="keyItemSets"
+            :valueHandlerMap="valueHandlerMap"
+        ></p-query-search>
+    </div>
+    `,
+    setup(props, emit) {
+        const state = reactive({
+            proxyValue: useProxyValue('value', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Query Search
+<br/>
+
+Query Search is <b>```key:value``` format search.</b> <br/>
+
+<Canvas>
+    <Story name="Basic" height="300px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        @search="queryItem = $event"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200">
+        <p class="mb-2 text-lg">Searched:</p>
+        <pre>{{queryItem}}</pre>
+    </div>
+</div>
+    `,
+    setup() {
+        const state = reactive({
+            queryItem: null
+        })
+        const keyItemSets = getKeyItemSets(5, 1)
+        const valueHandlerMap = getValueHandlerMap(keyItemSets)
+        return {
+            ...toRefs(state),
+            keyItemSets,
+            valueHandlerMap
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+
+1. After selecting a key first,
+2. you can search the value for the selected key.
+
+<br/>
+Plain text search is of course also provided.<br/>
+<br/>
+It provides <b>search suggestion for keys and values.</b> <br/>
+<br/>
+Also, you can give an <b>operator</b> between key and value. <br/>
+
+<br/>
+<br/>
+
+## Key item sets
+For ```key:value``` searches, ```keyItemSets``` must be given as props. <br/>
+```keyItemSets``` is an array of ```keyItemSet```. <br/>
+```keyItemSet``` is a set of title and key items. <br/>
+```title``` of key item set is useful when you want to distinguish and display the characteristics of key items. <br/>
+```items``` of key item set is an array of objects containing information of keys.<br/>
+If you input a value that is not in key items and press enter, it is regarded as a general keyword search.<br/>
+
+```typescript
+import {KeyDataType,OperatorType} from "./type";
+interface KeyItem {
+    label: string;
+    name: any;
+    dataType?: KeyDataType; // See the description of data types below
+    operators?: OperatorType[]; // See the description of Operators below
+}
+
+interface KeyItemSet {
+    title: string;
+    items: KeyItem[];
+}
+```
+
+<Canvas>
+    <Story name="With Several Key Item Sets" height="500px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Key Item Sets:</p>
+        <pre>{{keyItemSets}}</pre>
+    </div>
+</div>
+    `,
+    setup() {
+        const keyItemSets = getKeyItemSets(3, 4)
+        const valueHandlerMap = getValueHandlerMap(keyItemSets)
+        return {
+            keyItemSets,
+            valueHandlerMap
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+## How suggestion works?
+When you input a value, search recommendation will be provided.<br/>
+Suggestion works differently for <b>key search(selection)</b> and <b>value search</b>.<br/>
+Value search suggestion also works differently depending on data type of selected key.<br/>
+
+### Key items suggestion
+A key item that is not in ```keyItemSets``` cannot be selected as a key.<br/>
+Among the key items in the ```keyItemSets``` given as props, the suggestion menu shows those whose ```label``` property contains an input value.<br/>
+If there is no input value, all key items will be displayed.<br/>
+
+### Value items suggestion
+Value items suggestion can be different by selected key item. <br/>
+So you must give ```valueHandlerMap``` as props for suggestion list. <br/>
+Also, it works differently for each selected key item's data type.<br/>
+See the description of data types below.<br/>
+
+<br/>
+<br/>
+
+## Value handler map
+A value handler map is an object.<br/>
+The properties must be one of the ```name``` of key items.<br/>
+This object's value must be a ```ValueHandler``` or ```undefined```. <br/>
+If you don't want to suggest a values for a certain key, do not assign the key as a property or give ```undefined```.<br/>
+<br/>
+
+### Value handler
+The value handler is a ```function``` that returns suggestion items.<br/>
+
+#### Arguments
+The handler receives the input value as the first argument, perhaps to retrieve the search result.<br/>
+As the second argument, it receives the first selected key item.<br/>
+The third argument is the data type of the last selected key. <br/>
+The fourth argument, subPath, is a string connecting the names of the selected key items with a dot(.).<br/>
+The fifth argument is the operator entered by the user.<br/>
+<br/>
+
+#### Return object
+The handler must return an object whose type is ```HandlerResponse```.<br/>
+This object must contain an array of value items(```Array<ValueMenuItem>```) to suggest as the ```results``` property.<br/>
+```totalCount``` is the total number of value items searched with input value.<br/>
+It is useful to show only the top few of the searched items, and to tell users that the total number of searched items is 300.<br/>
+It is displayed in the suggestion title, but if you do not want to display it, do not provide this property.<br/>
+```dataType``` and ```operators``` are specifications for nested key selection.<br/>
+If ```dataType``` is ```object```, it is considered as nested key selection, not value search.<br/>
+And ```operators``` are list of available operators in the next search.<br/>
+
+
+```typescript
+import {ContextMenuType,KeyDataType,KeyItem,OperatorType} from "./type";
+interface T{
+}
+interface ValueMenuItem {
+    label: string;
+    name: any;
+    type?: ContextMenuType; // See menu type of context menu component
+    data?: T;
+}
+
+interface HandlerResponse {
+    results: Array<ValueMenuItem>;
+    totalCount?: number;
+    dataType?: KeyDataType; // See the description of data types below
+    operators?: OperatorType[]; // See the description of Operators below
+}
+
+interface ValueHandler {
+    (inputText: string,
+     rootKey: KeyItem,
+     dataType?: KeyDataType,
+     subPath?: string,
+     operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
+}
+
+interface ValueHandlerMap {
+    [key: string]: ValueHandler|undefined;
+}
+```
+
+
+<Canvas>
+    <Story name="Value Handler" height="500px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Key Item Sets:</p>
+        <pre>{{keyItemSets}}</pre>
+    </div>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Value Items:</p>
+        <pre>{{valueItemsMap}}</pre>
+    </div>
+</div>
+    `,
+            setup() {
+                const keyItemSets = [{
+                    title: 'Keys',
+                    items: [
+                        {label: 'Hello', name: 'hello'},
+                        {label: 'World', name: 'world'},
+                    ]
+                }]
+                const valueItemsMap = {
+                    hello: [
+                        {label: 'This is suggestion for hello', name: 'hello1'},
+                        {label: 'Pick me!', name: 'hello2'}
+                    ],
+                    world: [
+                        {label: 'This is suggestion for world', name: 'world1'},
+                        {label: 'If input value contains any of these items,', name: 'world2'},
+                        {label: 'you can see on the menu!', name: 'world3'},
+                    ],
+                }
+                const valueHandler = (inputText, rootKey) => {
+                    let results = valueItemsMap[rootKey.name];
+                    if (inputText) {
+                        const regex = getTextHighlightRegex(inputText);
+                        results = results.filter(d => regex.test(d.label));
+                    }
+                    return {
+                        results,
+                        totalCount: results.length,
+                    };
+                }
+                const valueHandlerMap = {
+                    hello: valueHandler,
+                    world: valueHandler
+                }
+                return {
+                    keyItemSets,
+                    valueItemsMap,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Nested key selection
+This component supports not only ```key:value``` search, but also ```key.a.b.c:value``` search. <br/>
+
+1. First, search for key items through ```keyItemSets```.
+2. Select one of the suggested key items. -> key
+3. If the ```dataType``` of the selected key item is ```object```, the next search is also considered to be a key search.
+4. Items retrieved through the value handler corresponding to the root key are suggested.
+5. Choose one of the suggested items. -> key.a
+6. If the ```dataType``` of the selected item is ```object```, steps 3-5 are repeated. -> key.a.b.c
+7. If the ```dataType``` of the selected item is not ```object```, it is regarded as a value item and the search is completed. -> key.a.b.c:value
+
+
+<Canvas>
+    <Story name="Nested Key Search" height="300px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        @search="queryItem = $event"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Searched:</p>
+        <pre>{{queryItem}}</pre>
+    </div>
+</div>
+    `,
+    setup() {
+        const state = reactive({
+            queryItem: null
+        })
+        const keyItemSets = [{
+            title: 'Keys',
+            items: [
+                {label: 'Root Key', name: 'root', dataType: 'object'},
+            ]
+        }]
+        const valueItemsMap = {
+            nested: [
+                {label: 'Nested', name: 'nested'},
+                {label: 'Last', name: 'last'},
+            ],
+            last: getValueItems(10)
+        }
+        const valueHandler = (inputText, rootKey, dataType, subPath) => {
+            const nextDataType = subPath && subPath.endsWith('last') ? 'string' : 'object'
+            let results;
+            if (nextDataType === 'object') {
+                results = valueItemsMap.nested;
+            } else {
+                results = valueItemsMap.last;
+            };
+            if (inputText) {
+                const regex = getTextHighlightRegex(inputText);
+                results = results.filter(d => regex.test(d.label));
+            }
+            return {
+                results,
+                totalCount: results.length,
+                dataType: nextDataType
+            };
+        }
+        const valueHandlerMap = {
+            root: valueHandler,
+        }
+        return {
+            ...toRefs(state),
+            keyItemSets,
+            valueHandlerMap
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Data types
+```dataType``` is an optional property for key item and value item(only when the selected key's data type is ```object```). <br/>
+This is used to determine the browser input form to be displayed to the user.<br/>
+It's NOT used for validation. It's only for input form determination. <br/>
+
+### Support data type
+- string(default)
+- integer
+- float
+- boolean
+- datetime
+- object
+
+### HTML input attributes for each data type
+| Data Type | HTML Input Attributes |
+| --------- | --------------- |
+| string(default) | type: text |
+| integer | type: number, step: 1, min: 0 |
+| float | type: number |
+| boolean | type: text |
+| datetime | type: text |
+| object(key) | type: text |
+| object(value) | type: text |
+
+### Data types that support value item suggestions
+- string(default)
+- integer
+- float
+- object
+
+### How data types without value items suggestions work
+| Selected Key's Data Type | How It Works                                                       |
+|--------------------------|--------------------------------------------------------------------|
+| boolean                  | TRUE/FALSE ```text``` suggestion.                                  |
+| datetime                 | Operator suggestion will be given. There will be value validation. |
+
+<Canvas>
+    <Story name="Data Types" height="300px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        @search="queryItem = $event"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Searched:</p>
+        <pre>{{queryItem}}</pre>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    queryItem: null
+                })
+                const keyItemSets = [{
+                    title: 'Keys',
+                    items: [
+                        {label: 'string', name: 'string'},
+                        {label: 'integer', name: 'integer', dataType: 'integer'},
+                        {label: 'float', name: 'float', dataType: 'float'},
+                        {label: 'boolean', name: 'boolean', dataType: 'boolean'},
+                        {label: 'datetime', name: 'datetime', dataType: 'datetime'},
+                        {label: 'object', name: 'object', dataType: 'object'},
+                    ]
+                }]
+                const valueItemsMap = {
+                    string: getValueItems(5),
+                    integer: [{label: 1, name: 1}, {label: 3, name: 3}],
+                    float: [{label: 0.33, name: 0.33}, {label: 28.224, name:28.224}],
+                    object: getValueItems(5),
+                }
+                const valueHandler = (inputText, rootKey, dataType, subPath) => {
+                    let results = valueItemsMap[rootKey.name]
+                    if (inputText) {
+                        const regex = getTextHighlightRegex(inputText);
+                        results = results.filter(d => regex.test(d.label));
+                    }
+                    return {
+                        results,
+                        totalCount: results.length,
+                    };
+                }
+                const valueHandlerMap = {
+                    string: valueHandler,
+                    integer: valueHandler,
+                    float: valueHandler,
+                    object: valueHandler,
+                }
+                return {
+                    ...toRefs(state),
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Supported operators
+We provide the following operators:
+```undefined```, '!', '>', '>=', '<', '<=', '=', '!=', '~'
+
+It is recommended to use these operators in the following meanings.
+
+| Operator | Description |
+| -------- | ----------- |
+| (default) | contain |
+| ! | not contain |
+| = | equal |
+| != | not equal |
+| > | greater than |
+| >= | greater than or equal |
+| < | less than |
+| <= | less than or equal |
+| ~ | regex |
+
+
+### Operator restrictions
+
+You can restrict operators the user can enter in two ways.<br/>
+
+1. You can give an operator array to ```operators``` property on the value handler's return object(useful with nested key selection).
+2. You can give an operator array to ```operators``` property of key item.
+
+Be careful when using them as they have the highest priority in the order they are listed.
+
+<Canvas>
+    <Story name="Operators" height="300px">
+        {{
+            components: { PQuerySearch },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        @search="queryItem = $event"
+    ></p-query-search>
+    <div class="my-2 p-4 rounded bg-gray-200 overflow-auto">
+        <p class="mb-2 text-lg">Searched:</p>
+        <pre>{{queryItem}}</pre>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    queryItem: null
+                })
+                const keyItemSets = [{
+                    title: 'Keys',
+                    items: [
+                        {label: 'All Operators', name: 'all'},
+                        {label: 'Restricted Operators(=, !=)', name: 'restricted', operators: ['=', '!=']},
+                        {label: 'Nested', name: 'nested' },
+                    ]
+                }]
+                const valueItems = getValueItems(5);
+                const valueHandler = (inputText, rootKey) => {
+                    let results = valueItems;
+                    if (inputText) {
+                        const regex = getTextHighlightRegex(inputText);
+                        results = results.filter(d => regex.test(d.label));
+                    }
+                    return {
+                        results,
+                        totalCount: results.length,
+                        operators: rootKey.name === 'nested' ? ['=', '!='] : undefined
+                    };
+                }
+                const valueHandlerMap = {
+                    all: valueHandler,
+                    restricted: valueHandler,
+                    nested: valueHandler,
+                }
+                return {
+                    ...toRefs(state),
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

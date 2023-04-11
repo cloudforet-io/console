@@ -1,0 +1,304 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { i18n } from '@/translations';
+
+import { reactive, toRefs, computed } from 'vue';
+
+import { basicItemSets, boardStandardItemSets, cardsStyleOption } from '@/data-display/board/mock';
+import { getBoardArgTypes } from '@/data-display/board/story-helper';
+import PBoard from '@/data-display/board/PBoard';
+
+<Meta title='Data Display/Board' parameters={{
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    }
+}} argTypes={getBoardArgTypes()}/>
+
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PBoard },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-board
+                :style-type="styleType"
+                :board-sets="boardItemList"
+                :style-options="styleOptions"
+            >
+                <template #item-content>
+                    <strong>Example Title</strong>
+                    <p>Any content can be here.</p>
+                </template>
+            </p-board>
+        </div>
+    `,
+    setup(props) {
+        const state = reactive({
+            boardItemList: computed(() => props.boardSets),
+            styleType: computed(() => props.styleType),
+            styleOptions: computed(() => props.styleOptions),
+            pageLimit: computed(() => props.pageLimit),
+        });
+        return {
+            ...toRefs(state),
+        };
+    }
+});
+
+# Board
+
+<br/>
+<br/>
+
+## Style Type and Style Options
+
+Board component has two style props: `styleType` and `styleOptions`.<br/>
+`styleType` is the highest standard that determines the style of `Board`, and `styleOptions` is an option that each `styleType` has independently.<br/>
+In order to use `Board` component, it is first necessary to understand what `styleOptions` each `styleType` has.
+
+|Style Type|Style Options Properties|Description|
+|-|-|-|
+|`list`| - |It is not affected by any styleOptions.|
+|`cards`|`column`|In the cards type, Board Items have a user-defined number of columns. The default is 1.|
+
+<br/>
+
+### cards - styleOptions
+```
+interface StyleOptions {
+    column: number;
+}
+```
+
+<br/>
+<br/>
+
+
+## Board Set Properties
+
+Board's `boardSets` props is an `array` of `BoardSet`.
+`BoardSet` is an `object` that extends `BoardItemProps` and includes following properties:
+
+
+|Properties|Description|Type|
+|-|-|-|
+|leftIcon|The name of icon-button-name in left content area. Must be a valid icon name for Icons component.|`String`|
+|iconButtonSets|Array of Icon button set that include icon name and icon button event.|`Array of Object`|
+|other properties|Other properties that have 'any' type. It exists for Board Item's content, so any type of data can be injected. |`any`|
+
+<br/>
+
+
+## Basic
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Basic">
+    {{
+        props: Object.keys(getBoardArgTypes()),
+        i18n,
+        components: { PBoard },
+        template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board
+            style-type="list"
+            :board-sets="boardItemList"
+        >
+            <template #item-content="{board}" >
+                <strong>{{ board.title }}</strong>
+                <p>{{ board.description1 }}</p>
+                <p>{{ board.description2 }}</p>
+            </template>
+        </p-board>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    boardItemList: basicItemSets,
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Style Type
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Style Type">
+        {{
+            i18n,
+            components: { PBoard },
+            template: `
+    <div class="h-full w-full overflow p-8 flex flex-wrap">
+        <div class="flex-grow p-4">
+            <strong>list</strong>
+            <br/>
+            <br/>
+            <p-board
+                style-type="list"
+                :board-sets="boardItemList"
+            >
+                <template #item-content>
+                    <strong>Example Title</strong>
+                    <p>Any content can be here.</p>
+                </template>
+            </p-board>
+        </div>
+        <div class="flex-grow p-4">
+            <strong>cards</strong>
+            <br/>
+            <br/>
+            <p-board
+                style-type="cards"
+                :board-sets="boardItemList"
+            >
+                <template #item-content>
+                    <strong>Left Icon</strong>
+                    <p>Collector tags icon</p>
+                </template>
+            </p-board>
+        </div>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    boardItemList: boardStandardItemSets,
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Style Type - Cards
+
+The Board component receives an object type prop called `styleOptions`.<br/>
+In the `cards` type case, `styleOptions` takes the number of columns.<br/>
+
+
+```
+interface StyleOptions {
+    column: number;
+}
+```
+When no value is given to styleOptions, it defaults to 1 column.<br/>
+In screen **breakpoints below tablet (less than 1024px)**, the given number of columns is ignored and **only has one column**.
+
+
+<br/>
+
+<Canvas>
+    <Story name="Style Type - Cards">
+        {{
+            i18n,
+            components: { PBoard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <strong>Column : 2</strong>
+        <br/>
+        <br/>
+        <p-board
+            style-type="cards"
+            :board-sets="boardItemList"
+            :style-options="styleOptionsColumn2"
+        >
+            <template #item-content>
+                <strong>Example Title</strong>
+                <p>Any content can be here.</p>
+            </template>
+        </p-board>
+        <br/>
+        <br/>
+        <strong>Column : 3</strong>
+        <br/>
+        <br/>
+        <p-board
+            style-type="cards"
+            :board-sets="boardItemList"
+            :style-options="styleOptionsColumn3"
+        >
+            <template #item-content>
+                <strong>Example Title</strong>
+                <p>Any content can be here.</p>
+            </template>
+        </p-board>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    boardItemList: boardStandardItemSets,
+                    styleOptionsColumn2 : { column: 2 },
+                    styleOptionsColumn3 : { column: 3 },
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Selectable
+<Canvas>
+    <Story name="Selectable">
+        {{
+            i18n,
+            components: { PBoard },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-board
+                        :board-sets="boardItemList"
+                        selectable
+                    >
+                        <template #item-content>
+                            <strong>Example Title</strong>
+                            <p>Any content can be here.</p>
+                        </template>
+                    </p-board>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    boardItemList: boardStandardItemSets,
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

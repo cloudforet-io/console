@@ -1,0 +1,325 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PSearch from './PSearch.vue';
+import { reactive, toRefs } from 'vue';
+import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
+
+<Meta title='Inputs/Search' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5952%3A1343',
+    },
+}} argTypes={getSearchArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PSearch },
+    template: `
+        <p-search v-model="proxyValue"
+                  v-bind="inputAttrs"
+                  :placeholder="placeholder"
+                  :disable-icon="disableIcon"
+                  :invalid="invalid"
+                  :disabled="disabled"
+                  :is-focused="isFocused"
+                  :visible-menu="visibleMenu"
+                  :use-fixed-menu-style="useFixedMenuStyle"
+                  :menu="menu"
+                  :loading="loading"
+                  :handler="handler"
+                  :disable-handler="disableHandler"
+                  :use-auto-complete="useAutoComplete"
+                  @search="onSearch"
+                  @focus="onFocus"
+                  @blur="onBlur"
+                  @input="onInput"
+                  @delete="onDelete"
+        >
+        </p-search>
+    `,
+    setup(props) {
+        const state = reactive({
+            proxyValue: props.value
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Search
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" >
+{{
+    components: { PSearch },
+    template: `
+        <p-search v-model="proxyValue"/>
+    `,
+    setup(props) {
+        const state = reactive({
+            proxyValue: props.value
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Auto Complete
+
+`useAutoComplete` = `true`
+
+Auto Complete function is available when you set `useAutoComplete` prop to `true`.
+
+
+When you enter a keyword in a search input, the `PContextMenu` is displayed.
+
+<br/>
+
+Below is an example of each handler.
+
+<br/>
+<br/>
+
+### Disable Handler
+`disableHandler` = `true`
+
+<br/>
+
+Menu items are not filtered because there is no handler.
+
+<Canvas>
+    <Story name="Disable Handler">
+        {{
+            components: { PSearch },
+            template: `
+        <div>
+            <div>Search Text : {{ searchText }}</div>
+            <br />
+            <p-search v-model="proxyValue"
+                  use-fixed-menu-style
+                  use-auto-complete
+                  :menu="menu"
+                  disable-handler
+                  @search="handleSearch"/>
+        </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value,
+                    menu: [
+                        { name: 1, label: 'menu1', type: 'item'},
+                        { name: 2, label: 'menu2', type: 'item'},
+                        { name: 3, label: 'menu3', type: 'item'},
+                    ],
+                    searchText: '',
+                })
+                const handleSearch = (val) => {
+                    state.searchText = val;
+                }
+                return {
+                    ...toRefs(state),
+                    handleSearch,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
+
+### Injected Handler
+
+<br/>
+
+`handler` must be defined. The `handler` is a function that returns a list of filtered menu items.
+<Canvas>
+    <Story name="Injected Handler">
+        {{
+            components: { PSearch },
+            template: `
+        <div>
+            <div>Search Text : {{ searchText }}</div>
+            <br />
+            <p-search v-model="proxyValue"
+                  use-fixed-menu-style
+                  use-auto-complete
+                  :handler="handlePromise"
+                  @search="handleSearch"/>
+        </div>
+    `,
+            setup(props) {
+                const menu = [
+                    { name: 1, label: 'menu1', type: 'item'},
+                    { name: 2, label: 'menu2', type: 'item'},
+                    { name: 3, label: 'menu3', type: 'item'},
+                ];
+                const state = reactive({
+                    proxyValue: props.value,
+                    searchText: '',
+                })
+                const handleSearch = (val) => {
+                    state.searchText = val;
+                }
+                const promiseReturn = (searchText) => new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve(menu.filter(item => item.label.includes(searchText)));
+                    }, 1000);
+                });
+                const handlePromise = (searchText) => promiseReturn(searchText);
+                return {
+                    ...toRefs(state),
+                    handleSearch,
+                    handlePromise,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Default Handler
+
+<br/>
+
+If `handler` is not defined, it is filtered through the built-in default `handler`.
+
+<Canvas>
+    <Story name="Default Handler">
+        {{
+            components: { PSearch },
+            template: `
+        <div>
+            <div>Search Text : {{ searchText }}</div>
+            <br />
+            <p-search v-model="proxyValue"
+                  use-fixed-menu-style
+                  use-auto-complete
+                  :menu="menu"
+                  @search="handleSearch"/>
+        </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value,
+                    menu: [
+                        { name: 1, label: 'menu1', type: 'item'},
+                        { name: 2, label: 'menu2', type: 'item'},
+                        { name: 3, label: 'menu3', type: 'item'},
+                    ],
+                    searchText: '',
+                })
+                const handleSearch = (val) => {
+                    state.searchText = val;
+                }
+                return {
+                    ...toRefs(state),
+                    handleSearch,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" invalid/>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" disabled/>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Readonly
+
+<Canvas>
+    <Story name="Readonly" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" readonly />
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

@@ -1,0 +1,119 @@
+import PTag from '@/data-display/tags/PTag.vue';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getTagArgTypes } from '@/data-display/tags/story-helper';
+import {
+    getBasicTagArgs
+} from '@/data-display/tags/mock';
+
+<Meta title='Data Display/Tag' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
+    }
+}} argTypes={getTagArgTypes()}
+/>
+
+export const Template = (args,{argTypes})=>({
+    props: Object.keys(argTypes),
+    components: { PTag },
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:100px;">
+            <p-tag
+                :category-item="categoryItem"
+                :key-item="keyItem"
+                :value-item="valueItem"
+                :deletable="deletable"
+                :outline="outline"
+                :selected="selected"
+                :invalid="invalid"
+                :error-message="errorMessage"
+            />
+        </div>
+    `,
+})
+
+# Tag
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="Basic">
+        {{
+            components:{ PTag },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-tag :category-item="fullArgs.categoryItem" :key-item="fullArgs.keyItem" :value-item="fullArgs.valueItem" style="margin: 1rem"/>
+    <p-tag :key-item="keyValueArgs.keyItem" :value-item="keyValueArgs.valueItem" style="margin: 1rem"/>
+    <p-tag :value-item="onlyValueArg.valueItem" style="margin: 1rem"/>
+</div>`,
+            setup() {
+                const state = {
+                    fullArgs: getBasicTagArgs().fullArgs,
+                    keyValueArgs: getBasicTagArgs().keyValueArgs,
+                    onlyValueArg: getBasicTagArgs().onlyValueArg,
+                };
+                return {
+                    ...state,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Deletable Tag
+<Canvas>
+    <Story name="Deletable Tag">
+        {{
+            components:{ PTag },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-tag style="margin: 1rem">solid</p-tag>
+    <p-tag :outline="true" style="margin: 1rem">outline</p-tag>
+    <p-tag :invalid="true" error-message="This is error message." style="margin: 1rem">error</p-tag>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Tag
+<Canvas>
+    <Story name="Tag">
+        {{
+            components:{ PTag },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-tag :deletable="false" style="margin: 1rem">solid</p-tag>
+    <p-tag :deletable="false" :outline="true" style="margin: 1rem">selected outline</p-tag>
+    <p-tag :deletable="false" :invalid="true" error-message="This is error message." style="margin: 1rem">error</p-tag>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Selected
+<Canvas>
+    <Story name="Selected">
+        {{
+            components:{ PTag },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-tag :selected="true" style="margin: 1rem">solid</p-tag>
+    <p-tag :selected="true" :outline="true" style="margin: 1rem">outline</p-tag>
+    <p-tag :selected="true" :invalid="true" error-message="This is error message." style="margin: 1rem">error</p-tag>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="100px" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />

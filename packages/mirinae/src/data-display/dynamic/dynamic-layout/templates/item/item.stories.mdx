@@ -1,0 +1,108 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {i18n} from '@/translations';
+import PDynamicLayout from '../../PDynamicLayout.vue';
+import { getDynamicLayoutItemArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/item/story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/- Item'
+      argTypes={getDynamicLayoutItemArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="item"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                            loading,
+                            timezone
+                          }"
+                           class="w-full"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Item Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | X |
+| markdown | X |
+| search | X |
+| disable_search | X |
+| headers | x |
+| layout | X |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | X |
+| sortDesc | X |
+| pageStart | X |
+| pageLimit | X |
+| searchText | X |
+| queryTags | X |
+
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | O |
+| totalCount | X |
+| timezone | O |
+| selectIndex | X |
+| selectable | X |
+| multiSelect | X |
+| invalid | X |
+| colCopy | X |
+| excelVisible | X |
+| settingsVisible | X |
+| keyItemSets | X |
+| valueHandlerMap | X |
+| language | X |
+| popupVisible | X |
+
+
+## Supported Events
+
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | X |
+| select | X |
+| export | X |
+| click-settings | X |
+| update-popup-visible | X |
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+

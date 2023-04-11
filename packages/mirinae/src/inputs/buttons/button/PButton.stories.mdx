@@ -1,0 +1,254 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import PButton from '@/inputs/buttons/button/PButton';
+import { BUTTON_STYLE, BUTTON_SIZE } from '@/inputs/buttons/button/type';
+import { getButtonArgTypes } from '@/inputs/buttons/button/story-helper';
+import { reactive, toRefs } from 'vue';
+
+<Meta title='Inputs/Buttons/Button' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5152%3A122457'
+    }
+}} component={PButton} argTypes={getButtonArgTypes()}/>
+
+export const Template = (args, {argTypes})=>({
+    props: Object.keys(argTypes),
+    components: {PButton},
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <p-button
+                @click="handleClick"
+                :href="href"
+                :styleType="styleType"
+                :size="size"
+                :disabled="disabled"
+                :readonly="readonly"
+                :loading="loading"
+                :block="block"
+                :icon-left="iconLeft"
+                :icon-right="iconRight"
+            >
+                {{$props.default}}
+            </p-button>
+        </div>`
+})
+
+# Button
+
+<br/>
+<br/>
+<br/>
+
+## Sizes
+<Canvas>
+    <Story name='Sizes' height='150px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                    <p-button v-for="size in buttonSizes" style-type="primary" style="margin-right: 20px" :size="size">
+                        <div>{{ size }}</div>
+                    </p-button>
+                </div>`,
+            setup() {
+                const state = reactive({
+                    buttonSizes: Object.values(BUTTON_SIZE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## With Icon
+<Canvas>
+    <Story name='With Icon' height='150px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div>
+                    <div style="display:flex; align-items:center; justify-content:center; background-color: white">
+                        <p-button v-for="size in buttonSizes" style-type="primary" style="margin-right: 20px" :size="size" icon-left="ic_plus_bold">
+                            <div>{{ size }}</div>
+                        </p-button>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                        <p-button v-for="size in buttonSizes" style-type="primary" style="margin-right: 20px" :size="size" icon-right="ic_plus_bold">
+                            <div>{{ size }}</div>
+                        </p-button>
+                    </div>
+                </div>
+`,
+            setup() {
+                const state = reactive({
+                    buttonSizes: Object.values(BUTTON_SIZE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Style Types
+<Canvas>
+    <Story name='Style Types' height='250px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display: flex; flex-direction: column; align-items: center; margin-top: 50px; background-color: white">
+                    <div style="display:flex">
+                        <p-button v-for="styleType in buttonStyles.slice(0, 4)" :style-type="styleType" style="margin-right: 20px">
+                            <div>{{ styleType }}</div>
+                        </p-button>
+                    </div>
+                    <div style="display:flex; margin-top: 20px">
+                        <p-button v-for="styleType in buttonStyles.slice(4, 7)" :style-type="styleType" style="margin-right: 20px">
+                            <div>{{ styleType }}</div>
+                        </p-button>
+                    </div>
+                    <div style="display:flex; margin-top: 20px">
+                        <p-button v-for="styleType in buttonStyles.slice(7)" :style-type="styleType" style="margin-right: 20px">
+                            <div>{{ styleType }}</div>
+                        </p-button>
+                    </div>
+                </div>`,
+            setup() {
+                const state = reactive({
+                    buttonStyles: Object.values(BUTTON_STYLE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## Disabled
+<Canvas>
+    <Story name='Disabled' height='150px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display: flex; flex-direction: column; align-items: center; background-color: white">
+                <div style="display:flex">
+                    <p-button v-for="styleType in buttonStyles.slice(0, 4)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(4, 7)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(7)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                </div>`,
+            setup() {
+                const state = reactive({
+                    buttonStyles: Object.values(BUTTON_STYLE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Loading
+<Canvas>
+    <Story name='Loading' height='150px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :loading="true"
+                    >
+                        <div class="loading-btn">
+                            Loading
+                        </div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Block
+<Canvas>
+    <Story name='Block' height='200px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                    >
+                        <div>Block</div>
+                    </p-button>
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                        size="lg"
+                    >
+                        <div>Block, size: lg</div>
+                    </p-button>
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                        size="sm"
+                    >
+                        <div>Block, size: sm</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Readonly
+<Canvas>
+    <Story name='Readonly' height='150px'>
+        {{
+            components:{ PButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :readonly="true"
+                    >
+                            Readonly
+                    </p-button>
+                    <p-button
+                        styleType="secondary"
+                        :readonly="true"
+                        class="mx-2"
+                    >
+                        Readonly
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />
+

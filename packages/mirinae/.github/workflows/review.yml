@@ -1,0 +1,57 @@
+# review for PRs
+name: SpaceONE Review
+
+on:
+  pull_request:
+    branches:
+      - beta
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+
+    - name: Install dependencies
+      if: steps.node-cache.outputs.cache-hit != 'true'
+      run: npm install
+
+
+    - name: Lint
+      run: |
+        npm run lint
+
+
+    - name: Test
+      run: |
+        npm run test:unit
+
+
+#    - name: Storybook
+#      run: |
+#        npm run build:storybook
+
+
+    - name: Build
+      run: |
+        npm run build
+
+    - name: Transpile
+      run: npm run vue-tsc || npm run tsc-alias
+

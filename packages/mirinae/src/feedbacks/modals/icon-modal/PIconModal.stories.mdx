@@ -1,0 +1,70 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import PIconModal from "@/feedbacks/modals/icon-modal/PIconModal";
+import {computed, reactive, toRefs,  ref} from "vue";
+import PButton from "@/inputs/buttons/button/PButton";
+import { faker } from '@faker-js/faker';
+import { getIconModalArgTypes } from '@/feedbacks/modals/icon-modal/story-helper';
+
+<Meta title='Feedbacks/Modals/Icon Modal' parameters={{
+    centered: { disable: true },
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A138158&t=kwTRXVZQtJLDw0Ei-4',
+    },
+}} argTypes={getIconModalArgTypes()} />
+
+export const Template = (args, {argTypes} ) => ({
+    props: Object.keys(argTypes),
+    components: { PIconModal, PButton },
+    template: `
+<div>
+    <p-button @click="launchModal">Launch a modal</p-button>
+    <p-icon-modal :visible.sync="modalVisible"
+                    :size="size"
+                    :icon-name="iconName"
+                    :emoji="emoji"
+                    :header-title="headerTitle"
+                    :header-desc="headerDesc"
+                    :button-text="buttonText"
+                    :button-style-type="buttonStyleType"
+                    :backdrop="backdrop"
+                    @close="closeModal"
+    />
+</div>`,
+    setup(props) {
+        const selectItem = ref('init');
+        const state = reactive({
+            modalVisible: props.visible,
+            contents: computed(() => faker.lorem.lines()),
+        });
+        const launchModal = () => {
+            state.modalVisible = true;
+        };
+        const closeModal = () => {
+            state.modalVisible = false;
+        };
+        return {
+            selectItem,
+            ...toRefs(state),
+            launchModal,
+            closeModal,
+        };
+    }
+});
+
+# Icon Modal
+
+<br/>
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>

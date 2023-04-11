@@ -1,0 +1,137 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PRadioGroup from './PRadioGroup.vue';
+import { reactive, toRefs } from 'vue';
+import { getRadioGroupArgTypes } from '@/inputs/radio-group/story-helper';
+import { PRadio } from '@';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Radio Group' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064'
+    }
+}} argTypes={getRadioGroupArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PRadioGroup, PRadio },
+    template: `
+        <div class="h-full w-full overflow p-8 flex flex-col">
+            <p-radio-group :direction="direction">
+                <p-radio v-for="value in values"
+                         :key="value"
+                         :value="value"
+                         v-model="proxySelected"
+                >
+                    This is radio for {{value}}
+                </p-radio>
+            </p-radio-group>
+        </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit),
+            values: [0, 1, 2, 3],
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Radio Group
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PRadioGroup, PRadio },
+            template: `
+                <div>
+                    <div class="flex flex-col">
+                        <p-radio-group>
+                            <p-radio v-for="value in values" v-model="selected" :value="value" :key="value">
+                                This is radio for {{value}}
+                            </p-radio>
+                        </p-radio-group>
+                    </div>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    selected: undefined,
+                    values: [0, 1, 2, 3]
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Direction
+
+<Canvas>
+    <Story name="Direction">
+        {{
+            components: { PRadioGroup, PRadio },
+            template: `
+            <div>
+                <div class="flex flex-col row-gap-8">
+                    <div class="flex flex-col row-gap-2">
+                        <p>Horizontal (default)</p>
+                        <p-radio-group direction="horizontal">
+                            <p-radio :key="value" v-for="value in horizontalValues" v-model="horizontalSelected" :value="value">
+                                {{value}}
+                            </p-radio>
+                        </p-radio-group>
+                    </div>
+                    <div class="flex flex-col row-gap-2">
+                        <p>Vertical</p>
+                        <p-radio-group direction="vertical">
+                            <p-radio :key="value" v-for="value in verticalValues" v-model="verticalSelected" :value="value">
+                                {{value}}
+                            </p-radio>
+                        </p-radio-group>
+                    </div>
+                </div>
+            </div>
+        `,
+            setup() {
+                const state = reactive({
+                    horizontalValues: [true, false],
+                    horizontalSelected: true,
+                    verticalValues: [true, false],
+                    verticalSelected: true,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

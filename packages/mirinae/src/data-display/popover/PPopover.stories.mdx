@@ -1,0 +1,109 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+
+import { getPopoverArgTypes } from './story-helper';
+import PPopover from '@/data-display/popover/PPopover';
+import PButton from '../../inputs/buttons/button/PButton';
+import { faker } from '@faker-js/faker'; import PTextInput from '../../inputs/input/text-input/PTextInput.vue';
+
+<Meta title='Data Display/Popover' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=2667%3A173604'
+    }
+}} argTypes={getPopoverArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PPopover, PButton },
+    template: `
+        <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
+            <p-popover :position="proxyPosition" :isVisible="proxyIsVisible"
+                       :ignore-target-click="ignoreTargetClick" :trigger="trigger">
+                <div v-if="defaultSlot" v-html="defaultSlot" />
+                <p-button v-else @click="handleClick">default</p-button>
+                <template #content>
+                    <div v-if="contentRefSlot" v-html="contentRefSlot" />
+                    <div v-else>
+                        <p style="margin-top:12px">content: {{defaultContentValue}}</p>
+                    </div>
+                </template>
+            </p-popover>
+        </div>
+    `,
+    setup(props) {
+        const state = reactive({
+            proxyPosition: props.position,
+            proxyIsVisible: props.isVisible,
+            defaultContentValue: faker.lorem.sentence(10),
+        })
+        const handleClick = () => {
+            alert('default slot clicked')
+        }
+        return {
+            ...toRefs(state),
+            handleClick,
+        }
+    }
+});
+
+
+# Popover
+<br/>
+<br/>
+
+## Basic
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PPopover, PTextInput, PButton },
+            template: `
+        <div class="w-full overflow p-8 flex flex-col justify-center" style="height: 500px;">
+            <b>click (default)</b>
+            <br/>
+            <p-popover>
+                <p-button>default</p-button>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+            <br/>
+            <br/>
+            <b>hover</b>
+            <br/>
+            <p-popover trigger="hover">
+                <p-button>default</p-button>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+            <br/>
+            <br/>
+            <b>focus</b>
+            <br/>
+            <p-popover trigger="focus">
+                <p-text-input style-type="primary" :outline="true">default</p-text-input>
+                <template #content>
+                    <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

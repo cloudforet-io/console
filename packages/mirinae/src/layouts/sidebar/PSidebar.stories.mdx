@@ -1,0 +1,421 @@
+import { faker } from '@faker-js/faker';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PSidebar from '@/layouts/sidebar/PSidebar.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import { reactive, toRefs, watch, computed } from 'vue';
+import { getSidebarArgTypes } from '@/layouts/sidebar/story-helper';
+
+
+<Meta title='Layouts/Sidebar' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6980%3A163443'
+    }
+}} component={PSidebar} argTypes={getSidebarArgTypes()} />
+
+
+export const Template = (args, {argTypes}) => {
+    return {
+        props: Object.keys(argTypes).filter(d => d !== 'visible'),
+        components: { PSidebar, PButton },
+        template: `
+            <div class="flex flex-col" style="height: 500px;">
+                <p-button :style-type="visible ? 'primary' : 'highlight'"
+                          @click="visible = !visible;">
+                    {{visible ? 'close' : 'open' }}
+                </p-button>
+                <p-sidebar :title="title"
+                            :style-type="styleType"
+                            :size="size"
+                            :hide-close-button="hideCloseButton"
+                            :is-fixed-size="isFixedSize"
+                            v-model="visible"
+                            class="mt-4 flex-grow"
+                            @close="onClose"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        {{contents || 'Non-sidebar area'}}
+                    </div>
+                    <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
+                </p-sidebar>
+            </div>
+        `,
+        setup(props) {
+            const state = reactive({
+                visible: true,
+            })
+            return {
+                ...toRefs(state),
+            }
+        }
+    }
+};
+
+export const Playground = (args, {argTypes}) => {
+    return {
+        props: Object.keys(argTypes),
+        components: { PSidebar },
+        template: `
+            <div class="flex flex-col" style="height: 500px;">
+                <p-sidebar :title="title"
+                            :visible="visible"
+                            :style-type="styleType"
+                            :size="size"
+                            :is-fixed-size="isFixedSize"
+                            :hide-close-button="hideCloseButton"
+                            class="mt-4 flex-grow"
+                >
+                    <div class="bg-primary3 h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>Sidebar contents</template>
+                </p-sidebar>
+            </div>
+        `,
+        setup(props) {
+            return {
+            }
+        }
+    }
+};
+
+
+# Sidebar
+<br/>
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="basic" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: ''
+        }
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Contents
+
+<Canvas>
+    <Story name="long contents" argTypes={{
+        contents: {
+            defaultValue: faker.lorem.lines(100)
+        },
+        sidebarContents: {
+            defaultValue: faker.lorem.lines(50)
+        }
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Title
+
+<Canvas>
+    <Story name="long title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: faker.lorem.lines(50)
+        }
+    }} args={{
+        title: faker.lorem.lines(2)
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## No Title
+
+<Canvas>
+    <Story name="no title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: faker.lorem.lines(50)
+        },
+    }} args={{
+        title: undefined
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Title
+
+<Canvas>
+    <Story name="custom title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: ''
+        }
+    }}>
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #title>
+                        <strong class="text-coral">This is Custom Title</strong> with title slot.
+                    </template>
+                    <template #sidebar>Sidebar Contents</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Secondary Style Type
+
+<Canvas>
+    <Story name="Secondary Style Type" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: 'Style Type - Secondary'
+        }
+    }}>
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Secondary Style Type"
+                            style-type="secondary"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        {{contents || 'Non-sidebar area'}}
+                    </div>
+                    <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Hide Close Button
+
+<Canvas>
+    <Story name="Hide Close Button" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: 'Style Type - Secondary'
+        }
+    }}>
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="No Close Button"
+                            :hide-close-button="true"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        {{contents || 'Non-sidebar area'}}
+                    </div>
+                    <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Large Size
+
+<Canvas>
+    <Story name="Large Size">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Large Size"
+                            :hide-close-button="true"
+                            size="lg"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>Large Size</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Medium Size
+
+<Canvas>
+    <Story name="Medium Size">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Medium Size"
+                            :hide-close-button="true"
+                            size="md"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>Medium Size</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+<br/>
+<br/>
+
+## Small Size
+
+<Canvas>
+    <Story name="Small Size">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Small Size"
+                            :hide-close-button="true"
+                            size="sm"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>Small Size</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Footer Slot
+
+<Canvas>
+    <Story name="Footer Slot">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Footer Sidebar"
+                            :hide-close-button="true"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>content</template>
+                    <template #footer>
+                        <div class="bg-gray-200">Footer Area</div>
+                    </template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground" >
+        {Playground.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />
