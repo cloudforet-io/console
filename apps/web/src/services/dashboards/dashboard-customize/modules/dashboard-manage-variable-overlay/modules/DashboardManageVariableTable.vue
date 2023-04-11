@@ -50,6 +50,7 @@
                                    @click="handleEditVariable(value)"
                     />
                     <p-icon-button name="ic_delete"
+                                   style-type="negative-transparent"
                                    @click="handleDeleteVariable(value)"
                     />
                 </div>
