@@ -169,7 +169,7 @@ const _toggleDashboardVariableUse = () => {
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
                 state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
-                if (state.affectedWidgetTitlesByCustomVariable) {
+                if (state.affectedWidgetTitlesByCustomVariable.length) {
                     state.selectedCustomVariable = k;
                     state.uncheckConfirmModalVisible = true;
                 } else {
