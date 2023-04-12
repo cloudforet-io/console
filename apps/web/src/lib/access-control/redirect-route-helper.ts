@@ -44,3 +44,7 @@ export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissions
     if (redirectMenuId) return { name: redirectMenuId };
     return { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
 };
+
+export const gerRedirectRouteByURL = () => {
+    console.log(window.location);
+};

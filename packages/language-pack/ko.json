@@ -32,6 +32,7 @@
 			"FIND": {
 				"BACK_TO_SIGN_IN": "",
 				"HELP_TEXT": "",
+				"INVALID_EMAIL_FORMAT": "",
 				"SEND": "",
 				"TITLE": "",
 				"USER_ID": ""

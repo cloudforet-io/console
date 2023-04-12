@@ -13,9 +13,7 @@ const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pag
 const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
 const PasswordContainer = () => import('@/services/auth/password/PasswordContainer.vue');
 const PasswordPage = () => import('@/services/auth/password/PasswordPage.vue');
-const ValidationEmailPage = () => import('@/services/auth/validationEmail/ValidationEmailPage.vue');
-// const SuccessPage = () => import('@/services/auth/password/successStatus/Success.vue');
-// const FailedPage = () => import('@/services/auth/password/successStatus/Failed.vue');
+const ValidationEmailPage = () => import('@/services/auth/password/validation-email/ValidationEmailPage.vue');
 
 export default [
     {
@@ -39,7 +37,6 @@ export default [
                 name: AUTH_ROUTE.SIGN_IN._NAME,
                 meta: {
                     isSignInPage: true,
-
                 },
                 props: (route) => ({
                     nextPath: route.query.nextPath,

@@ -7,13 +7,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
 export const checkSsoAccessToken = async (store) => {
-    if (window.location.pathname === '/reset-password') {
-        if (isMobile()) store.dispatch('display/showMobileGuideModal');
-        return;
-    }
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
+
+    if (window.location.pathname === '/reset-password') {
+        console.log(ssoAccessToken);
+        if (isMobile()) store.dispatch('display/showMobileGuideModal');
+        return;
+    }
     // signOut
     if (ssoAccessToken) {
         if (SpaceConnector.isTokenAlive) {
@@ -26,6 +28,6 @@ export const checkSsoAccessToken = async (store) => {
             }
         }
         if (isMobile()) store.dispatch('display/showMobileGuideModal');
-        else window.location.pathname = 'reset-password';
+        else window.location.pathname = '/reset-password';
     }
 };

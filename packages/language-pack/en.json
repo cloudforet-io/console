@@ -32,6 +32,7 @@
 			"FIND": {
 				"BACK_TO_SIGN_IN": "Back to Sign-in",
 				"HELP_TEXT": "Enter your User ID, then we'll send you a link to reset password again.",
+				"INVALID_EMAIL_FORMAT": "Invalid email format.",
 				"SEND": "Send Password Reset Email",
 				"TITLE": "Forgot your password?",
 				"USER_ID": "User ID"

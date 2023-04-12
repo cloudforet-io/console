@@ -103,8 +103,8 @@ import {
     PButton, PCollapsibleToggle, PI, PIconButton,
 } from '@spaceone/design-system';
 
+import CollapsibleContents from '@/services/auth/password/validation-email/modules/CollapsibleContents.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import CollapsibleContents from '@/services/auth/validationEmail/modules/CollapsibleContents.vue';
 
 const vm = getCurrentInstance()?.proxy as Vue;
 const { status, userId } = vm.$route.query;

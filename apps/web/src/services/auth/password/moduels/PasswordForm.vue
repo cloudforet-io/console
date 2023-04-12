@@ -4,7 +4,7 @@
             class="form"
             onsubmit="return false"
         >
-            <div v-if="passwordPageState.status !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME">
+            <div v-if="props.status !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME">
                 <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
                                :invalid="validationState.isIdValid === false"
                                :invalid-text="validationState.idInvalidText"
@@ -16,7 +16,7 @@
                                       :invalid="invalid"
                                       block
                                       @update:value="handleChangeInput('userId')"
-                                      @keyup.enter="handleClickEnter('userId')"
+                                      @keyup.enter="handleChangeInput('userId')"
                         />
                     </template>
                 </p-field-group>
@@ -35,7 +35,7 @@
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('password')"
-                                      @keyup.enter="handleClickEnter('password')"
+                                      @keyup.enter="handleChangeInput('password')"
                         />
                     </template>
                 </p-field-group>
@@ -52,7 +52,7 @@
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('password')"
-                                      @keyup.enter="handleClickEnter('password')"
+                                      @keyup.enter="handleChangeInput('password')"
                         />
                     </template>
                 </p-field-group>
@@ -74,13 +74,17 @@ import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import { blankValidator } from '@/lib/helper/user-validation-helper';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { usePasswordPageStore } from '@/services/auth/store/password-page-store';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
-const vm = getCurrentInstance()?.proxy as Vue;
+interface Props {
+    status: string
+}
 
-const passwordPageStore = usePasswordPageStore();
-const passwordPageState = passwordPageStore.$state;
+const props = withDefaults(defineProps<Props>(), {
+    status: '',
+});
+
+const vm = getCurrentInstance()?.proxy as Vue;
 
 const emit = defineEmits(['change-input', 'click-input']);
 
@@ -112,9 +116,6 @@ const handleChangeInput = (type: string) => {
             validationState.confirmPasswordInvalidText = '';
         }
     }
-};
-const handleClickEnter = () => {
-    emit('click-input', formState);
 };
 
 /* Expose */

@@ -1,5 +1,7 @@
 <template>
-    <div class="collapsible-contents-wrapper">
+    <p-data-loader class="collapsible-contents-wrapper"
+                   :loading="state.loading"
+    >
         <div class="contents-item">
             <p class="title">
                 {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.EXTENSION_TITLE_1') }}
@@ -28,22 +30,47 @@
                 </span>
             </p>
         </div>
-    </div>
+    </p-data-loader>
 </template>
 
 <script setup lang="ts">
 
-import { PTextButton } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+
+import { PTextButton, PDataLoader } from '@spaceone/design-system';
+
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
-import { usePasswordPageStore } from '@/services/auth/store/password-page-store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const passwordPageStore = usePasswordPageStore();
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
 
 const { query } = SpaceRouter.router.currentRoute;
-const handleClickResend = () => {
-    passwordPageStore.sendResetEmail(query.userId as string);
+
+const state = reactive({
+    loading: false,
+    domainId: computed(() => store.state.domain.domainId),
+});
+
+/* API */
+const handleClickResend = async () => {
+    const userId = query.userId as string;
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.identity.user.resetPassword({ user_id: userId, domain_id: state.domainId });
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
+        throw e;
+    } finally {
+        state.loading = false;
+    }
 };
 </script>
 
