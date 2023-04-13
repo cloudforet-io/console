@@ -114,12 +114,10 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     if (userType === 'DOMAIN_OWNER') {
         const userInfo = await getDomainOwnerInfo(userId);
-        console.log(userInfo);
         commit('setUser', userInfo);
         commit('setRoles', [{ name: 'Root Account', roleType: 'DOMAIN' }]);
     } else {
         const userInfo = await getUserInfo(userId);
-        console.log(userInfo);
         commit('setUser', userInfo);
 
         const userRoles = await getUserRoleBindings(userId);
@@ -138,7 +136,6 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
-    console.log({ commit, state, userRequest });
     await updateUser(state.userId, state.userType, userRequest);
     commit('setUser', { ...state, ...userRequest });
     commit('setTimezone', userRequest.timezone);

@@ -1,7 +1,7 @@
 <template>
     <div class="password-container">
         <div class="page-contents">
-            <router-view />
+            <slot />
         </div>
     </div>
 </template>

@@ -1,72 +1,74 @@
 <template>
-    <p-data-loader
-        class="password-page"
-        :loading="state.loading"
-    >
-        <div class="contents-wrapper">
-            <div class="headline-wrapper">
-                <h1 class="title">
-                    {{ state.pageTitle }}
-                </h1>
-                <div class="help-text-wrapper">
-                    <p v-if="state.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
-                       class="help-text"
+    <password-container>
+        <p-data-loader
+            class="password-page"
+            :loading="state.loading"
+        >
+            <div class="contents-wrapper">
+                <div class="headline-wrapper">
+                    <h1 class="title">
+                        {{ state.pageTitle }}
+                    </h1>
+                    <div class="help-text-wrapper">
+                        <p v-if="props.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
+                           class="help-text"
+                        >
+                            {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
+                            <span class="emphasis">
+                                {{ state.userInfo.email }}
+                            </span>
+                        </p>
+                        <p v-else
+                           class="help-text"
+                        >
+                            {{ $t('AUTH.PASSWORD.FIND.HELP_TEXT') }}
+                        </p>
+                    </div>
+                </div>
+                <password-form
+                    ref="passwordFormEl"
+                    v-model="formState"
+                    :status="props.status"
+                    @change-input="handleChangeInput"
+                    @click-input="handleClickButton"
+                />
+                <div class="button-wrapper">
+                    <p-button
+                        v-if="props.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
+                        :disabled="
+                            formState.password === ''
+                                || formState.confirmPassword === ''
+                                || formState.password !== formState.confirmPassword
+                                || formState.password.length< 8
+                        "
+                        @click="handleClickButton"
                     >
-                        {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
-                        <span class="emphasis">
-                            {{ state.email }}
-                        </span>
-                    </p>
-                    <p v-else
-                       class="help-text"
+                        {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
+                    </p-button>
+                    <p-button
+                        v-else
+                        :disabled="formState.userId === ''"
+                        @click="handleClickButton"
                     >
-                        {{ $t('AUTH.PASSWORD.FIND.HELP_TEXT') }}
+                        {{ $t('AUTH.PASSWORD.FIND.SEND') }}
+                    </p-button>
+                </div>
+                <div v-if="props.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME"
+                     class="util-wrapper"
+                >
+                    <p-icon-button name="ic_arrow-left"
+                                   size="sm"
+                                   class="go-back-button mr-2"
+                    />
+                    <p class="go-back-button">
+                        <router-link :to="{name: AUTH_ROUTE.SIGN_IN._NAME}">
+                            {{ $t('AUTH.PASSWORD.FIND.BACK_TO_SIGN_IN') }}
+                        </router-link>
                     </p>
                 </div>
             </div>
-            <password-form
-                ref="passwordFormEl"
-                v-model="formState"
-                :status="state.status"
-                @change-input="handleChangeInput"
-                @click-input="handleClickButton"
-            />
-            <div class="button-wrapper">
-                <p-button
-                    v-if="state.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
-                    :disabled="
-                        formState.password === ''
-                            || formState.confirmPassword === ''
-                            || formState.password !== formState.confirmPassword
-                            || formState.password.length< 8
-                    "
-                    @click="handleClickButton"
-                >
-                    {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
-                </p-button>
-                <p-button
-                    v-else
-                    :disabled="formState.userId === ''"
-                    @click="handleClickButton"
-                >
-                    {{ $t('AUTH.PASSWORD.FIND.SEND') }}
-                </p-button>
-            </div>
-            <div v-if="state.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME"
-                 class="util-wrapper"
-            >
-                <p-icon-button name="ic_arrow-left"
-                               size="sm"
-                               class="go-back-button mr-2"
-                />
-                <p class="go-back-button">
-                    <router-link :to="{name: AUTH_ROUTE.SIGN_IN._NAME}">
-                        {{ $t('AUTH.PASSWORD.FIND.BACK_TO_SIGN_IN') }}
-                    </router-link>
-                </p>
-            </div>
-        </div>
-    </p-data-loader>
+        </p-data-loader>
+    </password-container>
 </template>
 
 <script setup lang="ts">
@@ -93,8 +95,17 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import PasswordForm from '@/services/auth/password/moduels/PasswordForm.vue';
+import PasswordContainer from '@/services/auth/password/PasswordContainer.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import type { PasswordFormExpose } from '@/services/auth/type';
+
+interface Props {
+    status: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    status: '',
+});
 
 const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 
@@ -102,14 +113,12 @@ const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     loading: false,
-    logUserId: '',
     userType: '',
-    status: computed(() => SpaceRouter.router.currentRoute.name),
     pageTitle: computed(() => {
-        if (state.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME) {
+        if (props.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME) {
             return vm.$t('AUTH.PASSWORD.FIND.TITLE');
         }
-        if (state.status === AUTH_ROUTE.EMAIL.INVALID._NAME) {
+        if (props.status === AUTH_ROUTE.EMAIL.INVALID._NAME) {
             return 'The link is invalid';
         }
         return vm.$t('AUTH.PASSWORD.RESET.TITLE');
@@ -117,8 +126,6 @@ const state = reactive({
     domainId: computed<string>(() => store.state.domain.domainId),
     userInfo: computed<UserState>(() => store.state.user),
     tags: {},
-    // TODO: 이메일에서 받아오는 것으로 변경
-    email: '',
 });
 const formState = reactive({
     userId: '',
@@ -127,16 +134,6 @@ const formState = reactive({
 });
 
 /* Components */
-const getSSOTokenFromUrl = (): string|undefined => {
-    const queryString = vm.$router.currentRoute.query;
-    return queryString.sso_access_token as string;
-};
-const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
-    if (!ssoAccessToken) return undefined;
-    const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
-    if (decodedToken) return decodedToken.aud as string;
-    return undefined;
-};
 const handleChangeInput = (value) => {
     formState.userId = value.userId;
     formState.password = value.password;
@@ -175,12 +172,22 @@ const handleClickButton = () => {
     }
     resetInputs();
 };
+const getSSOTokenFromUrl = (): string|undefined => {
+    const queryString = vm.$router.currentRoute.query;
+    return queryString.sso_access_token as string;
+};
+const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
+    if (!ssoAccessToken) return undefined;
+    const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
+    if (decodedToken) return decodedToken.aud as string;
+    return undefined;
+};
 
 /* API */
 const getUserInfo = async (): Promise<UserState|undefined> => {
     try {
         const response = await SpaceConnector.client.identity.user.get({
-            user_id: state.logUserId,
+            user_id: state.userInfo.userId,
         });
         return {
             userId: response.user_id,
@@ -213,13 +220,10 @@ const sendResetEmail = async (userId, domainId) => {
 const postResetPassword = async (request) => {
     state.loading = true;
     try {
-        // TODO: API 완성 후 연결
-        // await SpaceConnector.clientV2.identity.user.update({ user_id: userId, password });
-        // await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
+        await SpaceConnector.clientV2.identity.user.update(request);
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
-        ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId: request.user_id, status: 'fail' } }).catch(() => {});
-        throw e;
+        ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
     } finally {
         state.loading = false;
     }
@@ -238,7 +242,7 @@ const initStatesByUrlSSOToken = async () => {
         // When there is no user id in sso access token
         if (!userId) return;
 
-        state.logUserId = userId;
+        state.userInfo.userId = userId;
         const userInfo = await getUserInfo();
         // When user info doesnt exist
         if (!userInfo) return;
@@ -252,7 +256,6 @@ const initStatesByUrlSSOToken = async () => {
 (async () => {
     await initStatesByUrlSSOToken();
 })();
-
 </script>
 
 <style lang="postcss" scoped>

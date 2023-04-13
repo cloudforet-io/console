@@ -24,7 +24,7 @@
             <div v-else>
                 <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
                                :invalid="validationState.isPasswordValid === false"
-                               :help-text="$t('AUTH.PASSWORD.RESET.DESC')"
+                               :help-text="validationState.passwordInvalidText"
                                required
                 >
                     <template #default="{invalid}">
@@ -51,8 +51,8 @@
                                       :invalid="invalid"
                                       block
                                       appearance-type="masking"
-                                      @update:value="handleChangeInput('password')"
-                                      @keyup.enter="handleChangeInput('password')"
+                                      @update:value="handleChangeInput('passwordConfirm')"
+                                      @keyup.enter="handleChangeInput('passwordConfirm')"
                         />
                     </template>
                 </p-field-group>
@@ -71,8 +71,14 @@ import {
 } from '@spaceone/design-system';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
-import { blankValidator } from '@/lib/helper/user-validation-helper';
 
+import type {
+    Validation,
+} from '@/services/administration/iam/user/lib/user-form-validations';
+import {
+    checkEmptyValue,
+    checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkRequiredField, checkSamePassword,
+} from '@/services/administration/iam/user/lib/user-form-validations';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
@@ -97,24 +103,51 @@ const validationState = reactive({
     isIdValid: undefined as undefined | boolean,
     idInvalidText: '' as TranslateResult | string,
     isPasswordValid: undefined as undefined | boolean,
+    passwordInvalidText: vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 }) as TranslateResult | string,
     isConfirmPasswordValid: undefined as undefined | boolean,
     confirmPasswordInvalidText: '' as TranslateResult | string,
 });
 
 /* Components */
+const checkPassword = async (password) => {
+    const passwordValidation: Validation[] = await Promise.all([
+        checkEmptyValue(password),
+        checkMinLength(password, 8),
+        checkOneLowerCase(password),
+        checkOneUpperCase(password),
+        checkOneNumber(password),
+    ]);
+    const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
+    if (!passwordInvalidObj) {
+        validationState.isPasswordValid = true;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
+    } else {
+        validationState.isPasswordValid = passwordInvalidObj.isValid;
+        validationState.passwordInvalidText = passwordInvalidObj.invalidText;
+    }
+};
+const checkPasswordCheck = async (password) => {
+    const passwordCheckValidation: Validation[] = await Promise.all([
+        checkRequiredField(formState.confirmPassword),
+        checkSamePassword(formState.confirmPassword, password),
+    ]);
+    const passwordCheckInvalidObj = passwordCheckValidation.find((item) => item.invalidText.length > 0);
+    if (!passwordCheckInvalidObj) {
+        validationState.isConfirmPasswordValid = true;
+        validationState.confirmPasswordInvalidText = '';
+    } else {
+        validationState.isConfirmPasswordValid = passwordCheckInvalidObj.isValid;
+        validationState.confirmPasswordInvalidText = passwordCheckInvalidObj.invalidText;
+    }
+};
 const handleChangeInput = (type: string) => {
     emit('change-input', formState);
     if (type === 'userId') {
         validationState.isIdValid = !(!formState.userId);
     } else if (type === 'password') {
-        validationState.isPasswordValid = blankValidator(formState.password);
-        if (formState.password !== formState.confirmPassword) {
-            validationState.isConfirmPasswordValid = false;
-            validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
-        } else {
-            validationState.isConfirmPasswordValid = true;
-            validationState.confirmPasswordInvalidText = '';
-        }
+        checkPassword(formState.password);
+    } else if (type === 'passwordConfirm') {
+        checkPasswordCheck(formState.password);
     }
 };
 

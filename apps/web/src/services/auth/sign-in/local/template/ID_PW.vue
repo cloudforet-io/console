@@ -33,7 +33,8 @@
         </form>
         <div class="util-wrapper">
             <p class="reset-pw-button">
-                <router-link :to="{ name: AUTH_ROUTE.PASSWORD._NAME }">
+                <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'find' } }">
+                    <!-- TODO: Babel edit-->
                     Forgot Password?
                 </router-link>
             </p>

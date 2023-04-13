@@ -59,7 +59,7 @@
         </div>
         <div class="utils-wrapper">
             <div v-if="state.status === 'done'">
-                <router-link :to="{name: AUTH_ROUTE.SIGN_IN._NAME}">
+                <router-link :to="{ name: AUTH_ROUTE.SIGN_OUT._NAME }">
                     <p-button class="go-back-console-button">
                         {{ state.userId
                             ? $t('AUTH.PASSWORD.RESET.EMAIL.DONE.GO_BACK_TO_CONSOLE')
@@ -86,7 +86,7 @@
                                class="go-back-button mr-2"
                 />
                 <p class="go-back-button">
-                    <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME}">
+                    <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: {status: 'find'}}">
                         {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.GO_BACK') }}
                     </router-link>
                 </p>

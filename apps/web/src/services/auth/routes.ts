@@ -1,7 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
-
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
@@ -11,7 +9,6 @@ const SignInPage = () => import('@/services/auth/sign-in/SignInPage.vue');
 const DomainAdminSignInPage = () => import('@/services/auth/sign-in/DomainAdminSignInPage.vue');
 const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
 const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
-const PasswordContainer = () => import('@/services/auth/password/PasswordContainer.vue');
 const PasswordPage = () => import('@/services/auth/password/PasswordPage.vue');
 const ValidationEmailPage = () => import('@/services/auth/password/validation-email/ValidationEmailPage.vue');
 
@@ -69,29 +66,16 @@ export default [
         ],
     },
     {
-        path: '/password',
-        name: AUTH_ROUTE.PASSWORD._NAME,
+        path: '/reset-password',
+        name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         meta: {
             isSignInPage: false,
             accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
-        redirect: () => {
-            if (store.getters['user/isUserNeedPasswordReset']) return { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
-            return { name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME };
-        },
-        component: PasswordContainer,
-        children: [
-            {
-                path: 'find',
-                name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
-                component: PasswordPage,
-            },
-            {
-                path: 'reset',
-                name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
-                component: PasswordPage,
-            },
-        ],
+        props: (route) => ({
+            status: route.query.status || AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
+        }),
+        component: PasswordPage,
     },
     {
         path: '/email',

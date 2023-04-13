@@ -167,7 +167,6 @@ export default {
                 formState.password = value.password || '';
                 formState.passwordManual = value.passwordManual;
             }
-            console.log(value);
         };
         const handleClose = () => {
             userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });

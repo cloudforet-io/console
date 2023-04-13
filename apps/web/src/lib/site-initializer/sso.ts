@@ -12,7 +12,6 @@ export const checkSsoAccessToken = async (store) => {
     const ssoAccessToken = params.get('sso_access_token');
 
     if (window.location.pathname === '/reset-password') {
-        console.log(ssoAccessToken);
         if (isMobile()) store.dispatch('display/showMobileGuideModal');
         return;
     }
