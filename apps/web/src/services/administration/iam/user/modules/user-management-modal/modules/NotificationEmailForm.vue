@@ -62,17 +62,24 @@
         </p-field-group>
         <div v-else>
             <div class="contents-wrapper">
-                <p>{{ $t('COMMON.NOTIFICATION_MODAL.SENT_DESC') }}</p>
-                <div class="email-wrapper">
-                    <p-i name="ic_envelope-filled"
-                         height="0.875rem"
-                         width="0.875rem"
-                         color="inherit"
-                    />
-                    <p class="email-tex">
-                        {{ formState.email }}
-                    </p>
+                <div>
+                    <p>{{ $t('COMMON.NOTIFICATION_MODAL.SENT_DESC') }}</p>
+                    <div class="email-wrapper">
+                        <p-i name="ic_envelope-filled"
+                             height="0.875rem"
+                             width="0.875rem"
+                             color="inherit"
+                        />
+                        <p class="email-tex">
+                            {{ formState.email }}
+                        </p>
+                    </div>
                 </div>
+                <p-icon-button name="ic_edit"
+                               size="md"
+                               class="edit-icon"
+                               @click="handleEditButton"
+                />
             </div>
             <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.VERIFICATION_CODE')"
                            :invalid="validationState.isValidationCodeValid"
@@ -82,11 +89,10 @@
                 <div class="input-form">
                     <p-text-input v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
-                                  @update:value="handleChangeVerify"
                     />
                     <p-button style-type="positive"
                               :loading="state.loading"
-                              @click="handleClickChange"
+                              @click="handleChangeVerify"
                     >
                         <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
                     </p-button>
@@ -119,7 +125,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PFieldGroup, PTextInput, PTooltip, PI, PButton, PCollapsibleToggle,
+    PFieldGroup, PTextInput, PTooltip, PI, PButton, PCollapsibleToggle, PIconButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -191,6 +197,10 @@ const handleClickChange = () => {
 const setForm = () => {
     formState.email = props.item.email || '';
 };
+const handleEditButton = () => {
+    state.isSent = false;
+    state.isEdit = true;
+};
 
 /* API */
 const handleClickSend = async () => {
@@ -215,7 +225,12 @@ const handleChangeVerify = async () => {
             user_id: props.item.user_id,
             domain_id: props.item.domain_id,
             code: formState.verificationCode,
-        }, false);
+        }, true);
+        if (userPageState.visibleUpdateModal) {
+            state.isSent = false;
+            state.isEdit = false;
+            state.isCollapsed = true;
+        }
     } catch (e) {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
@@ -278,7 +293,7 @@ watch(() => props.value, () => {
         }
     }
     .contents-wrapper {
-        @apply flex flex-col bg-gray-100 rounded text-label-md text-gray-700;
+        @apply flex justify-between bg-gray-100 rounded text-label-md text-gray-700;
         margin-bottom: 1rem;
         padding: 0.5rem;
         .email-wrapper {

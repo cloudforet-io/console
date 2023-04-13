@@ -15,7 +15,7 @@
                         >
                             {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
                             <span class="emphasis">
-                                {{ state.userInfo.email }}
+                                {{ state.userInfo.userId }}
                             </span>
                         </p>
                         <p v-else
@@ -42,6 +42,7 @@
                                 || formState.password.length< 8
                         "
                         @click="handleClickButton"
+                        @keyup.enter="handleClickButton"
                     >
                         {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
                     </p-button>
@@ -49,6 +50,7 @@
                         v-else
                         :disabled="formState.userId === ''"
                         @click="handleClickButton"
+                        @keyup.enter="handleClickButton"
                     >
                         {{ $t('AUTH.PASSWORD.FIND.SEND') }}
                     </p-button>
@@ -94,8 +96,8 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import PasswordForm from '@/services/auth/password/moduels/PasswordForm.vue';
-import PasswordContainer from '@/services/auth/password/PasswordContainer.vue';
+import PasswordContainer from '@/services/auth/password/modules/PasswordContainer.vue';
+import PasswordForm from '@/services/auth/password/modules/PasswordForm.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
@@ -156,25 +158,21 @@ const handleClickButton = () => {
         sendResetEmail(formState.userId, state.domainId);
     } else {
         const {
-            userId, name, email, language, timezone,
+            userId, email,
         } = state.userInfo;
         const request = {
             user_id: userId,
             password: formState.password,
-            name,
             email,
-            language,
-            timezone,
-            tags: state.tags,
-            domain_id: state.domainId,
         };
         postResetPassword(request);
     }
     resetInputs();
 };
 const getSSOTokenFromUrl = (): string|undefined => {
-    const queryString = vm.$router.currentRoute.query;
-    return queryString.sso_access_token as string;
+    const query = vm.$router.currentRoute.query;
+    const queryString = query.sso_access_token as string;
+    return queryString.split("'")[3];
 };
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     if (!ssoAccessToken) return undefined;
@@ -184,26 +182,6 @@ const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
 };
 
 /* API */
-const getUserInfo = async (): Promise<UserState|undefined> => {
-    try {
-        const response = await SpaceConnector.client.identity.user.get({
-            user_id: state.userInfo.userId,
-        });
-        return {
-            userId: response.user_id,
-            userType: 'USER',
-            backend: response.backend,
-            name: response.name,
-            email: response.email,
-            language: response.language,
-            timezone: response.timezone,
-            requiredActions: response.required_actions,
-        };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
 const sendResetEmail = async (userId, domainId) => {
     state.loading = true;
     try {
@@ -233,7 +211,6 @@ const postResetPassword = async (request) => {
 const initStatesByUrlSSOToken = async () => {
     try {
         const ssoAccessToken = getSSOTokenFromUrl();
-
         // When sso access token is not exist in url query string
         if (!ssoAccessToken) return;
 
@@ -243,12 +220,9 @@ const initStatesByUrlSSOToken = async () => {
         if (!userId) return;
 
         state.userInfo.userId = userId;
-        const userInfo = await getUserInfo();
-        // When user info doesnt exist
-        if (!userInfo) return;
+        state.userInfo.email = userId;
 
-        await store.commit('user/setUser', userInfo);
-        state.userType = userInfo.userType || 'USER';
+        await store.commit('user/setUser', state.userInfo);
     } catch (e) {
         ErrorHandler.handleError('Invalid token.');
     }

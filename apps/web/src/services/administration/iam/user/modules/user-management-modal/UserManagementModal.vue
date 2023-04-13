@@ -201,7 +201,7 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            userPageStore.$patch({ visibleCreateModal: false });
+            userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
         };
 
         /* init */

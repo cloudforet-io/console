@@ -102,7 +102,7 @@ import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
-import MobileGuideModal from '@/services/auth/reset-password/MobileGuideModal.vue';
+import MobileGuideModal from '@/services/auth/password/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 // import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 

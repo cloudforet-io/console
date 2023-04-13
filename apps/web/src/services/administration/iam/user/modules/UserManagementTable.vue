@@ -307,19 +307,19 @@ export default {
                 resource_type: 'identity.User',
                 resource_id: userId,
                 role_id: roleId,
+                domain_id: store.state.domain.domainId,
             });
         };
-        const unbindRole = async (userId, roleId) => {
+        const unbindRole = async (userId) => {
             const res = await SpaceConnector.client.identity.roleBinding.list({
-                resource_type: 'identity.User',
                 resource_id: userId,
-                role_id: roleId,
-                role_type: 'DOMAIN',
+                domain_id: store.state.domain.domainId,
             });
             const roleBindingId = res.results[0].role_binding_id;
             if (res.total_count > 0) {
                 await SpaceConnector.client.identity.roleBinding.delete({
                     role_binding_id: roleBindingId,
+                    domain_id: store.state.domain.domainId,
                 });
             }
         };
@@ -348,7 +348,7 @@ export default {
                     userFormState.roleOfSelectedUser = roleId;
                 }
                 if (roleId === '' && userFormState.roleOfSelectedUser !== '') {
-                    await unbindRole(item.user_id, roleId);
+                    await unbindRole(item.user_id);
                     userFormState.roleOfSelectedUser = roleId;
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');

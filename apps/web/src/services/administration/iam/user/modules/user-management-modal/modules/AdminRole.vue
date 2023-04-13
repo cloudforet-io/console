@@ -71,9 +71,11 @@ const handleSelectedMenuIndex = (selectedIndex: number) => {
 };
 const setForm = async () => {
     if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings) {
-        state.isToggled = true;
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
+        if (state.selectedMenuIndex !== -1) {
+            state.isToggled = true;
+        }
     } else formState.domainRole = '';
 };
 

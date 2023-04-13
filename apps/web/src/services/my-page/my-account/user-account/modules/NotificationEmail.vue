@@ -112,7 +112,6 @@ const handleChangeInput = async () => {
 
 /* Watcher */
 watch(() => store.state.user.email, (value) => {
-    console.log(value, state.email);
     formState.notificationEmail = value;
 });
 </script>
