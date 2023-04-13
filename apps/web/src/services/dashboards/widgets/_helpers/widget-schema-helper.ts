@@ -49,8 +49,8 @@ export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetF
 export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
     const inheritOptions: InheritOptions = {};
     const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
-    const requiredProperties = widgetConfig.options_schema?.schema.required ?? [];
-    defaultProperties.filter((d) => !requiredProperties.includes(d)).forEach((propertyName) => {
+    const fixedProperties = widgetConfig.options_schema?.fixed_properties ?? [];
+    defaultProperties.filter((d) => !fixedProperties.includes(d)).forEach((propertyName) => {
         inheritOptions[propertyName] = {
             enabled: true,
             variable_info: { key: propertyName.replace('filters.', '') },
