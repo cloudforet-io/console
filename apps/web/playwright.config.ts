@@ -58,7 +58,7 @@ export default defineConfig({
                 storageState: 'playwright/.auth/user.json',
                 // ignoreHTTPSErrors: true,
             },
-            dependencies: ['setup'],
+            // dependencies: ['setup'],
         },
         // {
         //     name: 'firefox',
