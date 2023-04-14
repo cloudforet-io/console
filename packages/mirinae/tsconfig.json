@@ -1,27 +1,13 @@
 {
+  "extends": "tsconfig/base.json",
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "target": "es2018",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "Node16",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "baseUrl": ".",
     "types": ["webpack-env", "vitest/globals"],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.vue"],
+  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.vue" ],
   "exclude": [
     "node_modules",
     "dist",

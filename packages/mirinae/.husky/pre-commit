@@ -1,9 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-if [ "$SKIP_PRE_COMMIT" -eq 1 ]
-then
-  echo "Skip pre-commit hook"
-else
-  npx lint-staged
-fi
