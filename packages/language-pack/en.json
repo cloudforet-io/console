@@ -1111,7 +1111,7 @@
 				"HOUR": "hr | hrs",
 				"LAST_UPDATE": "Last Update",
 				"MORE": "more",
-				"NO_DATA": "Add Service Account to create a dashboard.",
+				"NO_DATA": "Add the relevant cloud service accounts.",
 				"NO_DATA_TITLE": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
@@ -1155,8 +1155,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
-				"NO_PROJECT_HELP_TEXT": "",
-				"RESOURCE_MAP": "Getting started with grouping your scattered resource and accounts with your own project."
+				"NO_PROJECT_HELP_TEXT": "Integrate distributed resources and cloud accounts on project basis.",
+				"RESOURCE_MAP": "Integrate distributed resources and cloud accounts on project basis."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
@@ -1178,7 +1178,7 @@
 				"LABEL_SERVICE_LIMITS": "Service Limits",
 				"LABEL_WARNING": "Investigation recommended",
 				"NO_DATA": "No AWS Trusted Advisor",
-				"NO_DATA_DESC": "Add Service Account to create a dashboard.",
+				"NO_DATA_DESC": "Add the relevant cloud service accounts.",
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
@@ -1211,8 +1211,11 @@
 		"CREATE": {
 			"BLANK_DESC": "Build your own dashboard from scratch.",
 			"CANCEL": "Cancel",
+			"CONTINUE": "Continue",
 			"CREATE": "Create",
+			"CREATE_NEW_DASHBOARD": "Create New Dashboard",
 			"ENTIRE_WORKSPACES": "Entire Workspace",
+			"GO_BACK": "Go back",
 			"LABEL_DEFAULT_TEMPLATE": "Default Template",
 			"LABEL_EXISTING_DASHBOARD": "Existing Dashboard",
 			"LABEL_SCOPE": "Dashboard Scope",
@@ -1225,6 +1228,9 @@
 			"PUBLIC": "Public",
 			"PUBLIC_DESC": "Anyone who has 'View' access to selected dashboard scope",
 			"SINGLE_PROJECT": "Single Project",
+			"STEP": "Step",
+			"STEP1_DESC": "Choose dashboard scope and viewer.",
+			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
 			"VALIDATION_TEMPLATE": "Please Select Template."

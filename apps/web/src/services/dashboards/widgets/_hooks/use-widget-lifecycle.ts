@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { UnwrapRef } from 'vue';
 import {
     onUnmounted, watch,
 } from 'vue';
@@ -7,15 +7,16 @@ import { isEqual } from 'lodash';
 
 import type { Currency } from '@/store/modules/display/config';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
 interface UseWidgetLifecycleOptions {
     disposeWidget?: () => void;
     refreshWidget: () => void;
     props: WidgetProps;
-    settings?: Ref<DashboardSettings>;
+    state: UnwrapRef<WidgetState>;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
 }
 
@@ -41,7 +42,7 @@ export const useWidgetLifecycle = ({
     disposeWidget,
     refreshWidget,
     props,
-    settings,
+    state,
     onCurrencyUpdate,
 }: UseWidgetLifecycleOptions): void => {
     onUnmounted(() => {
@@ -57,9 +58,12 @@ export const useWidgetLifecycle = ({
         const _isRefreshable = checkRefreshable(props.inheritOptions, after, before, true);
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
-    if (settings && onCurrencyUpdate) {
-        watch(settings, (current, previous) => {
-            if (current && previous && current?.currency?.value !== previous?.currency?.value) {
+    if (state.settings) {
+        watch(() => state.settings, (current, previous) => {
+            if (!current || !previous) return;
+            if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
+                refreshWidget();
+            } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
                 onCurrencyUpdate(current.currency.value, previous.currency.value);
             }
         });

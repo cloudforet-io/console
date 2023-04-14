@@ -3,12 +3,6 @@ logs
 *.log
 npm-debug.log*
 
-# dependencies
-**/node_modules
-
-# outout
-out
-**/dist
 
 # lint
 **/.eslintrc.js
@@ -24,15 +18,15 @@ out
 #misc
 *.swp
 *.bak
-.git
-.DS_Store
-.husky
-.dockerignore
-commitlint.config.cjs
+**/.git
+**/.DS_Store
+**/.husky
+**/commitlint.config.cjs
 **/LICENSE
 **/AUTHORS
-VERSION
+**/VERSION
 **/README.md
-deploy
+**/deploy
 **/Dockerfile
-**/skaffold.template.yaml
+**/*.dockerfile
+**/*.dockerignore

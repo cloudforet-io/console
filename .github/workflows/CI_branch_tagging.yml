@@ -86,12 +86,10 @@ jobs:
           echo ${{ env.VERSION }} > VERSION
           if [[ $(cat VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
             then 
-              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
-              \npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4))
+              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces --include-workspace-root
               \npm install
             else 
-              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
-              \npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2)
+              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces --include-workspace-root
               \npm install
           fi
           git add .
@@ -107,12 +105,10 @@ jobs:
           echo ${{ env.VERSION }} > VERSION
           if [[ $(cat VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
             then 
-              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
-              \npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4))
+              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces --include-workspace-root
               \npm install
             else 
-              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
-              \npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2)
+              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces --include-workspace-root
               \npm install
           fi
           git add .

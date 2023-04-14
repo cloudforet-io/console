@@ -34,6 +34,7 @@ Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** SET VUE CONFIG ************** */
 
+Vue.config.devtools = import.meta.env.DEV;
 Vue.config.productionTip = import.meta.env.DEV;
 
 const pinia = createPinia();
