@@ -66,6 +66,18 @@ export default [
         ],
     },
     {
+        path: '/find-password',
+        name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
+        meta: {
+            isSignInPage: false,
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+        },
+        props: (route) => ({
+            status: route.query.status || AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
+        }),
+        component: PasswordPage,
+    },
+    {
         path: '/reset-password',
         name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         meta: {

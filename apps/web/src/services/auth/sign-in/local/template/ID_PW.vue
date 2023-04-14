@@ -33,7 +33,7 @@
         </form>
         <div class="util-wrapper">
             <p class="reset-pw-button">
-                <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'find' } }">
+                <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }">
                     {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
                 </router-link>
             </p>

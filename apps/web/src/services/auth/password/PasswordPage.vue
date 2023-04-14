@@ -230,7 +230,9 @@ const initStatesByUrlSSOToken = async () => {
     }
 };
 (async () => {
-    await initStatesByUrlSSOToken();
+    if (props.status !== AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME) {
+        await initStatesByUrlSSOToken();
+    }
 })();
 </script>
 
