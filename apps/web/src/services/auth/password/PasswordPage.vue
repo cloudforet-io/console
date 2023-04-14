@@ -121,7 +121,7 @@ const state = reactive({
             return vm.$t('AUTH.PASSWORD.FIND.TITLE');
         }
         if (props.status === AUTH_ROUTE.EMAIL.INVALID._NAME) {
-            return 'The link is invalid';
+            return vm.$t('AUTH.PASSWORD.INVALID_LINK');
         }
         return vm.$t('AUTH.PASSWORD.RESET.TITLE');
     }),
@@ -211,7 +211,10 @@ const initStatesByUrlSSOToken = async () => {
     try {
         const ssoAccessToken = getSSOTokenFromUrl();
         // When sso access token is not exist in url query string
-        if (!ssoAccessToken) return;
+        if (!ssoAccessToken) {
+            SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+            return;
+        }
 
         SpaceConnector.setToken(ssoAccessToken, '');
         const userId = getUserIdFromToken(ssoAccessToken);
