@@ -31,6 +31,7 @@
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "",
+				"FORGOT_PASSWORD": "",
 				"HELP_TEXT": "",
 				"INVALID_EMAIL_FORMAT": "",
 				"SEND": "",
@@ -1647,6 +1648,7 @@
 					"HELP_TEXT": "",
 					"NOT_VERIFIED": "",
 					"SEND_MAIL": "",
+					"SUCCESS": "",
 					"TITLE": "",
 					"VERIFIED": "",
 					"VERIFY": ""

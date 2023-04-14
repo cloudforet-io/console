@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -32,8 +33,7 @@ export const postValidationCode = async (body, setUser): Promise<void|Error> => 
         if (setUser) {
             await store.dispatch('user/setUser', { emailVerified: response.email_verified, email: response.email });
         }
-        // TODO: babel edit
-        showSuccessMessage('success!!!!!', '');
+        showSuccessMessage(i18n.t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SUCCESS'), '');
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;

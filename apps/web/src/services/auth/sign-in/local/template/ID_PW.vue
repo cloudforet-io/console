@@ -34,8 +34,7 @@
         <div class="util-wrapper">
             <p class="reset-pw-button">
                 <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'find' } }">
-                    <!-- TODO: Babel edit-->
-                    Forgot Password?
+                    {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
                 </router-link>
             </p>
             <p-button :style-type="buttonStyleType"

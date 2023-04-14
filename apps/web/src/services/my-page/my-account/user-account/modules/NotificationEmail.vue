@@ -60,8 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
@@ -73,6 +76,8 @@ import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
+
+const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
@@ -105,8 +110,7 @@ const handleChangeInput = async () => {
         validationState.isNotificationEmailValid = false;
     } else {
         validationState.isNotificationEmailValid = true;
-        // TODO: babel edit
-        validationState.notificationEmailInvalidText = 'check format';
+        validationState.notificationEmailInvalidText = vm.$t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
     }
 };
 

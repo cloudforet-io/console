@@ -31,6 +31,7 @@
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "Back to Sign-in",
+				"FORGOT_PASSWORD": "Forgot password?",
 				"HELP_TEXT": "Enter your User ID, then we'll send you a link to reset password again.",
 				"INVALID_EMAIL_FORMAT": "Invalid email format.",
 				"SEND": "Send Password Reset Email",
@@ -1647,6 +1648,7 @@
 					"HELP_TEXT": "Enter email address to receive important account and system-related information.",
 					"NOT_VERIFIED": "Not Verified",
 					"SEND_MAIL": "Send Verification Code",
+					"SUCCESS": "Successfully verified notification email.",
 					"TITLE": "Notification Email",
 					"VERIFIED": "Verified",
 					"VERIFY": "Verify"
