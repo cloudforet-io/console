@@ -1,5 +1,8 @@
 <template>
     <div class="centered-page-layout">
+        <g-n-b-logo :to="state.logoLink"
+                    class="gnb-logo"
+        />
         <div class="layout-contents">
             <slot />
         </div>
@@ -8,6 +11,21 @@
 
 <script setup lang="ts">
 
+import { computed, reactive } from 'vue';
+
+import { store } from '@/store';
+
+import { isUserAccessibleToMenu } from '@/lib/access-control';
+import { MENU_ID } from '@/lib/menu/config';
+
+import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
+
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+
+const state = reactive({
+    logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
+
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -22,6 +40,11 @@
         left: 0;
         right: 0;
         bottom: 0;
+    }
+    .gnb-logo {
+        @apply absolute;
+        top: 1rem;
+        left: 1.25rem;
     }
     .layout-contents {
         @apply absolute;
