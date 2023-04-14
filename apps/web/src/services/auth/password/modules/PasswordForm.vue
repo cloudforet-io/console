@@ -1,9 +1,6 @@
 <template>
     <div class="password-form">
-        <form
-            class="form"
-            onsubmit="return false"
-        >
+        <div class="form">
             <div v-if="props.status !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME">
                 <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
                                :invalid="validationState.isIdValid === false"
@@ -24,7 +21,8 @@
             <div v-else>
                 <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
                                :invalid="validationState.isPasswordValid === false"
-                               :help-text="validationState.passwordInvalidText"
+                               :invalid-text="validationState.passwordInvalidText"
+                               :help-text="$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 })"
                                required
                 >
                     <template #default="{invalid}">
@@ -57,7 +55,7 @@
                     </template>
                 </p-field-group>
             </div>
-        </form>
+        </div>
     </div>
 </template>
 
@@ -71,14 +69,12 @@ import {
 } from '@spaceone/design-system';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
-import type {
-    Validation,
-} from '@/services/administration/iam/user/lib/user-form-validations';
 import {
-    checkEmptyValue,
-    checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkRequiredField, checkSamePassword,
-} from '@/services/administration/iam/user/lib/user-form-validations';
+    oneLowerCaseValidator,
+    oneNumberValidator,
+    oneUpperCaseValidator, samePasswordValidator,
+} from '@/lib/helper/user-validation-helper';
+
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
@@ -109,35 +105,38 @@ const validationState = reactive({
 });
 
 /* Components */
-const checkPassword = async (password) => {
-    const passwordValidation: Validation[] = await Promise.all([
-        checkEmptyValue(password),
-        checkMinLength(password, 8),
-        checkOneLowerCase(password),
-        checkOneUpperCase(password),
-        checkOneNumber(password),
-    ]);
-    const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
-    if (!passwordInvalidObj) {
+const checkPassword = (password) => {
+    if (password === '') {
         validationState.isPasswordValid = true;
-        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
-    } else {
-        validationState.isPasswordValid = passwordInvalidObj.isValid;
-        validationState.passwordInvalidText = passwordInvalidObj.invalidText;
+        validationState.passwordInvalidText = '';
+        return;
     }
-};
-const checkPasswordCheck = async (password) => {
-    const passwordCheckValidation: Validation[] = await Promise.all([
-        checkRequiredField(formState.confirmPassword),
-        checkSamePassword(formState.confirmPassword, password),
-    ]);
-    const passwordCheckInvalidObj = passwordCheckValidation.find((item) => item.invalidText.length > 0);
-    if (!passwordCheckInvalidObj) {
+    if (!oneLowerCaseValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+    } else if (!oneUpperCaseValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+    } else if (!oneNumberValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+    } else if (formState.confirmPassword !== '' && !samePasswordValidator(password, formState.confirmPassword)) {
+        validationState.isConfirmPasswordValid = false;
+        validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+    } else {
+        validationState.isPasswordValid = true;
+        validationState.passwordInvalidText = '';
         validationState.isConfirmPasswordValid = true;
         validationState.confirmPasswordInvalidText = '';
+    }
+};
+const checkPasswordCheck = async (confirmPassword) => {
+    if (!samePasswordValidator(formState.password, confirmPassword)) {
+        validationState.isConfirmPasswordValid = false;
+        validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
     } else {
-        validationState.isConfirmPasswordValid = passwordCheckInvalidObj.isValid;
-        validationState.confirmPasswordInvalidText = passwordCheckInvalidObj.invalidText;
+        validationState.isConfirmPasswordValid = true;
+        validationState.confirmPasswordInvalidText = '';
     }
 };
 const handleChangeInput = (type: string) => {
@@ -147,7 +146,7 @@ const handleChangeInput = (type: string) => {
     } else if (type === 'password') {
         checkPassword(formState.password);
     } else if (type === 'passwordConfirm') {
-        checkPasswordCheck(formState.password);
+        checkPasswordCheck(formState.confirmPassword);
     }
 };
 
@@ -167,7 +166,6 @@ defineExpose<PasswordFormExpose>({
         :deep(.p-field-group) {
             .invalid-feedback {
                 @apply text-label-md;
-                position: absolute;
             }
             .help-msg {
                 @apply text-paragraph-md;

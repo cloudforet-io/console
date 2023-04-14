@@ -1,6 +1,8 @@
 <template>
     <div class="local-wrapper">
-        <form class="form">
+        <form class="form"
+              onsubmit="return false"
+        >
             <p-field-group :label="isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
                            :invalid="isIdValid === false"
                            required
@@ -24,9 +26,8 @@
                                   placeholder="Password"
                                   :invalid="invalid"
                                   block
-                                  appearance-type="masking"
                                   @update:value="checkPassword"
-                                  @keyup.enter.native="signIn"
+                                  @keyup.enter="signIn"
                     />
                 </template>
             </p-field-group>

@@ -33,7 +33,7 @@
                                           class="text-input"
                                           :disabled="!state.isManually"
                                           :invalid="invalid"
-                                          @update:value="handleChangeInput"
+                                          @update:value="handleChangeInput('password')"
                             />
                         </template>
                     </p-field-group>
@@ -52,7 +52,7 @@
                                           appearance-type="masking"
                                           :disabled="!state.isManually"
                                           :invalid="invalid"
-                                          @update:value="handleChangeInput"
+                                          @update:value="handleChangeInput('passwordCheck')"
                             />
                         </template>
                     </p-field-group>
@@ -74,23 +74,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, getCurrentInstance, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
 } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
-
-import type {
-    Validation,
-} from '@/services/administration/iam/user/lib/user-form-validations';
 import {
-    checkEmptyValue, checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
-    checkRequiredField,
-    checkSamePassword,
-} from '@/services/administration/iam/user/lib/user-form-validations';
+    oneLowerCaseValidator,
+    oneNumberValidator,
+    oneUpperCaseValidator,
+    samePasswordValidator,
+} from '@/lib/helper/user-validation-helper';
+
 import type { User } from '@/services/administration/iam/user/type';
 import { PasswordType } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -107,6 +105,8 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const vm = getCurrentInstance()?.proxy as Vue;
+
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
@@ -116,27 +116,27 @@ const state = reactive({
             return [
                 {
                     name: PasswordType.KEEP,
-                    label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
+                    label: vm.$t('COMMON.PROFILE.KEEP_PASSWORD'),
                 },
                 {
                     name: PasswordType.RESET,
-                    label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                    label: vm.$t('COMMON.PROFILE.SEND_LINK'),
                     disabled: !props.isValidEmail,
                 },
                 {
                     name: PasswordType.MANUALLY,
-                    label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
+                    label: vm.$t('COMMON.PROFILE.SET_MANUALLY'),
                 },
             ];
         }
         return [
             {
                 name: PasswordType.RESET,
-                label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                label: vm.$t('COMMON.PROFILE.SEND_LINK'),
             },
             {
                 name: PasswordType.MANUALLY,
-                label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
+                label: vm.$t('COMMON.PROFILE.SET_MANUALLY'),
             },
         ];
     }),
@@ -154,41 +154,47 @@ const validationState = reactive({
 });
 
 /* Components */
-const checkPassword = async (password) => {
-    const passwordValidation: Validation[] = await Promise.all([
-        checkEmptyValue(password),
-        checkMinLength(password, 8),
-        checkOneLowerCase(password),
-        checkOneUpperCase(password),
-        checkOneNumber(password),
-    ]);
-    const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
-    if (!passwordInvalidObj) {
+const checkPassword = (password) => {
+    if (password === '') {
         validationState.isPasswordValid = true;
         validationState.passwordInvalidText = '';
-    } else {
-        validationState.isPasswordValid = passwordInvalidObj.isValid;
-        validationState.passwordInvalidText = passwordInvalidObj.invalidText;
+        return;
     }
-};
-const checkPasswordCheck = async (password) => {
-    const passwordCheckValidation: Validation[] = await Promise.all([
-        checkRequiredField(formState.passwordCheck),
-        checkSamePassword(formState.passwordCheck, password),
-    ]);
-    const passwordCheckInvalidObj = passwordCheckValidation.find((item) => item.invalidText.length > 0);
-    if (!passwordCheckInvalidObj) {
+    if (!oneLowerCaseValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+    } else if (!oneUpperCaseValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+    } else if (!oneNumberValidator(password)) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+    } else if (formState.passwordCheck !== '' && !samePasswordValidator(password, formState.passwordCheck)) {
+        validationState.isPasswordCheckValid = false;
+        validationState.passwordCheckInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+    } else {
+        validationState.isPasswordValid = true;
+        validationState.passwordInvalidText = '';
         validationState.isPasswordCheckValid = true;
         validationState.passwordCheckInvalidText = '';
-    } else {
-        validationState.isPasswordCheckValid = passwordCheckInvalidObj.isValid;
-        validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
     }
 };
-const handleChangeInput = async () => {
+const checkPasswordCheck = (passwordCheck) => {
+    if (!samePasswordValidator(formState.password, passwordCheck)) {
+        validationState.isPasswordCheckValid = false;
+        validationState.passwordCheckInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+    } else {
+        validationState.isPasswordCheckValid = true;
+        validationState.passwordCheckInvalidText = '';
+    }
+};
+const handleChangeInput = (type) => {
     if (!state.isManually) return;
-    await checkPassword(formState.password);
-    await checkPasswordCheck(formState.password);
+    if (type === 'password') {
+        checkPassword(formState.password);
+    } else if (type === 'passwordCheck') {
+        checkPasswordCheck(formState.passwordCheck);
+    }
     if (validationState.isPasswordValid === false || validationState.isPasswordCheckValid === false) return;
     emit('change-input', {
         ...formState,

@@ -1,7 +1,8 @@
 <template>
     <div class="centered-page-layout">
-        <g-n-b-logo :to="state.logoLink"
+        <g-n-b-logo v-if="!props.hasNavBar"
                     class="gnb-logo"
+                    :to="{ name: ROOT_ROUTE._NAME }"
         />
         <div class="layout-contents">
             <slot />
@@ -11,20 +12,15 @@
 
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
-
-import { store } from '@/store';
-
-import { isUserAccessibleToMenu } from '@/lib/access-control';
-import { MENU_ID } from '@/lib/menu/config';
+import { ROOT_ROUTE } from '@/router/service-routes';
 
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
-
-const state = reactive({
-    logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
-
+interface Props {
+    hasNavBar?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+    hasNavBar: false,
 });
 </script>
 
@@ -42,7 +38,7 @@ const state = reactive({
         bottom: 0;
     }
     .gnb-logo {
-        @apply absolute;
+        @apply absolute z-10;
         top: 1rem;
         left: 1.25rem;
     }
