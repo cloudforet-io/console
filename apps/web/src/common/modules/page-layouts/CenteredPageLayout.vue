@@ -1,16 +1,17 @@
 <template>
-    <div class="password-container">
-        <div class="page-contents">
+    <div class="centered-page-layout">
+        <div class="layout-contents">
             <slot />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+
 </script>
 
 <style lang="postcss" scoped>
-.password-container {
+.centered-page-layout {
     &::before {
         @apply absolute;
         content: "";
@@ -22,7 +23,7 @@
         right: 0;
         bottom: 0;
     }
-    .page-contents {
+    .layout-contents {
         @apply absolute;
         top: 0;
         left: 0;
@@ -30,5 +31,4 @@
         bottom: 0;
     }
 }
-
 </style>

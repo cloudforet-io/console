@@ -1,5 +1,5 @@
 <template>
-    <password-container>
+    <centered-page-layout>
         <p-data-loader
             class="password-page"
             :loading="state.loading"
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </p-data-loader>
-    </password-container>
+    </centered-page-layout>
 </template>
 
 <script setup lang="ts">
@@ -95,8 +95,8 @@ import type { UserState } from '@/store/modules/user/type';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 
-import PasswordContainer from '@/services/auth/password/modules/PasswordContainer.vue';
 import PasswordForm from '@/services/auth/password/modules/PasswordForm.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import type { PasswordFormExpose } from '@/services/auth/type';
