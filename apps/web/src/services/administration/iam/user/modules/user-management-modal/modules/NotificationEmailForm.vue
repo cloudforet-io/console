@@ -120,7 +120,10 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, reactive, watch } from 'vue';
+import {
+    computed,
+    getCurrentInstance, reactive, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
@@ -141,11 +144,13 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 interface Props {
     item?: User;
-    value?: string;
+    email?: string;
+    isValidEmail?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
-    value: '',
+    email: undefined,
+    isValidEmail: false,
 });
 
 const userPageStore = useUserPageStore();
@@ -153,16 +158,17 @@ const userPageState = userPageStore.$state;
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
-const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const emit = defineEmits(['change-input', 'change-verify']);
 
 const state = reactive({
     loading: false,
     isEdit: false,
     isSent: false,
     isCollapsed: true,
+    loginUserId: computed(() => store.state.user.userId),
 });
 const formState = reactive({
-    email: '' || props.value,
+    email: '' || props.email,
     verificationCode: '',
 });
 const validationState = reactive({
@@ -211,6 +217,11 @@ const handleClickSend = async () => {
             email: formState.email,
             domain_id: props.item.domain_id,
         });
+        emit('change-verify', false);
+
+        if (state.loginUserId === props.item.user_id) {
+            await store.dispatch('user/setUser', { email: formState.email });
+        }
         state.isSent = true;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -225,11 +236,12 @@ const handleChangeVerify = async () => {
             user_id: props.item.user_id,
             domain_id: props.item.domain_id,
             code: formState.verificationCode,
-        }, true);
+        }, state.loginUserId === props.item.user_id);
         if (userPageState.visibleUpdateModal) {
             state.isSent = false;
             state.isEdit = false;
             state.isCollapsed = true;
+            emit('change-verify', true);
         }
     } catch (e) {
         validationState.isValidationCodeValid = true;
@@ -246,9 +258,12 @@ const handleChangeVerify = async () => {
     }
 })();
 
-watch(() => props.value, () => {
-    formState.email = props.value;
+watch(() => props.email, () => {
+    formState.email = props.email;
 });
+watch(() => props.isValidEmail, () => {
+    state.isEdit = !props.isValidEmail;
+}, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>

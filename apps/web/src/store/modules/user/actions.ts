@@ -11,7 +11,6 @@ import type {
 
 const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
-    console.log({ domain: response });
     return {
         userId: response.owner_id,
         userType: 'DOMAIN_OWNER',
@@ -27,7 +26,6 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
 
 const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
-    console.log({ user: response });
     return {
         userId: response.user_id,
         userType: 'USER',
@@ -61,7 +59,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userType === 'DOMAIN_OWNER') {
         await SpaceConnector.client.identity.domainOwner.update(request);
     } else {
-        await SpaceConnector.client.identity.user.update(request);
+        await SpaceConnector.clientV2.identity.user.update(request);
     }
 };
 

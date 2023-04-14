@@ -70,7 +70,7 @@ const handleSelectedMenuIndex = (selectedIndex: number) => {
     emit('change-input', { ...formState, domainRole: formState.domainRole });
 };
 const setForm = async () => {
-    if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings) {
+    if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings && userPageStore.selectedUsers[0].role_bindings.length > 0) {
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
         if (state.selectedMenuIndex !== -1) {

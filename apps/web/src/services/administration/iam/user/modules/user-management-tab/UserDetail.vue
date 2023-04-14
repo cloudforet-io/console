@@ -64,7 +64,7 @@
                     :domain-id="state.data.domain_id"
                     :verified="state.data.email_verified"
                     is-administration
-                    @handle-user-detail="getUserDetailPartialData"
+                    @handle-user-detail="getUserDetailData"
                 />
             </template>
         </p-definition-table>
@@ -90,6 +90,7 @@ import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue
 
 import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import type { UserDetailData } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
     userId: string
@@ -100,6 +101,9 @@ const props = withDefaults(defineProps<Props>(), {
     userId: '',
     timezone: '',
 });
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const state = reactive({
     loading: true,
@@ -124,22 +128,12 @@ const state = reactive({
 const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
-        state.data = await SpaceConnector.client.identity.user.get({
+        const response = await SpaceConnector.client.identity.user.get({
             user_id: userId || props.userId,
         });
+        state.data = response;
         // eslint-disable-next-line camelcase
         state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
-        state.loading = false;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-const getUserDetailPartialData = async () => {
-    state.loading = true;
-    try {
-        const response = await SpaceConnector.client.identity.user.get({
-            user_id: props.userId,
-        });
         state.data.email = response.email;
         state.data.email_verified = response.email_verified;
         state.loading = false;
@@ -153,6 +147,12 @@ watch(() => props.userId, () => {
     const userId = props.userId;
     getUserDetailData(userId);
 }, { immediate: true });
+watch(() => userPageState.visibleUpdateModal, () => {
+    if (!userPageState.visibleUpdateModal) {
+        getUserDetailData(props.userId);
+    }
+});
+
 </script>
 
 <style lang="postcss" scoped>

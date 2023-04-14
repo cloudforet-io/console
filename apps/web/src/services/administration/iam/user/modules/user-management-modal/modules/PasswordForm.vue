@@ -97,9 +97,11 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 interface Props {
     item?: User;
+    isValidEmail?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
+    isValidEmail: false,
 });
 
 const userPageStore = useUserPageStore();
@@ -119,7 +121,7 @@ const state = reactive({
                 {
                     name: PasswordType.RESET,
                     label: i18n.t('COMMON.PROFILE.SEND_LINK'),
-                    disabled: props.item.email_verified === false,
+                    disabled: !props.isValidEmail,
                 },
                 {
                     name: PasswordType.MANUALLY,

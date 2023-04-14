@@ -340,7 +340,7 @@ export default {
         };
         const updateUser = async (item, roleId) => {
             try {
-                await SpaceConnector.client.identity.user.update({
+                await SpaceConnector.clientV2.identity.user.update({
                     ...item,
                 });
                 if (roleId && roleId !== userFormState.roleOfSelectedUser) {

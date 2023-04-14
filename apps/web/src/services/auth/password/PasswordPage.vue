@@ -171,8 +171,7 @@ const handleClickButton = () => {
 };
 const getSSOTokenFromUrl = (): string|undefined => {
     const query = vm.$router.currentRoute.query;
-    const queryString = query.sso_access_token as string;
-    return queryString.split("'")[3];
+    return query.sso_access_token as string;
 };
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     if (!ssoAccessToken) return undefined;

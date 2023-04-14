@@ -24,7 +24,7 @@
                     />
                     <notification-email-form
                         v-if="formState.activeTab !== 'apiOnly'"
-                        v-model="formState.email"
+                        :email="formState.email"
                         @change-input="handleChangeInputs"
                     />
                     <password-form
@@ -48,11 +48,15 @@
                         @change-input="handleChangeInputs"
                     />
                     <notification-email-form
-                        :item="item"
+                        :is-valid-email="state.data.email_verified"
+                        :email="formState.email"
+                        :item="state.data"
                         @change-input="handleChangeInputs"
+                        @change-verify="handleChangeVerify"
                     />
                     <password-form
-                        :item="item"
+                        :is-valid-email="state.data.email_verified"
+                        :item="state.data"
                         @change-input="handleChangeInputs"
                     />
                     <admin-role
@@ -71,11 +75,15 @@
 </template>
 
 <script lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
 import NotificationEmailForm
@@ -85,26 +93,6 @@ import Tags from '@/services/administration/iam/user/modules/user-management-mod
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-interface AuthType {
-    user_type: string;
-    backend: string;
-}
-
-const authTypeMap: Record<string, AuthType> = {
-    external: {
-        user_type: 'USER',
-        backend: 'EXTERNAL',
-    },
-    local: {
-        user_type: 'USER',
-        backend: 'LOCAL',
-    },
-    apiOnly: {
-        user_type: 'API_USER',
-        backend: 'LOCAL',
-    },
-};
 
 export default {
     name: 'UserCreateModal',
@@ -138,6 +126,11 @@ export default {
         const userPageStore = useUserPageStore();
         const userPageState = userPageStore.$state;
 
+        const state = reactive({
+            data: {} as User,
+            selectedId: computed(() => props.item?.user_id),
+        });
+
         const formState = reactive({
             tabs: [
                 { name: 'local', label: 'Local' },
@@ -147,7 +140,7 @@ export default {
             userId: '',
             name: '',
             email: '',
-            domainRole: '',
+            domainRole: '' || undefined,
             password: '',
             passwordManual: false,
             tags: {},
@@ -172,31 +165,39 @@ export default {
             userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
         };
         const setForm = () => {
-            if (props.item) {
-                formState.userId = props.item.user_id;
-                formState.name = props.item.name;
-                formState.email = props.item.email;
-                formState.domainRole = props.item.domain_role;
-                formState.password = props.item.password;
-                formState.passwordManual = false;
-                formState.tags = props.item.tags;
-            }
+            formState.userId = state.data.user_id;
+            formState.name = state.data.name;
+            formState.email = state.data.email || '';
+            formState.domainRole = props.item.domain_role;
+            formState.password = props.item.password;
+            formState.passwordManual = false;
+            formState.tags = state.data.tags || {};
+        };
+        const handleChangeVerify = (status) => {
+            state.data.email_verified = status;
         };
 
         /* API */
+        const getUserDetailData = async (userId) => {
+            if (userId === undefined) return;
+            try {
+                state.data = await SpaceConnector.client.identity.user.get({
+                    user_id: userId,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
         const confirm = async () => {
             const data = {
                 user_id: formState.userId,
                 name: formState.name,
                 email: formState.email,
-                backend: authTypeMap[formState.activeTab]?.backend,
-                user_type: authTypeMap[formState.activeTab]?.user_type,
                 password: formState.password || '',
                 tags: formState.tags || {},
                 reset_password: !formState.passwordManual,
             };
-            console.log(data);
-            if (formState.domainRole !== '') {
+            if (formState.domainRole !== undefined) {
                 emit('confirm', data, formState.domainRole);
             } else {
                 emit('confirm', data, null);
@@ -219,6 +220,7 @@ export default {
         (async () => {
             await Promise.allSettled([
                 initAuthTypeList(),
+                getUserDetailData(state.selectedId),
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/user/load'),
             ]);
@@ -229,10 +231,12 @@ export default {
 
         return {
             userPageState,
+            state,
             formState,
             confirm,
             handleClose,
             handleChangeInputs,
+            handleChangeVerify,
         };
     },
     computed: {

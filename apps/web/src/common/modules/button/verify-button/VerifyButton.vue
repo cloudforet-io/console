@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PButton, PI } from '@spaceone/design-system';
 
@@ -76,6 +76,7 @@ const emit = defineEmits<{(e: 'handle-user-detail'): void}>();
 const state = reactive({
     loading: false,
     isModalVisible: false,
+    loginUserId: computed(() => store.state.user.userId),
 });
 const handleGetUserDetailEmit = () => {
     emit('handle-user-detail');
@@ -92,7 +93,7 @@ const handleClickVerifiedEmail = async () => {
         if (props.verified) return;
         state.loading = true;
         await postValidationEmail(userParam);
-        if (!props.isAdministration) {
+        if (state.loginUserId === props.userId) {
             await store.dispatch('user/setUser', { email: props.email });
         }
     } catch (e: any) {
