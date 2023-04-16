@@ -55,7 +55,7 @@ export default defineConfig({
                 launchOptions: {
                     args: ['--disable-site-isolation-trials', '--disable-web-security'],
                 },
-                storageState: 'playwright/.auth/user.json',
+                // storageState: 'playwright/.auth/user.json',
                 // ignoreHTTPSErrors: true,
             },
             // dependencies: ['setup'],
