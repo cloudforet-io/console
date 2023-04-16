@@ -3,12 +3,12 @@ import { test, expect } from '@playwright/test';
 test.describe('Send Reset Link Email', () => {
     let page;
 
-
     test.beforeEach(async ({ browser }) => {
         page = await browser.newPage();
 
         await page.goto('/sign-in');
         await expect(page).toHaveURL('/sign-in');
+
         const routerLink = await page.waitForSelector('#reset-pw-button');
         await routerLink.click();
         await page.waitForNavigation();
