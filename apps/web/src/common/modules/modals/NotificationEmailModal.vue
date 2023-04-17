@@ -15,6 +15,7 @@
                     >
                         <div class="notification-field-wrapper">
                             <p-text-input
+                                id="newNotificationEmail"
                                 v-model="formState.newNotificationEmail"
                                 @keyup.enter="handleClickSendEmailButton"
                             />
@@ -39,7 +40,7 @@
                                  width="0.875rem"
                                  color="inherit"
                             />
-                            <p class="email-tex">
+                            <p class="email-text">
                                 {{ state.email }}
                             </p>
                         </div>
@@ -55,7 +56,8 @@
                                :invalid-text="validationState.validationCodeInvalidText"
                                required
                 >
-                    <p-text-input v-model="formState.verificationCode"
+                    <p-text-input id="verificationCode"
+                                  v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                                   @keyup.enter="handleClickConfirmButton"
                     />

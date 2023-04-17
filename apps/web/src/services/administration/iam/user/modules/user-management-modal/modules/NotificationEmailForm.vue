@@ -70,7 +70,7 @@
                              width="0.875rem"
                              color="inherit"
                         />
-                        <p class="email-tex">
+                        <p class="email-text">
                             {{ formState.email }}
                         </p>
                     </div>
@@ -87,7 +87,8 @@
                            class="input-form-view"
             >
                 <div class="input-form">
-                    <p-text-input v-model="formState.verificationCode"
+                    <p-text-input id="verificationCode"
+                                  v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                     />
                     <p-button style-type="positive"

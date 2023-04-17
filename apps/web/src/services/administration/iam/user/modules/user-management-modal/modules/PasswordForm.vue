@@ -30,7 +30,7 @@
                                           type="password"
                                           autocomplete="current-password"
                                           appearance-type="masking"
-                                          class="text-input"
+                                          class="text-input password"
                                           :disabled="state.passwordType !== PasswordType.MANUALLY"
                                           :invalid="invalid"
                                           @update:value="handleChangeInput('password')"
@@ -47,7 +47,7 @@
                         <template #default="{invalid}">
                             <p-text-input v-model="formState.passwordCheck"
                                           type="password"
-                                          class="text-input"
+                                          class="text-input password-check"
                                           autocomplete="new-password"
                                           appearance-type="masking"
                                           :disabled="state.passwordType !== PasswordType.MANUALLY"
