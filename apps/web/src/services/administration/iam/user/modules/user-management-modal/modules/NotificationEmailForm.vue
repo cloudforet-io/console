@@ -259,11 +259,11 @@ const handleChangeVerify = async () => {
     }
 })();
 
-watch(() => props.email, () => {
-    formState.email = props.email;
+watch(() => props.email, (value) => {
+    formState.email = value;
 });
-watch(() => props.isValidEmail, () => {
-    state.isEdit = !props.isValidEmail;
+watch(() => props.isValidEmail, (value) => {
+    state.isEdit = !value;
 }, { immediate: true });
 </script>
 

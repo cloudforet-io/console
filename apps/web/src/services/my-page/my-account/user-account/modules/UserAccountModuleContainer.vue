@@ -1,5 +1,5 @@
 <template>
-    <p-pane-layout class="form-wrapper">
+    <p-pane-layout class="user-account-module-container">
         <slot name="headline">
             <div class="headline-wrapper">
                 <p class="form-title">
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="postcss" scoped>
-.form-wrapper {
+.user-account-module-container {
     padding: 1.5rem 1rem;
     .form-title {
         @apply text-display-md;

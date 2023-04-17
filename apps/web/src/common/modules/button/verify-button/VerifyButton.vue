@@ -35,7 +35,7 @@
             :email="props.email"
             :is-administration="props.isAdministration"
             :visible.sync="state.isModalVisible"
-            @handle-user-detail="handleGetUserDetailEmit"
+            @refresh-user="handleGetUserDetailEmit"
         />
     </div>
 </template>
@@ -55,7 +55,7 @@ import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationEmailModal from '@/common/modules/modals/NotificationEmailModal.vue';
 
-interface IProps {
+interface Props {
     email: string
     userId: string
     domainId: string
@@ -63,7 +63,7 @@ interface IProps {
     isAdministration?: boolean
 }
 
-const props = withDefaults(defineProps<IProps>(), {
+const props = withDefaults(defineProps<Props>(), {
     email: '',
     userId: '',
     domainId: '',
@@ -71,7 +71,7 @@ const props = withDefaults(defineProps<IProps>(), {
     isAdministration: false,
 });
 
-const emit = defineEmits<{(e: 'handle-user-detail'): void}>();
+const emit = defineEmits<{(e: 'refresh-user'): void}>();
 
 const state = reactive({
     loading: false,
@@ -79,7 +79,7 @@ const state = reactive({
     loginUserId: computed(() => store.state.user.userId),
 });
 const handleGetUserDetailEmit = () => {
-    emit('handle-user-detail');
+    emit('refresh-user');
 };
 
 /* API */

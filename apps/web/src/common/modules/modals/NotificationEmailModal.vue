@@ -132,7 +132,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
-const emit = defineEmits(['visible', 'handle-user-detail']);
+const emit = defineEmits(['visible', 'refresh-user']);
 
 const state = reactive({
     loading: false,
@@ -157,9 +157,9 @@ const handleEditButton = () => {
 };
 const handleClickCancel = () => {
     state.proxyVisible = false;
-    handleReset();
+    resetFormData();
 };
-const handleReset = () => {
+const resetFormData = () => {
     formState.newNotificationEmail = '';
     formState.verificationCode = '';
     validationState.isValidationCodeValid = false;
@@ -180,11 +180,10 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
                 await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
             }
         }
-        emit('handle-user-detail');
+        emit('refresh-user');
         state.isEditMode = false;
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        throw e;
     } finally {
         state.loading = false;
     }
@@ -197,9 +196,9 @@ const handleClickConfirmButton = async () => {
             domain_id: props.domainId,
             code: formState.verificationCode,
         }, state.myId === props.userId);
-        emit('handle-user-detail');
+        emit('refresh-user');
         state.proxyVisible = false;
-        handleReset();
+        resetFormData();
     } catch (e) {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');

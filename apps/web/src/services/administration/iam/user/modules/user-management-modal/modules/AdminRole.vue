@@ -9,7 +9,7 @@
         </div>
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
-                           :key="props.activeTab"
+                           :key="`admin-role-${props.activeTab}`"
                            :items="formState.domainRoleList"
                            :disabled="formState.domainRoleList.length < 2 || state.isSameId"
                            use-fixed-menu-style

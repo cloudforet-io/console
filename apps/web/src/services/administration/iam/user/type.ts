@@ -133,8 +133,8 @@ export interface ChannelItem {
 	protocol_name: string;
 }
 
-export const PasswordType = Object.freeze({
+export const PasswordType = {
     KEEP: 'KEEP',
     RESET: 'RESET',
     MANUALLY: 'MANUALLY',
-}as const);
+}as const;

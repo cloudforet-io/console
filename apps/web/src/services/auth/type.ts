@@ -1,13 +1,19 @@
 import type { TranslateResult } from 'vue-i18n';
 
 export interface PasswordFormValidation {
-    isIdValid: undefined | boolean,
-    idInvalidText: TranslateResult | string,
-    isPasswordValid: undefined | boolean,
-    isConfirmPasswordValid: undefined | boolean,
-    confirmPasswordInvalidText: TranslateResult | string,
+    isIdValid?: boolean,
+    idInvalidText: TranslateResult,
+    isPasswordValid?: boolean,
+    isConfirmPasswordValid?: boolean,
+    confirmPasswordInvalidText: TranslateResult,
 }
 
 export interface PasswordFormExpose {
     validationState: PasswordFormValidation
 }
+
+export const PasswordStatus = {
+    RESET: 'reset',
+    FIND: 'find',
+    INVALID: 'invalid',
+}as const;

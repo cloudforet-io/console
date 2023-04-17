@@ -1,7 +1,7 @@
 <template>
     <div class="password-form">
         <div class="form">
-            <div v-if="props.status !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME">
+            <div v-if="props.status !== PasswordStatus.RESET">
                 <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
                                :invalid="validationState.isIdValid === false"
                                :invalid-text="validationState.idInvalidText"
@@ -75,7 +75,7 @@ import {
     oneUpperCaseValidator, samePasswordValidator,
 } from '@/lib/helper/user-validation-helper';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { PasswordStatus } from '@/services/auth/type';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
 interface Props {

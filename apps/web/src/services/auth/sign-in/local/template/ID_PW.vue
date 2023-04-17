@@ -100,11 +100,11 @@ export default defineComponent({
 
         const validationState = reactive({
             isIdValid: undefined as undefined | boolean,
-            idInvalidText: '' as TranslateResult | string,
+            idInvalidText: '' as TranslateResult,
             isPasswordValid: undefined as undefined | boolean,
-            passwordInvalidText: '' as TranslateResult | string,
+            passwordInvalidText: '' as TranslateResult,
             isPasswordCheckValid: undefined as undefined | boolean,
-            passwordCheckInvalidText: '' as TranslateResult | string,
+            passwordCheckInvalidText: '' as TranslateResult,
         });
 
         const checkUserId = () => {

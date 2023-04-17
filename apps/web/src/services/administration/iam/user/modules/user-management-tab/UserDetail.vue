@@ -64,7 +64,7 @@
                     :domain-id="state.data.domain_id"
                     :verified="state.data.email_verified"
                     is-administration
-                    @handle-user-detail="getUserDetailData"
+                    @refresh-user="getUserDetailData"
                 />
             </template>
         </p-definition-table>
