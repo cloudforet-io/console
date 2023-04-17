@@ -6,7 +6,7 @@
         >
             <div class="password-form-view">
                 <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
-                    <p-radio v-for="(type, idx) in state.passwordType"
+                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
                              :key="type.name"
                              v-model="state.passwordStatus"
                              :value="idx"
@@ -31,7 +31,7 @@
                                           autocomplete="current-password"
                                           appearance-type="masking"
                                           class="text-input"
-                                          :disabled="!state.isManually"
+                                          :disabled="state.passwordType !== PasswordType.MANUALLY"
                                           :invalid="invalid"
                                           @update:value="handleChangeInput('password')"
                             />
@@ -50,7 +50,7 @@
                                           class="text-input"
                                           autocomplete="new-password"
                                           appearance-type="masking"
-                                          :disabled="!state.isManually"
+                                          :disabled="state.passwordType !== PasswordType.MANUALLY"
                                           :invalid="invalid"
                                           @update:value="handleChangeInput('passwordCheck')"
                             />
@@ -111,7 +111,7 @@ const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
     passwordStatus: 0,
-    passwordType: computed(() => {
+    passwordTypeArr: computed(() => {
         if (userPageState.visibleUpdateModal) {
             return [
                 {
@@ -140,7 +140,7 @@ const state = reactive({
             },
         ];
     }),
-    isManually: false,
+    passwordType: '',
 });
 const formState = reactive({
     password: '',
@@ -189,7 +189,7 @@ const checkPasswordCheck = (passwordCheck) => {
     }
 };
 const handleChangeInput = (type) => {
-    if (!state.isManually) return;
+    if (state.passwordType !== PasswordType.MANUALLY) return;
     if (type === 'password') {
         checkPassword(formState.password);
     } else if (type === 'passwordCheck') {
@@ -199,12 +199,12 @@ const handleChangeInput = (type) => {
     emit('change-input', {
         ...formState,
         password: formState.password,
-        passwordManual: state.isManually,
+        passwordType: state.passwordType,
     });
 };
 const handleClickRadio = (idx: number) => {
-    state.isManually = state.passwordType[idx].name === PasswordType.MANUALLY;
-    emit('change-input', { ...formState, password: '', passwordManual: state.isManually });
+    state.passwordType = state.passwordTypeArr[idx].name;
+    emit('change-input', { ...formState, password: '', passwordType: state.passwordType });
     resetForm();
 };
 const resetForm = () => {

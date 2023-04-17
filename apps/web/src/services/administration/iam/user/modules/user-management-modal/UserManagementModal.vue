@@ -92,6 +92,7 @@ import PasswordForm from '@/services/administration/iam/user/modules/user-manage
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import type { User } from '@/services/administration/iam/user/type';
+import { PasswordType } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export default {
@@ -141,7 +142,9 @@ export default {
             name: '',
             email: '',
             domainRole: '' || undefined,
+            roleId: '',
             password: '',
+            passwordType: '',
             passwordManual: false,
             tags: {},
         });
@@ -153,12 +156,15 @@ export default {
                 formState.email = value.userId;
             }
             if (value.email) formState.email = value.email;
-            if (value.domainRole) formState.domainRole = value.domainRole;
             if (value.tags) formState.tags = value.tags;
             if (value.name) formState.name = value.name;
+            if (value.domainRole) {
+                formState.domainRole = value.domainRole;
+                formState.roleId = value.roleId;
+            }
             if (value.password !== undefined || formState.passwordManual !== undefined) {
                 formState.password = value.password || '';
-                formState.passwordManual = value.passwordManual;
+                formState.passwordType = value.passwordType;
             }
         };
         const handleClose = () => {
@@ -195,10 +201,10 @@ export default {
                 email: formState.email,
                 password: formState.password || '',
                 tags: formState.tags || {},
-                reset_password: !formState.passwordManual,
+                reset_password: formState.passwordType === PasswordType.RESET,
             };
             if (formState.domainRole !== undefined) {
-                emit('confirm', data, formState.domainRole);
+                emit('confirm', data, formState.roleId);
             } else {
                 emit('confirm', data, null);
             }

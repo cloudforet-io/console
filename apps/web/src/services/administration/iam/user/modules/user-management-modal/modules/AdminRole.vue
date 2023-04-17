@@ -56,23 +56,26 @@ const state = reactive({
 });
 const formState = reactive({
     domainRole: '',
+    roleId: '',
     domainRoleList: [] as any[],
 });
 
 /* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
-    emit('change-input', { ...formState, domainRole: formState.domainRole });
+    emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
     state.selectedMenuIndex = selectedIndex;
     formState.domainRole = formState.domainRoleList[selectedIndex].label;
-    emit('change-input', { ...formState, domainRole: formState.domainRole });
+    formState.roleId = formState.domainRoleList[selectedIndex].name;
+    emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
 const setForm = async () => {
     if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings && userPageStore.selectedUsers[0].role_bindings.length > 0) {
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
+        formState.roleId = formState.domainRoleList[state.selectedMenuIndex].name;
         if (state.selectedMenuIndex !== -1) {
             state.isToggled = true;
         }
