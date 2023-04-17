@@ -3,37 +3,39 @@
          :class="{ admin: isDomainOwner }"
     >
         <div class="form-wrapper">
-            <div class="block mobile:hidden">
-                <p class="title">
-                    {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
-                </p>
-                <p class="subtitle">
-                    {{ isDomainOwner ? $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
-                </p>
-            </div>
+            <div class="headline-wrapper">
+                <div class="block mobile:hidden">
+                    <p class="title">
+                        {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+                    </p>
+                    <p class="subtitle">
+                        {{ isDomainOwner ? $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
+                    </p>
+                </div>
 
-            <div class="hidden mobile:flex">
-                <img v-if="ciLogoImage"
-                     class="logo-character"
-                     :src="ciLogoImage"
-                >
-                <img v-else
-                     class="logo-character"
-                     src="@/assets/images/brand/brand_logo.png"
-                >
-            </div>
+                <div class="hidden mobile:flex">
+                    <img v-if="ciLogoImage"
+                         class="logo-character"
+                         :src="ciLogoImage"
+                    >
+                    <img v-else
+                         class="logo-character"
+                         src="@/assets/images/brand/brand_logo.png"
+                    >
+                </div>
 
-            <div v-if="showErrorMessage"
-                 class="error-msg-box"
-            >
-                <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
-                <p-i name="ic_close"
-                     width="1.5rem"
-                     height="1.5rem"
-                     class="cursor-pointer"
-                     color="inherit"
-                     @click="hideErrorMessage"
-                />
+                <div v-if="showErrorMessage"
+                     class="error-msg-box"
+                >
+                    <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
+                    <p-i name="ic_close"
+                         width="1.5rem"
+                         height="1.5rem"
+                         class="cursor-pointer"
+                         color="inherit"
+                         @click="hideErrorMessage"
+                    />
+                </div>
             </div>
 
             <slot name="input" />
@@ -158,44 +160,45 @@ export default {
             margin: auto;
         }
 
-        .logo-character {
-            max-width: 6rem;
-            width: 25%;
-            margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .title {
-            @apply text-primary1;
-            font-size: 2rem;
-            line-height: 150%;
-        }
-        .subtitle {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 140%;
-            margin-bottom: 3rem;
-        }
-        .error-msg-box {
-            @apply bg-red-100 text-red-500 rounded;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            height: 2.25rem;
-            padding: 0.5rem;
-            margin-top: -2.75rem;
+        .headline-wrapper {
+            @apply relative;
             margin-bottom: 0.5rem;
-
-            .error-msg {
-                font-size: 0.875rem;
-                line-height: 140%;
+            .logo-character {
+                max-width: 6rem;
+                width: 25%;
+                margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
+                margin-left: auto;
+                margin-right: auto;
             }
+            .title {
+                @apply text-display-lg text-primary1;
+            }
+            .subtitle {
+                @apply text-paragraph-md text-gray-400;
+                padding-bottom: 1.75rem;
+                margin-top: 0.5rem;
+            }
+            .error-msg-box {
+                @apply absolute bg-red-100 text-red-500 rounded;
+                display: flex;
+                justify-content: space-between;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                height: 2.25rem;
+                padding: 0.5rem;
 
-            @media screen and (width < 478px) {
-                position: absolute;
-                height: 3.5rem;
-                z-index: 1;
-                margin-top: -4rem;
+                .error-msg {
+                    font-size: 0.875rem;
+                    line-height: 140%;
+                }
+
+                @media screen and (width < 478px) {
+                    position: absolute;
+                    height: 3.5rem;
+                    z-index: 1;
+                    margin-top: -4rem;
+                }
             }
         }
         .sign-in-button-wrapper {
@@ -204,7 +207,7 @@ export default {
             font-size: 0.875rem;
             line-height: 1.4;
             cursor: pointer;
-            margin-top: 5.5rem;
+            margin-top: 5.375rem;
 
             @screen mobile {
                 text-align: center;

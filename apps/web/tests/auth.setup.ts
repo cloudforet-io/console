@@ -5,9 +5,9 @@ setup('Authenticate', async ({ page }) => {
     page.goto('/');
 
     await test.step('Enter user information', async () => {
-        await page.getByPlaceholder('User ID').click();
-        await page.getByPlaceholder('User ID').fill(process.env.USERNAME as string);
-        await page.getByPlaceholder('User ID').press('Tab');
+        await page.getByPlaceholder('E-mail Address').click();
+        await page.getByPlaceholder('E-mail Address').fill(process.env.USERNAME as string);
+        await page.getByPlaceholder('E-mail Address').press('Tab');
         await page.getByPlaceholder('Password').fill(process.env.PASSWORD as string);
     });
 

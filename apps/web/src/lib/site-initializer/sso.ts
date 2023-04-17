@@ -11,11 +11,14 @@ export const checkSsoAccessToken = async (store) => {
         if (isMobile()) store.dispatch('display/showMobileGuideModal');
         return;
     }
+
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
+
     // signOut
     if (ssoAccessToken) {
+        console.log(SpaceConnector.isTokenAlive);
         if (SpaceConnector.isTokenAlive) {
             try {
                 const authType = store.state.domain.extendedAuthType;
@@ -26,6 +29,6 @@ export const checkSsoAccessToken = async (store) => {
             }
         }
         if (isMobile()) store.dispatch('display/showMobileGuideModal');
-        else window.location.pathname = 'reset-password';
+        else window.location.pathname = '/reset-password';
     }
 };

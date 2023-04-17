@@ -28,17 +28,58 @@
 		}
 	},
 	"AUTH": {
-		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "Your password has already been reset.",
-			"GO_TO_LOGIN_PAGE": "Go to Login",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "Go to Login without Changing Password",
-			"HELP_TEXT": "Enter a new password for account: ",
-			"INVALID_LINK": "Invalid Link",
-			"MOBILE_GUIDE_MODAL_DESC_1": "You must",
-			"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
-			"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
-			"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile",
-			"RESET_PASSWORD": "Reset Password"
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "Back to Sign-in",
+				"FORGOT_PASSWORD": "Forgot password?",
+				"HELP_TEXT": "Enter your User ID, then we'll send you a link to reset password again.",
+				"INVALID_EMAIL_FORMAT": "Invalid email format.",
+				"SEND": "Send Password Reset Email",
+				"TITLE": "Forgot your password?",
+				"USER_ID": "User ID"
+			},
+			"INVALID_LINK": "The link is invalid",
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "You must",
+				"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
+				"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
+				"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile"
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "Confirm Password",
+				"DESC": "At least 8 characters",
+				"DONE": "Your password has been \nreset successfully!",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "Click here",
+						"COLLAPSED": "Didn't receive an email?",
+						"DESC_1": "An email has been sent",
+						"DESC_2": "Follow the directions in the email to reset your password.",
+						"EXTENSION_CONTACT": "contact your domain administrators.",
+						"EXTENSION_DESC_1": "Your notification email may not be the same as your user ID. if you've forgotten the exact email address, please",
+						"EXTENSION_REASON_1": "Please wait a bit longer... It could take couple of minutes to show up in your inbox.",
+						"EXTENSION_REASON_2": "Check your spam.",
+						"EXTENSION_REASON_3": "to re-send the email.",
+						"EXTENSION_TITLE_1": "Didn't receive an email?",
+						"EXTENSION_TITLE_2": "Still having trouble?",
+						"GO_BACK_TO_CONSOLE": "Go back to Console",
+						"TITLE": "Password reset email sent"
+					},
+					"FAIL": {
+						"DESC_1": "No email address found",
+						"DESC_2": "on your account to send password \nreset link. Please",
+						"DESC_3": "contact your domain administrators",
+						"DESC_4": "and\nrequest to change password.",
+						"GO_BACK": "Go Back",
+						"TITLE": "Unable to reset password"
+					}
+				},
+				"GO_TO_SIGN_IN": "Go to Sign-in",
+				"HELP_TEXT": "Enter a new password for account:",
+				"NOT_MATCHING": "Not matching",
+				"RESET_PASSWORD": "Reset Password",
+				"TITLE": "Reset Password"
+			}
 		}
 	},
 	"AUTOMATION": {
@@ -887,6 +928,18 @@
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble.",
+			"COLLAPSE_TITLE": "Didn't get verification code?",
+			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"NOTIFICATION_EMAIL": "Notification Email",
+			"SEND_CODE": "Send Code",
+			"SEND_NEW_CODE": "Send new code",
+			"SENT_DESC": "A verification code has been sent to",
+			"TITLE": "Verify Notification Email",
+			"VERIFICATION_CODE": "Verification Code",
+			"VERIFY_NOW": "Verify Now"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "Close",
@@ -896,20 +949,26 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "Failed to Update Profile",
 			"ALT_S_UPDATE": "Successfully Updated Profile",
+			"CURRENT_PASSWORD": "Current Password",
 			"EMAIL": "E-mail",
 			"EMAIL_REQUIRED": "Please enter email",
 			"GROUP": "Group/Company",
 			"ID": "ID",
+			"KEEP_PASSWORD": "Keep current password",
 			"LANGUAGE": "Language",
 			"MAX_LENGTH_INVALID": "{max} characters in max",
 			"MIN_LENGTH_INVALID": "must longer than {min} characters.",
 			"MOBILE": "Mobile",
 			"NAME": "Name",
 			"NAME_REQUIRED": "Please enter name.",
+			"NEW_PASSWORD": "New Password",
 			"PASSWORD": "Password",
 			"PASSWORD_CHECK": "Password Check",
 			"PASSWORD_CHECK_INVALID": "Please enter same value again",
+			"PASSWORD_HELP_TEXT": "Notification email verification is required to send a password reset link.",
 			"ROLE": "Role",
+			"SEND_LINK": "Send user a password reset link",
+			"SET_MANUALLY": "Set password manually",
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
@@ -944,6 +1003,7 @@
 			"VERSION": "Version"
 		},
 		"TAGS": {
+			"ADD": "Add",
 			"ADD_TAG": "Add Tags",
 			"ADD_TAG_DESC": "Add associated tags.",
 			"ALT_E_UPDATE": "Failed to Update Tags",
@@ -1590,6 +1650,16 @@
 				"ACCOUNT_N_PROFILE": "Account & Profile",
 				"BASE_INFORMATION": "Base Information",
 				"CHANGE_PASSWORD": "Change Password",
+				"NOTIFICATION_EMAIL": {
+					"CHANGE": "Change",
+					"HELP_TEXT": "Enter email address to receive important account and system-related information.",
+					"NOT_VERIFIED": "Not Verified",
+					"SEND_MAIL": "Send Verification Code",
+					"SUCCESS": "Successfully verified notification email.",
+					"TITLE": "Notification Email",
+					"VERIFIED": "Verified",
+					"VERIFY": "Verify"
+				},
 				"SAVE_CHANGES": "Save Changes"
 			},
 			"API_KEY": {
@@ -1616,10 +1686,9 @@
 			"FORM": {
 				"ADD_TITLE": "Add User",
 				"ALREADY_EXISTS": "Already exists",
-				"ASSIGN_DOMAIN_ROLE": "Assign Admin Role",
+				"ASSIGN_DOMAIN_ROLE": "Admin Role",
 				"CHECK_USER_ID": "Check ID",
 				"DOMAIN_ADMIN": "Domain Admin",
-				"EMAIL": "E-mail",
 				"EMAIL_INVALID": "Invalid e-mail format.",
 				"EMPTY_SPACE_INVALID": "Remove empty space.",
 				"GROUP": "Group/Company",
@@ -1630,6 +1699,8 @@
 				"NAME": "Name",
 				"NAME_PLACEHOLDER": "Insert ID",
 				"NAME_VALID": "You can use this ID",
+				"NOTIFICATION_EMAIL": "Notification Email",
+				"NOTIFICATION_TOOLTIP": "Important account and system-\nrelated information will be sent\nto here.",
 				"NOT_SELECT_ROLE": "Not select role",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
@@ -1640,7 +1711,7 @@
 				"PASSWORD_CHECK": "Password Check",
 				"PASSWORD_CHECK_INVALID": "Please enter same value again.",
 				"PASSWORD_HELP_TEXT": "your Password must be 5 ~ 12 characters long",
-				"PASSWORD_INVALID": "Password must be 5 ~ 12 characters long.",
+				"PASSWORD_INVALID": "Password needs to at least 8 characters.",
 				"REQUIRED_FIELD": "Required field",
 				"TAGS": "Tags",
 				"TAGS_HELP_TEXT1": "Add associated tags.",
@@ -1649,8 +1720,8 @@
 				"TIMEZONE_INVALID": "The time zone is set incorrectly.",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"UPDATE_TITLE": "Update User",
-				"USER_ID": "ID",
-				"USER_ID_DUPLICATED": "same ID exists",
+				"USER_ID": "User ID",
+				"USER_ID_DUPLICATED": "Already being used.",
 				"USER_ID_INVALID": "Same ID exists.",
 				"USER_ID_NOT_EXIST": "ID does not exists."
 			},
@@ -1708,7 +1779,6 @@
 				"DISABLE_MODAL_DESC": "Are you sure you want to disable selected user? ",
 				"DISABLE_MODAL_TITLE": "Disable User",
 				"DOMAIN_ID": "Domain ID",
-				"EMAIL": "E-mail",
 				"ENABLE": "Enable",
 				"ENABLE_MODAL_DESC": "Are you sure you want to enable selected user below?",
 				"ENABLE_MODAL_TITLE": "Enable User",
@@ -1720,6 +1790,7 @@
 				"MY_ACCOUNT": "My Account",
 				"NAME": "Name",
 				"NOTIFICATION": "Notifications",
+				"NOTIFICATION_EMAIL": "Notification E-mail",
 				"NO_SELECTED": "Select a user for more details.",
 				"ROOT_ACCOUNT": "Root Account",
 				"SELECTED_DATA": "Selected Data",
