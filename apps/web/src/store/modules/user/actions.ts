@@ -19,6 +19,8 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         email: response.email,
         language: response.language,
         timezone: response.timezone,
+        // email_verified : There is data only when the value is true.
+        emailVerified: response.email_verified,
     };
 };
 
@@ -33,6 +35,8 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         language: response.language,
         timezone: response.timezone,
         requiredActions: response.required_actions,
+        // email_verified : There is data only when the value is true.
+        emailVerified: response.email_verified,
     };
 };
 
@@ -55,7 +59,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userType === 'DOMAIN_OWNER') {
         await SpaceConnector.client.identity.domainOwner.update(request);
     } else {
-        await SpaceConnector.client.identity.user.update(request);
+        await SpaceConnector.clientV2.identity.user.update(request);
     }
 };
 

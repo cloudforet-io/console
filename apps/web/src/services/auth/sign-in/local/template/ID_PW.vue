@@ -1,13 +1,15 @@
 <template>
     <div class="local-wrapper">
-        <form class="form">
+        <form class="form"
+              onsubmit="return false"
+        >
             <p-field-group :label="isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
                            :invalid="isIdValid === false"
                            required
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="userId"
-                                  placeholder="User ID"
+                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkUserId"
@@ -25,20 +27,29 @@
                                   :invalid="invalid"
                                   block
                                   @update:value="checkPassword"
-                                  @keyup.enter.native="signIn"
+                                  @keyup.enter="signIn"
                     />
                 </template>
             </p-field-group>
         </form>
-        <p-button :style-type="buttonStyleType"
-                  type="submit"
-                  size="lg"
-                  class="sign-in-btn"
-                  :loading="loading"
-                  @click="signIn"
-        >
-            {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
-        </p-button>
+        <div class="util-wrapper">
+            <p class="reset-pw-button">
+                <router-link id="reset-pw-button"
+                             :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
+                >
+                    {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
+                </router-link>
+            </p>
+            <p-button :style-type="buttonStyleType"
+                      type="submit"
+                      size="lg"
+                      class="sign-in-btn"
+                      :loading="loading"
+                      @click="signIn"
+            >
+                {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -57,6 +68,9 @@ import type { Vue } from 'vue/types/vue';
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -106,7 +120,7 @@ export default defineComponent({
         const checkPassword = async () => {
             if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
             if ((state.password.replace(/ /g, '').length !== state.password.length)
-          || !state.password) {
+                || !state.password) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
             } else {
@@ -128,8 +142,9 @@ export default defineComponent({
             };
             try {
                 await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
+                await store.dispatch('display/hideSignInErrorMessage');
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-                    await vm.$router.push({ name: AUTH_ROUTE.RESET_PASSWORD._NAME });
+                    await vm.$router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
                 } else {
                     context.emit('sign-in', state.userId);
                 }
@@ -147,6 +162,8 @@ export default defineComponent({
         return {
             ...toRefs(state),
             ...toRefs(validationState),
+            AUTH_ROUTE,
+            isMobile,
             signIn,
             checkUserId,
             checkPassword,
@@ -157,6 +174,7 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
+/* custom design-system component - p-text-input */
 :deep(.p-text-input) {
     input:-webkit-autofill {
         transition: background-color 5000s;
@@ -168,29 +186,45 @@ export default defineComponent({
         transition: background-color 5000s;
         -webkit-box-shadow: 0 0 0 30px theme('colors.blue.100') inset !important;
     }
+    .p-button {
+        @apply font-normal text-gray-700;
+    }
 }
 .local-wrapper {
     margin: auto;
     width: 100%;
-    .p-field-group {
-        margin-bottom: 1.5rem;
+    .form {
+        @apply flex flex-col;
+        gap: 1.25rem;
+        .p-field-group {
+            margin-bottom: 0;
+        }
     }
     .input-label {
-        @apply font-bold text-gray-900 mt-2;
-        font-size: 0.875rem;
-        line-height: 140%;
+        @apply text-label-md font-bold text-gray-900 mt-2;
         margin-bottom: 0.375rem;
     }
-
-    .sign-in-btn {
+    .util-wrapper {
+        @apply flex flex-col;
+        gap: 2.5rem;
         width: 100%;
-        margin-top: 2.5rem;
+        margin-top: 1.125rem;
+        .reset-pw-button {
+            @apply text-label-md text-blue-700;
+        }
+    }
+
+    @screen tablet {
+        .form {
+            gap: 1.5rem;
+        }
+        .util-wrapper {
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+        }
     }
 
     @screen mobile {
-        .form {
-            margin-top: 0.5rem;
-        }
         .p-field-group:deep(label) {
             display: none;
         }

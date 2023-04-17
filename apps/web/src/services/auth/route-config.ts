@@ -9,5 +9,15 @@ export const AUTH_ROUTE = Object.freeze({
     SIGN_OUT: {
         _NAME: 'signOut',
     },
-    RESET_PASSWORD: { _NAME: 'resetPassword' },
+    PASSWORD: {
+        _NAME: 'password',
+        STATUS: {
+            FIND: { _NAME: 'find' },
+            RESET: { _NAME: 'reset' },
+        },
+    },
+    EMAIL: {
+        _NAME: 'email',
+        INVALID: { _NAME: 'invalid' },
+    },
 });

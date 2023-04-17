@@ -1,159 +1,282 @@
 <template>
-    <p-table-check-modal
-        v-if="!!mode"
-        :visible="userPageState.visibleManagementModal"
-        :header-title="headerTitle"
-        :sub-title="subTitle"
-        :theme-color="themeColor"
-        :fields="fields"
-        :items="userPageStore.selectedUsers"
-        modal-size="md"
-        @confirm="checkModalConfirm"
-        @cancel="handleClose"
+    <p-button-modal class="user-management-modal"
+                    :header-title="headerTitle"
+                    size="md"
+                    :fade="true"
+                    :backdrop="true"
+                    :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
+                    :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '')"
+                    @confirm="confirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
     >
-        <template #col-state-format="{value}">
-            <p-status v-bind="userStateFormatter(value)"
-                      class="capitalize"
-            />
+        <template #body>
+            <p-box-tab v-if="userPageState.visibleCreateModal"
+                       v-model="formState.activeTab"
+                       :tabs="formState.tabs"
+                       style-type="gray"
+                       class="auth-type-tab"
+            >
+                <div class="input-form-wrapper">
+                    <user-info-form
+                        :active-tab="formState.activeTab"
+                        @change-input="handleChangeInputs"
+                    />
+                    <notification-email-form
+                        v-if="formState.activeTab !== 'apiOnly'"
+                        :email="formState.email"
+                        @change-input="handleChangeInputs"
+                    />
+                    <password-form
+                        v-if="formState.activeTab === 'local'"
+                        @change-input="handleChangeInputs"
+                    />
+                    <admin-role
+                        :active-tab="formState.activeTab"
+                        @change-input="handleChangeInputs"
+                    />
+                </div>
+                <div class="input-form-wrapper tags">
+                    <tags @change-input="handleChangeInputs" />
+                </div>
+            </p-box-tab>
+            <div v-else>
+                <div class="input-form-wrapper">
+                    <user-info-form
+                        :active-tab="formState.activeTab"
+                        :item="item"
+                        @change-input="handleChangeInputs"
+                    />
+                    <notification-email-form
+                        :is-valid-email="state.data.email_verified"
+                        :email="formState.email"
+                        :item="state.data"
+                        @change-input="handleChangeInputs"
+                        @change-verify="handleChangeVerify"
+                    />
+                    <password-form
+                        :is-valid-email="state.data.email_verified"
+                        :item="state.data"
+                        @change-input="handleChangeInputs"
+                    />
+                    <admin-role
+                        :item="item"
+                        @change-input="handleChangeInputs"
+                    />
+                </div>
+                <div class="input-form-wrapper tags">
+                    <tags :item="item"
+                          @change-input="handleChangeInputs"
+                    />
+                </div>
+            </div>
         </template>
-        <template #col-last_accessed_at-format="{ value }">
-            <span v-if="value === -1">
-                No Activity
-            </span>
-            <span v-if="value === 0">
-                {{ $t('IDENTITY.USER.MAIN.TODAY') }}
-            </span>
-            <span v-else-if="value === 1">
-                {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
-            </span>
-            <span v-else>
-                {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
-            </span>
-        </template>
-    </p-table-check-modal>
+    </p-button-modal>
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { computed, reactive } from 'vue';
 
-import {
-    PStatus, PTableCheckModal,
-} from '@spaceone/design-system';
-import { map } from 'lodash';
+import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
+import NotificationEmailForm
+    from '@/services/administration/iam/user/modules/user-management-modal/modules/NotificationEmailForm.vue';
+import PasswordForm from '@/services/administration/iam/user/modules/user-management-modal/modules/PasswordForm.vue';
+import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
+import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
+import type { User } from '@/services/administration/iam/user/type';
+import { PasswordType } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
-
 export default {
-    name: 'UserManagementModal',
+    name: 'UserCreateModal',
     components: {
-        PStatus,
-        PTableCheckModal,
+        Tags,
+        AdminRole,
+        PasswordForm,
+        NotificationEmailForm,
+        UserInfoForm,
+        PButtonModal,
+        PBoxTab,
+    },
+    directives: {
+        focus: {
+            inserted(el) {
+                el.focus();
+            },
+        },
     },
     props: {
         headerTitle: {
             type: String,
             required: true,
         },
-        subTitle: {
-            type: String,
-            default: '',
-        },
-        themeColor: {
-            type: String,
-            default: 'alert',
-        },
-        mode: {
-            type: String,
-            default: '',
+        item: {
+            type: undefined as undefined | User,
+            default: undefined,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const userPageStore = useUserPageStore();
         const userPageState = userPageStore.$state;
 
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            fields: computed(() => ([
-                { name: 'user_id', label: 'User ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'user_type', label: 'Access Control' },
-                { name: 'api_key_count', label: 'API Key' },
-                { name: 'role_name', label: 'Role' },
-                { name: 'backend', label: 'Auth Type' },
-                { name: 'last_accessed_at', label: 'Last Activity' },
-                { name: 'timezone', label: 'Timezone' },
-            ])),
+            data: {} as User,
+            selectedId: computed(() => props.item?.user_id),
         });
 
-        const getUsersParam = (items) => ({ users: map(items, 'user_id') });
+        const formState = reactive({
+            tabs: [
+                { name: 'local', label: 'Local' },
+                { name: 'apiOnly', label: 'API Only' },
+            ],
+            activeTab: '',
+            userId: '',
+            name: '',
+            email: '',
+            domainRole: '' || undefined,
+            roleId: '',
+            password: '',
+            passwordType: '',
+            passwordManual: false,
+            tags: {},
+        });
 
-        const deleteUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                userPageStore.$patch({ selectedIndices: [] });
-                showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleManagementModal: false });
+        /* Components */
+        const handleChangeInputs = (value) => {
+            if (value.userId) {
+                formState.userId = value.userId;
+                formState.email = value.userId;
+            }
+            if (value.email) formState.email = value.email;
+            if (value.tags) formState.tags = value.tags;
+            if (value.name) formState.name = value.name;
+            if (value.domainRole) {
+                formState.domainRole = value.domainRole;
+                formState.roleId = value.roleId;
+            }
+            if (value.password !== undefined || formState.passwordManual !== undefined) {
+                formState.password = value.password || '';
+                formState.passwordType = value.passwordType;
             }
         };
-        const enableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleManagementModal: false });
-            }
-        };
-        const disableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleManagementModal: false });
-            }
-        };
-        const checkModalConfirm = async (item) => {
-            if (props.mode === 'delete') await deleteUser(item);
-            else if (props.mode === 'enable') await enableUser(item);
-            else if (props.mode === 'disable') await disableUser(item);
-        };
-
         const handleClose = () => {
-            userPageStore.$patch({ visibleManagementModal: false });
+            userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
         };
+        const setForm = () => {
+            formState.userId = state.data.user_id;
+            formState.name = state.data.name;
+            formState.email = state.data.email || '';
+            formState.domainRole = props.item.domain_role;
+            formState.password = props.item.password;
+            formState.passwordManual = false;
+            formState.tags = state.data.tags || {};
+        };
+        const handleChangeVerify = (status) => {
+            state.data.email_verified = status;
+        };
+
+        /* API */
+        const getUserDetailData = async (userId) => {
+            if (userId === undefined) return;
+            try {
+                state.data = await SpaceConnector.client.identity.user.get({
+                    user_id: userId,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+        const confirm = async () => {
+            const data = {
+                user_id: formState.userId,
+                name: formState.name,
+                email: formState.email,
+                password: formState.password || '',
+                tags: formState.tags || {},
+                reset_password: formState.passwordType === PasswordType.RESET,
+            };
+            if (formState.domainRole !== undefined) {
+                emit('confirm', data, formState.roleId);
+            } else {
+                emit('confirm', data, null);
+            }
+            userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
+        };
+
+        /* init */
+        const initAuthTypeList = async () => {
+            if (store.state.domain.extendedAuthType !== undefined) {
+                formState.tabs = [
+                    { name: 'external', label: store.getters['domain/extendedAuthTypeLabel'] },
+                    ...formState.tabs,
+                ];
+                formState.activeTab = 'external';
+            } else {
+                formState.activeTab = 'local';
+            }
+        };
+        (async () => {
+            await Promise.allSettled([
+                initAuthTypeList(),
+                getUserDetailData(state.selectedId),
+                // LOAD REFERENCE STORE
+                store.dispatch('reference/user/load'),
+            ]);
+            if (userPageState.visibleUpdateModal) {
+                await setForm();
+            }
+        })();
 
         return {
-            userStateFormatter,
-            ...toRefs(state),
-            userPageStore,
             userPageState,
-            checkModalConfirm,
+            state,
+            formState,
+            confirm,
             handleClose,
+            handleChangeInputs,
+            handleChangeVerify,
         };
+    },
+    computed: {
+        store() {
+            return store;
+        },
     },
 };
 </script>
+
+<style lang="postcss">
+.user-management-modal {
+    .input-form-wrapper {
+        @apply flex flex-col bg-gray-100 rounded-lg;
+        padding: 1rem;
+        gap: 1rem;
+        & + .input-form-wrapper {
+            margin-top: 1.5rem;
+        }
+    }
+    .auth-type-tab {
+        margin-bottom: 1.5rem;
+        overflow-y: hidden;
+        .input-form-wrapper {
+            &.tags {
+                padding-top: 1.125rem;
+                padding-bottom: 0.25rem;
+                gap: 0.75rem;
+            }
+        }
+    }
+}
+.tooltip {
+    @apply text-paragraph-md;
+    width: 14rem;
+}
+</style>

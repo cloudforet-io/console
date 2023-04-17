@@ -28,17 +28,58 @@
 		}
 	},
 	"AUTH": {
-		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
-			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "パスワードを変更せずにログインに戻る",
-			"HELP_TEXT": "アカウントの新しいパスワード入力:",
-			"INVALID_LINK": "無効なリンクです",
-			"MOBILE_GUIDE_MODAL_DESC_1": "初期ログインの時に",
-			"MOBILE_GUIDE_MODAL_DESC_2": "PC環境でまずパスワードを再設定した後、",
-			"MOBILE_GUIDE_MODAL_DESC_3": "ご利用いただけます。",
-			"MOBILE_GUIDE_MODAL_TITLE": "モバイル環境では利用不可",
-			"RESET_PASSWORD": "パスワード再設定"
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "",
+				"FORGOT_PASSWORD": "",
+				"HELP_TEXT": "",
+				"INVALID_EMAIL_FORMAT": "",
+				"SEND": "",
+				"TITLE": "",
+				"USER_ID": ""
+			},
+			"INVALID_LINK": "",
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "",
+				"MOBILE_GUIDE_MODAL_DESC_2": "",
+				"MOBILE_GUIDE_MODAL_DESC_3": "",
+				"MOBILE_GUIDE_MODAL_TITLE": ""
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "",
+				"DESC": "",
+				"DONE": "",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "",
+						"COLLAPSED": "",
+						"DESC_1": "",
+						"DESC_2": "",
+						"EXTENSION_CONTACT": "",
+						"EXTENSION_DESC_1": "",
+						"EXTENSION_REASON_1": "",
+						"EXTENSION_REASON_2": "",
+						"EXTENSION_REASON_3": "",
+						"EXTENSION_TITLE_1": "",
+						"EXTENSION_TITLE_2": "",
+						"GO_BACK_TO_CONSOLE": "",
+						"TITLE": ""
+					},
+					"FAIL": {
+						"DESC_1": "",
+						"DESC_2": "",
+						"DESC_3": "",
+						"DESC_4": "",
+						"GO_BACK": "",
+						"TITLE": ""
+					}
+				},
+				"GO_TO_SIGN_IN": "",
+				"HELP_TEXT": "アカウントの新しいパスワード入力:",
+				"NOT_MATCHING": "",
+				"RESET_PASSWORD": "パスワード再設定",
+				"TITLE": ""
+			}
 		}
 	},
 	"AUTOMATION": {
@@ -887,6 +928,18 @@
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "",
+			"COLLAPSE_TITLE": "",
+			"INVALID_CODE": "",
+			"NOTIFICATION_EMAIL": "",
+			"SEND_CODE": "",
+			"SEND_NEW_CODE": "",
+			"SENT_DESC": "",
+			"TITLE": "",
+			"VERIFICATION_CODE": "",
+			"VERIFY_NOW": ""
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "閉じる",
@@ -896,20 +949,26 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "個人情報編集に失敗",
 			"ALT_S_UPDATE": "個人情報編集完了",
+			"CURRENT_PASSWORD": "",
 			"EMAIL": "メールアドレス",
 			"EMAIL_REQUIRED": "メールアドレスを入力してください",
 			"GROUP": "グループ/会社",
 			"ID": "ID",
+			"KEEP_PASSWORD": "",
 			"LANGUAGE": "言語",
 			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
 			"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
 			"MOBILE": "電話番号",
 			"NAME": "お名前",
 			"NAME_REQUIRED": "お名前を入力してください。",
+			"NEW_PASSWORD": "",
 			"PASSWORD": "パスワード",
 			"PASSWORD_CHECK": "パスワードの確認",
 			"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください",
+			"PASSWORD_HELP_TEXT": "",
 			"ROLE": "権限",
+			"SEND_LINK": "",
+			"SET_MANUALLY": "",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
@@ -944,6 +1003,7 @@
 			"VERSION": "バージョン"
 		},
 		"TAGS": {
+			"ADD": "",
 			"ADD_TAG": "タグの追加",
 			"ADD_TAG_DESC": "タグを追加して、リソースを管理します",
 			"ALT_E_UPDATE": "タグの編集に失敗",
@@ -1590,6 +1650,16 @@
 				"ACCOUNT_N_PROFILE": "アカウント＆情報",
 				"BASE_INFORMATION": "基本情報",
 				"CHANGE_PASSWORD": "パスワード変更",
+				"NOTIFICATION_EMAIL": {
+					"CHANGE": "",
+					"HELP_TEXT": "",
+					"NOT_VERIFIED": "",
+					"SEND_MAIL": "",
+					"SUCCESS": "",
+					"TITLE": "",
+					"VERIFIED": "",
+					"VERIFY": ""
+				},
 				"SAVE_CHANGES": "変更事項を保存"
 			},
 			"API_KEY": {
@@ -1616,10 +1686,9 @@
 			"FORM": {
 				"ADD_TITLE": "ユーザー追加",
 				"ALREADY_EXISTS": "すでに存在しています",
-				"ASSIGN_DOMAIN_ROLE": "ドメイン·ロールの割り当てる",
+				"ASSIGN_DOMAIN_ROLE": "",
 				"CHECK_USER_ID": "ユーザ名を確認",
 				"DOMAIN_ADMIN": "ドメイン管理者",
-				"EMAIL": "メールアドレス",
 				"EMAIL_INVALID": "無効なメール形式です",
 				"EMPTY_SPACE_INVALID": "空白を取り除いてください",
 				"GROUP": "グループ/会社",
@@ -1630,6 +1699,8 @@
 				"NAME": "お名前",
 				"NAME_PLACEHOLDER": "ユーザ名を入力",
 				"NAME_VALID": "使用可能なIDです",
+				"NOTIFICATION_EMAIL": "",
+				"NOTIFICATION_TOOLTIP": "",
 				"NOT_SELECT_ROLE": "ロールが選択されていません",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
@@ -1640,7 +1711,7 @@
 				"PASSWORD_CHECK": "パスワード確認",
 				"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください。",
 				"PASSWORD_HELP_TEXT": "パスワードは、5〜12文字で入力してください。",
-				"PASSWORD_INVALID": "パスワードは、5〜12文字で入力してください。",
+				"PASSWORD_INVALID": "",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"TAGS": "タグ",
 				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
@@ -1649,8 +1720,8 @@
 				"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"UPDATE_TITLE": "ユーザー編集",
-				"USER_ID": "ID",
-				"USER_ID_DUPLICATED": "同じIDが存在します。",
+				"USER_ID": "User ID",
+				"USER_ID_DUPLICATED": "",
 				"USER_ID_INVALID": "同じIDが存在します。",
 				"USER_ID_NOT_EXIST": "IDがありません"
 			},
@@ -1708,7 +1779,6 @@
 				"DISABLE_MODAL_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 				"DISABLE_MODAL_TITLE": "ユーザ無効化",
 				"DOMAIN_ID": "ドメイン名",
-				"EMAIL": "メールアドレス",
 				"ENABLE": "有効化",
 				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
 				"ENABLE_MODAL_TITLE": "ユーザー有効化",
@@ -1720,6 +1790,7 @@
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",
+				"NOTIFICATION_EMAIL": "",
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 				"ROOT_ACCOUNT": "Root account",
 				"SELECTED_DATA": "選択したデータ",

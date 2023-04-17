@@ -24,6 +24,7 @@ const state: UserState = {
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
     requiredActions: storedUserState.requiredActions,
+    emailVerified: storedUserState.emailVerified,
 };
 
 export default {
