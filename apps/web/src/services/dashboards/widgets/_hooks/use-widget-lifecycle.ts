@@ -163,7 +163,7 @@ export const useWidgetLifecycle = ({
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
     watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.initiated || !props.editMode || !props.inheritOptions || isEqual(after, before)) return;
+        if (!props.editMode || !props.inheritOptions || isEqual(after, before)) return;
         if (!state.widgetInfo) return;
 
         const [
@@ -181,6 +181,8 @@ export const useWidgetLifecycle = ({
         if (changedVariableSchemaProperties.length) {
             isWidgetOptionChanged = isAffectedByChangedVariableSchemaProperties(changedVariableSchemaProperties, props.inheritOptions);
         }
+
+        if (!props.initiated) return;
         if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) refreshWidget();
     }, { deep: true });
     if (state.settings) {
