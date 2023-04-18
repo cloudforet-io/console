@@ -16,8 +16,8 @@ export interface PasswordFormExpose {
     validationState: PasswordFormValidation
 }
 
-export const PasswordStatus = {
+export const PASSWORD_STATUS = {
     RESET: 'reset',
     FIND: 'find',
     INVALID: 'invalid',
-}as const;
+} as const;

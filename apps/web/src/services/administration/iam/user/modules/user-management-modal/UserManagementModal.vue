@@ -92,7 +92,7 @@ import PasswordForm from '@/services/administration/iam/user/modules/user-manage
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import type { User } from '@/services/administration/iam/user/type';
-import { PasswordType } from '@/services/administration/iam/user/type';
+import { PASSWORD_TYPE } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export default {
@@ -203,7 +203,7 @@ export default {
                 email: formState.email,
                 password: formState.password || '',
                 tags: formState.tags || {},
-                reset_password: formState.passwordType === PasswordType.RESET,
+                reset_password: formState.passwordType === PASSWORD_TYPE.RESET,
             };
             if (formState.domainRole !== undefined) {
                 emit('confirm', data, formState.roleId);

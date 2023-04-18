@@ -347,7 +347,7 @@ export default {
                     await bindRole(item.user_id, roleId);
                     userFormState.roleOfSelectedUser = roleId;
                 }
-                if (roleId === '' || !roleId && userFormState.roleOfSelectedUser !== '') {
+                if (!roleId && userFormState.roleOfSelectedUser !== '') {
                     await unbindRole(item.user_id);
                     userFormState.roleOfSelectedUser = roleId;
                 }

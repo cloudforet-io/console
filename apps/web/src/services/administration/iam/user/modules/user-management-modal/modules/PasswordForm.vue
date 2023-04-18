@@ -31,7 +31,7 @@
                                           autocomplete="current-password"
                                           appearance-type="masking"
                                           class="text-input password"
-                                          :disabled="state.passwordType !== PasswordType.MANUALLY"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
                                           :invalid="invalid"
                                           @update:value="handleChangeInput('password', $event)"
                             />
@@ -50,7 +50,7 @@
                                           class="text-input password-check"
                                           autocomplete="new-password"
                                           appearance-type="masking"
-                                          :disabled="state.passwordType !== PasswordType.MANUALLY"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
                                           :invalid="invalid"
                                           @update:value="handleChangeInput('passwordCheck', $event)"
                             />
@@ -92,7 +92,7 @@ import {
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { User } from '@/services/administration/iam/user/type';
-import { PasswordType } from '@/services/administration/iam/user/type';
+import { PASSWORD_TYPE } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 
@@ -116,27 +116,27 @@ const state = reactive({
         if (userPageState.visibleUpdateModal) {
             return [
                 {
-                    name: PasswordType.KEEP,
+                    name: PASSWORD_TYPE.KEEP,
                     label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
                 },
                 {
-                    name: PasswordType.RESET,
+                    name: PASSWORD_TYPE.RESET,
                     label: i18n.t('COMMON.PROFILE.SEND_LINK'),
                     disabled: !props.isValidEmail,
                 },
                 {
-                    name: PasswordType.MANUALLY,
+                    name: PASSWORD_TYPE.MANUALLY,
                     label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
                 },
             ];
         }
         return [
             {
-                name: PasswordType.RESET,
+                name: PASSWORD_TYPE.RESET,
                 label: i18n.t('COMMON.PROFILE.SEND_LINK'),
             },
             {
-                name: PasswordType.MANUALLY,
+                name: PASSWORD_TYPE.MANUALLY,
                 label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
             },
         ];
@@ -171,7 +171,7 @@ const {
 
 /* Components */
 const handleChangeInput = (type: string, e: string) => {
-    if (state.passwordType !== PasswordType.MANUALLY) return;
+    if (state.passwordType !== PASSWORD_TYPE.MANUALLY) return;
     if (type === 'password') {
         setForm('password', e);
     } else if (type === 'passwordCheck') {

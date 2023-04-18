@@ -10,7 +10,7 @@
                         {{ state.pageTitle }}
                     </h1>
                     <div class="help-text-wrapper">
-                        <p v-if="props.status === PasswordStatus.RESET"
+                        <p v-if="props.status === PASSWORD_STATUS.RESET"
                            class="help-text"
                         >
                             {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
@@ -34,7 +34,7 @@
                 />
                 <div class="button-wrapper">
                     <p-button
-                        v-if="props.status === PasswordStatus.RESET"
+                        v-if="props.status === PASSWORD_STATUS.RESET"
                         :disabled="
                             passwordInput === ''
                                 || confirmPasswordInput === ''
@@ -55,7 +55,7 @@
                         {{ $t('AUTH.PASSWORD.FIND.SEND') }}
                     </p-button>
                 </div>
-                <div v-if="props.status === PasswordStatus.FIND"
+                <div v-if="props.status === PASSWORD_STATUS.FIND"
                      class="util-wrapper"
                 >
                     <p-icon-button name="ic_arrow-left"
@@ -101,7 +101,7 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 
 import PasswordForm from '@/services/auth/password/modules/PasswordForm.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { PasswordStatus } from '@/services/auth/type';
+import { PASSWORD_STATUS } from '@/services/auth/type';
 import type { PasswordFormExpose, PasswordFormState } from '@/services/auth/type';
 
 interface Props {
@@ -120,10 +120,10 @@ const state = reactive({
     loading: false,
     userType: '',
     pageTitle: computed(() => {
-        if (props.status === PasswordStatus.FIND) {
+        if (props.status === PASSWORD_STATUS.FIND) {
             return i18n.t('AUTH.PASSWORD.FIND.TITLE');
         }
-        if (props.status === PasswordStatus.INVALID) {
+        if (props.status === PASSWORD_STATUS.INVALID) {
             return i18n.t('AUTH.PASSWORD.INVALID_LINK');
         }
         return i18n.t('AUTH.PASSWORD.RESET.TITLE');
@@ -243,7 +243,7 @@ const initStatesByUrlSSOToken = async () => {
     }
 };
 (async () => {
-    if (props.status !== PasswordStatus.FIND) {
+    if (props.status !== PASSWORD_STATUS.FIND) {
         await initStatesByUrlSSOToken();
     }
 })();

@@ -131,8 +131,8 @@ export interface ChannelItem {
 	protocol_name: string;
 }
 
-export const PasswordType = {
+export const PASSWORD_TYPE = {
     KEEP: 'KEEP',
     RESET: 'RESET',
     MANUALLY: 'MANUALLY',
-}as const;
+} as const;

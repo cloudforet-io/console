@@ -1,7 +1,7 @@
 <template>
     <div class="password-form">
         <div class="form">
-            <div v-if="props.status !== PasswordStatus.RESET">
+            <div v-if="props.status !== PASSWORD_STATUS.RESET">
                 <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
                                :invalid="validationState.isIdValid"
                                :invalid-text="validationState.idInvalidText"
@@ -69,6 +69,7 @@ import {
 
 import { i18n } from '@/translations';
 
+
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import {
     oneLowerCaseValidator,
@@ -78,7 +79,7 @@ import {
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { PasswordStatus } from '@/services/auth/type';
+import { PASSWORD_STATUS } from '@/services/auth/type';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
 interface Props {
