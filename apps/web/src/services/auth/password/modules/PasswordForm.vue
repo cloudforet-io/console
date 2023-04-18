@@ -110,7 +110,6 @@ const {
         if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
         if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
         if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
-        if (confirmPasswordInput.value !== '' && !samePasswordValidator(value, confirmPasswordInput.value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
         return '';
     },
     confirmPasswordInput(value: string) {

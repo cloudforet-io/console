@@ -149,7 +149,7 @@ const { userIdInput, passwordInput, confirmPasswordInput } = forms;
 /* Components */
 const handleChangeInput = (value: PasswordFormState) => {
     setForm('userIdInput', value.userIdInput.value);
-    setForm('passwordInput', value.userIdInput.value);
+    setForm('passwordInput', value.passwordInput.value);
     setForm('confirmPasswordInput', value.confirmPasswordInput.value);
 };
 const handleClickButton = () => {
