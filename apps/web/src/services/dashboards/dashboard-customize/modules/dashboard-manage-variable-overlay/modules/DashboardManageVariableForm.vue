@@ -192,7 +192,7 @@ const handleSave = () => {
     const variableToSave = {
         variable_type: 'CUSTOM',
         name: name.value,
-        use: false,
+        use: true,
         selection_type: state.selectionType,
         description: description.value,
         options,

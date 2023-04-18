@@ -99,11 +99,11 @@ const state = reactive({
     ]),
     selectedVariableType: 'ALL',
     variableFields: [
-        { name: 'name', label: 'Name' },
+        { name: 'name', label: 'Name', width: '220px' },
         { name: 'selection_type', label: 'Selection Type' },
         { name: 'variable_type', label: 'Variable Type' },
         { name: 'use', label: 'Use', width: '90px' },
-        { name: 'description', label: 'Description', width: '448px' },
+        { name: 'description', label: 'Description', width: '360px' },
         { name: 'managable', label: ' ', width: '144px' },
     ],
     selectionType: computed(() => ({
