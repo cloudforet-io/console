@@ -172,7 +172,7 @@ export default {
                 // https://pdfmake.github.io/docs/0.1/fonts/custom-fonts-client-side/url/
                 if (state.currency === CURRENCY.USD) return 'en';
                 if (state.currency === CURRENCY.KRW) return 'ko';
-                return 'jp';
+                return 'ja';
             }),
         });
 
