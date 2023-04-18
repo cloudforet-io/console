@@ -89,10 +89,9 @@
 
 <script lang="ts" setup>
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton,
@@ -105,6 +104,7 @@ import {
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -129,8 +129,6 @@ const props = withDefaults(defineProps<Props>(), {
     isAdministration: false,
     visible: false,
 });
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const emit = defineEmits(['visible', 'refresh-user']);
 
@@ -201,7 +199,7 @@ const handleClickConfirmButton = async () => {
         resetFormData();
     } catch (e) {
         validationState.isValidationCodeValid = true;
-        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
+        validationState.validationCodeInvalidText = i18n.t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
     }

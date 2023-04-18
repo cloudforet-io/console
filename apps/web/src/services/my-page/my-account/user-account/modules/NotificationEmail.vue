@@ -61,14 +61,14 @@
 
 <script setup lang="ts">
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
@@ -76,8 +76,6 @@ import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
@@ -110,7 +108,7 @@ const handleChangeInput = async () => {
         validationState.isNotificationEmailValid = false;
     } else {
         validationState.isNotificationEmailValid = true;
-        validationState.notificationEmailInvalidText = vm.$t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
+        validationState.notificationEmailInvalidText = i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
     }
 };
 

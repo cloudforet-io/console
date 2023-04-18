@@ -63,9 +63,8 @@
 
 <script setup lang="ts">
 
-import { computed, getCurrentInstance, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -82,8 +81,6 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
@@ -153,7 +150,7 @@ const checkCurrentPassword = async () => {
         validationState.currentPasswordInvalidText = '';
     } catch (e) {
         validationState.isCurrentPasswordValid = false;
-        validationState.currentPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        validationState.currentPasswordInvalidText = i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
     }
 };
 const updateUser = async (userParam) => {

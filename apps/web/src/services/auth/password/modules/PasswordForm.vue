@@ -3,54 +3,54 @@
         <div class="form">
             <div v-if="props.status !== PasswordStatus.RESET">
                 <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
-                               :invalid="validationState.isIdValid === false"
+                               :invalid="validationState.isIdValid"
                                :invalid-text="validationState.idInvalidText"
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.userId"
+                        <p-text-input :value="userIdInput"
                                       :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
                                       :invalid="invalid"
                                       block
-                                      @update:value="handleChangeInput('userId')"
-                                      @keyup.enter="handleChangeInput('userId')"
+                                      @update:value="handleChangeInput('userId', $event)"
+                                      @keyup.enter="handleChangeInput('userId', $event)"
                         />
                     </template>
                 </p-field-group>
             </div>
             <div v-else>
                 <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
-                               :invalid="validationState.isPasswordValid === false"
-                               :invalid-text="validationState.passwordInvalidText"
+                               :invalid="invalidState.passwordInput"
+                               :invalid-text="invalidTexts.passwordInput"
                                :help-text="$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 })"
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.password"
+                        <p-text-input :value="passwordInput"
                                       type="password"
                                       placeholder="Password"
                                       :invalid="invalid"
                                       block
                                       appearance-type="masking"
-                                      @update:value="handleChangeInput('password')"
-                                      @keyup.enter="handleChangeInput('password')"
+                                      @update:value="handleChangeInput('password', $event)"
+                                      @keyup.enter="handleChangeInput('password', $event)"
                         />
                     </template>
                 </p-field-group>
                 <p-field-group :label="$t('AUTH.PASSWORD.RESET.CONFIRM_PASSWORD')"
-                               :invalid="validationState.isConfirmPasswordValid === false"
-                               :invalid-text="validationState.confirmPasswordInvalidText"
+                               :invalid="invalidState.confirmPasswordInput"
+                               :invalid-text="invalidTexts.confirmPasswordInput"
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.confirmPassword"
+                        <p-text-input :value="confirmPasswordInput"
                                       type="password"
                                       placeholder="Confirm Password"
                                       :invalid="invalid"
                                       block
                                       appearance-type="masking"
-                                      @update:value="handleChangeInput('passwordConfirm')"
-                                      @keyup.enter="handleChangeInput('passwordConfirm')"
+                                      @update:value="handleChangeInput('passwordConfirm', $event)"
+                                      @keyup.enter="handleChangeInput('passwordConfirm', $event)"
                         />
                     </template>
                 </p-field-group>
@@ -60,13 +60,14 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, reactive } from 'vue';
+import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import {
@@ -74,6 +75,8 @@ import {
     oneNumberValidator,
     oneUpperCaseValidator, samePasswordValidator,
 } from '@/lib/helper/user-validation-helper';
+
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import { PasswordStatus } from '@/services/auth/type';
 import type { PasswordFormExpose } from '@/services/auth/type';
@@ -86,68 +89,55 @@ const props = withDefaults(defineProps<Props>(), {
     status: '',
 });
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
 const emit = defineEmits(['change-input', 'click-input']);
 
-const formState = reactive({
-    userId: '',
-    password: '',
-    confirmPassword: '',
+const {
+    forms: {
+        userIdInput,
+        passwordInput,
+        confirmPasswordInput,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    userIdInput: '',
+    passwordInput: '',
+    confirmPasswordInput: '',
+}, {
+    passwordInput(value: string) {
+        if (value === '') return '';
+        if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+        if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+        if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+        if (confirmPasswordInput.value !== '' && !samePasswordValidator(value, confirmPasswordInput.value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        return '';
+    },
+    confirmPasswordInput(value: string) {
+        if (value === '') return '';
+        if (!samePasswordValidator(passwordInput.value, value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        return '';
+    },
 });
 const validationState = reactive({
     isIdValid: undefined as undefined | boolean,
-    idInvalidText: '' as TranslateResult | string,
-    isPasswordValid: undefined as undefined | boolean,
-    passwordInvalidText: vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 }) as TranslateResult | string,
-    isConfirmPasswordValid: undefined as undefined | boolean,
-    confirmPasswordInvalidText: '' as TranslateResult | string,
+    idInvalidText: '' as TranslateResult,
 });
 
 /* Components */
-const checkPassword = (password) => {
-    if (password === '') {
-        validationState.isPasswordValid = true;
-        validationState.passwordInvalidText = '';
-        return;
-    }
-    if (!oneLowerCaseValidator(password)) {
-        validationState.isPasswordValid = false;
-        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-    } else if (!oneUpperCaseValidator(password)) {
-        validationState.isPasswordValid = false;
-        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-    } else if (!oneNumberValidator(password)) {
-        validationState.isPasswordValid = false;
-        validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
-    } else if (formState.confirmPassword !== '' && !samePasswordValidator(password, formState.confirmPassword)) {
-        validationState.isConfirmPasswordValid = false;
-        validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
-    } else {
-        validationState.isPasswordValid = true;
-        validationState.passwordInvalidText = '';
-        validationState.isConfirmPasswordValid = true;
-        validationState.confirmPasswordInvalidText = '';
-    }
-};
-const checkPasswordCheck = async (confirmPassword) => {
-    if (!samePasswordValidator(formState.password, confirmPassword)) {
-        validationState.isConfirmPasswordValid = false;
-        validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
-    } else {
-        validationState.isConfirmPasswordValid = true;
-        validationState.confirmPasswordInvalidText = '';
-    }
-};
-const handleChangeInput = (type: string) => {
-    emit('change-input', formState);
+const handleChangeInput = (type: string, e: string) => {
     if (type === 'userId') {
-        validationState.isIdValid = !(!formState.userId);
+        if (e === '') {
+            validationState.isIdValid = false;
+            validationState.idInvalidText = '';
+        }
+        setForm('userIdInput', e);
     } else if (type === 'password') {
-        checkPassword(formState.password);
+        setForm('passwordInput', e);
     } else if (type === 'passwordConfirm') {
-        checkPasswordCheck(formState.confirmPassword);
+        setForm('confirmPasswordInput', e);
     }
+    emit('change-input', { userIdInput, passwordInput, confirmPasswordInput });
 };
 
 /* Expose */

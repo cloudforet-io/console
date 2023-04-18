@@ -36,12 +36,10 @@ export interface UserDetailData {
 	name: string;
 	state: string;
 	email?: string;
-	// eslint-disable-next-line camelcase
 	user_type: string;
 	backend: string;
 	language: string;
 	timezone: string;
-	// eslint-disable-next-line camelcase
 	last_accessed_at: number;
 	created_at?: TimeStamp;
 	domain_id: string;

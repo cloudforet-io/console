@@ -68,6 +68,7 @@ import type { Vue } from 'vue/types/vue';
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -110,7 +111,7 @@ export default defineComponent({
         const checkUserId = () => {
             if (!state.userId) {
                 validationState.isIdValid = false;
-                validationState.idInvalidText = vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED');
+                validationState.idInvalidText = i18n.t('COMMON.SIGN_IN.USER_ID_REQUIRED');
             } else {
                 validationState.isIdValid = true;
                 validationState.idInvalidText = '';
@@ -122,7 +123,7 @@ export default defineComponent({
             if ((state.password.replace(/ /g, '').length !== state.password.length)
                 || !state.password) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
+                validationState.passwordInvalidText = i18n.t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';

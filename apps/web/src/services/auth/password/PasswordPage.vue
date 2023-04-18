@@ -27,7 +27,7 @@
                 </div>
                 <password-form
                     ref="passwordFormEl"
-                    v-model="formState"
+                    v-model="forms"
                     :status="props.status"
                     @change-input="handleChangeInput"
                     @click-input="handleClickButton"
@@ -36,10 +36,10 @@
                     <p-button
                         v-if="props.status === PasswordStatus.RESET"
                         :disabled="
-                            formState.password === ''
-                                || formState.confirmPassword === ''
-                                || formState.password !== formState.confirmPassword
-                                || formState.password.length< 8
+                            passwordInput === ''
+                                || confirmPasswordInput === ''
+                                || passwordInput !== confirmPasswordInput
+                                || passwordInput.length < 8
                         "
                         @click="handleClickButton"
                         @keyup.enter="handleClickButton"
@@ -48,7 +48,7 @@
                     </p-button>
                     <p-button
                         v-else
-                        :disabled="formState.userId === ''"
+                        :disabled="userIdInput === ''"
                         @click="handleClickButton"
                         @keyup.enter="handleClickButton"
                     >
@@ -89,18 +89,20 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { UserState } from '@/store/modules/user/type';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 
 import PasswordForm from '@/services/auth/password/modules/PasswordForm.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { PasswordStatus } from '@/services/auth/type';
-import type { PasswordFormExpose } from '@/services/auth/type';
+import type { PasswordFormExpose, PasswordFormState } from '@/services/auth/type';
 
 interface Props {
     status: string;
@@ -119,51 +121,52 @@ const state = reactive({
     userType: '',
     pageTitle: computed(() => {
         if (props.status === PasswordStatus.FIND) {
-            return vm.$t('AUTH.PASSWORD.FIND.TITLE');
+            return i18n.t('AUTH.PASSWORD.FIND.TITLE');
         }
         if (props.status === PasswordStatus.INVALID) {
-            return vm.$t('AUTH.PASSWORD.INVALID_LINK');
+            return i18n.t('AUTH.PASSWORD.INVALID_LINK');
         }
-        return vm.$t('AUTH.PASSWORD.RESET.TITLE');
+        return i18n.t('AUTH.PASSWORD.RESET.TITLE');
     }),
     domainId: computed<string>(() => store.state.domain.domainId),
     userInfo: computed<UserState>(() => store.state.user),
     tags: {},
 });
-const formState = reactive({
-    userId: '',
-    password: '',
-    confirmPassword: '',
+const {
+    forms,
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    userIdInput: '',
+    passwordInput: '',
+    confirmPasswordInput: '',
+}, {
+    userIdInput(value: string) { return !emailValidator(value) ? '' : i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT'); },
 });
+const { userIdInput, passwordInput, confirmPasswordInput } = forms;
 
 /* Components */
-const handleChangeInput = (value) => {
-    formState.userId = value.userId;
-    formState.password = value.password;
-    formState.confirmPassword = value.confirmPassword;
-};
-const resetInputs = () => {
-    formState.userId = '';
-    formState.password = '';
-    formState.confirmPassword = '';
+const handleChangeInput = (value: PasswordFormState) => {
+    setForm('userIdInput', value.userIdInput.value);
+    setForm('passwordInput', value.userIdInput.value);
+    setForm('confirmPasswordInput', value.confirmPasswordInput.value);
 };
 const handleClickButton = () => {
-    if (formState.userId !== '') {
-        if (emailValidator(formState.userId)) {
-            if (passwordFormEl.value) {
-                passwordFormEl.value.validationState.isIdValid = false;
-                passwordFormEl.value.validationState.idInvalidText = vm.$t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
-            }
+    if (userIdInput.value !== '' && passwordFormEl.value) {
+        if (invalidState.userIdInput) {
+            passwordFormEl.value.validationState.isIdValid = invalidState.userIdInput;
+            passwordFormEl.value.validationState.idInvalidText = invalidTexts.userIdInput;
             return;
         }
-        sendResetEmail(formState.userId, state.domainId);
+        sendResetEmail(userIdInput.value, state.domainId);
     } else {
         const {
             userId, email,
         } = state.userInfo;
         const request = {
             user_id: userId,
-            password: formState.password,
+            password: passwordInput.value,
             email,
         };
         postResetPassword(request);
@@ -179,6 +182,11 @@ const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
     if (decodedToken) return decodedToken.aud as string;
     return undefined;
+};
+const resetInputs = () => {
+    setForm('userIdInput', '');
+    setForm('passwordInput', '');
+    setForm('confirmPasswordInput', '');
 };
 
 /* API */
@@ -201,7 +209,7 @@ const postResetPassword = async (request) => {
         await SpaceConnector.clientV2.identity.user.update(request);
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
-        ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
     } finally {
         state.loading = false;
     }
