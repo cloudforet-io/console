@@ -3,9 +3,21 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - beta
+      - master
     paths-ignore:
       - '.github/**'
+      - '**/deploy/**'
+      - '**/skaffold.template.yaml'
+      - '**/Dockerfile'
+      - '**/.distignore'
+      - '**/README.md'
+      - '**/LICENSE'
+      - '**/AUTHORS'
+      - '**/.husky/**'
+      - '**/commitlint.config.js'
+      - '**/.lintstagedrc.js'
+      - 'apps/web/**'
+      - 'packages/core-lib/**'
 
 env:
   BUILD_PATH: "/tmp/spaceone/build"
@@ -36,12 +48,13 @@ jobs:
       - name: Prepare build
         run: |
           mkdir -p ${{ env.BUILD_PATH }}
-          cp package.json package-lock.json *.js ${{ env.BUILD_PATH }}/
-          cp -r src ${{ env.BUILD_PATH }}/src
-          cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
-          cp -r public ${{ env.BUILD_PATH }}/public
-          cp -r tsconfig.json ${{ env.BUILD_PATH }}/
-          cp -r tailwind.config.cjs ${{ env.BUILD_PATH }}/
+          mkdir -p ${{ env.BUILD_PATH }}/apps
+          mkdir -p ${{ env.BUILD_PATH }}/packages
+          cp package.json package-lock.json turbo.json  ${{ env.BUILD_PATH }}/
+          cp -r apps/storybook ${{ env.BUILD_PATH }}/apps/storybook
+          cp -r packages/mirinae ${{ env.BUILD_PATH }}/packages/mirinae
+          cp -r packages/tsconfig ${{ env.BUILD_PATH }}/packages/tsconfig
+          cp -r packages/eslint-config-custom ${{ env.BUILD_PATH }}/packages/eslint-config-custom
 
       - name: Install dependencies
         working-directory: ${{ env.BUILD_PATH }}
@@ -53,7 +66,7 @@ jobs:
         env:
           NODE_ENV: "production"
         run: |
-          npm run build:storybook
+          npm run build -- --filter=storybook
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -63,7 +76,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Deploy to s3
-        run: aws s3 sync ${{ env.BUILD_PATH }}/.out/ s3://${{ secrets.STORYBOOK_S3_BUCKET }} --delete
+        run: aws s3 sync ${{ env.BUILD_PATH }}/apps/storybook/.out/ s3://${{ secrets.STORYBOOK_S3_BUCKET }} --delete
 
       - name: Invalidate CloudFront Cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CDN_DISTRIBUTION_ID }} --paths "/*"

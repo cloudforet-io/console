@@ -1,0 +1,20 @@
+{
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["webpack-env", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../../packages/mirinae/src/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+    "../../packages/mirinae/**/*.@(ts|js|cjs|vue|mdx)"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".out"
+  ]
+}
