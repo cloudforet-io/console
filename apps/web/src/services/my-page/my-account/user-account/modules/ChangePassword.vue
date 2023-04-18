@@ -7,52 +7,55 @@
             <p-field-group
                 :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
                 required
-                :invalid="validationState.isCurrentPasswordValid === false"
+                :invalid="validationState.isCurrentPasswordValid"
                 :invalid-text="validationState.currentPasswordInvalidText"
                 class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="formState.currentPassword"
+                    <p-text-input :value="currentPassword"
                                   type="password"
                                   class="text-input"
                                   :invalid="invalid"
+                                  @update:value="setForm('currentPassword', $event)"
                     />
                 </template>
             </p-field-group>
             <p-field-group
                 :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
                 required
-                :invalid="validationState.isPasswordValid === false"
-                :invalid-text="validationState.passwordInvalidText"
+                :invalid="invalidState.password"
+                :invalid-text="invalidTexts.password"
                 class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="formState.password"
+                    <p-text-input :value="password"
                                   type="password"
                                   class="text-input"
                                   :invalid="invalid"
+                                  @update:value="setForm('password', $event)"
                     />
                 </template>
             </p-field-group>
             <p-field-group
                 :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
                 required
-                :invalid="validationState.isPasswordCheckValid === false"
-                :invalid-text="validationState.passwordCheckInvalidText"
+                :invalid="invalidState.passwordCheck"
+                :invalid-text="invalidTexts.passwordCheck"
                 class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="formState.passwordCheck"
+                    <p-text-input :value="passwordCheck"
                                   type="password"
                                   class="text-input"
                                   :invalid="invalid"
+                                  @update:value="setForm('passwordCheck', $event)"
                     />
                 </template>
             </p-field-group>
         </form>
         <div class="save-button">
             <p-button style-type="primary"
-                      :disabled="formState.currentPassword === '' || formState.password === '' || formState.passwordCheck === ''"
+                      :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
                       @click="handleClickPasswordConfirm"
             >
                 {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
@@ -77,8 +80,15 @@ import type { UpdateUserRequest } from '@/store/modules/user/type';
 
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import {
+    oneLowerCaseValidator,
+    oneNumberValidator,
+    oneUpperCaseValidator,
+    samePasswordValidator,
+} from '@/lib/helper/user-validation-helper';
 
-import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
+import { useFormValidator } from '@/common/composables/form-validator';
+
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
 
@@ -87,47 +97,49 @@ const state = reactive({
     domainId: computed(() => store.state.domain.domainId),
     isCheckedToken: false,
 });
-const formState = reactive({
+const {
+    forms: {
+        currentPassword,
+        password,
+        passwordCheck,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
     currentPassword: '',
     password: '',
     passwordCheck: '',
+}, {
+    password(value: string) {
+        if (value === '') return '';
+        if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+        if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+        if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+        return '';
+    },
+    passwordCheck(value: string) {
+        if (value === '') return '';
+        if (!samePasswordValidator(password.value, value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        return '';
+    },
 });
 const validationState = reactive({
     isCurrentPasswordValid: undefined as undefined | boolean,
-    currentPasswordInvalidText: '' as TranslateResult | string,
-    isPasswordValid: undefined as undefined | boolean,
-    passwordInvalidText: '' as TranslateResult | string,
-    isPasswordCheckValid: undefined as undefined | boolean,
-    passwordCheckInvalidText: '' as TranslateResult | string,
+    currentPasswordInvalidText: '' as TranslateResult,
 });
 
 /*  Components */
 const resetPasswordForm = () => {
-    formState.currentPassword = '';
-    formState.password = '';
-    formState.passwordCheck = '';
-};
-const checkPassword = async (password) => {
-    const { isValid, invalidText } = getPasswordValidationInfo(password);
-    validationState.isPasswordValid = isValid;
-    validationState.passwordInvalidText = invalidText;
-
-    if (password !== formState.passwordCheck) {
-        validationState.isPasswordCheckValid = false;
-        validationState.passwordCheckInvalidText = i18n.t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
-    } else {
-        validationState.isPasswordCheckValid = true;
-        validationState.passwordCheckInvalidText = '';
-    }
+    setForm({
+        currentPassword: '',
+        password: '',
+        passwordCheck: '',
+    });
 };
 const handleClickPasswordConfirm = async () => {
-    await checkPassword(formState.password);
-    if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) {
-        resetPasswordForm();
-        return;
-    }
     const userParam: UpdateUserRequest = {
-        password: formState.password,
+        password: password.value,
     };
     await updateUser(userParam);
     resetPasswordForm();
@@ -140,23 +152,23 @@ const checkCurrentPassword = async () => {
             domain_id: state.domainId,
             user_id: state.userId,
             credentials: {
-                password: formState.currentPassword,
+                password: currentPassword.value,
             },
         }, { skipAuthRefresh: true });
         if (response.access_token !== '' && response.refresh_token !== '') {
             state.isCheckedToken = true;
         }
-        validationState.isCurrentPasswordValid = true;
+        validationState.isCurrentPasswordValid = false;
         validationState.currentPasswordInvalidText = '';
     } catch (e) {
-        validationState.isCurrentPasswordValid = false;
+        validationState.isCurrentPasswordValid = true;
         validationState.currentPasswordInvalidText = i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
     }
 };
-const updateUser = async (userParam) => {
+const updateUser = async (userParam: UpdateUserRequest) => {
     try {
         await checkCurrentPassword();
-        if (state.isCheckedToken === false) return;
+        if (!state.isCheckedToken) return;
         await store.dispatch('user/setUser', userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e) {

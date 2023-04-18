@@ -148,9 +148,11 @@ const { userIdInput, passwordInput, confirmPasswordInput } = forms;
 
 /* Components */
 const handleChangeInput = (value: PasswordFormState) => {
-    setForm('userIdInput', value.userIdInput.value);
-    setForm('passwordInput', value.passwordInput.value);
-    setForm('confirmPasswordInput', value.confirmPasswordInput.value);
+    setForm({
+        userIdInput: value.userIdInput.value,
+        passwordInput: value.passwordInput.value,
+        confirmPasswordInput: value.confirmPasswordInput.value,
+    });
 };
 const handleClickButton = () => {
     if (userIdInput.value !== '' && passwordFormEl.value) {
@@ -184,9 +186,11 @@ const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     return undefined;
 };
 const resetInputs = () => {
-    setForm('userIdInput', '');
-    setForm('passwordInput', '');
-    setForm('confirmPasswordInput', '');
+    setForm({
+        userIdInput: '',
+        passwordInput: '',
+        confirmPasswordInput: '',
+    });
 };
 
 /* API */

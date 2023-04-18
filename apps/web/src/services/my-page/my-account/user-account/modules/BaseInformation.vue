@@ -134,7 +134,7 @@ const handleClickProfileConfirm = async () => {
 };
 
 /* API */
-const updateUser = async (userParam) => {
+const updateUser = async (userParam: UpdateUserRequest) => {
     try {
         await store.dispatch('user/setUser', userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
