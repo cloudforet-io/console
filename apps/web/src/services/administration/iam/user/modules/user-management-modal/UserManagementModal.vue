@@ -162,8 +162,10 @@ export default {
                 formState.domainRole = value.domainRole;
                 formState.roleId = value.roleId;
             }
-            if (value.password !== undefined || formState.passwordManual !== undefined) {
+            if (value.password) {
                 formState.password = value.password || '';
+            }
+            if (value.passwordType) {
                 formState.passwordType = value.passwordType;
             }
         };

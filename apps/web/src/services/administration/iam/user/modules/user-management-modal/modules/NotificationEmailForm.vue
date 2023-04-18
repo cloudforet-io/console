@@ -2,18 +2,18 @@
     <div class="notification-email-form-wrapper">
         <p-field-group v-if="!state.isSent"
                        :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
-                       :invalid="validationState.isEmailValid === false"
-                       :invalid-text="validationState.emailInvalidText"
+                       :invalid="invalidState.email"
+                       :invalid-text="invalidTexts.email"
                        class="input-form-view"
         >
             <template #default="{invalid}">
                 <div class="input-form">
-                    <p-text-input v-model="formState.email"
+                    <p-text-input :value="email"
                                   :invalid="invalid"
                                   :placeholder="store.state.user.userId"
                                   :disabled="userPageState.visibleUpdateModal && !state.isEdit"
                                   class="text-input"
-                                  @update:value="handleChangeInput"
+                                  @update:value="handleChangeInput($event)"
                     />
                     <div v-if="userPageState.visibleUpdateModal">
                         <p-button v-if="!state.isEdit"
@@ -71,7 +71,7 @@
                              color="inherit"
                         />
                         <p class="email-text">
-                            {{ formState.email }}
+                            {{ email }}
                         </p>
                     </div>
                 </div>
@@ -88,8 +88,9 @@
             >
                 <div class="input-form">
                     <p-text-input id="verificationCode"
-                                  v-model="formState.verificationCode"
+                                  :value="verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
+                                  @update:value="setForm('verificationCode', $event)"
                     />
                     <p-button style-type="positive"
                               :loading="state.loading"
@@ -139,6 +140,7 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -168,41 +170,36 @@ const state = reactive({
     isCollapsed: true,
     loginUserId: computed(() => store.state.user.userId),
 });
-const formState = reactive({
+const {
+    forms,
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
     email: '' || props.email,
     verificationCode: '',
+}, {
+    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
+const { email, verificationCode } = forms;
+
 const validationState = reactive({
-    isEmailValid: undefined as undefined | boolean,
-    emailInvalidText: '' as TranslateResult | string,
     isValidationCodeValid: undefined as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
 
 /* Components */
-const inputValidation = () => {
-    if (formState.email === '') {
-        validationState.isEmailValid = false;
-        return;
-    } if (emailValidator(formState.email)) {
-        validationState.isEmailValid = false;
-        validationState.emailInvalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
-        return;
-    }
-    validationState.isEmailValid = true;
-    validationState.emailInvalidText = '';
-};
-const handleChangeInput = () => {
-    inputValidation();
-    emit('change-input', { ...formState, email: formState.email });
+const handleChangeInput = (e) => {
+    setForm('email', e);
+    emit('change-input', { ...forms, email: email.value });
 };
 const handleClickChange = () => {
     if (!state.isEdit) {
         state.isEdit = true;
     }
 };
-const setForm = () => {
-    formState.email = props.item.email || '';
+const initForm = () => {
+    setForm('email', props.item.email || '');
 };
 const handleEditButton = () => {
     state.isSent = false;
@@ -215,13 +212,13 @@ const handleClickSend = async () => {
     try {
         await postValidationEmail({
             user_id: props.item.user_id,
-            email: formState.email,
+            email: email.value,
             domain_id: props.item.domain_id,
         });
         emit('change-verify', false);
 
         if (state.loginUserId === props.item.user_id) {
-            await store.dispatch('user/setUser', { email: formState.email });
+            await store.dispatch('user/setUser', { email: email.value });
         }
         state.isSent = true;
     } catch (e) {
@@ -236,7 +233,7 @@ const handleChangeVerify = async () => {
         await postValidationCode({
             user_id: props.item.user_id,
             domain_id: props.item.domain_id,
-            code: formState.verificationCode,
+            code: verificationCode.value,
         }, state.loginUserId === props.item.user_id);
         if (userPageState.visibleUpdateModal) {
             state.isSent = false;
@@ -255,12 +252,12 @@ const handleChangeVerify = async () => {
 /* Init */
 (async () => {
     if (userPageState.visibleUpdateModal) {
-        await setForm();
+        await initForm();
     }
 })();
 
 watch(() => props.email, (value) => {
-    formState.email = value;
+    setForm('email', value);
 });
 watch(() => props.isValidEmail, (value) => {
     state.isEdit = !value;

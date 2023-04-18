@@ -63,6 +63,11 @@ const formState = reactive({
 /* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
+    if (state.selectedMenuIndex === -1) {
+        state.selectedMenuIndex = 0;
+        formState.domainRole = formState.domainRoleList[0].label;
+        formState.roleId = formState.domainRoleList[0].name;
+    }
     emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
@@ -74,11 +79,10 @@ const handleSelectedMenuIndex = (selectedIndex: number) => {
 const setForm = async () => {
     if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings && userPageStore.selectedUsers[0].role_bindings.length > 0) {
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
+        if (state.selectedMenuIndex === -1) return;
+        state.isToggled = true;
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
         formState.roleId = formState.domainRoleList[state.selectedMenuIndex].name;
-        if (state.selectedMenuIndex !== -1) {
-            state.isToggled = true;
-        }
     } else formState.domainRole = '';
 };
 
