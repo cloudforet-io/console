@@ -1,0 +1,45 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PPagination from '@/navigation/pagination/pagination/PPagination.vue';
+import {
+    getPaginationArgTypes
+} from '@/navigation/pagination/pagination/story-helper';
+
+
+<Meta title='Navigation/Pagination/Pagination' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} component={PPagination} argTypes={getPaginationArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PPagination },
+    template: `
+        <p-pagination
+            :this-page.sync="thisPage"
+            :page-size.sync="pageSize"
+            :total-count="totalCount"
+        />
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Pagination
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

@@ -15,12 +15,12 @@
     "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0",
     "eslint-config-custom": "*",
     "husky": "^7.0.4",
     "lint-staged": "^13.2.0",
-    "turbo": "^1.8.3",
-    "@commitlint/cli": "^14.1.0",
-    "@commitlint/config-conventional": "^14.1.0"
+    "turbo": "^1.8.3"
   },
   "engines": {
     "npm": ">=7.0.0",

@@ -1,0 +1,369 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import dayjs from 'dayjs';
+import { reactive, toRefs, computed , watch } from 'vue';
+
+import { i18n } from '@/translations';
+
+import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown';
+import PDatetimePicker from './PDatetimePicker.vue';
+
+import { getDatetimePickerArtTypes } from '@/inputs/datetime-picker/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Datetime Picker' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/adutzilcHKkGuDjayFO7YS/Console-Basic?node-id=18277%3A382149'
+    }
+}} argTypes={getDatetimePickerArtTypes()}/>
+
+
+export const Template = (args, { argTypes }) => {
+    return {
+        props: Object.keys(argTypes),
+        components: { PDatetimePicker },
+        i18n,
+        template: `
+    <div class="h-full overflow p-8">
+        <p>select mode: {{ selectMode }}</p><br>
+        <p-datetime-picker
+            :selected-dates.sync="proxySelectedDates"
+            :style-type="styleType"
+            :timezone="timezone"
+            :min-date="minDate"
+            :max-date="maxDate"
+            :select-mode="selectMode"
+            :data-type="dataType"
+            :invalid="invalid"
+            @update:selectedDates="onUpdateSelectedDates"
+            @close="onClose"
+        />
+        <br>
+        <p>Selected Dates: {{ proxySelectedDates }}</p>
+    </div>
+    `,
+        setup(props, { emit }) {
+            const state = reactive({
+                proxySelectedDates: useProxyValue('selectedDates', props, emit),
+            });
+            return {
+                ...toRefs(state),
+            }
+        }
+    }
+};
+
+
+
+# Datetime Picker
+<br/>
+<br/>
+
+It has three select modes and four data types. <br/>
+Depending on the data type, some select modes may not work. <br/>
+Please refer to the table below. <br/>
+<br/>
+
+| dataType\selectMode | single | multiple | range |
+| :-: | :-: | :-: | :-: |
+| yearToMonth | O | X | X |
+| yearToDate | O | O | O |
+| yearToTime | O | O | O |
+| time | O | X | X |
+
+<br/>
+<br/>
+
+## Default
+<Canvas>
+    <Story name="Default Datetime Picker">
+        {() => ({
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+        <p-datetime-picker />
+`,
+        })}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+<Canvas>
+    <Story name="Invalid Datetime Picker">
+        {() => ({
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px;">
+    <tr>
+        <td><p-datetime-picker invalid :selected-dates.sync="selectedDates" /></td>
+        <td><p-datetime-picker invalid style-type="text" :selected-dates.sync="selectedDates" /></td>
+    </tr>
+    <tr>
+        <td><p-datetime-picker invalid data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+        <td><p-datetime-picker invalid data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+    </tr>
+    <tr>
+        <td><p-datetime-picker invalid data-type="time" /></td>
+        <td><p-datetime-picker invalid data-type="time" style-type="text" /></td>
+    </tr>
+</table>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: ['2021-10-01T00:00:00+09:00']
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        })}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Default With Time Picker
+<Canvas>
+    <Story name="Default With Time Picker">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+        <p-datetime-picker data-type="yearToTime" />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Default With Timezone
+<Canvas>
+    <Story name="Default With Timezone">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<div>
+    <p class="pb-2">UTC - {{ selectedUTCDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="UTC" :selected-dates.sync="selectedUTCDates" /></div>
+    <p class="pb-2">Asia/Seoul (GMT+9) - {{ selectedSeoulDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" /></div>
+    <p class="pb-2">America/New_York (GMT-4) - {{ selectedNewYorkDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" /></div>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    selectedUTCDates: ['2021-10-01T00:00:00+09:00'],
+                    selectedSeoulDates: ['2021-10-01T10:00:00Z'],
+                    selectedNewYorkDates: ['2021-10-01T10:00:00-04:00'],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Default With MinDate and MaxDate
+<Canvas>
+    <Story name="Default With MinDate and MaxDate">
+        {{
+            components: { PDatetimePicker, PSelectDropdown },
+            i18n,
+            template: `
+<div>
+    <p class="py-2">Select dataType.</p>
+    <p-select-dropdown v-model="selectedDataType" :items="menu"/>
+    <p class="py-2">Start Date</p>
+    <p-datetime-picker v-model="start" :max-date="(end && end[0]) || maxDate" :min-date="today" :data-type="selectedDataType" />
+    <p class="py-2">End Date</p>
+    <p-datetime-picker v-model="end" :min-date="(start && start[0]) || today" :max-date="maxDate" :data-type="selectedDataType" />
+</div>
+`,
+    setup() {
+        const state = reactive({
+            menu: [
+                { name: 'yearToDate', label: 'yearToDate. (min: today, max: month later)' },
+                { name: 'yearToMonth', label: 'yearToMonth. (min: today, max: year later)' },
+            ],
+            selectedDataType: 'yearToDate',
+            start: [],
+            end: [],
+            today: dayjs().toISOString(),
+            monthLater: dayjs().add(1, 'month').toISOString(),
+            yearLater: dayjs().add(1, 'year').toISOString(),
+            maxDate: computed(() => {
+                if (state.selectedDataType === 'yearToDate') return state.monthLater
+                if (state.selectedDataType === 'yearToMonth') return state.yearLater
+                return state.monthLater
+            })
+        })
+        watch(() => state.selectedDataType, () => {
+            state.start = []
+            state.end = []
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Text Style
+<Canvas>
+    <Story name="Text Style Datetime Picker">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+        <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: ['2021-11-01T00:00:00Z', '2021-11-02T09:49:30Z'],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Multiple Selection Mode
+<Canvas>
+    <Story name="Multiple Selection Mode Datetime Picker">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+        <p-datetime-picker select-mode="multiple" />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Range Selection Mode
+<Canvas>
+    <Story name="Range Selection Mode Datetime Picker">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<div>
+    <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
+    <p class="pt-2">{{ selectedDates }}</p>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: [
+                        dayjs.utc().startOf('month').format(),
+                        dayjs.utc().format(),
+                    ],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Time Only Selection
+<Canvas>
+    <Story name="Time Only Selection">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<div>
+    <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
+    <p class="pt-2">{{ selectedDates }}</p>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: [],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Year and Month Selection
+<Canvas>
+    <Story name="Year and Month Selection">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<div>
+    <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />
+    <p class="pt-2">{{ selectedDates }}</p>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: [],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

@@ -1,0 +1,188 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+
+import PButton from '@/inputs/buttons/button/PButton';
+import PSelectStatus from '@/inputs/select-status/PSelectStatus';
+
+import PToolboxTable from './PToolboxTable.vue';
+import { getToolboxTableArgTypes } from '@/data-display/tables/toolbox-table/story-helper';
+import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
+
+
+<Meta title='Data Display/Tables/Toolbox Table' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getToolboxTableArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PToolboxTable },
+    template: `
+    <div class="w-full h-full p-8">
+        <p-toolbox-table
+            :loading="loading"
+            :fields="fields"
+            :items="items"
+            :sortable="sortable"
+            :sortBy.sync="proxySortBy"
+            :sortDesc.sync="proxySortDesc"
+            :colCopy="colCopy"
+            :selectable="selectable"
+            :selectIndex.sync="proxySelectIndex"
+            :multiSelect="multiSelect"
+            :rowClickMultiSelectMode="rowClickMultiSelectMode"
+            :useCursorLoading="useCursorLoading"
+            :tableStyleType="tableStyleType"
+            :striped="striped"
+            :bordered="bordered"
+            :disableHover="disableHover"
+            :rowHeightFixed="rowHeightFixed"
+            :rowCursorPointer="rowCursorPointer"
+            :invalid="invalid"
+            :getRowClassNames="getRowClassNames"
+            :getRowSelectable="getRowSelectable"
+            :paginationVisible="paginationVisible"
+            :pageSizeChangeable="pageSizeChangeable"
+            :settingsVisible="settingsVisible"
+            :exportable="exportable"
+            :refreshable="refreshable"
+            :searchable="searchable"
+            :filtersVisible="filtersVisible"
+            :searchType="searchType"
+            :this-page.sync="proxyThisPage"
+            :pageSize.sync="proxyPageSize"
+            :totalCount="totalCount"
+            :pageSizeOptions="pageSizeOptions"
+            :sortByOptions="sortByOptions"
+            :keyItemSets="keyItemSets"
+            :valueHandlerMap="valueHandlerMap"
+            :queryTags.sync="proxyQueryTags"
+            :searchText.sync="proxySearchText"
+            :timezone="timezone"
+            @change="onChange"
+            @export="onExport"
+            @refresh="onRefresh"
+            @click-settings="onClickSettings"
+            @select="onSelect"
+            @rowLeftClick="onRowLeftClick"
+            @update:selectIndex="onUpdateSelectIndex"
+            @update:sortBy="onUpdateSortBy"
+            @update:sortDesc="onUpdateSortDesc"
+        ></p-toolbox-table>
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxySortBy: useProxyValue('sortBy', props, emit),
+            proxySortDesc: useProxyValue('sortDesc', props, emit),
+            proxySelectIndex: useProxyValue('selectIndex', props, emit),
+            proxyThisPage: useProxyValue('thisPage', props, emit),
+            proxyPageSize: useProxyValue('pageSize', props, emit),
+            proxySearchText: useProxyValue('searchText', props, emit),
+            proxyQueryTags: useProxyValue('queryTags', props, emit),
+        });
+        return {
+            ...toRefs(state),
+        };
+    }
+});
+
+
+# Toolbox Table
+<br/>
+<br/>
+
+This component is merged component of [Toolbox component](?path=/docs/navigation-toolbox--basic) and [Data Table component](?path=/docs/data-display-tables-data-table--basic).<br/>
+
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PToolboxTable },
+    template: `
+    <p-toolbox-table :fields="fields" :items="items"></p-toolbox-table>
+    `,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(7, 7)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+<Canvas>
+    <Story name="Slots">
+        {{
+            components: { PToolboxTable, PButton, PSelectStatus },
+            template: `
+    <div>
+        <div>
+            <p class="mb-4 text-xl font-bold">Slot: toolbox-top</p>
+            <p-toolbox-table :fields="fields" :items="items">
+            <template #toolbox-top>
+            <p class="font-bold text-2xl text-peacock-600 p-4">Example</p>
+            </template>
+            </p-toolbox-table>
+        </div>
+        <div class="mt-4">
+            <p class="mb-4 text-xl font-bold">Slot: toolbox-left</p>
+            <p-toolbox-table :fields="fields" :items="items">
+            <template #toolbox-left>
+                <p-button style-type="secondary">Button</p-button>
+            </template>
+            </p-toolbox-table>
+        </div>
+        <div class="mt-4">
+            <p class="mb-4 text-xl font-bold">Slot: toolbox-bottom</p>
+            <p-toolbox-table :fields="fields" :items="items">
+            <template #toolbox-bottom>
+                <div class="p-4">
+                    <strong class="mr-4">Select: </strong>
+                    <p-select-status v-for="val in fields" :key="val.name" class="mr-2"
+                        v-model="selected" :value="val.name" />
+                </div>
+            </template>
+            </p-toolbox-table>
+        </div>
+    </div>
+<!--<div>-->
+    `,
+    setup() {
+        const fields = getUserFields()
+        const state = reactive({
+            selected: [fields[0].name],
+        })
+        return {
+            ...toRefs(state),
+            fields,
+            items: getUsers(7, 7),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

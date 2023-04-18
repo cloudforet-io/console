@@ -1,0 +1,596 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import PDynamicField from './PDynamicField.vue';
+
+import { getDynamicFieldArgTypes } from '@/data-display/dynamic/dynamic-field/story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Field' argTypes={getDynamicFieldArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicField },
+    template: `
+      <div class="h-full w-full overflow p-8">
+          <p-dynamic-field v-bind="$props"></p-dynamic-field>
+      </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Dynamic Field
+<br/>
+<br/>
+
+Dynamic fields provide several types to display data.
+
+<br/>
+<br/>
+
+## Types
+
+The types that can be displayed as dynamic fields are as follows.
+
+- text
+- badge
+- datetime
+- dict
+- state
+- enum
+- size
+- more
+- list (deprecated)
+
+<br/>
+
+## Options
+
+Additional options for displaying data by type can be set.
+
+Each type is slightly different, but there are also **common options**.
+
+### Common Options
+
+- link
+  - ex) https://google.com/
+- sortable
+  - Can be sorted by the field, default true
+- sort_key
+  - Sorting key for each field (default sort key: key)
+- translation_id
+  - Translation key for the label of the field(optional)
+- default
+  - Used to display the default value when is undefined
+- delimiter
+  - When data is an array type, it is a delimiter between array values.
+- is_optional
+  - false (default) : Fields that are displayed by default even if the user does not select them
+  - true : Fields that are not visible to the user by default, but can be changed through the Custom Table feature.
+- field_description
+  - Description of the field
+- postfix
+  - the value after value
+  - ex) 70 + '%'
+- prefix
+  - the value before value
+  - ex) '$' + 3000
+- disable_copy
+  - false (default): Show copy icon
+  - true : Hide copy icon
+
+```typescript
+interface CommonOptions {
+    link?: string;
+    sortable?: boolean;
+    sort_key?: string;
+    width?: string;
+    translation_id?: string;
+    default?: any;
+    delimiter?: string;
+    postfix?: string;
+    prefix?: string;
+    field_description?: string;
+    disable_copy?: boolean;
+}
+````
+
+## Type Options
+
+In the ```options``` props, data display metadata is injected for each field. <br/>
+On the other hand, properties that do not need to be added to options are injected into the ```typeOptions``` props because they do not change for each field.<br/>
+For example, ```timezone``` is not the property of the ```options``` props but of \`typeOptions\` props because ```timezone``` will be all the same to all fields.
+
+```typescript
+interface DynamicFieldTypeOptions {
+    timezone?: string;
+    displayKey?: string;
+}
+```
+
+<br/>
+
+## Field Handler
+
+If you want to replace a value of field's ```props```, give ```handler```.<br/>
+This is useful when there are mutual influences depending on given props, such as when the ```type``` or ```options``` are changed by ```data```.<br/>
+
+
+### When field handler works?
+
+**Handler works every time each props value are changed**.<br/>
+
+
+### Parameter of field handler
+
+It takes **all dynamic field props object as a parameter** and returns **an object containing only changed dynamic field props**.<br/>
+Then, the returned object will be merged with the original props values.<br/>
+
+
+### Usage of ExtraData props with field handler
+
+When you want to change field props values through a handler, and you need **additional data other than field props**, use ```extraData``` props.<br/>
+
+For example, let's say you have the following props.<br/>
+
+```json5
+ { type: 'text', data: 'hello' }
+```
+
+If you want to attach 'world!', you can do it through a field handler as below.<br/>
+
+```javascript
+ const handler = ({data}) => {
+    return {
+        data: `${data} world!`
+    }
+ }
+```
+
+If you need data that is unknown at the time you inject the handler, props and handler function will be defined as below.<br/>
+
+```json5
+ { type: 'text', data: 'hello', extraData: 'world!' }
+```
+
+```javascript
+ const handler = ({data, extraData}) => {
+    return {
+        data: `${data} ${extraData}`
+    }
+ }
+```
+
+If you give ```extraData``` props, **the handler will be executed when changes of ```extraData``` props are detected.** <br/>
+<br/>
+
+
+### Field handler doesn't work recursively
+
+If the type is ```enum``` or the given data is iterable, field handler wouldn't be passed to the child.<br/>
+It will be invoked only at the parent level.<br/>
+For example, <br/>
+
+```json5
+[
+    {
+        type: 'enum',
+        data: 'first',
+        options: {
+            first: { type: 'badge', data: 'a' },
+            second: { type: 'badge', data: 'b' }
+        },
+        handler: ...
+    }
+]
+```
+
+in this case, field handler will be invoked once with parent item.<br/>
+
+<br/>
+
+# Dynamic Field by Each Type
+
+<br/>
+
+## Text Type
+The ```text``` type is the default type of the dynamic field.<br/>
+It's options are the same with the common options.
+
+<Canvas>
+    <Story name="Text Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p-dynamic-field type="text" :options="{}" data="Basic text type"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="text" :options="{link: 'https://www.google.com'}" data="Text type with link"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="list" :options="{
+                    sub_key: 'data',
+                    item: {
+                        options: {
+                            link: 'https://www.google.com'
+                        },
+                        type: 'text'
+                    }
+                }" :data="'Text type with link in list(list will be deprecated)'.split(' ').map(d => ({ data: d}))"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix (%)</p>
+                <p-dynamic-field type="text" :options="{postfix: '%'}" data="70"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (-)</p>
+                <p-dynamic-field type="text" :options="{prefix: '-'}" data="70"></p-dynamic-field>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Badge Type
+It's options are:
+
+```typescript
+interface BadgeOptions extends CommonOptions {
+    outline_color?: string;
+    shape?: string;
+    background_color?: string;
+    text_color?: string;
+}
+```
+
+<Canvas>
+    <Story name="Badge Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p-dynamic-field type="badge" :options="{}" data="Basic badge type"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="badge" :options="{link: 'https://www.google.com'}" data="Basic badge type with link"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="list" :options="{
+                    sub_key: 'data',
+                    item: {
+                        options: {
+                            link: 'https://www.google.com'
+                        },
+                        type: 'badge'
+                    }
+                }" :data="'Basic badge type with link in list(list will be deprecated)'.split(' ').map(d => ({ data: d}))"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="badge" :options="{outline_color: 'yellow.700', link: 'https://www.google.com'}" data="Outlined badge type with link"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="badge" :options="{shape: 'SQUARE'}" data="Square badge type"></p-dynamic-field>
+                <br/><br/>
+                <p-dynamic-field type="badge" :options="{text_color: 'peacock.700', background_color: 'coral.300'}" data="Custom Colored badge type"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix (%)</p>
+                <p-dynamic-field type="badge" :options="{postfix: '%'}" data="70"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (-)</p>
+                <p-dynamic-field type="badge" :options="{prefix: '-'}" data="70"></p-dynamic-field>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Datetime Type
+It's options are:
+
+```typescript
+enum DATETIME_SOURCE_TYPE {
+    iso8601 = 'iso8601',
+    timestamp = 'timestamp'
+}
+
+interface DatetimeOptions extends CommonOptions {
+    source_type: keyof typeof DATETIME_SOURCE_TYPE;
+    source_format?: string;
+    display_format?: string;
+}
+```
+
+<Canvas>
+    <Story name="Datetime Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p class="font-bold text-lg">with iso8601 source type</p><br/>
+                <span>basic: </span>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601'}" :data="new Date().toISOString()"></p-dynamic-field>
+                <br/><br/>
+                <span>with different display format: </span>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', display_format: 'YY.MM.DD hh:mm:ss'}" :data="new Date().toISOString()"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with timestamp source type</p><br/>
+                <p-dynamic-field type="datetime" :options="{source_type: 'timestamp', source_format: 'seconds'}" :data="{seconds: '1616034252', nanos: 345000000}"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( - ISO8601)</p>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', postfix: ' - ISO8601'}" :data="new Date().toISOString()"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (Time: )</p>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', prefix: 'Time: '}" :data="new Date().toISOString()"></p-dynamic-field>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Dict Type
+It's options are the same with the common options.
+
+<Canvas>
+    <Story name="Dict Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p class="font-bold text-lg">basic</p><br/>
+                <p-dynamic-field type="dict" :options="{}" :data="{a: 'aa', b: 'bb'}"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with link</p><br/>
+                <p-dynamic-field type="dict" :options="{link: 'https://www.google.com'}" :data="{a: 'aa', b: 'bb'}"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( days)</p>
+                <p-dynamic-field type="dict" :options="{postfix: ' days', link: 'https://www.google.com'}" :data="{a: '111', b: '222'}"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (days: )</p>
+                <p-dynamic-field type="dict" :options="{prefix: 'days: '}" :data="{a: '111', b: '222'}"></p-dynamic-field>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## State Type
+It's options are:
+
+```typescript
+interface StateOptions extends CommonOptions {
+    icon?: {
+        image?: string;
+        color?: string;
+    };
+    text_color?: string;
+}
+```
+
+<Canvas>
+    <Story name="State Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p class="font-bold text-lg">basic</p><br/>
+                <p-dynamic-field type="state" :options="{}" data="RUNNING"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with text color</p><br/>
+                <p-dynamic-field type="state" :options="{text_color: 'green.400'}" data="RUNNING"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with icon color</p><br/>
+                <p-dynamic-field type="state" :options="{icon: {color: 'green.400'}}" data="RUNNING"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with icon color</p><br/>
+                <p-dynamic-field type="state" :options="{icon: {image: 'ic_error-filled'}}" data="RUNNING"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( state)</p>
+                <p-dynamic-field type="state" :options="{postfix: ' state', icon: {color: 'green.400'}}" data="RUNNING"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (state: )</p>
+                <p-dynamic-field type="state" :options="{prefix: 'state: ', icon: {color: 'green.400'}}" data="RUNNING"></p-dynamic-field>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Enum Type
+It's options are:
+
+```typescript
+interface EnumItem {
+    name?: string;
+    type: DynamicFieldType;
+    options?: DynamicFieldOptions;
+    default?: any;
+}
+interface EnumOptions {
+    items?: EnumItem|string;
+    default?: any;
+}
+```
+
+<Canvas>
+    <Story name="Enum Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p class="font-bold text-lg">usual case</p><br/>
+                <p-dynamic-field type="enum" :options="options" data="RUNNING"></p-dynamic-field><br/>
+                <p-dynamic-field type="enum" :options="options" data="DEALLOCATED"></p-dynamic-field><br/>
+                <p-dynamic-field type="enum" :options="options" data="PENDING"></p-dynamic-field><br/>
+                <p-dynamic-field type="enum" :options="options" data="TERMINATED"></p-dynamic-field><br/>
+                <br/>
+                <p class="font-bold text-lg">default case</p><br/>
+                <p-dynamic-field type="enum" :options="options"></p-dynamic-field><br/>
+                <br/><br/>
+            </div>
+    `,
+            setup() {
+                const options = {
+                    items: {
+                        DEALLOCATED: {
+                            name: 'Deallocated',
+                            type: 'state',
+                            options: {
+                                text_color: 'red.500',
+                                icon: { color: 'red.500' },
+                                postfix: ' (this is postfix)'
+                            }
+                        },
+                        PENDING: {
+                            name: 'Pending',
+                            type: 'state',
+                            options: { icon: { color: 'yellow.500' } }
+                        },
+                        RUNNING: {
+                            name: 'Running',
+                            type: 'state',
+                            options: { icon: { color: 'green.500' } }
+                        },
+                        TERMINATED: {
+                            name: 'Terminated',
+                            options: {
+                                text_color: 'gray.500',
+                                icon: { color: 'gray.500' },
+                                description: 'This state is '
+                            },
+                            type: 'state',
+                        },
+                    },
+                    default: 'TERMINATED'
+                }
+                return {
+                    options
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Size Type
+It's options are:
+
+```typescript
+interface SizeOptions extends CommonOptions {
+    display_unit?: 'BYTES | KB | MB | GB | TB | PB';
+    source_unit?: 'BYTES | KB | MB | GB | TB | PB';
+}
+```
+
+
+<Canvas>
+    <Story name="Size Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p class="font-bold text-lg">auto case</p><br/>
+                <p-dynamic-field type="size" :options="{}" :data="123456789"></p-dynamic-field><br/>
+                <br/>
+                <p class="font-bold text-lg">from bytes to bytes, mb, gb, tb, pb</p><br/>
+                <p-dynamic-field type="size" :options="{display_unit: 'BYTES'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{display_unit: 'MB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{display_unit: 'GB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{display_unit: 'TB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{display_unit: 'PB'}" :data="123456789"></p-dynamic-field><br/>
+                <br/>
+                <p class="font-bold text-lg">from bytes, mb, gb, tb, pb to auto</p><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'BYTES'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'MB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'GB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'TB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'PB'}" :data="123456789"></p-dynamic-field><br/>
+                <br/>
+                <p class="font-bold text-lg">from kb to gb</p><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'KB', display_unit: 'GB', postfix: ' - this is postfix'}" :data="123456789"></p-dynamic-field><br/>
+                <br/>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## More Type
+It's options are:
+
+```typescript
+interface MoreOptions extends CommonOptions {
+    sub_key?: string;
+    layout: DynamicLayout;
+}
+```
+
+<Canvas>
+    <Story name="More Type">
+        {{
+            components: { PDynamicField },
+            template: `
+            <div>
+                <p>field type: more > layout: popup > layout: raw</p>
+                <p-dynamic-field type="more" :options="rawOptions" :data="data" :type-options="typeOptions" />
+                <br><br>
+                <p>field type: more > layout: popup > layout: item</p>
+                <p-dynamic-field type="more" :options="itemOptions" :data="data" :type-options="typeOptions" />
+                <br><br>
+            </div>
+    `,
+            setup() {
+                return {
+                    rawOptions: {
+                        sub_key: 'info',
+                        layout: {
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'raw',
+                                    options: {}
+                                }
+                            }
+                        },
+                        postfix: '(Jung)'
+                    },
+                    itemOptions: {
+                        layout: {
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'items',
+                                    options: {
+                                        fields: [
+                                            { key: 'id', label: 'ID', type: 'text' },
+                                            { key: 'name', label: 'Name', type: 'text' },
+                                            { key: 'info', label: 'Info', type: 'dict' }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        postfix: '(Jung)'
+                    },
+                    data: { id: 'j', name: 'sulmo', info: { weight: '83.5 kg', height: '179.3cm' } },
+                    typeOptions: { displayKey: 'name' }
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+# Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

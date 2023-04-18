@@ -1,0 +1,201 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+
+import PCard from './PCard.vue';
+import PI from '@/foundation/icons/PI.vue'
+import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
+import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
+
+
+<Meta title='Data Display/Cards/Card' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getCardArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PCard },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card
+            :header="header"
+            :style-type="styleType"
+            :size="size"
+            style="width: 20rem;"
+        >
+            <template #header><div v-if="headerSlot" v-html="headerSlot" /></template>
+            <div v-if="defaultSlot" v-html="defaultSlot" />
+        </p-card>
+     </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Card
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card
+            header="Basic Case Card"
+            style="width: 12rem;"
+        >
+            Hello World!
+        </p-card>
+     </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Without Header
+
+<br/>
+
+If you give ```false``` to ```header``` props and don't give ```header``` slot, the header will be not displayed.<br/>
+
+<Canvas>
+    <Story name="Without Header">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card :header="false" v-for="styleType in styleTypes" :key="styleType" :style-type="styleType"
+            style="width: 30rem; margin: 1rem;"
+        >
+            It has no header.
+        </p-card>
+     </div>
+    `,
+    setup() {
+        const state = reactive({
+            styleTypes: Object.values(CARD_STYLE_TYPE)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Style Types
+
+<Canvas>
+    <Story name="Style Types">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8 flex flex-wrap">
+        <p-card v-for="styleType in styleTypes" :key="styleType" :header="styleType" :style-type="styleType"
+            style="min-width: 20rem; margin: 1rem;"
+        >
+            This is {{styleType}} type.
+        </p-card>
+     </div>
+    `,
+    setup() {
+        const state = reactive({
+            styleTypes: Object.values(CARD_STYLE_TYPE)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+
+<Canvas>
+    <Story name="Size">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8 flex flex-wrap">
+        <p-card v-for="size in sizes" :key="size" :header="size" :size="size"
+            style="min-width: 20rem; margin: 1rem;"
+        >
+            This is {{size}} size.
+        </p-card>
+     </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(CARD_SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+<Canvas>
+    <Story name="Slots">
+        {{
+            components: { PCard, PI },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card style="width: 209px;">
+            <template #header>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-900">Created</span>
+                    <span class="text-alert">1 <p-i name="ic_caret-down-filled-alt" height="12px" width="12px" color="inherit" /></span>
+                </div>
+            </template>
+            <div class="flex justify-between items-center">
+                <span>8.5</span><span>145</span>
+            </div>
+            <div class="flex justify-between items-center text-gray text-xs mt-1">
+                <span>Dail Average</span><span class="text-right">Monthly Total</span>
+            </div>
+        </p-card>
+     </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

@@ -1,0 +1,108 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { faker }  from '@faker-js/faker'
+import {range} from 'lodash'
+import PTooltip from './PTooltip.vue';
+import {
+    getTooltipArgTypes
+} from '@/data-display/tooltips/story-helpers';
+import {POSITIONS} from "@/data-display/tooltips/type"; import {PBadge} from "@";
+
+
+<Meta title='Data Display/Tooltips' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124040'
+    }
+}} argTypes={getTooltipArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTooltip, PBadge },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-badge>
+                <p-tooltip  :tag="tag"
+                            :contents="contents"
+                            :position="position"
+                            :options="options"
+                >
+                    Show Tooltip
+                </p-tooltip>
+            </p-badge>
+        </div>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Tooltip
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PTooltip, PBadge },
+            template: `
+                <div class="h-full w-full overflow p-8 text-center">
+                    <p-badge>
+                        <p-tooltip :contents="contents" position="top">Top</p-tooltip>
+                    </p-badge>
+                </div>
+            `,
+            setup() {
+                return {
+                    contents: range(10).map(() => faker.lorem.sentence(5)),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Position
+
+<Canvas>
+    <Story name="Position">
+        {{
+            components: { PTooltip, PBadge },
+            template: `
+                <div class="h-full w-full overflow p-8 flex flex-wrap gap-2">
+                    <p-badge v-for="position in positions">
+                        <p-tooltip :contents="contents" :position="position">
+                                {{position}}
+                        </p-tooltip>
+                    </p-badge>
+                </div>
+            `,
+            setup() {
+                return {
+                    positions: Object.values(POSITIONS),
+                    contents: range(10).map(() => faker.lorem.sentence(5)),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

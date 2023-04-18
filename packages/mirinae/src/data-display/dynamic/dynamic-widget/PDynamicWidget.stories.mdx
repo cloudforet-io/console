@@ -1,0 +1,300 @@
+import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
+import {
+    reactive, toRefs,
+} from 'vue';
+import { range } from 'lodash';
+import PDynamicWidget from './PDynamicWidget.vue';
+import { getDynamicWidgetArgTypes } from '@/data-display/dynamic/dynamic-widget/story-helper';
+import {
+    getDynamicWidgetChartTypeMockData,
+    getDynamicWidgetMockData
+} from '@/data-display/dynamic/dynamic-widget/mock';
+import { DYNAMIC_WIDGET_TYPE } from '@/data-display/dynamic/dynamic-widget/type';
+import { DYNAMIC_CHART_LIMIT_MAP } from '@/data-display/dynamic/dynamic-chart/config';
+
+
+
+<Meta title='Data Display/Dynamic/Dynamic Widget'
+      argTypes={getDynamicWidgetArgTypes()}
+/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicWidget },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-dynamic-widget
+            :index="index"
+            :type="type"
+            :name="name"
+            :schema-options="{
+                value_options,
+                name_options,
+                chart_type,
+            }"
+            :data="data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+    </div>
+    `,
+});
+
+
+# Dynamic Widget
+
+<br/>
+<br/>
+
+## Supported Types
+
+<Description markdown={`
+${DYNAMIC_WIDGET_TYPE.map(d => `\`${d}\``).join(', ')} types are available.
+`}/>
+
+<br/>
+<br/>
+
+## Schema Options
+
+Options required to display data by type of Dynamic Widget.
+
+| Name | Description |
+| -- | -- |
+| value_options | Display options for value. `DynamicField` type.|
+| name_options | Display options for name. `DynamicField` type.|
+| chart_type | The type of chart. One of DynamicChart's type.|
+
+<br/>
+
+```typescript
+interface DynamicWidgetSchemaOptions {
+    value_options?: DynamicField;
+    name_options?: DynamicField;
+    chart_type?: DynamicChartType;
+}
+```
+<br/>
+
+## Dynamic Widget by Types
+
+<br/>
+<br/>
+
+### Summary Type
+
+<br/>
+
+#### Supported Schema Options
+
+| Name | Supported |
+| -- | -- |
+| value_options | O |
+| name_options | X |
+| chart_type | X |
+
+<br/>
+
+<Canvas>
+    <Story name="Summary Type">
+        {{
+    components: { PDynamicWidget },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-dynamic-widget
+            type="summary"
+            :name="name"
+            :schema-options="schemaOptions"
+            :data="data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+    </div>
+    `,
+    setup() {
+        const state = reactive(getDynamicWidgetMockData('summary'))
+        return toRefs(state)
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Chart Type
+
+<br/>
+
+#### Supported Schema Options
+
+| Name | Supported |
+| -- | -- |
+| value_options | O |
+| name_options | O|
+| chart_type | O |
+
+<br/>
+
+<Canvas>
+    <Story name="Chart Type">
+    {{
+        components: { PDynamicWidget },
+        template: `
+<div class="h-full w-full overflow p-8">
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: COLUMN</p>
+        <div class="flex flex-wrap gap-4">
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Basic</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="0"
+                    :name="name"
+                    :schema-options="column.schemaOptions"
+                    :data="column.data.slice(0, DYNAMIC_CHART_LIMIT_MAP.COLUMN)"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                ></p-dynamic-widget>
+            </div>
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Limit exceeded</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="0"
+                    :name="name"
+                    :schema-options="column.schemaOptions"
+                    :data="column.data"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                ></p-dynamic-widget>
+            </div>
+        </div>
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: DONUT</p>
+        <div class="flex flex-wrap gap-4">
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Basic</p>
+                <p-dynamic-widget
+                    type="chart"
+                    :index="1"
+                    :name="name"
+                    :schema-options="donut.schemaOptions"
+                    :data="donut.data.slice(0, DYNAMIC_CHART_LIMIT_MAP.DONUT)"
+                    :loading="loading"
+                    :view-options="viewOptions"
+                    style="overflow: hidden;"
+                ></p-dynamic-widget>
+            </div>
+            <div>
+                <p class="text-md font-bold text-gray-600 mb-4">Limit exceeded</p>
+                <p-dynamic-widget
+                type="chart"
+                :index="1"
+                :name="name"
+                :schema-options="donut.schemaOptions"
+                :data="donut.data"
+                :loading="loading"
+                :view-options="viewOptions"
+                style="overflow: hidden;"
+            ></p-dynamic-widget>
+            </div>
+        </div>
+        <p class="text-lg font-bold leading-6 my-6 border-b border-gray-300">Chart Type: TREEMAP</p>
+        <p-dynamic-widget
+            type="chart"
+            :index="2"
+            :name="name"
+            :schema-options="treemap.schemaOptions"
+            :data="treemap.data"
+            :loading="loading"
+            :view-options="viewOptions"
+        ></p-dynamic-widget>
+</div>
+`,
+        setup() {
+            const state = reactive({
+                ...getDynamicWidgetMockData('chart'),
+                column: getDynamicWidgetChartTypeMockData('COLUMN'),
+                donut: getDynamicWidgetChartTypeMockData('DONUT'),
+                treemap: getDynamicWidgetChartTypeMockData('TREEMAP')
+            })
+            return {
+                ...toRefs(state),
+                DYNAMIC_CHART_LIMIT_MAP
+            }
+        }
+    }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Using Widget List
+
+If multiple widgets are used as a list, the same theme will be displayed repeatedly.<br/>
+In this case, different themes can be reflected by giving the ```index``` prop.
+
+<Canvas>
+    <Story name="Using Widget List">
+        {{
+            components: { PDynamicWidget },
+            template: `
+<div class="h-full w-full overflow p-8">
+        <p class="text-lg font-bold leading-6 mb-8 border-b border-gray-300">Without Index: The same theme is displayed repeatedly.</p>
+        <div class="flex flex-wrap gap-4">
+            <p-dynamic-widget v-for="({type, name, schemaOptions, data, loading, viewOptions}, idx) in widgets"
+                :key="'without-idx' + idx"
+                :type="type"
+                :name="name"
+                :schema-options="schemaOptions"
+                :data="data"
+                :loading="loading"
+                :view-options="viewOptions"
+            ></p-dynamic-widget>
+        </div>
+        <p class="text-lg font-bold leading-6 my-8 border-b border-gray-300">With Index: Different themes are reflected.</p>
+        <div class="flex flex-wrap gap-4">
+            <p-dynamic-widget v-for="({type, name, schemaOptions, data, loading, viewOptions}, idx) in widgets"
+                :key="'without-idx' + idx"
+                :index="idx"
+                :type="type"
+                :name="name"
+                :schema-options="schemaOptions"
+                :data="data"
+                :loading="loading"
+                :view-options="viewOptions"
+            ></p-dynamic-widget>
+        </div>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    widgets: range(6).map(() => getDynamicWidgetMockData('chart'))
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" args={(() => {
+        const mockData = getDynamicWidgetMockData('summary')
+        return {
+            name: mockData.name,
+            type: mockData.type,
+            data: mockData.data,
+            loading: false,
+            ...mockData.schemaOptions,
+        }
+    })()}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

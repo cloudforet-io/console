@@ -1,0 +1,220 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+
+import {i18n} from '@/translations';
+
+import PToolbox from './PToolbox.vue';
+import { getToolboxArgTypes } from './story-helper';
+import { getKeyItemSets,
+    getValueHandlerMap
+} from '@/navigation/toolbox/mock';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Navigation/Toolbox' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179180',
+    }
+}} argTypes={getToolboxArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PToolbox },
+    i18n,
+    template: `
+    <p-toolbox
+        :paginationVisible="paginationVisible"
+        :pageSizeChangeable="pageSizeChangeable"
+        :settingsVisible="settingsVisible"
+        :sortable="sortable"
+        :exportable="exportable"
+        :refreshable="refreshable"
+        :searchable="searchable"
+        :filtersVisible="filtersVisible"
+        :searchType="searchType"
+        :this-page.sync="proxyThisPage"
+        :pageSize.sync="proxyPageSize"
+        :totalCount="totalCount"
+        :sortBy.sync="proxySortBy"
+        :pageSizeOptions="pageSizeOptions"
+        :sortByOptions="sortByOptions"
+        :keyItemSets="keyItemSets"
+        :valueHandlerMap="valueHandlerMap"
+        :queryTags.sync="proxyQueryTags"
+        :searchText.sync="proxySearchText"
+        :timezone="timezone"
+        @change="onChange"
+        @export="onExport"
+        @refresh="onRefresh"
+        @click-settings="onClickSettings"
+    >
+        <template v-if="leftAreaSlot" #left-area>
+            <span v-html="leftAreaSlot"/>
+        </template>
+    </p-toolbox>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxyThisPage: useProxyValue('thisPage', props, emit),
+            proxyPageSize: useProxyValue('pageSize', props, emit),
+            proxySortBy: useProxyValue('sortBy', props, emit),
+            proxySearchText: useProxyValue('searchText', props, emit),
+            proxyQueryTags: useProxyValue('queryTags', props, emit),
+        });
+        return {
+            ...toRefs(state),
+        };
+    }
+});
+
+
+# Toolbox
+
+<br />
+<br />
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PToolbox },
+    i18n,
+    template: `
+    <p-toolbox />
+`,
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Options
+
+<br/>
+
+When pagination, page size, filters like search text and query tags, and sort value are changed, `change` event will be occurred.<br/>
+`change` event has one argument, `options`. <br/>
+`options` contains `sortBy`, `pageStart`, `pageLimit`, `queryTags`, and `searchText` optionally.<br/>
+Each property in options exists only when the value changed.<br/>
+
+```typescript
+interface Options {
+    pageStart?: number;
+    pageLimit?: number;
+    sortBy?: string;
+    queryTags?: QueryTag[]; // query search tag type
+    searchText?: string;
+}
+```
+
+<br/>
+
+
+## Full Case
+
+<Canvas>
+    <Story name="Full Case" height="150px">
+{{
+    components: { PToolbox },
+    i18n,
+    template: `
+    <p-toolbox
+        paginationVisible
+        pageSizeChangeable
+        sortable
+        exportable
+        refreshable
+        searchable
+        filtersVisible
+        settingsVisible
+        :sortBy="'Recent'"
+        :sortByOptions="[{ name: 'Recent', label: 'Recent' }]"
+    >
+    </p-toolbox>
+`,
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Query Search
+
+<Canvas>
+    <Story name="Query Search" height="200px">
+{{
+    components: { PToolbox },
+    i18n,
+    template: `
+    <p-toolbox
+        searchable
+        searchType="query"
+        filtersVisible
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        :queryTags.sync="queryTags"
+    >
+    </p-toolbox>
+`,
+    setup(props) {
+        const state = reactive({
+            keyItemSets: getKeyItemSets(),
+            valueHandlerMap: getValueHandlerMap(),
+            queryTags: [
+                { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
+            ]
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Left Area Slot
+
+<Canvas>
+    <Story name="Left Area Slot">
+{{
+    components: { PToolbox },
+    i18n,
+    template: `
+    <p-toolbox
+        searchable
+        searchType="query"
+        filtersVisible
+        :queryTags="[
+            { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
+        ]"
+    >
+        <template #left-area>
+            <button class="py-1 px-3 h-full rounded-sm bg-primary text-white font-bold text-lg">LEFT AREA</button>
+        </template>
+    </p-toolbox>
+`,
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

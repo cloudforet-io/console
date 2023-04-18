@@ -1,0 +1,388 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {
+    toRefs, reactive, watch,
+} from 'vue';
+import {i18n} from "@/translations";
+import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
+import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
+import PButton from "@/inputs/buttons/button/PButton";
+import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
+import PHeading from '@/data-display/heading/PHeading.vue';
+import {
+     getJsonSchemaFormArgTypes,
+} from '@/inputs/forms/json-schema-form/story-helper';
+import {
+    getDefaultFormData, getDefaultSchema, getJsonInputSchema, getReferenceHandler
+} from "@/inputs/forms/json-schema-form/mock";
+import {supportLanguages} from "@/translations";
+import {
+    VALIDATION_MODES
+} from "@/inputs/forms/json-schema-form/type";
+import {
+    getFilterableDropdownMenuWithMultiTypes,
+} from '@/inputs/dropdown/filterable-dropdown/mock';
+
+
+<Meta title='Inputs/Forms/Json Schema Form' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A180989',
+    }
+}} argTypes={getJsonSchemaFormArgTypes()} />
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PJsonSchemaForm },
+    template: `
+        <p-json-schema-form
+            :schema="schema"
+            :form-data.sync="proxyFormData"
+            :language="$i18n.locale"
+            :validation-mode="validationMode"
+            :reset-on-schema-change="resetOnSchemaChange"
+            :custom-error-map="customErrorMap"
+            :reference-handler="simpleHandler"
+        />
+    `,
+    setup(props) {
+        const state = reactive({
+            proxyFormData: props.formData,
+        });
+        const menu = getFilterableDropdownMenuWithMultiTypes()
+        let allResults = [];
+        const simpleHandler = async (inputText) => {
+            state.loading = true;
+            allResults = await new Promise(resolve => {
+                setTimeout(() => {
+                    let filtered;
+                    const trimmed = inputText.trim();
+                    if (trimmed) {
+                        filtered = new Fuse(menu, {
+                            keys: ['label'],
+                            distance: 100,
+                            threshold: 0.1,
+                            ignoreLocation: true,
+                        }).search(trimmed);
+                    } else {
+                        filtered = [...menu]
+                    }
+                    resolve(filtered)
+                }, 500)
+            })
+            state.loading = false;
+            const results = allResults.slice(0, 5)
+            return { results, more: allResults.length > results.length }
+        }
+        watch(() => props.formData, (formData) => {
+            state.proxyFormData = formData
+        })
+        return {
+            ...toRefs(state),
+            simpleHandler
+        }
+    }
+});
+
+
+# Json Schema Form
+
+It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-format](https://www.npmjs.com/package/ajv-formats).
+
+
+## Supported Types & Formats & Keyword
+
+
+### Types
+|Type|Validator|UI Component|
+|-|-|-|
+|string|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|number|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|integer|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|array|ajv|[Text Input](?path=/docs/inputs-input--basic) or [Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)(with enum keyword)||
+
+### Formats
+**string type only**
+
+|Format|Validator|UI Component|
+|-|-|-|
+|password|ajv-format|[Text Input](?path=/docs/inputs-input--basic)|
+|generate_id|custom|GenerateIdFormat (Internal Component)|
+
+### Keywords
+|Keywords|Validator|UI Component|Description|
+|-|-|-|-|
+|markdown|custom|[Markdown](?path=/docs/data-display-markdown--string-markdown)|-|
+|json|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|json input mode. works only with `object` type|
+|enum|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `string` type only|
+|items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
+|menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
+|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
+|order|custom|-|order of properties. string[]|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
+            i18n,
+            template: `
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-heading>Json Schema Form</p-heading>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+                            :reference-handler="handler"
+        />
+    </div>
+    <div class="col-span-6 bg-coral-100 p-4">
+        <p-heading>Schema</p-heading>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+                       style="height: auto"
+        />
+        <p-heading>Form Data</p-heading>
+        <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                       mode="readOnly"
+                       style="height: auto"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {},
+                    handler: getReferenceHandler()
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Language
+
+<Canvas>
+    <Story name="Language" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data="formData"
+        :language="language"
+    />
+    <div class="col-span-6">
+        <p-select-dropdown class="mb-4"
+                           :selected.sync="language" :items="languages" />
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: getDefaultFormData(),
+                    language: 'en',
+                    languages: supportLanguages.map(d => ({name: d, label: d}))
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Reset on Schema Change
+
+<Canvas>
+    <Story name="Reset on Schema Change" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PButton },
+            i18n,
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data="formData"
+        :language="$i18n.locale"
+    />
+    <div class="col-span-6">
+        <p-button class="mb-4"
+                  @click="resetSchema">Reset Schema</p-button>
+        <p-button style-type="highlight"
+                  class="mb-4"
+                  @click="changeFormData">Change Form Data</p-button>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {}
+                })
+                const resetSchema = () => {
+                    state.schema = getDefaultSchema()
+                }
+                const changeFormData = () => {
+                    state.formData = getDefaultFormData()
+                }
+                return {
+                    ...toRefs(state),
+                    resetSchema,
+                    changeFormData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Validation Mode
+
+<Canvas>
+    <Story name="Validation Mode" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
+            i18n,
+            template: `
+<div class="grid grid-cols-12">
+    <p-json-schema-form
+        class="col-span-6"
+        :schema="schema"
+        :form-data.sync="formData"
+        :validation-mode="validationMode"
+        :language="$i18n.locale"
+    />
+    <div class="col-span-6">
+        <span class="font-lg font-bold mb-2">Validation Mode: </span>
+        <p-select-dropdown class="mb-4"
+            :selected.sync="validationMode" :items="validationModes" />
+        <p-heading>Schema</p-heading>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+        />
+        <p-heading>Form Data</p-heading>
+        <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                       mode="readOnly"
+                       style="height: auto"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {},
+                    validationModes: VALIDATION_MODES.map(d => ({name: d, label: d})),
+                    validationMode: VALIDATION_MODES[0]
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Json Input Mode
+
+<Canvas>
+    <Story name="Json Input Mode" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
+            i18n,
+            template: `
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-heading>Json Schema Form</p-heading>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+        />
+    </div>
+    <div class="col-span-6 bg-coral-100 p-4">
+        <p-heading>Schema</p-heading>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+                       style="height: auto"
+        />
+        <p-heading>Form Data</p-heading>
+        <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                       mode="readOnly"
+                       style="height: auto"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getJsonInputSchema(),
+                    formData: {},
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

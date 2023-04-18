@@ -1,0 +1,16 @@
+{
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["webpack-env", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.vue" ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".out"
+  ]
+}

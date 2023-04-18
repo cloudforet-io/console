@@ -1,0 +1,102 @@
+import icon from 'vue-svgicon';
+import PStatus from '@/data-display/status/PStatus.vue';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {
+    getStatusArgTypes
+} from "@/data-display/status/story-helper";
+
+<Meta title='Data Display/Status' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
+    }
+}} argTypes={getStatusArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PStatus },
+    template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-status
+        :icon="icon"
+        :text="text"
+        :text-color="textColor"
+        :icon-color="iconColor"
+        :theme="theme"
+        :disable-icon="disableIcon"
+        :icon-size="iconSize"
+        :icon-animation="iconAnimation"
+    >
+        <div v-if="defaultSlot" v-html="defaultSlot"/>
+    </p-status>
+</div>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+# Status
+
+<br/>
+<br/>
+<br/>
+
+## Theme
+<Canvas>
+    <Story name="Theme Status">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status theme="green" text="Enabled" style="margin: 1rem" />
+                    <p-status theme="yellow" text="Pending" style="margin: 1rem" />
+                    <p-status theme="red" text="Error" style="margin: 1rem" />
+                    <p-status theme="gray" text="Deleted" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Theme Without Icon
+<Canvas>
+    <Story name="Theme Status Without Icon">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status theme="green" :disable-icon="true" text="Enabled" style="margin: 1rem" />
+                    <p-status theme="yellow" :disable-icon="true" text="Pending" style="margin: 1rem" />
+                    <p-status theme="red" :disable-icon="true" text="Error" style="margin: 1rem" />
+                    <p-status theme="gray" :disable-icon="true" text="Deleted" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Icon
+<Canvas>
+    <Story name="Icon Status">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status icon="ic_check" text="Enabled" style="margin: 1rem" />
+                    <p-status icon="ic_plug-filled" text="Disconnected" style="margin: 1rem" />
+                    <p-status icon="ic_warning-filled" text="Duplicated" style="margin: 1rem" />
+                    <p-status icon="ic_spanner-filled" text="Manual" style="margin: 1rem" icon-animation="spin" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

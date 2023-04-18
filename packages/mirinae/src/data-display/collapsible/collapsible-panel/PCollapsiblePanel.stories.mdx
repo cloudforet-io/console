@@ -1,0 +1,140 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { faker } from '@faker-js/faker';
+
+import { i18n } from '@/translations';
+
+import PCollapsiblePanel from './PCollapsiblePanel.vue';
+import { getCollapsiblePanelArgTypes } from '@/data-display/collapsible/collapsible-panel/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Data Display/Collapsible/Collapsible Panel' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getCollapsiblePanelArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PCollapsiblePanel },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-collapsible-panel
+            v-model="proxyIsCollapsed"
+            @update:isCollapsed="onUpdateIsCollapsed"
+            :line-clamp="lineClamp"
+        >
+            <div v-if="defaultSlot" v-html="defaultSlot"/>
+        </p-collapsible-panel>
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state= reactive({
+            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Collapsible Panel
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PCollapsiblePanel },
+    i18n,
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-collapsible-panel>
+            {{contents}}
+        </p-collapsible-panel>
+    </div>
+    `,
+    setup() {
+        const state = reactive({
+            contents: faker.lorem.sentence(80)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Line Clamp
+
+<Canvas>
+    <Story name="Line Clamp">
+        {{
+            components: { PCollapsiblePanel },
+            i18n,
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <div class="p-4 mb-8">
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 5</p>
+            <p-collapsible-panel :line-clamp="5">
+                {{contents}}
+            </p-collapsible-panel>
+        </div>
+        <div class="p-4 mb-8">
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 1 </p>
+            <p-collapsible-panel :line-clamp="1">
+                {{contents}}
+            </p-collapsible-panel>
+        </div>
+        <div class="p-4 mb-8">
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 0</p>
+            <p-collapsible-panel :line-clamp="0">
+                {{contents}}
+            </p-collapsible-panel>
+        </div>
+        <div class="p-4 mb-8">
+            <p class="text-xl font-bold mb-2">Line Clamp: -1</p>
+            <p class="border-b mb-2">If the value is negative, the toggle will be not shown.</p>
+            <p-collapsible-panel :line-clamp="-1">
+                {{contents}}
+            </p-collapsible-panel>
+        </div>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    contents: faker.lorem.sentence(100)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

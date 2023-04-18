@@ -1,0 +1,171 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import {i18n} from '@/translations'
+import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+import { getDynamicLayoutMarkdownArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/markdown/story-helper';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/- Markdown'
+      argTypes={getDynamicLayoutMarkdownArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="markdown"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              language,
+                          }"
+                          :fetch-options="{
+                          }"
+                           class="w-full"
+      />
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Markdown Type
+<br/>
+<br/>
+
+## Supported Options
+
+| Name | Supported |
+| ---- | ----------- |
+| root_path | O |
+| translation_id | O |
+| fields | X |
+| markdown | O |
+| search | X |
+| disable_search | X |
+| headers | x |
+| layout | X |
+
+
+## Supported Fetch Options
+
+| Name | Supported |
+| ---- | ---- |
+| sortBy | X |
+| sortDesc | X |
+| pageStart | X |
+| pageLimit | X |
+| searchText | X |
+| queryTags | X |
+
+## Supported Type Options
+
+| Type Option Name | Supported |
+| ---- | ---- |
+| loading | X |
+| totalCount | X |
+| timezone | X |
+| selectIndex | X |
+| selectable | X |
+| multiSelect | X |
+| invalid | X |
+| colCopy | X |
+| excelVisible | X |
+| settingsVisible | X |
+| keyItemSets | X |
+| valueHandlerMap | X |
+| language | O |
+| popupVisible | X |
+
+
+## Supported Events
+| Event Name | Supported |
+| ---------- | ----------- |
+| fetch | X |
+| select | X |
+| export | X |
+| click-settings | X |
+| update-popup-visible | X |
+
+<br/>
+<br/>
+
+## With Data
+
+<Canvas>
+    <Story name="With Data" args={{
+        type: 'markdown',
+        options: {markdown: `
+# Support Template
+## Summery
+you are using {{data.compute.instance_type}}
+## Security Group Rules Raw Data
+there is {{ data.security_group_rules | length }} rules in your instance
+\`\`\`json
+{{data.security_group_rules}}
+\`\`\`
+`},
+        data: {
+            data: {
+                compute: {
+                    instance_type: 'm5.2xlarge',
+                },
+                security_group_rules: [
+                    {
+                        port_range_min: 80,
+                        port_range_max: 80,
+                        port: '80',
+                        security_group_name: 'web security group',
+                        security_group_id: '...',
+                        remote_cidr: '172.16.0.0/16',
+                        direction: 'inbound',
+                        prtocol: 'TCP',
+                        remote: '172.16.0.0/16',
+                    },
+                ]
+            }
+        },
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## With Language
+
+<Canvas>
+    <Story name="With Language" argTypes={{
+        language: {
+            control: {
+                type: 'select',
+                options: ['en', 'ko', 'ch']
+            }
+        }
+    }} args={{
+        type: 'markdown',
+        options: {
+            markdown: {
+                en: '### Support English',
+                ko: '### 한국어 지원',
+            }
+        },
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+

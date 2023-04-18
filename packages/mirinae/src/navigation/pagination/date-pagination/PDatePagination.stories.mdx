@@ -1,0 +1,59 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDatePagination from './PDatePagination.vue';
+import { getDatePaginationArgTypes } from '@/navigation/pagination/date-pagination/story-helper';
+
+
+<Meta title='Navigation/Pagination/Date Pagination' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A210565'
+    }
+}} argTypes={getDatePaginationArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDatePagination },
+    template: `
+<div>
+    <PDatePagination
+        :date.sync=date
+        :type=type
+        :allowFuture=allowFuture
+        :timezone=timezone
+    />
+    <div v-if="type === 'month'">
+        <p>previous month: {{ date.subtract(1, 'month').format('YYYY-MM') }}</p>
+        <b>current month: {{ date.format('YYYY-MM') }}</b>
+        <p>next month: {{ date.add(1, 'month').format('YYYY-MM') }}</p>
+    </div>
+    <div v-else>
+        <p>previous week: {{ date.subtract(1, 'week').format('YYYY-MM-DD') }} </p>
+        <b>current week: {{ date.format('YYYY-MM-DD') }}</b>
+        <p>next week: {{ date.add(1, 'week').format('YYYY-MM-DD') }}</p>
+    </div>
+    <br>
+    <p>Timezone: {{ timezone }}</p>
+</div>
+    `,
+    setup(props) {
+    }
+});
+
+
+## Basic
+<Canvas>
+    <Story name="date pagination">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## Playground
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>

@@ -1,0 +1,385 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PFieldGroup from './PFieldGroup.vue';
+import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
+import { reactive, toRefs } from 'vue';
+
+
+<Meta title='Inputs/Forms/Field Group' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5339%3A10120',
+    },
+}} argTypes={{
+    label: {
+        name: 'label',
+        type: {name: 'string'},
+        description: 'Label of field',
+        defaultValue: 'Label',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    helpText: {
+        name: 'helpText',
+        type: {name: 'string'},
+        description: 'Help text of field',
+        defaultValue: 'help text.',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    invalidText: {
+        name: 'invalidText',
+        type: {name: 'string'},
+        description: 'Invalid text of field',
+        defaultValue: 'invalid text.',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    validText: {
+        name: 'validText',
+        type: {name: 'string'},
+        description: 'Valid text of field',
+        defaultValue: 'valid text.',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    invalid: {
+        name: 'invalid',
+        type: {name: 'boolean'},
+        description: 'Props for show invalid text and invalid style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    valid: {
+        name: 'valid',
+        type: {name: 'boolean'},
+        description: 'Props for show valid text',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    required: {
+        name: 'required',
+        type: {name: 'boolean'},
+        description: 'Props for hide optional mark',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    labelSlot: {
+        name: 'label',
+        description: 'Slot for label',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    labelExtraSlot: {
+        name: 'label-extra',
+        description: 'Slot for add something into right area of label',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    validSlot: {
+        name: 'valid',
+        description: 'Slot for valid text',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    invalidSlot: {
+        name: 'invalid',
+        description: 'Slot for invalid text',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    help: {
+        name: 'help',
+        description: 'Slot for help text',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    default: {
+        name: 'default',
+        description: 'Slot for input form',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    onClickLabel: {
+        name: 'click-label',
+        description: 'Event triggered by clicking label',
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'events'
+        },
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PFieldGroup, PTextInput },
+    template: `
+        <p-field-group :invalid="invalid" :invalid-text="invalidText"
+                        :valid="valid" :valid-text="validText"
+                        :help-text="helpText" :required="required"
+                        :label="label"
+        >
+            <template v-if="labelSlot" #label>
+                <div v-html="labelSlot"/>
+            </template>
+            <template v-if="labelExtraSlot" #label-extra>
+                <div v-html="labelExtraSlot"/>
+            </template>
+            <template v-if="validSlot" #valid>
+                <div v-html="validSlot"/>
+            </template>
+            <template v-if="invalidSlot" #invalid>
+                <div v-html="invalidSlot"/>
+            </template>
+            <template v-if="help" #help>
+                <div v-html="help"/>
+            </template>
+            <template #default="{invalid}">
+                <div v-if="$props.default" v-html="$props.default"/>
+                <p-text-input v-else placeholder="Input" :invalid="invalid" v-model="value"/>
+            </template>
+        </p-field-group>
+    `,
+    setup() {
+        const state = reactive({
+            value: ''
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# FieldGroup
+
+<br/>
+<br/>
+
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PFieldGroup, PTextInput },
+            template: `
+        <p-field-group label="Name" invalid invalid-text="name is required field.">
+            <template #default="{invalid}">
+                <p-text-input placeholder="Name" :invalid="invalid" value=""/>
+            </template>
+        </p-field-group>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Valid
+
+<Canvas>
+    <Story name="Valid">
+        {{
+            components: { PFieldGroup, PTextInput },
+            template: `
+        <p-field-group label="Name" valid valid-text="this is an appropriate name.">
+            <template #default="{valid}">
+                <p-text-input placeholder="Name" :valid="valid" value="Wanjin"/>
+            </template>
+        </p-field-group>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Required
+
+<Canvas>
+    <Story name="Required">
+        {{
+            components: { PFieldGroup, PTextInput },
+            template: `
+        <p-field-group label="Name" required>
+            <p-text-input value="Wanjin"/>
+        </p-field-group>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Help Text
+
+<Canvas>
+    <Story name="Help Text">
+        {{
+            components: { PFieldGroup, PTextInput },
+            template: `
+        <p-field-group label="Name" help-text="Please enter 3 or more and 10 or less alphabets.">
+            <p-text-input value="Wanjin"/>
+        </p-field-group>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

@@ -1,0 +1,65 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PFileUploader from './PFileUploader.vue';
+import { reactive, toRefs } from 'vue';
+import { getFileUploaderArgTypes } from '@/inputs/file-uploader/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/File Uploader' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/'
+    }
+}} argTypes={getFileUploaderArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PFileUploader },
+    template: `
+            <div>
+                <p-file-uploader
+                    :uploaded-files.sync="proxyUploadedFiles"
+                />
+            </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxyUploadedFiles: useProxyValue('uploadedFiles', props, emit),
+        });
+        return {
+            ...toRefs(state),
+        }
+    }
+});
+
+
+# File Uploader
+<br/>
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PFileUploader },
+            template: `
+                <p-file-uploader />
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

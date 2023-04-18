@@ -1,0 +1,152 @@
+import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getTextPaginationArgTypes } from '@/navigation/pagination/text-pagination/story-helper';
+import {
+    computed, reactive, toRefs
+} from 'vue';
+
+<Meta title='Navigation/Pagination/Text Pagination' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A178955',
+    }
+}} argTypes={getTextPaginationArgTypes()} />
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextPagination },
+    template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-text-pagination
+        :all-page="allPage"
+        :this-page.sync="thisPage"
+        :show-page-number="showPageNumber"
+    />
+</div>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+# Text Pagination
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="Basic Text Pagination">
+        {{
+            components:{ PTextPagination },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-text-pagination
+        :all-page="allPage"
+        :this-page.sync="thisPage"
+    />
+</div>`,
+            setup() {
+                const state = reactive({
+                    allPage: 3,
+                    thisPage: 1,
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## no page number
+<Canvas>
+    <Story name="Without Page Number">
+        {{
+            components:{ PTextPagination },
+            template: `
+<div style="display: flex; align-items:center; justify-content:center;">
+    <p-text-pagination
+        :all-page="allPage"
+        :this-page.sync="thisPage"
+        :show-page-number="false"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    allPage: 3,
+                    thisPage: 1,
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## only this page number
+<Canvas>
+    <Story name="only this page number">
+        {{
+            components:{ PTextPagination },
+            template: `
+              <div style="display: flex; align-items:center; justify-content:center;">
+              <p-text-pagination
+                  :this-page.sync="thisPage"
+                  :disable-next-page="isMax"
+              />
+              </div>
+            `,
+            setup() {
+                const state = reactive({
+                    thisPage: 1,
+                    isMax: computed(() => state.thisPage === 3),
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## Custom contents with default slot
+<Canvas>
+    <Story name="Custom contents with default slot">
+        {{
+            components:{ PTextPagination },
+            template: `
+              <div style="display: flex; align-items:center; justify-content:center;">
+              <p-text-pagination
+                  :this-page.sync="thisPage"
+              ><template #default>
+<span>{{ thisPage }} page</span>
+</template>
+</p-text-pagination>
+              </div>
+            `,
+            setup() {
+                const state = reactive({
+                    thisPage: 1,
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

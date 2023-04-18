@@ -1,0 +1,202 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { faker } from '@faker-js/faker';
+import { reactive, toRefs, computed } from 'vue';
+
+import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup';
+import PTextarea from './PTextarea.vue';
+import { getTextareaArgTypes } from '@/inputs/textarea/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Textarea' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}}  argTypes={getTextareaArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextarea },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-textarea
+            v-model="value"
+            :placeholder="placeholder"
+            :autofocus="autofocus"
+            :readonly="readonly"
+            :disabled="disabled"
+            :invalid="invalid"
+        />
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state= reactive({
+            proxyValue: useProxyValue('value', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Textarea
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" >
+{{
+    components: { PTextarea },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-textarea :value="value" placeholder="placeholder" />
+    </div>
+    `,
+    setup() {
+        const state = reactive({
+            value: faker.lorem.sentence(30)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Placeholder
+
+<Canvas>
+    <Story name="Placeholder" >
+        {{
+            components: { PTextarea },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-textarea :value="value" placeholder="placeholder" />
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    value: ''
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled" >
+        {{
+            components: { PTextarea },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-textarea :value="value" disabled />
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    value: faker.lorem.sentence(30)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Readonly
+
+<Canvas>
+    <Story name="Readonly" >
+        {{
+            components: { PTextarea },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-textarea :value="value" readonly />
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    value: faker.lorem.sentence(30)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" >
+        {{
+            components: { PTextarea, PFieldGroup },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-group
+            label="Invalid style example"
+            help-text="The value must be between 2 and 50 characters."
+            :invalid-text="invalidText"
+        >
+            <p-textarea v-model="value" :invalid="!!invalidText" />
+        </p-field-group>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    value: '',
+                    invalidText: computed(() => {
+                        if (state.value.length < 2) {
+                            return 'The value must be at least 2 characters.';
+                        } else if (state.value.length > 50) {
+                            return 'The value must be within 50 characters.';
+                        } else {
+                            return ''
+                        }
+                    }),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

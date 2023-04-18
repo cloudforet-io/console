@@ -1,0 +1,165 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import PBreadcrumbs from './PBreadcrumbs.vue';
+import { getBreadcrumbsArgTypes } from '@/navigation/breadcrumbs/story-helper';
+
+
+<Meta title='Navigation/Breadcrumbs' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getBreadcrumbsArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PBreadcrumbs },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-breadcrumbs
+            :routes="routes"
+            :copiable="copiable"
+            @click="onClick"
+        ></p-breadcrumbs>
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Breadcrumbs
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PBreadcrumbs },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-breadcrumbs :routes="routes"></p-breadcrumbs>
+    </div>
+    `,
+            setup() {
+                return {
+                    routes: [
+                        { name: 'Page1', path: '/page1' },
+                        { name: 'Page2', path: '/page2' },
+                        { name: 'Page3' },
+                    ]
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Over Five Routes
+
+<Canvas>
+    <Story name="Over Five Routes">
+        {{
+            components: { PBreadcrumbs },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-breadcrumbs :routes="routes"></p-breadcrumbs>
+    </div>
+    `,
+            setup() {
+                return {
+                    routes: [
+                        { name: 'Page1', path: '/page1' },
+                        { name: 'Page2' },
+                        { name: 'Page3' },
+                        { name: 'Page4' },
+                        { name: 'Page5' },
+                        { name: 'Page6' },
+                    ]
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## With Route Location
+
+<Canvas>
+    <Story name="With Route Location">
+        {{
+            components: { PBreadcrumbs },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-breadcrumbs :routes="routes"></p-breadcrumbs>
+    </div>
+    `,
+            setup() {
+                return {
+                    routes: [
+                        { name: 'Page1', to: {name: 'Page1'} },
+                        { name: 'Page2', to: {name: 'Page2'} },
+                        { name: 'Page3' },
+                    ]
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Copiable
+
+<Canvas>
+    <Story name="Copiable">
+        {{
+            components: { PBreadcrumbs },
+            template: `
+    <div class="h-full w-full overflow p-8">
+    <p-breadcrumbs :routes="[
+                        { name: 'Page1', to: {name: 'Page1'} },
+                        { name: 'Page2', to: {name: 'Page2'} },
+                        { name: 'Page3' },
+                    ]"
+                   copiable
+    />
+    <br/>
+    <p-breadcrumbs :routes="[
+                        { name: 'Page1', path: '/page1' },
+                        { name: 'Page2' },
+                        { name: 'Page3' },
+                        { name: 'Page4' },
+                        { name: 'Page5' },
+                        { name: 'Page6' },
+                    ]"
+                   copiable
+    />
+    </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

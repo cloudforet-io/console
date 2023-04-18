@@ -1,8 +1,20 @@
 {
   "pipeline": {
-    "build": {
+    "@cloudforet/core-lib#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "inputs": [
+        "src/**", "package.json", "package-lock.json", "tsconfig.json"
+      ]
+    },
+    "@spaceone/design-system#build": {
+        "dependsOn": ["^build"],
+        "outputs": ["dist/**"],
+        "inputs": [
+            "src/**", "postcss.config.js", "tailwind.config.js",
+          "package.json", "tsconfig.build.json", "vite.config.ts",
+          "!./**/*.stories.mdx", "!./**/story-helper.ts", "!./**/*.mock.ts"
+        ]
     },
     "web#build": {
       "dependsOn": ["^build"],
@@ -14,12 +26,17 @@
         "vite.config.ts", "postcss.config.js", "tailwind.config.js"
       ]
     },
-    "@cloudforet/core-lib#build": {
+    "storybook#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
+      "outputs": [".out/**"],
       "inputs": [
-        "src/**", "package.json", "package-lock.json", "tsconfig.json"
+        "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
+        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*"
       ]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
     "dev": {
       "cache": false

@@ -1,0 +1,138 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+import { getToggleButtonArgTypes } from '@/inputs/buttons/toggle-button/story-helper';
+
+<Meta
+    title='Inputs/Buttons/Toggle Button'
+    parameters={{
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5131%3A127311',
+        },
+    }}
+    component={ PToggleButton }
+    argTypes={getToggleButtonArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PToggleButton },
+    template: `
+        <div class="flex items-center justify-center">
+            <p-toggle-button
+                :value="value"
+                :label="label"
+                :style-type="styleType"
+                :disabled="disabled"
+            />
+        </div>
+    `,
+    setup() {
+        return {};
+    }
+});
+
+# Toggle Button
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="toggle button basic">
+    {{
+        components: { PToggleButton },
+        template: `
+            <div class="flex items-center justify-center">
+                <p-toggle-button
+                    :value="true"
+                    class="mr-8"
+                />
+                <p-toggle-button
+                    :value="true"
+                    style-type="peacock500"
+                />
+            </div>
+        `
+    }}
+    </Story>
+</Canvas>
+
+## Label
+<Canvas>
+    <Story name="toggle button label">
+        {{
+            components: { PToggleButton },
+            template: `
+                <div class="flex items-center justify-center">
+                    <p-toggle-button
+                        :value="true"
+                        label="label"
+                        class="mr-8"
+                    />
+                </div>
+            `
+        }}
+    </Story>
+</Canvas>
+
+## Disabled
+<Canvas>
+    <Story name="toggle button disabeld">
+        {{
+            components: { PToggleButton },
+            template: `
+                <div class="flex flex-col items-center gap-6">
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            :value="false"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            label="label"
+                            :value="false"
+                            :disabled="true"
+                        />
+                    </div>
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            :value="true"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            label="label"
+                            :value="true"
+                            :disabled="true"
+                        />
+                    </div>
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            style-type="peacock500"
+                            :value="true"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            style-type="peacock500"
+                            label="label"
+                            :value="true"
+                            :disabled="true"
+                        />
+                    </div>
+                </div>
+            `
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

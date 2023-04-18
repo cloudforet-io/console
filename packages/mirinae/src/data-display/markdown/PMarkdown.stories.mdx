@@ -1,0 +1,83 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PMarkdown from './PMarkdown.vue';
+import mock from './mock.ts';
+import {getMarkdownArgTypes} from "@/data-display/markdown/story-helper";
+
+<Meta title='Data Display/Markdown' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5718%3A9288',
+    },
+}} argTypes={getMarkdownArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PMarkdown },
+    template: `
+        <p-markdown :markdown="markdown" :language="language" :data="data" :remove-spacing="removeSpacing" >
+        </p-markdown>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Markdown
+<br/>
+<br/>
+
+## String Markdown
+
+<Canvas>
+    <Story name="String Markdown" args={{
+        markdown: mock.markdown.en
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Object Markdown
+
+<Canvas>
+    <Story name="Object Markdown" args={{
+        markdown: mock.markdown,
+        language: 'ko'
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Data Combining
+
+<Canvas>
+    <Story name="Data Combining" args={{
+        markdown: mock.markdownWithData,
+        language: 'ko'
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

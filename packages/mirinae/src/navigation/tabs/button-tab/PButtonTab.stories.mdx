@@ -1,0 +1,180 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {reactive, toRefs} from 'vue';
+
+import PButtonTab from './PButtonTab.vue';
+import { getButtonTabArgTypes, Inner } from '@/navigation/tabs/button-tab/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Navigation/Tabs/Button Tab' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=12164%3A1629'
+    }
+}} argTypes={getButtonTabArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PButtonTab },
+    template: `
+    <p-button-tab
+        :tabs="tabs"
+        v-model="proxyActiveTab"
+        @update:activeTab="onUpdateActiveTab"
+        @change="onChange"
+    >
+        <div v-if="defaultSlot" v-html="defaultSlot"/>
+    </p-button-tab>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxyActiveTab: useProxyValue('activeTab',props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Button Tab
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PButtonTab },
+    template: `
+    <p-button-tab
+        :tabs="['Basic Information', 'EC2']"
+        v-model="activeTab"
+    >
+    </p-button-tab>
+    `,
+    setup(props) {
+        const state = reactive({
+            activeTab: 'Basic Information'
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots for Contents
+
+<Canvas>
+    <Story name="Slots for Contents">
+        {{
+            components: { PButtonTab },
+            template: `
+    <p-button-tab
+        :tabs="tabs"
+        v-model="activeTab"
+    >
+        <template #detail="slotProps">
+            <div class="p-4">
+                This is detail slot. <br/>
+                slot Props: <br/>
+                <pre class="mt-4 p-8 rounded bg-gray-200 w-full leading-6">{{slotProps}}</pre>
+            </div>
+        </template>
+        <template #info="slotProps">
+            <div class="p-4">
+                This is info slot. <br/>
+                slot Props: <br/>
+                <pre class="mt-4 p-8 rounded bg-gray-200 w-full leading-6">{{slotProps}}</pre>
+            </div>
+        </template>
+        <template #tags="slotProps">
+            <div class="p-4">
+                This is tags slot. <br/>
+                slot Props: <br/>
+                <pre class="mt-4 p-8 rounded bg-gray-200 w-full leading-6">{{slotProps}}</pre>
+            </div>
+        </template>
+    </p-button-tab>
+<!--<div>-->
+`,
+            setup(props) {
+                const state = reactive({
+                    tabs: [
+                        { name: 'detail', label: 'Detail' },
+                        { name: 'info', label: 'Info' },
+                        { name: 'tags', label: 'Tags' },
+                    ],
+                    activeTab: 'detail'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Keep Alive
+
+<Canvas>
+    <Story name="Keep Alive">
+{{
+    components: { PButtonTab, Inner },
+    template: `
+    <p-button-tab
+        :tabs="tabs"
+        v-model="activeTab"
+    >
+        <template #detail="{name}">
+            <inner key="detail" name="Detail. this tab is keep alive."/>
+        </template>
+        <template #info>
+            <inner name="info. this tab is NOT keep alive. If you select another tab and then return to this tab, it will return to the initial state." />
+        </template>
+        <template #tags="{name}">
+            <inner key="tags" name="Tags. this tab is keep alive."/>
+        </template>
+    </p-button-tab>
+<!--<div>-->
+`,
+    setup(props) {
+        const state = reactive({
+            tabs: [
+                { name: 'detail', label: 'Detail', keepAlive: true },
+                { name: 'info', label: 'Info', keepAlive: false },
+                { name: 'tags', label: 'Tags', keepAlive: true },
+            ],
+            activeTab: 'detail'
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

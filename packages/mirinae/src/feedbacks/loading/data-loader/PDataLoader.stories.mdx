@@ -1,0 +1,485 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from 'vue';
+import { range }from 'lodash'
+import { faker }  from '@faker-js/faker'
+import PButton from '@/inputs/buttons/button/PButton';
+import PDataLoader from './PDataLoader.vue';
+import { getDataLoaderArgTypes } from '@/feedbacks/loading/data-loader/story-helper';
+
+
+<Meta title='Feedbacks/loading/Data Loader' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5921%3A164129',
+    },
+}} argTypes={getDataLoaderArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDataLoader },
+    template: `
+        <p-data-loader v-bind="$props" class="p-3 bg-gray-100 border border-gray-200"  style="height: 300px;">
+            <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                {{d}}
+            </div>
+        </p-data-loader>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Data Loader
+<br/>
+<br/>
+
+## How it works with data prop?
+
+If the `data` prop is `undefined` or `null` , it is assumed that initial loading has not occurred yet. <br/>
+So the empty case screen is not visible. <br/>
+
+On the other hand, if the `data` prop is an empty `array` or an empty `object`, it is assumed that the data is empty and an empty case screen is displayed.<br/>
+
+When the type of `data` prop is `boolean`, if the value is `true`, data is considered to exist, and if `false`, data is considered empty.<br/>
+When you simply want to control whether an empty screen is shown or not, you can solve it by putting a `boolean` value in the `data` prop.<br/>
+
+## Basic
+<Canvas>
+    <Story name="Basic" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="mb-2" @click="fetchData">Reload Data</p-button>
+    <p-data-loader :loading="loading" :data="data"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: []
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                     state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 2000)
+                    })
+                    state.loading = false;
+                }
+                fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disable Empty Case
+
+`isEmpty` slot prop will be given for the default slot.
+
+<Canvas>
+    <Story name="Disable Empty Case" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="mb-2" @click="fetchData">{{data.length ? 'Empty Data' : 'Load Data'}}</p-button>
+    <p-data-loader :loading="loading" :data="data" disable-empty-case
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: false,
+                    data: range(15).map(() => faker.lorem.lines())
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            if (state.data.length) resolve([])
+                            else resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 1000)
+                    })
+                    state.loading = false;
+                }
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Data From Scratch
+<Canvas>
+    <Story name="Show Data From Scratch" >
+        {{
+            components: { PDataLoader },
+            template: `
+<div class="w-full">
+    <p class="font-lg font-bold my-4">Initial Loading with normal mode (empty case)</p>
+    <p-data-loader :loading="true" :data="[]"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+    </p-data-loader>
+    <p class="font-lg font-bold my-4">Initial Loading with <span class="text-secondary">showDataFromScratch</span> mode (empty case)</p>
+    <p-data-loader :loading="true" :data="[]" :show-data-from-scratch="true"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+    </p-data-loader>
+    <p class="font-lg font-bold my-4">Initial Loading with normal mode</p>
+    <p-data-loader :loading="true" :data="data"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+    <p class="font-lg font-bold my-4">Initial Loading with <span class="text-secondary">showDataFromScratch</span> mode</p>
+    <p-data-loader :loading="true" :data="data" :show-data-from-scratch="true"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    data: range(15).map(() => faker.lorem.lines())
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Min Loading
+<Canvas>
+    <Story name="Min Loading" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="mb-2" @click="fetchData">Reload Data</p-button>
+    <p-data-loader :loading="loading" :data="data" :min-loading-time="1000"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: []
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 2000)
+                    })
+                    state.loading = false;
+                }
+                fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Lazy Loading & Min Loading
+<Canvas>
+    <Story name="Lazy Loading & Min Loading" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="mb-2" @click="fetchData">Reload Data (data loading time: 1500)</p-button>
+    <div class="grid grid-cols-2">
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Lazy Loading(time: 1000)</p>
+            <p-data-loader :loading="loading" :data="data" :lazy-loading-time="1000"
+                class="p-3 bg-gray-100 border border-gray-200"
+                style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Lazy Loading(time: 2000)</p>
+            <p-data-loader :loading="loading" :data="data" :lazy-loading-time="2000"
+                class="p-3 bg-gray-100 border border-gray-200"
+                style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Lazy Loading(time: 1000) & Min Loading(time: 1000)</p>
+            <p-data-loader :loading="loading" :data="data" :lazy-loading-time="1000" :min-loading-time="1000"
+                class="p-3 bg-gray-100 border border-gray-200"
+                style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Lazy Loading(time: 1000) & Min Loading(time: 1500)</p>
+            <p-data-loader :loading="loading" :data="data" :lazy-loading-time="1000" :min-loading-time="1500"
+                class="p-3 bg-gray-100 border border-gray-200"
+                style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: []
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 1500)
+                    })
+                    state.loading = false;
+                }
+                fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loader Backdrop Opacity & Color
+
+You can adjust the opacity of the loader backdrop through the `loaderBackdropOpacity` prop.<br/>
+You can also change the backdrop color through the `loaderBackdropColor` prop.<br/>
+<br/>
+
+For the `loaderBackdropColor` prop, you can give the name of the color token. <br/>
+e.g. `gray.900`
+
+<Canvas>
+    <Story name="Loader Backdrop Opacity" >
+        {{
+            components: { PDataLoader },
+            template: `
+<div class="w-full">
+    <div class="grid grid-cols-2">
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Opacity: 0.6, Color: indianred</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="0.6"
+                            loader-backdrop-color="indianred"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px; background-color: indianred"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">Opacity: 0.9, Color: indianred</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="0.9"
+                            loader-backdrop-color="indianred"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px; background-color: indianred"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: range(15).map(() => faker.lorem.lines()),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disable Transition
+
+<Canvas>
+    <Story name="Disable Transition" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="flex-shrink-0 mb-2" @click="fetchData">Refresh</p-button>
+    <div class="grid grid-cols-2">
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">normal</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="1"
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+        <div class="mx-2">
+            <p class="font-lg font-bold my-4">disable transition</p>
+            <p-data-loader :loading="loading" :data="data"
+                            show-data-from-scratch
+                            :loader-backdrop-opacity="1"
+                            disable-transition
+                            class="p-3 bg-gray-100 border border-gray-200"
+                            style="width: 100%; height: 100px;"
+            >
+                <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                    {{d}}
+                </div>
+            </p-data-loader>
+        </div>
+    </div>
+</div>
+<!--<div>-->
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    data: [],
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 1000)
+                    })
+                    state.loading = false;
+                }
+                fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## No Data
+<Canvas>
+    <Story name="No Data" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-data-loader :data="false" :loading="false"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+    </p-data-loader>
+</div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

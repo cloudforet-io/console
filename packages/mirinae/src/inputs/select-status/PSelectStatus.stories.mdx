@@ -1,0 +1,204 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { range } from 'lodash';
+import { faker } from '@faker-js/faker';
+import {
+    reactive, toRefs
+} from 'vue';
+
+import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
+
+import PSelectStatus from './PSelectStatus.vue';
+import { getSelectStatusArgTypes } from '@/inputs/select-status/story-helper';
+import { useProxyValue } from '@/hooks';
+
+
+<Meta title='Inputs/Select Status' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getSelectStatusArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PSelectStatus },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-status
+            :value="value"
+            v-model="proxySelected"
+            :predicate="predicate"
+            :multi-selectable="multiSelectable"
+            :disable-check-icon="disableCheckIcon"
+            @change="onChange"
+        >
+            <span v-if="defaultSlot" v-html="defaultSlot" />
+        </p-select-status>
+    </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Select Status
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PSelectStatus },
+    template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-status v-for="(value, idx) in values" :key="idx"
+            :value="value"
+            v-model="selected"
+            class="mr-4"
+        >
+            {{value}}
+        </p-select-status>
+    </div>
+    `,
+    setup(props) {
+        const values = range(8).map(() => faker.random.word())
+        const state = reactive({
+            selected: values[0],
+            values,
+        })
+        return {
+            ...toRefs(state),
+        };
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## With Icon
+
+<Canvas>
+    <Story name="With Icon">
+        {{
+            components: { PSelectStatus },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-status v-for="(value, idx) in values" :key="idx"
+            :value="value"
+            :icon="icons[idx]"
+            v-model="selected"
+            class="mr-4"
+        >
+            {{value}}
+        </p-select-status>
+    </div>
+    `,
+            setup(props) {
+                const values = range(8).map(() => faker.random.word())
+                const state = reactive({
+                    selected: values[0],
+                    values,
+                    icons: getAllAvailableIcons()
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Multi Select
+
+<Canvas>
+    <Story name="Multi Select">
+        {{
+            components: { PSelectStatus },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-status v-for="(value, idx) in values" :key="idx"
+            :value="value"
+            multi-selectable
+            v-model="selected"
+            class="mr-4"
+        >
+            {{value}}
+        </p-select-status>
+    </div>
+    `,
+            setup(props) {
+                const values = range(8).map(() => faker.random.word())
+                const state = reactive({
+                    selected: [values[0], values[1]],
+                    values,
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Without Check Icon
+
+<Canvas>
+    <Story name="Without Check Icon">
+        {{
+            components: { PSelectStatus },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-status v-for="(value, idx) in values" :key="idx"
+            :value="value"
+            v-model="selected"
+            :disable-check-icon="true"
+            class="mr-4"
+        >
+            {{value}}
+        </p-select-status>
+    </div>
+    `,
+            setup(props) {
+                const values = range(8).map(() => faker.random.word())
+                const state = reactive({
+                    selected: [values[0]],
+                    values,
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
