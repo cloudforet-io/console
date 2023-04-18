@@ -74,8 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, reactive } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { computed, reactive } from 'vue';
 
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
@@ -109,8 +108,6 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
@@ -120,27 +117,27 @@ const state = reactive({
             return [
                 {
                     name: PasswordType.KEEP,
-                    label: vm.$t('COMMON.PROFILE.KEEP_PASSWORD'),
+                    label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
                 },
                 {
                     name: PasswordType.RESET,
-                    label: vm.$t('COMMON.PROFILE.SEND_LINK'),
+                    label: i18n.t('COMMON.PROFILE.SEND_LINK'),
                     disabled: !props.isValidEmail,
                 },
                 {
                     name: PasswordType.MANUALLY,
-                    label: vm.$t('COMMON.PROFILE.SET_MANUALLY'),
+                    label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
                 },
             ];
         }
         return [
             {
                 name: PasswordType.RESET,
-                label: vm.$t('COMMON.PROFILE.SEND_LINK'),
+                label: i18n.t('COMMON.PROFILE.SEND_LINK'),
             },
             {
                 name: PasswordType.MANUALLY,
-                label: vm.$t('COMMON.PROFILE.SET_MANUALLY'),
+                label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
             },
         ];
     }),

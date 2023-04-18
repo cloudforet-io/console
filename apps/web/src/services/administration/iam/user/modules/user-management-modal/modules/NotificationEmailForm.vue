@@ -123,11 +123,9 @@
 
 <script setup lang="ts">
 import {
-    computed,
-    getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PFieldGroup, PTextInput, PTooltip, PI, PButton, PCollapsibleToggle, PIconButton,
@@ -158,8 +156,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const emit = defineEmits(['change-input', 'change-verify']);
 
@@ -243,7 +239,7 @@ const handleChangeVerify = async () => {
         }
     } catch (e) {
         validationState.isValidationCodeValid = true;
-        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
+        validationState.validationCodeInvalidText = i18n.t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
     }
