@@ -63,10 +63,13 @@ const formState = reactive({
 /* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
-    if (state.selectedMenuIndex === -1) {
+    if (state.isToggled) {
         state.selectedMenuIndex = 0;
         formState.domainRole = formState.domainRoleList[0].label;
         formState.roleId = formState.domainRoleList[0].name;
+    } else {
+        formState.domainRole = '';
+        formState.roleId = '';
     }
     emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
