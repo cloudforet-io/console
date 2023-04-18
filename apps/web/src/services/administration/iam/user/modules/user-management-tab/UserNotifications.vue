@@ -153,7 +153,6 @@ export default {
                 });
                 state.items = res.results.map((d) => ({
                     ...d,
-                    // eslint-disable-next-line camelcase
                     protocol_type: injectProtocolName(d),
                 }));
             } catch (e) {

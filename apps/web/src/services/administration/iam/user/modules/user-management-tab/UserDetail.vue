@@ -64,7 +64,7 @@
                     :domain-id="state.data.domain_id"
                     :verified="state.data.email_verified"
                     is-administration
-                    @handle-user-detail="getUserDetailData"
+                    @refresh-user="getUserDetailData"
                 />
             </template>
         </p-definition-table>
@@ -132,7 +132,6 @@ const getUserDetailData = async (userId) => {
             user_id: userId || props.userId,
         });
         state.data = response;
-        // eslint-disable-next-line camelcase
         state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
         state.data.email = response.email;
         state.data.email_verified = response.email_verified;
@@ -143,12 +142,11 @@ const getUserDetailData = async (userId) => {
 };
 
 /* Watcher */
-watch(() => props.userId, () => {
-    const userId = props.userId;
-    getUserDetailData(userId);
+watch(() => props.userId, (value) => {
+    getUserDetailData(value);
 }, { immediate: true });
-watch(() => userPageState.visibleUpdateModal, () => {
-    if (!userPageState.visibleUpdateModal) {
+watch(() => userPageState.visibleUpdateModal, (value) => {
+    if (!value) {
         getUserDetailData(props.userId);
     }
 });

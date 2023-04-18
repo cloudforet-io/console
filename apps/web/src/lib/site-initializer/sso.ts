@@ -18,7 +18,6 @@ export const checkSsoAccessToken = async (store) => {
 
     // signOut
     if (ssoAccessToken) {
-        console.log(SpaceConnector.isTokenAlive);
         if (SpaceConnector.isTokenAlive) {
             try {
                 const authType = store.state.domain.extendedAuthType;

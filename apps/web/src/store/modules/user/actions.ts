@@ -20,7 +20,7 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         language: response.language,
         timezone: response.timezone,
         // email_verified : There is data only when the value is true.
-        emailVerified: response.email_verified,
+        emailVerified: !!response.email_verified,
     };
 };
 
@@ -36,7 +36,7 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         timezone: response.timezone,
         requiredActions: response.required_actions,
         // email_verified : There is data only when the value is true.
-        emailVerified: response.email_verified,
+        emailVerified: !!response.email_verified,
     };
 };
 

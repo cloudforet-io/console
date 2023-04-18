@@ -9,7 +9,7 @@
         </div>
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
-                           :key="props.activeTab"
+                           :key="`admin-role-${props.activeTab}`"
                            :items="formState.domainRoleList"
                            :disabled="formState.domainRoleList.length < 2 || state.isSameId"
                            use-fixed-menu-style
@@ -63,6 +63,14 @@ const formState = reactive({
 /* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
+    if (state.isToggled) {
+        state.selectedMenuIndex = 0;
+        formState.domainRole = formState.domainRoleList[0].label;
+        formState.roleId = formState.domainRoleList[0].name;
+    } else {
+        formState.domainRole = '';
+        formState.roleId = '';
+    }
     emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
@@ -74,11 +82,10 @@ const handleSelectedMenuIndex = (selectedIndex: number) => {
 const setForm = async () => {
     if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings && userPageStore.selectedUsers[0].role_bindings.length > 0) {
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
+        if (state.selectedMenuIndex === -1) return;
+        state.isToggled = true;
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
         formState.roleId = formState.domainRoleList[state.selectedMenuIndex].name;
-        if (state.selectedMenuIndex !== -1) {
-            state.isToggled = true;
-        }
     } else formState.domainRole = '';
 };
 

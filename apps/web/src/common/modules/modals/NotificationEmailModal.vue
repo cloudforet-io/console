@@ -15,6 +15,7 @@
                     >
                         <div class="notification-field-wrapper">
                             <p-text-input
+                                id="newNotificationEmail"
                                 v-model="formState.newNotificationEmail"
                                 @keyup.enter="handleClickSendEmailButton"
                             />
@@ -39,7 +40,7 @@
                                  width="0.875rem"
                                  color="inherit"
                             />
-                            <p class="email-tex">
+                            <p class="email-text">
                                 {{ state.email }}
                             </p>
                         </div>
@@ -55,7 +56,8 @@
                                :invalid-text="validationState.validationCodeInvalidText"
                                required
                 >
-                    <p-text-input v-model="formState.verificationCode"
+                    <p-text-input id="verificationCode"
+                                  v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                                   @keyup.enter="handleClickConfirmButton"
                     />
@@ -87,10 +89,9 @@
 
 <script lang="ts" setup>
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton,
@@ -103,6 +104,7 @@ import {
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -128,9 +130,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
-const emit = defineEmits(['visible', 'handle-user-detail']);
+const emit = defineEmits(['visible', 'refresh-user']);
 
 const state = reactive({
     loading: false,
@@ -155,9 +155,9 @@ const handleEditButton = () => {
 };
 const handleClickCancel = () => {
     state.proxyVisible = false;
-    handleReset();
+    resetFormData();
 };
-const handleReset = () => {
+const resetFormData = () => {
     formState.newNotificationEmail = '';
     formState.verificationCode = '';
     validationState.isValidationCodeValid = false;
@@ -178,11 +178,10 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
                 await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
             }
         }
-        emit('handle-user-detail');
+        emit('refresh-user');
         state.isEditMode = false;
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        throw e;
     } finally {
         state.loading = false;
     }
@@ -195,12 +194,12 @@ const handleClickConfirmButton = async () => {
             domain_id: props.domainId,
             code: formState.verificationCode,
         }, state.myId === props.userId);
-        emit('handle-user-detail');
+        emit('refresh-user');
         state.proxyVisible = false;
-        handleReset();
+        resetFormData();
     } catch (e) {
         validationState.isValidationCodeValid = true;
-        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
+        validationState.validationCodeInvalidText = i18n.t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
     }

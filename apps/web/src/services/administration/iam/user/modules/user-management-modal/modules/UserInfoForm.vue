@@ -28,8 +28,8 @@
                         disable-handler
                         :exact-mode="false"
                         use-fixed-menu-style
-                        @select="onSelectExternalUser"
-                        @delete-tag="onDeleteSelectedExternalUser"
+                        @select="handleSelectExternalUser"
+                        @delete-tag="handleDeleteSelectedExternalUser"
                     />
                 </div>
                 <div v-else
@@ -95,6 +95,7 @@ import {
 } from '@/services/administration/iam/user/lib/user-form-validations';
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { ExternalMenuType } from '@/services/administration/type';
 
 interface Props {
     activeTab?: string;
@@ -124,13 +125,13 @@ const formState = reactive({
 });
 const validationState = reactive({
     isUserIdValid: undefined as undefined | boolean,
-    userIdInvalidText: '' as TranslateResult | string,
-    userIdValidText: '' as TranslateResult | string,
+    userIdInvalidText: '' as TranslateResult,
+    userIdValidText: '' as TranslateResult,
 });
 
 /* Components */
 const setExternalMenuItems = (users) => {
-    state.externalItems = [];
+    const _externalItems: ExternalMenuType[] = [];
     users.forEach((user) => {
         const singleItem = {
             name: user.userId,
@@ -141,16 +142,17 @@ const setExternalMenuItems = (users) => {
             singleItem.label = `(${i18n.t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
             singleItem.disabled = true;
         }
-        state.externalItems.push(singleItem);
+        _externalItems.push(singleItem);
     });
+    state.externalItems = _externalItems;
 };
-const onDeleteSelectedExternalUser = () => {
+const handleDeleteSelectedExternalUser = () => {
     formState.userId = '';
     formState.name = '';
     validationState.isUserIdValid = undefined;
     validationState.userIdInvalidText = '';
 };
-const onSelectExternalUser = async (userItem) => {
+const handleSelectExternalUser = async (userItem) => {
     await getExternalUser(userItem.name);
     await handleClickCheckId();
 };
@@ -181,12 +183,12 @@ const listExternalUser = debounce(async () => {
 }, 300);
 const getExternalUser = async (userId: string) => {
     try {
-        const { results } = await SpaceConnector.client.identity.user.find({
+        const { results, total_count } = await SpaceConnector.client.identity.user.find({
             search: {
                 userId,
             },
         });
-        if (results.length) {
+        if (total_count > 0) {
             const selectedExternalUser = results[0];
             formState.userId = selectedExternalUser.userId;
 

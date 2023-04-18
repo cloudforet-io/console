@@ -36,21 +36,21 @@
               onsubmit="return false"
         >
             <p-field-group
-                :invalid="validationState.isNotificationEmailValid"
-                :invalid-text="validationState.notificationEmailInvalidText"
+                :invalid="invalidState.notificationEmail"
+                :invalid-text="invalidTexts.notificationEmail"
                 required
                 class="field-group"
             >
-                <p-text-input v-model="formState.notificationEmail"
+                <p-text-input v-model="notificationEmail"
                               :placeholder="state.userId"
                               :disabled="state.verified"
-                              :invalid="validationState.isNotificationEmailValid"
+                              :invalid="invalidState.notificationEmail"
                               block
-                              @update:value="handleChangeInput"
+                              @update:value="setForm('notificationEmail', $event)"
                 />
             </p-field-group>
             <verify-button
-                :email="formState.notificationEmail"
+                :email="notificationEmail"
                 :user-id="state.userId"
                 :domain-id="state.domainId"
                 :verified="state.verified"
@@ -61,23 +61,21 @@
 
 <script setup lang="ts">
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
+import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
@@ -94,29 +92,22 @@ const state = reactive({
         return store.state.user.email;
     }),
 });
-const formState = reactive({
+const {
+    forms: {
+        notificationEmail,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
     notificationEmail: state.email,
+}, {
+    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT'); },
 });
-const validationState = reactive({
-    isNotificationEmailValid: undefined as undefined | boolean,
-    notificationEmailInvalidText: '' as TranslateResult | string,
-});
-
-/* Components */
-const handleChangeInput = async () => {
-    if (formState.notificationEmail === '') {
-        validationState.isNotificationEmailValid = false;
-    } else if (!emailValidator(formState.notificationEmail)) {
-        validationState.isNotificationEmailValid = false;
-    } else {
-        validationState.isNotificationEmailValid = true;
-        validationState.notificationEmailInvalidText = vm.$t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
-    }
-};
 
 /* Watcher */
 watch(() => store.state.user.email, (value) => {
-    formState.notificationEmail = value;
+    setForm('notificationEmail', value);
 });
 </script>
 

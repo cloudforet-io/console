@@ -36,12 +36,10 @@ export interface UserDetailData {
 	name: string;
 	state: string;
 	email?: string;
-	// eslint-disable-next-line camelcase
 	user_type: string;
 	backend: string;
 	language: string;
 	timezone: string;
-	// eslint-disable-next-line camelcase
 	last_accessed_at: number;
 	created_at?: TimeStamp;
 	domain_id: string;
@@ -133,8 +131,8 @@ export interface ChannelItem {
 	protocol_name: string;
 }
 
-export const PasswordType = Object.freeze({
+export const PASSWORD_TYPE = {
     KEEP: 'KEEP',
     RESET: 'RESET',
     MANUALLY: 'MANUALLY',
-}as const);
+} as const;
