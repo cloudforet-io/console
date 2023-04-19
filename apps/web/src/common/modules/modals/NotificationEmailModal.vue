@@ -131,7 +131,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const emit = defineEmits(['visible', 'refresh-user', 'click-cancel']);
+const emit = defineEmits(['visible', 'refresh-user']);
 
 const state = reactive({
     loading: false,
@@ -158,6 +158,7 @@ const handleClickCancel = () => {
     state.proxyVisible = false;
     resetFormData();
     emit('click-cancel');
+    window.localStorage.setItem('hideNotificationEmailModal', 'true');
 };
 const resetFormData = () => {
     formState.newNotificationEmail = '';

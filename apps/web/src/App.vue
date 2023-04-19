@@ -69,7 +69,6 @@
                 :email="email"
                 :visible.sync="isVisible"
                 @refresh-user="updateUser"
-                @click-cancel="hideNotificationEmailModal"
             />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
@@ -155,9 +154,6 @@ export default defineComponent({
         const updateUser = async () => {
             await store.dispatch('user/setUser', { email: state.email, emailVerified: state.isEmailVerified });
         };
-        const hideNotificationEmailModal = () => {
-            window.localStorage.setItem('hideNotificationEmailModal', 'true');
-        };
 
         watch(() => vm.$route, (value) => {
             state.isVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
@@ -169,7 +165,6 @@ export default defineComponent({
             SIDEBAR_TYPE,
             showsBrowserRecommendation,
             updateUser,
-            hideNotificationEmailModal,
         };
     },
 
