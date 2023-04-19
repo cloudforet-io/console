@@ -93,7 +93,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             name: COST_VARIABLES_INFO.group_by.name,
             variable_type: 'MANAGED',
             use: true,
-            selection_type: 'MULTI',
+            selection_type: 'SINGLE',
             description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_GROUP_BY'),
             options: {
                 type: 'ENUM',
