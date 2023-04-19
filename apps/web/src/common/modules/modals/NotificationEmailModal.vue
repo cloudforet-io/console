@@ -3,7 +3,7 @@
         :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
-        :disabled="state.isEditMode ? formState.newNotificationEmail === '' || formState.verificationCode === '' : formState.verificationCode === ''"
+        :disabled="state.isEditMode ? (!formState.newNotificationEmail || !formState.verificationCode) : !formState.verificationCode"
         @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
