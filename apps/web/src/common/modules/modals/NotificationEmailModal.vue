@@ -3,6 +3,7 @@
         :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
+        :disabled="state.isEditMode ? formState.newNotificationEmail === '' || formState.verificationCode === '' : formState.verificationCode === ''"
         @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
@@ -255,6 +256,9 @@ watch(() => props.verified, (value) => {
                     background: initial;
                     padding: 0;
                     margin: 0;
+                    .emphasis:hover {
+                        text-decoration: underline;
+                    }
                 }
             }
         }

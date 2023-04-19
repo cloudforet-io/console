@@ -124,7 +124,8 @@ watch(() => store.state.user.email, (value) => {
         .verify-status-wrapper {
             margin-left: 0.5rem;
             .verified {
-                @apply text-label-md text-green-600;
+                @apply flex items-center text-label-md text-green-600;
+                gap: 0.25rem;
             }
             .not-verified {
                 @apply bg-yellow-200 text-label-sm;
