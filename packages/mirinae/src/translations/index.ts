@@ -10,7 +10,7 @@ import ko from '@/translations/language-pack/ko.json';
 
 Vue.use(VueI18n);
 
-export const supportLanguages = ['en', 'ko', 'jp'] as const;
+export const supportLanguages = ['en', 'ko', 'ja'] as const;
 export type SupportLanguage = typeof supportLanguages[number];
 
 // simple recursive remove keys with empty value
@@ -26,7 +26,7 @@ const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
 export const messages: Record<SupportLanguage, any> = {
     en: removeEmpty({ COMPONENT: en }),
     ko: removeEmpty({ COMPONENT: ko }),
-    jp: removeEmpty({ COMPONENT: ja }),
+    ja: removeEmpty({ COMPONENT: ja }),
 };
 
 export const i18n = new VueI18n({
