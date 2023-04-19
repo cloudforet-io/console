@@ -203,7 +203,7 @@ const sendResetEmail = async (userId, domainId) => {
         const errorType = e.axiosError.response.data.detail.code;
         if (errorType === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
             passwordFormEl.value.validationState.isIdValid = true;
-            passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.EXTERNAL_USER');
+            passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
         } else {
             ErrorHandler.handleError(e);
             await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
