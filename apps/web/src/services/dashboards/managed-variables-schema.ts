@@ -16,7 +16,8 @@ export const COST_VARIABLES_INFO = {
     },
     account: {
         key: 'account',
-        name: 'Account',
+        // "AWS Account ID" is temporary planning. This will be subdivided into several account ids later.
+        name: 'AWS Account ID',
     },
 } as const;
 
