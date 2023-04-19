@@ -30,7 +30,7 @@
                     v-model="forms"
                     :status="props.status"
                     @change-input="handleChangeInput"
-                    @click-input="handleClickButton"
+                    @click-button="handleClickButton"
                 />
                 <div class="button-wrapper">
                     <p-button
@@ -200,9 +200,14 @@ const sendResetEmail = async (userId, domainId) => {
         await SpaceConnector.clientV2.identity.user.resetPassword({ user_id: userId, domain_id: domainId });
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
     } catch (e: any) {
-        ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
-        throw e;
+        const errorType = e.axiosError.response.data.detail.code;
+        if (errorType === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
+            passwordFormEl.value.validationState.isIdValid = true;
+            passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.EXTERNAL_USER');
+        } else {
+            ErrorHandler.handleError(e);
+            await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
+        }
     } finally {
         state.loading = false;
     }

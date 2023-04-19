@@ -86,6 +86,7 @@ const setForm = async () => {
         state.isToggled = true;
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
         formState.roleId = formState.domainRoleList[state.selectedMenuIndex].name;
+        emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
     } else formState.domainRole = '';
 };
 

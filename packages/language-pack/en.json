@@ -31,6 +31,7 @@
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "Back to Sign-in",
+				"EXTERNAL_USER": "Invalid email format or Single Sign-On account",
 				"FORGOT_PASSWORD": "Forgot password?",
 				"HELP_TEXT": "Enter your User ID, then we'll send you a link to reset password again.",
 				"INVALID_EMAIL_FORMAT": "Invalid email format.",

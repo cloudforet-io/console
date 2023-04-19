@@ -31,6 +31,7 @@
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "",
+				"EXTERNAL_USER": "",
 				"FORGOT_PASSWORD": "",
 				"HELP_TEXT": "",
 				"INVALID_EMAIL_FORMAT": "",
