@@ -18,7 +18,7 @@ const inconsolataConfig: FontConfig = {
     formats: ['ttf'],
 };
 
-export const notoSansConfigMap: Record<string, FontConfig> = {
+export const notoSansConfigMap: Record<'en'|'ko'|'ja', FontConfig> = {
     en: {
         family: 'Noto Sans',
         urlPrefix: 'fonts/noto-sans/en/noto-sans-v27-latin-',
@@ -29,7 +29,7 @@ export const notoSansConfigMap: Record<string, FontConfig> = {
         urlPrefix: 'fonts/noto-sans/kr/noto-sans-kr-v13-latin_korean-',
         formats: ['woff2', 'woff'],
     },
-    jp: {
+    ja: {
         family: 'Noto Sans JP',
         urlPrefix: 'fonts/noto-sans/jp/noto-sans-jp-v28-latin_japanese-',
         formats: ['woff2', 'woff'],
@@ -159,24 +159,24 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
             },
         },
     ],
-    jp: [
+    ja: [
         {
-            family: notoSansConfigMap.jp.family,
-            source: getSources(notoSansConfigMap.jp, 'regular'),
+            family: notoSansConfigMap.ja.family,
+            source: getSources(notoSansConfigMap.ja, 'regular'),
             descriptors: {
                 weight: 400,
             },
         },
         {
-            family: notoSansConfigMap.jp.family,
-            source: getSources(notoSansConfigMap.jp, '500'),
+            family: notoSansConfigMap.ja.family,
+            source: getSources(notoSansConfigMap.ja, '500'),
             descriptors: {
                 weight: 500,
             },
         },
         {
-            family: notoSansConfigMap.jp.family,
-            source: getSources(notoSansConfigMap.jp, '700'),
+            family: notoSansConfigMap.ja.family,
+            source: getSources(notoSansConfigMap.ja, '700'),
             descriptors: {
                 weight: 700,
             },

@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
-import { dayjsLocaleMap } from '@/translations/vendors/dayjs';
 
 /**
  * @description Dayjs reflecting changes in language.
@@ -17,7 +16,7 @@ import { dayjsLocaleMap } from '@/translations/vendors/dayjs';
  */
 export const useI18nDayjs = () => ({
     i18nDayjs: computed<typeof dayjs>(() => {
-        dayjs.locale(dayjsLocaleMap[i18n.locale]);
+        dayjs.locale(i18n.locale);
         return dayjs;
     }),
 });
