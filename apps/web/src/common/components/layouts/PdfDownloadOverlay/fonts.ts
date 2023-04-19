@@ -3,7 +3,7 @@ import { notoSansConfigMap } from '@/styles/fonts';
 export const fontLanguages = Object.freeze({
     en: 'en',
     ko: 'ko',
-    jp: 'jp',
+    ja: 'ja',
 } as const);
 export type Language = typeof fontLanguages[keyof typeof fontLanguages];
 
@@ -33,7 +33,7 @@ export const pdfFontInfoMap: Record<PdfFontFamily, PdfFontInfo> = {
         bold: getPdfSource(notoSansConfigMap.ko, '700'),
     },
     [pdfFontFamily.NotoSansJp]: {
-        normal: getPdfSource(notoSansConfigMap.jp, 'regular'),
-        bold: getPdfSource(notoSansConfigMap.jp, '700'),
+        normal: getPdfSource(notoSansConfigMap.ja, 'regular'),
+        bold: getPdfSource(notoSansConfigMap.ja, '700'),
     },
 };

@@ -5,6 +5,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { setI18nLocale } from '@/translations';
 
+import { languages } from '@/store/modules/user/config';
+
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
@@ -17,7 +19,7 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         backend: 'LOCAL',
         name: response.name,
         email: response.email,
-        language: response.language,
+        language: languages[response.language] ? response.language : 'en',
         timezone: response.timezone,
     };
 };

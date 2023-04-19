@@ -5,7 +5,7 @@ export const timezoneList = ['UTC'].concat(timeZonesNames);
 export const languages = {
     en: 'English',
     ko: '한국어',
-    jp: '日本語',
+    ja: '日本語',
 };
 
 export const userTypes = {

@@ -174,9 +174,9 @@ export default defineComponent<Props>({
             isMakingPdfStarted: false,
             progressRate: 0,
             font: computed<PdfFontFamily>(() => {
-                if (fontLanguages.en === props.fontLanguage) return pdfFontFamily.NotoSans;
+                if (fontLanguages.ja === props.fontLanguage) return pdfFontFamily.NotoSansJp;
                 if (fontLanguages.ko === props.fontLanguage) return pdfFontFamily.NotoSansKo;
-                return pdfFontFamily.NotoSansJp;
+                return pdfFontFamily.NotoSans;
             }),
         });
 

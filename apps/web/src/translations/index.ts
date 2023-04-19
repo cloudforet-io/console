@@ -15,7 +15,7 @@ import { loadFonts } from '@/styles/fonts';
 Vue.use(VueI18n);
 
 const componentEN = messages.en;
-const componentJA = messages.jp;
+const componentJA = messages.ja;
 const componentKO = messages.ko;
 
 // simple recursive remove keys with empty value
@@ -28,7 +28,7 @@ const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
         {},
     );
 
-const supportLanguages = ['en', 'ko', 'jp'] as const;
+const supportLanguages = ['en', 'ko', 'ja'] as const;
 type SupportLanguage = typeof supportLanguages[number];
 
 const loadLocaleFiles = async (lang: string) => {
@@ -45,7 +45,7 @@ export const i18n = new VueI18n({
     messages: {
         en: removeEmpty({ ...en, ...componentEN }),
         ko: removeEmpty({ ...ko, ...componentKO }),
-        jp: removeEmpty({ ...ja, ...componentJA }),
+        ja: removeEmpty({ ...ja, ...componentJA }),
     },
     silentTranslationWarn: true,
     silentFallbackWarn: true,
