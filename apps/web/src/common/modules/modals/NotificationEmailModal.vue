@@ -3,6 +3,7 @@
         :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
+        :disabled="state.isEditMode ? (!formState.newNotificationEmail || !formState.verificationCode) : !formState.verificationCode"
         @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
@@ -117,7 +118,7 @@ interface Props {
     userId: string
     verified: boolean
     email: string
-    isAdministration: boolean
+    isAdministration?: boolean
     visible: boolean
 }
 
@@ -156,6 +157,8 @@ const handleEditButton = () => {
 const handleClickCancel = () => {
     state.proxyVisible = false;
     resetFormData();
+    emit('click-cancel');
+    window.localStorage.setItem('hideNotificationEmailModal', 'true');
 };
 const resetFormData = () => {
     formState.newNotificationEmail = '';
@@ -255,6 +258,9 @@ watch(() => props.verified, (value) => {
                     background: initial;
                     padding: 0;
                     margin: 0;
+                    .emphasis:hover {
+                        text-decoration: underline;
+                    }
                 }
             }
         }

@@ -158,7 +158,7 @@ export default {
             if (value.email) formState.email = value.email;
             if (value.tags) formState.tags = value.tags;
             if (value.name) formState.name = value.name;
-            if (value.domainRole) {
+            if (value.domainRoleList) {
                 formState.domainRole = value.domainRole;
                 formState.roleId = value.roleId;
             }

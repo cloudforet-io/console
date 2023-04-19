@@ -13,7 +13,7 @@
                                       :invalid="invalid"
                                       block
                                       @update:value="handleChangeInput('userId', $event)"
-                                      @keyup.enter="handleChangeInput('userId', $event)"
+                                      @keyup.enter="handleClickUtil('userId')"
                         />
                     </template>
                 </p-field-group>
@@ -33,7 +33,7 @@
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('password', $event)"
-                                      @keyup.enter="handleChangeInput('password', $event)"
+                                      @keyup.enter="handleClickUtil('password')"
                         />
                     </template>
                 </p-field-group>
@@ -50,7 +50,7 @@
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('passwordConfirm', $event)"
-                                      @keyup.enter="handleChangeInput('passwordConfirm', $event)"
+                                      @keyup.enter="handleClickUtil('passwordConfirm')"
                         />
                     </template>
                 </p-field-group>
@@ -90,7 +90,7 @@ const props = withDefaults(defineProps<Props>(), {
     status: '',
 });
 
-const emit = defineEmits(['change-input', 'click-input']);
+const emit = defineEmits(['change-input', 'click-button']);
 
 const {
     forms: {
@@ -138,6 +138,9 @@ const handleChangeInput = (type: string, e: string) => {
         setForm('confirmPasswordInput', e);
     }
     emit('change-input', { userIdInput, passwordInput, confirmPasswordInput });
+};
+const handleClickUtil = (type: string) => {
+    emit('click-button', type);
 };
 
 /* Expose */
