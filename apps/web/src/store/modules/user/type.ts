@@ -24,7 +24,7 @@ export interface UserState {
     timezone?: string;
     roles?: Array<UserRole>;
     requiredActions?: string[];
-    emailVerified?: boolean
+    emailVerified?: boolean;
 }
 
 export interface SignInRequest {

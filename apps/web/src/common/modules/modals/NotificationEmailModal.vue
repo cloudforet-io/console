@@ -118,7 +118,7 @@ interface Props {
     userId: string
     verified: boolean
     email: string
-    isAdministration: boolean
+    isAdministration?: boolean
     visible: boolean
 }
 
@@ -131,7 +131,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const emit = defineEmits(['visible', 'refresh-user']);
+const emit = defineEmits(['visible', 'refresh-user', 'click-cancel']);
 
 const state = reactive({
     loading: false,
@@ -157,6 +157,7 @@ const handleEditButton = () => {
 const handleClickCancel = () => {
     state.proxyVisible = false;
     resetFormData();
+    emit('click-cancel');
 };
 const resetFormData = () => {
     formState.newNotificationEmail = '';
