@@ -42,12 +42,15 @@
       "cache": false
     },
     "lint": {
+      "dependsOn": ["^lint"],
       "outputs": []
     },
     "format": {
+      "dependsOn": ["^format"],
       "outputs": []
     },
     "test": {
+      "dependsOn": ["^test"],
       "outputs": []
     }
   }
