@@ -40,7 +40,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'account'),
         schema: {
             type: 'object',
             properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'account'),

@@ -28,7 +28,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         group_by: 'budget_id',
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'product'),
         schema: {
             type: 'object',
             properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'product', 'region'),
