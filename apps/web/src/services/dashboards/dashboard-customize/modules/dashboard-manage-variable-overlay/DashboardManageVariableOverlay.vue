@@ -151,7 +151,10 @@ const handleConfirmModalAction = () => {
     if (deleteModalState.type === 'DELETE') {
         deleteVariable();
     } else if (deleteModalState.type === 'ESCAPE') {
-        SpaceRouter.router.go(-1);
+        SpaceRouter.router.replace({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        });
     }
     resetDeleteModalState();
 };
