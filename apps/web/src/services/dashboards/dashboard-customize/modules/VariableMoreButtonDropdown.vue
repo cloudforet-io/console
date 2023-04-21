@@ -174,6 +174,11 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
      * all variables (include Manged and Custom varialbes) are unchecked,
      * so we need to check if there is any custom variable affecting widgets
      * then handle it with warning modal or not
+     *
+     * TODO: refactoring
+     * Clear Selection with Custom variable affecting widgets case has an inconsistent concern.
+     * So this needs to be refactored
+     * (Advanced) Fundamental way is to separate single toggle case and clear selection case
      */
 
     // Clear Selection with Custom variable affecting widgets case
