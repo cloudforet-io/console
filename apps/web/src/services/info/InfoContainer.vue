@@ -44,7 +44,7 @@ export default defineComponent({
 
         /* Init */
         (async () => {
-            await store.dispatch('display/loadCurrencyRates');
+            await store.dispatch('settings/loadCurrencyRates');
         })();
 
         return {

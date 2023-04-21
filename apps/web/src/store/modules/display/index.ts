@@ -1,4 +1,4 @@
-import { DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import * as actions from './actions';
 import * as getters from './getters';
@@ -22,8 +22,6 @@ const state: DisplayState = {
     isLoading: storedDisplayState.isLoading ?? false,
     uncheckedNotificationCount: storedDisplayState.uncheckedNotificationCount ?? 0,
     isSignInFailed: storedDisplayState.isSignInFailed ?? false,
-    currency: storedDisplayState.currency ?? 'USD',
-    currencyRates: storedDisplayState.currencyRates ?? DEFAULT_CURRENCY_RATES,
     visibleMobileGuideModal: false,
 };
 

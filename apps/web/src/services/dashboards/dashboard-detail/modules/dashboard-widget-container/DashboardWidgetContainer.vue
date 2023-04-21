@@ -193,7 +193,7 @@ export default defineComponent<Props>({
             // emit('rendered', state.widgetRef);
         });
         (async () => {
-            await store.dispatch('display/loadCurrencyRates');
+            await store.dispatch('settings/loadCurrencyRates');
         })();
 
         return {
