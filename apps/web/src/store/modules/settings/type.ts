@@ -1,11 +1,11 @@
-export interface SetItemRequest {
-    key: string;
-    value: any;
-    path?: string;
-}
+import type { Currency } from '@/store/modules/settings/config';
 
-export type SettingItem = Record<string, any>;
+export type CurrencyRates = {
+    [K in Currency]: number;
+};
 
 export interface SettingsState {
-    items: SettingItem;
+    currencyRate: CurrencyRates;
+    currencyUpdateTime: number|undefined;
+    gnbNotificationLastReadTime: string;
 }
