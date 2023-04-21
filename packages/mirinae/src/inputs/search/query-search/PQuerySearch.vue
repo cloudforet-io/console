@@ -85,20 +85,19 @@
 
 <script lang="ts">
 import type {
-    PropType, SetupContext,
+    PropType, SetupContext, DirectiveFunction,
 } from 'vue';
 import {
     computed, defineComponent, reactive, toRef, toRefs,
 } from 'vue';
 
-
+import { vOnClickOutside } from '@vueuse/components';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import {
     reduce,
 } from 'lodash';
-import vClickOutside from 'v-click-outside';
 import { focus as vFocus } from 'vue-focus';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -120,7 +119,7 @@ export default defineComponent({
     },
     directives: {
         focus: vFocus,
-        clickOutside: vClickOutside.directive,
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     model: {
         prop: 'value',

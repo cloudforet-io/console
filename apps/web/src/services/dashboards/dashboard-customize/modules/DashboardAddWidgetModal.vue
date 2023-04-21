@@ -78,7 +78,7 @@ export default defineComponent<Props>({
                 version: '1', // TODO: auto?
                 inherit_options: widgetFormState.inheritOptions ?? {},
                 widget_options: widgetFormState.widgetOptions ?? {},
-                schema_properties: widgetFormState.schemaProperties ?? [],
+                default_schema_properties: widgetFormState.defaultSchemaProperties ?? [],
             };
             emit('add-widget', dashboardLayoutWidgetInfo);
             state.proxyVisible = false;

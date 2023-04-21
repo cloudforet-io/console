@@ -19,8 +19,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
         chart_type: CHART_TYPE.PIE,
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'product', 'account')],
-        fixed_properties: ['group_by'],
+        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region')],
         schema: {
             type: 'object',
             properties: {
@@ -38,6 +37,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
                     'account',
                 ),
             },
+            required: ['group_by'],
             order: ['group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',

@@ -1,7 +1,4 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
-
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
@@ -17,6 +14,7 @@ dayjs.extend(tz);
 
 export default {
     name: 'PDynamicFieldDatetime',
+    functional: true,
     components: { PAnchor },
     props: {
         options: {
@@ -43,7 +41,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DatetimeDynamicFieldProps, { attrs }: SetupContext) {
+    render(h, { props, data }: {props: DatetimeDynamicFieldProps; data: any}) {
         let result = '';
         const options: DatetimeOptions = props.options;
         const value = props.data === undefined || props.data === null ? props.options.default : props.data;
@@ -69,16 +67,17 @@ export default {
             }
         }
 
-        let datetimeEl = h('span', { ...attrs }, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
+        let datetimeEl = h('span', data, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
+
 
         if (options.link) {
             datetimeEl = h(PAnchor, {
-                ...attrs,
+                ...data,
                 attrs: { href: props.options.link, target: '_blank' },
             }, [datetimeEl]);
         }
 
-        return () => datetimeEl;
+        return datetimeEl;
     },
 };
 </script>

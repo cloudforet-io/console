@@ -37,26 +37,6 @@
                 </p-button>
             </template>
         </p-context-menu>
-        <delete-modal :header-title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
-                      :visible.sync="state.uncheckConfirmModalVisible"
-                      @confirm="handleConfirmUncheckModal"
-                      @cancel="handleCancelUncheckModal"
-                      @close="handleCancelUncheckModal"
-        >
-            <p>
-                <b>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
-                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
-            </p>
-            <div class="affected-widget-wrapper">
-                <ul>
-                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
-                        :key="`affected-widget-${idx}`"
-                    >
-                        • {{ title }}
-                    </li>
-                </ul>
-            </div>
-        </delete-modal>
     </div>
 </template>
 
@@ -69,17 +49,14 @@ import {
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, debounce, union } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import { SpaceRouter } from '@/router';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-
 
 interface Props {
     isManageable: boolean;
@@ -110,11 +87,8 @@ const state = reactive({
         });
         return result;
     }),
-    // uncheck custom variable
-    uncheckConfirmModalVisible: false,
-    selectedCustomVariable: undefined,
-    affectedWidgetTitlesByCustomVariable: [] as string[],
-    isClearSelectionCaseWithCustomVariableAffectingWidgets: false,
+    // Since variable's use changes after the dropdown is closed, create state to store the previous state and use it.
+    selectedForUpdate: [] as MenuItem[],
 });
 
 const {
@@ -141,83 +115,20 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // helper
-const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
-    const widgetTitles: string[] = [];
-    dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
-        const widgetInheritVariableKeys = Object.values(widgetInfo.inherit_options).filter((d) => d.enabled).map((d) => d.variable_info?.key);
-        if (widgetInheritVariableKeys.includes(targetProperty)) {
-            widgetTitles.push(widgetInfo.title);
-        }
+const updateVariablesUse = () => {
+    const _varialbesSchema = cloneDeep(state.variableSchema);
+    state.variableSchema.order.forEach((property) => {
+        _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
     });
-    return widgetTitles;
-};
-const updateVariablesUse = (property: string, isChecked: boolean) => {
-    const _variablesSchema = cloneDeep(state.variableSchema);
-    _variablesSchema.properties[property].use = isChecked;
     dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = _variablesSchema;
-    });
-};
-const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
-    /*
-     * when variable is unchecked,
-     * managed variable: delete variable from each widget & set default value if it's required option
-     * custom variable: show warning modal
-     */
-
-    const _beforeProperties: DashboardVariablesSchema['properties'] = state.variableSchema.properties;
-    const _afterPropertyNames: string[] = _selected.map((d) => d.name as string);
-    const beforePropertiesEntries = Object.entries(_beforeProperties);
-
-    /*
-     * when clear-selection is clicked
-     * all variables (include Manged and Custom varialbes) are unchecked,
-     * so we need to check if there is any custom variable affecting widgets
-     * then handle it with warning modal or not
-     *
-     * TODO: refactoring
-     * Clear Selection with Custom variable affecting widgets case has an inconsistent concern.
-     * So this needs to be refactored
-     * (Advanced) Fundamental way is to separate single toggle case and clear selection case
-     */
-
-    // Clear Selection with Custom variable affecting widgets case
-    if (!_selected.filter((d) => !d.disabled).length && beforePropertiesEntries.some(([k, v]) => v.variable_type === 'CUSTOM' && getAffectedWidgetTitlesByCustomVariable(k).length)) {
-        let affectedWidgetTitleSetByCustomVariable: string[] = [];
-        beforePropertiesEntries.forEach(([k]) => {
-            if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM' && getAffectedWidgetTitlesByCustomVariable(k).length) {
-                affectedWidgetTitleSetByCustomVariable = union(affectedWidgetTitleSetByCustomVariable, getAffectedWidgetTitlesByCustomVariable(k));
-            }
-        });
-        state.affectedWidgetTitlesByCustomVariable = affectedWidgetTitleSetByCustomVariable;
-        state.isClearSelectionCaseWithCustomVariableAffectingWidgets = true;
-        state.uncheckConfirmModalVisible = true;
-        return;
-    }
-
-    // Normal case
-    beforePropertiesEntries.forEach(([k, v]) => {
-        if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
-            if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
-                state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
-                if (state.affectedWidgetTitlesByCustomVariable.length) {
-                    state.selectedCustomVariable = k;
-                    state.uncheckConfirmModalVisible = true;
-                } else {
-                    updateVariablesUse(k, false);
-                }
-            } else { /* manged variable case */
-                updateVariablesUse(k, false);
-            }
-        } else if (!v?.use && _afterPropertyNames.includes(k)) { /* check case */
-            updateVariablesUse(k, true);
-        }
+        _state.variablesSchema = _varialbesSchema;
     });
 };
 
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
+    updateVariablesUse();
     SpaceRouter.router.push({
         name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
@@ -228,42 +139,28 @@ const handleClickButton = () => {
     if (visibleMenu.value) {
         hideContextMenu();
     } else {
+        state.selectedForUpdate = state.selected;
         focusOnContextMenu();
     }
 };
 
-const handleSelectVariable = (_selected: MenuItem[]) => {
-    _toggleDashboardVariableUse(_selected);
-    hideContextMenu();
-    state.searchText = '';
+const handleSelectVariable = (changedSelected: MenuItem[]) => {
+    state.selectedForUpdate = changedSelected;
 };
 
 const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;
     reloadMenu();
 }, 200);
-const handleConfirmUncheckModal = () => {
-    if (state.isClearSelectionCaseWithCustomVariableAffectingWidgets) {
-        const _beforeProperties: DashboardVariablesSchema['properties'] = state.variableSchema.properties;
-        const _afterPropertiesNames = state.selected.filter((d) => d.disabled).map((d) => d.name as string);
-        Object.entries(_beforeProperties).forEach(([k, v]) => {
-            if (v?.use && !_afterPropertiesNames.includes(k)) updateVariablesUse(k, false);
-        });
-        state.isClearSelectionCaseWithCustomVariableAffectingWidgets = false;
-    } else updateVariablesUse(state.selectedCustomVariable, false);
-    state.uncheckConfirmModalVisible = false;
-};
-const handleCancelUncheckModal = () => {
-    /* This $patch() is for initiating context menu items (state.selected) */
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = { ..._state.variablesSchema };
-    });
-    state.isClearSelectionCaseWithCustomVariableAffectingWidgets = false;
-    state.uncheckConfirmModalVisible = false;
-};
 
 watch(visibleMenu, (_visibleMenu) => {
-    if (_visibleMenu) initiateMenu();
+    if (_visibleMenu) {
+        initiateMenu();
+    } else {
+        // Reflect selectedForUpdate changes after the dropdown is closed.
+        updateVariablesUse();
+        state.searchText = '';
+    }
 });
 
 const {
@@ -295,12 +192,6 @@ const {
             width: max-content;
             max-width: 22.5rem;
         }
-    }
-
-    .affected-widget-wrapper {
-        @apply bg-gray-100 text-paragraph-md rounded;
-        padding: 0.75rem;
-        margin-top: 0.5rem;
     }
 }
 </style>

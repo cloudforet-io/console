@@ -109,6 +109,6 @@ export const getSortingData = (data: string[]) => {
         return 0;
     });
 
-    return [...strArr, ...numArr, ...sortedMixArr];
+    return [...numArr, ...sortedMixArr, ...strArr];
 };
 

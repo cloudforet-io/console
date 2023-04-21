@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onMounted,
+    computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
@@ -71,9 +71,7 @@ import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, debounce, flattenDeep } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { cloneDeep, debounce } from 'lodash';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -95,36 +93,32 @@ const state = reactive({
     contextMenuRef: null as any|null,
     searchText: '',
     variableProperty: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
+    variableSelectedOptions: computed<undefined|string|string[]>(() => dashboardDetailState.variables[props.propertyName]),
     variableName: computed(() => state.variableProperty?.name),
     selected: computed<MenuItem[]>(() => {
-        // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
-        const arrayOfSelectedOptions = flattenDeep([dashboardDetailState.variables[props.propertyName] ?? []]);
+        const option = state.variableSelectedOptions;
+        if (!option) return [];
+        let arrayOfSelectedOptions;
+        if (Array.isArray(option)) {
+            arrayOfSelectedOptions = option;
+        } else arrayOfSelectedOptions = [option];
 
-        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
+        if (state.variableProperty.variable_type === 'MANAGED') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
-        }
-        if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
-            return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
-        }
-        return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
+        } return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
     }),
-    // Options State
-    searchResourceOptions: [],
     options: computed<MenuItem[]>(() => {
         let result;
-
-        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
+        if (state.variableProperty.variable_type === 'MANAGED') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
-        } else if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
-            result = state.searchResourceOptions;
-        } else if (state.variableProperty.options?.type === 'ENUM') {
-            result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
-        }
-        return result ?? [];
+        } else result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
+        return result;
     }),
 });
+
+
 
 const {
     visibleMenu,
@@ -184,25 +178,11 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 
-const loadSearchResourceOptionsByCostAnalysis = async () => {
-    if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
-        const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
-            resource_type: 'cost_analysis.Cost',
-            distinct_key: state.variableProperty.options.resource_key,
-        });
-        state.searchResourceOptions = results.map((d) => ({ name: d.name, label: d.name }));
-    }
-};
-
 watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
     } else state.searchText = '';
 }, { immediate: true });
-
-onMounted(() => {
-    loadSearchResourceOptionsByCostAnalysis();
-});
 
 const {
     targetRef,
