@@ -111,7 +111,7 @@ export default defineComponent<Props>({
             // currency
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            currencySymbol: computed(() => store.getters['display/currencySymbol']),
+            currencySymbol: computed(() => store.getters['settings/currencySymbol']),
             // card data
             cards: computed<Card[]>(() => [
                 // total cost

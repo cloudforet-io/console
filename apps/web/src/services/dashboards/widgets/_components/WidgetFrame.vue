@@ -103,8 +103,8 @@ import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 

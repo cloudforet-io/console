@@ -4,8 +4,7 @@ import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie
 import type { IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import * as am5percent from '@amcharts/amcharts5/percent';
 
-import type { Currency } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

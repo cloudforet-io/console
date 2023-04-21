@@ -2,8 +2,7 @@ import type * as am5 from '@amcharts/amcharts5';
 import { Percent } from '@amcharts/amcharts5';
 import * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 
-import type { Currency } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

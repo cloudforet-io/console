@@ -107,7 +107,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

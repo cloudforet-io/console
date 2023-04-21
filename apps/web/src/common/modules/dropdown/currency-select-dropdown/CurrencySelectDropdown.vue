@@ -51,8 +51,8 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 export default {
     name: 'CurrencySelectDropdown',

@@ -4,9 +4,8 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, DEFAULT_CURRENCY_RATES } from '@/store/modules/display/config';
-import type { CurrencyRates, SettingsState } from '@/store/modules/settings/type';
+import { CURRENCY, DEFAULT_CURRENCY_RATES } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates, SettingsState } from '@/store/modules/settings/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

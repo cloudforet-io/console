@@ -21,7 +21,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { store } from '@/store';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 export default {
     name: 'CurrencySelectDropdown',
