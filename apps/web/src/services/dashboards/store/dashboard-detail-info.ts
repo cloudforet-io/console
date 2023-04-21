@@ -63,7 +63,6 @@ interface DashboardDetailInfoStoreActions {
     deleteWidget: any;
     resetVariables: any;
     updateWidgetValidation: any;
-    convertDashboardInfoByChangedVariableSchema: any;
 }
 const DEFAULT_REFRESH_INTERVAL = '5m';
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
@@ -208,8 +207,6 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 } else {
                     result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: this.dashboardId });
                 }
-                const resultWithConvertedVariableSchema = this.convertDashboardInfoByChangedVariableSchema(result);
-                this.setDashboardInfo(resultWithConvertedVariableSchema);
                 this.setDashboardInfo(result);
             } catch (e) {
                 this.resetDashboardData();
@@ -278,26 +275,6 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
         },
         updateWidgetValidation(isValid: boolean, widgetKey: string) {
             this.widgetValidMap[widgetKey] = isValid;
-        },
-        // This action is for handling dashbaord data that does not reflect schema changes.
-        convertDashboardInfoByChangedVariableSchema(dashboardInfo: DashboardModel) {
-            const _dashboardInfo = cloneDeep(dashboardInfo);
-            Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, v]) => {
-                if (!v.options) {
-                    _dashboardInfo.variables_schema.properties[k] = {
-                        ...managedDashboardVariablesSchema.properties[k],
-                    };
-                } else if (Array.isArray(v.options)) {
-                    _dashboardInfo.variables_schema.properties[k] = {
-                        ...v,
-                        options: {
-                            type: 'ENUM',
-                            values: v.options.map((d) => ({ key: d, label: d })),
-                        },
-                    };
-                }
-            });
-            return _dashboardInfo;
         },
     },
 });

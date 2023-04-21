@@ -31,28 +31,34 @@
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>
-            <template #col-description-format="{ value }">
+            <template #col-options-format="{ value }">
                 <p-collapsible-panel class="options-area"
                                      is-collapsed
                                      :line-clamp="1"
                 >
-                    {{ value }}
+                    {{ value.join(', ') }}
                 </p-collapsible-panel>
             </template>
             <template #col-managable-format="{ value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
-                    <p-icon-button name="ic_duplicate"
-                                   @click="handleClonrVariable(value)"
-                    />
-                    <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(value)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   style-type="negative-transparent"
-                                   @click="handleDeleteVariable(value)"
-                    />
+                    <p-button class="manage-button"
+                              style-type="tertiary"
+                              icon-left="ic_edit"
+                              size="sm"
+                              @click="handleEditVariable(value)"
+                    >
+                        {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}
+                    </p-button>
+                    <p-button class="manage-button"
+                              style-type="negative-secondary"
+                              icon-left="ic_delete"
+                              size="sm"
+                              @click="handleDeleteVariable(value)"
+                    >
+                        {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
+                    </p-button>
                 </div>
             </template>
         </p-data-table>
@@ -65,7 +71,7 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
+    PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -82,7 +88,6 @@ interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
 interface EmitFn {
     (e: 'delete', value: string): void;
     (e: 'edit', name: string): void;
-    (e: 'clone', name: string): void;
 }
 
 const emit = defineEmits<EmitFn>();
@@ -99,12 +104,12 @@ const state = reactive({
     ]),
     selectedVariableType: 'ALL',
     variableFields: [
-        { name: 'name', label: 'Name', width: '220px' },
+        { name: 'name', label: 'Name' },
         { name: 'selection_type', label: 'Selection Type' },
         { name: 'variable_type', label: 'Variable Type' },
         { name: 'use', label: 'Use', width: '90px' },
-        { name: 'description', label: 'Description', width: '360px' },
-        { name: 'managable', label: ' ', width: '144px' },
+        { name: 'options', label: 'Options', width: '448px' },
+        { name: 'managable', label: ' ', width: '164px' },
     ],
     selectionType: computed(() => ({
         SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
@@ -120,9 +125,6 @@ const state = reactive({
 /* EVENT */
 const handleSelectType = (selected) => {
     state.selectedVariableType = selected;
-};
-const handleClonrVariable = (propertyName: string) => {
-    emit('clone', propertyName);
 };
 const handleEditVariable = (propertyName: string) => {
     emit('edit', propertyName);
@@ -154,6 +156,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
+                options: Object.keys(state.allReferenceTypeInfo[d].referenceMap),
             };
         }
         return {
@@ -201,7 +204,10 @@ const {
             padding: 0;
         }
         .button-wrapper {
-            @apply w-full flex items-center justify-between;
+            @apply flex items-center justify-center;
+            .manage-button {
+                margin-right: 0.375rem;
+            }
         }
     }
 }

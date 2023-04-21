@@ -1,6 +1,4 @@
 <script lang="ts">
-import { h } from 'vue';
-
 import PBadge from '@/data-display/badge/PBadge.vue';
 import type { BadgeProps } from '@/data-display/badge/type';
 import { BADGE_SHAPE } from '@/data-display/badge/type';
@@ -11,6 +9,7 @@ import { commaFormatter, getColor } from '@/utils/helpers';
 
 export default {
     name: 'PDynamicFieldBadge',
+    functional: true,
     components: { PBadge },
     props: {
         options: {
@@ -34,7 +33,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: BadgeDynamicFieldProps) {
+    render(h, { props }: {props: BadgeDynamicFieldProps}) {
         const options: BadgeOptions = props.options;
         const badgeProps = {} as BadgeProps;
 
@@ -50,7 +49,7 @@ export default {
         }
 
         let badgeEl = props.data ?? props.options.default;
-        if (badgeEl === undefined || badgeEl === null) return () => undefined;
+        if (badgeEl === undefined || badgeEl === null) return undefined;
         if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
         badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
@@ -60,7 +59,7 @@ export default {
             }, badgeEl)];
         }
 
-        return () => h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
+        return h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
     },
 };
 </script>

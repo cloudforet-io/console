@@ -38,14 +38,14 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'account')],
-        fixed_properties: ['group_by'],
+        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region')],
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetOptionsSchema('group_by'),
                 ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'account'),
             },
+            required: ['group_by'],
             order: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'account')],
         },
     },

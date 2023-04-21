@@ -79,6 +79,41 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             options: VALIDATION_MODES,
         },
     },
+    // slots
+    labelExtraSlot: {
+        name: 'label-extra',
+        description: 'Slot for add something into right area of label',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    dropdownExtraSlot: {
+        name: 'dropdown-extra',
+        description: 'Slot for add something into right area of selected item of `PSelectDropdown` or `PFilterableDropdown`.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
     resetOnSchemaChange: {
         name: 'resetOnSchemaChange',
         type: { name: 'boolean' },
@@ -147,58 +182,6 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
-        },
-    },
-    // slots
-    labelExtraSlot: {
-        name: 'label-extra',
-        description: 'Slot for add something into right area of label',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text',
-        },
-    },
-    dropdownExtraSlot: {
-        name: 'dropdown-extra',
-        description: 'Slot for add something into right area of selected item of `PSelectDropdown` or `PFilterableDropdown`.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text',
-        },
-    },
-    inputExtraSlot: {
-        name: 'input-extra',
-        description: 'Slot for add something into right area of input',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text',
         },
     },
     // events

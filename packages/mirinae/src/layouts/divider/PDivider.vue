@@ -1,7 +1,12 @@
-<script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
+<template functional>
+    <component
+        :is="props.vertical ? 'div' : 'hr'"
+        v-bind="data.attrs"
+        :class="[{'p-divider': true}, {'vertical': props.vertical}, data.staticClass || '', data.class]"
+    />
+</template>
 
+<script lang="ts">
 export default {
     name: 'PDivider',
     props: {
@@ -9,15 +14,6 @@ export default {
             type: Boolean,
             default: false,
         },
-    },
-    setup(props, { attrs }: SetupContext) {
-        return () => h(props.vertical ? 'div' : 'hr', {
-            ...attrs,
-            class: {
-                'p-divider': true,
-                vertical: props.vertical,
-            },
-        });
     },
 };
 </script>

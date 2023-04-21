@@ -42,15 +42,6 @@
                         />
                     </div>
                 </template>
-                <template #input-extra="{ propertyName }">
-                    <p-icon-button v-if="!fixedProperties.includes(propertyName)"
-                                   class="delete-button"
-                                   shape="square"
-                                   style-type="negative-secondary"
-                                   name="ic_delete"
-                                   @click="handleDeleteProperty(propertyName)"
-                    />
-                </template>
                 <template #dropdown-extra="{ propertyName, selectedItem }">
                     <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)">
                         <span>{{ selectedItem.label }}</span>
@@ -61,8 +52,8 @@
         </p-data-loader>
         <dashboard-widget-more-options class="more-option-container"
                                        :widget-config-id="widgetConfigId"
-                                       :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleUpdateSchemaProperties"
+                                       :selected-properties="widgetFormState.defaultSchemaProperties"
+                                       @update:selected-properties="handleUpdateDefaultSchemaProperties"
         />
     </div>
 </template>
@@ -72,7 +63,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -125,7 +116,6 @@ export default defineComponent<Props>({
         PJsonSchemaForm,
         PToggleButton,
         PDataLoader,
-        PIconButton,
     },
     props: {
         widgetConfigId: {
@@ -147,8 +137,8 @@ export default defineComponent<Props>({
             widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
             schemaFormData: {},
-            //
-            fixedProperties: computed<string[]>(() => state.widgetConfig.options_schema?.fixed_properties ?? []),
+            // inherit
+            requiredProperties: computed<string[]>(() => state.widgetConfig.options_schema?.schema.required ?? []),
             inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
                 .filter(([, inheritOption]) => !!inheritOption.enabled)
                 .map(([propertyName]) => propertyName)),
@@ -175,9 +165,9 @@ export default defineComponent<Props>({
         const { referenceStoreState } = useReferenceStore();
 
         /* more options */
-        const handleUpdateSchemaProperties = (properties: string[]) => {
+        const handleUpdateDefaultSchemaProperties = (properties: string[]) => {
             widgetFormStore.$patch((_state) => {
-                _state.schemaProperties = properties;
+                _state.defaultSchemaProperties = properties;
             });
 
             // update inherit options
@@ -196,14 +186,10 @@ export default defineComponent<Props>({
                 referenceStoreState,
                 state.widgetConfig?.options_schema ?? {},
                 dashboardDetailState.variablesSchema,
-                widgetFormState.inheritOptions ?? {},
+                widgetFormState.inheritOptions,
                 properties,
                 dashboardDetailState.projectId,
             );
-        };
-        const handleDeleteProperty = (property: string) => {
-            const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
-            handleUpdateSchemaProperties(_properties);
         };
 
         /* utils */
@@ -235,11 +221,16 @@ export default defineComponent<Props>({
             });
             return formData;
         };
-        const getSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
-            if (!widgetInfo.schema_properties) {
-                return getRefinedSchemaProperties(state.widgetConfig?.options_schema ?? {});
+        const getDefaultSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
+            /*
+                TODO: After 1.11.0 QA duration, if statement below must be deleted.
+                This is compatible code to guard the case when default_schema_properties is undefined.
+                After release, this case doesn't needed to be considered.
+            */
+            if (!widgetInfo.default_schema_properties) {
+                return getRefinedDefaultSchemaProperties(state.widgetConfig?.options_schema ?? {});
             }
-            return widgetInfo.schema_properties ?? [];
+            return widgetInfo.default_schema_properties ?? [];
         };
 
 
@@ -264,25 +255,26 @@ export default defineComponent<Props>({
         };
 
         /* schema refining helpers */
-        const getRefinedSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
-            const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
+        const getRefinedDefaultSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
+            const requiredProperties: string[] = widgetOptionsSchema.schema.required ?? [];
             const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
-            const allProperties = union(fixedProperties, defaultProperties);
+            const allProperties = union(requiredProperties, defaultProperties);
 
-            const fixedIdxMap: Record<string, number> = {};
-            fixedProperties.forEach((name, idx) => { fixedIdxMap[name] = idx; });
+            // generate maps. { [propertyName: string]: number(= index) }
+            const requiredIdxMap = {};
+            requiredProperties.forEach((name, idx) => { requiredIdxMap[name] = idx; });
             const defaultIdxMap = {};
             defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
 
             return allProperties.sort((a, b) => {
-                if (fixedIdxMap[a] !== undefined) {
-                    // if both are fixed, follow required index order
-                    if (fixedIdxMap[b] !== undefined) return fixedIdxMap[a] > fixedIdxMap[b] ? 1 : -1;
-                    // otherwise, fixed item comes before
+                if (requiredIdxMap[a] !== undefined) {
+                    // if both are required, follow required index order
+                    if (requiredIdxMap[b] !== undefined) return requiredIdxMap[a] > requiredIdxMap[b] ? 1 : -1;
+                    // otherwise, required item comes before
                     return -1;
                 }
-                // if one is default and one is fixed, fixed one comes before
-                if (fixedIdxMap[b] !== undefined) return 1;
+                // if one is default and one is required, required one comes before
+                if (requiredIdxMap[b] !== undefined) return 1;
 
                 // if both are default, follow default index order
                 return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
@@ -294,8 +286,8 @@ export default defineComponent<Props>({
             // reset widget form store states
             widgetFormStore.$reset();
             widgetFormStore.$patch((_state) => {
-                _state.schemaProperties = [];
-                _state.inheritOptions = {};
+                _state.defaultSchemaProperties = [];
+                _state.inheritOption = {};
             });
             // reset states
             state.widgetOptionsJsonSchema = {
@@ -313,20 +305,18 @@ export default defineComponent<Props>({
             // init widget form store states
             widgetFormStore.$patch((_state) => {
                 _state.widgetConfigId = widgetConfigId;
-                _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
+                _state.defaultSchemaProperties = getRefinedDefaultSchemaProperties(widgetOptionsSchema);
                 _state.inheritOptions = {};
             });
             if (!props.widgetKey) {
-                let _inheritOptions = widgetFormState.inheritOptions;
-                widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
+                widgetFormState.defaultSchemaProperties?.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
+                    widgetFormStore.$patch((_state) => {
+                        _state.inheritOptions = {
+                            ..._state.inheritOptions,
+                            [propertyName]: { enabled: true },
+                        };
+                    });
                     state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
-                    _inheritOptions = {
-                        ..._inheritOptions,
-                        [propertyName]: { enabled: true },
-                    };
-                });
-                widgetFormStore.$patch((_state) => {
-                    _state.inheritOptions = _inheritOptions;
                 });
             }
             // init states
@@ -335,7 +325,7 @@ export default defineComponent<Props>({
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions ?? {},
-                widgetFormState.schemaProperties ?? [],
+                widgetFormState.defaultSchemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
         };
@@ -351,7 +341,7 @@ export default defineComponent<Props>({
             // init widget form store states
             widgetFormStore.$patch((_state) => {
                 _state.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
-                _state.schemaProperties = getSchemaPropertiesFromWidgetInfo(widgetInfo);
+                _state.defaultSchemaProperties = getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo);
             });
             // init options schema
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
@@ -359,7 +349,7 @@ export default defineComponent<Props>({
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions ?? {},
-                widgetFormState.schemaProperties ?? [],
+                widgetFormState.defaultSchemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
             // init form data
@@ -412,8 +402,7 @@ export default defineComponent<Props>({
             /* reference store */
             referenceStoreState,
             /* more options */
-            handleUpdateSchemaProperties,
-            handleDeleteProperty,
+            handleUpdateDefaultSchemaProperties,
             /* inherit */
             handleChangeInheritToggle,
             //
@@ -446,9 +435,6 @@ export default defineComponent<Props>({
     .widget-options-form-wrapper {
         height: 100%;
         min-height: 15rem;
-        .delete-button {
-            margin-left: 0.25rem;
-        }
     }
 
     /* custom design-system component - p-field-group */

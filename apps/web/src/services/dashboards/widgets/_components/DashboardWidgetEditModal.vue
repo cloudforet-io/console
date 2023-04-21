@@ -52,7 +52,7 @@ const handleEditModalConfirm = () => {
         title: widgetFormState.widgetTitle ?? '',
         inherit_options: widgetFormState.inheritOptions ?? {},
         widget_options: widgetFormState.widgetOptions ?? {},
-        schema_properties: widgetFormState.schemaProperties ?? [],
+        default_schema_properties: widgetFormState.defaultSchemaProperties ?? [],
     };
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
     dashboardDetailStore.updateWidgetValidation(true, props.widgetKey);

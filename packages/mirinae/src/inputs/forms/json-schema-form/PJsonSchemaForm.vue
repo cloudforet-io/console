@@ -53,82 +53,75 @@
                     </span>
                 </template>
                 <template #default="{invalid}">
-                    <div class="field-group-default-wrapper">
-                        <div class="input-wrapper">
-                            <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
-                                                :key="`GenerateIdFormat-${schemaProperty.propertyName}`"
-                                                :value="rawFormData[schemaProperty.propertyName]"
-                                                :disabled="schemaProperty.disabled"
-                                                :invalid="invalid"
-                                                class="input-form"
-                                                @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                    <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
+                                        :key="`GenerateIdFormat-${schemaProperty.propertyName}`"
+                                        :value="rawFormData[schemaProperty.propertyName]"
+                                        :disabled="schemaProperty.disabled"
+                                        :invalid="invalid"
+                                        class="input-form"
+                                        @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                    />
+                    <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
+                                        :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
+                                        :form-data="rawFormData[schemaProperty.propertyName]"
+                                        :schema="schemaProperty"
+                                        :is-root="false"
+                                        @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                    />
+                    <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
+                                       :key="`PSelectDropdown-${schemaProperty.propertyName}`"
+                                       :selected="rawFormData[schemaProperty.propertyName]"
+                                       :items="schemaProperty.menuItems"
+                                       :disabled="schemaProperty.disabled"
+                                       :use-fixed-menu-style="useFixedMenuStyle"
+                                       class="input-form"
+                                       @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                    >
+                        <template #default="{ item }">
+                            <slot name="dropdown-extra"
+                                  v-bind="{...schemaProperty, selectedItem: item }"
                             />
-                            <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
-                                                :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
-                                                :form-data="rawFormData[schemaProperty.propertyName]"
-                                                :schema="schemaProperty"
-                                                :is-root="false"
-                                                @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                        </template>
+                    </p-select-dropdown>
+                    <p-filterable-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
+                                           :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
+                                           :menu="schemaProperty.menuItems"
+                                           :selected="rawFormData[schemaProperty.propertyName]"
+                                           :multi-selectable="schemaProperty.multiInputMode"
+                                           :appearance-type="schemaProperty.appearanceType"
+                                           :page-size="10"
+                                           show-select-marker
+                                           :use-fixed-menu-style="useFixedMenuStyle"
+                                           :invalid="invalid"
+                                           :handler="schemaProperty.referenceHandler"
+                                           class="input-form"
+                                           @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                    >
+                        <template #selected-extra="{ items }">
+                            <slot name="dropdown-extra"
+                                  v-bind="{...schemaProperty, selectedItem: items}"
                             />
-                            <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
-                                               :key="`PSelectDropdown-${schemaProperty.propertyName}`"
-                                               :selected="rawFormData[schemaProperty.propertyName]"
-                                               :items="schemaProperty.menuItems"
-                                               :disabled="schemaProperty.disabled"
-                                               :use-fixed-menu-style="useFixedMenuStyle"
-                                               class="input-form"
-                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
-                            >
-                                <template #default="{ item }">
-                                    <slot name="dropdown-extra"
-                                          v-bind="{...schemaProperty, selectedItem: item }"
-                                    />
-                                </template>
-                            </p-select-dropdown>
-                            <p-filterable-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
-                                                   :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
-                                                   :menu="schemaProperty.menuItems"
-                                                   :selected="rawFormData[schemaProperty.propertyName]"
-                                                   :multi-selectable="schemaProperty.multiInputMode"
-                                                   :appearance-type="schemaProperty.appearanceType"
-                                                   :page-size="10"
-                                                   show-select-marker
-                                                   :use-fixed-menu-style="useFixedMenuStyle"
-                                                   :invalid="invalid"
-                                                   :handler="schemaProperty.referenceHandler"
-                                                   class="input-form"
-                                                   @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
-                            >
-                                <template #selected-extra="{ items }">
-                                    <slot name="dropdown-extra"
-                                          v-bind="{...schemaProperty, selectedItem: items}"
-                                    />
-                                </template>
-                            </p-filterable-dropdown>
-                            <template v-else>
-                                <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
-                                              :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
-                                              :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
-                                              :type="schemaProperty.inputType"
-                                              :invalid="invalid"
-                                              :placeholder="schemaProperty.inputPlaceholder"
-                                              :appearance-type="schemaProperty.appearanceType"
-                                              :autocomplete="false"
-                                              :use-auto-complete="schemaProperty.useAutoComplete"
-                                              :use-fixed-menu-style="useFixedMenuStyle"
-                                              :disabled="schemaProperty.disabled"
-                                              :multi-input="schemaProperty.multiInputMode"
-                                              :page-size="10"
-                                              class="input-form"
-                                              @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
-                                              @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
-                                />
-                            </template>
-                        </div>
-                        <slot name="input-extra"
-                              v-bind="schemaProperty"
+                        </template>
+                    </p-filterable-dropdown>
+                    <template v-else>
+                        <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
+                                      :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
+                                      :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
+                                      :type="schemaProperty.inputType"
+                                      :invalid="invalid"
+                                      :placeholder="schemaProperty.inputPlaceholder"
+                                      :appearance-type="schemaProperty.appearanceType"
+                                      :autocomplete="false"
+                                      :use-auto-complete="schemaProperty.useAutoComplete"
+                                      :use-fixed-menu-style="useFixedMenuStyle"
+                                      :disabled="schemaProperty.disabled"
+                                      :multi-input="schemaProperty.multiInputMode"
+                                      :page-size="10"
+                                      class="input-form"
+                                      @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                      @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                         />
-                    </div>
+                    </template>
                 </template>
             </p-field-group>
         </template>
@@ -404,12 +397,6 @@ export default defineComponent<JsonSchemaFormProps>({
 .p-json-schema-form {
     > .input-form-wrapper.no-margin {
         margin-bottom: 0;
-    }
-    .field-group-default-wrapper {
-        display: flex;
-        .input-wrapper {
-            flex-grow: 1;
-        }
     }
     .invalid-message {
         display: block;

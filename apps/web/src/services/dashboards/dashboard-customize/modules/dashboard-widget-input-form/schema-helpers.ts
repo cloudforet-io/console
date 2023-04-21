@@ -97,7 +97,7 @@ export const getRefinedWidgetOptionsSchema = (
     widgetOptionsSchema: WidgetOptionsSchema,
     variablesSchema: DashboardVariablesSchema,
     inheritOptions: InheritOptions,
-    schemaProperties: string[],
+    defaultSchemaProperties: string[],
     projectId?: string,
 ): WidgetOptionsSchema['schema'] => {
     const schema = widgetOptionsSchema?.schema;
@@ -105,15 +105,15 @@ export const getRefinedWidgetOptionsSchema = (
     const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
         type: 'object',
         properties: {},
-        required: schemaProperties as WidgetOptionsSchemaProperty[],
-        order: schema?.order ?? schemaProperties as WidgetOptionsSchemaProperty[],
+        required: schema?.required ?? [],
+        order: schema?.order ?? defaultSchemaProperties as WidgetOptionsSchemaProperty[],
     };
     if (!schema?.properties) return refinedJsonSchema;
 
     // refine each property schema
     Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
-        // set properties declared in schemaProperties only
-        if (!schemaProperties.includes(propertyName as WidgetOptionsSchemaProperty)) return;
+        // set properties declared in defaultSchemaProperties only
+        if (!defaultSchemaProperties.includes(propertyName)) return;
         const isInherit = !!inheritOptions[propertyName]?.enabled;
         refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
     });

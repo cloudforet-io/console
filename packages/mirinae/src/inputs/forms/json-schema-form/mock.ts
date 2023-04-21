@@ -147,7 +147,7 @@ export const getDefaultSchema = () => ({
         friends: {
             title: 'Friends (use referenceHandler)',
             type: 'array',
-            reference: { resource_type: 'friend', reference_key: 'friend' },
+            reference: 'friend',
             items: {},
         },
     },

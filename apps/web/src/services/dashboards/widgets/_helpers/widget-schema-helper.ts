@@ -44,13 +44,12 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
-export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
 
 export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
     const inheritOptions: InheritOptions = {};
     const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
-    const fixedProperties = widgetConfig.options_schema?.fixed_properties ?? [];
-    defaultProperties.filter((d) => !fixedProperties.includes(d)).forEach((propertyName) => {
+    const requiredProperties = widgetConfig.options_schema?.schema.required ?? [];
+    defaultProperties.filter((d) => !requiredProperties.includes(d)).forEach((propertyName) => {
         inheritOptions[propertyName] = {
             enabled: true,
             variable_info: { key: propertyName.replace('filters.', '') },
