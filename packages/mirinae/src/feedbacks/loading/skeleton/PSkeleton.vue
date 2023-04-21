@@ -1,7 +1,4 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
-
 import { getBindClass } from '@/utils/functional-helpers';
 
 import { gray } from '@/styles/colors.cjs';
@@ -9,7 +6,7 @@ import { gray } from '@/styles/colors.cjs';
 const isEmptyVNode = (nodes) => {
     if (!nodes) return true;
 
-    const [firstNode] = nodes();
+    const [firstNode] = nodes;
     let str = firstNode.text;
     if (str) {
         // remove all line-break and space character
@@ -21,6 +18,7 @@ const isEmptyVNode = (nodes) => {
 
 export default {
     name: 'PSkeleton',
+    functional: true,
     props: {
         loading: {
             type: Boolean,
@@ -51,14 +49,14 @@ export default {
             default: 0.4,
         },
     },
-    setup(props, { slots, attrs }: SetupContext) {
+    render(h, {
+        props, slots, data,
+    }) {
         const {
             loading, duration, width, height, tag, animation, opacity,
         } = props;
         const style: CSSStyleDeclaration = {} as CSSStyleDeclaration;
-        let slotNodes;
-        if (slots.default) slotNodes = slots.default();
-        const showLoading = loading || isEmptyVNode(slotNodes);
+        const showLoading = loading || isEmptyVNode(slots().default);
 
         if (showLoading) {
             if (width) style.width = width;
@@ -72,21 +70,21 @@ export default {
                 style.backgroundImage = '';
                 style.animation = '';
             }
-            return () => h(props.tag || 'span', {
-                ...attrs,
+            return h(props.tag || 'span', {
+                ...data,
                 class: {
-                    ...getBindClass(attrs.class),
+                    ...getBindClass(data.class),
                     'p-skeleton': true,
                 },
                 style,
             });
         }
-        return () => h(tag || 'span', {
-            ...attrs,
+        return h(tag || 'span', {
+            ...data,
             class: {
-                ...getBindClass(attrs.class),
+                ...getBindClass(data.class),
             },
-        }, slotNodes);
+        }, slots().default);
     },
 };
 </script>
