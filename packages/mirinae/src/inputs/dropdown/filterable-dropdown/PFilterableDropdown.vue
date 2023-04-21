@@ -1,5 +1,5 @@
 <template>
-    <div v-on-click-outside="hideMenu"
+    <div ref="containerRef"
          class="p-filterable-dropdown"
          :class="{ disabled, opened: proxyVisibleMenu, invalid }"
     >
@@ -23,6 +23,7 @@
                     {{ displayValueOnDropdownButton }}
                     <p-badge v-if="displayBadgeValueOnDropdownButton"
                              :style-type="disabled ? 'gray200' : 'blue200'"
+                             :badge-type="disabled ? 'solid' : 'subtle'"
                     >
                         {{ displayBadgeValueOnDropdownButton }}
                     </p-badge>
@@ -99,10 +100,7 @@ import {
     computed, watch, useSlots, ref, toRef,
 } from 'vue';
 
-// CAUTION: this vOnClickOutside is using !! Please do not remove.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { vOnClickOutside } from '@vueuse/components';
-import { useFocus } from '@vueuse/core';
+import { onClickOutside, useFocus } from '@vueuse/core';
 import { debounce, isEqual, reduce } from 'lodash';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
@@ -200,6 +198,9 @@ const toggleMenu = () => {
     if (proxyVisibleMenu.value) hideMenu();
     else showMenu();
 };
+
+const containerRef = ref<HTMLElement|null>(null);
+onClickOutside(containerRef, hideMenu);
 
 /* context menu controller */
 const menuRef = ref<any|null>(null);

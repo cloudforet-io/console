@@ -33,6 +33,7 @@
             <dashboard-manage-variable-table v-if="contentType === 'LIST'"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
+                                             @clone="handleChangeCloneContent"
             />
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
@@ -96,6 +97,7 @@ const state = reactive({
     titleSet: computed<Record<OverlayStatus, TranslateResult>>(() => ({
         LIST: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE'),
         ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
+        CLONE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
     variableSchema: computed(() => dashboardDetailState.variablesSchema),
@@ -149,7 +151,7 @@ const handleConfirmModalAction = () => {
     if (deleteModalState.type === 'DELETE') {
         deleteVariable();
     } else if (deleteModalState.type === 'ESCAPE') {
-        SpaceRouter.router.go(-1);
+        state.contentType = 'LIST';
     }
     resetDeleteModalState();
 };
@@ -157,9 +159,13 @@ const handleChangeEditContent = (propertyName: string) => {
     state.selectedVariable = propertyName;
     state.contentType = 'EDIT';
 };
+const handleChangeCloneContent = (propertyName: string) => {
+    state.selectedVariable = propertyName;
+    state.contentType = 'CLONE';
+};
 const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
-    if (state.contentType === 'ADD') {
+    if (state.contentType === 'ADD' || state.contentType === 'CLONE') {
         const variableKey = getUUID();
         properties[variableKey] = variable;
         dashboardDetailStore.$patch((_state) => {
