@@ -13,8 +13,25 @@
                                   :placeholder="store.state.user.userId"
                                   :disabled="userPageState.visibleUpdateModal && !state.isEdit"
                                   class="text-input"
+                                  @focusout="handleFocusOutInput"
                                   @update:value="handleChangeInput($event)"
-                    />
+                    >
+                        <div v-if="userPageState.visibleUpdateModal && (email !== '' && !state.isFocused && !state.loading)"
+                             class="email-status-badge"
+                             @click="handleClickChange"
+                        >
+                            <span>{{ email }}</span>
+                            <p-badge class="selected-text"
+                                     badge-type="subtle"
+                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
+                            >
+                                {{ isValidEmail
+                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
+                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
+                                }}
+                            </p-badge>
+                        </div>
+                    </p-text-input>
                     <div v-if="userPageState.visibleUpdateModal">
                         <p-button v-if="!state.isEdit"
                                   style-type="tertiary"
@@ -29,6 +46,7 @@
                             <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
                         </p-button>
                         <p-button v-else
+                                  ref="sendEmailButtonEl"
                                   style-type="tertiary"
                                   class="send-mail-button"
                                   :loading="state.loading"
@@ -111,7 +129,7 @@
                 >
                     {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_DESC') }}
                     <p-button class="send-code-button"
-                              @click.prevent="handleClickSend"
+                              @click="handleClickSend"
                     >
                         <span class="emphasis">{{ $t('COMMON.NOTIFICATION_MODAL.SEND_NEW_CODE') }}</span>
                     </p-button>
@@ -123,12 +141,12 @@
 
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PTextInput, PTooltip, PI, PButton, PCollapsibleToggle, PIconButton,
+    PFieldGroup, PTextInput, PTooltip, PI, PButton, PCollapsibleToggle, PIconButton, PBadge,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -159,11 +177,14 @@ const userPageState = userPageStore.$state;
 
 const emit = defineEmits(['change-input', 'change-verify']);
 
+const sendEmailButtonEl = ref();
+
 const state = reactive({
     loading: false,
     isEdit: false,
     isSent: false,
     isCollapsed: true,
+    isFocused: false,
     loginUserId: computed(() => store.state.user.userId),
 });
 const {
@@ -192,14 +213,19 @@ const handleChangeInput = (e) => {
 const handleClickChange = () => {
     if (!state.isEdit) {
         state.isEdit = true;
+    } else {
+        state.isFocused = true;
     }
 };
-const initForm = () => {
-    setForm('email', props.item.email || '');
+const handleFocusOutInput = () => {
+    state.isFocused = false;
 };
 const handleEditButton = () => {
     state.isSent = false;
     state.isEdit = true;
+};
+const initForm = () => {
+    setForm('email', props.item.email || '');
 };
 
 /* API */
@@ -245,19 +271,20 @@ const handleChangeVerify = async () => {
     }
 };
 
-/* Init */
-(async () => {
-    if (userPageState.visibleUpdateModal) {
-        await initForm();
-    }
-})();
-
+/* Watcher */
 watch(() => props.email, (value) => {
     setForm('email', value);
 });
 watch(() => props.isValidEmail, (value) => {
     state.isEdit = !value;
 }, { immediate: true });
+
+/* Init */
+(async () => {
+    if (userPageState.visibleUpdateModal) {
+        await initForm();
+    }
+})();
 </script>
 
 <style lang="postcss" scoped>
@@ -269,6 +296,10 @@ watch(() => props.isValidEmail, (value) => {
         .input-form {
             @apply flex;
             gap: 0.5rem;
+
+            .email-status-badge {
+                width: 100%;
+            }
 
             /* custom design-system component - p-button */
             :deep(.p-button) {
@@ -299,6 +330,13 @@ watch(() => props.isValidEmail, (value) => {
         /* custom design-system component - p-text-input */
         :deep(.p-text-input) {
             width: 100%;
+
+            .tag-container {
+                padding: 0;
+                .p-badge {
+                    margin-left: 0.5rem;
+                }
+            }
         }
     }
     .contents-wrapper {
