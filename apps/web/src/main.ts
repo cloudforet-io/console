@@ -18,6 +18,7 @@ import { siteInit } from '@/lib/site-initializer';
 import App from './App.vue';
 
 import '@/styles/style.pcss';
+// eslint-disable-next-line
 import '@spaceone/design-system/css/light-style.css';
 import '@spaceone/design-system/dist/style.css';
 

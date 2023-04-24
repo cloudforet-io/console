@@ -34,6 +34,7 @@
                                    width="1.5rem"
                                    height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   class="delete-button"
                                    @click="handleVisibleDeleteModal"
                     />
                 </span>

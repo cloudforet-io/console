@@ -31,7 +31,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
                 size: widgetConfig.sizes[0],
                 version: '1',
                 inherit_options: getWidgetDefaultInheritOptions(widgetConfig),
-                default_schema_properties: widgetConfig.options_schema?.default_properties ?? [],
+                schema_properties: widgetConfig.options_schema?.default_properties ?? [],
             };
             return widgetInfo;
         } catch (e) {

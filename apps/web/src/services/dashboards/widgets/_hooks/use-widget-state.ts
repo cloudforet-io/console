@@ -16,6 +16,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
@@ -23,11 +24,15 @@ import type {
     SelectorType,
     WidgetFiltersMap,
     WidgetFilter,
+    DashboardLayoutWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const getRefinedOptions = (
     configOptions?: WidgetOptions,
@@ -108,6 +113,7 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
 
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
+    widgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     title: ComputedRef<string|undefined>;
     options: ComputedRef<WidgetOptions>;
     currency: ComputedRef<Currency>;
@@ -128,8 +134,9 @@ export interface WidgetState<Data = any> {
 export function useWidgetState<Data = any>(
     props: WidgetProps,
 ) {
-    const state = reactive<WidgetState<Data>>({
+    const state = reactive<WidgetState<Data>>({ // dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
+        widgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)),
         title: computed(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
             state.widgetConfig.options,

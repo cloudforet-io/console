@@ -25,47 +25,18 @@
                                :selected.sync="selectionType"
             />
         </p-field-group>
-        <p-field-group class="options-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
-                       required
+        <p-field-group class="description-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
         >
-            <div class="options-wrapper">
-                <p-button class="option-add-button"
-                          icon-left="ic_plus_bold"
-                          style-type="secondary"
-                          @click="handleAddOption"
-                >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
-                </p-button>
-                <draggable :list="options"
-                           class="draggable-wrapper"
-                           ghost-class="ghost"
-                >
-                    <div v-for="(option, index) in options"
-                         :key="`drag-item-${option.key}`"
-                         class="draggable-item"
-                    >
-                        <p-i class="grab-area"
-                             name="ic_drag-handle"
-                             width="1rem"
-                             height="1rem"
-                        />
-                        <p-text-input :value="option.value"
-                                      class="option-input"
-                                      :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
-                                      :invalid="option.error"
-                                      @update:value="handleChangeOptionValue(index, $event)"
-                        />
-                        <div class="option-delete-area">
-                            <p-icon-button v-if="options.length > 1"
-                                           name="ic_delete"
-                                           @click="handleDeleteOption(option.key)"
-                            />
-                        </div>
-                    </div>
-                </draggable>
-            </div>
+            <p-text-input class="description-input"
+                          :value="description"
+                          @update:value="setForm('description', $event)"
+            />
         </p-field-group>
+        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
+                                                 :options.sync="options"
+                                                 @update-options-invalid="handleUpdateOptionsInvalid"
+        />
         <div class="button-wrapper">
             <p-button style-type="tertiary"
                       @click="handleCancel"
@@ -85,10 +56,9 @@
 import {
     computed, onMounted, reactive, toRefs,
 } from 'vue';
-import draggable from 'vuedraggable';
 
 import {
-    PButton, PFieldGroup, PIconButton, PSelectDropdown, PTextInput, PI, useProxyValue,
+    PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -97,10 +67,17 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type {
+    DashboardVariableSchemaProperty, EnumOptions, SearchResourceOptions,
+} from '@/services/dashboards/config';
+import DashboardManageVariableOptionsField
+    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableOptionsField.vue';
 import type {
     OverlayStatus,
+    OptionItem,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
+
+const CLONE_PREFIX = 'Copy - ';
 
 interface Props {
     contentType: OverlayStatus;
@@ -112,11 +89,6 @@ interface EmitFn {
     (e: 'save-click', value: DashboardVariableSchemaProperty): void;
     (e: 'cancel-click'): void;
 }
-type OptionItem = {
-    key: string;
-    value: string;
-    error?: boolean;
-};
 
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
@@ -124,12 +96,14 @@ const emit = defineEmits<EmitFn>();
 const {
     forms: {
         name,
+        description,
     },
     setForm,
     invalidState,
     invalidTexts,
 } = useFormValidator({
     name: '',
+    description: '',
 }, {
     name(value: string) {
         if (props.variableNames.includes(value)) {
@@ -141,34 +115,44 @@ const {
 });
 
 // helper
-const checkOptionsChanged = (subject: string[] = [], target: {key: string, value: string}[]): boolean => {
-    const emptyExcludedTarget = target.filter((d) => d.value !== '');
-    if (subject.length !== emptyExcludedTarget.length) return false;
-    for (let idx = 0; idx < subject.length; idx++) if (subject[idx] !== emptyExcludedTarget[idx].value) return false;
+const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options'], target: OptionItem[]): boolean => {
+    let _subject;
+    if (Array.isArray(subject)) {
+        _subject = subject.map((d) => ({ key: d, label: d }));
+    } else if (subject?.type === 'ENUM') {
+        _subject = subject?.values;
+    } else _subject = [];
+    // TODO: refactor Search Data Source CASE
+    const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
+    if (_subject.length !== targetExcludingEmpty.length) return false;
+    for (let idx = 0; idx < _subject.length; idx++) if (_subject[idx].key !== targetExcludingEmpty[idx].key || _subject[idx].key !== targetExcludingEmpty[idx].label) return false;
     return true;
 };
 
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
+    optionsType: 'ENUM',
     options: [
-        { key: getUUID(), value: '' },
+        { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
+    resourceKey: '', // TODO: setting resource key in 'SEARCH_RESOURCE' option type
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
     ]),
-
 });
 
 const formInvalidState = reactive({
-    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.value !== '').length === 0) || state.options.some((option) => option.error)),
+    optionsInvalid: false,
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || formInvalidState.optionsInvalid),
     isChanged: computed<boolean>(() => {
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
+        const isDescriptionChanged = (props.selectedVariable?.description ?? '') === description.value;
         const isSelectionTypeChanged = (props.selectedVariable?.selection_type ?? 'MULTI') === state.selectionType;
-        const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options ?? [], state.options);
+        const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options, state.options);
 
-        return isNameChanged && isSelectionTypeChanged && isOptionChanged;
+        return isNameChanged && isDescriptionChanged && isSelectionTypeChanged && isOptionChanged;
     }),
     formInvalid: computed<boolean>(() => {
         if (props.contentType === 'ADD') {
@@ -179,6 +163,10 @@ const formInvalidState = reactive({
 });
 
 // Event
+const handleUpdateOptionsInvalid = (invalid: boolean) => {
+    formInvalidState.optionsInvalid = invalid;
+};
+
 const handleCancel = () => {
     if (!formInvalidState.isChanged) {
         emit('cancel-click');
@@ -186,42 +174,48 @@ const handleCancel = () => {
     }
     state.proxyContentType = 'LIST';
 };
-const handleAddOption = () => {
-    state.options = [...state.options, { key: getUUID(), value: '' }];
-};
-const handleDeleteOption = (key: string) => {
-    state.options = state.options.filter((d) => d.key !== key);
-};
 
 const handleSave = () => {
+    let options;
+    if (state.optionsType === 'ENUM') {
+        options = {
+            type: 'ENUM',
+            values: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
+        } as EnumOptions;
+    } else {
+        options = {
+            type: 'SEARCH_RESOURCE',
+            resource_key: '',
+        } as SearchResourceOptions;
+    }
     const variableToSave = {
         variable_type: 'CUSTOM',
         name: name.value,
-        use: false,
+        use: true,
         selection_type: state.selectionType,
-        options: state.options.map((d) => d.value).filter((value) => value !== ''),
+        description: description.value,
+        options,
     } as DashboardVariableSchemaProperty;
     emit('save-click', variableToSave);
 };
 
-const handleChangeOptionValue = (index: number, value: string) => {
-    state.options[index].error = state.options.some((option, _index) => {
-        if (index === _index || value === '') return false;
-        return option.value === value;
-    });
-    state.options[index].value = value;
-};
-
 onMounted(() => {
-    if (props.contentType === 'EDIT') {
-        setForm('name', props.selectedVariable?.name ?? '');
+    if (props.contentType === 'EDIT' || props.contentType === 'CLONE') {
+        const namePrefix = props.contentType === 'CLONE' ? CLONE_PREFIX : '';
+        setForm('name', `${namePrefix}${props.selectedVariable?.name}` ?? '');
+        setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+        // TODO: add SEARCH_RESOURCE case
+        if (Array.isArray(props.selectedVariable?.options)) {
+            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getUUID(), key: d, label: d })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
+        } else if (props.selectedVariable?.options?.type === 'ENUM') {
+            state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getUUID(), key: d.key, label: d.label })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
+        }
     }
 });
 
 const {
-    selectionType, options, selectionMenu,
+    selectionType, optionsType, options, selectionMenu,
 } = toRefs(state);
 
 </script>
@@ -244,45 +238,15 @@ const {
         }
     }
 
-    .options-field {
+    .description-field {
         @apply w-1/2;
-
-        .options-wrapper {
-            @apply w-full bg-gray-100 rounded-md;
-            padding: 0.5rem;
-
-            .option-add-button {
-                margin-bottom: 0.5rem;
-            }
-            .draggable-wrapper {
-                @apply border border-gray-200 rounded flex flex-col bg-white;
-                padding: 0.75rem 0.375rem;
-                gap: 0.5rem;
-                .draggable-item {
-                    @apply flex items-center bg-white;
-                    .grab-area {
-                        cursor: grab;
-                        &:active {
-                            cursor: grabbing;
-                        }
-                    }
-                    .option-input {
-                        @apply w-full;
-                    }
-                    .option-delete-area {
-                        width: 2rem;
-                        height: 2rem;
-                    }
-                }
-                .ghost {
-                    @apply bg-blue-200;
-                }
-            }
+        .description-input {
+            @apply w-full;
         }
     }
 
     @screen tablet {
-        .name-field, .selection-type-field, .options-field {
+        .name-field, .selection-type-field, .description-field {
             @apply w-full;
         }
     }

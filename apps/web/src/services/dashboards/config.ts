@@ -74,7 +74,13 @@ export interface DashboardConfig {
 }
 
 // variables
-export type DashboardVariables = Record<string, string|string[]>;
+export type DashboardVariables = SingleSelectDashboardVariables | MultiSelectDashboardVariables;
+interface SingleSelectDashboardVariables {
+    [key: string]: string;
+}
+interface MultiSelectDashboardVariables {
+    [key: string]: string[];
+}
 
 export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
 export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
@@ -83,15 +89,31 @@ export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
 export type VariableType = typeof VARIABLE_TYPES[number];
 
 
+export interface EnumOptions {
+    type: 'ENUM';
+    values: { key: string; label: string; }[];
+}
+export interface SearchResourceOptions {
+    type: 'SEARCH_RESOURCE';
+    resource_key: string;
+}
+export interface ReferenceResourceOptions {
+    type: 'REFERENCE_RESOURCE',
+    reference_key: string;
+}
+
+type LegacyOptions = string[];
+type VariableOptions = EnumOptions|SearchResourceOptions|ReferenceResourceOptions|LegacyOptions;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
+    name: string;
     variable_type: VariableType;
     use: boolean;
     selection_type: VariableSelectionType;
-    options?: string[];
-    name: string;
+    description?: string | TranslateResult;
     disabled?: boolean;
+    options?: VariableOptions;
 }
 export interface DashboardVariablesSchema {
     properties: {

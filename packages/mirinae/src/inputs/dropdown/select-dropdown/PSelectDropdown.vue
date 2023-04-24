@@ -80,10 +80,11 @@ import {
     toRefs,
     nextTick, toRef,
 } from 'vue';
-import type { DirectiveFunction, SetupContext, PropType } from 'vue';
+import type { SetupContext, PropType } from 'vue';
 
-import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
+import vClickOutside from 'v-click-outside';
+
 
 
 import PI from '@/foundation/icons/PI.vue';
@@ -101,13 +102,13 @@ import {
 
 export default defineComponent<SelectDropdownProps>({
     name: 'PSelectDropdown',
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
     components: {
         PI,
         PIconButton,
         PContextMenu,
+    },
+    directives: {
+        clickOutside: vClickOutside.directive,
     },
     model: {
         prop: 'selected',
@@ -232,7 +233,7 @@ export default defineComponent<SelectDropdownProps>({
             state.proxyVisibleMenu = !state.proxyVisibleMenu;
             e.stopPropagation();
         };
-        const handleClickOutside = (): void => {
+        const handleClickOutside = () => {
             state.proxyVisibleMenu = false;
         };
         const handlePressDownKey = () => {

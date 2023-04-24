@@ -2,29 +2,31 @@
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <template v-for="(widget) in reformedWidgetInfoList">
-            <component :is="widget.component"
-                       :id="widget.widget_key"
-                       :key="widget.widget_key"
-                       ref="widgetRef"
-                       v-intersection-observer="handleIntersectionObserver"
-                       :widget-config-id="widget.widget_name"
-                       :widget-key="widget.widget_key"
-                       :title="widget.title"
-                       :options="widget.widget_options"
-                       :inherit-options="widget.inherit_options"
-                       :size="widget.size"
-                       :width="widget.width"
-                       :theme="widget.theme"
-                       :dashboard-variables="dashboardDetailState.variables"
-                       :dashboard-variables-schema="dashboardDetailState.variablesSchema"
-                       :dashboard-settings="dashboardDetailState.settings"
-                       :currency-rates="currencyRates"
-                       :edit-mode="editMode"
-                       :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                       :all-reference-type-info="allReferenceTypeInfo"
-                       :initiated="!!initiatedWidgetMap[widget.widget_key]"
-            />
+        <template v-if="!dashboardDetailState.loadingDashboard">
+            <template v-for="(widget) in reformedWidgetInfoList">
+                <component :is="widget.component"
+                           :id="widget.widget_key"
+                           :key="widget.widget_key"
+                           ref="widgetRef"
+                           v-intersection-observer="handleIntersectionObserver"
+                           :widget-config-id="widget.widget_name"
+                           :widget-key="widget.widget_key"
+                           :title="widget.title"
+                           :options="widget.widget_options"
+                           :inherit-options="widget.inherit_options"
+                           :size="widget.size"
+                           :width="widget.width"
+                           :theme="widget.theme"
+                           :dashboard-variables="dashboardDetailState.variables"
+                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                           :dashboard-settings="dashboardDetailState.settings"
+                           :currency-rates="currencyRates"
+                           :edit-mode="editMode"
+                           :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                           :all-reference-type-info="allReferenceTypeInfo"
+                           :initiated="!!initiatedWidgetMap[widget.widget_key]"
+                />
+            </template>
         </template>
     </div>
 </template>
