@@ -328,10 +328,10 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
                 if (roleId.length > 0 || roleId !== '') {
                     await bindRole(item.user_id, roleId);
                 }
-                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
