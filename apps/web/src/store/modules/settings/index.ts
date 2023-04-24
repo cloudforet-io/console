@@ -5,10 +5,8 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 import type { SettingsState } from './type';
 
-export const STORAGE_KEY = 'store/settings';
-
 const state: SettingsState = {
-    currencyRate: DEFAULT_CURRENCY_RATES,
+    currencyRates: DEFAULT_CURRENCY_RATES,
     currencyUpdateTime: undefined,
     currency: 'USD',
     gnbNotificationLastReadTime: '',

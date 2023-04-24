@@ -121,7 +121,7 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
                 },
             ])),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
@@ -138,7 +138,7 @@ export default {
                 granularity: state.granularity,
                 stack: state.stack,
             });
-            store.commit('display/setCurrency', state.currency);
+            store.commit('settings/setCurrency', state.currency);
 
             state.proxyVisible = false;
         };
@@ -156,7 +156,7 @@ export default {
             if (after) {
                 state.granularity = costAnalysisPageState.granularity;
                 state.stack = costAnalysisPageState.stack;
-                state.currency = store.state.display.currency;
+                state.currency = store.state.settings.currency;
             }
         });
 

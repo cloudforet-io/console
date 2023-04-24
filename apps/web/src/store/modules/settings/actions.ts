@@ -9,7 +9,7 @@ import type { Currency, CurrencyRates, SettingsState } from '@/store/modules/set
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export const initSettings = ({ commit, rootState }): void => {
+export const initSettings: Action<SettingsState, any> = ({ commit, rootState, dispatch }): void => {
     const userId = rootState?.user?.userId;
     if (!window.localStorage.getItem('spaceConnector/accessToken')) return;
     try {
@@ -19,6 +19,7 @@ export const initSettings = ({ commit, rootState }): void => {
             const settingsObj = JSON.parse(settings);
             commit('initUserSettings', settingsObj.global);
         }
+        dispatch('loadCurrencyRates');
     } catch (e) {
         window.localStorage.removeItem(userId);
     }
@@ -54,7 +55,7 @@ const storeCurrencyRates = (rates, commit: Commit) => {
 };
 
 export const loadCurrencyRates: Action<SettingsState, any> = async ({ state, commit }) => {
-    const storedCurrencyRate: CurrencyRates|undefined = state.currencyRate;
+    const storedCurrencyRate: CurrencyRates|undefined = state.currencyRates;
     const storedUpdateTime: number|undefined = state.currencyUpdateTime;
     const now = dayjs();
     const storedDate = storedUpdateTime ? dayjs.unix(storedUpdateTime) : undefined;

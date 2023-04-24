@@ -6,12 +6,30 @@ const localStoragePlugin = (store: Store<any>) => {
         const settingsObj = settings ? JSON.parse(settings) : {};
         const global = settingsObj.global || {};
         switch (mutation.type) {
-        case 'settings/setCurrencyRate':
+        case 'settings/setCurrencyRates':
             window.localStorage.setItem(state.user.userId, JSON.stringify({
                 ...settingsObj,
                 global: {
                     ...global,
-                    currencyRate: mutation.payload,
+                    currencyRates: mutation.payload,
+                },
+            }));
+            break;
+        case 'settings/setCurrency':
+            window.localStorage.setItem(state.user.userId, JSON.stringify({
+                ...settingsObj,
+                global: {
+                    ...global,
+                    currency: mutation.payload,
+                },
+            }));
+            break;
+        case 'settings/setCurrencyUpdateTime':
+            window.localStorage.setItem(state.user.userId, JSON.stringify({
+                ...settingsObj,
+                global: {
+                    ...global,
+                    currencyUpdateTime: mutation.payload,
                 },
             }));
             break;

@@ -56,7 +56,7 @@ export default {
 
         /* Init */
         (async () => {
-            await store.dispatch('settings/loadCurrencyRates');
+            await store.dispatch('settings/initSettings');
         })();
 
         return {
