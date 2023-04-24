@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, h, reactive } from 'vue';
+import { h } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import type { BadgeProps } from '@/data-display/badge/type';
