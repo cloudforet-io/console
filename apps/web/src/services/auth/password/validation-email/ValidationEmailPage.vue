@@ -3,7 +3,6 @@
         <div class="status-wrapper">
             <lottie-vue-player v-if="state.status === 'done'"
                                autoplay
-                               loop
                                src="/src/assets/images/lottie_done.json"
                                :style="{ height: '5rem', width: '5rem', backgroundColor: 'transparent' }"
             />
