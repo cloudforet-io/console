@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { RenderContext } from 'vue/types/options';
-import type { VNode } from 'vue/types/vnode';
+import { h } from 'vue';
+import type { SetupContext } from 'vue';
 
 import bytes from 'bytes';
 
@@ -20,7 +20,6 @@ const UNIT_SEPARATOR = ' ';
 
 export default {
     name: 'PDynamicFieldSize',
-    functional: true,
     components: { PAnchor },
     props: {
         options: {
@@ -44,9 +43,10 @@ export default {
             default: undefined,
         },
     },
-    render(h, { props, data }: RenderContext<SizeDynamicFieldProps>): VNode {
+    setup(props: SizeDynamicFieldProps, { attrs }: SetupContext) {
         let value: number|null;
 
+        // eslint-disable-next-line vue/no-setup-props-destructure
         if (typeof props.data === 'number') value = props.data;
         else if (typeof props.data === 'string') value = Number(props.data);
         else if (props.options.default !== undefined) value = props.options.default ?? 0;
@@ -72,7 +72,7 @@ export default {
             }
         }
 
-        let sizeEl = h('span', data, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
+        let sizeEl = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
         if (props.options.link) {
             sizeEl = h(PAnchor, {
@@ -81,7 +81,7 @@ export default {
             }, [sizeEl]);
         }
 
-        return sizeEl;
+        return () => sizeEl;
     },
 };
 </script>

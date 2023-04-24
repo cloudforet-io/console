@@ -59,6 +59,11 @@ export default defineConfig(async ({ command, mode }) => {
                 emitErrorAsWarning: true,
             }),
         ],
+        build: {
+            rollupOptions: {
+                external: ['@spaceone/design-system/css/*'],
+            },
+        },
         server: { port: 8080 },
         preview: { port: 8080 },
         test: {
