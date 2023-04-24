@@ -55,7 +55,6 @@
                         @change-verify="handleChangeVerify"
                     />
                     <password-form
-                        :is-valid-email="state.data.email_verified"
                         :item="state.data"
                         @change-input="handleChangeInputs"
                     />
@@ -200,7 +199,7 @@ export default {
             const data = {
                 user_id: formState.userId,
                 name: formState.name,
-                email: formState.email,
+                email: formState.email || formState.userId,
                 password: formState.password || '',
                 tags: formState.tags || {},
                 reset_password: formState.passwordType === PASSWORD_TYPE.RESET,
