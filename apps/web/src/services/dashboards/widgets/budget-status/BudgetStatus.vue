@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 

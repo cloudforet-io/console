@@ -56,7 +56,6 @@
 import {
     computed, onMounted, reactive, toRefs,
 } from 'vue';
-import draggable from 'vuedraggable';
 
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
