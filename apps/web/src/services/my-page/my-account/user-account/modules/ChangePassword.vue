@@ -171,8 +171,13 @@ const updateUser = async (userParam: UpdateUserRequest) => {
         if (!state.isCheckedToken) return;
         await store.dispatch('user/setUser', userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
-    } catch (e) {
-        showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
+    } catch (e: any) {
+        const errorDetail = e.axiosError.response.data.detail;
+        if (errorDetail.code === 'ERROR_PASSWORD_NOT_CHANGED') {
+            showErrorMessage(errorDetail.message, '');
+        } else {
+            showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
+        }
     }
 };
 </script>
