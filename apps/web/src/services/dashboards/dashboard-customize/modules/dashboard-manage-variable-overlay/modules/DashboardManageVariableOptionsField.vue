@@ -180,7 +180,8 @@ watch(() => state.manualOptionValidations, (updated) => {
 
 @screen tablet {
     .dashboard-manage-variable-options-field {
-        @apply w-full; }
+        @apply w-full;
+    }
 }
 
 </style>
