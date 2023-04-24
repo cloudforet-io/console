@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { store } from '@/store';
+import { initServiceSettingsStore } from '@/store/util';
 
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
@@ -9,20 +9,10 @@ interface CostExplorerSettingsState {
     costAnalysisMoreGroupBy: MoreGroupByItem[];
 }
 
-const getLocalStorageItem = (service: string): CostExplorerSettingsState | undefined => {
-    const userId = store.state.user.userId;
-    if (userId) {
-        const userSettings = JSON.parse(window.localStorage.getItem(userId) || '{}');
-        const userSettingsObject = userSettings;
-        return userSettingsObject[service] || {};
-    }
-    return undefined;
-};
-
 
 export const useCostExplorerSettingsStore = defineStore('cost-explorer-settings', {
     state: (): CostExplorerSettingsState => {
-        const localStorageItem = getLocalStorageItem('costExplorer');
+        const localStorageItem = initServiceSettingsStore<CostExplorerSettingsState>('costExplorer');
         return ({
             homeDashboardId: localStorageItem?.homeDashboardId || '',
             costAnalysisMoreGroupBy: localStorageItem?.costAnalysisMoreGroupBy || [],
