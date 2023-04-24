@@ -26,15 +26,13 @@ COPY turbo.json turbo.json
 ENV NODE_ENV production
 
 # Uncomment and use build args to enable remote caching
-ARG TURBO_TEAM
-ENV TURBO_TEAM=$TURBO_TEAM
-
-ARG TURBO_TOKEN
-ENV TURBO_TOKEN=$TURBO_TOKEN
+#ARG TURBO_TEAM
+#ENV TURBO_TEAM=$TURBO_TEAM
+#
+#ARG TURBO_TOKEN
+#ENV TURBO_TOKEN=$TURBO_TOKEN
 
 RUN npx turbo build --filter=@cloudforet/core-lib
-# Due to unexpected bug, we need to copy postcss.config.cjs manually
-COPY --from=builder /app/out/full/packages/mirinae/postcss.config.cjs packages/mirinae/postcss.config.cjs
 RUN npx turbo build --filter=web...
 
 FROM nginx AS runner
