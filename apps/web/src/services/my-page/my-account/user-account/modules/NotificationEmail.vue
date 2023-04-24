@@ -102,7 +102,7 @@ const {
 } = useFormValidator({
     notificationEmail: state.email,
 }, {
-    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT'); },
+    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
 
 /* Watcher */
