@@ -1,6 +1,6 @@
 {
   "name": "@cloudforet/core-lib",
-  "version": "1.11.0-25",
+  "version": "1.11.0-26",
   "description": "Cloudforet Console Core Library",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
