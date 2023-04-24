@@ -104,6 +104,7 @@ import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import NotificationEmailModal from '@/common/modules/modals/NotificationEmailModal.vue';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -157,6 +158,16 @@ export default defineComponent({
 
         watch(() => vm.$route, (value) => {
             state.isVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
+        });
+        watch(() => state.isVisible, async (value) => {
+            if (value) {
+                const userParam = {
+                    email: state.email,
+                    user_id: state.userId,
+                    domain_id: state.domainId,
+                };
+                await postValidationEmail(userParam);
+            }
         });
 
         return {
