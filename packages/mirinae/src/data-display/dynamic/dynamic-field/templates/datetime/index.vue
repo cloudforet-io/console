@@ -45,6 +45,7 @@ export default {
     },
     setup(props: DatetimeDynamicFieldProps, { attrs }: SetupContext) {
         let result = '';
+        // eslint-disable-next-line vue/no-setup-props-destructure
         const options: DatetimeOptions = props.options;
         const value = props.data === undefined || props.data === null ? props.options.default : props.data;
 

@@ -52,6 +52,7 @@ export default {
         },
     },
     setup(props, { slots, attrs }: SetupContext) {
+        // eslint-disable-next-line vue/no-setup-props-destructure
         const {
             loading, duration, width, height, tag, animation, opacity,
         } = props;
@@ -78,7 +79,7 @@ export default {
                     ...getBindClass(attrs.class),
                     'p-skeleton': true,
                 },
-                style,
+                staticStyle: style,
             });
         }
         return () => h(tag || 'span', {

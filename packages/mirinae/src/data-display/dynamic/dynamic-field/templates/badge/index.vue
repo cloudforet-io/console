@@ -1,5 +1,5 @@
 <script lang="ts">
-import { h } from 'vue';
+import { computed, h, reactive } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import type { BadgeProps } from '@/data-display/badge/type';
@@ -35,7 +35,9 @@ export default {
         },
     },
     setup(props: BadgeDynamicFieldProps) {
+        // eslint-disable-next-line vue/no-setup-props-destructure
         const options: BadgeOptions = props.options;
+
         const badgeProps = {} as BadgeProps;
 
         if (options.shape) {

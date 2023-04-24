@@ -46,6 +46,7 @@ export default {
     setup(props: SizeDynamicFieldProps, { attrs }: SetupContext) {
         let value: number|null;
 
+        // eslint-disable-next-line vue/no-setup-props-destructure
         if (typeof props.data === 'number') value = props.data;
         else if (typeof props.data === 'string') value = Number(props.data);
         else if (props.options.default !== undefined) value = props.options.default ?? 0;
