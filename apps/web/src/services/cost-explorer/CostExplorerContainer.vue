@@ -19,6 +19,8 @@
 </template>
 
 <script lang="ts">
+import { computed } from 'vue';
+
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -26,6 +28,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 
 export default {
     name: 'CostExplorerContainer',
@@ -36,6 +39,20 @@ export default {
     },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
+        const userId = computed(() => store.state.user.userId);
+        const costExplorerSettings = useCostExplorerSettingsStore();
+        costExplorerSettings.$onAction((action) => {
+            action.after(() => {
+                if (window) {
+                    const settings = window.localStorage.getItem(userId.value);
+                    if (settings) {
+                        const settingsObj = JSON.parse(settings);
+                        settingsObj.costExplorer = action.store.$state;
+                        window.localStorage.setItem(userId.value, JSON.stringify(settingsObj));
+                    }
+                }
+            });
+        });
 
         /* Init */
         (async () => {
