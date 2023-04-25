@@ -3,36 +3,60 @@ logs
 *.log
 npm-debug.log*
 
-# dependencies
+# Docker
+.dockerignrore
+**/Dockerfile
+**/*.dockerfile
+**/*.dockerignore
+
+# Deploy
+deploy
+
+# Dependencies
 **/node_modules
 
-# outout
+# Output
 out
 **/dist
+apps/storybook/.out
+packages/mirinae/css
+packages/mirinae/types
 
-# lint
+# Lint
 **/.eslintrc.js
 **/.eslintrc.cjs
 **/.eslintignore
+
+# Commit hooks
+.husky
+commitlint.config.cjs
 **/.lintstagedrc.cjs
 
-# tests
+# Test
 **/tests
 **/playwright
 **/playwright.config.ts
+**/__tests__
 
-#misc
-*.swp
-*.bak
-.git
-.DS_Store
-.husky
-.dockerignore
-commitlint.config.cjs
+# Skaffold
+**/skaffold.template.yaml
+**/skaffold-*.yaml
+
+# Metadata
 **/LICENSE
 **/AUTHORS
 VERSION
 **/README.md
-deploy
-**/Dockerfile
-**/skaffold.template.yaml
+**/CHANGELOG.md
+
+# Turborepo
+**/.turbo
+
+# Babel edit
+**/*.babel
+
+# misc
+.idea
+*.swp
+*.bak
+**/.DS_Store

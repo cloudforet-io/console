@@ -1,6 +1,5 @@
 dist
 KB_SSOPage.vue
-*.config.js
 *.config.cjs
 /**/vue-diff/*
 *.spec.ts
