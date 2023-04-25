@@ -176,11 +176,15 @@ export default defineComponent({
                 }
             }
 
-            .p-context-menu {
+            /* custom design-system component - p-context-menu */
+            :deep(.p-context-menu) {
                 height: 100%;
                 border: none;
                 & span {
                     border-radius: 0.25rem;
+                }
+                .menu-container {
+                    padding: 0.75rem 0.875rem 0 0.875rem;
                 }
             }
 
@@ -196,6 +200,7 @@ export default defineComponent({
                 .body {
                     height: calc(100% - 2.25rem);
                     border-bottom-right-radius: 0;
+                    padding: 0;
                 }
             }
             .p-i-ic_plus {
