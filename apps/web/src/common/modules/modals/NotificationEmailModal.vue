@@ -44,7 +44,7 @@
                                  color="inherit"
                             />
                             <p class="email-text">
-                                {{ formState.newNotificationEmail }}
+                                {{ props.isAdministration ? formState.newNotificationEmail : state.email }}
                             </p>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -140,10 +140,11 @@ const state = reactive({
     isCollapsed: true,
     isEditMode: props.verified,
     myId: computed(() => store.state.user.userId),
+    email: computed(() => props.email),
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
-    newNotificationEmail: props.isAdministration ? props.email : store.state.user.email || '',
+    newNotificationEmail: state.email || '',
     verificationCode: '',
 });
 const validationState = reactive({
@@ -158,8 +159,9 @@ const handleEditButton = () => {
     formState.newNotificationEmail = '';
 };
 const handleClickCancel = () => {
-    state.proxyVisible = false;
     resetFormData();
+    state.proxyVisible = false;
+    state.isEditMode = props.verified;
     emit('refresh-user');
     window.localStorage.setItem('hideNotificationEmailModal', 'true');
 };
@@ -188,6 +190,9 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
                 await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
             }
         }
+        if (!props.isAdministration) {
+            emit('refresh-user');
+        }
         state.isEditMode = false;
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -214,11 +219,6 @@ const handleClickConfirmButton = async () => {
         state.loading = false;
     }
 };
-
-/* Watcher */
-watch(() => props.verified, (value) => {
-    state.isEditMode = value;
-});
 </script>
 
 <style lang="postcss" scoped>
