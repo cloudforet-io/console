@@ -43,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
         left: 1.25rem;
     }
     .layout-contents {
-        @apply absolute;
+        @apply absolute flex items-center justify-center;
         top: 0;
         left: 0;
         right: 0;

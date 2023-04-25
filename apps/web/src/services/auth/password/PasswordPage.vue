@@ -256,17 +256,12 @@ const initStatesByUrlSSOToken = async () => {
 
 <style lang="postcss" scoped>
 .password-page {
-    @apply relative justify-center;
-    width: 100%;
-    height: 100%;
+    width: auto;
     .contents-wrapper {
-        @apply absolute flex flex-col;
+        @apply flex flex-col;
         gap: 2.5rem;
         width: 25rem;
         min-width: 17.5rem;
-        top: 45%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         .headline-wrapper {
             @apply flex flex-col;
             width: 100%;

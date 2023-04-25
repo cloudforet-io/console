@@ -184,9 +184,7 @@ export default {
     @apply flex justify-end mt-8 gap-4;
 }
 .dashboard-create-page {
-    @apply flex items-center justify-center;
     width: 100%;
-    height: 100%;
     .dashboard-create-step1 {
         @apply w-full;
         max-width: 30rem;
