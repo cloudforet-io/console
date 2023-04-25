@@ -46,7 +46,6 @@
                             <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
                         </p-button>
                         <p-button v-else
-                                  ref="sendEmailButtonEl"
                                   style-type="tertiary"
                                   class="send-mail-button"
                                   :loading="state.loading"
@@ -141,7 +140,7 @@
 
 <script setup lang="ts">
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -176,8 +175,6 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const emit = defineEmits(['change-input', 'change-verify']);
-
-const sendEmailButtonEl = ref();
 
 const state = reactive({
     loading: false,
@@ -217,8 +214,10 @@ const handleClickChange = () => {
         state.isFocused = true;
     }
 };
-const handleFocusOutInput = () => {
-    state.isFocused = false;
+const handleFocusOutInput = (e) => {
+    if (!e.relatedTarget.matches('.send-mail-button')) {
+        state.isFocused = false;
+    }
 };
 const handleEditButton = () => {
     state.isSent = false;
@@ -247,6 +246,7 @@ const handleClickSend = async () => {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
+        state.isFocused = false;
     }
 };
 const handleChangeVerify = async () => {
