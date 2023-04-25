@@ -1,6 +1,6 @@
 {
   "name": "tsconfig",
-  "version": "1.11.0-26",
+  "version": "1.11.0-27",
   "private": true,
   "files": [
     "base.json"
