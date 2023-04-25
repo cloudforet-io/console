@@ -10,6 +10,7 @@
                              :key="type.name"
                              v-model="state.passwordStatus"
                              :value="idx"
+                             :disabled="type.disabled"
                              @change="handleClickRadio(idx)"
                     >
                         {{ type.label }}
@@ -97,9 +98,11 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 interface Props {
     item?: User;
+    isValidEmail?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
+    isValidEmail: false,
 });
 
 const userPageStore = useUserPageStore();
@@ -119,6 +122,7 @@ const state = reactive({
                 {
                     name: PASSWORD_TYPE.RESET,
                     label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                    disabled: !props.isValidEmail,
                 },
                 {
                     name: PASSWORD_TYPE.MANUALLY,

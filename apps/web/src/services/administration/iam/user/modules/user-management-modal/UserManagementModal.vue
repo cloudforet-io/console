@@ -56,6 +56,7 @@
                     />
                     <password-form
                         :item="state.data"
+                        :is-valid-email="state.data.email_verified"
                         @change-input="handleChangeInputs"
                     />
                     <admin-role
