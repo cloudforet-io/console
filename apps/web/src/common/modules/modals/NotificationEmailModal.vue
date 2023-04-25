@@ -12,16 +12,18 @@
             <div class="modal-content-wrapper">
                 <div v-if="state.isEditMode">
                     <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.NOTIFICATION_EMAIL')"
+                                   :invalid="validationState.isEmailValid"
                                    required
                     >
                         <div class="notification-field-wrapper">
                             <p-text-input
                                 id="newNotificationEmail"
                                 v-model="formState.newNotificationEmail"
+                                :invalid="validationState.isEmailValid"
                                 @keyup.enter="handleClickSendEmailButton"
                             />
                             <p-button style-type="secondary"
-                                      :disabled="formState.newNotificationEmail === '' || emailValidator(formState.newNotificationEmail)"
+                                      :disabled="!formState.newNotificationEmail || emailValidator(formState.newNotificationEmail)"
                                       :loading="state.loading"
                                       @click.prevent="handleClickSendEmailButton(false)"
                             >
@@ -42,7 +44,7 @@
                                  color="inherit"
                             />
                             <p class="email-text">
-                                {{ state.email }}
+                                {{ formState.newNotificationEmail }}
                             </p>
                         </div>
                     </div>
@@ -138,14 +140,14 @@ const state = reactive({
     isCollapsed: true,
     isEditMode: props.verified,
     myId: computed(() => store.state.user.userId),
-    email: computed(() => (props.isAdministration ? props.email : store.state.user.email)),
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
-    newNotificationEmail: '',
+    newNotificationEmail: props.isAdministration ? props.email : store.state.user.email || '',
     verificationCode: '',
 });
 const validationState = reactive({
+    isEmailValid: undefined as undefined | boolean,
     isValidationCodeValid: undefined as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
@@ -153,11 +155,12 @@ const validationState = reactive({
 /* Components */
 const handleEditButton = () => {
     state.isEditMode = true;
+    formState.newNotificationEmail = '';
 };
 const handleClickCancel = () => {
     state.proxyVisible = false;
     resetFormData();
-    emit('click-cancel');
+    emit('refresh-user');
     window.localStorage.setItem('hideNotificationEmailModal', 'true');
 };
 const resetFormData = () => {
@@ -169,24 +172,28 @@ const resetFormData = () => {
 
 /* API */
 const handleClickSendEmailButton = async (resend?: boolean) => {
+    if (!formState.newNotificationEmail && resend) {
+        validationState.isEmailValid = true;
+        return;
+    }
     state.loading = true;
     try {
         await postValidationEmail({
             user_id: props.userId,
             domain_id: props.domainId,
-            email: resend === true ? state.email : formState.newNotificationEmail,
+            email: formState.newNotificationEmail,
         });
         if (state.myId === props.userId) {
             if (resend !== true) {
                 await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
             }
         }
-        emit('refresh-user');
         state.isEditMode = false;
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
+        validationState.isEmailValid = false;
     }
 };
 const handleClickConfirmButton = async () => {

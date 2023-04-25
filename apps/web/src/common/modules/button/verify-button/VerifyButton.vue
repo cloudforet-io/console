@@ -71,7 +71,7 @@ const props = withDefaults(defineProps<Props>(), {
     isAdministration: false,
 });
 
-const emit = defineEmits<{(e: 'refresh-user'): void}>();
+const emit = defineEmits<{(e: 'refresh-user', userId: string): void}>();
 
 const state = reactive({
     loading: false,
@@ -79,19 +79,19 @@ const state = reactive({
     loginUserId: computed(() => store.state.user.userId),
 });
 const handleGetUserDetailEmit = () => {
-    emit('refresh-user');
+    emit('refresh-user', props.userId);
 };
 
 /* API */
 const handleClickVerifiedEmail = async () => {
-    const userParam: UpdateUserRequest = {
-        user_id: props.userId,
-        email: props.email,
-        domain_id: props.domainId,
-    };
+    state.loading = true;
     try {
         if (props.verified) return;
-        state.loading = true;
+        const userParam: UpdateUserRequest = {
+            user_id: props.userId,
+            email: props.email,
+            domain_id: props.domainId,
+        };
         await postValidationEmail(userParam);
         if (state.loginUserId === props.userId) {
             await store.dispatch('user/setUser', { email: props.email });
