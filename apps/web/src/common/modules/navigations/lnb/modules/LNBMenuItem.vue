@@ -54,6 +54,12 @@
                       v-bind="{...$props, item, index: idx}"
                 />
                 <div class="text-wrapper">
+                    <p-i v-if="item.icon"
+                         :name="item.icon"
+                         width="1rem"
+                         height="1rem"
+                         class="icon"
+                    />
                     <span class="text">{{ item.label }}</span>
                     <slot name="after-text"
                           v-bind="{...$props, item, index: idx}"
@@ -229,6 +235,10 @@ export default defineComponent<Props>({
             .text {
                 @apply overflow-hidden whitespace-no-wrap;
                 text-overflow: ellipsis;
+            }
+            .icon {
+                flex-shrink: 0;
+                margin-right: 0.25rem;
             }
         }
         .favorite-button {
