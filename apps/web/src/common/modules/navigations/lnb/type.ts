@@ -24,6 +24,7 @@ export interface LNBItem {
     isBeta?: boolean;
     hideFavorite?: boolean;
     favoriteType?: FavoriteType;
+    icon?: string;
 }
 
 export type LNBMenu = LNBItem[]|LNBItem;
