@@ -156,13 +156,10 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .cloud-service-history-changes-tab {
     height: 100%;
-    padding: 1rem;
-    .p-heading {
-        margin: 0.5rem 0 1rem 0;
-    }
     .cloud-service-history-changes-wrapper {
         @apply flex;
         height: calc(100% - 3.5rem);
+        padding: 1rem;
         .cloud-service-history-changes-key-nav {
             width: 20%;
 
