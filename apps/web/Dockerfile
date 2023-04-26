@@ -16,14 +16,14 @@ WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
-COPY .git/ .git/
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
+RUN npm ci
 
 # Build the project
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
+COPY .git/ .git/
 ENV NODE_ENV production
 
 # Use build args to enable remote caching
@@ -36,7 +36,9 @@ ENV TURBO_TOKEN=$TURBO_TOKEN
 ARG TURBO_API
 ENV TURBO_API=$TURBO_API
 
-RUN npx turbo build --filter=web... --team=${TURBO_TEAM} --token=${TURBO_TOKEN} --api=${TURBO_API}
+ENV FORCE_COLOR=1
+
+RUN npx turbo build --filter=web...
 RUN rm -rf .git
 
 FROM nginx AS runner
