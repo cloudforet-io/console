@@ -9,8 +9,8 @@ import { flattenDeep, isEmpty, merge } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 

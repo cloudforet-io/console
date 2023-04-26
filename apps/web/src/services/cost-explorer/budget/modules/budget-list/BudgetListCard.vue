@@ -160,8 +160,8 @@ export default {
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currency: computed(() => store.state.settings.currency),
+            currencyRates: computed(() => store.state.settings.currencyRates),
         });
         const state = reactive({
             linkLocation: computed<Location>(() => ({

@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,

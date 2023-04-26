@@ -1,7 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import type { SidebarType, Currency } from '@/store/modules/display/config';
+import type { SidebarType } from '@/store/modules/display/config';
 
 import type { Menu } from '@/lib/menu/config';
 
@@ -15,10 +15,6 @@ export interface DisplayMenu extends Menu {
     subMenuList?: DisplayMenu[];
 }
 
-export type CurrencyRates = {
-    [K in Currency]: number;
-};
-
 export interface DisplayState {
     visibleSidebar: boolean;
     sidebarType: SidebarType;
@@ -26,8 +22,6 @@ export interface DisplayState {
     isLoading: boolean;
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
-    currency: Currency;
-    currencyRates: CurrencyRates;
     visibleMobileGuideModal: boolean;
 }
 

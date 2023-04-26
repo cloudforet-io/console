@@ -105,8 +105,8 @@ export default {
         const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currency: computed(() => store.state.settings.currency),
+            currencyRates: computed(() => store.state.settings.currencyRates),
             //
             loading: true,
             legends: [] as Legend[],
