@@ -131,7 +131,6 @@ const { email } = forms;
 
 /* Components */
 const handleChangeInput = (e) => {
-    console.log(invalidTexts.email);
     setForm('email', e);
     emit('change-input', { ...forms, email: email.value });
 };
