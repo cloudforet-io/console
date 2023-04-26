@@ -36,13 +36,12 @@
                     <p-button
                         v-if="props.status === PASSWORD_STATUS.RESET"
                         :disabled="
-                            passwordInput === ''
-                                || confirmPasswordInput === ''
+                            !passwordInput
+                                || !confirmPasswordInput
                                 || passwordInput !== confirmPasswordInput
                                 || passwordInput.length < 8
                         "
                         @click="handleClickButton"
-                        @keyup.enter="handleClickButton"
                     >
                         {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
                     </p-button>
@@ -50,7 +49,6 @@
                         v-else
                         :disabled="userIdInput === ''"
                         @click="handleClickButton"
-                        @keyup.enter="handleClickButton"
                     >
                         {{ $t('AUTH.PASSWORD.FIND.SEND') }}
                     </p-button>
@@ -163,13 +161,10 @@ const handleClickButton = () => {
         }
         sendResetEmail(userIdInput.value, state.domainId);
     } else {
-        const {
-            userId, email,
-        } = state.userInfo;
+        const { userId } = state.userInfo;
         const request = {
             user_id: userId,
             password: passwordInput.value,
-            email,
         };
         postResetPassword(request);
     }
