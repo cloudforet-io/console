@@ -26,7 +26,7 @@ import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

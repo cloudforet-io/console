@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 

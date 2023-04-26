@@ -50,8 +50,8 @@ import dayjs from 'dayjs';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

@@ -51,8 +51,8 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 export default {
     name: 'CurrencySelectDropdown',
@@ -76,8 +76,8 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            currency: computed(() => props.currency || store.state.display.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
+            currency: computed(() => props.currency || store.state.settings.currency),
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
@@ -87,7 +87,7 @@ export default {
         const DEFAULT_CURRENCY = CURRENCY.USD;
 
         const handleSelectCurrency = (currency: Currency) => {
-            store.commit('display/setCurrency', currency);
+            store.commit('settings/setCurrency', currency);
             emit('update:currency', currency);
         };
 

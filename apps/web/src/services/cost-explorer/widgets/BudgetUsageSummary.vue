@@ -20,7 +20,7 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import BudgetStat from '@/services/cost-explorer/budget/modules/budget-stat/BudgetStat.vue';
 import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';

@@ -1,6 +1,6 @@
-import type { SettingsState } from './type';
+import type { Getter } from 'vuex';
 
-export const getItem = (state: SettingsState): any => {
-    const items = state.items;
-    return (key: string, path = '/') => items[`${path}:${key}`];
-};
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { SettingsState } from '@/store/modules/settings/type';
+
+export const currencySymbol: Getter<SettingsState, any> = (state): string => CURRENCY_SYMBOL[state.currency] ?? '$';
