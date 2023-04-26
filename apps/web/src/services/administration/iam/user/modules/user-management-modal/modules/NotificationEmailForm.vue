@@ -12,10 +12,9 @@
                                   :placeholder="store.state.user.userId"
                                   :disabled="userPageState.visibleUpdateModal && !state.isEdit"
                                   class="text-input"
-                                  @focusout="handleFocusOutInput"
                                   @update:value="handleChangeInput($event)"
                     >
-                        <div v-if="userPageState.visibleUpdateModal && (email !== '' && !state.isFocused && !state.loading)"
+                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
                              class="email-status-badge"
                              @click="handleClickBadge"
                         >
@@ -47,6 +46,7 @@
                         <p-button v-else
                                   style-type="tertiary"
                                   class="send-mail-button"
+                                  :disabled="!email || emailValidator(email)"
                                   :loading="state.loading"
                                   @click="handleClickSend"
                         >
@@ -124,7 +124,6 @@ const {
     invalidTexts,
 } = useFormValidator({
     email: '' || props.email,
-    verificationCode: '',
 }, {
     email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
@@ -138,18 +137,13 @@ const handleChangeInput = (e) => {
 const handleClickChange = () => {
     if (!state.isEdit) {
         state.isEdit = true;
-    } else {
         state.isFocused = true;
+        setForm('email', '');
     }
 };
 const handleClickBadge = () => {
     if (state.isEdit) {
         state.isFocused = true;
-    }
-};
-const handleFocusOutInput = (e) => {
-    if (!e.relatedTarget.matches('.send-mail-button')) {
-        state.isFocused = false;
     }
 };
 const initForm = () => {
@@ -165,6 +159,7 @@ const handleClickSend = async () => {
             email: email.value,
             force: true,
         });
+        state.isEdit = false;
         emit('change-verify', true);
 
         if (state.loginUserId === props.item.user_id) {
@@ -174,7 +169,6 @@ const handleClickSend = async () => {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
-        state.isFocused = false;
     }
 };
 
