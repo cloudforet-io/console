@@ -140,7 +140,10 @@ const handleChangeInput = (type: string, e: string) => {
     emit('change-input', { userIdInput, passwordInput, confirmPasswordInput });
 };
 const handleClickUtil = (type: string) => {
-    emit('click-button', type);
+    if (type !== 'userId') {
+        if (passwordInput.value === '' || invalidState.passwordInput || confirmPasswordInput.value === '' || invalidState.confirmPasswordInput) return;
+    }
+    emit('click-button');
 };
 
 /* Expose */

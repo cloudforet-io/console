@@ -17,7 +17,7 @@
                     >
                         <div v-if="userPageState.visibleUpdateModal && (email !== '' && !state.isFocused && !state.loading)"
                              class="email-status-badge"
-                             @click="handleClickChange"
+                             @click="handleClickBadge"
                         >
                             <span>{{ email }}</span>
                             <p-badge class="selected-text"
@@ -113,7 +113,6 @@ const emit = defineEmits(['change-input', 'change-verify']);
 const state = reactive({
     loading: false,
     isEdit: false,
-    isSent: false,
     isCollapsed: true,
     isFocused: false,
     loginUserId: computed(() => store.state.user.userId),
@@ -143,6 +142,11 @@ const handleClickChange = () => {
         state.isFocused = true;
     }
 };
+const handleClickBadge = () => {
+    if (state.isEdit) {
+        state.isFocused = true;
+    }
+};
 const handleFocusOutInput = (e) => {
     if (!e.relatedTarget.matches('.send-mail-button')) {
         state.isFocused = false;
@@ -159,14 +163,13 @@ const handleClickSend = async () => {
         await postValidationEmail({
             user_id: props.item.user_id,
             email: email.value,
-            domain_id: props.item.domain_id,
+            force: true,
         });
-        emit('change-verify', false);
+        emit('change-verify', true);
 
         if (state.loginUserId === props.item.user_id) {
             await store.dispatch('user/setUser', { email: email.value });
         }
-        state.isSent = true;
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
