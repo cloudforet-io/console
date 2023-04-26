@@ -57,7 +57,6 @@
         >
             <p-text-input v-model="formState.name"
                           class="text-input"
-                          autocomplete="username"
                           @update:value="handleChangeInput"
             />
         </p-field-group>
