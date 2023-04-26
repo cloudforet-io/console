@@ -1,4 +1,4 @@
-import type { Action, Dispatch } from 'vuex';
+import type { Action } from 'vuex';
 
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -9,11 +9,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { Currency } from '@/store/modules/display/config';
 import {
-    CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE,
+    SIDEBAR_TYPE,
 } from '@/store/modules/display/config';
-import type { CurrencyRates, DisplayState } from '@/store/modules/display/type';
+import type { DisplayState } from '@/store/modules/display/type';
 
 import {
     hideLoadingMessage, showLoadingMessage, showSuccessMessage,
@@ -109,7 +108,7 @@ const getNotificationListParam = (userId: string, currentTime: Dayjs, lastNotifi
 
 let notificationListApiToken: CancelTokenSource | undefined;
 export const checkNotification: Action<DisplayState, any> = async ({
-    commit, state, rootState, rootGetters,
+    commit, state, rootState,
 }): Promise<void> => {
     if (notificationListApiToken) {
         debugCheckNotification('[CHECK NOTI]', ' pending...');
@@ -120,7 +119,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
         notificationListApiToken = axios.CancelToken.source();
 
         const currentTime = dayjs.tz(dayjs.utc(), rootState.user.timezone);
-        const lastNotificationReadTimeStr = rootGetters['settings/getItem']('lastNotificationReadTime', '/gnb');
+        const lastNotificationReadTimeStr = rootState.settings.gnbNotificationLastReadTime;
         const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(rootState.user.timezone) : undefined;
         const param = getNotificationListParam(
             rootState.user.userId,
@@ -175,68 +174,6 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
     checkNotificationInterval = setInterval(() => {
         dispatch('checkNotification');
     }, 10000);
-};
-
-type ExchangeRateData = {
-    currency: Currency;
-    rate: number;
-    is_default: boolean;
-    state: string;
-};
-
-const getCurrencyRates = async (): Promise<CurrencyRates> => {
-    try {
-        const { results } = await SpaceConnector.client.costAnalysis.exchangeRate.list();
-
-        const rates = { USD: 1 } as CurrencyRates;
-        results.forEach(({ currency, rate, state }: ExchangeRateData) => {
-            if (CURRENCY[currency] && state === 'ENABLED') rates[currency] = rate;
-        });
-        return rates;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return DEFAULT_CURRENCY_RATES;
-    }
-};
-
-/* Currency */
-interface CurrencyRatesStoredData {
-    rates: CurrencyRates;
-    timestamp: number;
-}
-
-const storeCurrencyRates = (rates, dispatch: Dispatch) => {
-    const currencyRatesStoreData: CurrencyRatesStoredData = {
-        rates,
-        timestamp: dayjs().unix(),
-    };
-    dispatch('settings/setItem', {
-        key: 'currencyRates',
-        value: currencyRatesStoreData,
-        path: '/common',
-    }, { root: true });
-};
-
-export const loadCurrencyRates: Action<DisplayState, any> = async ({
-    commit, dispatch, rootGetters,
-}) => {
-    const storedData: CurrencyRatesStoredData|undefined = rootGetters['settings/getItem']('currencyRates', '/common');
-    const now = dayjs();
-    const storedDate = storedData?.timestamp ? dayjs.unix(storedData?.timestamp) : undefined;
-    const storedRates = storedData?.rates ?? {};
-    const isDateStoredToday = storedDate ? storedDate.isSame(now, 'day') : false;
-    if (isDateStoredToday) {
-        const localData = { USD: 1 };
-        Object.keys(storedRates).forEach((k) => {
-            if (CURRENCY[k]) localData[k] = storedRates[k];
-        });
-        commit('setCurrencyRates', localData);
-        return;
-    }
-
-    const rates = await getCurrencyRates();
-    commit('setCurrencyRates', rates);
-    storeCurrencyRates(rates, dispatch);
 };
 
 export const showMobileGuideModal: Action<DisplayState, any> = ({ commit }) => {

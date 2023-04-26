@@ -89,7 +89,7 @@ export default defineComponent<Props>({
             widgetRef: [] as Array<WidgetComponent|null>,
             initiatedWidgetMap: {} as Record<string, any>,
             allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currencyRates: computed(() => store.state.settings.currencyRates),
         });
 
         /* container width */
@@ -194,7 +194,7 @@ export default defineComponent<Props>({
             // emit('rendered', state.widgetRef);
         });
         (async () => {
-            await store.dispatch('display/loadCurrencyRates');
+            await store.dispatch('settings/initSettings');
         })();
 
         return {

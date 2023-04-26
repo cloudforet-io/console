@@ -52,7 +52,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import config from '@/lib/config';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';

@@ -10,8 +10,9 @@ import type {
     PublicDashboardInfo,
     UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
 
 export const useCostExplorerDashboardStore = defineStore('cost-explorer-dashboard', {
     state: () => ({
@@ -31,7 +32,7 @@ export const useCostExplorerDashboardStore = defineStore('cost-explorer-dashboar
             }));
             return [...publicList, ...userList];
         },
-        homeDashboardId: () => store.getters['settings/getItem']('homeDashboard', COST_EXPLORER_ROUTE.DASHBOARD._NAME),
+        homeDashboardId: () => costExplorerSettingsStore.homeDashboardId,
     },
     actions: {
         async setDashboardList(): Promise<void> {
@@ -53,11 +54,7 @@ export const useCostExplorerDashboardStore = defineStore('cost-explorer-dashboar
             }
         },
         setHomeDashboard(homeDashboardId: string) {
-            store.dispatch('settings/setItem', {
-                key: 'homeDashboard',
-                value: homeDashboardId,
-                path: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-            });
+            costExplorerSettingsStore.setHomeDashboardId(homeDashboardId);
         },
     },
 });
