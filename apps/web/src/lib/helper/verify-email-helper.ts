@@ -3,7 +3,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -17,7 +17,7 @@ export const postValidationEmail = async (body): Promise<void|Error> => {
         });
         return undefined;
     } catch (e: any) {
-        ErrorHandler.handleError(e);
+        showErrorMessage(e.axiosError.response.data.detail.message, e);
         throw e;
     }
 };
