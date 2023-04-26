@@ -215,15 +215,12 @@ import CloudServiceLogTab from '@/services/asset-inventory/cloud-service/cloud-s
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import {
+    TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
+} from '@/services/asset-inventory/store/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 
-const DEFAULT_PAGE_SIZE = 15;
-
-// TODO: move this code to store
-const STORAGE_PREFIX = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
-const TABLE_MIN_HEIGHT = 400;
 
 export default {
     name: 'CloudServiceDetailPage',
@@ -266,6 +263,7 @@ export default {
     setup(props) {
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
         const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
+        const assetInventorySettingsStore = useAssetInventorySettingsStore();
 
         const vm = getCurrentInstance()?.proxy as Vue;
 
@@ -275,7 +273,7 @@ export default {
         const { filters: searchFilters, urlQueryStringFilters } = queryTagsHelper;
         const fetchOptionState = reactive({
             pageStart: 1,
-            pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
+            pageLimit: assetInventorySettingsStore.getCloudServiceTablePageLimit,
             sortDesc: true,
             sortBy: 'created_at',
             queryTags: computed(() => queryTagsHelper.queryTags.value),
@@ -288,7 +286,7 @@ export default {
             selectIndex: [] as number[],
         });
 
-        const tableHeight = store.getters['settings/getItem']('tableHeight', STORAGE_PREFIX) ?? 0;
+        const tableHeight = assetInventorySettingsStore.getCloudServiceTableHeight;
         const tableState = reactive({
             hasManagePermission: useManagePermissionState(),
             schema: null as null|DynamicLayout,
@@ -359,11 +357,7 @@ export default {
 
         const handleTableHeightChange = (height) => {
             tableState.tableHeight = height;
-            store.dispatch('settings/setItem', {
-                key: 'tableHeight',
-                value: height,
-                path: STORAGE_PREFIX,
-            });
+            assetInventorySettingsStore.setCloudServiceTableHeight(height);
         };
 
         const handleSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
@@ -452,11 +446,7 @@ export default {
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
-                await store.dispatch('settings/setItem', {
-                    key: 'pageLimit',
-                    value: changed.pageLimit,
-                    path: STORAGE_PREFIX,
-                });
+                assetInventorySettingsStore.setCloudServiceTablePageLimit(changed.pageLimit);
             }
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;

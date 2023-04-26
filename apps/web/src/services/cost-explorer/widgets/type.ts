@@ -1,7 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { Currency } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
 

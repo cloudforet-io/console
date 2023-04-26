@@ -30,7 +30,7 @@ import { cloneDeep } from 'lodash';
 
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';

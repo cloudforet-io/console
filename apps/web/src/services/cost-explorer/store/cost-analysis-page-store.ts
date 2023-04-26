@@ -9,7 +9,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -26,6 +26,8 @@ interface CostAnalysisPageState {
     selectedQueryId?: string;
     costQueryList: CostQuerySetModel[];
 }
+
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -116,7 +118,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.period = getInitialDates();
             this.filters = {};
             // set more group by items
-            const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+            const storedMoreGroupByItems: MoreGroupByItem[] = costExplorerSettingsStore.$state.costAnalysisMoreGroupBy;
             this.moreGroupBy = getMergedMoreGroupByItems([], storedMoreGroupByItems);
         },
         async setQueryOptions(options?: CostQuerySetOption) {
@@ -144,7 +146,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.primaryGroupBy = refinedGroupBy?.[0];
 
             // set moreGroupByItems
-            const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+            const storedMoreGroupByItems: MoreGroupByItem[] = costExplorerSettingsStore.$state.costAnalysisMoreGroupBy;
             this.moreGroupBy = getMergedMoreGroupByItems(refinedGroupBy ?? [], storedMoreGroupByItems);
 
             if (options.period) this.period = { start: options.period.start, end: options.period.end };
@@ -204,11 +206,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         },
         setMoreGroupByWithSettings(moreGroupByItems: MoreGroupByItem[]) {
             this.moreGroupBy = moreGroupByItems;
-            store.dispatch('settings/setItem', {
-                key: 'more_group_by',
-                value: moreGroupByItems,
-                path: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-            }, { root: true });
+            costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
         },
     },
 });

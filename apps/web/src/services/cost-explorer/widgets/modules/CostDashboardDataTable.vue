@@ -98,7 +98,7 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
