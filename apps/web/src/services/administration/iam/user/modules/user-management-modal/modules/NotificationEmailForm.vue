@@ -46,7 +46,7 @@
                         <p-button v-else
                                   style-type="tertiary"
                                   class="send-mail-button"
-                                  :disabled="!email || emailValidator(email)"
+                                  :disabled="!email || invalidTexts.email !== ''"
                                   :loading="state.loading"
                                   @click="handleClickSend"
                         >
@@ -131,6 +131,7 @@ const { email } = forms;
 
 /* Components */
 const handleChangeInput = (e) => {
+    console.log(invalidTexts.email);
     setForm('email', e);
     emit('change-input', { ...forms, email: email.value });
 };
@@ -149,7 +150,6 @@ const handleClickBadge = () => {
 const initForm = () => {
     setForm('email', props.item.email || '');
 };
-
 /* API */
 const handleClickSend = async () => {
     state.loading = true;
