@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 

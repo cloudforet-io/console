@@ -181,10 +181,9 @@ import { cloneDeep } from 'lodash';
 
 import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

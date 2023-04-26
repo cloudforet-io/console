@@ -62,8 +62,8 @@ import type { Location } from 'vue-router';
 
 import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
 
-import type { CurrencySymbol } from '@/store/modules/display/config';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { CurrencySymbol } from '@/store/modules/settings/type';
 
 const UNIT_TYPE = Object.freeze({
     PERCENT: 'PERCENT',

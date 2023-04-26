@@ -1,8 +1,8 @@
 import type { Mutation } from 'vuex';
 
-import type { Currency, SidebarType } from '@/store/modules/display/config';
+import type { SidebarType } from '@/store/modules/display/config';
 
-import type { CurrencyRates, DisplayState } from './type';
+import type { DisplayState } from './type';
 
 export const setVisibleSidebar: Mutation<DisplayState> = (state, visible: boolean): void => {
     state.visibleSidebar = visible;
@@ -26,14 +26,6 @@ export const setUncheckedNotificationCount: Mutation<DisplayState> = (state, cou
 
 export const setIsSignInFailed: Mutation<DisplayState> = (state, isSignInFailed: boolean): void => {
     state.isSignInFailed = isSignInFailed;
-};
-
-export const setCurrency: Mutation<DisplayState> = (state, currency: Currency): void => {
-    state.currency = currency;
-};
-
-export const setCurrencyRates: Mutation<DisplayState> = (state, rates: CurrencyRates): void => {
-    state.currencyRates = rates;
 };
 
 export const setVisibleMobileGuideModal: Mutation<DisplayState> = (state, visibleMobileGuideModal: boolean): void => {
