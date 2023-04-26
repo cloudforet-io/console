@@ -8,12 +8,15 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const postValidationEmail = async (body): Promise<void|Error> => {
-    const { email, user_id, domain_id } = body;
+    const {
+        email, user_id, domain_id, force,
+    } = body;
     try {
         await SpaceConnector.clientV2.identity.user.verifyEmail({
             user_id,
             email,
             domain_id,
+            force,
         });
         return undefined;
     } catch (e: any) {
