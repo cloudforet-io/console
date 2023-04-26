@@ -67,7 +67,7 @@
                 :user-id="userId"
                 :verified="isEmailVerified"
                 :email="email"
-                :visible.sync="isVisible"
+                :visible.sync="notificationEmailModalVisible"
                 @refresh-user="updateUser"
             />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
@@ -141,7 +141,7 @@ export default defineComponent({
             userId: computed(() => store.state.user.userId),
             email: computed(() => store.state.user.email),
             domainId: computed(() => store.state.domain.domainId),
-            isVisible: false,
+            notificationEmailModalVisible: false,
         });
         const goToSignIn = () => {
             const res: Location = {
@@ -157,9 +157,9 @@ export default defineComponent({
         };
 
         watch(() => vm.$route, (value) => {
-            state.isVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
+            state.notificationEmailModalVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
         });
-        watch(() => state.isVisible, async (value) => {
+        watch(() => state.notificationEmailModalVisible, async (value) => {
             if (value) {
                 const userParam = {
                     email: state.email,
