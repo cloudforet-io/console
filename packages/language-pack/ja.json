@@ -1454,7 +1454,11 @@
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
 			"UPDATE_TITLE": "ウィジェットの更新",
-			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
+			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。",
+			"VIEW_MODE": {
+				"EDIT_OPTION": "",
+				"VIEW_MODE": ""
+			}
 		}
 	},
 	"IAM": {
