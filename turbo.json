@@ -1,57 +1,57 @@
 {
   "pipeline": {
     "@cloudforet/core-lib#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
+      "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.json"
-      ]
+      ],
+      "cache": true
     },
     "@spaceone/design-system#build": {
-        "dependsOn": ["^build"],
-        "outputs": ["dist/**"],
+      "outputs": ["./dist/**", "./css/**", "./types/**"],
         "inputs": [
-            "src/**", "postcss.config.js", "tailwind.config.js",
-          "package.json", "tsconfig.build.json", "vite.config.ts",
+            "src/**", "postcss.config.cjs", "tailwind.config.cjs",
+          "package.json", "tsconfig.build.json", "vite.config.js",
           "!./**/*.stories.mdx", "!./**/story-helper.ts", "!./**/*.mock.ts"
-        ]
+        ],
+      "cache": true
     },
     "web#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
+      "dependsOn": ["@cloudforet/core-lib#build","@spaceone/design-system#build"],
+      "outputs": ["./dist/**"],
       "inputs": [
         "public/**", "!public/config/development.json",
         "src/**", "!src/assets/.github", "!src/assets/.gitignore", "!src/assets/Dockerfile", "!src/assets/public/**",
         "package.json", "package-lock.json", "tsconfig.json",
-        "vite.config.ts", "postcss.config.js", "tailwind.config.js"
-      ]
+        "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs"
+      ],
+      "cache": true
     },
     "storybook#build": {
-      "dependsOn": ["^build"],
-      "outputs": [".out/**"],
+      "outputs": ["./.out/**"],
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*"
-      ]
-    },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      ],
+      "cache": true
     },
     "dev": {
       "cache": false
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "format": {
       "dependsOn": ["^format"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "test": {
       "dependsOn": ["^test"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     }
   }
 }

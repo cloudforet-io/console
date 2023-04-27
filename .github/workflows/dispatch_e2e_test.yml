@@ -1,5 +1,4 @@
-# E2E Test
-name: Playwright Tests
+name: "[Dispatch] E2E Test"
 
 on:
   workflow_dispatch:

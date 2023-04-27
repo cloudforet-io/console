@@ -1,0 +1,72 @@
+name: "[Dispatch] Storybook Deploy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'branch를 입력해주세요(master와 release-x.y.z만 허용)'
+        required: true
+        default: 'master'
+
+env:
+  BRANCH: ${{ github.event.inputs.branch }}
+  SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Restore cached node_modules
+        id: restore-node-cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.restore-node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build
+        env:
+          NODE_ENV: "production"
+        run: |
+          npm run build -- --filter=storybook --token="${{ secrets.TURBO_TOKEN }}" --team="${{ secrets.TURBO_TEAM }}" --api="${{ secrets.TURBO_API }}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.STORYBOOK_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.STORYBOOK_AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Deploy to s3
+        run: aws s3 sync apps/storybook/.out/ s3://${{ secrets.STORYBOOK_S3_BUCKET }} --delete
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CDN_DISTRIBUTION_ID }} --paths "/*"
+
+  notification:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.15.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,ref,workflow,job
+          author_name: Github Action Slack

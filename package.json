@@ -20,13 +20,13 @@
     "@commitlint/cli": "^14.1.0",
     "@commitlint/config-conventional": "^14.1.0",
     "eslint-config-custom": "*",
-    "husky": "^7.0.4",
+    "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "turbo": "^1.8.3"
+    "turbo": "^1.9.3"
   },
   "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0"
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
   },
-  "packageManager": "npm@8.1.2"
+  "packageManager": "npm@8.19.4"
 }
