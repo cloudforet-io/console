@@ -1,0 +1,10 @@
+{
+  "name": "@cloudforet/stylelint-config-custom",
+  "version": "1.11.0-27",
+  "private": true,
+  "main": "index.js",
+  "devDependencies": {
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^20.0.0"
+  }
+}

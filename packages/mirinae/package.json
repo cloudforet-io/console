@@ -98,6 +98,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "@cloudforet/stylelint-config-custom": "*",
     "postcss-config-custom": "*",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/bytes": "^3.1.1",
@@ -116,8 +117,6 @@
     "eslint-config-custom": "*",
     "resolve-url-loader": "^3.1.5",
     "rollup-plugin-copy": "^3.4.0",
-    "stylelint": "^13.13.1",
-    "stylelint-config-standard": "^20.0.0",
     "ts-loader": "^8.4.0",
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",

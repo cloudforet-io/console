@@ -4,7 +4,6 @@
   "private": true,
   "main": "index.js",
   "devDependencies": {
-    "postcss": "^8.3.1",
     "postcss-comment": "^2.0.0",
     "postcss-conditionals": "^2.1.0",
     "postcss-easy-import": "^3.0.0",

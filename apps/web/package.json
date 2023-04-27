@@ -80,6 +80,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "@cloudforet/stylelint-config-custom": "*",
     "postcss-config-custom": "*",
     "@babel/preset-env": "^7.21.4",
     "@playwright/test": "^1.31.1",
@@ -99,14 +100,13 @@
     "dotenv": "^16.0.3",
     "eslint-config-custom": "*",
     "jsdom": "^20.0.1",
-    "stylelint": "^13.13.1",
-    "stylelint-config-standard": "^20.0.0",
     "tsconfig": "*",
     "vite": "^4.3.3",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
     "vitest": "^0.26.3",
-    "vue-template-compiler": "^2.7.14"
+    "vue-template-compiler": "^2.7.14",
+    "postcss": "^8.3.1"
   },
   "browserslist": [
     "> 1%",
