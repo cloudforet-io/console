@@ -145,7 +145,7 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
             state.optionsErrorMap,
         )),
-        currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
+        currency: computed(() => dashboardDetailStore.dashboardCurrency ?? CURRENCY.USD),
         groupBy: computed(() => state.options?.group_by),
         granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
