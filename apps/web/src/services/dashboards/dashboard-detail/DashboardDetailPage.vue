@@ -48,7 +48,9 @@
             </template>
         </p-heading>
         <div class="filter-box">
-            <dashboard-labels />
+            <dashboard-labels :editable="state.hasManagePermission"
+                              @update-labels="handleUpdateLabels"
+            />
             <dashboard-toolset />
         </div>
         <p-divider class="divider" />
@@ -85,6 +87,8 @@ import {
 import {
     PDivider, PI, PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 
@@ -167,6 +171,24 @@ const getDashboardData = async (dashboardId: string, force = false) => {
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
+const updateDashboardLabel = async (labels: string[]) => {
+    try {
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                labels,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                labels,
+            });
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 // name edit
 const handleVisibleNameEditModal = () => {
@@ -190,6 +212,9 @@ const handleVisibleCloneModal = () => {
 // else
 const handleRefresh = () => {
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+const handleUpdateLabels = (labels) => {
+    updateDashboardLabel(labels);
 };
 
 /* init */
