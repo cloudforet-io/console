@@ -8,6 +8,14 @@
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
+        <p-icon-button v-if="!props.editMode"
+                       v-tooltip.bottom="$t('DASHBOARDS.WIDGET.VIEW_MODE.VIEW_MODE')"
+                       class="view-mode-button"
+                       name="ic_arrows-expand-all"
+                       shape="square"
+                       style-type="tertiary"
+                       @click="handleClickViewModeButton"
+        />
         <div class="body"
              :style="{overflowY: props.overflowY}"
         >
@@ -86,6 +94,9 @@
                                      :widget-key="props.widgetKey"
                                      @refresh="emit('refresh')"
         />
+        <widget-view-mode-modal :visible.sync="state.viewModeModalVisible"
+                                :selected-widget-key="props.widgetKey"
+        />
     </div>
 </template>
 
@@ -114,6 +125,7 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
+import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
@@ -209,6 +221,7 @@ const state = reactive({
             },
         },
     ]),
+    viewModeModalVisible: false,
 });
 
 const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YY-MM-DD') : undefined);
@@ -217,10 +230,14 @@ const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
 };
+const handleClickViewModeButton = () => {
+    state.viewModeModalVisible = true;
+};
 </script>
 
 <style lang="postcss" scoped>
 .widget-frame {
+    position: relative;
     height: 29rem;
 
     @apply border rounded-lg bg-white;
@@ -229,23 +246,36 @@ const handleDeleteModalConfirm = () => {
     flex-direction: column;
 
     .widget-header {
-        @apply flex justify-between items-center;
+        @apply flex items-center;
         .title {
+            @apply truncate;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: -webkit-box;
+            display: block;
             -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
             font-size: 1rem;
             font-weight: 700;
             color: theme('colors.gray.900');
             line-height: 1.25;
             margin: 0.25rem 0;
+            padding-right: 1rem;
         }
-        padding: 0.75rem 1.5rem 1rem 1.5rem;
+        padding: 0.75rem 2.5rem 1rem 1.5rem;
         border-color: inherit;
         flex: 0 0;
     }
+    .view-mode-button {
+        position: absolute;
+        display: none;
+        right: 0.25rem;
+        top: 0.25rem;
+    }
+    &:hover {
+        .view-mode-button {
+            display: flex;
+        }
+    }
+
     .body {
         height: auto;
         overflow-y: auto;
