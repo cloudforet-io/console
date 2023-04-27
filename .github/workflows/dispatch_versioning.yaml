@@ -1,0 +1,72 @@
+name: "[Dispatch] Versioning"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'branch를 입력해주세요(master와 release-x.y.z만 허용)'
+        required: true
+        default: 'master'
+      version:
+        description: 'version을 입력해주세요(x.y.z)'
+        required: true
+        default: '1.0.0'
+
+env:
+  BRANCH: ${{ github.event.inputs.branch }}
+  VERSION: ${{ github.event.inputs.version }}
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Restore cached node_modules
+        id: restore-node-cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.restore-node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+        
+      - name: Change version
+        run: |
+          npm version ${{ env.VERSION }} --no-git-tag-version --allow-same-version --no-commit-hooks --include-workspace-root -ws
+
+      - name: Configure git
+        run: |
+          git config --global user.email "${{ vars.GIT_EMAIL }}"
+          git config --global user.name "${{ vars.GIT_USERNAME }}"
+
+      - name: Check if there are any changes
+        id: check_changes
+        run: |
+          git diff --exit-code --quiet || echo "::set-output name=changed::true"
+        continue-on-error: true
+
+      - name: Commit changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git commit -am "chore: version ${{ env.VERSION }}"
+
+      - name: Push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_TOKEN }}
+          branch: ${{ github.ref }}

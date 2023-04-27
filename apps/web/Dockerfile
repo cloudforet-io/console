@@ -18,22 +18,28 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-RUN npm install
+RUN npm ci
 
 # Build the project
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
+COPY .git/ .git/
 ENV NODE_ENV production
 
-# Uncomment and use build args to enable remote caching
-#ARG TURBO_TEAM
-#ENV TURBO_TEAM=$TURBO_TEAM
-#
-#ARG TURBO_TOKEN
-#ENV TURBO_TOKEN=$TURBO_TOKEN
+# Use build args to enable remote caching
+ARG TURBO_TEAM
+ENV TURBO_TEAM=$TURBO_TEAM
 
-RUN npx turbo build --filter=@cloudforet/core-lib
+ARG TURBO_TOKEN
+ENV TURBO_TOKEN=$TURBO_TOKEN
+
+ARG TURBO_API
+ENV TURBO_API=$TURBO_API
+
+ENV FORCE_COLOR=1
+
 RUN npx turbo build --filter=web...
+RUN rm -rf .git
 
 FROM nginx AS runner
 

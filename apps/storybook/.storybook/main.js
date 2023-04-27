@@ -32,8 +32,7 @@ module.exports = {
         config.resolve.alias = {
             vue: 'vue/dist/vue.common.js',
             '@': path.resolve(__dirname, '../../../packages/mirinae/src'),
-            fs: path.resolve(__dirname, 'fsMock.js'),
-            '@storybook/addon-docs': path.resolve(__dirname, '../node_modules/@storybook/addon-docs')
+            fs: path.resolve(__dirname, 'fsMock.js')
         };
 
         /* SASS settings */

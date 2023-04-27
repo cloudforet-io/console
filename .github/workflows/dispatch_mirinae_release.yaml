@@ -1,0 +1,70 @@
+name: "[Dispatch] Mirinae Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'branch를 입력해주세요(master와 release-x.y.z만 허용)'
+        required: true
+        default: 'master'
+      version:
+        description: 'version을 입력해주세요(x.y.z)'
+        required: true
+        default: '1.0.0'
+
+env:
+  BRANCH: ${{ github.event.inputs.branch }}
+  VERSION: ${{ github.event.inputs.version }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Restore cached node_modules
+        id: restore-node-cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.restore-node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build
+        env:
+          NODE_ENV: "production"
+        run: |
+          npm run build -- --filter=@spaceone/design-system --token="${{ secrets.TURBO_TOKEN }}" --team="${{ secrets.TURBO_TEAM }}" --api="${{ secrets.TURBO_API }}"
+
+#      - name: Release
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+#        run: |
+
+  notification:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.15.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,ref,workflow,job
+          author_name: Github Action Slack

@@ -3,7 +3,7 @@
     "checkJs": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "types": ["webpack-env", "vitest/globals"],
+    "types": ["vitest/globals"],
     "baseUrl": ".",
     "outDir": "types",
     "paths": {
