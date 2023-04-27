@@ -847,7 +847,9 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "言語編集に失敗",
 				"ALT_S_UPDATE": "言語編集完了",
+				"ALT_S_UPDATE_CURRENCY": "",
 				"GO_TO_MYPAGE": "マイページ",
+				"LABEL_CURRENCY": "通貨",
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
