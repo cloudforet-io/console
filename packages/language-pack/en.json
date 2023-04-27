@@ -847,7 +847,9 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "Failed to Update Language",
 				"ALT_S_UPDATE": "Successfully Updated Language",
+				"ALT_S_UPDATE_CURRENCY": "Successfully Updated Currency",
 				"GO_TO_MYPAGE": "Go to My Page",
+				"LABEL_CURRENCY": "Currency",
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
