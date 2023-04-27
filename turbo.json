@@ -40,15 +40,18 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "format": {
       "dependsOn": ["^format"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "test": {
       "dependsOn": ["^test"],
-      "outputs": []
+      "outputs": [],
+      "cache": false
     }
   }
 }
