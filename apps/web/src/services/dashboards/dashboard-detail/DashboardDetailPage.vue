@@ -171,24 +171,6 @@ const getDashboardData = async (dashboardId: string, force = false) => {
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
-const updateDashboardLabel = async (labels: string[]) => {
-    try {
-        const isProjectDashboard = props.dashboardId?.startsWith('project');
-        if (isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
-                labels,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
-                labels,
-            });
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 // name edit
 const handleVisibleNameEditModal = () => {
@@ -213,8 +195,23 @@ const handleVisibleCloneModal = () => {
 const handleRefresh = () => {
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
-const handleUpdateLabels = (labels) => {
-    updateDashboardLabel(labels);
+const handleUpdateLabels = async (labels: string[]) => {
+    try {
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                labels,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                labels,
+            });
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 /* init */
