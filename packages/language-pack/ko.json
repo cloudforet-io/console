@@ -806,7 +806,9 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "언어 변경 실패",
 				"ALT_S_UPDATE": "언어 변경 완료",
+				"ALT_S_UPDATE_CURRENCY": "",
 				"GO_TO_MYPAGE": "마이페이지",
+				"LABEL_CURRENCY": "통화",
 				"LABEL_LANGUAGE": "언어",
 				"LABEL_PROFILE": "프로필",
 				"LABEL_ROLE": "역할",
