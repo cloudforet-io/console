@@ -1,6 +1,6 @@
 <template>
     <p-select-dropdown :items="state.currencyItems"
-                       :selected="currency"
+                       :selected="state.currency"
                        style-type="transparent"
                        menu-position="right"
                        class="currency-select-dropdown"
