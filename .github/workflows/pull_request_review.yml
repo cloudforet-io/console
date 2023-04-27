@@ -1,8 +1,8 @@
-# [PR] Review
-name: SpaceONE Review
+name: "[PR] Review"
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     path-ignores:
       - '.github/**'
       - '**/deploy/**'
@@ -19,11 +19,12 @@ on:
     branches:
       - master
       - feature-*
-
+    workflow_dispatch:
 
 jobs:
   review:
     runs-on: ubuntu-latest
+
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -31,21 +32,27 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
-
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
+          ref: ${{ github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'npm'
+          node-version: 16
+
+      - name: Restore cached node_modules
+        id: restore-node-cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
 
       - name: Install dependencies
+        if: steps.restore-node-cache.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Build Packages
