@@ -70,7 +70,7 @@
     "dayjs": "^1.10.7",
     "dompurify": "^2.3.3",
     "dragselect": "^1.15.1",
-    "ejs": "^3.1.7",
+    "ejs": "^3.1.9",
     "filepond": "^4.30.3",
     "filepond-plugin-file-validate-type": "^1.2.6",
     "flatpickr": "^4.6.9",

@@ -50,7 +50,7 @@
     "currency.js": "^2.0.4",
     "dayjs": "^1.10.7",
     "diff-match-patch": "^1.0.5",
-    "ejs": "^3.1.7",
+    "ejs": "^3.1.9",
     "hashids": "^2.2.1",
     "highlight.js": "^11.5.1",
     "html-to-image": "^1.9.0",
@@ -80,7 +80,6 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.21.4",
     "@playwright/test": "^1.31.1",
     "@types/bytes": "^3.1.1",
