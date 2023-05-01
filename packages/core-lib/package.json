@@ -35,7 +35,8 @@
     "rimraf": "^3.0.2",
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",
-    "tsconfig": "*"
+    "tsconfig": "*",
+    "vite": "^4.3.3"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
