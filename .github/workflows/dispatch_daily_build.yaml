@@ -1,0 +1,148 @@
+name: "[Dispatch] Daily build"
+
+on:
+  workflow_dispatch:
+
+env:
+  BRANCH: master
+  SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.PAT_TOKEN }}
+          submodules: recursive
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.CLOUDFORET_DOCKER_USERNAME }}
+          password: ${{ secrets.CLOUDFORET_DOCKER_PASSWORD }}
+
+      - name: Get Date
+        run: |
+          sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+          echo "TIME=$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
+
+      - name: Build and push to dockerhub
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
+            TURBO_TEAM=${{ secrets.TURBO_TEAM }}
+          push: true
+          tags: |
+            cloudforetdev/${{ github.event.repository.name }}:latest
+            cloudforetdev/${{ github.event.repository.name }}:${{ env.TIME }}
+          cache-from: cloudforetdev/${{ env.SERVICE }}:latest
+          cache-to: type=inline
+
+      - name: Notice when job fails
+        if: failure()
+        uses: 8398a7/action-slack@v3.15.0
+        with:
+          status: ${{job.status}}
+          fields: repo,workflow,job
+          author_name: Github Action Slack
+
+  scan:
+    needs: docker
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Run Trivy vulnerability scanner
+        id: trivy-scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: cloudforetdev/${{ github.event.repository.name }}:${{ env.VERSION }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Count vulnerabilities
+        id: vulnerabilities
+        run: |
+          count=$(jq '.runs[].results[].ruleId' ./trivy-results.sarif | wc -c)
+          echo "result_count=$count" >> $GITHUB_OUTPUT
+          echo "$count"
+
+      - name: slack
+        if:  ${{ steps.vulnerabilities.outputs.result_count != 0 }}
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflowRun
+          custom_payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":warning: Image vulnerability detected"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Image:*\n$cloudforetdev/${{ github.event.repository.name }}:${{ env.VERSION }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repo name:*\n${{ github.repository }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "View Detail"
+                      },
+                      "style": "danger",
+                      "url": "https://github.com/${{ github.repository }}/security/code-scanning"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{secrets.VULNERABILITY_SLACK_WEBHOOK_URL}} 
+
+  notification:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack
+        if: always()
+        uses: 8398a7/action-slack@v3.15.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,ref,workflow,job
+          author_name: Github Action Slack
