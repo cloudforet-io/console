@@ -1,0 +1,11 @@
+name: "[PR Open] example"
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Implement here with test codes!"
