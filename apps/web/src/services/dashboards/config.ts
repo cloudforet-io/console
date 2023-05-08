@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { Currency } from '@/store/modules/display/config';
+import type { CURRENCY } from '@/store/modules/display/config';
 
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
@@ -47,13 +47,14 @@ export interface DateRange {
 
 
 // dashboard configs
+export type DashboardCurrency = 'DEFAULT' | typeof CURRENCY[keyof typeof CURRENCY];
 export interface DashboardSettings {
     date_range: {
         enabled: boolean;
     } & DateRange;
     currency: {
         enabled: boolean;
-        value?: Currency;
+        value?: DashboardCurrency;
     };
     refresh_interval_option: RefreshIntervalOption;
 }
