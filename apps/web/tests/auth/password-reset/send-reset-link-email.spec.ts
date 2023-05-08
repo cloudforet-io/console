@@ -11,6 +11,7 @@ test.describe('Send Reset Link Email', () => {
 
         const routerLink = await page.waitForSelector('#reset-pw-button');
         await routerLink.click();
+
         await page.waitForNavigation();
         await expect(page).toHaveURL('/find-password?status=find');
     });

@@ -3,9 +3,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Verified status notification email', () => {
     test('Verified status notification email', async ({ page }) => {
         await test.step('1. Go to my page', async () => {
-            const locatorName = page.locator('.p-heading.heading-main>.heading-wrapper>h2');
-
             await page.goto('/my-page');
+
+            const locatorName = page.locator('.p-heading.heading-main>.heading-wrapper>h2');
             await expect(locatorName).toContainText('Account & Profile');
         });
 
@@ -18,19 +18,18 @@ test.describe('Verified status notification email', () => {
         });
 
         await test.step('3. Open change modal', async () => {
-            const locatorName = page.locator('.p-button-modal .modal-content .header .modal-header');
             await page.getByRole('button', { name: 'Change', exact: true }).click();
 
+            const locatorName = page.locator('.p-button-modal .modal-content .header .modal-header');
             await expect(locatorName).toContainText('Verify Notification Email');
         });
 
         await test.step('4. Change notification email', async () => {
-            const locatorName = page.locator('.notification-email-modal-wrapper .modal-content-wrapper .sent-email-wrapper .contents-wrapper .email-wrapper');
-
             await page.locator('#newNotificationEmail').getByRole('textbox').click();
             await page.locator('#newNotificationEmail').getByRole('textbox').fill(process.env.CHANGE_NOTIFICATION_EMAIL as string);
             await page.getByRole('button', { name: 'Send Code' }).click();
 
+            const locatorName = page.locator('.notification-email-modal-wrapper .modal-content-wrapper .sent-email-wrapper .contents-wrapper .email-wrapper');
             await expect(locatorName).toContainText(process.env.CHANGE_NOTIFICATION_EMAIL as string);
         });
 
