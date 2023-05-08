@@ -68,7 +68,7 @@
                                             <template v-if="isFieldSortable(field.sortable)">
                                                 <p-i
                                                     v-if="sortable && (field.sortKey|| field.name) === sortBy"
-                                                    :name="proxyState.proxySortDesc ? 'ic_caret-down' : 'ic_caret-up-filled'"
+                                                    :name="proxyState.proxySortDesc ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                                                     class="sort-icon"
                                                 />
                                                 <p-i v-else
@@ -360,7 +360,6 @@ export default defineComponent<DataTableProps>({
             proxySortBy: useProxyValue<string>('sortBy', props, emit),
             proxySortDesc: useProxyValue<boolean|undefined>('sortDesc', props, emit),
         });
-        console.log(proxyState.proxySortDesc);
 
         const state = reactive({
             tbodyRef: null as HTMLElement|null,
@@ -457,10 +456,16 @@ export default defineComponent<DataTableProps>({
                 let sortBy = proxyState.proxySortBy;
                 let sortDesc: undefined|boolean = proxyState.proxySortDesc;
 
-                if (sortBy !== clickedKey) {
+                if (sortBy === clickedKey) {
+                    // set reverse mode
+                    sortDesc = !sortDesc;
+
+                    // when clicked the other thead
+                } else {
                     sortBy = clickedKey;
+                    sortDesc = true;
                 }
-                sortDesc = !sortDesc;
+
                 // set changed values
                 proxyState.proxySortBy = sortBy;
                 proxyState.proxySortDesc = sortDesc;
