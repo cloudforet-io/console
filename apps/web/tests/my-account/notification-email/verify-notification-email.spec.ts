@@ -3,9 +3,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Verify notification email', () => {
     test('Verify notification email', async ({ page }) => {
         await test.step('1. Go to my account page', async () => {
-            const locatorName = page.locator('.p-heading.heading-main>.heading-wrapper>h2');
-
             await page.goto('/my-page');
+
+            const locatorName = page.locator('.p-heading.heading-main>.heading-wrapper>h2');
             await expect(locatorName).toContainText('Account & Profile');
         });
 
@@ -18,9 +18,9 @@ test.describe('Verify notification email', () => {
         });
 
         await test.step('3. Open verify modal', async () => {
-            const locatorName = page.locator('.p-button-modal .modal-content .header .modal-header');
             await page.getByRole('button', { name: 'Verify' }).click();
 
+            const locatorName = page.locator('.p-button-modal .modal-content .header .modal-header');
             await expect(locatorName).toContainText('Verify Notification Email');
         });
 
@@ -31,14 +31,14 @@ test.describe('Verify notification email', () => {
         });
 
         await test.step('5. Change notification email', async () => {
-            const locatorName = page.locator('.notification-email-modal-wrapper .modal-content-wrapper .sent-email-wrapper .contents-wrapper .email-wrapper');
             const editIconName = page.locator('.notification-email-modal-wrapper .modal-content-wrapper .sent-email-wrapper .edit-icon');
-
             await editIconName.click();
+
             await page.locator('#newNotificationEmail').getByRole('textbox').click();
             await page.locator('#newNotificationEmail').getByRole('textbox').fill(process.env.CHANGE_NOTIFICATION_EMAIL as string);
             await page.getByRole('button', { name: 'Send Code' }).click();
 
+            const locatorName = page.locator('.notification-email-modal-wrapper .modal-content-wrapper .sent-email-wrapper .contents-wrapper .email-wrapper');
             await expect(locatorName).toContainText(process.env.CHANGE_NOTIFICATION_EMAIL as string);
         });
 
