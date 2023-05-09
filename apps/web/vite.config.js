@@ -2,6 +2,7 @@ import path from 'path';
 import process from 'process';
 
 import vuePlugin from '@vitejs/plugin-vue2';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv } from 'vite';
 import StylelintPlugin from 'vite-plugin-stylelint';
 import VueTypeImports from 'vite-plugin-vue-type-imports';
@@ -24,6 +25,10 @@ export default defineConfig(async ({ command, mode }) => {
                 lintOnStart: false,
                 emitErrorAsWarning: true,
             }),
+            ...(process.env.NODE_ENV === 'production' ? [] : [visualizer({
+                emitFile: true,
+                filename: 'stats.html',
+            })]),
         ],
         build: {
             rollupOptions: {
