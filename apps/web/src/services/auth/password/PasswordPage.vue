@@ -210,7 +210,8 @@ const sendResetEmail = async (userId, domainId) => {
 const postResetPassword = async (request) => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.user.update(request);
+        const userInfo = await SpaceConnector.clientV2.identity.user.update(request);
+        await store.commit('user/setUser', userInfo);
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
@@ -224,14 +225,10 @@ const initStatesByUrlSSOToken = async () => {
     try {
         const ssoAccessToken = getSSOTokenFromUrl();
         // When sso access token is not exist in url query string
-        if (!ssoAccessToken) {
-            SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
-            return;
-        }
-
+        if (!ssoAccessToken) return;
         SpaceConnector.setToken(ssoAccessToken, '');
+
         const userId = getUserIdFromToken(ssoAccessToken);
-        // When there is no user id in sso access token
         if (!userId) return;
 
         state.userInfo.userId = userId;
@@ -240,6 +237,7 @@ const initStatesByUrlSSOToken = async () => {
         await store.commit('user/setUser', state.userInfo);
     } catch (e) {
         ErrorHandler.handleError('Invalid token.');
+        SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
     }
 };
 (async () => {
