@@ -5,7 +5,7 @@ on:
 
 env:
   REPO: cloudforet-io/actions
-  WORKFLOW_NAME: deploy.yaml
+  WORKFLOW_NAME: dispatch_apply_workflows.yaml
 
 jobs:
   owner_check:
