@@ -210,7 +210,6 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 }
                 const resultWithConvertedVariableSchema = this.convertDashboardInfoByChangedVariableSchema(result);
                 this.setDashboardInfo(resultWithConvertedVariableSchema);
-                this.setDashboardInfo(result);
             } catch (e) {
                 this.resetDashboardData();
                 throw e;
