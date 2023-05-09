@@ -88,6 +88,7 @@ import {
 
 import { SpaceRouter } from '@/router';
 
+import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
@@ -202,6 +203,9 @@ const init = async () => {
         currency: queryStringToObject(currentQuery.currency),
         refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
     };
+    if (!Object.values(CURRENCY).includes(useQueryValue.currency.value)) {
+        useQueryValue.currency.value = CURRENCY.USD;
+    }
 
     if (useQueryValue.variables) {
         dashboardDetailStore.$patch((_state) => {

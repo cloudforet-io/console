@@ -76,7 +76,12 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            currency: computed(() => props.currency || store.state.display.currency),
+            currency: computed(() => {
+                if (!Object.values(CURRENCY).includes(props.currency)) {
+                    return CURRENCY.USD;
+                }
+                return props.currency || store.state.display.currency;
+            }),
             currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
