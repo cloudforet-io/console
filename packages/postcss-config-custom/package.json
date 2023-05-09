@@ -1,0 +1,20 @@
+{
+  "name": "postcss-config-custom",
+  "version": "1.11.0-27",
+  "private": true,
+  "main": "index.js",
+  "devDependencies": {
+    "postcss-comment": "^2.0.0",
+    "postcss-conditionals": "^2.1.0",
+    "postcss-easy-import": "^3.0.0",
+    "postcss-import": "^15.0.0",
+    "postcss-hexrgba": "^2.0.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-mixins": "^6.2.3",
+    "postcss-nested": "^4.2.3",
+    "postcss-preset-env": "6.7.0",
+    "postcss-simple-vars": "^5.0.2",
+    "autoprefixer": "^9.8.8",
+    "tailwindcss": "^1.9.6"
+  }
+}

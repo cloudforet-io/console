@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
         exclude: mode === 'test' ? ['vue'] : [],
     },
     build: {
+        sourcemap: 'inline',
         lib: {
             entry: {
                 mirinae: path.resolve(__dirname, './src/index.ts'),
