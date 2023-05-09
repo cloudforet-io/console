@@ -10,6 +10,8 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    outputs:
+        TIME: ${{ steps.get_date.outputs.TIME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,7 +35,10 @@ jobs:
       - name: Get Date
         run: |
           sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
-          echo "TIME=$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
+          CURRENT_TIME=$(date +'%Y%m%d.%H%M%S')
+          
+          echo "TIME=$CURRENT_TIME" >> $GITHUB_ENV
+          echo "TIME=$CURRENT_TIME" >> $GITHUB_OUTPUT
 
       - name: Build and push to dockerhub
         uses: docker/build-push-action@v4
@@ -67,7 +72,7 @@ jobs:
         id: trivy-scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: cloudforetdev/${{ github.event.repository.name }}:${{ env.VERSION }}
+          image-ref: cloudforetdev/${{ github.event.repository.name }}:${{ needs.docker.outputs.TIME }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           ignore-unfixed: true
@@ -107,7 +112,7 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Image:*\n$cloudforetdev/${{ github.event.repository.name }}:${{ env.VERSION }}"
+                      "text": "*Image:*\n$cloudforetdev/${{ github.event.repository.name }}:${{ needs.docker.outputs.TIME }}
                     },
                     {
                       "type": "mrkdwn",
