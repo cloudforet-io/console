@@ -9,7 +9,7 @@
                       icon-left="ic_plus_bold"
                       @click="handleAddPair"
             >
-                <span>{{ $t('COMMON.TAGS.ADD_TAG') }}</span>
+                <span>{{ isAdministration ? $t('COMMON.TAGS.ADD') : $t('COMMON.TAGS.ADD_TAG') }}</span>
             </p-button>
         </slot>
         <div v-if="showHeader"
@@ -22,7 +22,7 @@
                 <span>{{ $t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
             </div>
         </div>
-        <div>
+        <div :class="isAdministration && 'is-administration'">
             <div v-for="(item, idx) in items"
                  :key="idx"
                  class="tags-group"
@@ -125,6 +125,10 @@ export default defineComponent({
         focused: {
             type: Boolean,
             default: true,
+        },
+        isAdministration: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }: SetupContext) {
@@ -250,6 +254,13 @@ export default defineComponent({
             padding-left: 0.125rem;
             padding-right: 0.125rem;
             line-height: 2rem;
+        }
+    }
+    .is-administration {
+        .tags-group {
+            .input-box {
+                width: 100%;
+            }
         }
     }
 }

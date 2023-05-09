@@ -98,7 +98,6 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),
@@ -150,9 +149,14 @@ export default {
             }
         };
 
-        watch(() => vm.$route.query.error, () => {
-            state.showErrorMessage = !!vm.$route.query.error;
+        /* Watcher */
+        watch(() => vm.$route.query.error, (value) => {
+            state.showErrorMessage = !!value;
         });
+
+        watch(() => vm.$route.name, () => {
+            store.dispatch('display/hideSignInErrorMessage');
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

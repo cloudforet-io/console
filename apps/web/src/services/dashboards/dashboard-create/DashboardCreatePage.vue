@@ -183,42 +183,46 @@ export default {
 .button-area {
     @apply flex justify-end mt-8 gap-4;
 }
-.dashboard-create-step1 {
-    @apply w-full;
-    max-width: 30rem;
-    padding: 2.5rem;
-    margin: 0 auto;
-
-    .p-button {
-        &.transparent {
-            &:focus {
-                @apply text-gray-900;
-            }
-            &:hover {
-                @apply text-blue-600;
-            }
-        }
-    }
-
-    @screen tablet {
+.dashboard-create-page {
+    width: 100%;
+    .dashboard-create-step1 {
         @apply w-full;
-    }
-}
+        max-width: 30rem;
+        padding: 2.5rem;
+        margin: 0 auto;
 
-.dashboard-create-step2 {
-    width: 62.5rem;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 4.0625rem;
+        .p-button {
+            &.transparent {
+                &:focus {
+                    @apply text-gray-900;
+                }
+                &:hover {
+                    @apply text-blue-600;
+                }
+            }
+        }
 
-    @screen tablet {
-        @apply w-full p-8;
-
-        .button-area {
-            @apply flex-col w-full mt-4;
+        @screen tablet {
+            @apply w-full;
         }
     }
-    .dashboard-create-header {
-        @apply mb-8;
+
+    .dashboard-create-step2 {
+        width: 62.5rem;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4.0625rem;
+
+        @screen tablet {
+            @apply w-full p-8;
+
+            .button-area {
+                @apply flex-col w-full mt-4;
+            }
+        }
+        .dashboard-create-header {
+            @apply mb-8;
+        }
     }
 }
+
 </style>

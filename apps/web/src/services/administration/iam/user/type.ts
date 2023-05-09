@@ -17,6 +17,7 @@ interface UserData {
 	created_at: TimeStamp;
 	domain_id?: string;
 	email?: string;
+	email_verified?: boolean;
 	language: string;
 	last_accessed_at: TimeStamp;
 	name: string;
@@ -26,6 +27,23 @@ interface UserData {
 	user_id: string;
 	backend: string;
 	role_bindings?: RoleBindingType[];
+}
+
+export interface UserDetailData {
+	roles?: unknown;
+	tags?: Tags;
+	user_id: string;
+	name: string;
+	state: string;
+	email?: string;
+	user_type: string;
+	backend: string;
+	language: string;
+	timezone: string;
+	last_accessed_at: number;
+	created_at?: TimeStamp;
+	domain_id: string;
+	email_verified?: boolean;
 }
 
 export interface User extends UserData {
@@ -112,3 +130,9 @@ export interface ChannelItem {
 	notification_level?: string;
 	protocol_name: string;
 }
+
+export const PASSWORD_TYPE = {
+    KEEP: 'KEEP',
+    RESET: 'RESET',
+    MANUALLY: 'MANUALLY',
+} as const;

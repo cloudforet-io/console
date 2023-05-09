@@ -3,15 +3,15 @@
                     :hide-header-close-button="true"
                     :hide-footer-close-button="true"
                     :visible="isVisible"
-                    :header-title="$t('AUTH.RESET_PASSWORD_PAGE.MOBILE_GUIDE_MODAL_TITLE')"
+                    :header-title="$t('AUTH.PASSWORD.MOBILE.MOBILE_GUIDE_MODAL_TITLE')"
                     size="sm"
                     @confirm="handleCloseModal"
     >
         <template #body>
             <div class="description">
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.MOBILE_GUIDE_MODAL_DESC_1') }}
-                <strong>{{ $t('AUTH.RESET_PASSWORD_PAGE.MOBILE_GUIDE_MODAL_DESC_2') }}</strong>
-                {{ $t('AUTH.RESET_PASSWORD_PAGE.MOBILE_GUIDE_MODAL_DESC_3') }}
+                {{ $t('AUTH.PASSWORD.MOBILE.MOBILE_GUIDE_MODAL_DESC_1') }}
+                <strong>{{ $t('AUTH.PASSWORD.MOBILE.MOBILE_GUIDE_MODAL_DESC_2') }}</strong>
+                {{ $t('AUTH.PASSWORD.MOBILE.MOBILE_GUIDE_MODAL_DESC_3') }}
             </div>
         </template>
         <template #confirm-button>

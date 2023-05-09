@@ -28,17 +28,58 @@
 		}
 	},
 	"AUTH": {
-		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "패스워드가 이미 변경되었습니다. 변경된 패스워드로 로그인하세요.",
-			"GO_TO_LOGIN_PAGE": "로그인 페이지로 이동",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "변경하지 않고 로그인으로 돌아가기",
-			"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
-			"INVALID_LINK": "잘못된 링크입니다.",
-			"MOBILE_GUIDE_MODAL_DESC_1": "초기 진입 시, ",
-			"MOBILE_GUIDE_MODAL_DESC_2": "PC환경에서 먼저 비밀번호 재설정 후",
-			"MOBILE_GUIDE_MODAL_DESC_3": "이용하실 수 있습니다.",
-			"MOBILE_GUIDE_MODAL_TITLE": "모바일 환경 이용 불가",
-			"RESET_PASSWORD": "비밀번호 재설정"
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "로그인 하러 가기",
+				"FORGOT_PASSWORD": "비밀번호를 잊어버리셨나요?",
+				"HELP_TEXT": "사용자 아이디를 입력하시면, 비밀번호 재설정 링크를 이메일로 보내드립니다.",
+				"INVALID_EMAIL_FORMAT": "잘못된 이메일 형식 또는 \bSingle Sign-On 계정입니다. ",
+				"SEND": "비밀번호 재설정 이메일 발송",
+				"TITLE": "비밀번호를 잊어버리셨나요?",
+				"USER_ID": "사용자 아이디"
+			},
+			"INVALID_LINK": "유효하지 않\u001e은 링크입니다",
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "데스크탑 또는 노트북 환경에서",
+				"MOBILE_GUIDE_MODAL_DESC_2": "초기 비밀번호 재설정 후 ",
+				"MOBILE_GUIDE_MODAL_DESC_3": "로그인을 하실 수 있습니다.",
+				"MOBILE_GUIDE_MODAL_TITLE": "모바일 환경 지원불가"
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "비밀번호 확인",
+				"DESC": "{min}자 이상 입력해주세요.",
+				"DONE": "비밀번호 재설정 완료!",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "이 곳",
+						"COLLAPSED": "이메일을 받지 못하셨나요?",
+						"DESC_1": "이메일 발송 완료",
+						"DESC_2": "전달드린 가이드에 따라 비밀번호를 변경해주세요.",
+						"EXTENSION_CONTACT": "도메인 관리자에게 문의해주세요. ",
+						"EXTENSION_DESC_1": "알림 전용 이메일은 사용자 아이디와 다를 수 있습니다. 만약, 알림 전용 이메일을 잊으셨다면, ",
+						"EXTENSION_REASON_1": "조금만 더 기다려 주세요. 수신함에 확인될 때까지 10분 이상 소요될 수 있습니다. ",
+						"EXTENSION_REASON_2": "스팸 메일을 확인해주세요. ",
+						"EXTENSION_REASON_3": "을 클릭하여, 이메일을 재전송을 시도하세요. ",
+						"EXTENSION_TITLE_1": "이메일을 받지 못하셨나요?",
+						"EXTENSION_TITLE_2": "아직도 이메일을 받지 못하셨나요? ",
+						"GO_BACK_TO_CONSOLE": "콘솔 로그인 하러 가기",
+						"TITLE": "비밀번호 재설정 이메일 발송 완료"
+					},
+					"FAIL": {
+						"DESC_1": "요청하신 계정에는",
+						"DESC_2": "비밀번호 재설정 링크 발송을 위한 알림전용 이메일이 인증되어 있지 않습니다. ",
+						"DESC_3": "도메인 관리자에게 문의하시어, ",
+						"DESC_4": "비밀번호 재설정을 요청해주세요.  ",
+						"GO_BACK": "뒤로가기",
+						"TITLE": "비밀번호 재설정 불가"
+					}
+				},
+				"GO_TO_SIGN_IN": "로그인 하러 가기",
+				"HELP_TEXT": "다음 계정의 새로운 비밀번호 입력 필요: ",
+				"NOT_MATCHING": "일치하지 않습니다.",
+				"RESET_PASSWORD": "비밀번호 재설정",
+				"TITLE": "비밀번호 재설정"
+			}
 		}
 	},
 	"AUTOMATION": {
@@ -887,6 +928,18 @@
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "스팸 메일을 확인하거나 조금만 더 기다려 주세요. 만일 아직도 이메일을 받지 못한 경우, ",
+			"COLLAPSE_TITLE": "인증 코드를 받지 못하셨나요?",
+			"INVALID_CODE": "잘못된 인증 코드 입니다. 이메일을 다시 확인 해주세요.",
+			"NOTIFICATION_EMAIL": "알림 전용 이메일",
+			"SEND_CODE": "인증 코드 전송",
+			"SEND_NEW_CODE": "인증 코드 재전송",
+			"SENT_DESC": "인증코드가 입력한 이메일로 발송 되었습니다: ",
+			"TITLE": "알림전용 이메일 인증",
+			"VERIFICATION_CODE": "인증 코드",
+			"VERIFY_NOW": "인증"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "닫기",
@@ -896,20 +949,26 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "개인 정보 수정 실패",
 			"ALT_S_UPDATE": "개인 정보 수정 완료",
+			"CURRENT_PASSWORD": "현재 비밀번호",
 			"EMAIL": "이메일",
 			"EMAIL_REQUIRED": "이메일을 입력해주세요.",
 			"GROUP": "소속",
 			"ID": "아이디",
+			"KEEP_PASSWORD": "현재 비밀번호 유지",
 			"LANGUAGE": "언어",
 			"MAX_LENGTH_INVALID": "{max}자 이하로 입력해 주세요.",
 			"MIN_LENGTH_INVALID": "{min}자 이상 입력해 주세요.",
 			"MOBILE": "전화번호",
 			"NAME": "이름 ",
 			"NAME_REQUIRED": "이름을 입력해 주세요.",
+			"NEW_PASSWORD": "새 비밀번호",
 			"PASSWORD": "비밀번호",
 			"PASSWORD_CHECK": "비밀번호 확인",
 			"PASSWORD_CHECK_INVALID": "동일한 비밀번호를 입력해 주세요.",
+			"PASSWORD_HELP_TEXT": "인증된 알림 전용 이메일이 있는 계정일 경우에만 비밀번호 재설정 링크 수신이 가능합니다.",
 			"ROLE": "권한",
+			"SEND_LINK": "사용자에게 비밀번호 재설정 이메일 발송",
+			"SET_MANUALLY": "관리자가 대신 비밀번호 설정",
 			"TIMEZONE": "타임존",
 			"TITLE": "개인 정보"
 		},
@@ -944,6 +1003,7 @@
 			"VERSION": "버전 "
 		},
 		"TAGS": {
+			"ADD": "추가",
 			"ADD_TAG": "태그 추가",
 			"ADD_TAG_DESC": "태그를 추가하여 리소스를 관리하세요.",
 			"ALT_E_UPDATE": "태그 수정 실패",
@@ -1604,6 +1664,16 @@
 				"ACCOUNT_N_PROFILE": "계정 & 프로필",
 				"BASE_INFORMATION": "기본 정보",
 				"CHANGE_PASSWORD": "비밀번호 변경 ",
+				"NOTIFICATION_EMAIL": {
+					"CHANGE": "변경",
+					"HELP_TEXT": "계정 및 시스템 관련 주요 정보를 받으실 이메일 주소를 입력하세요.",
+					"NOT_VERIFIED": "인증되지 않음",
+					"SEND_MAIL": "인증 코드 전송",
+					"SUCCESS": "알림 전용 이메일 인증 완료",
+					"TITLE": "알림 전용 이메일",
+					"VERIFIED": "인증됨",
+					"VERIFY": "인증"
+				},
 				"SAVE_CHANGES": "변경사항 저장 "
 			},
 			"API_KEY": {
@@ -1630,10 +1700,9 @@
 			"FORM": {
 				"ADD_TITLE": "사용자 추가",
 				"ALREADY_EXISTS": "이미 추가됨",
-				"ASSIGN_DOMAIN_ROLE": "어드민 역할(Role) 할당",
+				"ASSIGN_DOMAIN_ROLE": "어드민 역할(Role)",
 				"CHECK_USER_ID": "아이디 확인",
 				"DOMAIN_ADMIN": "도메인 관리자 ",
-				"EMAIL": "이메일",
 				"EMAIL_INVALID": "잘못된 이메일 형식입니다. ",
 				"EMPTY_SPACE_INVALID": "공백을 없애주세요.",
 				"GROUP": "소속",
@@ -1644,6 +1713,8 @@
 				"NAME": "이름",
 				"NAME_PLACEHOLDER": "아이디 입력",
 				"NAME_VALID": "사용 가능한 아이디입니다.",
+				"NOTIFICATION_EMAIL": "알림 전용 이메일",
+				"NOTIFICATION_TOOLTIP": "계정 및 시스템 관련 주요 정보를 받으실 이메일 주소를 입력하세요.",
 				"NOT_SELECT_ROLE": "역할을 선택하지 않음 ",
 				"NO_RESULTS_FOUND": "검색결과가 없습니다.",
 				"NO_RESULTS_FOUND_HELP_TEXT": "검색결과가 없습니다.",
@@ -1654,7 +1725,7 @@
 				"PASSWORD_CHECK": "비밀번호 확인",
 				"PASSWORD_CHECK_INVALID": "동일한 비밀번호를 입력해주세요.",
 				"PASSWORD_HELP_TEXT": "비밀번호는 5 ~ 12 자로 입력해주세요",
-				"PASSWORD_INVALID": "비밀번호는 5 ~ 12 자로 입력해주세요.",
+				"PASSWORD_INVALID": "8자 이상 입력해주세요.",
 				"REQUIRED_FIELD": "해당 정보를 입력해주세요.",
 				"TAGS": "태그",
 				"TAGS_HELP_TEXT1": "태그를 추가하여 리소스를 관리하세요.",
@@ -1663,8 +1734,8 @@
 				"TIMEZONE_INVALID": "타임존이 잘못 설정되었습니다.",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
 				"UPDATE_TITLE": "사용자 수정",
-				"USER_ID": "아이디",
-				"USER_ID_DUPLICATED": "같은 아이디가 존재합니다",
+				"USER_ID": "유저 아이디",
+				"USER_ID_DUPLICATED": "이미 사용중입니다.",
 				"USER_ID_INVALID": "같은 아이디가 존재합니다.",
 				"USER_ID_NOT_EXIST": "아이디가 없습니다."
 			},
@@ -1722,7 +1793,6 @@
 				"DISABLE_MODAL_DESC": "선택한 사용자를 비활성화 하시겠습니까?",
 				"DISABLE_MODAL_TITLE": "사용자 비활성화",
 				"DOMAIN_ID": "도메인 아이디",
-				"EMAIL": "이메일",
 				"ENABLE": "활성화",
 				"ENABLE_MODAL_DESC": "선택한 사용자를 활성화 하시겠습니까?",
 				"ENABLE_MODAL_TITLE": "사용자 활성화",
@@ -1734,6 +1804,7 @@
 				"MY_ACCOUNT": "내 계정 ",
 				"NAME": "이름",
 				"NOTIFICATION": "알림",
+				"NOTIFICATION_EMAIL": "알림 전용 이메일",
 				"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"ROOT_ACCOUNT": "루트 어카운트 ",
 				"SELECTED_DATA": "선택한 데이터",
