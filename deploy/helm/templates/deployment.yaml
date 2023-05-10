@@ -42,18 +42,18 @@ spec:
           ports:
             - containerPort: 80
           volumeMounts:
-            - name: {{ .Values.name }}-nginx
-              mountPath: /etc/nginx/conf.d/wconsole-client.conf
-              subPath: wconsole-client.conf
+            - name: {{ .Values.name }}-conf
+              mountPath: /var/www/config/production.json
+              subPath: production.json
+              readOnly: true
+            - name: {{ .Values.name }}-nginx-conf
+              mountPath: /etc/nginx/conf.d/nginx.conf
+              subPath: nginx.conf
               readOnly: true
             - name: timezone
               mountPath: /etc/localtime
             - name: log-volume
               mountPath: /var/log/spaceone
-            - name: {{ .Values.name }}-spa-conf
-              mountPath: /var/www/config/production.json
-              subPath: production.json
-              readOnly: true
 
 {{- if .Values.volumeMounts.application }}
 {{- toYaml .Values.volumeMounts.application | nindent 12 }}
@@ -73,12 +73,12 @@ spec:
 {{- end }}
 
       volumes:
-        - name: {{ .Values.name }}-nginx
+        - name: {{ .Values.name }}-conf
           configMap:
-            name: {{ .Values.name }}-nginx
-        - name: {{ .Values.name }}-spa-conf
+            name: {{ .Values.name }}-conf
+        - name: {{ .Values.name }}-nginx-conf
           configMap:
-            name: {{ .Values.name }}-spa-conf
+            name: {{ .Values.name }}-nginx-conf
 
 {{- if .Values.volumes }}
 {{- toYaml .Values.volumes | nindent 8 }}
