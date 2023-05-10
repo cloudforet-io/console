@@ -1,14 +1,14 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
+         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
-        <p-icon-button v-if="!props.editMode"
+        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
                        v-tooltip.bottom="$t('DASHBOARDS.VIEW_MODE.VIEW_MODE')"
                        class="view-mode-button"
                        name="ic_arrows-expand-all"
@@ -94,8 +94,10 @@
                                      :widget-key="props.widgetKey"
                                      @refresh="emit('refresh')"
         />
-        <widget-view-mode-modal :visible.sync="state.viewModeModalVisible"
-                                :selected-widget-key="props.widgetKey"
+        <widget-view-mode-modal v-if="state.viewModeModalVisible"
+                                :visible.sync="state.viewModeModalVisible"
+                                :widget-key="props.widgetKey"
+                                :theme="props.theme"
         />
     </div>
 </template>
@@ -128,6 +130,7 @@ import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/
 import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 export interface WidgetFrameProps {
     title: TranslateResult;
@@ -147,10 +150,12 @@ export interface WidgetFrameProps {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
+    disableViewMode?: boolean;
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
     refreshOnResize?: boolean;
+    theme?: WidgetTheme;
 }
 
 interface IconConfig {
@@ -169,6 +174,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     selectedDates: () => [],
     currency: CURRENCY.USD,
     overflowY: undefined,
+    theme: undefined,
 });
 
 const emit = defineEmits(['refresh']);
