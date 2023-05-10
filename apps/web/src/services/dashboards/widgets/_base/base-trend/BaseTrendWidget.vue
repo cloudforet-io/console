@@ -37,7 +37,6 @@
                                :color-set="colorSet"
                                :this-page="state.thisPage"
                                :show-next-page="state.data?.more"
-                               disable-ellipsis
                                show-legend
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"

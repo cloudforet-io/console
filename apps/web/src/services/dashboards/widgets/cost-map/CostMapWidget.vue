@@ -187,7 +187,9 @@ const drawChart = (chartData) => {
     series.set('tooltip', tooltip);
     chartHelper.setTreemapTooltipText(series, tooltip, state.currency, props.currencyRates);
 
-    setTreemapLabelText(series);
+    setTreemapLabelText(series, {
+        oversizedBehavior: 'truncate',
+    });
     series.labels.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[TEXT_COLOR_FIELD_NAME]);
 
     series.data.setAll(chartData);
