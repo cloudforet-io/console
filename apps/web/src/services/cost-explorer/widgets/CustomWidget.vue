@@ -206,7 +206,9 @@ export default {
         /* Util */
         const getFields = (granularity: Granularity, period: Period, groupBy?: GroupBy) => {
             let groupByFields: DataTableFieldType[] = [];
-            if (groupBy) groupByFields = [GROUP_BY_ITEM_MAP[groupBy]];
+            if (groupBy) {
+                groupByFields = GROUP_BY_ITEM_MAP[groupBy] ? [GROUP_BY_ITEM_MAP[groupBy]] : [{ name: groupBy, label: groupBy }];
+            }
             const costFields: DataTableFieldType[] = getDataTableCostFields(granularity, period, !!groupBy);
             return groupByFields.concat(costFields);
         };

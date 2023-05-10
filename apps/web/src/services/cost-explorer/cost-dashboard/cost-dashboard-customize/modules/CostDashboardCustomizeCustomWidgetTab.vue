@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="widgetCardImageList[idx].value.default"
+                                 :src="widgetCardImageList[idx]?.value?.default"
                             >
                         </div>
                     </li>
@@ -58,7 +58,7 @@
                                    :selected-item="selectedItem"
             />
             <p-button v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
-                      style-type="negative-outlined"
+                      style-type="negative-secondary"
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
             >
