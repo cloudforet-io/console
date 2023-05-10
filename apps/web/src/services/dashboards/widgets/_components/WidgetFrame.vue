@@ -1,14 +1,14 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
+         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
-        <p-icon-button v-if="!props.editMode"
+        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
                        v-tooltip.bottom="$t('DASHBOARDS.VIEW_MODE.VIEW_MODE')"
                        class="view-mode-button"
                        name="ic_arrows-expand-all"
@@ -150,6 +150,7 @@ export interface WidgetFrameProps {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
+    disableViewMode?: boolean;
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;

@@ -49,6 +49,7 @@
                            :currency-rates="state.currencyRates"
                            :error-mode="dashboardDetailState.widgetValidMap[state.widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
+                           :disable-view-mode="true"
                 />
             </div>
         </div>
