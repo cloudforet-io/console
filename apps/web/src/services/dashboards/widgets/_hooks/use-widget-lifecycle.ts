@@ -28,6 +28,7 @@ interface UseWidgetLifecycleOptions {
 }
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const checkRefreshableByDashboardVariables = (
     inheritOptions: InheritOptions,
@@ -157,13 +158,14 @@ export const useWidgetLifecycle = ({
     onUnmounted(() => {
         if (disposeWidget) disposeWidget();
     });
-    watch(() => props.dashboardVariables, (after, before) => {
-        if (!props.initiated || props.errorMode || !props.inheritOptions) return;
-        const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
+    watch(() => dashboardDetailState.variables, (after, before) => {
+        if (!props.initiated || props.errorMode || !state.widgetInfo?.inherit_options) return;
+        const _isRefreshable = checkRefreshableByDashboardVariables(state.widgetInfo?.inherit_options, after, before);
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
-    watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.editMode || !props.inheritOptions || isEqual(after, before)) return;
+    watch(() => dashboardDetailState.variablesSchema, (after, before) => {
+        const inheritOptions = state.widgetInfo?.inherit_options;
+        if (!props.editMode || !inheritOptions || isEqual(after, before)) return;
         if (!state.widgetInfo) return;
 
         const [
@@ -176,10 +178,10 @@ export const useWidgetLifecycle = ({
             isWidgetOptionAdded = updateWidgetByAddedVariableSchemaProperties(addedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig);
         }
         if (deletedVariableSchemaProperties.length) {
-            isWidgetOptionDeleted = updateWidgetByDeletedVariableSchemaProperties(deletedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig, props.inheritOptions, after);
+            isWidgetOptionDeleted = updateWidgetByDeletedVariableSchemaProperties(deletedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig, inheritOptions, after);
         }
         if (changedVariableSchemaProperties.length) {
-            isWidgetOptionChanged = isAffectedByChangedVariableSchemaProperties(changedVariableSchemaProperties, props.inheritOptions);
+            isWidgetOptionChanged = isAffectedByChangedVariableSchemaProperties(changedVariableSchemaProperties, state.widgetInfo?.inherit_options);
         }
 
         if (!props.initiated) return;
@@ -191,7 +193,7 @@ export const useWidgetLifecycle = ({
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidget();
             } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
-                onCurrencyUpdate(current.currency.value, previous.currency.value);
+                onCurrencyUpdate();
             }
         });
     }
