@@ -23,7 +23,7 @@
                           class="edit-button"
                           @click="handleClickEditOption"
                 >
-                    {{ $t('DASHBOARDS.WIDGET.VIEW_MODE.EDIT_OPTION') }}
+                    {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
                 </p-button>
             </div>
             <div class="filter-wrapper">
