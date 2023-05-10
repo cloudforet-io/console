@@ -25,6 +25,7 @@ Follow the [official docker installation guide](https://docs.docker.com/engine/i
 ```bash
 docker pull wanzargen/turbo-cache-server:latest
 ```
+The source code of this image is [here](https://github.com/WANZARGEN/turborepo-remote-cache.git) which is forked from [turborepo-remote-cache](https://github.com/ducktors/turborepo-remote-cache.git).
 
 ### 3. Add environment variables
 Copy the `dev/turbo-cache-server.sample.env` file to `dev/turbo-cache-server.env` and edit the variables.
@@ -43,7 +44,7 @@ Add `.turbo/config.json` file.
 ```json
 {
   "teamId": "your_team_name",
-  "apiUrl": "http://0.0.0.0:<the_port_number_you_set_in_step_4>"
+  "apiUrl": "http://localhost:<the_port_number_you_set_in_step_4>"
 }
 ```
 
