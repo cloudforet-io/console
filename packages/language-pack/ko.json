@@ -1366,6 +1366,13 @@
 		"LNB": {
 			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
 		},
+		"VIEW_MODE": {
+			"CANCEL": "취소",
+			"EDIT_OPTION": "",
+			"EDIT_WIDGET_OPTION": "위젯 옵션 수정",
+			"SAVE": "저장",
+			"VIEW_MODE": ""
+		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
 				"DESC": "얼럿 히스토리 설명"
@@ -1456,11 +1463,7 @@
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
 			"UPDATE_TITLE": "위젯 편집",
-			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. ",
-			"VIEW_MODE": {
-				"EDIT_OPTION": "",
-				"VIEW_MODE": ""
-			}
+			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
 		}
 	},
 	"IAM": {
