@@ -15,6 +15,8 @@ export const useWidgetFrameProps = (props: any, state: any):ComputedRef => compu
     currency: state.currency,
     disableFullSize: !state.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
     isOnlyFullSize: state.widgetConfig?.sizes.length === 1 && state.widgetConfig?.sizes[0] === WIDGET_SIZE.full,
+    disableViewMode: props.disableViewMode,
     widgetLocation: state.widgetLocation,
     errorMode: props.errorMode,
+    theme: props.theme,
 }));

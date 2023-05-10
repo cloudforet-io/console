@@ -205,6 +205,7 @@ export interface WidgetProps {
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     initiated?: boolean;
+    disableViewMode?: boolean;
 }
 
 export interface WidgetExpose<Data = any> {
