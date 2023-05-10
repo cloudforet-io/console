@@ -117,6 +117,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue';
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
+import { getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
@@ -240,7 +241,7 @@ export default {
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: costAnalysisPageState.selectedQueryId,
-                    options: {
+                    options: getRefinedCostQueryOptions({
                         granularity: costAnalysisPageState.granularity,
                         stack: costAnalysisPageState.stack,
                         period: costAnalysisPageState.period,
@@ -248,7 +249,7 @@ export default {
                         primary_group_by: costAnalysisPageState.primaryGroupBy, // will be deprecated(< v1.10.5)
                         more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
                         filters: costAnalysisPageState.filters,
-                    },
+                    }),
                 });
                 await costAnalysisPageStore.listCostQueryList();
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');

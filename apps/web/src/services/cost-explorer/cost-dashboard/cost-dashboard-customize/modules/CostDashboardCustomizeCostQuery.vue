@@ -132,7 +132,7 @@ export default {
                     name: `${query.name}-${getUUID().slice(0, 23)}`,
                     options: {
                         granularity: query.options?.granularity,
-                        group_by: query.options?.primary_group_by,
+                        group_by: query.options?.group_by,
                         stack: query.options?.stack,
                         filters: query.options?.filters,
                         chart_type: query.options?.granularity === GRANULARITY.ACCUMULATED ? CHART_TYPE.DONUT : CHART_TYPE.STACKED_COLUMN,
