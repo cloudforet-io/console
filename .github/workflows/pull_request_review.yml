@@ -10,12 +10,13 @@ on:
       - '**/Dockerfile'
       - '**/*.dockerfile'
       - '**/*.dockerignore'
-      - '**/README.md'
       - '**/LICENSE'
       - '**/AUTHORS'
       - '**/.husky/**'
       - '**/commitlint.config.js'
       - '**/.lintstagedrc.js'
+      - '**/*.md'
+      - '**/*.env'
     branches:
       - master
       - feature-*
