@@ -33,7 +33,7 @@ export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5
     });
 };
 
-export const setTreemapLabelText = (series: am5hierarchy.Treemap, settings?: am5hierarchy.ITreemapSettings): void => {
+export const setTreemapLabelText = (series: am5hierarchy.Treemap, settings?: am5.Template<am5.Label>['_settings']): void => {
     series.labels.template.setAll({
         text: '{category}',
         paddingLeft: 4,
