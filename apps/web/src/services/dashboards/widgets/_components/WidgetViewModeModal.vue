@@ -39,6 +39,7 @@ import { PHeading, PIconButton, PButton } from '@spaceone/design-system';
 import { flattenDeep } from 'lodash';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -55,12 +56,13 @@ const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
 });
 const emit = defineEmits(['update:visible']);
 
-const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
     hasManagePermission: useManagePermissionState(),
     widgetInfo: computed<DashboardLayoutWidgetInfo | undefined>(() => {
-        const _dashboardWidgetInfoList = flattenDeep(dashboardDetailInfoState.dashboardWidgetInfoList ?? []);
+        const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
         return _dashboardWidgetInfoList.find((w) => w.widget_key === props.selectedWidgetKey);
     }),
     variablesSnapshot: {},
@@ -68,17 +70,21 @@ const state = reactive({
 });
 
 const handleCloseModal = () => {
-    emit('update:visible', false);
-    // TODO: reset variables, variable schema
+    state.proxyVisible = false;
+    dashboardDetailStore.$patch({
+        variables: state.variablesSnapshot,
+        variablesSchema: state.variableSchemaSnapshot,
+    });
 };
 const handleClickEditOption = () => {
     // TODO: open widget edit sidebar
+    // store.dispatch('display/showWidget');
 };
 
 watch(() => props.visible, (visible) => {
     if (visible) {
-        state.variablesSnapshot = dashboardDetailInfoState.variables;
-        state.variableSchemaSnapshot = dashboardDetailInfoState.variablesSchema;
+        state.variablesSnapshot = dashboardDetailState.variables;
+        state.variableSchemaSnapshot = dashboardDetailState.variablesSchema;
     }
 });
 </script>
@@ -104,6 +110,19 @@ watch(() => props.visible, (visible) => {
         height: 6rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
         padding: 2rem;
+
+        /* custom design-system component - p-heading */
+        :deep(.p-heading) {
+            min-width: 0;
+            .heading-wrapper {
+                width: 100%;
+            }
+            .title {
+                @apply truncate;
+                display: inline-block;
+                width: calc(100% - 4rem);
+            }
+        }
     }
     .content-wrapper {
         @apply bg-gray-100;
