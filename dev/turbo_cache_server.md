@@ -12,6 +12,10 @@ But this guide will explain how to use github repository to store the cache data
 We have a [console-artifacts](https://github.com/cloudforet-io/console-artifacts.git) repository to store the cache data.
 You can fork and use it, or you can create your own repository.
 
+### 2. Issue a github token
+You need to issue a github token to access the repository.
+Follow the [official guide](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) to issue a token.
+
 ## Set up the server
 
 ### 1. Install docker
