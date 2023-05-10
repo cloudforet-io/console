@@ -14,7 +14,6 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 export const WIDGET_SIZE = {
@@ -190,12 +189,6 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
 
 export interface WidgetProps {
     widgetConfigId: string;
-    title?: string;
-    options?: WidgetOptions;
-    inheritOptions?: InheritOptions;
-    dashboardVariables?: DashboardVariables;
-    dashboardVariablesSchema?: DashboardVariablesSchema;
-    dashboardSettings: DashboardSettings;
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
