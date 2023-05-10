@@ -47,7 +47,7 @@ spec:
               subPath: production.json
               readOnly: true
             - name: {{ .Values.name }}-nginx-conf
-              mountPath: /etc/nginx/conf.d/nginx.conf
+              mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
             - name: timezone
