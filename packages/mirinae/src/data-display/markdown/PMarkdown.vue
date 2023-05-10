@@ -58,12 +58,13 @@ export default defineComponent<MarkdownProps>({
             marked.parse(doc, (error, parseResult) => {
                 if (error) console.error('[Mirinae] Markdown parsing error: ', error);
                 else {
-                    doc = parseResult.replace(/<pre>/g, '<pre class="hljs"');
+                    doc = parseResult.replace(/<pre>/g, '<pre class="hljs"').replace(/<a/g, '<a target="_blank"');
                 }
             });
 
-            return DOMPurify.sanitize(doc);
+            return DOMPurify.sanitize(doc, { ADD_ATTR: ['target'] });
         });
+
         return {
             md,
         };
