@@ -1,6 +1,6 @@
 {
   "name": "@cloudforet/language-pack",
-  "version": "1.12.0-dev4",
+  "version": "1.12.0-dev5",
   "private": true,
   "files": [
     "en.json",
