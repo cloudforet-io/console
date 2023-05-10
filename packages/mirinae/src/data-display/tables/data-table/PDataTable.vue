@@ -459,13 +459,11 @@ export default defineComponent<DataTableProps>({
                 if (sortBy === clickedKey) {
                     // set reverse mode
                     sortDesc = !sortDesc;
-
                     // when clicked the other thead
                 } else {
                     sortBy = clickedKey;
-                    sortDesc = true;
+                    sortDesc = false;
                 }
-
                 // set changed values
                 proxyState.proxySortBy = sortBy;
                 proxyState.proxySortDesc = sortDesc;
