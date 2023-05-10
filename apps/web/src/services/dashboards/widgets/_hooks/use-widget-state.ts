@@ -137,12 +137,12 @@ export function useWidgetState<Data = any>(
     const state = reactive<WidgetState<Data>>({ // dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
         widgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)),
-        title: computed(() => props.title ?? state.widgetConfig.title),
+        title: computed(() => state.widgetInfo?.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
             state.widgetConfig.options,
-            props.options,
-            props.inheritOptions,
-            props.dashboardVariables,
+            state.widgetInfo?.widget_options,
+            state.widgetInfo?.inherit_options,
+            dashboardDetailState.variables,
             state.optionsErrorMap,
         )),
         currency: computed(() => dashboardDetailStore.dashboardCurrency ?? CURRENCY.USD),
@@ -155,13 +155,13 @@ export function useWidgetState<Data = any>(
         }),
         loading: true,
         settings: computed<DashboardSettings>(() => ({
-            ...props.dashboardSettings,
-            date_range: props.dashboardSettings.date_range?.enabled ? props.dashboardSettings.date_range : {
+            ...dashboardDetailState.settings,
+            date_range: dashboardDetailState.settings.date_range?.enabled ? dashboardDetailState.settings.date_range : {
                 enabled: false,
                 start: dayjs.utc().format('YYYY-MM'),
                 end: dayjs.utc().format('YYYY-MM'),
             },
-            currency: props.dashboardSettings.currency?.enabled ? props.dashboardSettings.currency : {
+            currency: dashboardDetailState.settings.currency?.enabled ? dashboardDetailState.settings.currency : {
                 enabled: false,
                 value: CURRENCY.USD,
             },
@@ -196,9 +196,9 @@ export function useWidgetState<Data = any>(
             return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
-            props.inheritOptions,
+            state.widgetInfo?.inherit_options,
             state.widgetConfig?.options_schema?.schema,
-            props.dashboardVariablesSchema,
+            dashboardDetailState.variablesSchema,
         )),
     }) as UnwrapRef<WidgetState<Data>>;
 
