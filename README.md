@@ -90,7 +90,6 @@ If you’d rather have your charts without any branding, please purchase a [comm
 }
 ```
 
-
 ## Run
 
 You can run the Web Console on your local with following commands.
@@ -101,10 +100,9 @@ npm install
 npm run start:web
 ```
 
+## Testing
 
-### E2E Test Settings
-
-#### Set Variables
+### Set variables for e2e test
 
 Add `apps/web/playwright/local.env` file into project root.
 ```
@@ -121,6 +119,8 @@ You can see the details in the [Mirinae storybook](http://storybook.developer.sp
 You can see the description of the Mirinae in the [Mirinae package](./packages/mirinae/README.md). <br/>
 
 ## Contributing
+
+- [Develop with local turbo cache server](./dev/turbo-cache-server.md)
 
 TBU
 

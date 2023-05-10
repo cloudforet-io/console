@@ -16,6 +16,8 @@ node_modules.nosync/
 # Turborepo
 .turbo
 out/
+dev/*.env
+!dev/*.sample.env
 
 # Playwright
 user.json
