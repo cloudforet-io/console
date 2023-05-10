@@ -51,7 +51,7 @@ ENV NGINX_CONF_PATH /etc/nginx/conf.d
 RUN mkdir -p ${LOG_PATH}/nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
-COPY apps/web/pkg/nginx.conf ${NGINX_CONF_PATH}/cloudforet_console.conf
+COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
 
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
 
