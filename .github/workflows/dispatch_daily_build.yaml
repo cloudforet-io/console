@@ -5,7 +5,7 @@ on:
 
 env:
   BRANCH: master
-  SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   docker:
