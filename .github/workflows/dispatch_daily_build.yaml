@@ -45,7 +45,6 @@ jobs:
         with:
           context: .
           file: ./apps/web/Dockerfile
-          platforms: linux/amd64,linux/arm64
           build-args: |
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
