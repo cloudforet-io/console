@@ -11,8 +11,17 @@ on:
         description: 'enter version(x.y.z)'
         required: true
         default: '1.0.0'
+      container_arch:
+        type: choice
+        description: 'choose container architecture'
+        default: linux/amd64
+        options:
+        - "linux/amd64"
+        - "linux/amd64,linux/arm64"
+
 
 env:
+  ARCH: ${{ github.event.inputs.container_arch }}
   BRANCH: ${{ github.event.inputs.branch }}
   VERSION: ${{ github.event.inputs.version }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -120,7 +129,7 @@ jobs:
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
             TURBO_API=${{ secrets.TURBO_API }}
-          platforms: linux/amd64, linux/arm64
+          platforms: ${{ env.ARCH }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
