@@ -189,6 +189,9 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
 
 export interface WidgetProps {
     widgetConfigId: string;
+    title?: string;
+    options?: WidgetOptions;
+    inheritOptions?: InheritOptions;
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
