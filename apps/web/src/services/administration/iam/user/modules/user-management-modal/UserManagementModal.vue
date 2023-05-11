@@ -201,10 +201,12 @@ export default {
                 user_id: formState.userId,
                 name: formState.name,
                 email: formState.email || formState.userId,
-                password: formState.password || '',
                 tags: formState.tags || {},
-                reset_password: formState.passwordType === PASSWORD_TYPE.RESET,
+                password: formState.password || '',
+                backend: formState.activeTab === 'local' ? 'LOCAL' : 'EXTERNAL',
+                reset_password: formState.activeTab === 'local' ? formState.passwordType === PASSWORD_TYPE.RESET : undefined,
             };
+
             if (formState.domainRole !== undefined) {
                 emit('confirm', data, formState.roleId);
             } else {
