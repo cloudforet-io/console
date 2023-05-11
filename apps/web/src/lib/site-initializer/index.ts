@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
@@ -62,6 +63,7 @@ const init = async () => {
         initRouter(domainName);
         initErrorHandler(store);
         initRequestIdleCallback();
+        LocalStorageAccessor.init();
         await checkSsoAccessToken(store);
     } else {
         initRouter();
