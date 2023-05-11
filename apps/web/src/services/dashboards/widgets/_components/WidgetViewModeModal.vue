@@ -5,7 +5,7 @@
         <div v-if="state.proxyVisible"
              class="modal-header"
         >
-            <p-heading :title="state.widget?.title ?? ''"
+            <p-heading :title="dashboardDetailState.name"
                        show-back-button
                        @click-back-button="handleCloseModal"
             />
@@ -29,27 +29,23 @@
             <div class="filter-wrapper">
                 <dashboard-variables-selector :is-manageable="false" />
             </div>
-            <div v-if="state.widget"
+            <div v-if="state.component"
                  class="widget-wrapper"
             >
                 <component :is="state.component"
-                           :id="state.widget.widget_key"
-                           :key="state.widget.widget_key"
                            ref="widgetRef"
-                           :widget-config-id="state.widget.widget_name"
-                           :widget-key="state.widget.widget_key"
-                           :title="state.widget.title"
-                           :options="state.widget.widget_options"
-                           :inherit-options="state.widget.inherit_options"
+                           :widget-key="widgetFormState.widgetInfo.widget_key"
+                           :widget-config-id="widgetFormState.widgetInfo.widget_name"
+                           :title="widgetFormState.widgetTitle"
+                           :options="widgetFormState.widgetOptions"
+                           :inherit-options="widgetFormState.inheritOptions"
                            size="full"
                            :theme="props.theme"
-                           :dashboard-variables="dashboardDetailState.variables"
-                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
-                           :dashboard-settings="dashboardDetailState.settings"
                            :currency-rates="state.currencyRates"
-                           :error-mode="dashboardDetailState.widgetValidMap[state.widget.widget_key] === false"
+                           :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            :disable-view-mode="true"
+                           :initiated="state.initiated"
                 />
             </div>
         </div>
@@ -62,7 +58,6 @@ import {
 } from 'vue';
 
 import { PHeading, PIconButton, PButton } from '@spaceone/design-system';
-import { flattenDeep } from 'lodash';
 
 import { store } from '@/store';
 
@@ -71,8 +66,10 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type { DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -93,6 +90,8 @@ const emit = defineEmits(['update:visible']);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
@@ -100,13 +99,10 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.display.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    widget: computed<DashboardLayoutWidgetInfo|undefined>(() => {
-        const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
-        return _dashboardWidgetInfoList.find((w) => w.widget_key === props.widgetKey);
-    }),
     component: null as AsyncComponent|null,
-    variablesSnapshot: {},
-    variableSchemaSnapshot: {},
+    initiated: false,
+    variablesSnapshot: {} as DashboardVariables,
+    variableSchemaSnapshot: {} as DashboardVariablesSchema,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -137,16 +133,15 @@ const handleClickEditOption = () => {
     // store.dispatch('display/showWidget');
 };
 
-watch(() => props.visible, (visible) => {
-    if (visible) initSnapshot();
-}, { immediate: true });
-watch(() => state.widget, (widget) => {
-    if (widget) initWidgetComponent(widget);
-}, { immediate: true });
-watch(() => state.widgetRef, (_widgetRef) => {
-    if (_widgetRef) {
-        const prevData = dashboardDetailState.widgetDataMap[props.widgetKey];
-        _widgetRef.initWidget(prevData);
+watch(() => props.visible, async (visible) => {
+    if (visible) {
+        initSnapshot();
+        await widgetFormStore.initWidgetForm(props.widgetKey);
+        if (widgetFormState.widgetInfo) {
+            await initWidgetComponent(widgetFormState.widgetInfo);
+            state.widgetRef?.initWidget();
+            state.initiated = true;
+        }
     }
 });
 </script>
@@ -201,6 +196,7 @@ watch(() => state.widgetRef, (_widgetRef) => {
             .dashboard-variable-selector {
                 @apply relative flex items-center flex-wrap;
                 gap: 0.5rem;
+                z-index: 10;
             }
         }
     }
