@@ -137,11 +137,11 @@ export function useWidgetState<Data = any>(
     const state = reactive<WidgetState<Data>>({ // dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
         widgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === props.widgetKey)),
-        title: computed(() => state.widgetInfo?.title ?? state.widgetConfig.title),
+        title: computed(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
             state.widgetConfig.options,
-            state.widgetInfo?.widget_options,
-            state.widgetInfo?.inherit_options,
+            props.options,
+            props.inheritOptions,
             dashboardDetailState.variables,
             state.optionsErrorMap,
         )),
@@ -196,7 +196,7 @@ export function useWidgetState<Data = any>(
             return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
-            state.widgetInfo?.inherit_options,
+            props.inheritOptions,
             state.widgetConfig?.options_schema?.schema,
             dashboardDetailState.variablesSchema,
         )),

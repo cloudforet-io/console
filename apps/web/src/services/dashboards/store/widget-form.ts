@@ -21,8 +21,8 @@ interface WidgetFormActions {
     initWidgetForm: (widgetKey: string) => DashboardLayoutWidgetInfo|undefined;
 }
 
-const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 export const useWidgetFormStore = defineStore<string, WidgetFormState, any, WidgetFormActions>('widget-form', {
     state: () => ({
@@ -67,7 +67,7 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
             this.inheritOptions = _inheritOptions;
         },
         initWidgetForm(widgetKey: string) {
-            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailInfoState.dashboardWidgetInfoList ?? []);
+            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
             this.widgetInfo = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
             if (this.widgetInfo) {
                 this.widgetConfigId = this.widgetInfo.widget_name;
