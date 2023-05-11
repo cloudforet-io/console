@@ -4,14 +4,15 @@ on:
   repository_dispatch:
     types: [make_helm_chart]
 
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 jobs:
   helm_cloudforet:
     if: github.repository_owner == 'cloudforet-io'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ env.BRANCH }}
           
       - name: Install Helm
         uses: azure/setup-helm@v1
