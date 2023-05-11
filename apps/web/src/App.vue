@@ -94,6 +94,8 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { store } from '@/store';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
@@ -148,7 +150,7 @@ export default defineComponent({
             store.commit('error/setVisibleSessionExpiredError', false);
             vm.$router.push(res);
         };
-        const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
+        const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
         const updateUser = async () => {
             await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
         };

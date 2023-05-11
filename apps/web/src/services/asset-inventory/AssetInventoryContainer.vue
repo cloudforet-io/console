@@ -29,6 +29,8 @@ import {
     defineComponent, onUnmounted,
 } from 'vue';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
@@ -60,11 +62,10 @@ export default defineComponent({
         assetInventorySettings.$onAction((action) => {
             action.after(() => {
                 if (window) {
-                    const settings = window.localStorage.getItem(userId.value);
+                    const settings = LocalStorageAccessor.getItem(userId.value, 'object');
                     if (settings) {
-                        const settingsObj = JSON.parse(settings);
-                        settingsObj.assetInventory = action.store.$state;
-                        window.localStorage.setItem(userId.value, JSON.stringify(settingsObj));
+                        settings.assetInventory = action.store.$state;
+                        LocalStorageAccessor.setItem(userId.value, settings);
                     }
                 }
             });
