@@ -2,6 +2,7 @@ import type { Action, Commit } from 'vuex';
 
 import dayjs from 'dayjs';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY, DEFAULT_CURRENCY_RATES } from '@/store/modules/settings/config';
@@ -11,9 +12,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const initSettings: Action<SettingsState, any> = ({ commit, rootState, dispatch }): void => {
     const userId = rootState?.user?.userId;
-    if (!window.localStorage.getItem('spaceConnector/accessToken')) return;
+    if (!LocalStorageAccessor.getItem('spaceConnector/accessToken')) return;
     try {
-        const settings = window.localStorage.getItem(userId);
+        const settings = LocalStorageAccessor.getItem(userId);
 
         if (settings) {
             const settingsObj = JSON.parse(settings);
@@ -21,7 +22,7 @@ export const initSettings: Action<SettingsState, any> = ({ commit, rootState, di
         }
         dispatch('loadCurrencyRates');
     } catch (e) {
-        window.localStorage.removeItem(userId);
+        LocalStorageAccessor.removeItem(userId);
     }
 };
 
