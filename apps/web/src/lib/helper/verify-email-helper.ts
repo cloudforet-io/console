@@ -35,7 +35,7 @@ export const postValidationCode = async (body, setUser): Promise<void|Error> => 
             domain_id,
         });
         if (setUser) {
-            await store.dispatch('user/setUser', { emailVerified: response.email_verified, email: response.email });
+            await store.dispatch('user/setUser', { email: response.email, email_verified: response.email_verified });
         }
         showSuccessMessage(i18n.t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SUCCESS'), '');
     } catch (e: any) {

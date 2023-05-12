@@ -138,7 +138,17 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
     await updateUser(state.userId, state.userType, userRequest);
-    commit('setUser', { ...state, ...userRequest });
+
+    const convertRequestType = (): UserState => ({
+        userId: userRequest.user_id || state.userId,
+        name: userRequest.name || state.name,
+        email: userRequest.email || state.email,
+        language: userRequest.language || state.language,
+        timezone: userRequest.timezone || state.timezone,
+        emailVerified: userRequest.email_verified || state.emailVerified,
+    });
+
+    commit('setUser', { ...state, ...convertRequestType() });
     commit('setTimezone', userRequest.timezone);
     if (userRequest.language) {
         commit('setLanguage', userRequest.language);
