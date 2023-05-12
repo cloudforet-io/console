@@ -180,7 +180,7 @@ const handleClickSendEmailButton = async () => {
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {
-            await store.dispatch('user/setUser', { email: formState.newNotificationEmail, emailVerified: false });
+            await store.dispatch('user/setUser', { email: formState.newNotificationEmail, email_verified: false });
         }
         state.proxyModalType = MODAL_TYPE.VERIFY;
     } catch (error: any) {

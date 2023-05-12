@@ -150,7 +150,7 @@ export default defineComponent({
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
         const updateUser = async () => {
-            await store.dispatch('user/setUser', { email: state.email, emailVerified: state.isEmailVerified });
+            await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
         };
 
         watch(() => vm.$route, (value) => {
