@@ -65,10 +65,8 @@
             <notification-email-modal
                 :domain-id="domainId"
                 :user-id="userId"
-                :verified="isEmailVerified"
-                :email="email"
                 :visible.sync="notificationEmailModalVisible"
-                @refresh-user="updateUser"
+                :modal-type="MODAL_TYPE.SEND"
             />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
@@ -87,8 +85,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
@@ -104,9 +101,9 @@ import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
-import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
-import NotificationEmailModal from '@/common/modules/modals/NotificationEmailModal.vue';
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
+import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
@@ -159,21 +156,12 @@ export default defineComponent({
         watch(() => vm.$route, (value) => {
             state.notificationEmailModalVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
         });
-        watch(() => state.notificationEmailModalVisible, async (value) => {
-            if (value) {
-                const userParam = {
-                    email: state.email,
-                    user_id: state.userId,
-                    domain_id: state.domainId,
-                };
-                await postValidationEmail(userParam);
-            }
-        });
 
         return {
             ...toRefs(state),
             goToSignIn,
             SIDEBAR_TYPE,
+            MODAL_TYPE,
             showsBrowserRecommendation,
             updateUser,
         };

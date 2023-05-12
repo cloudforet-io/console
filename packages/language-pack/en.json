@@ -931,11 +931,13 @@
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble,",
 			"COLLAPSE_TITLE": "Didn't get verification code?",
+			"ENTER_EMAIL": "Enter Notification Email",
 			"INVALID_CODE": "Invalid code. Please check the email try again.",
 			"NOTIFICATION_EMAIL": "Notification Email",
 			"SEND_CODE": "Send Code",
 			"SEND_NEW_CODE": "Send new code",
 			"SENT_DESC": "A verification code has been sent to",
+			"SUCCESS": "Successfully sent a verification code to your notification email.",
 			"TITLE": "Verify Notification Email",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY_NOW": "Verify Now"

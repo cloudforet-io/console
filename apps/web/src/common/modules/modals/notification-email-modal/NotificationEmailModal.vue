@@ -1,40 +1,52 @@
 <template>
     <p-button-modal
+        v-if="state.proxyModalType === MODAL_TYPE.SEND"
+        :header-title="$t('COMMON.NOTIFICATION_MODAL.ENTER_EMAIL')"
+        class="notification-email-modal-wrapper"
+        :visible="state.proxyVisible"
+        :loading="state.loading"
+        :disabled="!formState.newNotificationEmail"
+        @confirm="handleClickSendEmailButton"
+        @cancel="handleClickCancel"
+        @close="handleClickCancel"
+    >
+        <template #body>
+            <div class="modal-content-wrapper">
+                <p class="help-text">
+                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
+                </p>
+                <p-field-group :label="$t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.TITLE')"
+                               :invalid="validationState.isEmailValid"
+                               required
+                >
+                    <div class="notification-field-wrapper">
+                        <p-text-input
+                            id="newNotificationEmail"
+                            v-model="formState.newNotificationEmail"
+                            :invalid="validationState.isEmailValid"
+                            @keyup.enter="handleClickSendEmailButton"
+                        />
+                    </div>
+                </p-field-group>
+            </div>
+        </template>
+        <template #confirm-button>
+            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
+        </template>
+    </p-button-modal>
+    <p-button-modal
+        v-else
         :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
-        :disabled="state.isEditMode ? (!formState.newNotificationEmail || !formState.verificationCode) : !formState.verificationCode"
+        :disabled="!formState.verificationCode"
         @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <div v-if="state.isEditMode">
-                    <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.NOTIFICATION_EMAIL')"
-                                   :invalid="validationState.isEmailValid"
-                                   required
-                    >
-                        <div class="notification-field-wrapper">
-                            <p-text-input
-                                id="newNotificationEmail"
-                                v-model="formState.newNotificationEmail"
-                                :invalid="validationState.isEmailValid"
-                                @keyup.enter="handleClickSendEmailButton"
-                            />
-                            <p-button style-type="secondary"
-                                      :disabled="!formState.newNotificationEmail || emailValidator(formState.newNotificationEmail)"
-                                      :loading="state.loading"
-                                      @click.prevent="handleClickSendEmailButton(false)"
-                            >
-                                {{ $t('COMMON.NOTIFICATION_MODAL.SEND_CODE') }}
-                            </p-button>
-                        </div>
-                    </p-field-group>
-                </div>
-                <div v-else
-                     class="sent-email-wrapper"
-                >
+                <div class="sent-email-wrapper">
                     <div class="contents-wrapper">
                         <p>{{ $t('COMMON.NOTIFICATION_MODAL.SENT_DESC') }}</p>
                         <div class="email-wrapper">
@@ -44,15 +56,10 @@
                                  color="inherit"
                             />
                             <p class="email-text">
-                                {{ props.isAdministration ? formState.newNotificationEmail : state.email }}
+                                {{ formState.newNotificationEmail || props.email }}
                             </p>
                         </div>
                     </div>
-                    <p-icon-button name="ic_edit"
-                                   size="sm"
-                                   class="edit-icon"
-                                   @click="handleEditButton"
-                    />
                 </div>
                 <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.VERIFICATION_CODE')"
                                :invalid="validationState.isValidationCodeValid"
@@ -76,7 +83,7 @@
                     >
                         {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_DESC') }}
                         <p-button class="send-code-button"
-                                  @click.prevent="handleClickSendEmailButton(true)"
+                                  @click.prevent="handleClickSendEmailButton"
                         >
                             <span class="emphasis">{{ $t('COMMON.NOTIFICATION_MODAL.SEND_NEW_CODE') }}</span>
                         </p-button>
@@ -92,7 +99,7 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -102,35 +109,32 @@ import {
     PCollapsibleToggle,
     PFieldGroup,
     PI,
-    PIconButton,
     PTextInput,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 interface Props {
     domainId: string
     userId: string
-    verified: boolean
-    email: string
-    isAdministration?: boolean
     visible: boolean
+    email?: string
+    modalType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
     domainId: '',
     userId: '',
-    verified: false,
-    email: '',
-    isAdministration: false,
     visible: false,
+    email: '',
+    modalType: '',
 });
 
 const emit = defineEmits(['visible', 'refresh-user']);
@@ -138,13 +142,12 @@ const emit = defineEmits(['visible', 'refresh-user']);
 const state = reactive({
     loading: false,
     isCollapsed: true,
-    isEditMode: props.verified,
-    myId: computed(() => store.state.user.userId),
-    email: computed(() => props.email),
+    loginUserId: computed(() => store.state.user.userId),
     proxyVisible: useProxyValue('visible', props, emit),
+    proxyModalType: '',
 });
 const formState = reactive({
-    newNotificationEmail: state.email || '',
+    newNotificationEmail: '',
     verificationCode: '',
 });
 const validationState = reactive({
@@ -154,14 +157,9 @@ const validationState = reactive({
 });
 
 /* Components */
-const handleEditButton = () => {
-    state.isEditMode = true;
-    formState.newNotificationEmail = '';
-};
 const handleClickCancel = () => {
     resetFormData();
     state.proxyVisible = false;
-    state.isEditMode = props.verified;
     emit('refresh-user');
     window.localStorage.setItem('hideNotificationEmailModal', 'true');
 };
@@ -173,11 +171,7 @@ const resetFormData = () => {
 };
 
 /* API */
-const handleClickSendEmailButton = async (resend?: boolean) => {
-    if (!formState.newNotificationEmail && resend) {
-        validationState.isEmailValid = true;
-        return;
-    }
+const handleClickSendEmailButton = async () => {
     state.loading = true;
     try {
         await postValidationEmail({
@@ -185,17 +179,12 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
             domain_id: props.domainId,
             email: formState.newNotificationEmail,
         });
-        if (state.myId === props.userId) {
-            if (resend !== true) {
-                await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
-            }
+        if (state.loginUserId === props.userId) {
+            await store.dispatch('user/setUser', { email: formState.newNotificationEmail, emailVerified: false });
         }
-        if (!props.isAdministration) {
-            emit('refresh-user');
-        }
-        state.isEditMode = false;
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
+        state.proxyModalType = MODAL_TYPE.VERIFY;
+    } catch (error: any) {
+        ErrorHandler.handleError(error);
     } finally {
         state.loading = false;
         validationState.isEmailValid = false;
@@ -208,7 +197,7 @@ const handleClickConfirmButton = async () => {
             user_id: props.userId,
             domain_id: props.domainId,
             code: formState.verificationCode,
-        }, state.myId === props.userId);
+        }, state.loginUserId === props.userId);
         emit('refresh-user');
         state.proxyVisible = false;
         resetFormData();
@@ -219,12 +208,23 @@ const handleClickConfirmButton = async () => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => state.proxyVisible, (value) => {
+    if (value) {
+        state.proxyModalType = props.modalType;
+    }
+});
 </script>
 
 <style lang="postcss" scoped>
 .notification-email-modal-wrapper {
     .modal-content-wrapper {
         @apply flex flex-col;
+        .help-text {
+            @apply text-gray-900 text-paragraph-md;
+            margin-bottom: 1rem;
+        }
         .notification-field-wrapper {
             @apply flex;
             gap: 1rem;

@@ -18,6 +18,7 @@ export const postValidationEmail = async (body): Promise<void|Error> => {
             domain_id,
             force,
         });
+        await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
         return undefined;
     } catch (e: any) {
         showErrorMessage(e.axiosError.response.data.detail.message, e);

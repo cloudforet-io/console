@@ -82,15 +82,6 @@ const state = reactive({
     verified: computed(() => store.state.user.emailVerified),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
-    email: computed(() => {
-        if (store.state.user.email === '') {
-            if (state.userType === 'LOCAL') {
-                return state.userId;
-            }
-            return '';
-        }
-        return store.state.user.email;
-    }),
 });
 const {
     forms: {
@@ -100,15 +91,23 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    notificationEmail: state.email,
+    notificationEmail: '',
 }, {
     notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
 
 /* Watcher */
 watch(() => store.state.user.email, (value) => {
-    setForm('notificationEmail', value);
-});
+    let result = value;
+    if (value === '') {
+        if (state.userType === 'LOCAL') {
+            result = state.userId;
+        } else {
+            result = '';
+        }
+    }
+    setForm('notificationEmail', result);
+}, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>
@@ -139,6 +138,7 @@ watch(() => store.state.user.email, (value) => {
     }
     .form {
         @apply relative flex;
+        max-width: 33.625rem;
         margin-top: 1rem;
 
         .icon-edit {
@@ -147,8 +147,8 @@ watch(() => store.state.user.email, (value) => {
 
         /* custom design-system component - p-field-group */
         :deep(.p-field-group) {
+            flex: 1;
             &.field-group {
-                width: 26.625rem;
                 margin-bottom: 0;
 
                 /* custom design-system component - p-text-input */
