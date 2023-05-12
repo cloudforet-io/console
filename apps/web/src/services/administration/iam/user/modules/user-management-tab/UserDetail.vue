@@ -113,7 +113,10 @@ const state = reactive({
         { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
         { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
         {
-            name: 'email', label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'), block: true, disableCopy: state.data.user_type === 'API_USER',
+            name: 'email',
+            label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
+            block: true,
+            disableCopy: state.data.user_type === 'API_USER',
         },
         { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
         { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
@@ -178,10 +181,13 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
     }
     &.block {
         .extra {
-            width: 3.75rem;
+            width: 11.375rem;
             height: 1.5rem;
             margin-top: -0.125rem;
             margin-left: 0;
+            .verify-button-wrapper {
+                @apply flex justify-end;
+            }
         }
     }
 }

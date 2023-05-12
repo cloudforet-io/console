@@ -931,11 +931,13 @@
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "스팸 메일을 확인하거나 조금만 더 기다려 주세요. 만일 아직도 이메일을 받지 못한 경우, ",
 			"COLLAPSE_TITLE": "인증 코드를 받지 못하셨나요?",
+			"ENTER_EMAIL": "",
 			"INVALID_CODE": "잘못된 인증 코드 입니다. 이메일을 다시 확인 해주세요.",
 			"NOTIFICATION_EMAIL": "알림 전용 이메일",
 			"SEND_CODE": "인증 코드 전송",
 			"SEND_NEW_CODE": "인증 코드 재전송",
 			"SENT_DESC": "인증코드가 입력한 이메일로 발송 되었습니다: ",
+			"SUCCESS": "",
 			"TITLE": "알림전용 이메일 인증",
 			"VERIFICATION_CODE": "인증 코드",
 			"VERIFY_NOW": "인증"

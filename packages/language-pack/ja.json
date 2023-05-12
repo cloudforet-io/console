@@ -931,11 +931,13 @@
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
 			"COLLAPSE_TITLE": "認証コードが届きませんか？",
+			"ENTER_EMAIL": "",
 			"INVALID_CODE": "無効なコードです。もう一度メールを確認してください。",
 			"NOTIFICATION_EMAIL": "お知らせメール",
 			"SEND_CODE": "認証コードを送信",
 			"SEND_NEW_CODE": "再送信",
 			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
+			"SUCCESS": "",
 			"TITLE": "通知メールを確認する",
 			"VERIFICATION_CODE": "認証コード",
 			"VERIFY_NOW": "認証"
