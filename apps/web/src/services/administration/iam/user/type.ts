@@ -136,3 +136,13 @@ export const PASSWORD_TYPE = {
     RESET: 'RESET',
     MANUALLY: 'MANUALLY',
 } as const;
+
+export interface UserManagementData {
+	user_id: string;
+	name: string;
+	email: string;
+	tags: Tags;
+	password: string;
+	reset_password?: boolean;
+	backend?: string
+}

@@ -162,7 +162,7 @@ const handleClickSend = async () => {
         emit('change-verify', true);
 
         if (state.loginUserId === props.item.user_id) {
-            await store.dispatch('user/setUser', { email: email.value });
+            await store.dispatch('user/setUser', { email: email.value, emailVerified: true });
         }
     } catch (e) {
         ErrorHandler.handleError(e);

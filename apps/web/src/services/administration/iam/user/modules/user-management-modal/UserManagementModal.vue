@@ -91,7 +91,7 @@ import NotificationEmailForm
 import PasswordForm from '@/services/administration/iam/user/modules/user-management-modal/modules/PasswordForm.vue';
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
-import type { User } from '@/services/administration/iam/user/type';
+import type { User, UserManagementData } from '@/services/administration/iam/user/type';
 import { PASSWORD_TYPE } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -197,15 +197,19 @@ export default {
             }
         };
         const confirm = async () => {
-            const data = {
+            const data: UserManagementData = {
                 user_id: formState.userId,
                 name: formState.name,
                 email: formState.email || formState.userId,
                 tags: formState.tags || {},
                 password: formState.password || '',
-                backend: formState.activeTab === 'local' ? 'LOCAL' : 'EXTERNAL',
-                reset_password: formState.activeTab === 'local' ? formState.passwordType === PASSWORD_TYPE.RESET : undefined,
             };
+            if (userPageState.visibleCreateModal) {
+                data.backend = formState.activeTab === 'local' ? 'LOCAL' : 'EXTERNAL';
+            }
+            if (formState.activeTab === 'local') {
+                data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
+            }
 
             if (formState.domainRole !== undefined) {
                 emit('confirm', data, formState.roleId);

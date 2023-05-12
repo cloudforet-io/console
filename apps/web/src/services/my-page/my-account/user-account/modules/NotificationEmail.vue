@@ -99,7 +99,7 @@ const {
 /* Watcher */
 watch(() => store.state.user.email, (value) => {
     let result = value;
-    if (value) {
+    if (value === '') {
         if (state.userType === 'LOCAL') {
             result = state.userId;
         } else {
