@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'branch를 입력해주세요(master와 release-x.y.z만 허용)'
+        description: 'Please enter branch (only master and release-x.y.z are allowed)'
         required: true
         default: 'master'
+      version:
+        description: 'Please enter version(x.y.z)'
+        required: true
+        default: '1.0.0'
 
 env:
   BRANCH: ${{ github.event.inputs.branch }}
@@ -15,6 +19,29 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    services:
+      turbo_cache:
+        image: ${{ secrets.TURBO_CACHE_SERVER_IMAGE }}
+        env:
+          PORT: 3000
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          STORAGE_PROVIDER: git-repository
+          STORAGE_PATH: console-artifacts
+          GIT_REPOSITORY: ${{ vars.TURBO_CACHE_SERVER_GIT_REPOSITORY }}
+          GIT_BRANCH: ${{ vars.TURBO_CACHE_SERVER_GIT_BRANCH }}
+          GIT_USER_NAME: ${{ vars.GIT_USERNAME }}
+          GIT_USER_EMAIL: ${{ vars.GIT_EMAIL }}
+          GIT_USER_PASSWORD: ${{ secrets.PAT_TOKEN }}
+        ports:
+          - 3000:3000
+        options: >-
+          --health-cmd "curl -f GET 'http://localhost:3000/v8/artifacts/status' -H 'Authorization: Bearer $TURBO_TOKEN'"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+          --health-start-period 30s
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,7 +71,7 @@ jobs:
         env:
           NODE_ENV: "production"
         run: |
-          npm run build -- --filter=storybook --token="${{ secrets.TURBO_TOKEN }}" --team="${{ secrets.TURBO_TEAM }}" --api="${{ secrets.TURBO_API }}"
+          npm run build -- --filter=storybook --token="${{ secrets.TURBO_TOKEN }}" --team="${{ secrets.TURBO_TEAM }}" --api="http://localhost:3000"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

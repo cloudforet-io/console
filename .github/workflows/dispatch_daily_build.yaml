@@ -12,6 +12,28 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         TIME: ${{ steps.get_date.outputs.TIME }}
+    services:
+      turbo_cache:
+        image: ${{ secrets.TURBO_CACHE_SERVER_IMAGE }}
+        env:
+          PORT: 3000
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          STORAGE_PROVIDER: git-repository
+          STORAGE_PATH: console-artifacts
+          GIT_REPOSITORY: ${{ vars.TURBO_CACHE_SERVER_GIT_REPOSITORY }}
+          GIT_BRANCH: ${{ vars.TURBO_CACHE_SERVER_GIT_BRANCH }}
+          GIT_USER_NAME: ${{ vars.GIT_USERNAME }}
+          GIT_USER_EMAIL: ${{ vars.GIT_EMAIL }}
+          GIT_USER_PASSWORD: ${{ secrets.PAT_TOKEN }}
+        ports:
+          - 3000:3000
+        options: >-
+          --health-cmd "curl -f GET 'http://localhost:3000/v8/artifacts/status' -H 'Authorization: Bearer $TURBO_TOKEN'"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+          --health-start-period 30s
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -45,7 +67,7 @@ jobs:
           build-args: |
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
-            TURBO_API=${{ secrets.TURBO_API }}
+            TURBO_API=http://host.docker.internal:3000
           push: true
           tags: |
             cloudforetdev/${{ github.event.repository.name }}:latest
