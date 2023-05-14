@@ -16,8 +16,8 @@ on:
         description: 'choose container architecture'
         default: linux/amd64
         options:
-        - "linux/amd64"
-        - "linux/amd64,linux/arm64"
+          - "linux/amd64"
+          - "linux/amd64,linux/arm64"
 
 
 env:
@@ -25,7 +25,6 @@ env:
   BRANCH: ${{ github.event.inputs.branch }}
   VERSION: ${{ github.event.inputs.version }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  TURBO_CACHE_SERVER_IMAGE: ${{ secrets.TURBO_CACHE_SERVER_IMAGE }}
 
 jobs:
   versioning:
@@ -94,7 +93,7 @@ jobs:
 
     services:
       turbo_cache:
-        image: ${{ env.TURBO_CACHE_SERVER_IMAGE }}
+        image: wanzargen/turbo-cache-server:1.0.0
         env:
           PORT: 3000
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
