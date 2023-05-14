@@ -11,10 +11,10 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     outputs:
-        TIME: ${{ steps.get_date.outputs.TIME }}
+      TIME: ${{ steps.get_date.outputs.TIME }}
     services:
       turbo_cache:
-        image: ${{ secrets.TURBO_CACHE_SERVER_IMAGE }}
+        image: wanzargen/turbo-cache-server:1.0.0
         env:
           PORT: 3000
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
           build-args: |
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
-            TURBO_API=http://host.docker.internal:3000
+            TURBO_API=http://172.17.0.1:3000
           push: true
           tags: |
             cloudforetdev/${{ github.event.repository.name }}:latest
@@ -97,7 +97,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          
+
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -157,7 +157,7 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{secrets.VULNERABILITY_SLACK_WEBHOOK_URL}} 
+          SLACK_WEBHOOK_URL: ${{secrets.VULNERABILITY_SLACK_WEBHOOK_URL}}
 
   notification:
     needs: docker
