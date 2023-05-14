@@ -1,8 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-cd apps/web
-npx lint-staged
-
-cd ../../packages/core-lib
 npx lint-staged

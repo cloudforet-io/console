@@ -23,7 +23,7 @@ Follow the [official docker installation guide](https://docs.docker.com/engine/i
 
 ### 2. Pull docker image
 ```bash
-docker pull wanzargen/turbo-cache-server:latest
+docker pull wanzargen/turbo-cache-server:1.0.0
 ```
 The source code of this image is [here](https://github.com/WANZARGEN/turborepo-remote-cache.git) which is forked from [turborepo-remote-cache](https://github.com/ducktors/turborepo-remote-cache.git).
 
@@ -34,26 +34,24 @@ Copy the `dev/turbo-cache-server.sample.env` file to `dev/turbo-cache-server.env
 
 ### 4. Run the server
 ```bash
-docker run -d -p 3000:3000 --name turbo-cache-server --rm --env-file=./dev/turbo-cache-server.env wanzargen/turbo-cache-server:latest
+docker run -d -p 3000:3000 --name turbo-cache-server --rm --env-file=./dev/turbo-cache-server.env wanzargen/turbo-cache-server:1.0.0
 ```
 
 ## Set up the client
 
-### 1. Add turbo config file
-Add `.turbo/config.json` file.
-```json
-{
-  "teamId": "your_team_name",
-  "apiUrl": "http://localhost:<the_port_number_you_set_in_step_4>"
-}
-```
-
-### 2. Set turbo token as your environment variable
+### 1. Set turbo environment variable
 
 ```bash
+export TURBO_TEAM=your_team_name
+export TURBO_API=http://localhost:<the_port_number_you_set_in_step_4>
 export TURBO_TOKEN=your_token_you_set_in_step_3
 ```
-This command is not permanent. You need to run this command every time you open a new terminal.
-If you want to set it permanently, add the above command to your `.bashrc` or `.zshrc` file.
+This command is not permanent. You need to run this command every time you open a new terminal. <br/>
+If you want to set it permanently, add the above command to your `.bashrc` or `.zshrc` file like below.
+```bash
+echo "export TURBO_TEAM=your_team_name" >> ~/.zshrc
+echo "export TURBO_API=http://localhost:<the_port_number_you_set_in_step_4>" >> ~/.zshrc
+echo "export TURBO_TOKEN=your_token_you_set_in_step_3" >> ~/.zshrc
+```
 
 
