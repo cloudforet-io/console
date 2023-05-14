@@ -33,7 +33,7 @@ jobs:
 
     services:
       turbo_cache:
-        image: ${{ secrets.TURBO_CACHE_SERVER_IMAGE }}
+        image: wanzargen/turbo-cache-server:latest
         env:
           PORT: 3000
           TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
