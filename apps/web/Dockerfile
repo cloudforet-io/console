@@ -25,8 +25,9 @@ ENV TURBO_API=$TURBO_API
 ENV FORCE_COLOR=1
 
 RUN npx turbo build --filter=web... --output-logs=new-only --summarize
-RUN find .turbo/runs/. -type f -exec cat {} \;
-RUN rm -rf .git
+
+# Enable only for turbo debugging purposes
+#RUN find .turbo/runs/. -type f -exec cat {} \;
 
 FROM nginx AS runner
 
