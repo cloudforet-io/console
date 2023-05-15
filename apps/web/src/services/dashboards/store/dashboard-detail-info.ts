@@ -46,6 +46,7 @@ export interface DashboardDetailInfoStoreState {
     dashboardWidgetInfoList: DashboardLayoutWidgetInfo[];
     loadingWidgets: boolean;
     widgetDataMap: WidgetDataMap;
+    widgetViewModeModalVisible: boolean,
     // validation
     isNameValid?: boolean;
     widgetValidMap: WidgetValidMap;
@@ -128,6 +129,7 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
         widgetDataMap: {},
+        widgetViewModeModalVisible: false,
         // validation
         isNameValid: undefined,
         widgetValidMap: {},
