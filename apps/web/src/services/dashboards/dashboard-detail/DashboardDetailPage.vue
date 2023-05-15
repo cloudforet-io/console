@@ -75,6 +75,7 @@
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
                                :dashboard="dashboardDetailState"
         />
+        <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible" />
     </div>
 </template>
 
@@ -120,6 +121,7 @@ import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRef
 import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
