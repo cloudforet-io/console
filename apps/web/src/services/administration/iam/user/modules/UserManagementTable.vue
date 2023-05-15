@@ -113,7 +113,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -352,8 +352,13 @@ export default {
                     userFormState.roleOfSelectedUser = roleId;
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+            } catch (e: any) {
+                const errorDetail = e.axiosError.response.data.detail;
+                if (errorDetail.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
+                    showErrorMessage(errorDetail.message, '');
+                } else {
+                    ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+                }
             } finally {
                 await userPageStore.listUsers(userListApiQuery);
                 userPageStore.$patch({ selectedIndices: [] });

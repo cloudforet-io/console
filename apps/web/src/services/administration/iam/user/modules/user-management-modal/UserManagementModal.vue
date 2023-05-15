@@ -207,7 +207,7 @@ export default {
             if (userPageState.visibleCreateModal) {
                 data.backend = formState.activeTab === 'local' ? 'LOCAL' : 'EXTERNAL';
             }
-            if (formState.activeTab === 'local') {
+            if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
                 data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
             }
 
