@@ -3,9 +3,16 @@ import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
+/* Description
+    * This store is used to get/manage 'a' widget data.
+    * This store is used in
+    *   1) widget view modal (in dashboard detail page)
+    *   2) widget edit modal (in dashboard customize page)
+* */
 
 interface WidgetFormState {
     widgetConfigId?: string;
@@ -15,6 +22,9 @@ interface WidgetFormState {
     widgetOptions?: WidgetOptions;
     widgetInfo?: DashboardLayoutWidgetInfo;
     schemaProperties?: string[];
+    // view modal
+    widgetKey?: string;
+    theme?: WidgetTheme;
 }
 interface WidgetFormActions {
     setFormData: (formData: any) => void;
