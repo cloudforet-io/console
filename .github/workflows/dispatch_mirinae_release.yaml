@@ -72,8 +72,11 @@ jobs:
       - name: Build
         env:
           NODE_ENV: "production"
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+          TURBO_API: "http://localhost:3000"
         run: |
-          npm run build -- --filter=@spaceone/design-system --token="${{ secrets.TURBO_TOKEN }}" --team="${{ secrets.TURBO_TEAM }}" --api="http://localhost:3000"
+          npm run build -- --filter=@spaceone/design-system --output-logs=new-only
 
 #      - name: Release
 #        env:

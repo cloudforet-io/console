@@ -79,7 +79,7 @@ jobs:
         run: npm ci
 
       - name: Build Packages
-        run: npm run build -- --filter="./packages/*" --parallel
+        run: npm run build -- --filter="./packages/*" --parallel --output-logs=new-only
 
       - name: Lint
         run: npm run lint
@@ -88,4 +88,4 @@ jobs:
         run: npm run test
 
       - name: Build Apps
-        run: npm run build -- --filter="./apps/*" --parallel
+        run: npm run build -- --filter="./apps/*" --parallel --output-logs=new-only
