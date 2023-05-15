@@ -10,7 +10,7 @@ export const useWidgetFrameProps = (props: any, state: any):ComputedRef => compu
     editMode: props.editMode,
     widgetConfigId: props.widgetConfigId,
     title: state.title,
-    size: state.size,
+    size: state.size, // TODO: delete this comment
     dateRange: state.dateRange,
     currency: state.currency,
     disableFullSize: !state.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
