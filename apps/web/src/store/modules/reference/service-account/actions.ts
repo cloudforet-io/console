@@ -18,7 +18,6 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.identity.serviceAccount.list({
@@ -37,6 +36,7 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
         });
 
         commit('setServiceAccounts', serviceAccounts);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
