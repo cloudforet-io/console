@@ -20,7 +20,6 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const repoResponse = await SpaceConnector.client.repository.repository.list({
@@ -52,6 +51,7 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
         await Promise.all(promises);
 
         commit('setPlugins', plugins);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
