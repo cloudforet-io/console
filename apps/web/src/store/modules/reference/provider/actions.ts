@@ -22,7 +22,6 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.identity.provider.list({
@@ -47,6 +46,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
         });
 
         commit('setProviders', providers);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

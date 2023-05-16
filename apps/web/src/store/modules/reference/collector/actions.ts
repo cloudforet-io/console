@@ -20,7 +20,6 @@ export const load: Action<CollectorReferenceState, any> = async ({ state, commit
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.inventory.collector.list({
@@ -40,6 +39,7 @@ export const load: Action<CollectorReferenceState, any> = async ({ state, commit
         });
 
         commit('setCollectors', collectors);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
