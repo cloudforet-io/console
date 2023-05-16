@@ -19,4 +19,5 @@ export const useWidgetFrameProps = (props: any, state: any):ComputedRef => compu
     widgetLocation: state.widgetLocation,
     errorMode: props.errorMode,
     theme: props.theme,
+    nonInheritOptionsTooltip: state.nonInheritOptionsTooltip,
 }));

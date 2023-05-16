@@ -28,6 +28,7 @@ import type {
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetOptionsSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
@@ -130,6 +131,7 @@ export interface WidgetState<Data = any> {
     consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
+    nonInheritOptionsTooltip?: ComputedRef<string|undefined>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -200,6 +202,19 @@ export function useWidgetState<Data = any>(
             state.widgetConfig?.options_schema?.schema,
             dashboardDetailState.variablesSchema,
         )),
+        nonInheritOptionsTooltip: computed<string|undefined>(() => {
+            if (!state.widgetInfo?.schema_properties?.length) return undefined;
+            const enabledInheritOptions: string[] = Object.entries(state.widgetInfo.inherit_options).filter(([, v]) => v.enabled).map(([k]) => k);
+            const nonInheritOptions: string[] = [];
+            state.widgetInfo.schema_properties.forEach((property) => {
+                if (!enabledInheritOptions.includes(property)) nonInheritOptions.push(property);
+            });
+            if (!nonInheritOptions.length) return undefined;
+            const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
+            // song-lang
+            return `This widget has its own non-inherited options, and they won't be affected by the main dashboard option until you reset it in view mode.</br></br>
+            List of non-inherited options:</br>${tooltipText}`;
+        }),
     }) as UnwrapRef<WidgetState<Data>>;
 
     return state;
