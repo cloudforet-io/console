@@ -47,7 +47,14 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
 export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
-export const getWidgetOptionsSchemaPropertyName = (property: WidgetOptionsSchemaProperty): string => { // 'filters.project_group' -> 'Project Group'
+
+/** @function
+ * @name getWidgetOptionsSchemaPropertyName
+ * @example
+    * getWidgetOptionsSchemaPropertyName('filters.project_group') => 'Project Group'
+    * getWidgetOptionsSchemaPropertyName('group_by') => 'Group By'
+ */
+export const getWidgetOptionsSchemaPropertyName = (property: WidgetOptionsSchemaProperty): string => {
     if (property.startsWith('filters.')) {
         return REFERENCE_TYPE_INFO[property.replace('filters.', '')].name;
     }
