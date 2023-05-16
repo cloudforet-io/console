@@ -54,6 +54,17 @@
                                :vertical="true"
                     />
                     <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <p-divider v-if="props.nonInheritOptionsTooltip"
+                               :vertical="true"
+                    />
+                    <p-i v-if="props.nonInheritOptionsTooltip"
+                         v-tooltip="props.nonInheritOptionsTooltip"
+                         name="ic_warning-filled"
+                         color="inherit"
+                         height="1rem"
+                         width="1rem"
+                         class="warning-icon"
+                    />
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
@@ -151,6 +162,7 @@ export interface WidgetFrameProps {
     overflowY?: string;
     refreshOnResize?: boolean;
     theme?: WidgetTheme;
+    nonInheritOptionsTooltip?: string;
 }
 
 interface IconConfig {
@@ -170,6 +182,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     currency: CURRENCY.USD,
     overflowY: undefined,
     theme: undefined,
+    nonInheritOptionsTooltip: undefined,
 });
 
 const emit = defineEmits(['refresh']);
