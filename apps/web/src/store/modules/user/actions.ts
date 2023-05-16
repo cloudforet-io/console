@@ -145,7 +145,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
         email: userRequest.email || state.email,
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,
-        emailVerified: userRequest.email_verified || state.emailVerified,
+        emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
     });
 
     commit('setUser', { ...state, ...convertRequestType() });
