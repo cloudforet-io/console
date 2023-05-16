@@ -9,7 +9,7 @@
         </template>
         <variable-more-button-dropdown :is-manageable="props.isManageable" />
         <button class="reset-button"
-                @click="dashboardDetailStore.resetVariables"
+                @click="dashboardDetailStore.resetVariables(props.originVariables, props.originVariablesSchema)"
         >
             <p-i name="ic_refresh"
                  width="1rem"
@@ -23,7 +23,6 @@
 </template>
 
 <script lang="ts" setup>
-
 import type Vue from 'vue';
 import { computed, getCurrentInstance, reactive } from 'vue';
 
@@ -31,6 +30,7 @@ import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
@@ -41,6 +41,8 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 
 interface Props {
     isManageable: boolean;
+    originVariables?: DashboardVariables;
+    originVariablesSchema?: DashboardVariablesSchema;
 }
 
 const props = defineProps<Props>();
