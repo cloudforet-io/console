@@ -20,7 +20,6 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state,
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.inventory.cloudServiceType.list({
@@ -45,6 +44,7 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state,
         });
 
         commit('setCloudServiceTypes', cloudServiceTypes);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
