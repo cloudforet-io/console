@@ -59,6 +59,9 @@ jobs:
         with:
           submodules: true
           ref: ${{ github.ref }}
+          
+      - name: haha
+        run: echo "haha"
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
