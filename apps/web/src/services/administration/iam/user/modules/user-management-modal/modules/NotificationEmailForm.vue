@@ -132,7 +132,9 @@ const { email } = forms;
 /* Components */
 const handleChangeInput = (e) => {
     setForm('email', e);
-    emit('change-input', { ...forms, email: email.value });
+    if (!state.isEdit) {
+        emit('change-input', { ...forms, email: email.value });
+    }
 };
 const handleClickChange = () => {
     if (!state.isEdit) {
@@ -159,6 +161,7 @@ const handleClickSend = async () => {
             force: true,
         });
         state.isEdit = false;
+        emit('change-input', { ...forms, email: email.value });
         emit('change-verify', true);
 
         if (state.loginUserId === props.item.user_id) {
