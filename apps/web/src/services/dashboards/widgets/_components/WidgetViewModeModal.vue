@@ -27,7 +27,10 @@
             </div>
             <div class="filter-wrapper">
                 <div class="left-part">
-                    <dashboard-variables-selector :is-manageable="false" />
+                    <dashboard-variables-selector :is-manageable="false"
+                                                  :origin-variables="state.variablesSnapshot"
+                                                  :origin-variables-schema="state.variableSchemaSnapshot"
+                    />
                 </div>
                 <div class="right-part">
                     <dashboard-toolset />

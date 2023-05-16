@@ -257,29 +257,26 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             delete _widgetValidMap[widgetKey];
             this.widgetValidMap = _widgetValidMap;
         },
-        resetVariables() {
-            const {
-                properties: originProperties,
-                order: originOrder,
-            } = refineVariablesSchema(this.dashboardInfo?.variables_schema);
-            const originVariables = this.dashboardInfo?.variables ?? {};
+        resetVariables(originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) {
+            const _originVariables = originVariables ?? this.dashboardInfo?.variables ?? {};
+            const _originVariablesSchema = originVariablesSchema ?? refineVariablesSchema(this.dashboardInfo?.variables_schema);
 
             // reset variables schema
             let _variableSchema = cloneDeep(this.variablesSchema);
             this.variablesSchema.order.forEach((property) => {
-                if (!originProperties[property]) return;
-                _variableSchema.properties[property].use = originProperties[property].use;
+                if (!_originVariablesSchema?.properties[property]) return;
+                _variableSchema.properties[property].use = _originVariablesSchema?.properties[property].use;
             });
             if (this.projectId) _variableSchema = refineProjectDashboardVariablesSchema(_variableSchema);
             this.variablesSchema = _variableSchema;
 
             // reset variables
             let _variables = cloneDeep(this.variables);
-            originOrder.forEach((property) => {
+            _originVariablesSchema.order.forEach((property) => {
                 // CASE: existing variable is deleted.
                 if (!this.variablesSchema.properties[property]) return;
-                if (isEqual(this.variablesSchema.properties[property], originProperties[property])) {
-                    _variables[property] = originVariables[property];
+                if (isEqual(this.variablesSchema.properties[property], _originVariablesSchema?.properties[property])) {
+                    _variables[property] = _originVariables[property];
                 }
             });
             if (this.projectId) _variables = refineProjectDashboardVariables(_variables, this.projectId);

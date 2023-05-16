@@ -176,7 +176,7 @@ const state = reactive({
                 budget_type: 'left_budget',
                 budget_rate: (100 - chartSpentBudgetRate),
                 pieSettings: {
-                    fill: color(gray[400]),
+                    fill: color(gray[200]),
                 },
             },
         ];
