@@ -57,14 +57,16 @@
                     <p-divider v-if="props.nonInheritOptionsTooltip"
                                :vertical="true"
                     />
-                    <p-i v-if="props.nonInheritOptionsTooltip"
-                         v-tooltip="props.nonInheritOptionsTooltip"
-                         name="ic_warning-filled"
-                         color="inherit"
-                         height="1rem"
-                         width="1rem"
-                         class="warning-icon"
-                    />
+                    <p-tooltip v-if="props.nonInheritOptionsTooltip"
+                               class="widget-non-inherit-tooltip"
+                               :contents="props.nonInheritOptionsTooltip"
+                    >
+                        <p-i name="ic_warning-filled"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
@@ -116,7 +118,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI,
+    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -348,6 +350,9 @@ const handleClickViewModeButton = () => {
                     &.vertical {
                         height: 1rem;
                     }
+                }
+                .widget-non-inherit-tooltip {
+                    @apply text-gray-700;
                 }
             }
             .footer-right {
