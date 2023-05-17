@@ -10,6 +10,11 @@
                 <router-view />
             </template>
         </vertical-page-layout>
+        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+                              has-nav-bar
+        >
+            <router-view />
+        </centered-page-layout>
         <general-page-layout v-else
                              :breadcrumbs="breadcrumbs"
         >
@@ -24,6 +29,7 @@ import {
 } from 'vue';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
@@ -37,6 +43,7 @@ export default defineComponent({
     components: {
         AssetInventoryLNB,
         GeneralPageLayout,
+        CenteredPageLayout,
         VerticalPageLayout,
     },
     setup() {
