@@ -86,7 +86,8 @@ const state = reactive({
 </script>
 
 <style lang="postcss">
-/* Applying 'important' to resolve the issue where CSS is not being applied due to a change in the timing of the loading of 'vue-notification-group' during build. */
+/* CAUTION: Do not remove 'important'.
+ * This resolves the issue where CSS is not being applied due to a change in the timing of the loading of original 'vue-notification-group' libarary's css on the application at running time. */
 .vue-notification-group {
     overflow: unset !important;
     z-index: 10000 !important;
