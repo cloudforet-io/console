@@ -14,7 +14,9 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
         _NAME: MENU_ID.ASSET_INVENTORY_COLLECTOR,
         CREATE: {
             _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.create`,
-            STEPS: { _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.create.steps` },
+        },
+        DETAIL: {
+            _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.detail`,
         },
         HISTORY: {
             _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.history`,
