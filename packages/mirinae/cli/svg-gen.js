@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 /**
- * generate svg icons object
+ * generate svg icons contents
  * @since 2023-05-12
  */
 
@@ -34,6 +34,7 @@ const targetPath = path.isAbsolute(program.opts().targetPath)
 // auto run
 (async () => {
     try {
+        /* TODO: replace to generate function in Vue 3 with @yzfe/svgicon */
         await build({
             sourcePath,
             targetPath,

@@ -10,7 +10,10 @@ const Svgo = require('svgo');
 const defaultSvgoConfig = require('./svgo');
 
 /**
- * build svg icon
+ * build
+ * - build svg icons
+ * - register svg icons to svgicon
+ * - this must be replaced to generate function in Vue 3 with @yzfe/svgicon
  */
 async function build(options) {
     const { sourcePath, targetPath } = options;

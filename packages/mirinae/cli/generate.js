@@ -8,6 +8,11 @@ const fs = require('fs-plus');
 const readdirAsync = util.promisify(fs.readdir);
 const writeFileAsync = util.promisify(fs.writeFile);
 
+/**
+ * generate
+ * - generate svg icons object
+ * - this will be used after Vue3 migration with @yzfe/vue3-svgicon
+ */
 async function generate(options) {
     const {
         sourcePath, targetPath,
