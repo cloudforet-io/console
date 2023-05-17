@@ -1,40 +1,27 @@
 type ItemType = string | number | boolean | object | null;
 
 export class LocalStorageAccessor {
-    private static storage: Storage;
+    private static storage: Storage = window.localStorage;
 
-    static init(): void {
-        LocalStorageAccessor.storage = window.localStorage;
-    }
-
-    static getItem(key: string, itemType?: ItemType) {
+    static getItem(key: string, disableParse = false) {
         const item = this.storage.getItem(key);
-        if (itemType === 'number') {
-            return Number(item);
-        } if (itemType === 'boolean') {
-            return Boolean(item);
-        } if (itemType === 'object') {
-            try {
-                return item ? JSON.parse(item) : {};
-            } catch {
-                return {};
-            }
+        if (disableParse) {
+            return item;
         }
-        return item;
+        try {
+            return item ? JSON.parse(item) : null;
+        } catch {
+            return item;
+        }
     }
 
     static setItem(key: string, value: ItemType): void {
         switch (typeof value) {
-        case 'object':
-            this.storage.setItem(key, JSON.stringify(value));
-            break;
-        case 'boolean':
-        case 'number':
-            this.storage.setItem(key, String(value));
-            break;
-        default:
+        case 'string':
             this.storage.setItem(key, value);
             break;
+        default:
+            this.storage.setItem(key, JSON.stringify(value));
         }
     }
 
