@@ -28,6 +28,8 @@ const ServiceAccountDetailPage = () => import('@/services/asset-inventory/servic
 const ServiceAccountAddPage = () => import('@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
 const ServiceAccountSearchPage = () => import('@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
 
+const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
+const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
 const CollectorDetailPage = () => import('@/services/asset-inventory/collector/collector-detail/CollectorDetailPage.vue');
 
 const assetInventoryRoute: RouteConfig = {
@@ -102,9 +104,29 @@ const assetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: 'create',
-                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
                     meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION, centeredLayout: true },
                     component: CreateCollectorPage as any,
+                },
+                {
+                    path: 'history',
+                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
+                    component: { template: '<keep-alive><router-view /></keep-alive>' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                            meta: { lnbVisible: true },
+                            component: CollectorHistoryPage as any,
+                        },
+                        {
+                            path: ':jobId',
+                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
+                            props: true,
+                            component: CollectJobPage as any,
+                        },
+                    ],
                 },
                 {
                     path: ':collectorId',

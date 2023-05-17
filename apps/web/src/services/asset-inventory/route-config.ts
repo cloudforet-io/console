@@ -18,6 +18,10 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
         DETAIL: {
             _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.detail`,
         },
+        HISTORY: {
+            _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.history`,
+            JOB: { _NAME: `${MENU_ID.ASSET_INVENTORY_COLLECTOR}.history.job` },
+        },
     },
     SERVICE_ACCOUNT: {
         _NAME: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
