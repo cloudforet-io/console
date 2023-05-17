@@ -11,6 +11,7 @@
         <p-divider />
         <div class="dashboard-selectors">
             <dashboard-variables-selector class="variable-selector-wrapper"
+                                          disable-save-button
                                           is-manageable
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
