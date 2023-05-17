@@ -89,7 +89,7 @@ const state = reactive({
 <style lang="postcss">
 .vue-notification-group {
     overflow: unset;
-    z-index: 10000;
+    z-index: 10000 !important;
 }
 .vue-notification-wrapper {
     margin: 1rem 0;
@@ -103,7 +103,6 @@ const state = reactive({
     margin-left: 0;
     margin-right: 0;
     overflow-y: hidden;
-    z-index: 10000;
 
     .alert-contents {
         @apply bg-gray-900 rounded-lg;
