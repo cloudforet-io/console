@@ -103,6 +103,7 @@ const state = reactive({
     margin-left: 0;
     margin-right: 0;
     overflow-y: hidden;
+    z-index: 10000;
 
     .alert-contents {
         @apply bg-gray-900 rounded-lg;
