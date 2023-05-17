@@ -21,7 +21,6 @@ const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
 const CollectorPage = () => import('@/services/asset-inventory/collector/CollectorPage.vue');
-const CollectorPluginPage = () => import('@/services/asset-inventory/collector/collector-plugins/CollectorPluginsPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
 
 const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
@@ -29,8 +28,7 @@ const ServiceAccountDetailPage = () => import('@/services/asset-inventory/servic
 const ServiceAccountAddPage = () => import('@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
 const ServiceAccountSearchPage = () => import('@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
 
-const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
-const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
+const CollectorDetailPage = () => import('@/services/asset-inventory/collector/collector-detail/CollectorDetailPage.vue');
 
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
@@ -104,43 +102,16 @@ const assetInventoryRoute: RouteConfig = {
                 },
                 {
                     path: 'create',
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE' },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            component: CollectorPluginPage as any,
-                        },
-                        {
-                            path: ':pluginId',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
-                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            props: true,
-                            component: CreateCollectorPage as any,
-                        },
-                    ],
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION, centeredLayout: true },
+                    component: CreateCollectorPage as any,
                 },
                 {
-                    path: 'history',
-                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
-                    component: { template: '<keep-alive><router-view /></keep-alive>' },
-                    children: [
-                        {
-                            path: '/',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
-                            meta: { lnbVisible: true },
-                            component: CollectorHistoryPage as any,
-                        },
-                        {
-                            path: ':jobId',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
-                            props: true,
-                            component: CollectJobPage as any,
-                        },
-                    ],
+                    path: ':collectorId',
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                    props: true,
+                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId },
+                    component: CollectorDetailPage as any,
                 },
             ],
         },
