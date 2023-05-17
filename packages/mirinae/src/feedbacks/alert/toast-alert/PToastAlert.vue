@@ -12,15 +12,12 @@
                  @click="close"
             >
                 <div class="icon-wrapper">
-                    <span class="text-safe">
-                        <p-i v-if="item.type === 'success'"
-                             name="ic_check"
-                             class="item-type-icon"
-                             width="1.5rem"
-                             height="1.5rem"
-                             color="inherit"
-                        />
-                    </span>
+                    <p-i name="ic_check"
+                         class="item-type-icon"
+                         width="1.5rem"
+                         height="1.5rem"
+                         :color="safe"
+                    />
                     <p-i v-if="item.type === 'warning'"
                          name="ic_warning-filled"
                          class="item-type-icon"
@@ -70,6 +67,8 @@ import {
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 
+import { safe } from '@/styles/colors.cjs';
+
 /**
  * Used library: vue-notification
  * https://www.npmjs.com/package/vue-notification
@@ -87,17 +86,17 @@ const state = reactive({
 </script>
 
 <style lang="postcss">
+/* CAUTION: Do not remove 'important'.
+ * This resolves the issue where CSS is not being applied due to a change in the timing of the loading of original 'vue-notification-group' libarary's css on the application at running time. */
 .vue-notification-group {
-    overflow: unset;
-    z-index: 10000;
+    overflow: unset !important;
+    z-index: 10000 !important;
 }
 .vue-notification-wrapper {
-    margin: 1rem 0;
-    overflow: visible;
+    margin: 1rem 0 !important;
+    overflow: visible !important;
 }
-</style>
 
-<style lang="postcss">
 .p-toast-alert {
     margin-top: 4.5rem;
     margin-left: 0;
