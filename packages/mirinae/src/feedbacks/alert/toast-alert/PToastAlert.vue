@@ -12,7 +12,8 @@
                  @click="close"
             >
                 <div class="icon-wrapper">
-                    <p-i name="ic_check"
+                    <p-i v-if="item.type === 'success'"
+                         name="ic_check"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
