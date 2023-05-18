@@ -62,7 +62,7 @@ async function build(options) {
                 data = renameStyle(data);
 
                 // escape single quotes
-                data = data.replace(/'/g, "\\'");
+                data = data.replace(/'/g, "''");
 
                 const content = compile(tpl, {
                     name,
