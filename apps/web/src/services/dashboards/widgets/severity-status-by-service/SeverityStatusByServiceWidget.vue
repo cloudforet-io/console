@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="severity-status-by-service"
+                  @refresh="refreshWidget"
     >
         <div class="data-container">
             <div class="chart-wrapper"
@@ -33,17 +34,24 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineProps, reactive, toRefs,
+    computed, defineExpose, defineProps, reactive, toRefs,
 } from 'vue';
+
+import dayjs from 'dayjs';
 
 import { green, red } from '@/styles/colors';
 
+import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
+
+const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS = {
     CRITICAL: { label: 'Critical', color: red[400] },
     HIGH: { label: 'High', color: red[300] },
@@ -54,6 +62,10 @@ const SEVERITY_STATUS = {
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState(props)),
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
+        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    })),
     sampleData: computed(() => [...Array(20)].map(() => Object.values(SEVERITY_STATUS)[Math.floor(Math.random() * 5)])),
     boxWidth: computed<number>(() => {
         if (!props.width) return 112;
@@ -64,6 +76,33 @@ const state = reactive({
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+
+const fetchData = async () => {
+    //
+};
+const initWidget = async () => {
+    state.loading = true;
+    state.data = await fetchData();
+    state.loading = false;
+    return state.data;
+};
+const refreshWidget = async () => {
+    state.loading = true;
+    state.data = await fetchData();
+    state.loading = false;
+    return state.data;
+};
+
+useWidgetLifecycle({
+    disposeWidget: undefined,
+    refreshWidget,
+    props,
+    state,
+});
+defineExpose<WidgetExpose>({
+    initWidget,
+    refreshWidget,
+});
 </script>
 <style lang="postcss" scoped>
 .severity-status-by-service {
