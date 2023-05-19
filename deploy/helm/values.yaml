@@ -27,8 +27,8 @@ production_json:
         ENDPOINT: "<console-api endpoint>"
     GTAG_ID: "DISABLED"
     GTM_ID: "DISABLED"
-    DOMAIN_NAME:
-    DOMAIN_NAME_REF: hostname
+    DOMAIN_NAME: spaceone
+    DOMAIN_NAME_REF: config
     AMCHARTS_LICENSE:
         CHARTS: ''
         MAPS: ''

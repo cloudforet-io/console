@@ -18,7 +18,6 @@ export const load: Action<SecretReferenceState, any> = async ({ state, commit },
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.secret.secret.list({
@@ -37,6 +36,7 @@ export const load: Action<SecretReferenceState, any> = async ({ state, commit },
         });
 
         commit('setSecrets', secrets);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
