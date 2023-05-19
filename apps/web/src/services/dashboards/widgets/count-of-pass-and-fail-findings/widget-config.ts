@@ -29,7 +29,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'compliance_type', 'account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'compliance_type', 'asset_account')],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
