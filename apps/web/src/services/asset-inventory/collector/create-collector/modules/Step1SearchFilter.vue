@@ -115,6 +115,7 @@ const state = reactive({
     ]),
     selectedProvider: 'all',
     repositoryList: [
+        // TODO: need api call-repository
         { name: 'all', label: 'All Repository' },
         { name: 'market', label: 'Marketplace' },
         { name: 'custom', label: 'Custom' },
