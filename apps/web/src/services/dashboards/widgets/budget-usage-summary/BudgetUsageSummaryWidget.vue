@@ -116,7 +116,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -176,7 +176,7 @@ const state = reactive({
                 budget_type: 'left_budget',
                 budget_rate: (100 - chartSpentBudgetRate),
                 pieSettings: {
-                    fill: color(gray[400]),
+                    fill: color(gray[200]),
                 },
             },
         ];
@@ -267,7 +267,8 @@ const drawChart = (chartData) => {
     };
     const series = createPieSeries(seriesSettings);
     chart.series.push(series);
-    setChartColors(chart, colorSet.value);
+    const chartColor = state.spentBudget.rate > 100 ? [red[500]] : colorSet.value;
+    setChartColors(chart, chartColor);
 
     series.labels.template.set('forceHidden', true);
     series.ticks.template.set('visible', false);
