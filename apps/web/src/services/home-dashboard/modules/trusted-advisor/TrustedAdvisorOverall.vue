@@ -208,6 +208,7 @@ export default {
     }
     .title {
         @apply col-span-12;
+        font-weight: bold;
         font-size: 1rem;
         line-height: 1.6;
     }
