@@ -69,7 +69,8 @@ const handleClose = () => {
 }
 
 .collector-creator-page {
-    padding: 1.875rem 2.5rem;
+    padding: 1.875rem 0;
+    margin: 0 2.5rem;
 
     .header {
         margin-bottom: 2rem;
@@ -79,6 +80,8 @@ const handleClose = () => {
                 @apply text-gray-500;
             }
         }
+
+        /* custom design-system component - p-heading */
         &:deep(.p-heading.heading-main) {
             margin-bottom: 0.3125rem;
         }
