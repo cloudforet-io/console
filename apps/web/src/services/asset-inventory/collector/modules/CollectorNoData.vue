@@ -14,10 +14,10 @@
                 icon-left="ic_plus_bold"
                 @click="handleCreate"
             >
-                <span>Create Collector</span>
+                <span>{{ i18n.t('PLUGIN.COLLECTOR.CREATE.TITLE') }}</span>
             </p-button>
         </template>
-        There’s no collector created yet.
+        {{ i18n.t('PLUGIN.COLLECTOR.MAIN.NO_COLLECTOR_DATA') }}
     </p-empty>
 </template>
 
@@ -25,6 +25,7 @@
 import { PEmpty, PButton } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
