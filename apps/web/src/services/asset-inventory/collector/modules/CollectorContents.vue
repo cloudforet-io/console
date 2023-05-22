@@ -22,7 +22,7 @@
         </p-toolbox>
         <div class="collector-lists">
             <p-card
-                v-for="item in cloudCollectorPageState.collectorList"
+                v-for="item in cloudCollectorPageState.filteredList"
                 :key="item.collector_id"
                 :header="item.name"
                 style-type="white"

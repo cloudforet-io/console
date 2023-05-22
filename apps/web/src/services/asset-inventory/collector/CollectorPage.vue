@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PHeading, PButton, PDataLoader } from '@spaceone/design-system';
 
@@ -49,8 +49,6 @@ import CollectorNoData from '@/services/asset-inventory/collector/modules/Collec
 import { CollectorQueryHelperSet } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
-
-const queryHelper = new QueryHelper();
 
 const cloudCollectorPageStore = useCollectorPageStore();
 const cloudCollectorPageState = cloudCollectorPageStore.$state;
@@ -85,7 +83,7 @@ const listCollectors = async () => {
     state.loading = true;
     const detailLinkQueryHelper = new QueryHelper();
     try {
-        collectorApiQueryHelper.setFilters(queryHelper.filters);
+        collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
         const res = await SpaceConnector.client.inventory.collector.list({
             query: collectorApiQueryHelper.data,
         });
@@ -117,6 +115,11 @@ const listCollectors = async () => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => cloudCollectorPageState.selectedProvider, async () => {
+    await listCollectors();
+});
 
 /* INIT */
 (async () => {
