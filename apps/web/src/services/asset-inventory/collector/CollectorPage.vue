@@ -119,8 +119,8 @@ const listCollectors = async () => {
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
+        listCollectors(),
     ]);
-    await Promise.all([listCollectors()]);
 })();
 </script>
 
