@@ -17,6 +17,16 @@ export const UPGRADE_MODE = Object.freeze({
     MANUAL: 'MANUAL',
 });
 
+export const CollectorQueryHelperSet = {
+    COLLECTOR_ID: 'collector_id',
+    NAME: 'name',
+    LAST_COLLECTED_AT: 'last_collected_at',
+    PROVIDER: 'provider',
+    TAGS: 'tags',
+    PLUGIN_INFO: 'plugin_info',
+    STATE: 'state',
+} as const;
+
 export interface FilterFormat {
     name: string;
     type: string;
