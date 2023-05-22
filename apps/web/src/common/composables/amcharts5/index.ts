@@ -115,7 +115,7 @@ export const useAmcharts5 = (
             return createMapChart(state.root as Root, settings);
         },
         //
-        createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.XYSeries => {
+        createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.LineSeries => {
             if (!state.root) throw new Error('No root');
             return createXYLineSeries(state.root as Root, chart, settings);
         },
