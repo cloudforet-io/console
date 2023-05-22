@@ -10,6 +10,7 @@
                 <p class="step">
                     Step {{ state.step }}<span>/4</span>
                 </p>
+                <!--                song-lang-->
                 <p-heading :title="$t('Create New Collector')" />
                 <p class="description">
                     {{ state.descriptionByStep[state.step] }}
@@ -45,6 +46,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 const state = reactive({
     step: 1,
     descriptionByStep: computed(() => ({
+        // song-lang
         1: i18n.t('Select a plugin first.'),
         2: i18n.t('Enter Basic Information.'),
         3: i18n.t('Set Advanced Options.'),
