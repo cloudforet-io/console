@@ -187,7 +187,7 @@ export const createXYLineSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.XYSeries => {
+): am5xy.LineSeries => {
     const series = am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
