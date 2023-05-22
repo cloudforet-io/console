@@ -27,6 +27,12 @@ export const CollectorQueryHelperSet = {
     STATE: 'state',
 } as const;
 
+export const CollectorItemInfoType = {
+    PLUGIN: 'PLUGIN',
+    STATUS: 'STATUS',
+    JOBS: 'JOBS',
+    SCHEDULE: 'SCHEDULE',
+} as const;
 export interface FilterFormat {
     name: string;
     type: string;

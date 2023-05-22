@@ -18,10 +18,10 @@
                 </router-link>
             </template>
         </p-heading>
-        <p-data-loader :data="[]"
-                       :loading="state.loading && !state.items"
+        <p-data-loader :data="cloudCollectorPageState.collectorList"
+                       :loading="state.loading && !cloudCollectorPageState.collectorList"
         >
-            <!-- TODO: collector contents-->
+            <collector-contents />
             <template #no-data>
                 <collector-no-data />
             </template>
@@ -44,16 +44,19 @@ import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { CollectorQueryHelperSet } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 const queryHelper = new QueryHelper();
 
+const cloudCollectorPageStore = useCollectorPageStore();
+const cloudCollectorPageState = cloudCollectorPageStore.$state;
+
 const state = reactive({
     loading: true,
-    items: undefined as CollectorModel[] | undefined,
     totalCount: 0,
     pageStart: 1,
     pageLimit: 15,
@@ -86,7 +89,7 @@ const listCollectors = async () => {
         const res = await SpaceConnector.client.inventory.collector.list({
             query: collectorApiQueryHelper.data,
         });
-        state.items = res.results.map((d) => ({
+        const items = res.results.map((d) => ({
             plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
             plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
             detailLink: {
@@ -105,10 +108,11 @@ const listCollectors = async () => {
             ...d,
         }));
         state.totalCount = res.total_count || 0;
+        await cloudCollectorPageStore.setCollectorList(items);
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.items = [];
         state.totalCount = 0;
+        await cloudCollectorPageStore.setCollectorList([]);
     } finally {
         state.loading = false;
     }
@@ -119,8 +123,8 @@ const listCollectors = async () => {
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
-        listCollectors(),
     ]);
+    await listCollectors();
 })();
 </script>
 
