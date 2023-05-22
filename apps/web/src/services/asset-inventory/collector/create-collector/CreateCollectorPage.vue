@@ -3,7 +3,7 @@
         <p-icon-button name="ic_close"
                        color="inherit"
                        class="close-button"
-                       @click.stop="handleClose"
+                       @click="handleClickClose"
         />
         <div class="collector-creator-page">
             <div class="header">
@@ -21,6 +21,12 @@
             <create-collector-step3 v-if="state.step===3" />
             <create-collector-step4 v-if="state.step===4" />
         </div>
+        <!--        song-lang-->
+        <delete-modal :header-title="$t('Are you sure you want to quit?')"
+                      :visible.sync="state.isDeleteModalVisible"
+                      :contents="$t('You cannot undo this action.')"
+                      @confirm="handleClose"
+        />
     </fragment>
 </template>
 
@@ -29,9 +35,12 @@ import { computed, reactive } from 'vue';
 
 import { PHeading, PIconButton } from '@spaceone/design-system';
 
+
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import CreateCollectorStep1
     from '@/services/asset-inventory/collector/create-collector/modules/CreateCollectorStep1.vue';
@@ -45,6 +54,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const state = reactive({
     step: 1,
+    isDeleteModalVisible: false,
     descriptionByStep: computed(() => ({
         // song-lang
         1: i18n.t('Select a plugin first.'),
@@ -53,6 +63,10 @@ const state = reactive({
         4: i18n.t('Set schedule for automate collecting jobs.'),
     })),
 });
+
+const handleClickClose = () => {
+    state.isDeleteModalVisible = true;
+};
 
 const handleClose = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
