@@ -1,0 +1,190 @@
+<template>
+    <div class="left-area">
+        <div class="radio-container">
+            <div class="provider">
+                <p-field-title class="title">
+                    Provider
+                </p-field-title>
+                <p-radio-group direction="vertical">
+                    <p-radio v-for="provider in state.providerList"
+                             :key="provider.name"
+                             v-model="state.selectedProvider"
+                             :value="provider.name"
+                    >
+                        <div class="content-menu-item">
+                            <p-lazy-img v-if="provider.name !== 'all'"
+                                        width="1.25rem"
+                                        height="1.25rem"
+                                        error-icon="ic_cloud-filled"
+                                        :src="provider.img"
+                                        class="mr-1"
+                            />{{ provider.label }}
+                        </div>
+                    </p-radio>
+                </p-radio-group>
+            </div>
+            <div class="repository">
+                <p-field-title class="title">
+                    Repository
+                </p-field-title>
+                <p-radio-group direction="vertical">
+                    <p-radio v-for="repo in state.repositoryList"
+                             :key="repo.name"
+                             v-model="state.selectedRepository"
+                             :value="repo.name"
+                    >
+                        <div class="content-menu-item">
+                            {{ repo.label }}
+                        </div>
+                    </p-radio>
+                </p-radio-group>
+            </div>
+        </div>
+        <div class="dropdown-container">
+            <div class="provider">
+                <p-select-dropdown v-model="state.selectedProvider"
+                                   :items="state.providerList"
+                                   class="select-dropdown"
+                >
+                    <template #default="{ item }">
+                        <span class="content-menu-placeholder">
+                            <p-lazy-img v-if="item.name !== 'all'"
+                                        width="1rem"
+                                        height="1rem"
+                                        error-icon="ic_cloud-filled"
+                                        :src="item.img"
+                                        class="mr-1"
+                            /><span>{{ item.label }}</span>
+                        </span>
+                    </template>
+                    <template #menu-item--format="{ item }">
+                        <div class="content-menu-item">
+                            <p-lazy-img v-if="item.name !== 'all'"
+                                        width="1rem"
+                                        height="1rem"
+                                        error-icon="ic_cloud-filled"
+                                        :src="item.img"
+                                        class="mr-1"
+                            /><span>{{ item.label }}</span>
+                        </div>
+                    </template>
+                </p-select-dropdown>
+            </div>
+            <div class="repository">
+                <p-select-dropdown v-model="state.selectedRepository"
+                                   :items="state.repositoryList"
+                                   class="select-dropdown"
+                >
+                    <template #default="{ item }">
+                        <div class="content-menu-placeholder">
+                            <span>{{ item.label }}</span>
+                        </div>
+                    </template>
+                    <template #menu-item--format="{ item }">
+                        <div class="content-menu-item">
+                            <span>{{ item.label }}</span>
+                        </div>
+                    </template>
+                </p-select-dropdown>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
+import {
+    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown,
+} from '@spaceone/design-system';
+
+import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providerList: computed(() => [
+        { name: 'all', label: 'All Providers', img: undefined },
+        ...Object.keys(state.providers).map((k) => ({
+            label: state.providers[k].name,
+            name: k,
+            img: state.providers[k]?.icon,
+        })),
+        { name: 'etc', label: 'ETC', img: undefined },
+    ]),
+    selectedProvider: 'all',
+    repositoryList: [
+        // TODO: need api call-repository
+        { name: 'all', label: 'All Repository' },
+        { name: 'market', label: 'Marketplace' },
+        { name: 'custom', label: 'Custom' },
+    ],
+    selectedRepository: 'all',
+});
+
+</script>
+
+<style lang="postcss" scoped>
+.left-area {
+    width: 14.125rem;
+    .content-menu-item {
+        @apply inline-flex items-center text-label-md;
+        margin-left: 0.25rem;
+    }
+
+    .content-menu-placeholder {
+        @apply inline-flex items-center text-label-md;
+        line-height: 1.5;
+        margin-left: 0.25rem;
+        width: 100%;
+
+        span {
+            @apply truncate;
+        }
+    }
+
+    .select-dropdown {
+        width: 100%;
+    }
+
+    .provider {
+        margin-bottom: 1.625rem;
+    }
+    .dropdown-container {
+        width: 100%;
+        display: none;
+    }
+}
+
+@screen tablet {
+    @apply flex-col;
+
+    .left-area {
+        width: 100%;
+        .radio-container {
+            display: none;
+        }
+        .dropdown-container {
+            @apply flex gap-4;
+        }
+    }
+}
+
+@screen mobile {
+    .left-area {
+        .dropdown-container {
+            @apply grid grid-cols-2 gap-4;
+            width: 100%;
+
+            /* custom design-system component - p-select-dropdown */
+            &:deep(.p-select-dropdown) {
+                .text {
+                    width: calc(100% - 1.25rem);
+                }
+            }
+        }
+    }
+}
+</style>
+
