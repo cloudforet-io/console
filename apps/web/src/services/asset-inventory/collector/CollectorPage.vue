@@ -69,10 +69,10 @@ const state = reactive({
 });
 
 /* Components */
-const listCollectors = async () => {
+const initCollectorList = async () => {
     state.loading = true;
     try {
-        await getListCollectors();
+        await getCollectorList();
         if (Object.keys(state.items).length > 0) {
             await cloudCollectorPageStore.setCollectorList(state.items);
         }
@@ -85,8 +85,32 @@ const listCollectors = async () => {
     }
 };
 const filterByProvider = async () => {
-    await getListCollectors();
+    await getCollectorList();
     await cloudCollectorPageStore.setFilteredCollectorList(state.items);
+};
+const setCollectorList = (result) => {
+    const detailLinkQueryHelper = new QueryHelper();
+    state.items = computed(() => result.results.map((d) => ({
+        collectorId: d.collector_id,
+        name: d.name,
+        pluginName: state.plugins[d.plugin_info.plugin_id]?.label,
+        pluginIcon: state.plugins[d.plugin_info.plugin_id]?.icon,
+        pluginInfo: d.plugin_info,
+        detailLink: {
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+            param: { id: d.collector_id },
+            query: {
+                filters: detailLinkQueryHelper.setFilters([
+                    {
+                        k: CollectorQueryHelperSet.COLLECTOR_ID,
+                        v: d.collector_id,
+                        o: '=',
+                    },
+                ]).rawQueryStrings,
+            },
+        },
+    })));
+    state.totalCount = result.total_count || 0;
 };
 
 /* Query Helper */
@@ -104,31 +128,12 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(state.sortBy, true);
 
 /* API */
-const getListCollectors = async () => {
-    const detailLinkQueryHelper = new QueryHelper();
+const getCollectorList = async () => {
     collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
     const res = await SpaceConnector.client.inventory.collector.list({
         query: collectorApiQueryHelper.data,
     });
-    state.items = res.results.map((d) => ({
-        plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
-        plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
-        detailLink: {
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
-            param: { id: d.collector_id },
-            query: {
-                filters: detailLinkQueryHelper.setFilters([
-                    {
-                        k: CollectorQueryHelperSet.COLLECTOR_ID,
-                        v: d.collector_id,
-                        o: '=',
-                    },
-                ]).rawQueryStrings,
-            },
-        },
-        ...d,
-    }));
-    state.totalCount = res.total_count || 0;
+    await setCollectorList(res);
 };
 
 /* Watcher */
@@ -143,7 +148,7 @@ watch(() => cloudCollectorPageState.selectedProvider, async () => {
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
     ]);
-    await listCollectors();
+    await initCollectorList();
 })();
 </script>
 

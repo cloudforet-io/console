@@ -7,12 +7,12 @@
                 {{ props.label }}
             </p>
             <div class="plugin">
-                <p-lazy-img :src="props.item.plugin_icon"
+                <p-lazy-img :src="props.item.pluginIcon"
                             width="1.25rem"
                             height="1.25rem"
                 />
-                <span class="plugin-name">{{ props.item.plugin_name }}</span>
-                <span class="plugin-version">v{{ props.item.plugin_info.version }}</span>
+                <span class="plugin-name">{{ props.item.pluginName }}</span>
+                <span class="plugin-version">v{{ props.item.pluginInfo.version }}</span>
             </div>
         </div>
         <div
@@ -144,7 +144,6 @@ const props = withDefaults(defineProps<Props>(), {
     item: undefined,
     type: '',
 });
-
 
 const state = reactive({
     toggleActive: false,
