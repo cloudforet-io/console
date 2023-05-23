@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -22,7 +22,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
-        group_by: GROUP_BY.REGION,
+        asset_group_by: ASSET_GROUP_BY.REGION,
         pagination_options: {
             enabled: true,
             page_size: 8,

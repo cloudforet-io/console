@@ -1,7 +1,5 @@
 import type { AsyncComponent } from 'vue';
 
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicWidgetType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
@@ -32,7 +30,7 @@ export const GRANULARITY = {
     YEARLY: 'YEARLY',
 } as const;
 
-export const GROUP_BY = {
+export const COST_GROUP_BY = {
     // resource reference type
     PROVIDER: REFERENCE_TYPE_INFO.provider.key,
     PROJECT: REFERENCE_TYPE_INFO.project.key,
@@ -47,6 +45,18 @@ export const GROUP_BY = {
     ACCOUNT: 'account',
 } as const;
 
+export const ASSET_GROUP_BY = {
+    // resource reference type
+    PROJECT: REFERENCE_TYPE_INFO.project.key,
+    PROVIDER: REFERENCE_TYPE_INFO.provider.key,
+    REGION: REFERENCE_TYPE_INFO.region.key,
+    // asset reference
+    COMPLIANCE_TYPE: 'compliance_type',
+    COMPLIANCE_NUMBER: 'compliance_number',
+    SERVICE: 'service',
+    ACCOUNT: 'asset_account',
+};
+
 export const CHART_TYPE = {
     TREEMAP: 'TREEMAP',
     MAP: 'MAP',
@@ -59,19 +69,20 @@ export const CHART_TYPE = {
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
-export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
+export type CostGroupBy = typeof COST_GROUP_BY[keyof typeof COST_GROUP_BY];
+export type AssetGroupBy = typeof ASSET_GROUP_BY[keyof typeof ASSET_GROUP_BY];
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface BaseConfigInfo {
     config_id: string;
     version?: string;
 }
-export interface WidgetConfig {
+export interface BaseWidgetConfig {
     widget_config_id: string;
     widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
-    labels?: string[];
+    // labels?: string[];
 
     description?: {
         translation_id?: string;
@@ -85,10 +96,19 @@ export interface WidgetConfig {
     };
 
     sizes: WidgetSize[];
-    options?: WidgetOptions;
+    // options?: WidgetOptions;
     options_schema?: WidgetOptionsSchema;
 }
 
+export interface CostWidgetConfig extends BaseWidgetConfig {
+    labels?: ['Cost'];
+    options?: CostWidgetOptions;
+}
+export interface AssetWidgetConfig extends BaseWidgetConfig {
+    labels?: ['Asset'];
+    options?: AssetWidgetOptions;
+}
+export type WidgetConfig = CostWidgetConfig|AssetWidgetConfig;
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface LegendOptions {
@@ -112,11 +132,14 @@ export const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.cloud_service_type.type,
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
-    GROUP_BY.CATEGORY,
-    GROUP_BY.RESOURCE_GROUP,
-    GROUP_BY.PRODUCT,
-    GROUP_BY.TYPE,
-    GROUP_BY.ACCOUNT,
+    COST_GROUP_BY.CATEGORY,
+    COST_GROUP_BY.RESOURCE_GROUP,
+    COST_GROUP_BY.PRODUCT,
+    COST_GROUP_BY.TYPE,
+    COST_GROUP_BY.ACCOUNT,
+    // asset reference
+    ASSET_GROUP_BY.COMPLIANCE_TYPE,
+    ASSET_GROUP_BY.ACCOUNT,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
@@ -127,40 +150,51 @@ export type WidgetFiltersSchema = {
     [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
 };
 export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
-export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty|string;
-export type WidgetOptionsSchemaProperties = Partial<Record<WidgetOptionsSchemaProperty, JsonSchema['properties']>>;
-export interface WidgetOptionsSchema {
-    default_properties?: WidgetOptionsSchemaProperty[];
-    fixed_properties?: WidgetOptionsSchemaProperty[];
+export type WidgetOptionsSchemaProperty = 'cost_group_by'|'asset_group_by'|WidgetFiltersSchemaProperty|string;
+export type CostWidgetOptionsSchemaProperty = 'cost_group_by'|WidgetFiltersSchemaProperty|string;
+export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSchemaProperty|string;
+export interface BaseWidgetOptionsSchema<T extends string> {
+    default_properties?: T[];
+    fixed_properties?: T[];
     schema: {
         type: 'object',
-        properties: WidgetOptionsSchemaProperties;
-        required?: WidgetOptionsSchemaProperty[];
-        order?: WidgetOptionsSchemaProperty[];
+        properties: Partial<Record<T, JsonSchema['properties']>>;
+        required?: T[];
+        order?: T[];
     };
 }
-
+export type WidgetOptionsSchema =
+     | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
+     | BaseWidgetOptionsSchema<AssetWidgetOptionsSchemaProperty>;
 
 /* widget options */
-export interface WidgetOptions {
-    group_by?: GroupBy | string;
+export interface BaseWidgetOptions {
+    // group_by?: GroupBy | string;
     granularity?: Granularity;
     stacked?: boolean;
     legend_options?: LegendOptions;
     chart_type?: ChartType;
-    dynamic_widget_type?: DynamicWidgetType;
-    name_options?: DynamicField;
-    value_options?: DynamicField;
-    selector_options?: {
-        enabled?: boolean;
-        type: 'cost-usage'|'days';
-    };
+    // selector_options?: {
+    //     enabled?: boolean;
+    //     type: 'cost-usage'|'days';
+    // };
     pagination_options?: {
         enabled?: boolean;
         page_size?: number;
     };
     filters?: WidgetFiltersMap;
 }
+export interface CostWidgetOptions extends BaseWidgetOptions {
+    cost_group_by?: CostGroupBy | string;
+    selector_options?: {
+        enabled?: boolean;
+        type: 'cost-usage'|'days';
+    };
+}
+export interface AssetWidgetOptions extends BaseWidgetOptions {
+    asset_group_by?: AssetGroupBy | string;
+}
+export type WidgetOptions = CostWidgetOptions|AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name

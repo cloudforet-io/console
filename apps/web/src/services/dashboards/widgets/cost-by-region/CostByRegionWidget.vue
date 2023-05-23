@@ -73,7 +73,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
@@ -120,10 +120,10 @@ const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
         {
-            label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
+            label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
         },
         {
-            label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
+            label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
             label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
@@ -210,7 +210,7 @@ const fetchData = async (): Promise<FullData> => {
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
-                group_by: [state.groupBy, GROUP_BY.PROVIDER],
+                group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
@@ -273,7 +273,7 @@ const drawChart = (chartData: MapChartData[]) => {
 const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -285,7 +285,7 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -318,7 +318,7 @@ useWidgetLifecycle({
     state,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
+        state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
         chartHelper.clearChildrenOfRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
