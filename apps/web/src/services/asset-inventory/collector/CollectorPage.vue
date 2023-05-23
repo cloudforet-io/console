@@ -86,7 +86,7 @@ const listCollectors = async () => {
 };
 const filterByProvider = async () => {
     await getListCollectors();
-    await cloudCollectorPageStore.setFilterByCollectorList(state.items);
+    await cloudCollectorPageStore.setFilteredCollectorList(state.items);
 };
 
 /* Query Helper */
