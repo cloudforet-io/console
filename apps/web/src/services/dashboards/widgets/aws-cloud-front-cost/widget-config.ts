@@ -1,6 +1,6 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
     getWidgetOptionsSchema,
@@ -25,7 +25,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        group_by: GROUP_BY.PROJECT,
+        cost_group_by: COST_GROUP_BY.PROJECT,
         chart_type: CHART_TYPE.STACKED_COLUMN,
         granularity: GRANULARITY.ACCUMULATED,
         legend_options: {
@@ -42,15 +42,15 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'account')],
-        fixed_properties: ['group_by'],
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'account')],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('group_by'),
+                ...getWidgetOptionsSchema('cost_group_by'),
                 ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'account'),
             },
-            order: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'account')],
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'account')],
         },
     },
 };
