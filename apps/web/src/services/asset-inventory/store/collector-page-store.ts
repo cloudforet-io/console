@@ -34,7 +34,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
             this.collectorList = collectorList;
             this.filteredList = collectorList;
         },
-        async setFilterByCollectorList(collectorList) {
+        async setFilteredCollectorList(collectorList) {
             this.filteredList = collectorList;
         },
     },
