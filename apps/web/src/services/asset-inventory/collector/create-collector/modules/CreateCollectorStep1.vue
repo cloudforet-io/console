@@ -20,6 +20,7 @@
                                 <collect-plugin-contents :plugin="item" />
                                 <p-button style-type="secondary"
                                           class="select-button"
+                                          @click="handleClickNextStep(item)"
                                 >
                                     {{ $t('Select') }}
                                 </p-button>
@@ -61,6 +62,9 @@ import Step1SearchFilter from '@/services/asset-inventory/collector/create-colle
 import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
 
+const emit = defineEmits([
+    'update:currentStep',
+]);
 
 const state = reactive({
     searchValue: '',
@@ -104,6 +108,10 @@ const getPlugins = async () => {
 
 const handleSearch = (value) => {
     console.log('value', value);
+};
+const handleClickNextStep = (item) => {
+    emit('update:currentStep', 2);
+    console.log('item', item);
 };
 
 (() => {

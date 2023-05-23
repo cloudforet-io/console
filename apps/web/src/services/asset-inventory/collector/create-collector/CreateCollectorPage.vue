@@ -16,10 +16,18 @@
                     {{ state.descriptionByStep[state.step] }}
                 </p>
             </div>
-            <create-collector-step1 v-if="state.step===1" />
-            <create-collector-step2 v-if="state.step===2" />
-            <create-collector-step3 v-if="state.step===3" />
-            <create-collector-step4 v-if="state.step===4" />
+            <create-collector-step1 v-if="state.step===1"
+                                    @update:currentStep="handleChangeStep"
+            />
+            <create-collector-step2 v-if="state.step===2"
+                                    @update:currentStep="handleChangeStep"
+            />
+            <create-collector-step3 v-if="state.step===3"
+                                    @update:currentStep="handleChangeStep"
+            />
+            <create-collector-step4 v-if="state.step===4"
+                                    @update:currentStep="handleChangeStep"
+            />
         </div>
         <!--        song-lang-->
         <delete-modal :header-title="$t('Are you sure you want to quit?')"
@@ -70,6 +78,10 @@ const handleClickClose = () => {
 
 const handleClose = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+};
+
+const handleChangeStep = (step: number) => {
+    state.step = step;
 };
 
 (() => {
