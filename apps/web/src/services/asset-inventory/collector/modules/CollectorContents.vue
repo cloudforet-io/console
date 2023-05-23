@@ -31,7 +31,7 @@
         >
             <p-card
                 v-for="item in cloudCollectorPageState.filteredList"
-                :key="item.collector_id"
+                :key="item.collectorId"
                 :header="item.name"
                 style-type="white"
             >
