@@ -47,6 +47,18 @@ export const GROUP_BY = {
     ACCOUNT: 'account',
 } as const;
 
+export const ASSET_GROUP_BY = {
+    // resource reference type
+    PROJECT: REFERENCE_TYPE_INFO.project.key,
+    PROVIDER: REFERENCE_TYPE_INFO.provider.key,
+    REGION: REFERENCE_TYPE_INFO.region.key,
+    // asset reference
+    COMPLIANCE_TYPE: 'compliance_type',
+    COMPLIANCE_NUMBER: 'compliance_number',
+    SERVICE: 'service',
+    ACCOUNT: 'asset_account',
+};
+
 export const CHART_TYPE = {
     TREEMAP: 'TREEMAP',
     MAP: 'MAP',
@@ -60,6 +72,7 @@ export const CHART_TYPE = {
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
+export type AssetGroupBy = typeof ASSET_GROUP_BY[keyof typeof ASSET_GROUP_BY];
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface BaseConfigInfo {
@@ -117,6 +130,9 @@ export const WIDGET_FILTER_KEYS = [
     GROUP_BY.PRODUCT,
     GROUP_BY.TYPE,
     GROUP_BY.ACCOUNT,
+    // asset reference
+    ASSET_GROUP_BY.COMPLIANCE_TYPE,
+    ASSET_GROUP_BY.ACCOUNT,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
@@ -127,7 +143,7 @@ export type WidgetFiltersSchema = {
     [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
 };
 export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
-export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty|string;
+export type WidgetOptionsSchemaProperty = 'group_by'|'asset_group_by'|WidgetFiltersSchemaProperty|string;
 export type WidgetOptionsSchemaProperties = Partial<Record<WidgetOptionsSchemaProperty, JsonSchema['properties']>>;
 export interface WidgetOptionsSchema {
     default_properties?: WidgetOptionsSchemaProperty[];
