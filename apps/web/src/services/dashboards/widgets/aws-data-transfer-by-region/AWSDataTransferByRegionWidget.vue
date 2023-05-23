@@ -73,7 +73,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -120,7 +120,7 @@ const state = reactive({
             sourceUnit: USAGE_SOURCE_UNIT,
         };
         return [
-            { label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
+            { label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
             {
                 name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions, textAlign: 'right',
             },
@@ -189,7 +189,7 @@ const fetchData = async (): Promise<FullData> => {
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
-                group_by: [state.groupBy, GROUP_BY.TYPE],
+                group_by: [state.groupBy, COST_GROUP_BY.TYPE],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
@@ -202,12 +202,12 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                field_group: [GROUP_BY.TYPE],
+                field_group: [COST_GROUP_BY.TYPE],
                 sort: [{ key: '_total_usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
-        return { results: sortTableData(results, GROUP_BY.TYPE), more };
+        return { results: sortTableData(results, COST_GROUP_BY.TYPE), more };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };

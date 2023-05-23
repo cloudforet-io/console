@@ -23,7 +23,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
-        group_by: 'budget_id',
+        cost_group_by: 'budget_id',
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'product'),

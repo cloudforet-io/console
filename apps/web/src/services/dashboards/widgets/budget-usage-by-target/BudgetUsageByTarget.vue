@@ -51,7 +51,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -123,7 +123,7 @@ const fetchData = async (): Promise<FullData> => {
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
                 granularity: state.granularity,
-                group_by: [state.groupBy, GROUP_BY.PROJECT_GROUP, GROUP_BY.PROJECT],
+                group_by: [state.groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
@@ -138,8 +138,8 @@ const fetchData = async (): Promise<FullData> => {
                 },
                 select: {
                     [state.groupBy]: state.groupBy,
-                    [GROUP_BY.PROJECT_GROUP]: GROUP_BY.PROJECT_GROUP,
-                    [GROUP_BY.PROJECT]: GROUP_BY.PROJECT,
+                    [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
+                    [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
                     total_spent: 'total_spent',
                     total_budget: 'total_budget',
                     budget_usage: {

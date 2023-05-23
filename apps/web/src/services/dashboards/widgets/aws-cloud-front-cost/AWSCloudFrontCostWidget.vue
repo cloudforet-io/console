@@ -76,8 +76,8 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -117,7 +117,7 @@ const state = reactive({
     legends: [] as Legend[],
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, GROUP_BY.TYPE, valueKey, true, props.allReferenceTypeInfo);
+        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, COST_GROUP_BY.TYPE, valueKey, true, props.allReferenceTypeInfo);
         return _chartData.reverse();
     }),
     tableFields: computed<Field[]>(() => {
@@ -126,7 +126,7 @@ const state = reactive({
             type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
-        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },

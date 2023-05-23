@@ -18,12 +18,12 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
         chart_type: CHART_TYPE.DONUT,
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'product', 'account')],
-        fixed_properties: ['group_by'],
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'product', 'account')],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('group_by'),
+                ...getWidgetOptionsSchema('cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -37,7 +37,7 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
                     'account',
                 ),
             },
-            order: ['group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
                 'service_account',
