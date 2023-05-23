@@ -74,6 +74,7 @@ const isBeta = (item) => get(item, 'tags.beta', '');
         }
         .plugin-description {
             @apply inline-flex items-end gap-1;
+            margin-bottom: 0.5rem;
             flex-wrap: wrap;
             .plugin-description-text {
                 @apply text-label-sm text-gray-500 truncate;
