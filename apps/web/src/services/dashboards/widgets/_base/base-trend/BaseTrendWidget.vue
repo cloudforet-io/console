@@ -78,7 +78,7 @@ import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
     getXYChartLegends,
@@ -121,7 +121,7 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, { type: 'cost' });
-        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             {
