@@ -18,10 +18,15 @@
                 </router-link>
             </template>
         </p-heading>
-        <p-data-loader :data="cloudCollectorPageState.collectorList"
-                       :loading="state.loading && !cloudCollectorPageState.collectorList"
+        <p-data-loader
+            :data="cloudCollectorPageState.collectorList"
+            :loading="state.loading && !cloudCollectorPageState.collectorList"
         >
-            <collector-contents />
+            <collector-contents
+                :query-helper="collectorApiQueryHelper"
+                :total-count="state.totalCount"
+                :page-limit="state.pageLimit"
+            />
             <template #no-data>
                 <collector-no-data />
             </template>
@@ -59,10 +64,30 @@ const state = reactive({
     pageStart: 1,
     pageLimit: 15,
     sortBy: '',
-    plugins: computed<PluginReferenceMap>(
-        () => store.getters['reference/pluginItems'],
-    ),
+    items: {},
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
+
+/* Components */
+const listCollectors = async () => {
+    state.loading = true;
+    try {
+        await getListCollectors();
+        if (Object.keys(state.items).length > 0) {
+            await cloudCollectorPageStore.setCollectorList(state.items);
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.totalCount = 0;
+        await cloudCollectorPageStore.setCollectorList([]);
+    } finally {
+        state.loading = false;
+    }
+};
+const filterByProvider = async () => {
+    await getListCollectors();
+    await cloudCollectorPageStore.setFilterByCollectorList(state.items);
+};
 
 /* Query Helper */
 const collectorApiQueryHelper = new ApiQueryHelper()
@@ -79,50 +104,41 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(state.sortBy, true);
 
 /* API */
-const listCollectors = async () => {
-    state.loading = true;
+const getListCollectors = async () => {
     const detailLinkQueryHelper = new QueryHelper();
-    try {
-        collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
-        const res = await SpaceConnector.client.inventory.collector.list({
-            query: collectorApiQueryHelper.data,
-        });
-        const items = res.results.map((d) => ({
-            plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
-            plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
-            detailLink: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
-                param: { id: d.collector_id },
-                query: {
-                    filters: detailLinkQueryHelper.setFilters([
-                        {
-                            k: CollectorQueryHelperSet.COLLECTOR_ID,
-                            v: d.collector_id,
-                            o: '=',
-                        },
-                    ]).rawQueryStrings,
-                },
+    collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
+    const res = await SpaceConnector.client.inventory.collector.list({
+        query: collectorApiQueryHelper.data,
+    });
+    state.items = res.results.map((d) => ({
+        plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
+        plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
+        detailLink: {
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+            param: { id: d.collector_id },
+            query: {
+                filters: detailLinkQueryHelper.setFilters([
+                    {
+                        k: CollectorQueryHelperSet.COLLECTOR_ID,
+                        v: d.collector_id,
+                        o: '=',
+                    },
+                ]).rawQueryStrings,
             },
-            ...d,
-        }));
-        state.totalCount = res.total_count || 0;
-        await cloudCollectorPageStore.setCollectorList(items);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.totalCount = 0;
-        await cloudCollectorPageStore.setCollectorList([]);
-    } finally {
-        state.loading = false;
-    }
+        },
+        ...d,
+    }));
+    state.totalCount = res.total_count || 0;
 };
 
 /* Watcher */
 watch(() => cloudCollectorPageState.selectedProvider, async () => {
-    await listCollectors();
+    await filterByProvider();
 });
 
 /* INIT */
 (async () => {
+    await cloudCollectorPageStore.initState();
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),

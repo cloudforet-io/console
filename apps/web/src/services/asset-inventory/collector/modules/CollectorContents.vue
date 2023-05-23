@@ -20,7 +20,11 @@
                 </p-button>
             </template>
         </p-toolbox>
-        <div class="collector-lists">
+        <p-data-loader
+            class="collector-lists"
+            :data="cloudCollectorPageState.filteredList"
+            :loading="false"
+        >
             <p-card
                 v-for="item in cloudCollectorPageState.filteredList"
                 :key="item.collector_id"
@@ -37,17 +41,22 @@
                     />
                 </div>
             </p-card>
-        </div>
+            <template #no-data>
+                <collector-list-no-data />
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PToolbox, PButton, PCard } from '@spaceone/design-system';
+import {
+    PToolbox, PButton, PCard, PDataLoader,
+} from '@spaceone/design-system';
 
 import type { QueryTag } from '@cloudforet/core-lib/component-util/query-search/type';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -55,20 +64,21 @@ import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
+import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
 import CollectorProviderList from '@/services/asset-inventory/collector/modules/CollectorProviderList.vue';
 import { CollectorItemInfoType } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
+    queryHelper?: ApiQueryHelper
     totalCount?: number
-    pageStart?: number
     pageLimit?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    queryHelper: undefined,
     totalCount: 0,
-    pageStart: 1,
     pageLimit: 15,
 });
 
@@ -96,16 +106,13 @@ const handlerState = reactive({
 });
 
 /* Components */
-const collectorApiQueryHelper = new ApiQueryHelper()
-    .setOnly('collector_id', 'name', 'last_collected_at', 'provider', 'tags', 'plugin_info', 'state')
-    .setPage(props.pageStart, props.pageLimit);
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
 const handleExport = async () => {
     await store.dispatch('file/downloadExcel', {
         url: '/inventory/collector/list',
-        param: { query: collectorApiQueryHelper.data },
+        param: { query: props.queryHelper.data },
         fields: handlerState.excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
     });
@@ -131,30 +138,36 @@ const handleChange = async () => {
         padding-left: 0.75rem;
     }
 
+    /* custom design-system component - p-toolbox */
     :deep(.p-toolbox) {
         .left-area-wrapper, .search-wrapper, .tool {
             margin-bottom: 0;
         }
     }
 
-    .collector-lists {
-        @apply grid grid-cols-2 gap-4;
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
+        .data-wrapper {
+            @apply grid grid-cols-2 gap-4;
 
-        /* custom design-system component - p-card */
+            .p-card {
+                header {
+                    @apply text-label-xl font-bold;
+                    padding: 1.5rem 1.5rem 0.5rem;
+                }
 
-        :deep(.p-card) {
-            header {
-                @apply text-label-xl font-bold;
-                padding: 1.5rem 1.5rem 0.5rem;
-            }
+                .body {
+                    padding: 0.5rem 1.5rem 1.5rem;
 
-            .body {
-                padding: 0.5rem 1.5rem 1.5rem;
-
-                .collector-info-wrapper {
-                    @apply grid grid-cols-2 gap-6;
+                    .collector-info-wrapper {
+                        @apply grid grid-cols-2 gap-6;
+                    }
                 }
             }
+        }
+        .no-data-wrapper {
+            background-color: initial;
+            border: none;
         }
     }
 }

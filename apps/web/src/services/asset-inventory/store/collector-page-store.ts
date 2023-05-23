@@ -21,11 +21,20 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
     },
     actions: {
+        async initState() {
+            this.selectedProvider = 'all';
+            this.searchFilters = [];
+            this.collectorList = undefined;
+            this.filteredList = undefined;
+        },
         async setSelectedProvider(provider) {
             this.selectedProvider = provider;
         },
         async setCollectorList(collectorList) {
             this.collectorList = collectorList;
+            this.filteredList = collectorList;
+        },
+        async setFilterByCollectorList(collectorList) {
             this.filteredList = collectorList;
         },
     },
