@@ -58,7 +58,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-          ref: ${{ github.ref }}
+          ref: ${{ github.base_ref }}
+
+      - name: Display base branch
+        run:
+          echo ${{ github.base_ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
