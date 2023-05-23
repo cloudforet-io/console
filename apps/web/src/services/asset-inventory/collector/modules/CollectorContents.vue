@@ -1,6 +1,10 @@
 <template>
     <div class="collector-contents">
-        <collector-provider-list />
+        <provider-list
+            :provider-list="state.providerList"
+            :selected-provider="state.selectedProvider"
+            @handle-selected-provider="handleSelectedProvider"
+        />
         <p-toolbox
             search-type="query"
             :total-count="props.totalCount"
@@ -49,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PToolbox, PButton, PCard, PDataLoader,
@@ -61,12 +65,14 @@ import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import type { ReferenceItem } from '@/store/modules/reference/type';
+
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
-import CollectorProviderList from '@/services/asset-inventory/collector/modules/CollectorProviderList.vue';
 import { CollectorItemInfoType } from '@/services/asset-inventory/collector/type';
+import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
@@ -86,7 +92,9 @@ const cloudCollectorPageStore = useCollectorPageStore();
 const cloudCollectorPageState = cloudCollectorPageStore.$state;
 
 const state = reactive({
+    providerList: [] as ReferenceItem[],
     searchTags: [] as QueryTag[],
+    selectedProvider: computed(() => cloudCollectorPageState.selectedProvider),
 });
 
 const handlerState = reactive({
@@ -106,6 +114,9 @@ const handlerState = reactive({
 });
 
 /* Components */
+const handleSelectedProvider = (providerName: string) => {
+    cloudCollectorPageStore.setSelectedProvider(providerName);
+};
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
@@ -126,6 +137,14 @@ const handleChange = async () => {
     // }
     // await listCollectors();
 };
+
+/* Watcher */
+watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
+    state.providerList = [
+        { key: 'all', name: 'All Providers' },
+        ...Object.values(value),
+    ];
+}, { immediate: true });
 </script>
 
 <style scoped lang="postcss">
