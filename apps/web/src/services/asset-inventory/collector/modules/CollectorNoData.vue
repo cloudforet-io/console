@@ -14,10 +14,10 @@
                 icon-left="ic_plus_bold"
                 @click="handleCreate"
             >
-                <span>{{ i18n.t('PLUGIN.COLLECTOR.CREATE.TITLE') }}</span>
+                <span>{{ $t('PLUGIN.COLLECTOR.CREATE.TITLE') }}</span>
             </p-button>
         </template>
-        {{ i18n.t('PLUGIN.COLLECTOR.MAIN.NO_COLLECTOR_DATA') }}
+        {{ $t('PLUGIN.COLLECTOR.MAIN.NO_COLLECTOR_DATA') }}
     </p-empty>
 </template>
 
@@ -25,7 +25,6 @@
 import { PEmpty, PButton } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
