@@ -1,7 +1,7 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['monthlyCost', { title: 'Monthly Cost Overview' }],
@@ -10,13 +10,13 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
         title: 'Cost Trend By Project',
         widget_options: {
-            group_by: GROUP_BY.PROJECT,
+            cost_group_by: COST_GROUP_BY.PROJECT,
         },
     }],
     ['costTrendStacked', {
         title: 'Cost Trend By Product',
         widget_options: {
-            group_by: GROUP_BY.PRODUCT,
+            cost_group_by: COST_GROUP_BY.PRODUCT,
         },
     }],
     ['costDonut', { title: 'Cost By Provider' }],

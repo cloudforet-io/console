@@ -22,7 +22,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        group_by: ASSET_GROUP_BY.SERVICE,
+        asset_group_by: ASSET_GROUP_BY.SERVICE,
         pagination_options: {
             enabled: true,
             page_size: 5,
