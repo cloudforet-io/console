@@ -82,7 +82,13 @@ jobs:
         run: npm run build -- --filter="./packages/*" --parallel --output-logs=new-only
 
       - name: Check pwd
-        run: echo "$(pwd)"
+        run: |
+          pwd
+          cat apps/web/src/services/dashboards/widgets/trend-of-pass-and-fail-findings/TrendOfPassAndFailFindingsWidget.vue
+          cat apps/web/src/services/dashboards/widgets/_configs/view-config.ts
+          cat apps/web/src/services/dashboards/widgets/trend-of-pass-and-fail-findings/widget-config.ts
+          cat apps/web/src/services/dashboards/widgets/_configs/config.ts
+          
 
       - name: Lint
         run: npm run lint
