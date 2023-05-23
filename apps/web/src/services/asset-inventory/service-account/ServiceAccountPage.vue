@@ -4,8 +4,8 @@
                    use-total-count
                    :total-count="typeOptionState.totalCount"
         />
-        <service-account-provider-list :provider-list="providerList"
-                                       :selected-provider.sync="selectedProvider"
+        <provider-list :provider-list="providerList"
+                       :selected-provider.sync="selectedProvider"
         />
         <p-dynamic-layout v-if="tableState.schema"
                           class="service-account-table"
@@ -92,17 +92,16 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
+import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
-import ServiceAccountProviderList
-    from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
 import type { ServiceAccountModelForBinding } from '@/services/asset-inventory/service-account/type';
 
 export default {
     name: 'ServiceAccountPage',
     components: {
         CustomFieldModal,
-        ServiceAccountProviderList,
+        ProviderList,
         PDynamicLayout,
         PHeading,
         PButton,
