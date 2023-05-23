@@ -7,8 +7,8 @@ import {
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { GroupBy } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData, PieChartData,
 } from '@/services/dashboards/widgets/type';
@@ -25,7 +25,7 @@ const mergeByKey = (arrA, arrB, key) => {
  */
 export const getRefinedXYChartData = (
     rawData: CostAnalyzeDataModel['results'],
-    groupBy?: GroupBy,
+    groupBy?: CostGroupBy,
     categoryKey = 'date',
     valueKey = 'usd_cost_sum',
     isHorizontal = false,
@@ -72,7 +72,7 @@ export const getRefinedXYChartData = (
  */
 export const getXYChartLegends = (
     rawData: CostAnalyzeDataModel['results'],
-    groupBy: GroupBy,
+    groupBy: CostGroupBy,
     allReferenceTypeInfo: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
@@ -86,7 +86,7 @@ export const getXYChartLegends = (
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            if (groupBy === GROUP_BY.PROVIDER && !disableReferenceColor) {
+            if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
                 _color = referenceMap[_name]?.color;
             }
         } else if (!_name) {
@@ -103,7 +103,7 @@ export const getXYChartLegends = (
     return legends;
 };
 
-export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: GroupBy): Legend[] => {
+export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: CostGroupBy): Legend[] => {
     if (!rawData || !groupBy) return [];
     return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
 };
@@ -122,7 +122,7 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
  * @name getRefinedTreemapChartData
  * @description Convert raw data to TreemapChart data.
  */
-export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: CostGroupBy, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         name: 'Root',
         value: '',
@@ -154,7 +154,7 @@ export const getRefinedTreemapChartData = (rawData: TreemapChartData['children']
  */
 export const getRefinedPieChartData = (
     rawData: CostAnalyzeDataModel['results'],
-    groupBy: GroupBy,
+    groupBy: CostGroupBy,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): PieChartData[] => {
     if (!rawData || !groupBy) return [];
