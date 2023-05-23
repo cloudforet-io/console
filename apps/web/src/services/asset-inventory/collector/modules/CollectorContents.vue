@@ -162,6 +162,11 @@ watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
         .left-area-wrapper, .search-wrapper, .tool {
             margin-bottom: 0;
         }
+        @screen tablet {
+            .left-area-wrapper, .search-wrapper, .tool {
+                margin-bottom: 1rem;
+            }
+        }
     }
 
     /* custom design-system component - p-data-loader */

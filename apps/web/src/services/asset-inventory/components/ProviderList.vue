@@ -54,7 +54,6 @@ const handleSelectProvider = (providerName) => {
 .provider-list {
     @apply grid w-full gap-2;
     grid-template-columns: repeat(6, minmax(10rem, auto));
-    padding-bottom: 1rem;
     overflow-x: auto;
 
     /* custom design-system component - p-button */
