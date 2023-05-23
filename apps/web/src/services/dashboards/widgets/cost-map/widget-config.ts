@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
     getWidgetOptionsSchema,
@@ -23,16 +23,16 @@ const costMapWidgetConfig: WidgetConfig = {
     },
     sizes: ['md', 'full'],
     options: {
-        group_by: GROUP_BY.PROJECT,
+        cost_group_by: COST_GROUP_BY.PROJECT,
         granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'product', 'account')],
-        fixed_properties: ['group_by'],
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'product', 'account')],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('group_by'),
+                ...getWidgetOptionsSchema('cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -46,7 +46,7 @@ const costMapWidgetConfig: WidgetConfig = {
                     'account',
                 ),
             },
-            order: ['group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
                 'service_account',
