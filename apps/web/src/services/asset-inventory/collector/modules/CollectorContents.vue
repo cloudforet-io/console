@@ -24,31 +24,30 @@
                 </p-button>
             </template>
         </p-toolbox>
-        <p-data-loader
-            class="collector-lists"
-            :data="cloudCollectorPageState.filteredList"
-            :loading="false"
-        >
-            <p-card
-                v-for="item in cloudCollectorPageState.filteredList"
-                :key="item.collectorId"
-                :header="item.name"
-                style-type="white"
+        <div class="collector-list-wrapper">
+            <div
+                v-if="cloudCollectorPageState.filteredList.length > 0"
+                class="collector-list"
             >
-                <div class="collector-info-wrapper">
-                    <collector-item-info
-                        v-for="info in handlerState.infoItems"
-                        :key="info.key"
-                        :label="info.label"
-                        :type="info.key"
-                        :item="item"
-                    />
-                </div>
-            </p-card>
-            <template #no-data>
-                <collector-list-no-data />
-            </template>
-        </p-data-loader>
+                <p-card
+                    v-for="item in cloudCollectorPageState.filteredList"
+                    :key="item.collectorId"
+                    :header="item.name"
+                    style-type="white"
+                >
+                    <div class="collector-info-wrapper">
+                        <collector-item-info
+                            v-for="info in handlerState.infoItems"
+                            :key="info.key"
+                            :label="info.label"
+                            :type="info.key"
+                            :item="item"
+                        />
+                    </div>
+                </p-card>
+            </div>
+            <collector-list-no-data v-else />
+        </div>
     </div>
 </template>
 
@@ -56,7 +55,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PToolbox, PButton, PCard, PDataLoader,
+    PToolbox, PButton, PCard,
 } from '@spaceone/design-system';
 
 import type { QueryTag } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -169,12 +168,12 @@ watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
         }
     }
 
-    /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader) {
-        .data-wrapper {
+    .collector-list-wrapper{
+        .collector-list {
             @apply grid grid-cols-2 gap-4;
 
-            .p-card {
+            /* custom design-system component - p-card */
+            :deep(.p-card) {
                 header {
                     @apply text-label-xl font-bold;
                     padding: 1.5rem 1.5rem 0.5rem;
@@ -188,10 +187,6 @@ watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
                     }
                 }
             }
-        }
-        .no-data-wrapper {
-            background-color: initial;
-            border: none;
         }
     }
 }

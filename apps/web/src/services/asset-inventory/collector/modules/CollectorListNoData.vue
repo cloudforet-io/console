@@ -15,3 +15,11 @@
 <script setup lang="ts">
 import { PEmpty } from '@spaceone/design-system';
 </script>
+
+<style scoped lang="postcss">
+.p-empty {
+    margin-top: 3rem;
+    background-color: initial;
+    border: none;
+}
+</style>
