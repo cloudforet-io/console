@@ -2095,6 +2095,17 @@
 				"TAG": "",
 				"VERSION": ""
 			}
+			"MAIN": {
+				"CREATE": "",
+				"CREATE_COLLECTOR": "",
+				"EDIT_SCHEDULE": "",
+				"HISTORY": "",
+				"NO_DATA": "",
+				"NO_SCHEDULE": "",
+				"SET_SCHEDULE": "",
+				"TITLE": "",
+				"VIEW_HISTORY_DETAIL": ""
+			}
 		},
 		"SERVER": {
 			"MAIN": {
