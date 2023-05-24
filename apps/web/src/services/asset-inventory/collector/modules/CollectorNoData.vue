@@ -14,10 +14,10 @@
                 icon-left="ic_plus_bold"
                 @click="handleCreate"
             >
-                <span>{{ $t('PLUGIN.COLLECTOR.CREATE.TITLE') }}</span>
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.CREATE_COLLECTOR') }}</span>
             </p-button>
         </template>
-        {{ $t('PLUGIN.COLLECTOR.MAIN.NO_COLLECTOR_DATA') }}
+        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_DATA') }}
     </p-empty>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
     <div class="collector-page">
         <p-heading
-            :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
+            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
             use-total-count
             use-selected-count
             :total-count="state.totalCount"
@@ -13,7 +13,7 @@
                     <p-button style-type="tertiary"
                               class="history-button"
                     >
-                        {{ $t("MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE") }}
+                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
                     </p-button>
                 </router-link>
             </template>
