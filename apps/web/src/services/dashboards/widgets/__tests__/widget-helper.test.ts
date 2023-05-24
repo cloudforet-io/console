@@ -47,7 +47,7 @@ describe('[Widget Helper] getWidgetConfig', () => {
     it('test CostMapWidget', () => {
         const mergedCostMapWidgetConfig = getWidgetConfig(costMapWidgetConfigId);
         expect(mergedCostMapWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'group_by', 'filters.provider', 'filters.project', 'filters.service_account',
+            'cost_group_by', 'filters.provider', 'filters.project', 'filters.service_account',
         ]));
     });
 });
