@@ -17,41 +17,20 @@
                     >
                         <template #content>
                             <div class="plugin-card-content">
-                                <div class="left-contents">
-                                    <p-lazy-img :src="item.icon"
-                                                class="plugin-icon"
-                                                width="2.5rem"
-                                                height="2.5rem"
-                                    />
-                                    <div class="contents">
-                                        <p class="plugin-name">
-                                            {{ item.name }} <span v-if="isBeta(item)"
-                                                                  class="beta"
-                                            >{{ $t('beta') }}</span>
-                                        </p>
-                                        <div class="plugin-description">
-                                            <span class="plugin-description-text">
-                                                {{ item.tags.description }}
-                                            </span><p-anchor size="sm"
-                                                             :highlight="true"
-                                            >
-                                                {{ $t('learn more') }}
-                                            </p-anchor>
-                                        </div>
-                                        <div v-if="item.labels">
-                                            <p-label v-for="(label, idx) in item.labels"
-                                                     :key="`${label}-${idx}`"
-                                                     class="mr-2 mb-2"
-                                                     :text="label"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+                                <collect-plugin-contents :plugin="item" />
                                 <p-button style-type="secondary"
-                                          class="create-button"
+                                          class="select-button"
+                                          @click="handleClickNextStep(item)"
                                 >
                                     {{ $t('Select') }}
                                 </p-button>
+                                <p-i class="select-icon"
+                                     name="ic_chevron-right"
+                                     :color="gray[300]"
+                                     width="1.5rem"
+                                     height="1.5rem"
+                                     @click="handleClickNextStep(item)"
+                                />
                             </div>
                         </template>
                     </p-board-item>
@@ -65,9 +44,8 @@
 import { reactive } from 'vue';
 
 import {
-    PSearch, PDataLoader, PBoardItem, PLazyImg, PButton, PLabel, PAnchor,
+    PSearch, PDataLoader, PBoardItem, PButton, PI,
 } from '@spaceone/design-system';
-import { get } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -77,9 +55,16 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
+import CollectPluginContents
+    from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
+
+const emit = defineEmits([
+    'update:currentStep',
+]);
 
 const state = reactive({
     searchValue: '',
@@ -120,10 +105,13 @@ const getPlugins = async () => {
         state.loading = false;
     }
 };
-const isBeta = (item) => get(item, 'tags.beta', '');
 
 const handleSearch = (value) => {
     console.log('value', value);
+};
+const handleClickNextStep = (item) => {
+    emit('update:currentStep', 2);
+    console.log('item', item);
 };
 
 (() => {
@@ -144,45 +132,28 @@ const handleSearch = (value) => {
         .right-area {
             overflow-y: auto;
             max-width: 44.375rem;
+
             .plugin-card-list {
                 @apply flex flex-col flex-wrap gap-2;
+                :deep(.p-board-item) {
+                    .content-area .content {
+                        flex-grow: unset;
+                        width: 100%;
+                    }
+                }
 
                 .plugin-card-item {
                     border-radius: 0.375rem;
                     width: 100%;
+
                     .plugin-card-content {
                         @apply flex justify-between;
                         width: 100%;
-                        .left-contents {
-                            @apply flex items-center;
-                            width: 100%;
-                            .plugin-icon {
-                                margin-right: 1.5rem;
-                            }
-                            .contents {
-                                @apply flex flex-col;
-                                width: 100%;
-
-                                .plugin-name {
-                                    @apply text-label-md text-gray-900 flex;
-                                    margin-bottom: 0.25rem;
-                                    .beta {
-                                        @apply text-label-xs text-coral-500 font-normal;
-                                    }
-                                }
-                                .plugin-description {
-                                    @apply inline-flex items-end gap-1;
-                                    width: 100%;
-                                    .plugin-description-text {
-                                        @apply text-label-sm text-gray-500 truncate;
-                                        max-width: 18.75rem;
-                                        flex-shrink: 0;
-                                    }
-                                }
-                            }
-                        }
-                        .create-button {
+                        .select-button {
                             flex-shrink: 0;
+                        }
+                        .select-icon {
+                            display: none;
                         }
                     }
                 }
@@ -203,13 +174,21 @@ const handleSearch = (value) => {
         min-width: 43rem;
         .contents-container {
             @apply flex-col;
-            .plugin-description {
-                @apply inline-flex items-end gap-1 flex-wrap;
-                width: 100%;
-                .plugin-description-text {
-                    @apply text-label-sm text-gray-500 truncate;
-                    max-width: 18.75rem;
-                    flex-shrink: 0;
+            .right-area {
+                .plugin-card-list {
+                    .plugin-card-item {
+                        .plugin-card-content {
+                            @apply flex items-center;
+                            .select-button {
+                                display: none;
+                            }
+                            .select-icon {
+                                flex-shrink: 0;
+                                display: inline-block;
+                                cursor: pointer;
+                            }
+                        }
+                    }
                 }
             }
         }
