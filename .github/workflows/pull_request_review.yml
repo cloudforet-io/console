@@ -1,7 +1,7 @@
 name: "[PR] Review"
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
     path-ignores:
       - '.github/**'
@@ -25,33 +25,6 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
-
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-      TURBO_API: 'http://localhost:3000'
-
-    services:
-      turbo_cache:
-        image: wanzargen/turbo-cache-server:1.0.0
-        env:
-          PORT: 3000
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-          STORAGE_PROVIDER: git-repository
-          STORAGE_PATH: console-artifacts
-          GIT_REPOSITORY: ${{ vars.TURBO_CACHE_SERVER_GIT_REPOSITORY }}
-          GIT_BRANCH: ${{ vars.TURBO_CACHE_SERVER_GIT_BRANCH }}
-          GIT_USER_NAME: ${{ vars.GIT_USERNAME }}
-          GIT_USER_EMAIL: ${{ vars.GIT_EMAIL }}
-          GIT_USER_PASSWORD: ${{ secrets.PAT_TOKEN }}
-        ports:
-          - 3000:3000
-        options: >-
-          --health-cmd "curl -f GET 'http://localhost:3000/v8/artifacts/status' -H 'Authorization: Bearer $TURBO_TOKEN'"
-          --health-interval 10s
-          --health-timeout 10s
-          --health-retries 10
-          --health-start-period 30s
 
     steps:
       - name: Checkout code
