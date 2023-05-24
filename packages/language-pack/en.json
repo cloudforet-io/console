@@ -2049,6 +2049,19 @@
 				"TYPE": "Type"
 			}
 		},
+		"COLLECTOR": {
+			"MAIN": {
+				"CREATE": "Create",
+				"CREATE_COLLECTOR": "Create Collector",
+				"EDIT_SCHEDULE": "Edit schedule",
+				"HISTORY": "Collector History",
+				"NO_DATA": "There’s no collector created yet.",
+				"NO_SCHEDULE": "No Scheduled",
+				"SET_SCHEDULE": "Set schedule",
+				"TITLE": "Collector",
+				"VIEW_HISTORY_DETAIL": "View history details"
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",

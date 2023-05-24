@@ -22,7 +22,7 @@
             <p class="info-label">
                 {{ props.label }}
             </p>
-            <span>No Schedule</span>
+            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
         </div>
         <div
             v-else-if="props.type === CollectorItemInfoType.JOBS"
@@ -80,7 +80,7 @@
                 </span>
             </div>
             <div class="to-history-detail">
-                <span>View history detail</span>
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
                 <p-i
                     name="ic_chevron-right"
                     width="0.75rem"
@@ -117,7 +117,7 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ state.toggleActive ? 'Edit' : 'Set' }} Schedule
+                {{ state.toggleActive ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </p-button>
         </div>
     </div>

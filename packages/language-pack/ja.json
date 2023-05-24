@@ -2049,6 +2049,19 @@
 				"TYPE": "種類"
 			}
 		},
+		"COLLECTOR": {
+			"MAIN": {
+				"CREATE": "",
+				"CREATE_COLLECTOR": "",
+				"EDIT_SCHEDULE": "",
+				"HISTORY": "",
+				"NO_DATA": "",
+				"NO_SCHEDULE": "",
+				"SET_SCHEDULE": "",
+				"TITLE": "",
+				"VIEW_HISTORY_DETAIL": ""
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "作業",

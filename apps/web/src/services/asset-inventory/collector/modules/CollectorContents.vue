@@ -20,7 +20,7 @@
                     icon-left="ic_plus_bold"
                     @click="handleCreate"
                 >
-                    Create
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
                 </p-button>
             </template>
         </p-toolbox>
@@ -31,7 +31,7 @@
             >
                 <p-card
                     v-for="item in cloudCollectorPageState.filteredList"
-                    :key="item.collectorId"
+                    :key="item.collector_id"
                     :header="item.name"
                     style-type="white"
                 >
@@ -161,6 +161,7 @@ watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
         .left-area-wrapper, .search-wrapper, .tool {
             margin-bottom: 0;
         }
+
         @screen tablet {
             .left-area-wrapper, .search-wrapper, .tool {
                 margin-bottom: 1rem;
@@ -168,7 +169,7 @@ watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
         }
     }
 
-    .collector-list-wrapper{
+    .collector-list-wrapper {
         .collector-list {
             @apply grid grid-cols-2 gap-4;
 
