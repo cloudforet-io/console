@@ -31,7 +31,7 @@
         </div>
         <!--        song-lang-->
         <delete-modal :header-title="$t('Are you sure you want to quit?')"
-                      :visible.sync="state.isDeleteModalVisible"
+                      :visible.sync="state.deleteModalVisible"
                       :contents="$t('You cannot undo this action.')"
                       @confirm="handleClose"
         />
@@ -62,7 +62,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const state = reactive({
     step: 1,
-    isDeleteModalVisible: false,
+    deleteModalVisible: false,
     descriptionByStep: computed(() => ({
         // song-lang
         1: i18n.t('Select a plugin first.'),
@@ -73,7 +73,7 @@ const state = reactive({
 });
 
 const handleClickClose = () => {
-    state.isDeleteModalVisible = true;
+    state.deleteModalVisible = true;
 };
 
 const handleClose = () => {
