@@ -2094,7 +2094,7 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "Specific Service Account",
 				"TAG": "Tag",
 				"VERSION": "Version"
-			}
+			},
 			"MAIN": {
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
