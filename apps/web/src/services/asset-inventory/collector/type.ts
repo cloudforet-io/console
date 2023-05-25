@@ -17,7 +17,7 @@ export const UPGRADE_MODE = Object.freeze({
     MANUAL: 'MANUAL',
 });
 
-export const CollectorQueryHelperSet = {
+export const COLLECTOR_QUERY_HELPER_SET = {
     COLLECTOR_ID: 'collector_id',
     NAME: 'name',
     LAST_COLLECTED_AT: 'last_collected_at',
@@ -27,7 +27,7 @@ export const CollectorQueryHelperSet = {
     STATE: 'state',
 } as const;
 
-export const CollectorItemInfoType = {
+export const COLLECTOR_ITEM_INFO_TYPE = {
     PLUGIN: 'PLUGIN',
     STATUS: 'STATUS',
     JOBS: 'JOBS',

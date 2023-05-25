@@ -51,7 +51,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
-import { CollectorQueryHelperSet } from '@/services/asset-inventory/collector/type';
+import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
@@ -102,7 +102,7 @@ const setCollectorList = (result) => {
             query: {
                 filters: detailLinkQueryHelper.setFilters([
                     {
-                        k: CollectorQueryHelperSet.COLLECTOR_ID,
+                        k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
                         v: d.collector_id,
                         o: '=',
                     },
@@ -116,13 +116,13 @@ const setCollectorList = (result) => {
 /* Query Helper */
 const collectorApiQueryHelper = new ApiQueryHelper()
     .setOnly(
-        CollectorQueryHelperSet.COLLECTOR_ID,
-        CollectorQueryHelperSet.NAME,
-        CollectorQueryHelperSet.LAST_COLLECTED_AT,
-        CollectorQueryHelperSet.PROVIDER,
-        CollectorQueryHelperSet.TAGS,
-        CollectorQueryHelperSet.PLUGIN_INFO,
-        CollectorQueryHelperSet.STATE,
+        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+        COLLECTOR_QUERY_HELPER_SET.NAME,
+        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
+        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
+        COLLECTOR_QUERY_HELPER_SET.TAGS,
+        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
+        COLLECTOR_QUERY_HELPER_SET.STATE,
     )
     .setPage(state.pageStart, state.pageLimit)
     .setSort(state.sortBy, true);

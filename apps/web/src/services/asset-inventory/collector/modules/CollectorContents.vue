@@ -52,7 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PToolbox, PButton, PCard,
@@ -70,7 +72,7 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
-import { CollectorItemInfoType } from '@/services/asset-inventory/collector/type';
+import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
@@ -98,10 +100,10 @@ const state = reactive({
 
 const handlerState = reactive({
     infoItems: [
-        { key: CollectorItemInfoType.PLUGIN, label: 'Plugin' },
-        { key: CollectorItemInfoType.STATUS, label: 'Current Status' },
-        { key: CollectorItemInfoType.JOBS, label: 'Recent Collector Jobs' },
-        { key: CollectorItemInfoType.SCHEDULE, label: 'Schedule' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: 'Plugin' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: 'Current Status' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: 'Schedule' },
     ],
     excelFields: [
         { key: 'name', name: 'Name' },

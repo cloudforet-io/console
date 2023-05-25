@@ -1,6 +1,6 @@
 <template>
     <div class="collector-item-info">
-        <div v-if="props.type === CollectorItemInfoType.PLUGIN"
+        <div v-if="props.type === COLLECTOR_ITEM_INFO_TYPE.PLUGIN"
              class="info-item"
         >
             <p class="info-label">
@@ -16,7 +16,7 @@
             </div>
         </div>
         <div
-            v-else-if="props.type === CollectorItemInfoType.STATUS"
+            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.STATUS"
             class="info-item"
         >
             <p class="info-label">
@@ -25,7 +25,7 @@
             <span>{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
         </div>
         <div
-            v-else-if="props.type === CollectorItemInfoType.JOBS"
+            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.JOBS"
             class="info-item"
         >
             <p class="info-label">
@@ -90,7 +90,7 @@
             </div>
         </div>
         <div
-            v-else-if="props.type === CollectorItemInfoType.SCHEDULE"
+            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE"
             class="info-item"
         >
             <p class="info-label">
@@ -131,7 +131,7 @@ import {
 } from '@spaceone/design-system';
 
 import type { CollectorModel } from '@/services/asset-inventory/collector/type';
-import { CollectorItemInfoType } from '@/services/asset-inventory/collector/type';
+import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
 
 interface Props {
     label: string;
