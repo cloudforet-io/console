@@ -6,13 +6,15 @@
             @change-provider="handleSelectedProvider"
         />
         <p-toolbox
-            search-type="query"
-            :total-count="props.totalCount"
-            :page-size="props.pageLimit"
-            :query-tags="state.searchTags"
             exportable
+            filters-visible
+            search-type="query"
+            :query-tags="state.searchTags"
+            :key-item-sets="props.keyItemSets"
+            :value-handler-map="props.valueHandlerMap"
+            :total-count="props.totalCount"
             @change="handleChange"
-            @refresh="handleChange"
+            @refresh="handleChange()"
             @export="handleExport"
         >
             <template #left-area>
@@ -24,7 +26,7 @@
                 </p-button>
             </template>
         </p-toolbox>
-        <!-- FIXME: change loading data-->
+        <!-- FIXME: apply loading data -->
         <p-data-loader
             class="collector-lists-wrapper"
             :data="cloudCollectorPageState.filteredList"
@@ -65,7 +67,7 @@ import {
     PToolbox, PButton, PCard, PDataLoader,
 } from '@spaceone/design-system';
 
-import type { QueryTag } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -82,11 +84,15 @@ import { useCollectorPageStore } from '@/services/asset-inventory/store/collecto
 interface Props {
     totalCount?: number
     pageLimit?: number
+    keyItemSets?: KeyItemSet[]
+    valueHandlerMap?: ValueHandlerMap
 }
 
 const props = withDefaults(defineProps<Props>(), {
     totalCount: 0,
     pageLimit: 15,
+    keyItemSets: undefined,
+    valueHandlerMap: undefined,
 });
 
 const cloudCollectorPageStore = useCollectorPageStore();
@@ -96,12 +102,6 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 
-const state = reactive({
-    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
-    searchTags: [] as QueryTag[],
-    selectedProvider: computed(() => cloudCollectorPageState.selectedProvider),
-});
-
 const handlerState = reactive({
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: 'Plugin' },
@@ -109,6 +109,11 @@ const handlerState = reactive({
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs' },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: 'Schedule' },
     ],
+});
+
+const state = reactive({
+    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
+    selectedProvider: computed(() => cloudCollectorPageState.selectedProvider),
 });
 
 const emit = defineEmits(['export-excel', 'change-toolbox']);
@@ -123,8 +128,8 @@ const handleCreate = () => {
 const handleExport = async () => {
     emit('export-excel');
 };
-const handleChange = async () => {
-    emit('change-toolbox');
+const handleChange = async (options) => {
+    emit('change-toolbox', options);
 };
 </script>
 

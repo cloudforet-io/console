@@ -18,6 +18,7 @@
                 </router-link>
             </template>
         </p-heading>
+        <!-- FIXME: loading must be fixed after basic function. -->
         <p-data-loader
             :data="cloudCollectorPageState.collectorList"
             :loading="state.loading && !cloudCollectorPageState.collectorList"
@@ -27,7 +28,10 @@
             <collector-contents
                 :total-count="state.totalCount"
                 :page-limit="state.pageLimit"
+                :key-item-sets="handlerState.keyItemSets"
+                :value-handler-map="handlerState.valueHandlerMap"
                 @export-excel="handleExportExcel"
+                @change-toolbox="handleChangeToolBox"
             />
             <template #no-data>
                 <collector-no-data />
@@ -41,6 +45,9 @@ import { computed, reactive, watch } from 'vue';
 
 import { PButton, PDataLoader, PHeading } from '@spaceone/design-system';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -48,8 +55,10 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -63,7 +72,46 @@ import { useCollectorPageStore } from '@/services/asset-inventory/store/collecto
 const cloudCollectorPageStore = useCollectorPageStore();
 const cloudCollectorPageState = cloudCollectorPageStore.$state;
 
-const detailLinkQueryHelper = new QueryHelper();
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+const handlerState = reactive({
+    excelFields: [
+        { key: 'name', name: 'Name' },
+        { key: 'state', name: 'State' },
+        { key: 'plugin_info.plugin_id', name: 'Plugin' },
+        { key: 'plugin_info.version', name: 'Version' },
+        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
+    ],
+    keyItemSets: computed<KeyItemSet[]>(() => [{
+        title: 'Properties',
+        items: [
+            { name: 'collector_id', label: 'Collector Id' },
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
+            { name: 'plugin_info.plugin_id', label: 'Plugin' },
+            { name: 'plugin_info.version', label: 'Version' },
+            { name: 'provider', label: 'Provider', valueSet: storeState.providers },
+            { name: 'supported_resource_type', label: 'Resource Type' },
+            { name: 'created_at', label: 'Created' },
+            { name: 'last_collected_at', label: 'Last Collected' },
+        ],
+    }]),
+    valueHandlerMap: {
+        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
+        name: makeDistinctValueHandler('inventory.Collector', 'name'),
+        state: makeDistinctValueHandler('inventory.Collector', 'state'),
+        'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
+        'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
+        provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
+        supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
+        created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
+        last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
+    } as ValueHandlerMap,
+});
+
+const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets ?? []);
 
 const state = reactive({
     loading: true,
@@ -72,9 +120,9 @@ const state = reactive({
     pageLimit: 15,
     sortBy: '',
     collectors: undefined as undefined | CollectorModel[],
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    searchTags: computed(() => searchQueryHelper.setFilters(cloudCollectorPageState.searchFilters).queryTags),
     items: computed(() => {
-        const plugins = state.plugins;
+        const plugins = storeState.plugins;
         return state.collectors?.map((d) => ({
             collectorId: d.collector_id,
             name: d.name,
@@ -85,7 +133,7 @@ const state = reactive({
                 name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                 param: { id: d.collector_id },
                 query: {
-                    filters: detailLinkQueryHelper.setFilters([
+                    filters: searchQueryHelper.setFilters([
                         {
                             k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
                             v: d.collector_id,
@@ -96,16 +144,6 @@ const state = reactive({
             },
         }));
     }),
-});
-
-const handlerState = reactive({
-    excelFields: [
-        { key: 'name', name: 'Name' },
-        { key: 'state', name: 'State' },
-        { key: 'plugin_info.plugin_id', name: 'Plugin' },
-        { key: 'plugin_info.version', name: 'Version' },
-        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
-    ],
 });
 
 /* Components */
@@ -135,6 +173,17 @@ const handleExportExcel = async () => {
         fields: handlerState.excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
     });
+};
+const handleChangeToolBox = async (options) => {
+    if (options.queryTags !== undefined) {
+        searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
+        cloudCollectorPageStore.$patch((_state) => {
+            _state.searchFilters = searchQueryHelper.filters;
+        });
+        await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
+    }
+    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
+    await initCollectorList();
 };
 
 /* Query Helper */
