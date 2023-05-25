@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from 'vue';
 
-import {i18n} from '@/translations';
+import { I18nConnector } from '@/translations';
 
 import PSelectDropdown from './PSelectDropdown.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
@@ -23,7 +23,7 @@ import { useProxyValue } from '@/hooks';
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    i18n,
+    i18n: I18nConnector.i18n,
     components: { PSelectDropdown },
     template: `
     <div class="h-full w-full overflow p-8">
@@ -68,7 +68,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Basic" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
@@ -93,7 +93,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Disabled" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
@@ -117,7 +117,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Invalid" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
@@ -141,7 +141,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Button Style Type" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
                 <table style="border-collapse: separate; border-spacing: 16px;">
@@ -180,7 +180,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Size" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
                 <table style="border-collapse: separate; border-spacing: 16px;">
@@ -225,7 +225,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Read Only" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
                 <table style="border-collapse: separate; border-spacing: 16px;">
@@ -272,7 +272,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Icon Button Type" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: {
                 PSelectDropdown
             },
@@ -320,7 +320,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Default Slot" height={'500px'}>
         {{
-            i18n,
+            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
