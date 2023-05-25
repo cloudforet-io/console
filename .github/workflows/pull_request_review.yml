@@ -50,6 +50,18 @@ jobs:
         if: steps.restore-node-cache.outputs.cache-hit != 'true'
         run: npm ci
 
+      - name: Make turbo cache directory
+        run: mkdir -p node_modules/.cache/turbo
+
+      - name: Download turbo artifact
+        uses: actions/download-artifact@v3
+        with:
+          path: node_modules/.cache/turbo
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: node_modules/.cache/turbo
+
       - name: Build Packages
         run: npm run build -- --filter="./packages/*" --parallel --output-logs=new-only
 
@@ -61,3 +73,8 @@ jobs:
 
       - name: Build Apps
         run: npm run build -- --filter="./apps/*" --parallel --output-logs=new-only
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: node_modules/.cache/turbo/
