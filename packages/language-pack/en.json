@@ -2094,6 +2094,17 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "Specific Service Account",
 				"TAG": "Tag",
 				"VERSION": "Version"
+			},
+			"MAIN": {
+				"CREATE": "Create",
+				"CREATE_COLLECTOR": "Create Collector",
+				"EDIT_SCHEDULE": "Edit schedule",
+				"HISTORY": "Collector History",
+				"NO_DATA": "There’s no collector created yet.",
+				"NO_SCHEDULE": "No Scheduled",
+				"SET_SCHEDULE": "Set schedule",
+				"TITLE": "Collector",
+				"VIEW_HISTORY_DETAIL": "View history details"
 			}
 		},
 		"SERVER": {
@@ -2653,6 +2664,7 @@
 				"DETAILS_FILTER_TITLE": "Filter Format",
 				"DISABLE": "Disable",
 				"ENABLE": "Enable",
+				"NO_COLLECTOR_DATA": "There’s no collector created yet.",
 				"NO_SELECTED_COLLECTOR": "Select a collector for more details.",
 				"SCHEDULE_ACTION": "Action",
 				"SCHEDULE_ADD": "Add",
