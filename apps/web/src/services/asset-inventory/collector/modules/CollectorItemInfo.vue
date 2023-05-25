@@ -33,7 +33,7 @@
             </p>
             <div class="jobs-wrapper">
                 <span class="icon-fill-wrapper">
-                    <!-- TODO: Replace with real data-->
+                    <!-- FIXME: Replace with real data-->
                     <p-i
                         name="ic_check"
                         class="check-icon"
@@ -204,6 +204,8 @@ const handleChangeToggle = () => {
             @apply text-label-sm text-blue-700;
         }
 
+        /* FIXME: Reducing dependencies on the design system */
+
         /* custom design-system component - p-toggle-button */
         :deep(.p-toggle-button) {
             .label {
@@ -215,6 +217,8 @@ const handleChangeToggle = () => {
                 }
             }
         }
+
+        /* FIXME: Reducing dependencies on the design system */
 
         /* custom design-system component - p-button */
         :deep(.p-button) {

@@ -131,6 +131,8 @@ const handleChange = async () => {
         padding-left: 0.75rem;
     }
 
+    /* FIXME: Reducing dependencies on the design system */
+
     /* custom design-system component - p-toolbox */
     :deep(.p-toolbox) {
         .left-area-wrapper, .search-wrapper, .tool {
@@ -147,6 +149,8 @@ const handleChange = async () => {
     .collector-list-wrapper {
         .collector-list {
             @apply grid grid-cols-2 gap-4;
+
+            /* FIXME: Reducing dependencies on the design system */
 
             /* custom design-system component - p-card */
             :deep(.p-card) {
