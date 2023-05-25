@@ -29,7 +29,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
@@ -37,16 +37,18 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'provider',
-                    // 'compliance_type',
-                    'account',
+                    'region',
+                    'asset_compliance_type',
+                    'asset_account',
                 ),
             },
             order: getWidgetFilterSchemaPropertyNames(
                 'project',
                 'service_account',
                 'provider',
-                // 'compliance_type',
-                'account',
+                'region',
+                'asset_compliance_type',
+                'asset_account',
             ),
         },
     },
