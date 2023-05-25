@@ -21,6 +21,8 @@
         <p-data-loader
             :data="cloudCollectorPageState.collectorList"
             :loading="state.loading && !cloudCollectorPageState.collectorList"
+            loader-backdrop-color="gray.100"
+            class="collector-contents-wrapper"
         >
             <collector-contents
                 :total-count="state.totalCount"
@@ -205,22 +207,7 @@ watch(() => cloudCollectorPageState.selectedProvider, async () => {
     }
 }
 
-/* FIXME: Reducing dependencies on the design system */
-
-/* custom design-system component - p-data-loader */
-:deep(.p-data-loader) {
+.collector-contents-wrapper {
     min-height: 16.875rem;
-
-    .no-data-wrapper {
-        @apply bg-white rounded-md border border-gray-200;
-        height: auto;
-        max-height: initial;
-    }
-
-    .loader-wrapper {
-        .loader-backdrop {
-            @apply hidden;
-        }
-    }
 }
 </style>

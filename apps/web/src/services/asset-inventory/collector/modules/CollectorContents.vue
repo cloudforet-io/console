@@ -24,30 +24,37 @@
                 </p-button>
             </template>
         </p-toolbox>
-        <div class="collector-list-wrapper">
-            <div
-                v-if="cloudCollectorPageState.filteredList?.length > 0"
-                class="collector-list"
-            >
+        <!-- FIXME: change loading data-->
+        <p-data-loader
+            class="collector-lists-wrapper"
+            :data="cloudCollectorPageState.filteredList"
+            :loading="false"
+        >
+            <div class="collector-lists">
                 <p-card
                     v-for="item in cloudCollectorPageState.filteredList"
                     :key="item.collector_id"
-                    :header="item.name"
+                    :header="false"
                     style-type="white"
                 >
-                    <div class="collector-info-wrapper">
-                        <collector-item-info
-                            v-for="info in handlerState.infoItems"
-                            :key="info.key"
-                            :label="info.label"
-                            :type="info.key"
-                            :item="item"
-                        />
+                    <div class="collector-item">
+                        <span class="collector-item-name">{{ item.name }}</span>
+                        <div class="collector-info-wrapper">
+                            <collector-item-info
+                                v-for="info in handlerState.infoItems"
+                                :key="info.key"
+                                :label="info.label"
+                                :type="info.key"
+                                :item="item"
+                            />
+                        </div>
                     </div>
                 </p-card>
             </div>
-            <collector-list-no-data v-else />
-        </div>
+            <template #no-data>
+                <collector-list-no-data class="collector-no-data" />
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
@@ -55,7 +62,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PToolbox, PButton, PCard,
+    PToolbox, PButton, PCard, PDataLoader,
 } from '@spaceone/design-system';
 
 import type { QueryTag } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -146,25 +153,20 @@ const handleChange = async () => {
         }
     }
 
-    .collector-list-wrapper {
-        .collector-list {
+    .collector-lists-wrapper {
+        .collector-lists {
             @apply grid grid-cols-2 gap-4;
 
-            /* FIXME: Reducing dependencies on the design system */
+            .collector-item {
+                @apply flex flex-col;
+                gap: 1.25rem;
+                padding: 0.5rem 0.625rem;
 
-            /* custom design-system component - p-card */
-            :deep(.p-card) {
-                header {
+                .collector-item-name {
                     @apply text-label-xl font-bold;
-                    padding: 1.5rem 1.5rem 0.5rem;
                 }
-
-                .body {
-                    padding: 0.5rem 1.5rem 1.5rem;
-
-                    .collector-info-wrapper {
-                        @apply grid grid-cols-2 gap-6;
-                    }
+                .collector-info-wrapper {
+                    @apply grid grid-cols-2 gap-6;
                 }
             }
         }

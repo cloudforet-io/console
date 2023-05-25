@@ -35,7 +35,7 @@ const handleCreate = () => {
 
 <style scoped lang="postcss">
 .p-empty {
-    padding-top: 3rem;
-    padding-bottom: 2.5rem;
+    @apply w-full bg-white rounded-md border border-gray-200;
+    padding: 1.563rem 1.25rem 1.375rem;
 }
 </style>

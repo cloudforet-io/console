@@ -1,5 +1,5 @@
 <template>
-    <div class="collector-item-info">
+    <div class="collector-item">
         <div v-if="props.type === COLLECTOR_ITEM_INFO_TYPE.PLUGIN"
              class="info-item"
         >
@@ -158,7 +158,7 @@ const handleChangeToggle = () => {
 </script>
 
 <style scoped lang="postcss">
-.collector-item-info {
+.collector-item {
     .info-item {
         @apply flex flex-col;
         gap: 0.5rem;
