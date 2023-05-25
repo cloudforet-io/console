@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import { PHeading, PButton, PDataLoader } from '@spaceone/design-system';
+import { PButton, PDataLoader, PHeading } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -72,7 +72,7 @@ const state = reactive({
 const initCollectorList = async () => {
     state.loading = true;
     try {
-        await getCollectorList();
+        await setCollectorList();
         if (Object.keys(state.items).length > 0) {
             await cloudCollectorPageStore.setCollectorList(state.items);
         }
@@ -85,12 +85,13 @@ const initCollectorList = async () => {
     }
 };
 const filterByProvider = async () => {
-    await getCollectorList();
+    await setCollectorList();
     await cloudCollectorPageStore.setFilteredCollectorList(state.items);
 };
-const setCollectorList = (result) => {
+const setCollectorList = async () => {
+    const collectorListData = await getCollectorList();
     const detailLinkQueryHelper = new QueryHelper();
-    state.items = computed(() => result.results.map((d) => ({
+    state.items = computed(() => collectorListData.results.map((d) => ({
         collectorId: d.collector_id,
         name: d.name,
         pluginName: state.plugins[d.plugin_info.plugin_id]?.label,
@@ -110,7 +111,7 @@ const setCollectorList = (result) => {
             },
         },
     })));
-    state.totalCount = result.total_count || 0;
+    state.totalCount = collectorListData.total_count || 0;
 };
 
 /* Query Helper */
@@ -128,12 +129,16 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(state.sortBy, true);
 
 /* API */
-const getCollectorList = async () => {
+const getCollectorList = () => {
     collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
-    const res = await SpaceConnector.client.inventory.collector.list({
-        query: collectorApiQueryHelper.data,
-    });
-    await setCollectorList(res);
+    try {
+        return SpaceConnector.client.inventory.collector.list({
+            query: collectorApiQueryHelper.data,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
 };
 
 /* Watcher */
