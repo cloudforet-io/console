@@ -40,11 +40,11 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'cost_account'),
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'account'),
-            order: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'account'),
+            properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+            order: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account'),
         },
     },
 };

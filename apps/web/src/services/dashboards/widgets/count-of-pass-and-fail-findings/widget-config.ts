@@ -12,6 +12,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     title: 'Count of Pass and Fail Findings',
     labels: ['Asset'],
     description: {
+        // TODO: To be added
         // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
         // preview_image: 'widget-img_monthlyCost--thumbnail.png',
     },
@@ -29,7 +30,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'compliance_type', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'service_account', 'asset_compliance_type', 'asset_account')],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
@@ -39,7 +40,8 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'provider',
-                    'compliance_type',
+                    'region',
+                    'asset_compliance_type',
                     'asset_account',
                 ),
             },
@@ -47,7 +49,8 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                 'project',
                 'service_account',
                 'provider',
-                'compliance_type',
+                'region',
+                'asset_compliance_type',
                 'asset_account',
             )],
         },
