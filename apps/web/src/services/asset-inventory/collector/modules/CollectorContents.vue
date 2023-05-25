@@ -3,7 +3,7 @@
         <provider-list
             :provider-list="state.providerList"
             :selected-provider="state.selectedProvider"
-            @handle-selected-provider="handleSelectedProvider"
+            @change-provider="handleSelectedProvider"
         />
         <p-toolbox
             search-type="query"
