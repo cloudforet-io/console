@@ -22,6 +22,7 @@
                                           class="select-button"
                                           @click="handleClickNextStep(item)"
                                 >
+                                    <!--                                    // song-lang-->
                                     {{ $t('Select') }}
                                 </p-button>
                                 <p-i class="select-icon"
@@ -61,10 +62,14 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const emit = defineEmits([
     'update:currentStep',
 ]);
+
+const collectorFormStore = useCollectorFormStore();
+
 
 const state = reactive({
     searchValue: '',
@@ -111,7 +116,7 @@ const handleSearch = (value) => {
 };
 const handleClickNextStep = (item) => {
     emit('update:currentStep', 2);
-    console.log('item', item);
+    collectorFormStore.setSelectedCollector(item);
 };
 
 (() => {

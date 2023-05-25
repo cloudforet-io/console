@@ -1,6 +1,19 @@
 import { defineStore } from 'pinia';
 
-export const useCollectorFormStore = defineStore('collector-form', {
-    state: () => ({}),
-    actions: {},
+interface CollectorFormState {
+    selectedCollector: any; // TODO: CollectorPlugin Model
+}
+
+type CollectorFormGetter = any;
+type CollectorFormAction = any;
+
+export const useCollectorFormStore = defineStore<string, CollectorFormState, CollectorFormGetter, CollectorFormAction>('collector-form', {
+    state: () => ({
+        selectedCollector: null,
+    }),
+    actions: {
+        setSelectedCollector(collector: any) {
+            this.selectedCollector = collector;
+        },
+    },
 });
