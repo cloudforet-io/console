@@ -59,14 +59,11 @@ import {
 } from '@spaceone/design-system';
 
 import type { QueryTag } from '@cloudforet/core-lib/component-util/query-search/type';
-import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
@@ -76,13 +73,11 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
-    queryHelper?: ApiQueryHelper
     totalCount?: number
     pageLimit?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    queryHelper: undefined,
     totalCount: 0,
     pageLimit: 15,
 });
@@ -107,14 +102,9 @@ const handlerState = reactive({
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs' },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: 'Schedule' },
     ],
-    excelFields: [
-        { key: 'name', name: 'Name' },
-        { key: 'state', name: 'State' },
-        { key: 'plugin_info.plugin_id', name: 'Plugin' },
-        { key: 'plugin_info.version', name: 'Version' },
-        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
-    ],
 });
+
+const emit = defineEmits(['export-excel', 'change-toolbox']);
 
 /* Components */
 const handleSelectedProvider = (providerName: string) => {
@@ -124,21 +114,10 @@ const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
 const handleExport = async () => {
-    await store.dispatch('file/downloadExcel', {
-        url: '/inventory/collector/list',
-        param: { query: props.queryHelper.data },
-        fields: handlerState.excelFields,
-        file_name_prefix: FILE_NAME_PREFIX.collector,
-    });
+    emit('export-excel');
 };
 const handleChange = async () => {
-    // setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
-    // if (options.queryTags !== undefined) {
-    //     state.searchTags = options.queryTags;
-    //     queryHelper.setFiltersAsQueryTag(options.queryTags);
-    //     await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-    // }
-    // await listCollectors();
+    emit('change-toolbox');
 };
 </script>
 

@@ -23,9 +23,9 @@
             :loading="state.loading && !cloudCollectorPageState.collectorList"
         >
             <collector-contents
-                :query-helper="collectorApiQueryHelper"
                 :total-count="state.totalCount"
                 :page-limit="state.pageLimit"
+                @export-excel="handleExportExcel"
             />
             <template #no-data>
                 <collector-no-data />
@@ -47,6 +47,8 @@ import { store } from '@/store';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
@@ -66,6 +68,16 @@ const state = reactive({
     sortBy: '',
     items: {},
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+
+const handlerState = reactive({
+    excelFields: [
+        { key: 'name', name: 'Name' },
+        { key: 'state', name: 'State' },
+        { key: 'plugin_info.plugin_id', name: 'Plugin' },
+        { key: 'plugin_info.version', name: 'Version' },
+        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
+    ],
 });
 
 /* Components */
@@ -112,6 +124,14 @@ const setCollectorList = async () => {
         },
     })));
     state.totalCount = collectorListData.total_count || 0;
+};
+const handleExportExcel = async () => {
+    await store.dispatch('file/downloadExcel', {
+        url: '/inventory/collector/list',
+        param: { query: collectorApiQueryHelper.data },
+        fields: handlerState.excelFields,
+        file_name_prefix: FILE_NAME_PREFIX.collector,
+    });
 };
 
 /* Query Helper */
