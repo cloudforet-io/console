@@ -39,14 +39,14 @@ const props = withDefaults(defineProps<Props>(), {
     selectedProvider: 'all',
 });
 
-const emit = defineEmits<{(e: 'handle-selected-provider', providerName: string): void}>();
+const emit = defineEmits<{(e: 'change-provider', providerName: string): void}>();
 
 const state = reactive({
     proxySelectedProvider: useProxyValue('selectedProvider', props, emit),
 });
 const handleSelectProvider = (providerName) => {
     state.proxySelectedProvider = providerName;
-    emit('handle-selected-provider', providerName);
+    emit('change-provider', providerName);
 };
 </script>
 
