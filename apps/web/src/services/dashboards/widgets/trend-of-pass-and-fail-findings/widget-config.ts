@@ -29,7 +29,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'provider', 'compliance_type', 'region', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'provider', 'asset_compliance_type', 'region', 'asset_account')],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
@@ -39,7 +39,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'provider',
-                    'compliance_type',
+                    'asset_compliance_type',
                     'region',
                     'asset_account',
                 ),
@@ -48,7 +48,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                 'project',
                 'service_account',
                 'provider',
-                'compliance_type',
+                'asset_compliance_type',
                 'region',
                 'asset_account',
             )],

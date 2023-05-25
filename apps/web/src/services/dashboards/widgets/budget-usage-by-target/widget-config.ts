@@ -26,11 +26,11 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         cost_group_by: 'budget_id',
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'product'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'product', 'region'),
-            order: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'product', 'region'),
+            properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'cost_product', 'region'),
+            order: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'cost_product', 'region'),
         },
     },
 } as WidgetConfig;
