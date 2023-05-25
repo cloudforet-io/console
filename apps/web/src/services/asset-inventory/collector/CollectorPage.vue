@@ -53,6 +53,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
+import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
@@ -60,14 +61,39 @@ import { useCollectorPageStore } from '@/services/asset-inventory/store/collecto
 const cloudCollectorPageStore = useCollectorPageStore();
 const cloudCollectorPageState = cloudCollectorPageStore.$state;
 
+const detailLinkQueryHelper = new QueryHelper();
+
 const state = reactive({
     loading: true,
     totalCount: 0,
     pageStart: 1,
     pageLimit: 15,
     sortBy: '',
-    items: {},
+    collectors: undefined as undefined | CollectorModel[],
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    items: computed(() => {
+        const plugins = state.plugins;
+        return state.collectors?.map((d) => ({
+            collectorId: d.collector_id,
+            name: d.name,
+            pluginName: plugins[d.plugin_info.plugin_id]?.label,
+            pluginIcon: plugins[d.plugin_info.plugin_id]?.icon,
+            pluginInfo: d.plugin_info,
+            detailLink: {
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                param: { id: d.collector_id },
+                query: {
+                    filters: detailLinkQueryHelper.setFilters([
+                        {
+                            k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+                            v: d.collector_id,
+                            o: '=',
+                        },
+                    ]).rawQueryStrings,
+                },
+            },
+        }));
+    }),
 });
 
 const handlerState = reactive({
@@ -84,7 +110,7 @@ const handlerState = reactive({
 const initCollectorList = async () => {
     state.loading = true;
     try {
-        await setCollectorList();
+        await getCollectorList();
         if (Object.keys(state.items).length > 0) {
             await cloudCollectorPageStore.setCollectorList(state.items);
         }
@@ -97,33 +123,8 @@ const initCollectorList = async () => {
     }
 };
 const filterByProvider = async () => {
-    await setCollectorList();
+    await getCollectorList();
     await cloudCollectorPageStore.setFilteredCollectorList(state.items);
-};
-const setCollectorList = async () => {
-    const collectorListData = await getCollectorList();
-    const detailLinkQueryHelper = new QueryHelper();
-    state.items = computed(() => collectorListData.results.map((d) => ({
-        collectorId: d.collector_id,
-        name: d.name,
-        pluginName: state.plugins[d.plugin_info.plugin_id]?.label,
-        pluginIcon: state.plugins[d.plugin_info.plugin_id]?.icon,
-        pluginInfo: d.plugin_info,
-        detailLink: {
-            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
-            param: { id: d.collector_id },
-            query: {
-                filters: detailLinkQueryHelper.setFilters([
-                    {
-                        k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-                        v: d.collector_id,
-                        o: '=',
-                    },
-                ]).rawQueryStrings,
-            },
-        },
-    })));
-    state.totalCount = collectorListData.total_count || 0;
 };
 const handleExportExcel = async () => {
     await store.dispatch('file/downloadExcel', {
@@ -149,15 +150,16 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(state.sortBy, true);
 
 /* API */
-const getCollectorList = () => {
+const getCollectorList = async () => {
     collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
     try {
-        return SpaceConnector.client.inventory.collector.list({
+        const res = await SpaceConnector.client.inventory.collector.list({
             query: collectorApiQueryHelper.data,
         });
+        state.collectors = res.results;
+        state.totalCount = res.total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
 };
 
