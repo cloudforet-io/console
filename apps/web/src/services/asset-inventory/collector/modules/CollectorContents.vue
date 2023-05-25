@@ -26,7 +26,7 @@
         </p-toolbox>
         <div class="collector-list-wrapper">
             <div
-                v-if="cloudCollectorPageState.filteredList.length > 0"
+                v-if="cloudCollectorPageState.filteredList?.length > 0"
                 class="collector-list"
             >
                 <p-card
@@ -52,9 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PToolbox, PButton, PCard,
@@ -66,7 +64,7 @@ import type { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
@@ -92,8 +90,12 @@ const props = withDefaults(defineProps<Props>(), {
 const cloudCollectorPageStore = useCollectorPageStore();
 const cloudCollectorPageState = cloudCollectorPageStore.$state;
 
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
+
 const state = reactive({
-    providerList: [] as ReferenceItem[],
+    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
     searchTags: [] as QueryTag[],
     selectedProvider: computed(() => cloudCollectorPageState.selectedProvider),
 });
@@ -138,14 +140,6 @@ const handleChange = async () => {
     // }
     // await listCollectors();
 };
-
-/* Watcher */
-watch(() => store.state.reference.provider.items, (value: ReferenceItem) => {
-    state.providerList = [
-        { key: 'all', name: 'All Providers' },
-        ...Object.values(value),
-    ];
-}, { immediate: true });
 </script>
 
 <style scoped lang="postcss">
