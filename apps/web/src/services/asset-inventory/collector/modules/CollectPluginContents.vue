@@ -55,7 +55,7 @@ const isBeta = (item) => get(item, 'tags.beta', '');
 
 <style lang="postcss" scoped>
 .plugin-data-contents {
-    @apply flex items-center;
+    @apply flex;
     width: 100%;
     .plugin-icon {
         flex-shrink: 0;
