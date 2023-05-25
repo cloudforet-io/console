@@ -2094,6 +2094,17 @@
 				"SPECIFIC_SERVICE_ACCOUNT": "",
 				"TAG": "",
 				"VERSION": ""
+			},
+			"MAIN": {
+				"CREATE": "",
+				"CREATE_COLLECTOR": "",
+				"EDIT_SCHEDULE": "",
+				"HISTORY": "",
+				"NO_DATA": "",
+				"NO_SCHEDULE": "",
+				"SET_SCHEDULE": "",
+				"TITLE": "",
+				"VIEW_HISTORY_DETAIL": ""
 			}
 		},
 		"SERVER": {
@@ -2653,6 +2664,7 @@
 				"DETAILS_FILTER_TITLE": "フィルタ情報",
 				"DISABLE": "無効化",
 				"ENABLE": "有効化",
+				"NO_COLLECTOR_DATA": "",
 				"NO_SELECTED_COLLECTOR": "コレクターを選択したら詳しい情報が確認できます。",
 				"SCHEDULE_ACTION": "作業",
 				"SCHEDULE_ADD": "追加",
