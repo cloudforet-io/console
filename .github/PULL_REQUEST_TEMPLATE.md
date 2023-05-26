@@ -7,10 +7,14 @@
 - [ ] Bug fixes
 - [ ] Feature improvement
 - [ ] Refactor
+- [ ] Mirinae update
+    - [ ] These changes require a usage change
 - [ ] Others (performance improvement, CI/CD, etc.)
 
 ### Checklist
 - [ ] `Error / Warning / Lint / Type`
+- [ ] Updated Storybook documents for component (if **Mirinae** are updated)
+- [ ] Tested with console(if **Mirinae** are updated)
 
 ### Description
 
