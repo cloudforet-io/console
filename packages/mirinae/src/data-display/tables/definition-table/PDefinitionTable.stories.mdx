@@ -266,7 +266,7 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
                 { label: 'Provider', name: 'provider' },
             ],
             data: {
-                collector_id: 'collector-6746d641c98b',
+                collector_id: 'collector-' + faker.random.alphaNumeric(7),
                 name: 'collector name',
                 provider: 'aws',
             }
@@ -379,7 +379,7 @@ You can customize the value to be copied by giving ```copyValue``` or ```copyVal
                         { label: 'Provider', name: 'provider', copyValue: 'AWS' },
                     ],
                     data: {
-                        collector_id: 'collector-6746d641c98b',
+                        collector_id: `collector-${faker.random.alphaNumeric(7)}`,
                         name: 'collector name',
                         provider: 'aws',
                     }
@@ -449,7 +449,7 @@ fields: [
                         { label: 'Provider', name: 'provider', block: true },
                     ],
                     data: {
-                        collector_id: 'collector-6746d641c98b',
+                        collector_id: `collector-${faker.random.alphaNumeric(7)}`,
                         name: 'collector name',
                         provider: 'aws',
                     }
@@ -496,7 +496,7 @@ fields: [
                         { label: 'Provider', name: 'provider' },
                     ],
                     data: {
-                        collector_id: 'collector-6746d641c98b',
+                        collector_id: `collector-${faker.random.alphaNumeric(7)}`,
                         name: 'collector name',
                         provider: 'aws',
                     }
