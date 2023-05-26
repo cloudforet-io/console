@@ -21,14 +21,17 @@
                                      :loading="state.loading"
         />
         <collector-schedule-section class="section" />
-        <collector-options-section class="section" />
+        <collector-options-section class="section"
+                                   :loading="state.loading"
+                                   :collector-options="state.collectorOptions"
+        />
         <collector-service-accounts-section class="section" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import {
-    defineProps, reactive, onMounted,
+    defineProps, reactive, onMounted, computed,
 } from 'vue';
 
 import { PHeading, PSkeleton, PButton } from '@spaceone/design-system';
@@ -41,7 +44,7 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const props = defineProps<{
@@ -52,6 +55,7 @@ const collectorName = 'Collector';
 const state = reactive({
     loading: true,
     collector: null as null|CollectorModel,
+    collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
 });
 
 const getCollector = async (): Promise<CollectorModel> => {
