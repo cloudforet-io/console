@@ -185,7 +185,6 @@ export default {
         };
         const getVersions = async () => {
             try {
-                state.versions = [];
                 const res = await SpaceConnector.client.repository.plugin.getVersions({
                     plugin_id: state.pluginId,
                 });
