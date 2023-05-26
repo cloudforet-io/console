@@ -2,11 +2,11 @@
     <span class="p-field-title"
           v-on="$listeners"
     >
-        <label>
+        <span class="title">
             <slot>
                 {{ props.label }}
             </slot>
-        </label>
+        </span>
         <span v-if="props.description"
               class="description"
         >
@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<FieldTitleProps>(), {
     display: inline-block;
     letter-spacing: 0;
     margin-bottom: 0.25rem;
-    > label {
+    > .title {
         @apply text-label-md font-bold;
         display: block;
     }
