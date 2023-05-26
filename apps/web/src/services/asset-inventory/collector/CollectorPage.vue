@@ -29,7 +29,7 @@
                 :key-item-sets="handlerState.keyItemSets"
                 :provider-list="state.providerList"
                 :search-tags="state.searchTags"
-                @change-toolbox="handleChangeToolBox"
+                @change-toolbox="handleChangeToolbox"
             />
             <template #no-data>
                 <collector-no-data />
@@ -145,7 +145,7 @@ const initCollectorList = async () => {
         await collectorPageStore.$reset();
     }
 };
-const handleChangeToolBox = async (options) => {
+const handleChangeToolbox = async (options) => {
     setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
     await initCollectorList();
 };
