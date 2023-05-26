@@ -1,37 +1,47 @@
 <template>
-    <label class="p-field-title" v-on="$listeners">
-        <slot>
-            {{ label }}
-        </slot>
-    </label>
+    <span class="p-field-title"
+          v-on="$listeners"
+    >
+        <span class="title">
+            <slot>
+                {{ props.label }}
+            </slot>
+        </span>
+        <span v-if="props.description"
+              class="description"
+        >
+            {{ props.description }}
+        </span>
+    </span>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { defineProps } from 'vue';
 
-interface Props {
-    label: string;
+interface FieldTitleProps {
+    label?: string;
+    description?: string;
 }
 
-
-export default defineComponent<Props>({
-    name: 'PFieldTitle',
-    props: {
-        label: {
-            type: String,
-            default: '',
-        },
-    },
+const props = withDefaults(defineProps<FieldTitleProps>(), {
+    label: '',
+    description: undefined,
 });
+
 </script>
+
 <style lang="postcss">
 .p-field-title {
     @apply text-gray-900;
     display: inline-block;
-    font-size: 0.875rem;
-    font-weight: bold;
     letter-spacing: 0;
-    line-height: 1.4rem;
     margin-bottom: 0.25rem;
+    > .title {
+        @apply text-label-md font-bold;
+        display: block;
+    }
+    > .description {
+        @apply text-paragraph-md font-normal;
+    }
 }
 </style>
