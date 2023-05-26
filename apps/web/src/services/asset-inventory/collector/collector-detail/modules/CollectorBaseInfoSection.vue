@@ -14,17 +14,17 @@
         </p-heading>
 
         <p-definition-table :fields="fields"
-                            :loading="loading"
-                            :data="collector"
+                            :loading="state.loading"
+                            :data="state.collector"
         >
             <template #data-pluginName>
-                <p-lazy-img :src="pluginIcon"
-                            :loading="loading"
+                <p-lazy-img :src="state.pluginIcon"
+                            :loading="state.loading"
                             width="1rem"
                             height="1rem"
                 />
                 <!-- TODO: Remove test code below: 'Name!' -->
-                <span class="ml-2 leading-none">{{ pluginName || 'Name!' }}</span>
+                <span class="ml-2 leading-none">{{ state.pluginName || 'Name!' }}</span>
             </template>
             <template #data-plugin_info.version="{ value }">
                 {{ value }} {{ isLatestVersion(value) ? ' (latest)' : '' }}
@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, computed, ref, onMounted,
+    defineProps, computed, onMounted, reactive,
 } from 'vue';
 
 import {
@@ -66,6 +66,7 @@ import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 const props = defineProps<{}>();
 
 const timezone = computed<string>(() => store.state.user.timezone);
+const plugins = computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']);
 const fields = computed<DefinitionField[]>(() => [
     { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
     { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
@@ -75,12 +76,13 @@ const fields = computed<DefinitionField[]>(() => [
     { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
     { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
 ]);
-const collector = ref<null|CollectorModel>(null);
-const loading = ref(true);
 
-const plugins = computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']);
-const pluginName = computed<string>(() => (collector.value ? plugins.value[collector.value.plugin_info.plugin_id]?.label ?? '' : ''));
-const pluginIcon = computed<string>(() => (collector.value ? plugins.value[collector.value.plugin_info.plugin_id]?.icon ?? '' : ''));
+const state = reactive({
+    collector: null as null|CollectorModel,
+    loading: true,
+    pluginName: computed<string>(() => (state.collector ? plugins.value[state.collector.plugin_info.plugin_id]?.label ?? '' : '')),
+    pluginIcon: computed<string>(() => (state.collector ? plugins.value[state.collector.plugin_info.plugin_id]?.icon ?? '' : '')),
+});
 
 // TODO: Implement isLatestVersion
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,7 +91,7 @@ const isLatestVersion = (version: string) => true;
 
 // TODO: move to upper level
 const getCollector = async (): Promise<CollectorModel> => {
-    loading.value = true;
+    state.loading = true;
     // TODO: change to real data
     const result = await new Promise<CollectorModel>((resolve) => {
         setTimeout(() => {
@@ -122,12 +124,12 @@ const getCollector = async (): Promise<CollectorModel> => {
             });
         }, 2000);
     });
-    loading.value = false;
+    state.loading = false;
     return result;
 };
 
 onMounted(async () => {
-    collector.value = await getCollector();
+    state.collector = await getCollector();
 });
 
 </script>
