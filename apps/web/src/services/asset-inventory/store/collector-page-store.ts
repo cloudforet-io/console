@@ -36,7 +36,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 const res = await SpaceConnector.client.inventory.collector.list({
                     query: queryData,
                 });
-                this.totalCount = res.totalCount;
+                this.totalCount = res.total_count;
                 this.collectors = res.results;
             } catch (e) {
                 ErrorHandler.handleError(e);
