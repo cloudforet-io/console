@@ -1,6 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  class="count-of-pass-and-fail-findings"
+                  class="count-of-findings-widget"
                   @refresh="refreshWidget"
     >
         <div class="data-container">
@@ -33,7 +33,8 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose,
+    defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
@@ -53,13 +54,12 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import countOfFailFindingsWidgetConfig from '@/services/dashboards/widgets/count-of-fail-findings/widget-config';
+import countOfPassAndFailFindingsWidgetConfig from '@/services/dashboards/widgets/count-of-pass-and-fail-findings/widget-config';
+import type { Legend } from '@/services/dashboards/widgets/type';
 
 
 const DATE_FORMAT = 'YYYY-MM';
-const FINDING_STATUS_MAP = {
-    pass: { label: 'Pass', color: green[500] },
-    fail: { label: 'Fail', color: red[400] },
-};
 const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -72,9 +72,23 @@ const state = reactive({
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     // TODO: remove sampleData
+    legends: computed<Legend[]|undefined>(() => {
+        if (props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id) {
+            return [
+                { name: 'pass', label: 'Pass', color: green[500] },
+                { name: 'fail', label: 'Fail', color: red[400] },
+            ];
+        } if (props.widgetConfigId === countOfFailFindingsWidgetConfig.widget_config_id) {
+            return [
+                { name: 'fail', label: 'Fail', color: red[400] },
+            ];
+        }
+        return undefined;
+    }),
     showNextPage: computed(() => state.thisPage * 8 <= 20),
     sampleData: computed(() => [...Array(20)].map(() => ({
         region_code: `region-${random(0, 1000)}`,
+        service: `service-${random(0, 1000)}`,
         pass: random(0, 100),
         fail: random(0, 100),
     }))),
@@ -90,7 +104,7 @@ const fetchData = async () => {
     // TODO: fetch data
 };
 const drawChart = (chartData) => {
-    if (!state.groupBy) return;
+    if (!state.groupBy || !state.legends) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupBy);
     yAxis.data.setAll(cloneDeep(chartData));
@@ -100,16 +114,16 @@ const drawChart = (chartData) => {
     });
     chart.children.push(legend);
 
-    Object.entries(FINDING_STATUS_MAP).forEach(([k, v]) => {
+    state.legends.forEach((_legend) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: v.label,
-            valueXField: k,
+            name: _legend.label,
+            valueXField: _legend.name,
             categoryYField: state.groupBy,
             xAxis,
             yAxis,
             baseAxis: yAxis,
             stacked: true,
-            fill: v.color,
+            fill: _legend.color,
         };
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         series.columns.template.setAll({
@@ -118,7 +132,7 @@ const drawChart = (chartData) => {
         chart.series.push(series);
         series.data.setAll(cloneDeep(chartData));
     });
-    if (legend) legend.data.setAll(chart.series.values);
+    legend.data.setAll(chart.series.values);
 };
 const initWidget = async (data) => {
     state.loading = true;
@@ -149,9 +163,10 @@ defineExpose<WidgetExpose>({
     initWidget,
     refreshWidget,
 });
+
 </script>
 <style lang="postcss" scoped>
-.count-of-pass-and-fail-findings {
+.count-of-findings-widget {
     .data-container {
         display: flex;
         flex-direction: column;
@@ -166,12 +181,12 @@ defineExpose<WidgetExpose>({
                 }
             }
         }
-    }
-    .table-pagination-wrapper {
-        flex-shrink: 0;
-        text-align: center;
-        .this-page {
-            font-weight: bold;
+        .table-pagination-wrapper {
+            flex-shrink: 0;
+            text-align: center;
+            .this-page {
+                font-weight: bold;
+            }
         }
     }
 }
