@@ -16,7 +16,10 @@
             </template>
         </p-heading>
 
-        <collector-base-info-section class="section" />
+        <collector-base-info-section class="section"
+                                     :collector="state.collector"
+                                     :loading="state.loading"
+        />
         <collector-schedule-section class="section" />
         <collector-options-section class="section" />
         <collector-service-accounts-section class="section" />
@@ -24,7 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import {
+    defineProps, reactive, onMounted,
+} from 'vue';
 
 import { PHeading, PSkeleton, PButton } from '@spaceone/design-system';
 
@@ -36,6 +41,7 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
+import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const props = defineProps<{
@@ -43,8 +49,52 @@ const props = defineProps<{
 }>();
 
 const collectorName = 'Collector';
+const state = reactive({
+    loading: true,
+    collector: null as null|CollectorModel,
+});
 
+const getCollector = async (): Promise<CollectorModel> => {
+    state.loading = true;
+    // TODO: change to real data
+    const result = await new Promise<CollectorModel>((resolve) => {
+        setTimeout(() => {
+            resolve({
+                collector_id: 'collector-1',
+                name: 'collector-1',
+                state: 'ENABLED',
+                provider: 'aws',
+                capability: {
+                    supported_schema: ['aws_access_key', 'aws_access_key_pair'],
+                    supported_mode: ['FULL', 'DIFF'],
+                    supported_schedule: ['* * * * *'],
+                },
+                plugin_info: {
+                    plugin_id: 'plugin-1',
+                    version: '1.0',
+                    upgrade_mode: 'AUTO',
+                    options: {
+                        supported_resource_type: ['inventory.Server'],
+                        filter_format: [],
+                    },
+                },
+                priority: 1,
+                tags: {
+                    'spaceone:region': 'kr',
+                    'spaceone:zone': 'kr-1',
+                },
+                last_collected_at: '2021-08-31T00:00:00Z',
+                created_at: '2021-08-31T00:00:00Z',
+            });
+        }, 2000);
+    });
+    state.loading = false;
+    return result;
+};
 
+onMounted(async () => {
+    state.collector = await getCollector();
+});
 
 </script>
 

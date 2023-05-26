@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                    heading-type="sub"
         >
             <template #extra>
@@ -8,18 +8,18 @@
                           icon-left="ic_edit"
                           style-type="secondary"
                 >
-                    {{ i18n.t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-heading>
 
         <p-definition-table :fields="fields"
-                            :loading="state.loading"
-                            :data="state.collector"
+                            :loading="props.loading"
+                            :data="props.collector"
         >
             <template #data-pluginName>
                 <p-lazy-img :src="state.pluginIcon"
-                            :loading="state.loading"
+                            :loading="props.loading"
                             width="1rem"
                             height="1rem"
                 />
@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, computed, onMounted, reactive,
+    defineProps, computed, reactive,
 } from 'vue';
 
 import {
@@ -62,8 +62,10 @@ import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
-const props = defineProps<{}>();
+const props = defineProps<{
+    loading: boolean;
+    collector: CollectorModel|null;
+}>();
 
 const timezone = computed<string>(() => store.state.user.timezone);
 const plugins = computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']);
@@ -78,58 +80,13 @@ const fields = computed<DefinitionField[]>(() => [
 ]);
 
 const state = reactive({
-    collector: null as null|CollectorModel,
-    loading: true,
-    pluginName: computed<string>(() => (state.collector ? plugins.value[state.collector.plugin_info.plugin_id]?.label ?? '' : '')),
-    pluginIcon: computed<string>(() => (state.collector ? plugins.value[state.collector.plugin_info.plugin_id]?.icon ?? '' : '')),
+    pluginName: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.label ?? '' : '')),
+    pluginIcon: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.icon ?? '' : '')),
 });
 
 // TODO: Implement isLatestVersion
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isLatestVersion = (version: string) => true;
 
-
-// TODO: move to upper level
-const getCollector = async (): Promise<CollectorModel> => {
-    state.loading = true;
-    // TODO: change to real data
-    const result = await new Promise<CollectorModel>((resolve) => {
-        setTimeout(() => {
-            resolve({
-                collector_id: 'collector-1',
-                name: 'collector-1',
-                state: 'ENABLED',
-                provider: 'aws',
-                capability: {
-                    supported_schema: ['aws_access_key', 'aws_access_key_pair'],
-                    supported_mode: ['FULL', 'DIFF'],
-                    supported_schedule: ['* * * * *'],
-                },
-                plugin_info: {
-                    plugin_id: 'plugin-1',
-                    version: '1.0',
-                    upgrade_mode: 'AUTO',
-                    options: {
-                        supported_resource_type: ['inventory.Server'],
-                        filter_format: [],
-                    },
-                },
-                priority: 1,
-                tags: {
-                    'spaceone:region': 'kr',
-                    'spaceone:zone': 'kr-1',
-                },
-                last_collected_at: '2021-08-31T00:00:00Z',
-                created_at: '2021-08-31T00:00:00Z',
-            });
-        }, 2000);
-    });
-    state.loading = false;
-    return result;
-};
-
-onMounted(async () => {
-    state.collector = await getCollector();
-});
-
 </script>
+
