@@ -33,9 +33,7 @@
                             >
                                 <slot :name="`data-${idx}`"
                                       v-bind="{...scope, index: idx, items}"
-                                >
-                                    {{ scope.value }}
-                                </slot>
+                                />
                             </slot>
                         </slot>
                     </template>
