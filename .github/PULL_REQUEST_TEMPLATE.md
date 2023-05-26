@@ -7,10 +7,9 @@
 - [ ] Bug fixes
 - [ ] Feature improvement
 - [ ] Refactor
-- [ ] These changes require a usage change
 - [ ] Others (performance improvement, CI/CD, etc.)
 
-### Affected to
+### Affects to
 - [ ] Packages
   - [ ] core-lib
   - [ ] mirinae
