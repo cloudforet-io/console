@@ -1,10 +1,10 @@
 <template>
     <div class="collector-page">
         <p-heading
-            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
             use-total-count
             use-selected-count
-            :total-count="state.totalCount"
+            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+            :total-count="collectorPageState.totalCount"
         >
             <template #extra>
                 <router-link
@@ -20,16 +20,15 @@
         </p-heading>
         <!-- FIXME: loading must be fixed after basic function. -->
         <p-data-loader
-            :data="cloudCollectorPageState.collectorList"
-            :loading="state.loading && !cloudCollectorPageState.collectorList"
+            :data="collectorPageState.collectorList"
+            :loading="collectorPageState.loading && !collectorPageState.collectorList"
             loader-backdrop-color="gray.100"
             class="collector-contents-wrapper"
         >
             <collector-contents
-                :total-count="state.totalCount"
-                :page-limit="state.pageLimit"
                 :key-item-sets="handlerState.keyItemSets"
-                :value-handler-map="handlerState.valueHandlerMap"
+                :provider-list="state.providerList"
+                :search-tags="state.searchTags"
                 @export-excel="handleExportExcel"
                 @change-toolbox="handleChangeToolBox"
             />
@@ -41,15 +40,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 
 import { PButton, PDataLoader, PHeading } from '@spaceone/design-system';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -64,13 +63,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
-const cloudCollectorPageStore = useCollectorPageStore();
-const cloudCollectorPageState = cloudCollectorPageStore.$state;
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -98,32 +96,16 @@ const handlerState = reactive({
             { name: 'last_collected_at', label: 'Last Collected' },
         ],
     }]),
-    valueHandlerMap: {
-        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
-        name: makeDistinctValueHandler('inventory.Collector', 'name'),
-        state: makeDistinctValueHandler('inventory.Collector', 'state'),
-        'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
-        'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
-        provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
-        supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
-        created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
-        last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
-    } as ValueHandlerMap,
 });
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets ?? []);
 
 const state = reactive({
-    loading: true,
-    totalCount: 0,
-    pageStart: 1,
-    pageLimit: 15,
-    sortBy: '',
-    collectors: undefined as undefined | CollectorModel[],
-    searchTags: computed(() => searchQueryHelper.setFilters(cloudCollectorPageState.searchFilters).queryTags),
+    providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
+    searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
     items: computed(() => {
         const plugins = storeState.plugins;
-        return state.collectors?.map((d) => ({
+        return collectorPageState.collectors?.map((d) => ({
             collectorId: d.collector_id,
             name: d.name,
             pluginName: plugins[d.plugin_info.plugin_id]?.label,
@@ -146,25 +128,32 @@ const state = reactive({
     }),
 });
 
+/* Query Helper */
+const collectorApiQueryHelper = new ApiQueryHelper()
+    .setOnly(
+        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+        COLLECTOR_QUERY_HELPER_SET.NAME,
+        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
+        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
+        COLLECTOR_QUERY_HELPER_SET.TAGS,
+        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
+        COLLECTOR_QUERY_HELPER_SET.STATE,
+    )
+    .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
+    .setSort(collectorPageState.sortBy, true);
+
 /* Components */
 const initCollectorList = async () => {
-    state.loading = true;
+    collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     try {
-        await getCollectorList();
+        await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
         if (Object.keys(state.items).length > 0) {
-            await cloudCollectorPageStore.setCollectorList(state.items);
+            await collectorPageStore.setCollectorList(state.items);
         }
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.totalCount = 0;
-        await cloudCollectorPageStore.setCollectorList([]);
-    } finally {
-        state.loading = false;
+        await collectorPageStore.$reset();
     }
-};
-const filterByProvider = async () => {
-    await getCollectorList();
-    await cloudCollectorPageStore.setFilteredCollectorList(state.items);
 };
 const handleExportExcel = async () => {
     await store.dispatch('file/downloadExcel', {
@@ -177,51 +166,25 @@ const handleExportExcel = async () => {
 const handleChangeToolBox = async (options) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        cloudCollectorPageStore.$patch((_state) => {
-            _state.searchFilters = searchQueryHelper.filters;
-        });
+        await collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
         await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
     }
     setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
     await initCollectorList();
 };
 
-/* Query Helper */
-const collectorApiQueryHelper = new ApiQueryHelper()
-    .setOnly(
-        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-        COLLECTOR_QUERY_HELPER_SET.NAME,
-        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
-        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
-        COLLECTOR_QUERY_HELPER_SET.TAGS,
-        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
-        COLLECTOR_QUERY_HELPER_SET.STATE,
-    )
-    .setPage(state.pageStart, state.pageLimit)
-    .setSort(state.sortBy, true);
-
-/* API */
-const getCollectorList = async () => {
-    collectorApiQueryHelper.setFilters(cloudCollectorPageStore.allFilters);
-    try {
-        const res = await SpaceConnector.client.inventory.collector.list({
-            query: collectorApiQueryHelper.data,
-        });
-        state.collectors = res.results;
-        state.totalCount = res.total_count;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
 /* Watcher */
-watch(() => cloudCollectorPageState.selectedProvider, async () => {
-    await filterByProvider();
+watch(() => collectorPageState.selectedProvider, async () => {
+    await initCollectorList();
+});
+
+/* Unmounted */
+onUnmounted(() => {
+    collectorPageStore.$reset();
 });
 
 /* INIT */
 (async () => {
-    await cloudCollectorPageStore.initState();
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
