@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {
-    cloneDeep, isEmpty, isEqual, union,
+    cloneDeep, isEmpty, isEqual,
 } from 'lodash';
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
@@ -10,11 +10,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
 
+import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { assetManagedDashboardVariablesSchema, costManagedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -82,21 +85,32 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
 });
 
 const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    if (labels?.includes('Asset')) {
-        return {
-            properties: { ...assetManagedDashboardVariablesSchema.properties, ...variablesSchemaInfo?.properties ?? {} },
-            order: union(assetManagedDashboardVariablesSchema.order, variablesSchemaInfo?.order ?? []),
-        };
+    if (isEmpty(variablesSchemaInfo?.properties)) { // create dashboard case
+        const _managedDashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
+        if (labels?.includes('Asset')) {
+            Object.entries(_managedDashboardVariablesSchema.properties).forEach(([key, value]) => {
+                if (Object.keys(ASSET_REFERENCE_TYPE_INFO).includes(key)) {
+                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
+                }
+            });
+        } else if (labels?.includes('Cost')) {
+            Object.entries(_managedDashboardVariablesSchema.properties).forEach(([key, value]) => {
+                if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
+                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
+                }
+            });
+        }
+        return _managedDashboardVariablesSchema;
     }
     return {
-        properties: { ...costManagedDashboardVariablesSchema.properties, ...variablesSchemaInfo?.properties ?? {} },
-        order: union(costManagedDashboardVariablesSchema.order, variablesSchemaInfo?.order ?? []),
+        properties: { ...variablesSchemaInfo?.properties ?? {} },
+        order: variablesSchemaInfo?.order ?? [],
     };
 };
 const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    let projectPropertySchema = { ...costManagedDashboardVariablesSchema.properties.project, disabled: true };
+    let projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
     if (labels?.includes('Asset')) {
-        projectPropertySchema = { ...assetManagedDashboardVariablesSchema.properties.project, disabled: true };
+        projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
     }
     const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
 
@@ -294,9 +308,8 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             const _dashboardInfo = cloneDeep(dashboardInfo);
             Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, v]) => {
                 if (!v.options) {
-                    const targetProperty = dashboardInfo.labels.includes('Asset') ? assetManagedDashboardVariablesSchema.properties[k] : costManagedDashboardVariablesSchema.properties[k];
                     _dashboardInfo.variables_schema.properties[k] = {
-                        ...targetProperty,
+                        ...managedDashboardVariablesSchema.properties[k],
                     };
                 } else if (Array.isArray(v.options)) {
                     _dashboardInfo.variables_schema.properties[k] = {
