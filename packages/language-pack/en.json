@@ -2085,7 +2085,7 @@
 				"REGION": "Region",
 				"SAVE_CHANGES": "Save Changes",
 				"SCHEDULE": "Schedule",
-				"SCHEDULE_COLLECT_DESC": "Collect data at 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 every day.",
+				"SCHEDULE_COLLECT_DESC": "Collect data at {times} every day.",
 				"SCHEDULE_HOURLY": "Hourly Schedule",
 				"SCHEDULE_ON_OFF": "Schedule Power ON/OFF",
 				"SCHEDULE_TURN_ON_DESC": "Turn on to collect data automatically.",
@@ -3044,5 +3044,6 @@
 		}
 	},
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
-	"TAB_MEMBER": "Member"
+	"TAB_MEMBER": "Member",
+	"INVENTORY.COLLECTOR.DETAIL.EDIT": ""
 }
