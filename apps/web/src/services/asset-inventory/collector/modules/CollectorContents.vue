@@ -12,8 +12,8 @@
                 search-type="query"
                 :query-tags="props.searchTags"
                 :key-item-sets="props.keyItemSets"
-                :value-handler-map="handlerState.valueHandlerMap"
-                :total-count="cloudCollectorPageState.totalCount"
+                :value-handler-map="state.valueHandlerMap"
+                :total-count="collectorPageState.totalCount"
                 @change="handleChange"
                 @refresh="handleChange"
                 @export="handleExport"
@@ -31,12 +31,12 @@
             <!-- FIXME: apply loading data -->
             <p-data-loader
                 class="collector-lists-wrapper"
-                :data="cloudCollectorPageState.filteredList"
+                :data="collectorPageState.filteredList"
                 :loading="false"
             >
                 <div class="collector-lists">
                     <p-card
-                        v-for="item in cloudCollectorPageState.filteredList"
+                        v-for="item in collectorPageState.filteredList"
                         :key="item.collector_id"
                         :header="false"
                         style-type="white"
@@ -45,7 +45,7 @@
                             <span class="collector-item-name">{{ item.name }}</span>
                             <div class="collector-info-wrapper">
                                 <collector-item-info
-                                    v-for="info in handlerState.infoItems"
+                                    v-for="info in state.infoItems"
                                     :key="info.key"
                                     :label="info.label"
                                     :type="info.key"
@@ -72,10 +72,13 @@ import {
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, QueryTag, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
+
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
@@ -96,10 +99,11 @@ const props = withDefaults(defineProps<Props>(), {
     searchTags: undefined,
 });
 
-const cloudCollectorPageStore = useCollectorPageStore();
-const cloudCollectorPageState = cloudCollectorPageStore.$state;
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
 
-const handlerState = reactive({
+const state = reactive({
+    selectedProvider: computed(() => collectorPageState.selectedProvider),
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: 'Plugin' },
         { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: 'Current Status' },
@@ -117,25 +121,33 @@ const handlerState = reactive({
         created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
         last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
     } as ValueHandlerMap,
+    excelFields: [
+        { key: 'name', name: 'Name' },
+        { key: 'state', name: 'State' },
+        { key: 'plugin_info.plugin_id', name: 'Plugin' },
+        { key: 'plugin_info.version', name: 'Version' },
+        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
+    ],
 });
 
-const state = reactive({
-    selectedProvider: computed(() => cloudCollectorPageState.selectedProvider),
-});
 
-const emit = defineEmits(['export-excel', 'change-toolbox']);
+const emit = defineEmits(['change-toolbox']);
 
 /* Components */
 const handleSelectedProvider = (providerName: string) => {
-    cloudCollectorPageStore.setSelectedProvider(providerName);
+    collectorPageStore.setSelectedProvider(providerName);
 };
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
-const handleExport = async () => {
-    emit('export-excel');
-};
+const handleExport = async () => {};
 const handleChange = async (options) => {
+    const searchQueryHelper = new QueryHelper();
+    if (options.queryTags !== undefined) {
+        searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
+        await collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
+        await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
+    }
     emit('change-toolbox', options);
 };
 </script>

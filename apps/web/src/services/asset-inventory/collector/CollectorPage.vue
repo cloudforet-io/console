@@ -29,7 +29,6 @@
                 :key-item-sets="handlerState.keyItemSets"
                 :provider-list="state.providerList"
                 :search-tags="state.searchTags"
-                @export-excel="handleExportExcel"
                 @change-toolbox="handleChangeToolBox"
             />
             <template #no-data>
@@ -56,9 +55,6 @@ import { store } from '@/store';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { replaceUrlQuery } from '@/lib/router-query-string';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
@@ -74,14 +70,8 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
+
 const handlerState = reactive({
-    excelFields: [
-        { key: 'name', name: 'Name' },
-        { key: 'state', name: 'State' },
-        { key: 'plugin_info.plugin_id', name: 'Plugin' },
-        { key: 'plugin_info.version', name: 'Version' },
-        { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
-    ],
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
@@ -155,20 +145,7 @@ const initCollectorList = async () => {
         await collectorPageStore.$reset();
     }
 };
-const handleExportExcel = async () => {
-    await store.dispatch('file/downloadExcel', {
-        url: '/inventory/collector/list',
-        param: { query: collectorApiQueryHelper.data },
-        fields: handlerState.excelFields,
-        file_name_prefix: FILE_NAME_PREFIX.collector,
-    });
-};
 const handleChangeToolBox = async (options) => {
-    if (options.queryTags !== undefined) {
-        searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        await collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
-        await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
-    }
     setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
     await initCollectorList();
 };
