@@ -10,7 +10,7 @@ import { getLabelArgTypes } from '@/data-display/field-title/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A193199'
     }
-}} component={PFieldTitle} argTypes={getLabelArgTypes()}
+}} argTypes={getLabelArgTypes()}
 />
 
 export const Template = (args, { argTypes }) => ({
@@ -18,7 +18,10 @@ export const Template = (args, { argTypes }) => ({
     components: { PFieldTitle },
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-field-title :label="label">
+        <p-field-title
+            :label="label"
+            :description="description"
+        >
             <template v-if="defaultSlot"><span v-html="defaultSlot"/></template>
         </p-field-title>
     </div>
@@ -33,6 +36,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Basic
 
 <Canvas>
     <Story name="Basic">
@@ -53,6 +57,29 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## With Description
+
+<Canvas>
+    <Story name="With Description">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title description="This is description for field title.🤓">Field Title</p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
 
 <Canvas>
     <Story name="Playground">
