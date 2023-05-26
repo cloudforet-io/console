@@ -4,14 +4,15 @@ import {
     getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
-    widget_config_id: 'countOfPassAndFailFindings',
+const countOfFailFindingsWidgetConfig: WidgetConfig = {
+    widget_config_id: 'countOfFailFindings',
     base_configs: [{ config_id: 'baseCountOfFindings' }],
-    title: 'Count of Pass and Fail Findings',
+    title: 'Count of Fail Findings',
     labels: ['Asset'],
     description: {
-        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC', // TODO: To be added
-        preview_image: 'widget-img_countOfPassAndFailFindings--thumbnail.png',
+        // TODO: To be added
+        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
+        preview_image: 'widget-img_countOfFailFindings--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
     theme: {
@@ -20,7 +21,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
-        asset_group_by: ASSET_GROUP_BY.REGION,
+        asset_group_by: ASSET_GROUP_BY.SERVICE,
         pagination_options: {
             enabled: true,
             page_size: 8,
@@ -54,4 +55,4 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     },
 };
 
-export default countOfPassAndFailFindingsWidgetConfig;
+export default countOfFailFindingsWidgetConfig;
