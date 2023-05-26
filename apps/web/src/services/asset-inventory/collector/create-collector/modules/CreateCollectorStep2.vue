@@ -201,7 +201,7 @@ const handleClose = () => {
 
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/collector/load'),
+        store.dispatch('reference/collector/load', { force: true }),
         getVersions(),
     ]);
     initSelectedVersion();
