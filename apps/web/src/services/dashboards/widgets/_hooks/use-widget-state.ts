@@ -146,7 +146,7 @@ export function useWidgetState<Data = any>(
             state.optionsErrorMap,
         )),
         currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
-        groupBy: computed(() => state.options?.group_by),
+        groupBy: computed(() => state.options?.cost_group_by ?? state.options?.asset_group_by),
         granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         size: computed(() => {
