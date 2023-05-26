@@ -1,5 +1,5 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { i18n } from '@/translations';
+import { I18nConnector } from '@/translations';
 import PBoardItem
     from '@/data-display/board-item/PBoardItem';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton';
@@ -18,7 +18,7 @@ import { standardIconActionSet, extraIconActionSet } from '@/data-display/board-
 
 export const Template = (args, {argTypes}) => ({
     props: Object.keys(argTypes),
-    i18n,
+    i18n: I18nConnector.i18n,
     components: { PBoardItem },
     template: `
         <div class="h-full w-full overflow p-8">
@@ -54,7 +54,6 @@ Main content used for `board-item` component is injected using `content` slot.<b
 <Canvas>
     <Story name="Basic">
         {{
-            i18n,
             components: { PBoardItem },
             template: `
                 <div class="h-full w-full overflow p-8">
@@ -91,7 +90,6 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 <Canvas>
     <Story name="Left Icon">
         {{
-            i18n,
             components: { PBoardItem },
             template: `
                 <div class="h-full w-full overflow p-8">
@@ -121,7 +119,6 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 <Canvas>
     <Story name="Rounded">
         {{
-            i18n,
             components: { PBoardItem },
             template: `
     <div class="h-full w-full overflow p-8">
@@ -151,7 +148,6 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 <Canvas>
     <Story name="Selected">
         {{
-            i18n,
             components: { PBoardItem },
             template: `
                 <div class="h-full w-full overflow p-8">
@@ -199,7 +195,6 @@ That's why it's named overlay.<br/>
 <Canvas>
     <Story name="Icon Button Sets">
         {{
-            i18n,
             components: { PBoardItem },
             template: `
     <div class="h-full w-full overflow p-8">
@@ -233,7 +228,6 @@ Custom content injected into the `custom-right-overlay-content` slot is not repl
 <Canvas>
     <Story name="Custom Right Content Slot">
         {{
-            i18n,
             components: { PBoardItem, PTextButton },
             template: `
                 <div class="h-full w-full overflow p-8">

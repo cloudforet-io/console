@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import {i18n} from '@/translations'
+import { I18nConnector } from '@/translations'
 import { getDynamicLayoutTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/table/story-helper';
 
 <Meta title='Data Display/Dynamic/Dynamic Layout/- [Table] Table'
@@ -10,7 +10,7 @@ import { getDynamicLayoutTableArgTypes } from '@/data-display/dynamic/dynamic-la
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PDynamicLayout },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
       <p-dynamic-layout :name="name" type="table"
                           :options="options"
