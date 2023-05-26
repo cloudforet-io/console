@@ -133,6 +133,8 @@ const state = reactive({
 
 const emit = defineEmits(['change-toolbox']);
 
+const searchQueryHelper = new QueryHelper();
+
 /* Components */
 const handleSelectedProvider = (providerName: string) => {
     collectorPageStore.setSelectedProvider(providerName);
@@ -142,7 +144,6 @@ const handleCreate = () => {
 };
 const handleExport = async () => {};
 const handleChange = async (options) => {
-    const searchQueryHelper = new QueryHelper();
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
         await collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
