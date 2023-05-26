@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import {
     toRefs, reactive, watch,
 } from 'vue';
-import {i18n} from "@/translations";
+import { I18nConnector } from "@/translations";
 import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import PButton from "@/inputs/buttons/button/PButton";
@@ -32,7 +32,7 @@ import {
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    i18n,
+    i18n: I18nConnector.i18n,
     components: { PJsonSchemaForm },
     template: `
         <p-json-schema-form
@@ -139,7 +139,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Basic" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">
@@ -231,7 +231,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Reset on Schema Change" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PButton },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid grid-cols-12">
     <p-json-schema-form
@@ -283,7 +283,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Validation Mode" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid grid-cols-12">
     <p-json-schema-form
@@ -334,7 +334,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Json Input Mode" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">

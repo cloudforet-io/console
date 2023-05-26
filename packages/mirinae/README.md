@@ -67,6 +67,7 @@ https://www.amcharts.com/online-store/licenses-explained/
 ```shell
 npm install @spaceone/design-system vue vue-router vue-i18n vue-fragment @amcharts
 ```
+You need to use `vue-router` and `vue-i18n` plug-ins in your project to use several components that have dependencies with these plug-ins.
 
 ### 2. Set plugin
    
@@ -80,17 +81,15 @@ Vue.use(MirinaeDesignSystem, pluginOptions);
 
 #### Plugin Options
 
-| Option | Description |
-| --- | ---- |
-| installVueRouter | Whether to install Vue Router. Some components use Vue Router, so don't give this option if you have already installed it in your application. |
-| installVueI18n | Whether to install Vue I18n. Some components use Vue I18n, so don't give this option if you have already installed it in your application. |
-| installFragment | Whether to install Vue Fragment. Some components use Vue Fragment, so don't give this option if you have already installed it in your application. |
-| amchartsLicenses | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array. |
+| Option                 | Description                                                                                                                                                                   |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| vueI18n                | Whether to set your Vue I18n configs. If you use Vue I18n and want to use your Vue I18n configs, give your Vue I18n to this option. In Mirinae, some components use Vue I18n. |
+| installFragment        | Whether to install Vue Fragment. Some components use Vue Fragment, so don't give this option if you have already installed it in your application.                            |
+| amchartsLicenses       | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array.                                                                                |
 
 ```typescript
 interface MirinaeDSOptions {
-    installVueRouter?: boolean;
-    installVueI18n?: boolean;
+    vueI18n?: VueI18n;
     installFragment?: boolean;
     amchartsLicenses?: string[];
 }
@@ -111,6 +110,15 @@ export default {
     ...
 }
 ```
+
+### Components with dependencies
+These components require plug-ins `vue-router` and `vue-i18n` installed in your project to function fully. If these plug-ins are not installed, it may not work as intended.
+
+| Plug-in          | Components                           |
+|------------------|--------------------------------------|
+| Vue Router       | - `PAnchor` <br/> - `PBreadcrumbs`   |
+| Vue I18n         | - `PSearch` <br/> - `PDatetimePicker` |
+
 
 <br/>
 
