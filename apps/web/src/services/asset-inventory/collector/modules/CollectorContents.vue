@@ -41,7 +41,7 @@
                         :header="false"
                         style-type="white"
                     >
-                        <div class="collector-item">
+                        <div class="collector-item-wrapper">
                             <span class="collector-item-name">{{ item.name }}</span>
                             <div class="collector-info-wrapper">
                                 <collector-item-info
@@ -158,7 +158,7 @@ const handleChange = async (options) => {
             .collector-lists {
                 @apply grid grid-cols-2 gap-4;
 
-                .collector-item {
+                .collector-item-wrapper {
                     @apply flex flex-col;
                     gap: 1.25rem;
                     padding: 0.5rem 0.625rem;
