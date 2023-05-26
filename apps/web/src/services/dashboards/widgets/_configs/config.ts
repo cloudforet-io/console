@@ -97,18 +97,17 @@ export interface BaseWidgetConfig {
         inherit?: boolean;
         inherit_count?: number;
     };
-
     sizes: WidgetSize[];
     // options?: WidgetOptions;
     options_schema?: WidgetOptionsSchema;
 }
 
 export interface CostWidgetConfig extends BaseWidgetConfig {
-    labels?: ['Cost'];
+    labels?: Array<'Cost'|string>;
     options?: CostWidgetOptions;
 }
 export interface AssetWidgetConfig extends BaseWidgetConfig {
-    labels?: ['Asset'];
+    labels?: Array<'Asset'|string>;
     options?: AssetWidgetOptions;
 }
 export type WidgetConfig = CostWidgetConfig|AssetWidgetConfig;
