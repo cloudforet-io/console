@@ -111,3 +111,5 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         ASSET_REFERENCE_TYPE_INFO.asset_account.type,
     ],
 };
+
+export const managedVariablesPropertiesMap = new Map(Object.entries(managedDashboardVariablesSchema.properties));

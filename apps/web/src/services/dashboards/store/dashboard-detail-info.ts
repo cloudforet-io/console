@@ -17,7 +17,7 @@ import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -88,13 +88,13 @@ const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema, l
     if (isEmpty(variablesSchemaInfo?.properties)) { // create dashboard case
         const _managedDashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
         if (labels?.includes('Asset')) {
-            Object.entries(_managedDashboardVariablesSchema.properties).forEach(([key, value]) => {
+            managedVariablesPropertiesMap.forEach((value, key) => {
                 if (Object.keys(ASSET_REFERENCE_TYPE_INFO).includes(key)) {
                     _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
                 }
             });
         } else if (labels?.includes('Cost')) {
-            Object.entries(_managedDashboardVariablesSchema.properties).forEach(([key, value]) => {
+            managedVariablesPropertiesMap.forEach((value, key) => {
                 if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
                     _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
                 }
