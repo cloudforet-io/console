@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-2">
-        <collect-plugin-contents :plugin="collectorFormState.selectedCollector" />
+        <collect-plugin-contents :plugin="collectorFormState.originCollector" />
         <div class="input-form">
             <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')"
                            :invalid-text="invalidTexts.name"
@@ -96,7 +96,10 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -119,9 +122,10 @@ const collectorFormState = collectorFormStore.$state;
 const state = reactive({
     loading: true,
     plugin: {},
-    pluginId: computed(() => collectorFormState.selectedCollector.plugin_id),
+    pluginId: computed(() => collectorFormState.originCollector.plugin_id),
     tags: {},
-    collectorNames: [] as any[], // FIXME: type
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     versions: [] as any[], // FIXME: type
     isAutoUpgrade: false,
     isTagsValid: true,
@@ -157,16 +161,6 @@ const {
     },
 });
 
-const getNames = async () => {
-    // TODO: You need to check if there are any API changes.
-    const res = await SpaceConnector.client.inventory.collector.list({
-        query: {
-            only: ['name'],
-        },
-    });
-    state.collectorNames = res.results.map((v) => v.name);
-};
-
 const getVersions = async () => {
     try {
         state.versions = [];
@@ -174,17 +168,17 @@ const getVersions = async () => {
         const res = await SpaceConnector.client.repository.plugin.getVersions({
             plugin_id: state.pluginId,
         });
-        res.results.forEach((value, index) => {
-            if (index === 0) {
-                state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
-            } else {
-                state.versions.push({ type: 'item', label: value, name: value });
-            }
+        state.versions = res.results.map((value, index) => {
+            if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
+            return { type: 'item', label: value, name: value };
         });
-        setForm('version', res.results[0]);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
     }
+};
+
+const initSelectedVersion = () => {
+    setForm('version', state.versions[0].name);
 };
 
 /* event */
@@ -206,8 +200,11 @@ const handleClose = () => {
 };
 
 (async () => {
-    await getNames();
-    await getVersions();
+    await Promise.allSettled([
+        store.dispatch('reference/collector/load'),
+        getVersions(),
+    ]);
+    initSelectedVersion();
 })();
 </script>
 <style lang="postcss" scoped>

@@ -116,7 +116,7 @@ const handleSearch = (value) => {
 };
 const handleClickNextStep = (item) => {
     emit('update:currentStep', 2);
-    collectorFormStore.setSelectedCollector(item);
+    collectorFormStore.setOriginCollector(item);
 };
 
 (() => {
