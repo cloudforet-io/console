@@ -49,8 +49,6 @@ export class MirinaeInstaller {
             classPrefix: 'p-i',
         });
 
-        // I18n plug-in is not installed directly from mirinae. use parent project's I18n plug-in.
-        // Therefore, the vueI18n option requires the prerequisite of installing I18n plug-in in the parent project.
         // The role of this option is whether to use internal I18n config or external project config.
         I18nConnector.i18n = options.vueI18n ?? i18n;
 
