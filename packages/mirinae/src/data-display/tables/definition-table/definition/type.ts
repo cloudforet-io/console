@@ -1,6 +1,8 @@
+import type { TranslateResult } from 'vue-i18n';
+
 export interface DefinitionProps {
     name: string;
-    label?: string;
+    label?: TranslateResult;
     data: any;
     disableCopy?: boolean;
     formatter?: (data: any, props: DefinitionProps) => any;

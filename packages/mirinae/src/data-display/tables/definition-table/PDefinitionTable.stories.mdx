@@ -64,15 +64,21 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
                 { label: 'Id', name: 'collector_id' },
                 { label: 'Name', name: 'name' },
                 { label: 'Provider', name: 'provider' },
+                { label: 'Plugin', name: 'plugin_info' },
             ],
             data: {},
             loading: true
         });
         setTimeout(() => {
             state.data = {
-                collector_id: 'collector-6746d641c98b',
+                collector_id: 'collector-abcdefg',
                     name: 'collector name',
                 provider: 'aws',
+                plugin_info: {
+                    plugin_id: 'plugin-1',
+                    version: '1.0',
+                    upgrade_mode: 'AUTO',
+                }
             }
             state.loading = false
         }, 2000)
@@ -122,11 +128,17 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
                         { label: 'Id', name: 'collector_id' },
                         { label: 'Name', name: 'name' },
                         { label: 'Provider', name: 'provider' },
+                        { label: 'Plugin', name: 'plugin_info' },
                     ],
                     data: {
-                        collector_id: 'collector-6746d641c98b',
+                        collector_id: 'collector-abcdefg',
                         name: 'collector name',
                         provider: 'aws',
+                        plugin_info: {
+                            plugin_id: 'plugin-1',
+                            version: '1.0',
+                            upgrade_mode: 'AUTO',
+                        }
                     }
                 });
                 return {
@@ -312,11 +324,17 @@ fields: [
                         { label: 'Id', name: 'collector_id' },
                         { label: 'Name', name: 'name' },
                         { label: 'Provider', name: 'provider', disableCopy: true },
+                        { label: 'Plugin', name: 'plugin_info' },
                     ],
                     data: {
-                        collector_id: 'collector-6746d641c98b',
+                        collector_id: 'collector-abcdefg',
                         name: 'collector name',
                         provider: 'aws',
+                        plugin_info: {
+                            plugin_id: 'plugin-1',
+                            version: '1.0',
+                            upgrade_mode: 'AUTO',
+                        }
                     }
                 });
                 return {
