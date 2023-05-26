@@ -16,6 +16,7 @@
         <p-definition-table :fields="fields"
                             :loading="props.loading"
                             :data="props.collector"
+                            style-type="white"
         >
             <template #data-pluginName>
                 <p-lazy-img :src="state.pluginIcon"
@@ -90,3 +91,8 @@ const isLatestVersion = (version: string) => true;
 
 </script>
 
+<style lang="postcss" scoped>
+.p-definition-table {
+    border-color: transparent;
+}
+</style>
