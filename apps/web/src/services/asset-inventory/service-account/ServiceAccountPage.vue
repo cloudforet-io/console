@@ -359,6 +359,7 @@ export default {
     }
     .service-account-table {
         @apply overflow-hidden border border-gray-200 rounded-lg;
+        margin-top: 1rem;
     }
 
     /* custom design-system component -  p-dynamic-layout */

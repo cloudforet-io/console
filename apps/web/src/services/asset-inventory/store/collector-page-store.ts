@@ -1,12 +1,21 @@
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
+        loading: true,
+        totalCount: 0,
+        pageStart: 1,
+        pageLimit: 15,
+        sortBy: '',
         selectedProvider: 'all',
+        collectors: [] as CollectorModel[],
         searchFilters: [] as ConsoleFilter[],
         collectorList: undefined as CollectorModel[] | undefined,
         filteredList: undefined as CollectorModel[] | undefined,
@@ -21,11 +30,20 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
     },
     actions: {
-        async initState() {
-            this.selectedProvider = 'all';
-            this.searchFilters = [];
-            this.collectorList = undefined;
-            this.filteredList = undefined;
+        async getCollectorList(queryData) {
+            this.loading = true;
+            try {
+                const res = await SpaceConnector.client.inventory.collector.list({
+                    query: queryData,
+                });
+                this.totalCount = res.total_count;
+                this.collectors = res.results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            } finally {
+                this.loading = false;
+            }
         },
         async setSelectedProvider(provider) {
             this.selectedProvider = provider;
@@ -34,8 +52,8 @@ export const useCollectorPageStore = defineStore('collector-page', {
             this.collectorList = collectorList;
             this.filteredList = collectorList;
         },
-        async setFilteredCollectorList(collectorList) {
-            this.filteredList = collectorList;
+        async setFilteredCollectorList(filters) {
+            this.searchFilters = filters;
         },
     },
 });
