@@ -20,9 +20,10 @@
   - [ ] web
 
 ### Checklist
-- `Error / Warning / Lint / Type`
-- Updated Storybook documents for component (if **Mirinae** are updated)
-- Tested with console(if **Mirinae** are updated)
+- Did you check the `lint` and `type`?
+- Did you document the changes?
+  - Changes in `mirinae` should be reflected in `storybook`.
+- Did you test the app after the package changes?
 
 
 ### Description
