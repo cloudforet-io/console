@@ -7,15 +7,17 @@ export enum COLLECT_MODE {
     update = 'UPDATE'
 }
 
-export enum COLLECTOR_STATE {
-    enabled = 'ENABLED',
-    disabled = 'DISABLED'
-}
+export const COLLECTOR_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type CollectorState = typeof COLLECTOR_STATE[keyof typeof COLLECTOR_STATE];
 
-export const UPGRADE_MODE = Object.freeze({
+export const UPGRADE_MODE = {
     AUTO: 'AUTO',
     MANUAL: 'MANUAL',
-});
+} as const;
+export type UpgradeMode = typeof UPGRADE_MODE[keyof typeof UPGRADE_MODE];
 
 export const COLLECTOR_QUERY_HELPER_SET = {
     COLLECTOR_ID: 'collector_id',
@@ -55,18 +57,19 @@ export interface CollectorPluginModel {
     secret_id?: string;
     secret_group_id?: string;
     provider?: string;
+    upgrade_mode: UpgradeMode;
 }
 
 export interface CollectorModel extends Tags {
     collector_id: string;
     name: string;
-    state: COLLECTOR_STATE;
+    state: CollectorState;
     provider: string;
     capability: any;
     plugin_info: CollectorPluginModel;
     priority: number;
-    created_at: TimeStamp;
-    last_collected_at: TimeStamp | null;
+    created_at: TimeStamp | string;
+    last_collected_at: TimeStamp | null | string;
 }
 
 export interface CollectorUpdateParameter extends Tags {
