@@ -81,7 +81,7 @@ Please refer to the table below. <br/>
     <Story name="Default Datetime Picker">
         {() => ({
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
         <p-datetime-picker />
 `,
@@ -97,7 +97,7 @@ Please refer to the table below. <br/>
     <Story name="Invalid Datetime Picker">
         {() => ({
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <table style="border-collapse: separate; border-spacing: 16px;">
     <tr>
@@ -134,7 +134,7 @@ Please refer to the table below. <br/>
     <Story name="Default With Time Picker">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
         <p-datetime-picker data-type="yearToTime" />
 `,
@@ -151,7 +151,7 @@ Please refer to the table below. <br/>
     <Story name="Default With Timezone">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div>
     <p class="pb-2">UTC - {{ selectedUTCDates }}</p>
@@ -185,7 +185,7 @@ Please refer to the table below. <br/>
     <Story name="Default With MinDate and MaxDate">
         {{
             components: { PDatetimePicker, PSelectDropdown },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div>
     <p class="py-2">Select dataType.</p>
@@ -235,7 +235,7 @@ Please refer to the table below. <br/>
     <Story name="Text Style Datetime Picker">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
         <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
 `,
@@ -260,7 +260,7 @@ Please refer to the table below. <br/>
     <Story name="Multiple Selection Mode Datetime Picker">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
         <p-datetime-picker select-mode="multiple" />
 `,
@@ -277,7 +277,7 @@ Please refer to the table below. <br/>
     <Story name="Range Selection Mode Datetime Picker">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div>
     <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
@@ -308,7 +308,7 @@ Please refer to the table below. <br/>
     <Story name="Time Only Selection">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div>
     <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
@@ -335,7 +335,7 @@ Please refer to the table below. <br/>
     <Story name="Year and Month Selection">
         {{
             components: { PDatetimePicker },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div>
     <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />

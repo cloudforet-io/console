@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from 'vue';
 
-import {i18n} from '@/translations';
+import { I18nConnector } from '@/translations';
 
 import PToolbox from './PToolbox.vue';
 import { getToolboxArgTypes } from './story-helper';
@@ -22,7 +22,7 @@ import { useProxyValue } from '@/hooks';
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PToolbox },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
     <p-toolbox
         :paginationVisible="paginationVisible"
@@ -81,7 +81,7 @@ export const Template = (args, { argTypes }) => ({
     <Story name="Basic">
 {{
     components: { PToolbox },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
     <p-toolbox />
 `,
@@ -120,7 +120,7 @@ interface Options {
     <Story name="Full Case" height="150px">
 {{
     components: { PToolbox },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
     <p-toolbox
         paginationVisible
@@ -149,7 +149,7 @@ interface Options {
     <Story name="Query Search" height="200px">
 {{
     components: { PToolbox },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
     <p-toolbox
         searchable
@@ -186,7 +186,7 @@ interface Options {
     <Story name="Left Area Slot">
 {{
     components: { PToolbox },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
     <p-toolbox
         searchable
