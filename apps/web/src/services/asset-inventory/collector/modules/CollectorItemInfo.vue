@@ -7,12 +7,12 @@
                 {{ props.label }}
             </p>
             <div class="plugin">
-                <p-lazy-img :src="props.item.pluginIcon"
+                <p-lazy-img :src="props.item.plugin.icon"
                             width="1.25rem"
                             height="1.25rem"
                 />
-                <span class="plugin-name">{{ props.item.pluginName }}</span>
-                <span class="plugin-version">v{{ props.item.pluginInfo.version }}</span>
+                <span class="plugin-name">{{ props.item.plugin.name }}</span>
+                <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
             </div>
         </div>
         <div
@@ -130,12 +130,12 @@ import {
     PButton, PI, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
 
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
 
 interface Props {
     label: string;
-    item?: CollectorModel;
+    item?: CollectorItemInfo;
     type: string;
 }
 

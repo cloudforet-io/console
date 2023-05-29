@@ -145,3 +145,26 @@ export interface ScheduleGetParameter {
 
 export type CollectorListResp = ListType<CollectorModel>;
 export type CollectorScheduleListResp = ListType<CollectorScheduleModel>;
+
+interface CollectorPlugin {
+    name?: string;
+    icon?: string;
+    info: CollectorPluginModel
+}
+interface CollectorDetailLink {
+    name: string;
+    param: CollectorDetailLinkParameter,
+    query: CollectorDetailLinkQuery
+}
+interface CollectorDetailLinkParameter {
+    id: string
+}
+interface CollectorDetailLinkQuery {
+    filters: string[]
+}
+export interface CollectorItemInfo {
+    collectorId: string,
+    name: string,
+    plugin: CollectorPlugin,
+    detailLink: CollectorDetailLink
+}
