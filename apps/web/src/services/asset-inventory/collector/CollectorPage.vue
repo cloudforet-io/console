@@ -4,7 +4,7 @@
             use-total-count
             use-selected-count
             :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.totalCount"
+            :total-count="collectorPageState.listCount"
         >
             <template #extra>
                 <router-link
@@ -18,19 +18,23 @@
                 </router-link>
             </template>
         </p-heading>
-        <!-- FIXME: loading must be fixed after basic function. -->
         <p-data-loader
-            :data="collectorPageState.collectorList"
-            :loading="collectorPageState.loading && !collectorPageState.collectorList"
+            :data="state.hasCollectorList"
+            :loading="state.initLoading"
             loader-backdrop-color="gray.100"
-            class="collector-contents-wrapper"
+            class="collector-loader-wrapper"
         >
-            <collector-contents
-                :key-item-sets="handlerState.keyItemSets"
-                :provider-list="state.providerList"
-                :search-tags="state.searchTags"
-                @change-toolbox="handleChangeToolbox"
-            />
+            <div class="collector-contents-wrapper">
+                <provider-list
+                    :provider-list="state.providerList"
+                    :selected-provider="collectorPageState.selectedProvider"
+                    @change-provider="handleSelectedProvider"
+                />
+                <collector-contents
+                    :key-item-sets="handlerState.keyItemSets"
+                    @change-toolbox="handleChangeToolbox"
+                />
+            </div>
             <template #no-data>
                 <collector-no-data />
             </template>
@@ -39,20 +43,16 @@
 </template>
 
 <script lang="ts" setup>
-import {
-    computed, onUnmounted, reactive, watch,
-} from 'vue';
+import { computed, onUnmounted, reactive } from 'vue';
 
-import { PButton, PDataLoader, PHeading } from '@spaceone/design-system';
+import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
 import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -60,6 +60,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
+import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
@@ -68,7 +69,6 @@ const collectorPageState = collectorPageStore.$state;
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
 const handlerState = reactive({
@@ -88,34 +88,10 @@ const handlerState = reactive({
     }]),
 });
 
-const searchQueryHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets ?? []);
-
 const state = reactive({
+    initLoading: true,
+    hasCollectorList: false,
     providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
-    searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
-    items: computed(() => {
-        const plugins = storeState.plugins;
-        return collectorPageState.collectors?.map((d) => ({
-            collectorId: d.collector_id,
-            name: d.name,
-            pluginName: plugins[d.plugin_info.plugin_id]?.label,
-            pluginIcon: plugins[d.plugin_info.plugin_id]?.icon,
-            pluginInfo: d.plugin_info,
-            detailLink: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
-                param: { id: d.collector_id },
-                query: {
-                    filters: searchQueryHelper.setFilters([
-                        {
-                            k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-                            v: d.collector_id,
-                            o: '=',
-                        },
-                    ]).rawQueryStrings,
-                },
-            },
-        }));
-    }),
 });
 
 /* Query Helper */
@@ -134,26 +110,34 @@ const collectorApiQueryHelper = new ApiQueryHelper()
 
 /* Components */
 const initCollectorList = async () => {
+    state.initLoading = true;
+    try {
+        await collectorPageStore.getCollectorList();
+        if (collectorPageState.listCount > 0) {
+            state.hasCollectorList = true;
+        }
+    } catch (e) {
+        await collectorPageStore.$reset();
+    } finally {
+        state.initLoading = false;
+    }
+};
+const refreshCollectorList = async () => {
     collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     try {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
-        if (Object.keys(state.items).length > 0) {
-            await collectorPageStore.setCollectorList(state.items);
-        }
     } catch (e) {
         ErrorHandler.handleError(e);
-        await collectorPageStore.$reset();
     }
 };
-const handleChangeToolbox = async (options) => {
-    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
-    await initCollectorList();
+const handleSelectedProvider = (providerName: string) => {
+    collectorPageStore.setSelectedProvider(providerName);
+    refreshCollectorList();
 };
-
-/* Watcher */
-watch(() => collectorPageState.selectedProvider, async () => {
-    await initCollectorList();
-});
+const handleChangeToolbox = (options) => {
+    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
+    refreshCollectorList();
+};
 
 /* Unmounted */
 onUnmounted(() => {
@@ -196,7 +180,12 @@ onUnmounted(() => {
     }
 }
 
-.collector-contents-wrapper {
+.collector-loader-wrapper {
     min-height: 16.875rem;
+
+    .collector-contents-wrapper {
+        @apply flex flex-col;
+        gap: 1.5rem;
+    }
 }
 </style>
