@@ -171,7 +171,8 @@ const handleChangeToolbox = async (options) => {
 // watch(() => state.items, async (value) => {
 //     const ids = value?.map((item) => item.collectorId);
 //     if (ids.length > 0) {
-//         await collectorPageStore.getCollectorSchedule(ids);
+//         const promises = ids.map(collectorPageStore.getCollectorSchedule);
+//         await Promise.all(promises);
 //     }
 // });
 </script>

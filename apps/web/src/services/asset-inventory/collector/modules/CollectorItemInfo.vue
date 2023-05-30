@@ -156,8 +156,10 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PI, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
+
+import { store } from '@/store';
+
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
@@ -178,35 +180,33 @@ const props = withDefaults(defineProps<Props>(), {
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
+const { i18nDayjs } = useI18nDayjs();
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
+
 const state = reactive({
+    current: computed(() => i18nDayjs.value.tz(i18nDayjs.value(), storeState.timezone)),
     schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
     collectorState: computed(() => state.schedule?.collector_info.state),
     toggleStatus: computed(() => (state.collectorState === COLLECTOR_STATE.ENABLED ? 'ON' : 'OFF')),
     nextSchedule: computed(() => {
         if (state.schedule) {
-            const numbersArray = state.schedule.schedule?.hours ?? [];
-            const hour = dayjs().hour();
-            const hasNextSchedule = numbersArray.find((num) => num > hour);
+            const hours = state.schedule.schedule?.hours ?? [];
+            const sortedHours = hours.sort((a, b) => a - b);
+            const currentHour = state.current.hour();
+            const closestHour = sortedHours.find((num) => num > currentHour);
 
-            let closestValue = 0;
-            if (hasNextSchedule) {
-                closestValue = hasNextSchedule as number;
-            } else {
-                closestValue = 24 - Math.min(...numbersArray);
+            if (closestHour) {
+                return state.current.set('h', closestHour).set('m', 0);
             }
-            return closestValue;
+            return state.current.set('h', sortedHours[0] ?? 0).set('m', 0).add(1, 'd');
         }
-        return undefined;
+        return null;
     }),
     diffSchedule: computed(() => {
-        const today = dayjs();
-        let dueDate: Dayjs;
-
-        if (state.nextSchedule >= 24) {
-            dueDate = today.add(1, 'd');
-        }
-        dueDate = today.set('h', state.nextSchedule).set('m', 0);
-        const timeDiff = dueDate.diff(today, 'm');
+        const timeDiff = state.nextSchedule.diff(state.current, 'm');
         return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
     }),
 });
