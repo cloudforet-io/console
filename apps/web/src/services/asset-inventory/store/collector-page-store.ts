@@ -54,7 +54,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
         async getCollectorSchedule(id) {
             try {
-                const res = await SpaceConnector.client.inventory.collector.schedule.list({
+                const res = await SpaceConnector.client.inventory.collector.listSchedules({
                     collector_id: id,
                 });
                 this.schedules.push(...res.results);
