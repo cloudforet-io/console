@@ -44,7 +44,10 @@
             </template>
         </p-definition-table>
 
-        <collector-base-info-edit v-if="state.isEditMode" />
+        <collector-base-info-edit v-if="state.isEditMode"
+                                  @cancel="handleEditCancel"
+                                  @save="handleEditSave"
+        />
     </p-pane-layout>
 </template>
 
@@ -99,6 +102,16 @@ const isLatestVersion = (version: string) => true;
 
 const handleClickEdit = () => {
     state.isEditMode = true;
+};
+
+const handleEditCancel = () => {
+    state.isEditMode = false;
+    // TODO: Implement cancel
+};
+
+const handleEditSave = () => {
+    state.isEditMode = false;
+    // TODO: Implement save
 };
 
 onMounted(async () => {
