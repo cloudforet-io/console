@@ -184,7 +184,7 @@ const state = reactive({
     toggleStatus: computed(() => (state.collectorState === COLLECTOR_STATE.ENABLED ? 'ON' : 'OFF')),
     nextSchedule: computed(() => {
         if (state.schedule) {
-            const numbersArray = state.schedule.schedule.hours;
+            const numbersArray = state.schedule.schedule?.hours ?? [];
             const hour = dayjs().hour();
             const hasNextSchedule = numbersArray.find((num) => num > hour);
 
