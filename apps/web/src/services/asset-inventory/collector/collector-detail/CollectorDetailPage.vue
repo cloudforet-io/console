@@ -25,7 +25,9 @@
                                    :loading="state.loading"
                                    :collector-options="state.collectorOptions"
         />
-        <collector-service-accounts-section class="section" />
+        <collector-service-accounts-section class="section"
+                                            :providers="state.collectorProviders"
+        />
     </div>
 </template>
 
@@ -56,6 +58,8 @@ const state = reactive({
     loading: true,
     collector: null as null|CollectorModel,
     collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
+    // TODO: must be updated after backend api spec is updated
+    collectorProviders: computed<null|string[]>(() => (state.collector?.provider ? [state.collector.provider] : null)),
 });
 
 const getCollector = async (): Promise<CollectorModel> => {
