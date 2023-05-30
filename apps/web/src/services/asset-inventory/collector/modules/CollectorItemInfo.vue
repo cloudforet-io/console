@@ -80,13 +80,15 @@
                 </span>
             </div>
             <div class="to-history-detail">
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-                <p-i
-                    name="ic_chevron-right"
-                    width="0.75rem"
-                    height="0.75rem"
-                    color="inherit transparent"
-                />
+                <router-link :to="props.item.detailLink">
+                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+                    <p-i
+                        name="ic_chevron-right"
+                        width="0.75rem"
+                        height="0.75rem"
+                        color="inherit transparent"
+                    />
+                </router-link>
             </div>
         </div>
         <div
