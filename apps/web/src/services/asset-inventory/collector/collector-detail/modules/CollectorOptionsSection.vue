@@ -12,17 +12,46 @@
                 </p-button>
             </template>
         </p-heading>
+        <p-definition-table :fields="state.fields"
+                            :loading="props.loading"
+                            :data="props.collectorOptions"
+                            style-type="white"
+        />
     </p-pane-layout>
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { defineProps, computed, reactive } from 'vue';
 
-import { PHeading, PButton, PPaneLayout } from '@spaceone/design-system';
+import {
+    PHeading, PButton, PPaneLayout, PDefinitionTable,
+} from '@spaceone/design-system';
+import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
 import { i18n } from '@/translations';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
-const props = defineProps<{}>();
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+
+const props = defineProps<{
+    loading: boolean;
+    collectorOptions: CollectorPluginModel['options']|null;
+}>();
+
+
+const state = reactive({
+    fields: computed<DefinitionField[]>(() => {
+        if (!props.collectorOptions) return [];
+        return Object.keys(props.collectorOptions).map((key) => ({
+            name: key,
+            label: key,
+        }));
+    }),
+});
 
 </script>
+
+<style lang="postcss" scoped>
+.p-definition-table {
+    border-color: transparent;
+}
+</style>
