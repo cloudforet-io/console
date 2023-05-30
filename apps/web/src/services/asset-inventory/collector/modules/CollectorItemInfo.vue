@@ -156,6 +156,8 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PI, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
@@ -183,42 +185,28 @@ const state = reactive({
     nextSchedule: computed(() => {
         if (state.schedule) {
             const numbersArray = state.schedule.schedule.hours;
-            const hour = new Date().getHours();
+            const hour = dayjs().hour();
             const hasNextSchedule = numbersArray.find((num) => num > hour);
 
             let closestValue = 0;
-
             if (hasNextSchedule) {
                 closestValue = hasNextSchedule as number;
             } else {
                 closestValue = 24 - Math.min(...numbersArray);
             }
-
             return closestValue;
         }
         return undefined;
     }),
     diffSchedule: computed(() => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1;
-        const day = today.getDate();
-        let formatDate = '';
+        let dueDate: Dayjs;
 
         if (state.nextSchedule >= 24) {
-            formatDate = `${year}-${month}-${day + 1}`;
-        } else {
-            formatDate = `${year}-${month}-${day}`;
+            dueDate = dayjs().add(1, 'd');
         }
-
-        const dueDate = new Date(`${formatDate} ${state.nextSchedule}:00:00`);
-
-        const timeDiff = Math.abs(dueDate.getTime() - today.getTime());
-
-        const diffHour = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
-        const diffMin = Math.floor((timeDiff / (1000 * 60)) % 60);
-
-        return { diffHour, diffMin };
+        dueDate = dayjs().set('h', state.nextSchedule).set('m', 0);
+        const timeDiff = dueDate.diff(dayjs(), 'm');
+        return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
     }),
 });
 
