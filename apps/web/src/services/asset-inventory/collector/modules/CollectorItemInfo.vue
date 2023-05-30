@@ -22,7 +22,27 @@
             <p class="info-label">
                 {{ props.label }}
             </p>
-            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
+            <div class="label-description">
+                <span v-if="!storeState.schedule">{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
+                <div v-else
+                     class="scheduled"
+                >
+                    <p-i
+                        name="ic_alarm-clock"
+                        class="alarm-icon"
+                        height="1.25rem"
+                        width="1.25rem"
+                        color="inherit"
+                    />
+                    <!-- TODO: apply translation later because of license issue  -->
+                    <p class="description">
+                        Scheduled
+                        <span class="emphasis">
+                            in 1 hr 30 mins
+                        </span>
+                    </p>
+                </div>
+            </div>
         </div>
         <div
             v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.JOBS"
@@ -126,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PI, PLazyImg, PToggleButton,
@@ -134,6 +154,7 @@ import {
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
+import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
     label: string;
@@ -147,9 +168,49 @@ const props = withDefaults(defineProps<Props>(), {
     type: '',
 });
 
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
+
+const storeState = reactive({
+    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
+});
+
+// TODO: will be changed schedule states after checking API
 const state = reactive({
-    toggleActive: false,
-    toggleStatus: 'OFF',
+    toggleActive: computed(() => storeState.schedule?.collector_info.state === 'ENABLED'),
+    toggleStatus: computed(() => (state.toggleActive ? 'ON' : 'OFF')),
+    // nextSchedule: computed(() => {
+    //     if (storeState.schedule) {
+    //         const today = new Date();
+    //         const schedulesArray = storeState.schedule.schedule.hours;
+    //         const hour = today.getHours();
+    //         return schedulesArray?.find((s) => Number(s) > hour || Math.min(Number(s)));
+    //     }
+    //     return undefined;
+    // }),
+    // diffSchedule: computed(() => {
+    //     const today = new Date();
+    //     const year = today.getFullYear();
+    //     const month = today.getMonth() + 1;
+    //     const day = today.getDate();
+    //     let formattedDate = '';
+    //
+    //     if (state.nextSchedule) {
+    //         formattedDate = `${year}-${month}-${day}`;
+    //     } else {
+    //         formattedDate = `${year}-${month}-${day + 1}`;
+    //     }
+    //
+    //     const dueDate = new Date(`${formattedDate} ${state.nextSchedule}:00:00`);
+    //
+    //     const timeDiff = Math.abs(dueDate.getTime() - today.getTime());
+    //
+    //     const diffDay = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    //     const diffHour = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+    //     const diffMin = Math.floor((timeDiff / (1000 * 60)) % 60);
+    //
+    //     return { diffDay, diffHour, diffMin };
+    // }),
 });
 
 /* Components */
@@ -167,6 +228,19 @@ const handleChangeToggle = () => {
 
         .info-label {
             @apply text-label-sm text-gray-500;
+        }
+
+        .label-description {
+            @apply text-label-md text-gray-700;
+
+            .scheduled {
+                @apply flex items-center;
+                gap: 0.25rem;
+
+                .emphasis {
+                    @apply font-bold text-gray-900 not-italic;
+                }
+            }
         }
 
         .plugin {

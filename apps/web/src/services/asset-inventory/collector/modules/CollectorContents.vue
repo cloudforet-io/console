@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PToolbox, PButton, PCard, PDataLoader,
@@ -163,6 +163,15 @@ const handleChangeToolbox = async (options) => {
     }
     emit('change-toolbox', options);
 };
+
+/* Watcher */
+watch(() => state.items, async (value) => {
+    const ids = value?.map((item) => item.collectorId);
+    if (ids.length > 0) {
+        const promises = ids.map(collectorPageStore.getCollectorSchedule);
+        await Promise.all(promises);
+    }
+});
 </script>
 
 <style scoped lang="postcss">
