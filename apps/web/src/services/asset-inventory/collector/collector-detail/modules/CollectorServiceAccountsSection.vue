@@ -36,6 +36,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+// TODO: Move type declaration to separated file. this is temporary.
 interface SecretModel {
     secret_id: string;
     provider: string;
