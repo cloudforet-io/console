@@ -142,6 +142,7 @@ const handleChangeToolbox = (options) => {
 /* Unmounted */
 onUnmounted(() => {
     collectorPageStore.$reset();
+    collectorPageStore.$dispose();
 });
 
 /* INIT */
