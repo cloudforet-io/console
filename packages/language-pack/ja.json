@@ -2072,6 +2072,7 @@
 				"AUTO_UPGRADE": "",
 				"A_PROVIDER": "",
 				"BASE_INFO": "",
+				"CANCEL": "",
 				"COLLECTOR_HISTORY": "",
 				"COLLECTOR_OPTIONS": "",
 				"CREATED": "",
@@ -2159,6 +2160,7 @@
 			}
 		}
 	},
+	"INVENTORY.COLLECTOR.DETAIL.EDIT": "",
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
