@@ -4,16 +4,19 @@
                    heading-type="sub"
         >
             <template #extra>
-                <p-button size="md"
+                <p-button v-if="!state.isEditMode"
+                          size="md"
                           icon-left="ic_edit"
                           style-type="secondary"
+                          @click="handleClickEdit"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-heading>
 
-        <p-definition-table :fields="fields"
+        <p-definition-table v-if="!state.isEditMode"
+                            :fields="fields"
                             :loading="props.loading"
                             :data="props.collector"
                             style-type="white"
@@ -40,12 +43,14 @@
                 {{ value ? iso8601Formatter(value, timezone) : '' }}
             </template>
         </p-definition-table>
+
+        <collector-base-info-edit v-if="state.isEditMode" />
     </p-pane-layout>
 </template>
 
 <script lang="ts" setup>
 import {
-    defineProps, computed, reactive,
+    defineProps, computed, reactive, onMounted,
 } from 'vue';
 
 import {
@@ -60,6 +65,8 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import CollectorBaseInfoEdit
+    from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoEdit.vue';
 import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
@@ -83,11 +90,20 @@ const fields = computed<DefinitionField[]>(() => [
 const state = reactive({
     pluginName: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.label ?? '' : '')),
     pluginIcon: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.icon ?? '' : '')),
+    isEditMode: false,
 });
 
 // TODO: Implement isLatestVersion
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isLatestVersion = (version: string) => true;
+
+const handleClickEdit = () => {
+    state.isEditMode = true;
+};
+
+onMounted(async () => {
+    await store.dispatch('reference/plugin/load');
+});
 
 </script>
 
