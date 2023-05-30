@@ -10,7 +10,7 @@
             :total-count="collectorPageState.totalCount"
             @change="handleChangeToolbox"
             @refresh="handleChangeToolbox"
-            @export="handleExport"
+            @export="handleExportExcel"
         >
             <template #left-area>
                 <p-button
@@ -146,7 +146,7 @@ const state = reactive({
     }),
 });
 
-const emit = defineEmits(['change-toolbox']);
+const emit = defineEmits(['change-toolbox', 'export-excel']);
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
 
@@ -154,7 +154,9 @@ const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? 
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
-const handleExport = async () => {};
+const handleExportExcel = async () => {
+    emit('export-excel', state.excelFields);
+};
 const handleChangeToolbox = async (options) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
