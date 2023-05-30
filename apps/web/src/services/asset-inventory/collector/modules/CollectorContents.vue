@@ -7,7 +7,7 @@
             :key-item-sets="props.keyItemSets"
             :query-tags="state.searchTags"
             :value-handler-map="state.valueHandlerMap"
-            :total-count="collectorPageState.listCount"
+            :total-count="collectorPageState.totalCount"
             @change="handleChangeToolbox"
             @refresh="handleChangeToolbox"
             @export="handleExport"

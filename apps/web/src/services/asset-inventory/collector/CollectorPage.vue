@@ -4,7 +4,7 @@
             use-total-count
             use-selected-count
             :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.listCount"
+            :total-count="collectorPageState.totalCount"
         >
             <template #extra>
                 <router-link
@@ -113,7 +113,7 @@ const initCollectorList = async () => {
     state.initLoading = true;
     try {
         await collectorPageStore.getCollectorList();
-        if (collectorPageState.listCount > 0) {
+        if (collectorPageState.totalCount > 0) {
             state.hasCollectorList = true;
         }
     } catch (e) {

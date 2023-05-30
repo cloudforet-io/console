@@ -17,7 +17,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
         searchFilters: [] as ConsoleFilter[],
-        listCount: 0,
+        totalCount: 0,
     }),
     getters: {
         allFilters: (state): ConsoleFilter[] => {
@@ -36,7 +36,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                     query: queryData,
                 });
                 this.collectors = res.results;
-                this.listCount = res.total_count;
+                this.totalCount = res.total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
