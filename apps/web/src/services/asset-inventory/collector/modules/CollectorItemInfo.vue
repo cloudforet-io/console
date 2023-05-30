@@ -23,8 +23,7 @@
                 {{ props.label }}
             </p>
             <div class="label-description">
-                <span v-if="!storeState.schedule">{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
-                <div v-else
+                <div v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
                      class="scheduled"
                 >
                     <p-i
@@ -34,14 +33,20 @@
                         width="1.25rem"
                         color="inherit"
                     />
-                    <!-- TODO: apply translation later because of license issue  -->
+                    <!-- TODO: apply translation later because of license issue -->
                     <p class="description">
                         Scheduled
                         <span class="emphasis">
-                            in 1 hr 30 mins
+                            in
+                            <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
+                            <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
                         </span>
                     </p>
                 </div>
+                <!-- TODO: add in-progress state -->
+                <span v-else>
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                </span>
             </div>
         </div>
         <div
@@ -119,13 +124,13 @@
                 {{ props.label }}
             </p>
             <p-toggle-button
-                :value="state.toggleActive"
+                :value="state.collectorState === COLLECTOR_STATE.ENABLED"
                 :label="state.toggleStatus"
-                :class="state.toggleActive ? 'toggle-active' : ''"
+                :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
                 @change-toggle="handleChangeToggle"
             />
             <p-button style-type="transparent">
-                <p-i v-if="state.toggleActive"
+                <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
                      name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
@@ -139,7 +144,7 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ state.toggleActive ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ state.collectorState === COLLECTOR_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </p-button>
         </div>
     </div>
@@ -153,7 +158,7 @@ import {
 } from '@spaceone/design-system';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
-import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
+import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
@@ -171,53 +176,54 @@ const props = withDefaults(defineProps<Props>(), {
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
-const storeState = reactive({
-    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
-});
-
-// TODO: will be changed schedule states after checking API
 const state = reactive({
-    toggleActive: computed(() => storeState.schedule?.collector_info.state === 'ENABLED'),
-    toggleStatus: computed(() => (state.toggleActive ? 'ON' : 'OFF')),
-    // nextSchedule: computed(() => {
-    //     if (storeState.schedule) {
-    //         const today = new Date();
-    //         const schedulesArray = storeState.schedule.schedule.hours;
-    //         const hour = today.getHours();
-    //         return schedulesArray?.find((s) => Number(s) > hour || Math.min(Number(s)));
-    //     }
-    //     return undefined;
-    // }),
-    // diffSchedule: computed(() => {
-    //     const today = new Date();
-    //     const year = today.getFullYear();
-    //     const month = today.getMonth() + 1;
-    //     const day = today.getDate();
-    //     let formattedDate = '';
-    //
-    //     if (state.nextSchedule) {
-    //         formattedDate = `${year}-${month}-${day}`;
-    //     } else {
-    //         formattedDate = `${year}-${month}-${day + 1}`;
-    //     }
-    //
-    //     const dueDate = new Date(`${formattedDate} ${state.nextSchedule}:00:00`);
-    //
-    //     const timeDiff = Math.abs(dueDate.getTime() - today.getTime());
-    //
-    //     const diffDay = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    //     const diffHour = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
-    //     const diffMin = Math.floor((timeDiff / (1000 * 60)) % 60);
-    //
-    //     return { diffDay, diffHour, diffMin };
-    // }),
+    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
+    collectorState: computed(() => state.schedule?.collector_info.state),
+    toggleStatus: computed(() => (state.collectorState === COLLECTOR_STATE.ENABLED ? 'ON' : 'OFF')),
+    nextSchedule: computed(() => {
+        if (state.schedule) {
+            const numbersArray = state.schedule.schedule.hours;
+            const hour = new Date().getHours();
+            const hasNextSchedule = numbersArray.find((num) => num > hour);
+
+            let closestValue = 0;
+
+            if (hasNextSchedule) {
+                closestValue = hasNextSchedule as number;
+            } else {
+                closestValue = 24 - Math.min(...numbersArray);
+            }
+
+            return closestValue;
+        }
+        return undefined;
+    }),
+    diffSchedule: computed(() => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        const day = today.getDate();
+        let formatDate = '';
+
+        if (state.nextSchedule >= 24) {
+            formatDate = `${year}-${month}-${day + 1}`;
+        } else {
+            formatDate = `${year}-${month}-${day}`;
+        }
+
+        const dueDate = new Date(`${formatDate} ${state.nextSchedule}:00:00`);
+
+        const timeDiff = Math.abs(dueDate.getTime() - today.getTime());
+
+        const diffHour = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+        const diffMin = Math.floor((timeDiff / (1000 * 60)) % 60);
+
+        return { diffHour, diffMin };
+    }),
 });
 
 /* Components */
-const handleChangeToggle = () => {
-    state.toggleActive = !state.toggleActive;
-    state.toggleStatus = state.toggleActive ? 'ON' : 'OFF';
-};
+const handleChangeToggle = () => {};
 </script>
 
 <style scoped lang="postcss">
