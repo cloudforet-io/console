@@ -199,13 +199,14 @@ const state = reactive({
         return undefined;
     }),
     diffSchedule: computed(() => {
+        const today = dayjs();
         let dueDate: Dayjs;
 
         if (state.nextSchedule >= 24) {
-            dueDate = dayjs().add(1, 'd');
+            dueDate = today.add(1, 'd');
         }
-        dueDate = dayjs().set('h', state.nextSchedule).set('m', 0);
-        const timeDiff = dueDate.diff(dayjs(), 'm');
+        dueDate = today.set('h', state.nextSchedule).set('m', 0);
+        const timeDiff = dueDate.diff(today, 'm');
         return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
     }),
 });
