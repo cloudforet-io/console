@@ -191,7 +191,7 @@ export default defineComponent({
     .slide-fade-enter-active, .slide-fade-leave-active {
         transition: all 0.2s linear;
     }
-    .slide-fade-enter, .slide-fade-leave-to {
+    .slide-fade-enter-from, .slide-fade-leave-to {
         transform: translateY($(max-height));
         opacity: 0;
     }
@@ -243,7 +243,7 @@ export default defineComponent({
                 margin-left: -$(sidebar-fixed-size);
             }
         }
-        .slide-fade-enter, .slide-fade-leave-to {
+        .slide-fade-enter-from, .slide-fade-leave-to {
             transform: translateX(100%);
             opacity: 0;
             &.sm {

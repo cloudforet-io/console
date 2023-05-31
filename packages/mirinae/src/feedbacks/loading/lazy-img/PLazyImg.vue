@@ -154,10 +154,10 @@ export default defineComponent<Props>({
     .fade-in-leave-active, .fade-in-enter-active {
         transition: visibility 0.25s;
     }
-    .fade-in-leave-to, .fade-in-enter {
+    .fade-in-leave-to, .fade-in-enter-from {
         visibility: hidden;
     }
-    .fade-in-enter-to, .fade-in-leave {
+    .fade-in-enter-to, .fade-in-leave-from {
         visibility: visible;
     }
 }

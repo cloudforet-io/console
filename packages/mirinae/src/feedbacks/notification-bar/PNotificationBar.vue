@@ -90,7 +90,7 @@ export default defineComponent({
     .slide-enter-active, .slide-leave-active {
         transition: all 0.2s ease-in-out;
     }
-    .slide-enter, .slide-leave-to {
+    .slide-enter-from, .slide-leave-to {
         margin-bottom: -100%;
         transform: translateY(-100%);
     }

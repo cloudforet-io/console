@@ -1,6 +1,8 @@
 <template>
     <div class="p-button-tab">
-        <transition name="fade" mode="out-in">
+        <transition name="fade"
+                    mode="out-in"
+        >
             <div class="button-group">
                 <button v-for="(tab, idx) in tabItems"
                         ref="buttonRefs"
@@ -17,9 +19,15 @@
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)"
+                      :name="activeTab"
+                      v-bind="currentTabItem"
+                />
             </keep-alive>
-            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)"
+                  :name="activeTab"
+                  v-bind="currentTabItem"
+            />
         </div>
     </div>
 </template>
@@ -135,7 +143,7 @@ export default defineComponent({
     .fade-enter-active, .fade-leave-active {
         transition: visibility, opacity 0.2s;
     }
-    .fade-enter, .fade-leave-to {
+    .fade-enter-from, .fade-leave-to {
         opacity: 0;
         visibility: hidden;
     }
