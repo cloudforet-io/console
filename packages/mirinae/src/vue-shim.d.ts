@@ -1,15 +1,10 @@
-declare module '*.vue' {
-    import Vue from 'vue';
+declare module 'vue' {
+    import type { CompatVue } from '@vue/runtime-dom';
 
-    import { VTooltip } from 'v-tooltip';
-    import { Fragment } from 'vue-fragment';
-    import Notifications from 'vue-notification';
-    import SvgIcon from 'vue-svgicon';
-
-    Vue.use(Fragment.Plugin);
-    Vue.use(Notifications);
-    Vue.use(SvgIcon);
-    Vue.use(VTooltip);
-
+    const Vue: CompatVue;
     export default Vue;
+    // eslint-disable-next-line import/no-extraneous-dependencies
+    export * from '@vue/runtime-dom';
+    const { configureCompat } = Vue;
+    export { configureCompat };
 }
