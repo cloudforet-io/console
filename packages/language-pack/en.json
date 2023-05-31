@@ -2072,6 +2072,7 @@
 				"AUTO_UPGRADE": "Auto Upgrade",
 				"A_PROVIDER": "A Provider",
 				"BASE_INFO": "Base Information",
+				"CANCEL": "Cancel",
 				"COLLECTOR_HISTORY": "Collector History",
 				"COLLECTOR_OPTIONS": "Collector Options",
 				"CREATED": "Created",
@@ -2159,6 +2160,7 @@
 			}
 		}
 	},
+	"INVENTORY.COLLECTOR.DETAIL.EDIT": "",
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
@@ -3045,5 +3047,5 @@
 	},
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
 	"TAB_MEMBER": "Member",
-	"INVENTORY.COLLECTOR.DETAIL.EDIT": ""
+	"INVENTORY.COLLECTOR.DETAIL.CANCEL": ""
 }
