@@ -205,11 +205,11 @@ export default {
                 password: formState.password || '',
             };
             if (userPageState.visibleCreateModal) {
-                if (formState.activeTab === 'local' || formState.activeTab === 'apiOnly') {
+                if (formState.activeTab === 'local') {
                     data.backend = 'LOCAL';
-                    if (formState.activeTab === 'apiOnly') {
-                        data.user_type = 'API_USER';
-                    }
+                } else if (formState.activeTab === 'apiOnly') {
+                    data.backend = 'LOCAL';
+                    data.user_type = 'API_USER';
                 } else {
                     data.backend = 'EXTERNAL';
                 }
