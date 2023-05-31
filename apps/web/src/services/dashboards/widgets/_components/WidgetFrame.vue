@@ -175,7 +175,7 @@ const state = reactive({
             const startText = dayjs.utc(start).format('YY-MM-DD');
             return `${startText} ~ ${endText}`;
         }
-        if (start && endDayjs) {
+        if (start && !endDayjs) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
             if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
