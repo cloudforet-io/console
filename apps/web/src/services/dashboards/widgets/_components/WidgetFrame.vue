@@ -165,14 +165,15 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
-        const start = setBasicDateFormat(props.dateRange?.start);
+        const start = props.dateRange?.start;
         const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
         if (start && endDayjs) {
             let endText;
             const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
             if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
             else endText = endDayjs.endOf('month').format('YY-MM-DD');
-            return `${start} ~ ${endText}`;
+            const startText = dayjs.utc(start).format('YY-MM-DD');
+            return `${startText} ~ ${endText}`;
         }
         if (start && !endDayjs) {
             const today = dayjs();
@@ -211,7 +212,6 @@ const state = reactive({
     ]),
 });
 
-const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
