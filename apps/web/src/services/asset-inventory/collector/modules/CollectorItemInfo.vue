@@ -22,7 +22,32 @@
             <p class="info-label">
                 {{ props.label }}
             </p>
-            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}</span>
+            <div class="label-description">
+                <div v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
+                     class="scheduled"
+                >
+                    <p-i
+                        name="ic_alarm-clock"
+                        class="alarm-icon"
+                        height="1.25rem"
+                        width="1.25rem"
+                        color="inherit"
+                    />
+                    <!-- TODO: apply translation later because of license issue -->
+                    <p class="description">
+                        Scheduled
+                        <span class="emphasis">
+                            in
+                            <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
+                            <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
+                        </span>
+                    </p>
+                </div>
+                <!-- TODO: add in-progress state -->
+                <span v-else>
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                </span>
+            </div>
         </div>
         <div
             v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.JOBS"
@@ -80,13 +105,15 @@
                 </span>
             </div>
             <div class="to-history-detail">
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-                <p-i
-                    name="ic_chevron-right"
-                    width="0.75rem"
-                    height="0.75rem"
-                    color="inherit transparent"
-                />
+                <router-link :to="props.item.detailLink">
+                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+                    <p-i
+                        name="ic_chevron-right"
+                        width="0.75rem"
+                        height="0.75rem"
+                        color="inherit transparent"
+                    />
+                </router-link>
             </div>
         </div>
         <div
@@ -97,13 +124,13 @@
                 {{ props.label }}
             </p>
             <p-toggle-button
-                :value="state.toggleActive"
+                :value="state.collectorState === COLLECTOR_STATE.ENABLED"
                 :label="state.toggleStatus"
-                :class="state.toggleActive ? 'toggle-active' : ''"
+                :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
                 @change-toggle="handleChangeToggle"
             />
             <p-button style-type="transparent">
-                <p-i v-if="state.toggleActive"
+                <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
                      name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
@@ -117,21 +144,26 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ state.toggleActive ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ state.collectorState === COLLECTOR_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </p-button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PI, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
 
+import { store } from '@/store';
+
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
-import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/type';
+import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
+import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
     label: string;
@@ -145,16 +177,42 @@ const props = withDefaults(defineProps<Props>(), {
     type: '',
 });
 
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
+
+const { i18nDayjs } = useI18nDayjs();
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
+
 const state = reactive({
-    toggleActive: false,
-    toggleStatus: 'OFF',
+    current: computed(() => i18nDayjs.value.tz(i18nDayjs.value(), storeState.timezone)),
+    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
+    collectorState: computed(() => state.schedule?.collector_info.state),
+    toggleStatus: computed(() => (state.collectorState === COLLECTOR_STATE.ENABLED ? 'ON' : 'OFF')),
+    nextSchedule: computed(() => {
+        if (state.schedule) {
+            const hours = state.schedule.schedule?.hours ?? [];
+            const sortedHours = hours.sort((a, b) => a - b);
+            const currentHour = state.current.hour();
+            const closestHour = sortedHours.find((num) => num > currentHour);
+
+            if (closestHour) {
+                return state.current.set('h', closestHour).set('m', 0);
+            }
+            return state.current.set('h', sortedHours[0] ?? 0).set('m', 0).add(1, 'd');
+        }
+        return null;
+    }),
+    diffSchedule: computed(() => {
+        const timeDiff = state.nextSchedule.diff(state.current, 'm');
+        return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
+    }),
 });
 
 /* Components */
-const handleChangeToggle = () => {
-    state.toggleActive = !state.toggleActive;
-    state.toggleStatus = state.toggleActive ? 'ON' : 'OFF';
-};
+const handleChangeToggle = () => {};
 </script>
 
 <style scoped lang="postcss">
@@ -165,6 +223,19 @@ const handleChangeToggle = () => {
 
         .info-label {
             @apply text-label-sm text-gray-500;
+        }
+
+        .label-description {
+            @apply text-label-md text-gray-700;
+
+            .scheduled {
+                @apply flex items-center;
+                gap: 0.25rem;
+
+                .emphasis {
+                    @apply font-bold text-gray-900 not-italic;
+                }
+            }
         }
 
         .plugin {

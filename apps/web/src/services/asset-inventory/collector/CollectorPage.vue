@@ -33,6 +33,7 @@
                 <collector-contents
                     :key-item-sets="handlerState.keyItemSets"
                     @change-toolbox="handleChangeToolbox"
+                    @export-excel="handleExportExcel"
                 />
             </div>
             <template #no-data>
@@ -54,6 +55,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -109,6 +112,24 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(collectorPageState.sortBy, true);
 
 /* Components */
+const handleSelectedProvider = (providerName: string) => {
+    collectorPageStore.setSelectedProvider(providerName);
+    refreshCollectorList();
+};
+const handleChangeToolbox = (options) => {
+    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
+    refreshCollectorList();
+};
+const handleExportExcel = async (excelFields) => {
+    await store.dispatch('file/downloadExcel', {
+        url: '/inventory/collector/list',
+        param: { query: collectorApiQueryHelper.data },
+        fields: excelFields,
+        file_name_prefix: FILE_NAME_PREFIX.collector,
+    });
+};
+
+/* API */
 const initCollectorList = async () => {
     state.initLoading = true;
     try {
@@ -129,14 +150,6 @@ const refreshCollectorList = async () => {
     } catch (e) {
         ErrorHandler.handleError(e);
     }
-};
-const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
-    refreshCollectorList();
-};
-const handleChangeToolbox = (options) => {
-    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
-    refreshCollectorList();
 };
 
 /* Unmounted */
