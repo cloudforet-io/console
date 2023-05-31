@@ -14,10 +14,6 @@ module.exports = {
                         group: 'builtin',
                     },
                     {
-                        pattern: '@vue/test-utils',
-                        group: 'builtin',
-                    },
-                    {
                         pattern: 'vue/types/**',
                         group: 'builtin',
                     },
@@ -32,7 +28,6 @@ module.exports = {
                         position: 'after',
                     },
                 ],
-                pathGroupsExcludedImportTypes: ['@vue/test-utils'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,

@@ -47,9 +47,6 @@
     "eslint": "eslint --quiet --ext .js,.vue,.ts ./src/",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
-    "test": "vitest run",
-    "test:watch": "vitest watch --ui",
-    "test:coverage": "vitest run --coverage",
     "icon": "node ./cli/svg-gen.js -s ./src/foundation/icons/icon-assets -t src/foundation/icons/p-icons"
   },
   "dependencies": {
@@ -111,7 +108,6 @@
     "@types/uuid": "^8.3.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitest/ui": "^0.26.3",
-    "@vue/test-utils": "^1.3.3",
     "concurrently": "^7.6.0",
     "eslint-config-custom": "*",
     "postcss-config-custom": "*",
