@@ -144,5 +144,6 @@ export interface UserManagementData {
 	tags: Tags;
 	password: string;
 	reset_password?: boolean;
-	backend?: string
+	backend?: string;
+	user_type?: string;
 }
