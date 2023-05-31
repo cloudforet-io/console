@@ -10,7 +10,7 @@
                 <p class="step">
                     Step {{ state.step }}<span>/4</span>
                 </p>
-                <!--                song-lang-->
+                <!--                TODO: translation-->
                 <p-heading :title="$t('Create New Collector')" />
                 <p class="description">
                     {{ state.descriptionByStep[state.step] }}
@@ -29,7 +29,7 @@
                                     @update:currentStep="handleChangeStep"
             />
         </div>
-        <!--        song-lang-->
+        <!--        TODO: translation-->
         <delete-modal :header-title="$t('Are you sure you want to quit?')"
                       :visible.sync="state.deleteModalVisible"
                       :contents="$t('You cannot undo this action.')"
@@ -64,7 +64,7 @@ const state = reactive({
     step: 1,
     deleteModalVisible: false,
     descriptionByStep: computed(() => ({
-        // song-lang
+        // TODO: translation
         1: i18n.t('Select a plugin first.'),
         2: i18n.t('Enter Basic Information.'),
         3: i18n.t('Set Advanced Options.'),

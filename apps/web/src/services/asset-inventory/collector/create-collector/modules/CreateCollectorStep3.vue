@@ -10,7 +10,7 @@
                            class="step-left-text-button"
                            @click="handleClickOtherPluginButton"
             >
-                <!--                song-lang-->
+                <!--                TODO: translation-->
                 {{ $t('Select Other Plugin') }}
             </p-text-button>
             <div class="right-area">
@@ -19,19 +19,19 @@
                           size="lg"
                           @click="handleClickPrevButton"
                 >
-                    <!--                song-lang-->
+                    <!--                TODO: translation-->
                     {{ $t('Previous') }}
                 </p-button>
                 <p-button :disabled="!state.isAttachedServiceAccountValid"
                           size="lg"
                           @click="handleClickNextButton"
                 >
-                    <!--                song-lang-->
+                    <!--                TODO: translation-->
                     {{ $t('Continue') }}
                 </p-button>
             </div>
         </div>
-        <!--        song-lang-->
+        <!--        TODO: translation-->
         <delete-modal :header-title="$t('Are you sure you want to start from selecting plugin?')"
                       :visible.sync="state.deleteModalVisible"
                       :contents="$t('You cannot undo this action.')"
