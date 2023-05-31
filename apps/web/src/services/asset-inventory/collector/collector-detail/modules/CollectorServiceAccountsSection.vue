@@ -45,7 +45,7 @@ interface SecretModel {
     created_at: string;
 }
 const props = defineProps<{
-    providers: string[]|null
+    providers?: string[]|null
 }>();
 
 const fields: DefinitionField[] = [
