@@ -8,26 +8,33 @@
                        :valid-text="$t('Good')"
                        :required="true"
         >
-            <template #defaults>
-                <p-radio-group>
-                    <p-radio v-for="(item) in attachedServiceAccountList"
-                             :key="`${item.value}`"
-                             :value="item.value"
-                             :selected="state.selectedAttachedServiceAccountType"
-                             @change="handleChangeAttachedServiceAccountType"
-                    >
-                        {{ item.label }}
-                    </p-radio>
-                </p-radio-group>
-                <p-filterable-dropdown v-if="state.selectedAttachedServiceAccountType !== 'all'"
-                                       class="specific-service-account-dropdown"
+            <p-radio-group class="attached-service-account-radio-group">
+                <p-radio v-for="(item) in attachedServiceAccountList"
+                         :key="`${item.name}`"
+                         :value="item.name"
+                         :selected="state.selectedAttachedServiceAccountType"
+                         @change="handleChangeAttachedServiceAccountType"
+                >
+                    {{ item.label }}
+                </p-radio>
+            </p-radio-group>
+            <p-select-dropdown class="attached-service-account-dropdown"
+                               :selected="state.selectedAttachedServiceAccountType"
+                               :items="attachedServiceAccountList"
+                               @update:selected="handleChangeAttachedServiceAccountType"
+            />
+            <div v-if="state.selectedAttachedServiceAccountType !== 'all'">
+                <p-field-title class="specific-service-account-dropdown-label"
+                               :label="$t('Specific Service Account')"
+                />
+                <p-filterable-dropdown class="specific-service-account-dropdown"
                                        :selected="selectedAttachedServiceAccount"
                                        multi-selectable
                                        :menu="state.serviceAccountMenu"
                                        appearance-type="badge"
                                        @update:selected="setForm('selectedAttachedServiceAccount', $event)"
                 />
-            </template>
+            </div>
         </p-field-group>
     </div>
 </template>
@@ -37,7 +44,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown,
+    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -60,11 +67,11 @@ const collectorFormStore = useCollectorFormStore();
 const attachedServiceAccountList = [
     {
         label: 'All', // TODO: translation
-        value: 'all',
+        name: 'all',
     },
     {
         label: 'Specific Service Account', // TODO: translation
-        value: 'specific',
+        name: 'specific',
     },
 ];
 
@@ -132,10 +139,42 @@ watch(() => isAllValid.value, (value) => {
 
 <style lang="postcss" scoped>
 .attached-service-account-form {
+    .attached-service-account-radio-group {
+        display: block;
+    }
+    .attached-service-account-dropdown {
+        width: 100%;
+        display: none;
+    }
 
     .specific-service-account-dropdown {
-        margin-top: 16px;
+        margin-top: 1rem;
         width: 100%;
+    }
+
+    .specific-service-account-dropdown-label {
+        display: none;
+    }
+}
+
+@screen mobile {
+    .attached-service-account-form {
+        .attached-service-account-radio-group {
+            display: none;
+        }
+
+        .attached-service-account-dropdown {
+            display: block;
+        }
+
+        .specific-service-account-dropdown {
+            margin-top: 0.3125rem;
+            width: 100%;
+        }
+        .specific-service-account-dropdown-label {
+            display: block;
+            margin-top: 1rem;
+        }
     }
 }
 </style>
