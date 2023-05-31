@@ -205,7 +205,14 @@ export default {
                 password: formState.password || '',
             };
             if (userPageState.visibleCreateModal) {
-                data.backend = formState.activeTab === 'local' ? 'LOCAL' : 'EXTERNAL';
+                if (formState.activeTab === 'local') {
+                    data.backend = 'LOCAL';
+                } else if (formState.activeTab === 'apiOnly') {
+                    data.backend = 'LOCAL';
+                    data.user_type = 'API_USER';
+                } else {
+                    data.backend = 'EXTERNAL';
+                }
             }
             if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
                 data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
