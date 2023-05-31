@@ -1,9 +1,9 @@
-import type { PluginObject } from 'vue';
+import type { Plugin } from 'vue';
 
 import type { MirinaeOptions } from './install';
 import { MirinaeInstaller } from './install';
 
-const mirinaeOptions: PluginObject<MirinaeOptions> = {
+const mirinaeOptions: Plugin<MirinaeOptions> = {
     install: MirinaeInstaller.install,
 };
 
