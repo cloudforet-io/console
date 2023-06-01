@@ -18,25 +18,7 @@
             <collector-version-form class="version-row"
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
-            <!--            TODO: translation-->
-            <p-field-group :label="$t('Tag')">
-                <template #label-extra>
-                    <div class="mt-1">
-                        <!-- TODO: translation -->
-                        <p class="tag-description">
-                            {{ $t("Set Account's tag.") }}
-                        </p>
-                        <p class="tag-description">
-                            {{ $t("The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.") }}
-                        </p>
-                    </div>
-                </template>
-                <tags-input-group :tags="state.tags"
-                                  show-validation
-                                  :is-valid.sync="state.isTagsValid"
-                                  @update-tags="handleUpdateTags"
-                />
-            </p-field-group>
+            <collector-tag-form @updateIsTagsValid="handleChangeIsTagsValid" />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
@@ -87,11 +69,10 @@ import { i18n } from '@/translations';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
@@ -107,13 +88,12 @@ const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
     loading: true,
-    tags: {},
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     isTagsValid: true,
     isVersionValid: false,
     deleteModalVisible: false,
-    isAllFormValid: computed(() => isAllValid.value && state.isVersionValid),
+    isAllFormValid: computed(() => isAllValid.value && state.isVersionValid && state.isTagsValid),
 });
 
 const {
@@ -140,9 +120,6 @@ const {
 
 
 /* event */
-const handleUpdateTags = (tags: Tag) => {
-    state.tags = tags;
-};
 
 const handleClickPrevButton = () => {
     state.deleteModalVisible = true;
@@ -158,6 +135,10 @@ const handleChangeIsVersionValid = (isValid: boolean) => {
     state.isVersionValid = isValid;
 };
 
+const handleChangeIsTagsValid = (isValid: boolean) => {
+    state.isTagsValid = isValid;
+};
+
 (async () => {
     await store.dispatch('reference/collector/load', { force: true });
 })();
@@ -168,10 +149,6 @@ const handleChangeIsVersionValid = (isValid: boolean) => {
 
     .input-form {
         margin-top: 2rem;
-        .tag-description {
-            @apply text-label-md text-gray-900;
-            font-weight: 400;
-        }
     }
 
     .step-footer {
