@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="legend-wrapper">
-                <div v-for="status in Object.values(SEVERITY_STATUS)"
+                <div v-for="status in Object.values(SEVERITY_STATUS_MAP)"
                      :key="`status-${status.label}`"
                      class="legend"
                 >
@@ -39,11 +39,10 @@ import {
 
 import dayjs from 'dayjs';
 
-import { green, red } from '@/styles/colors';
-
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -52,13 +51,6 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 
 
 const DATE_FORMAT = 'YYYY-MM';
-const SEVERITY_STATUS = {
-    CRITICAL: { label: 'Critical', color: red[400] },
-    HIGH: { label: 'High', color: red[300] },
-    MEDIUM: { label: 'Medium', color: red[200] },
-    LOW: { label: 'Low', color: red[100] },
-    PASS: { label: 'Pass', color: green[500] },
-};
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState(props)),
@@ -66,7 +58,7 @@ const state = reactive({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    sampleData: computed(() => [...Array(20)].map(() => Object.values(SEVERITY_STATUS)[Math.floor(Math.random() * 5)])),
+    sampleData: computed(() => [...Array(20)].map(() => Object.values(SEVERITY_STATUS_MAP)[Math.floor(Math.random() * 5)])),
     boxWidth: computed<number>(() => {
         if (!props.width) return 112;
         const widgetPadding = 24;
