@@ -115,8 +115,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import CollectorPluginsToolbox from '@/services/asset-inventory/collector/collector-plugins/modules/CollectorPluginsToolbox.vue';
-import PluginFilter from '@/services/asset-inventory/collector/collector-plugins/modules/PluginFilter.vue';
+import CollectorPluginsToolbox from '@/services/asset-inventory/collector/collector-plugins-old/modules/CollectorPluginsToolbox.vue';
+import PluginFilter from '@/services/asset-inventory/collector/collector-plugins-old/modules/PluginFilter.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 enum PLUGIN_STATE {

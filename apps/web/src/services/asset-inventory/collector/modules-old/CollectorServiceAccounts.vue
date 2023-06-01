@@ -81,7 +81,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const CollectDataModal = () => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue');
+const CollectDataModal = () => import('@/services/asset-inventory/collector/modules-old/CollectDataModal.vue');
 
 interface SecretModel {
     secret_id: string;
