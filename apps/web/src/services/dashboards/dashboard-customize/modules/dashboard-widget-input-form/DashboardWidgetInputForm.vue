@@ -37,7 +37,7 @@
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
-                                         :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || fixedProperties.includes(propertyName)"
+                                         :disabled="isInheritDisabled(propertyName)"
                                          @change-toggle="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
@@ -211,6 +211,7 @@ export default defineComponent<Props>({
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
         };
+        const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || state.fixedProperties.includes(propertyName);
 
         const getFormDataFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
             const { widget_options, inherit_options } = widgetInfo;
@@ -408,6 +409,7 @@ export default defineComponent<Props>({
             title,
             updateTitle,
             isTitleInvalid,
+            isInheritDisabled,
             titleInvalidText,
             /* reference store */
             referenceStoreState,
