@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-2">
-        <collect-plugin-contents :plugin="collectorFormState.originCollector" />
+        <collect-plugin-contents :plugin="collectorFormState.pluginInfo" />
         <div class="input-form">
             <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')"
                            :invalid-text="invalidTexts.name"
