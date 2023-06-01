@@ -117,7 +117,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import EditScheduleModal from '@/services/asset-inventory/collector/modules/EditScheduleModal.vue';
+import EditScheduleModal from '@/services/asset-inventory/collector/modules-old/EditScheduleModal.vue';
 
 export default {
     name: 'CollectorSchedules',

@@ -252,11 +252,11 @@ import type { CollectorModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const TagsPanel = (): Component => import('@/common/modules/tags/tags-panel/TagsPanel.vue') as Component;
-const CollectorUpdateModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectorUpdateModal.vue') as Component;
-const CollectDataModal = (): Component => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue') as Component;
-const CollectorDetails = (): Component => import('@/services/asset-inventory/collector/modules/CollectorDetails.vue') as Component;
-const CollectorServiceAccounts = (): Component => import('@/services/asset-inventory/collector/modules/CollectorServiceAccounts.vue') as Component;
-const CollectorSchedules = (): Component => import('@/services/asset-inventory/collector/modules/CollectorSchedules.vue') as Component;
+const CollectorUpdateModal = (): Component => import('@/services/asset-inventory/collector/modules-old/CollectorUpdateModal.vue') as Component;
+const CollectDataModal = (): Component => import('@/services/asset-inventory/collector/modules-old/CollectDataModal.vue') as Component;
+const CollectorDetails = (): Component => import('@/services/asset-inventory/collector/modules-old/CollectorDetails.vue') as Component;
+const CollectorServiceAccounts = (): Component => import('@/services/asset-inventory/collector/modules-old/CollectorServiceAccounts.vue') as Component;
+const CollectorSchedules = (): Component => import('@/services/asset-inventory/collector/modules-old/CollectorSchedules.vue') as Component;
 
 export default {
     name: 'CollectorPage',
