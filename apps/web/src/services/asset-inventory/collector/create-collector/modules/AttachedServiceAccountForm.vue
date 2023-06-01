@@ -8,6 +8,7 @@
                        :valid-text="$t('Good')"
                        :required="true"
         >
+            <!-- NOTE: screen desktop size-->
             <p-radio-group class="attached-service-account-radio-group">
                 <p-radio v-for="(item) in attachedServiceAccountList"
                          :key="`${item.name}`"
@@ -18,6 +19,7 @@
                     {{ item.label }}
                 </p-radio>
             </p-radio-group>
+            <!-- NOTE: screen mobile size-->
             <p-select-dropdown class="attached-service-account-dropdown"
                                :selected="state.selectedAttachedServiceAccountType"
                                :items="attachedServiceAccountList"
@@ -46,6 +48,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -76,7 +79,7 @@ const attachedServiceAccountList = [
 ];
 
 const state = reactive({
-    selectedAttachedServiceAccountType: 'all',
+    selectedAttachedServiceAccountType: 'all' as 'all'|'specific',
     serviceAccountMenu: [{ // TODO: need to change to real data
         name: 'f5d14ee6-35b4-409c-973b-ebb0420548b5',
         label: 'Mouse',
@@ -91,7 +94,7 @@ const state = reactive({
         name: '8845d702-4f89-478e-9227-d90b33c42a60',
         label: 'Lempira',
         type: 'item',
-    }],
+    }] as MenuItem[],
     isAttachedServiceAccountValid: computed<boolean>(() => {
         if (invalidState.selectedAttachedServiceAccount === undefined || state.selectedAttachedServiceAccountType === 'all') {
             return false;

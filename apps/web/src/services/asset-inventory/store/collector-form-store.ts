@@ -20,7 +20,7 @@ export const useCollectorFormStore = defineStore<string, CollectorFormState, Col
             this.originCollector = collector;
         },
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount) {
-            if (!serviceAccount || !serviceAccount.length) this.attachedServiceAccount = null;
+            if (!serviceAccount?.length) this.attachedServiceAccount = null;
             else this.attachedServiceAccount = serviceAccount;
         },
     },
