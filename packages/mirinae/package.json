@@ -113,7 +113,7 @@
     "postcss-config-custom": "*",
     "resolve-url-loader": "^3.1.5",
     "rollup-plugin-copy": "^3.4.0",
-    "vue-router": "^3.6.5",
+    "vue-router": "^4.2.2",
     "ts-loader": "^8.4.0",
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",

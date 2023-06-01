@@ -63,9 +63,8 @@ import {
     computed,
     defineComponent, reactive, toRefs,
 } from 'vue';
-
 import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
@@ -78,7 +77,7 @@ export interface ContextMenuItemProps {
     name?: string | number;
     label?: number | TranslateResult;
     link?: string;
-    to?: Location;
+    to?: RouteLocation;
     disabled?: boolean;
     selected?: boolean;
     selectMarker?: SelectMarker;
