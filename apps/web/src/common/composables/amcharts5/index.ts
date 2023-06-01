@@ -18,7 +18,7 @@ import {
 } from '@/common/composables/amcharts5/concepts-helper';
 import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
-    createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
+    createDonutChart, createPieChart, createPieSeries, setPieLabelText, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
 import { createTreeMapSeries, setTreemapTooltipText, setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
@@ -164,6 +164,7 @@ export const useAmcharts5 = (
         setXYSharedTooltipTextByUsage,
         setXYSingleTooltipText,
         setPieTooltipText,
+        setPieLabelText,
         setTreemapTooltipText,
         setTreemapLabelText,
         setChartColors,
