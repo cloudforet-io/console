@@ -12,7 +12,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     title: 'Trend of Pass and Fail Findings',
     labels: ['Asset'],
     description: {
-        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
+        translation_id: 'DASHBOARDS.WIDGET.TREND_OF_PASS_AND_FAIL_FINDINGS.DESC',
         preview_image: 'widget-img_trendOfPassAndFailFindings--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
