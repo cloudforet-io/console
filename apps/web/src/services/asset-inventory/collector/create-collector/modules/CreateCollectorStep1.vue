@@ -62,6 +62,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const emit = defineEmits([
@@ -73,7 +74,7 @@ const collectorFormStore = useCollectorFormStore();
 
 const state = reactive({
     searchValue: '',
-    pluginList: [] as any[],
+    pluginList: [] as CollectorPluginModel[],
     loading: false,
 });
 
@@ -114,9 +115,9 @@ const getPlugins = async () => {
 const handleSearch = (value) => {
     console.log('value', value);
 };
-const handleClickNextStep = (item) => {
+const handleClickNextStep = (item: CollectorPluginModel) => {
     emit('update:currentStep', 2);
-    collectorFormStore.setOriginCollector(item);
+    collectorFormStore.setPluginInfo(item);
 };
 
 (() => {

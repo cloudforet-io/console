@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
 
+import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+
 type AttachedServiceAccount = string[]|null; // TODO: need to check type
 
 interface CollectorFormState {
-    originCollector: any; // TODO: CollectorPlugin Model
+    originCollector: CollectorModel|null;
+    pluginInfo: CollectorPluginModel|null;
     attachedServiceAccount: AttachedServiceAccount;
 }
 
@@ -13,11 +16,15 @@ type CollectorFormAction = any;
 export const useCollectorFormStore = defineStore<string, CollectorFormState, CollectorFormGetter, CollectorFormAction>('collector-form', {
     state: () => ({
         originCollector: null,
+        pluginInfo: null,
         attachedServiceAccount: null,
     }),
     actions: {
-        setOriginCollector(collector: any) {
+        setOriginCollector(collector: CollectorModel) {
             this.originCollector = collector;
+        },
+        setPluginInfo(pluginInfo: CollectorPluginModel) {
+            this.pluginInfo = pluginInfo;
         },
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount) {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
