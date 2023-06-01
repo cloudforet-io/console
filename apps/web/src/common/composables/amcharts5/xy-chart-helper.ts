@@ -99,6 +99,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
     });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
+        min: 0,
     }));
     return { chart, xAxis, yAxis };
 };
