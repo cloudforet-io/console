@@ -35,4 +35,9 @@ export const SEVERITY_STATUS_MAP = {
     MEDIUM: { name: 'medium', label: 'Medium', color: red[200] },
     LOW: { name: 'low', label: 'Low', color: red[100] },
     PASS: { name: 'pass', label: 'Pass', color: green[500] },
-};
+} as const;
+
+export const COMPLIANCE_STATUS_MAP = {
+    PASS: { name: 'pass', label: 'Pass', color: green[500] },
+    FAIL: { name: 'fail', label: 'Fail', color: red[400] },
+} as const;

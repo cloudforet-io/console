@@ -4,7 +4,7 @@ import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
-    // ['complianceCheckStatus'],
+    ['complianceCheckStatus'],
     ['totalFailureAndSeverity'],
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
@@ -44,7 +44,7 @@ export const complianceOverviewDashboard: DashboardConfig = {
             enabled: true,
         },
         currency: {
-            enabled: true,
+            enabled: false,
         },
         refresh_interval_option: '5m',
     },
