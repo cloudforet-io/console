@@ -7,14 +7,13 @@
         <p-toggle-button :value="state.isAutoSchedule"
                          @change-toggle="handleChangeToggle"
         />
-        <i18n v-if="!props.editHours"
+        <i18n v-if="!props.editMode"
               path="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
               tag="p"
               class="collect-data-desc"
         >
             <template #times>
-                <!-- TODO: change times with real data -->
-                <span class="times">00:00, 04:00, 08:00, 12:00, 16:00, 20:00</span>
+                <span class="times">{{ state.timezoneAppliedHours.map(hour => `${hour}:00`).join(', ') }}</span>
             </template>
         </i18n>
         <p-field-group v-else
@@ -44,7 +43,7 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive, computed,
+    defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
 import {
@@ -56,7 +55,7 @@ import { range, size } from 'lodash';
 import { store } from '@/store';
 
 const props = defineProps<{
-    editHours: boolean;
+    editMode?: boolean;
     utcHours?: string[];
 }>();
 
@@ -69,14 +68,14 @@ const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     isAutoSchedule: true,
     isAllHoursSelected: computed<boolean>(() => state.selectedUtcHours.length === size(hoursMatrix)),
-    selectedUtcHours: props.utcHours ?? [] as string[],
+    selectedUtcHours: [] as string[],
     timezoneAppliedHours: computed<string[]>(() => {
         if (state.timezone === 'UTC') return state.selectedUtcHours;
         // set an hour as utc and get the hour in timezone
         return state.selectedUtcHours.map((utcHour) => dayjs.utc()
             .hour(Number(utcHour)).tz(state.timezone)
             .get('hour')
-            .toString());
+            .toString()).sort((a, b) => Number(a) - Number(b));
     }),
 });
 
@@ -118,6 +117,15 @@ const handleClickAllHours = () => {
 
     updateSelectedHoursAndEmit();
 };
+
+// reset selected hours and selected hours set every time editMode is changed
+watch(() => props.editMode, () => {
+    selectedUtcHoursSet.clear();
+    props.utcHours?.forEach((hour) => {
+        selectedUtcHoursSet.add(hour);
+    });
+    state.selectedUtcHours = [...(props.utcHours ?? [])];
+}, { immediate: true });
 
 </script>
 
