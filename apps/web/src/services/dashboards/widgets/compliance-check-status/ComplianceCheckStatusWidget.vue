@@ -101,6 +101,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
+// TODO: replace with real data
 interface Data {
     budget_type: string;
     budget_count: number;
