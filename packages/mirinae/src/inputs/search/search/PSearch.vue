@@ -60,14 +60,15 @@
 </template>
 
 <script lang="ts">
-import type { PropType, DirectiveFunction } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, toRef, watch,
-} from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
+import {
+    computed, defineComponent, reactive, toRefs, toRef, watch,
+} from 'vue';
+import type { PropType, DirectiveFunction } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { TranslateResult } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -75,7 +76,6 @@ import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
-import { I18nConnector } from '@/translations';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
@@ -155,12 +155,13 @@ export default defineComponent<SearchProps>({
         },
     },
     setup(props, { emit, listeners }) {
+        const { t } = useI18n();
         const state = reactive({
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             inputRef: null as null|HTMLElement,
             handlerLoading: true,
             placeholderText: computed<TranslateResult>(() => {
-                if (props.placeholder === undefined) return I18nConnector.i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
+                if (props.placeholder === undefined) return t('COMPONENT.SEARCH.PLACEHOLDER');
                 return props.placeholder;
             }),
             filteredMenu: [] as MenuItem[],
