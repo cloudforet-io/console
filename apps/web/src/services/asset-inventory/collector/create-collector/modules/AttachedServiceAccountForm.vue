@@ -125,7 +125,7 @@ const {
     },
 });
 
-const handleChangeAttachedServiceAccountType = (selectedValue: string) => {
+const handleChangeAttachedServiceAccountType = (selectedValue: 'all'|'specific') => {
     state.selectedAttachedServiceAccountType = selectedValue;
     if (selectedValue === 'all') {
         collectorFormStore.setAttachedServiceAccount(null);

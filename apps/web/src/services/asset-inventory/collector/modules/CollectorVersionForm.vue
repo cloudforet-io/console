@@ -67,7 +67,7 @@ const {
 });
 
 const state = reactive({
-    pluginId: computed(() => collectorFormState.originCollector.plugin_id),
+    pluginId: computed<string>(() => collectorFormState.originCollector.plugin_id),
     isAutoUpgrade: false,
     versions: [] as any[], // FIXME: type
 });
