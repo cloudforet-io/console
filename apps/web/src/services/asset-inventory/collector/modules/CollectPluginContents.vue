@@ -1,19 +1,19 @@
 <template>
     <div class="plugin-data-contents">
-        <p-lazy-img :src="props.plugin.icon"
+        <p-lazy-img :src="state.icon"
                     class="plugin-icon"
                     width="2.5rem"
                     height="2.5rem"
         />
         <div class="contents">
             <p class="plugin-name">
-                {{ props.plugin.name }} <span v-if="isBeta(props.plugin)"
-                                              class="beta"
+                {{ state.name }} <span v-if="state.isBeta"
+                                       class="beta"
                 >{{ $t('beta') }}</span>
             </p>
             <div class="plugin-description">
                 <span class="plugin-description-text">
-                    {{ props.plugin.tags.description }}
+                    {{ state.description }}
                 </span><p-anchor size="sm"
                                  :highlight="true"
                 >
@@ -21,10 +21,8 @@
                     {{ $t('learn more') }}
                 </p-anchor>
             </div>
-            <div v-if="props.plugin.labels"
-                 class="label-container"
-            >
-                <p-label v-for="(label, idx) in props.plugin.labels"
+            <div class="label-container">
+                <p-label v-for="(label, idx) in state.labels"
                          :key="`${label}-${idx}`"
                          class="mb-1"
                          :text="label"
@@ -35,21 +33,29 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { defineProps, reactive, computed } from 'vue';
 
 import {
     PAnchor, PLazyImg, PLabel,
 } from '@spaceone/design-system';
-import { get } from 'lodash';
+
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 
 // TODO: Add plugin data type
 interface Props {
-    plugin: any;
+    plugin?: CollectorPluginModel|null;
 }
 
 const props = defineProps<Props>();
 
-const isBeta = (item) => get(item, 'tags.beta', '');
+const state = reactive({
+    icon: computed(() => props.plugin?.tags.icon ?? ''),
+    name: computed(() => props.plugin?.name ?? ''),
+    description: computed(() => props.plugin?.tags.description ?? ''),
+    labels: computed<string[]>(() => props.plugin?.labels ?? []),
+    isBeta: computed(() => !!props.plugin?.tags.beta ?? false),
+});
+
 
 </script>
 
