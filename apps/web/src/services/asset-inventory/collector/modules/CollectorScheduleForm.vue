@@ -98,13 +98,14 @@ const handleChangeToggle = () => {
 };
 
 const handleClickHour = (hour: string) => {
-    let utcHour;
+    let utcHour: string;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
         // set an hour as timezone and get the hour in utc
         utcHour = dayjs().tz(state.timezone)
             .hour(Number(hour)).utc()
-            .get('hour');
+            .get('hour')
+            .toString();
     }
     if (selectedUtcHoursSet.has(utcHour)) {
         selectedUtcHoursSet.delete(utcHour);
