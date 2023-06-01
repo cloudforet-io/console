@@ -34,7 +34,7 @@
                                        multi-selectable
                                        :menu="state.serviceAccountMenu"
                                        appearance-type="badge"
-                                       @update:selected="setForm('selectedAttachedServiceAccount', $event)"
+                                       @update:selected="handleSelectAttachedServiceAccount"
                 />
             </div>
         </p-field-group>
@@ -111,7 +111,7 @@ const {
     invalidState,
     invalidTexts,
     isAllValid,
-} = useFormValidator({
+} = useFormValidator<{selectedAttachedServiceAccount : string[]|null}>({
     selectedAttachedServiceAccount: [],
 }, {
     selectedAttachedServiceAccount(value: string[]|null) {
@@ -130,8 +130,13 @@ const handleChangeAttachedServiceAccountType = (selectedValue: 'all'|'specific')
     if (selectedValue === 'all') {
         collectorFormStore.setAttachedServiceAccount(null);
     } else {
-        collectorFormStore.setAttachedServiceAccount(selectedAttachedServiceAccount);
+        collectorFormStore.setAttachedServiceAccount(selectedAttachedServiceAccount.value);
     }
+};
+
+const handleSelectAttachedServiceAccount = (selectedValue: string[]) => {
+    setForm('selectedAttachedServiceAccount', selectedValue);
+    collectorFormStore.setAttachedServiceAccount(selectedValue);
 };
 
 watch(() => isAllValid.value, (value) => {
