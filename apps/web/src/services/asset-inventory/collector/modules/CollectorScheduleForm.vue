@@ -152,6 +152,10 @@ watch(() => props.editMode, () => {
     grid-template-columns: repeat(12, 2rem);
     grid-template-rows: auto;
 
+    @screen mobile {
+        grid-template-columns: repeat(4, 2rem);
+    }
+
     .time-block {
         @apply bg-white border border-gray-300 rounded-xs;
         display: inline-block;
