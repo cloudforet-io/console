@@ -116,7 +116,7 @@ export interface WidgetState<Data = any> {
     widgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     title: ComputedRef<string|undefined>;
     options: ComputedRef<WidgetOptions>;
-    currency: ComputedRef<Currency>;
+    currency: ComputedRef<Currency|undefined>;
     groupBy: ComputedRef<GroupBy | string | undefined>;
     granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
@@ -145,7 +145,10 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
             state.optionsErrorMap,
         )),
-        currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
+        currency: computed(() => {
+            if (state.widgetConfig.labels?.includes('Cost')) return state.settings?.currency?.value ?? CURRENCY.USD;
+            return undefined;
+        }),
         groupBy: computed(() => {
             if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_group_by;
             if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_group_by;
