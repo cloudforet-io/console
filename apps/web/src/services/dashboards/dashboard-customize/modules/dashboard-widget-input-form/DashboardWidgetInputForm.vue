@@ -37,7 +37,7 @@
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
-                                         :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled"
+                                         :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || fixedProperties.includes(propertyName)"
                                          @change-toggle="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
