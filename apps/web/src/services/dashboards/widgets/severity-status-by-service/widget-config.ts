@@ -14,7 +14,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
     labels: ['Asset'],
     description: {
         // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
-        // preview_image: 'widget-img_monthlyCost--thumbnail.png',
+        preview_image: 'widget-img_severityStatusByService--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
     theme: {

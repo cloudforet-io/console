@@ -96,10 +96,10 @@ const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     // chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     chartData: computed(() => ([
-        { date: '2022-08', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2022-09', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2022-10', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2022-11', pass: random(300, 500), fail: random(0, 100) },
+        { date: '2023-02', pass: random(300, 500), fail: random(0, 100) },
+        { date: '2023-03', pass: random(300, 500), fail: random(0, 100) },
+        { date: '2023-04', pass: random(300, 500), fail: random(0, 100) },
+        { date: '2023-05', pass: random(300, 500), fail: random(0, 100) },
     ])),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
@@ -152,6 +152,7 @@ const drawChart = (chartData: XYChartData[]) => {
             valueYField: k,
             stroke: v.color,
             fill: v.color,
+            stacked: true,
         };
         const series = chartHelper.createXYLineSeries(chart, seriesSettings);
         chart.series.push(series);

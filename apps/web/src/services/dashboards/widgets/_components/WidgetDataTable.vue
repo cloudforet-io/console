@@ -159,7 +159,7 @@
             >
                 <template #default>
                     <span class="this-page">{{ state.proxyThisPage }}</span>
-                    <span v-if="showNextPage"> / ...</span>
+                    <span v-if="props.showNextPage"> / ...</span>
                 </template>
             </p-text-pagination>
         </div>
@@ -167,8 +167,6 @@
 </template>
 
 <script setup lang="ts">
-
-
 import {
     defineProps, reactive, ref,
 } from 'vue';
