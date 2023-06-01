@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { ComputedRef } from 'vue';
 import {
     defineProps, defineEmits, reactive, computed,
 } from 'vue';
@@ -66,13 +65,7 @@ const emits = defineEmits<{(event: 'update:hours', value: string[]): void;
 
 const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
 const selectedUtcHoursSet = new Set<string>();
-const state = reactive<{
-    timezone: ComputedRef<string>;
-    isAutoSchedule: boolean;
-    isAllHoursSelected: ComputedRef<boolean>;
-    selectedUtcHours: string[];
-    timezoneAppliedHours: ComputedRef<string[]>;
-}>({
+const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     isAutoSchedule: true,
     isAllHoursSelected: computed<boolean>(() => state.selectedUtcHours.length === size(hoursMatrix)),
