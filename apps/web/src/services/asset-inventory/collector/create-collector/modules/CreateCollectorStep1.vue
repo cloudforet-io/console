@@ -22,7 +22,7 @@
                                           class="select-button"
                                           @click="handleClickNextStep(item)"
                                 >
-                                    <!--                                    // song-lang-->
+                                    <!--                                    // TODO: translation-->
                                     {{ $t('Select') }}
                                 </p-button>
                                 <p-i class="select-icon"

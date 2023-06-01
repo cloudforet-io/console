@@ -31,11 +31,11 @@
                                    class="w-full"
                 />
             </div>
-            <!--            song-lang-->
+            <!--            TODO: translation-->
             <p-field-group :label="$t('Tag')">
                 <template #label-extra>
                     <div class="mt-1">
-                        <!-- song-lang -->
+                        <!-- TODO: translation -->
                         <p class="tag-description">
                             {{ $t("Set Account's tag.") }}
                         </p>
@@ -57,7 +57,7 @@
                            class="step-left-text-button"
                            @click="handleClickPrevButton"
             >
-                <!--                song-lang-->
+                <!--                TODO: translation-->
                 {{ $t('Select Other Plugin') }}
             </p-text-button>
             <p-button icon-left="ic_arrow-left"
@@ -66,7 +66,7 @@
                       size="lg"
                       @click="handleClickPrevButton"
             >
-                <!--                song-lang-->
+                <!--                TODO: translation-->
                 {{ $t('Previous') }}
             </p-button>
             <p-button :disabled="!isAllValid"
@@ -74,11 +74,11 @@
                       size="lg"
                       @click="handleClickNextButton"
             >
-                <!--                song-lang-->
+                <!--                TODO: translation-->
                 {{ $t('Continue') }}
             </p-button>
         </div>
-        <!--        song-lang-->
+        <!--        TODO: translation-->
         <delete-modal :header-title="$t('Are you sure you want to start from selecting plugin?')"
                       :visible.sync="state.deleteModalVisible"
                       :contents="$t('You cannot undo this action.')"

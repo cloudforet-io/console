@@ -17,7 +17,7 @@
                 </span><p-anchor size="sm"
                                  :highlight="true"
                 >
-                    <!--                    // song-lang-->
+                    <!--                    // TODO: translation-->
                     {{ $t('learn more') }}
                 </p-anchor>
             </div>
