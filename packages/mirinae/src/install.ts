@@ -1,10 +1,9 @@
 
+import Notifications from '@kyvg/vue3-notification';
 import VTooltip from 'v-tooltip';
 import velocity from 'velocity-animate';
 import type { App } from 'vue';
-import type VueI18n from 'vue-i18n';
-import type { NotificationOptions } from 'vue-notification';
-import Notifications from 'vue-notification';
+import type { I18n } from 'vue-i18n';
 import SvgIcon from 'vue-svgicon';
 
 import { i18n, I18nConnector } from '@/translations';
@@ -13,21 +12,8 @@ import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
 export interface MirinaeOptions {
     amchartsLicenses?: string[];
-    vueI18n?: VueI18n;
+    vueI18n?: I18n;
 }
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-declare module 'vue/types/vue' {
-    interface Vue {
-        $notify: (options: NotificationOptions | string) => void;
-    }
-	// eslint-disable-next-line @typescript-eslint/no-shadow
-    interface VueConstructor {
-        notify: (options: NotificationOptions | string) => void;
-    }
-}
-
 
 export class MirinaeInstaller {
     private static _options: MirinaeOptions;

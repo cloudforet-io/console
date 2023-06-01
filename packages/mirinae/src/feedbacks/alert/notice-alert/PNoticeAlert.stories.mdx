@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import { useNotification } from "@kyvg/vue3-notification";
 
 import PNoticeAlert from '@/feedbacks/alert/notice-alert/PNoticeAlert.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -32,8 +32,10 @@ export const Template = (args, { argTypes }) => ({
         </div>
     `,
     setup(props) {
+        const { notify } = useNotification()
+
         const displayNotice = () => {
-            Vue.notify({
+            notify({
                 group: props.group,
                 type: 'info',
                 title: 'This is Title',
@@ -71,8 +73,9 @@ export const Template = (args, { argTypes }) => ({
 <!--<div>-->
 `,
             setup() {
+                const { notify } = useNotification()
                 const displayNotice = (alertType) => {
-                    Vue.notify({
+                    notify({
                         group: 'noticeBottomRight',
                         type: alertType,
                         title: 'This is Title',
