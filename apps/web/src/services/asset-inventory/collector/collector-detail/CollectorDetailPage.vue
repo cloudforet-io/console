@@ -10,7 +10,7 @@
                     <p-button v-if="props.collectorId"
                               style-type="tertiary"
                     >
-                        {{ i18n.t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                        {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
                     </p-button>
                 </router-link>
             </template>
@@ -38,8 +38,6 @@ import {
 
 import { PHeading, PSkeleton, PButton } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
-
 import CollectorBaseInfoSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoSection.vue';
 import CollectorOptionsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorOptionsSection.vue';
@@ -59,7 +57,7 @@ const state = reactive({
     collector: null as null|CollectorModel,
     collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
     // TODO: must be updated after backend api spec is updated
-    collectorProviders: computed<null|string[]>(() => (state.collector?.provider ? [state.collector.provider] : null)),
+    collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
 });
 
 const getCollector = async (): Promise<CollectorModel> => {

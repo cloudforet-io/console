@@ -7,6 +7,7 @@
                        :valid="state.isAttachedServiceAccountValid"
                        :valid-text="$t('Good')"
                        :required="true"
+                       :class="{'margin-on-specific': props.marginOnSpecific && state.selectedAttachedServiceAccountType === 'specific'}"
         >
             <!-- NOTE: screen desktop size-->
             <p-radio-group class="attached-service-account-radio-group">
@@ -58,11 +59,13 @@ import { useCollectorFormStore } from '@/services/asset-inventory/store/collecto
 
 interface Props {
     title?: TranslateResult;
+    marginOnSpecific?: boolean;
 }
 
-const emit = defineEmits([
-    'update:isAttachedServiceAccountValid',
-]);
+type SelectType = 'all'|'specific';
+
+const emit = defineEmits<{(e: 'update:isAttachedServiceAccountValid', value: boolean): void;
+}>();
 
 const props = defineProps<Props>();
 const collectorFormStore = useCollectorFormStore();
@@ -79,7 +82,7 @@ const attachedServiceAccountList = [
 ];
 
 const state = reactive({
-    selectedAttachedServiceAccountType: 'all' as 'all'|'specific',
+    selectedAttachedServiceAccountType: 'all' as SelectType,
     serviceAccountMenu: [{ // TODO: need to change to real data
         name: 'f5d14ee6-35b4-409c-973b-ebb0420548b5',
         label: 'Mouse',
@@ -125,7 +128,7 @@ const {
     },
 });
 
-const handleChangeAttachedServiceAccountType = (selectedValue: 'all'|'specific') => {
+const handleChangeAttachedServiceAccountType = (selectedValue: SelectType) => {
     state.selectedAttachedServiceAccountType = selectedValue;
     if (selectedValue === 'all') {
         collectorFormStore.setAttachedServiceAccount(null);
@@ -147,6 +150,10 @@ watch(() => isAllValid.value, (value) => {
 
 <style lang="postcss" scoped>
 .attached-service-account-form {
+    .margin-on-specific {
+        margin-bottom: 15rem;
+    }
+
     .attached-service-account-radio-group {
         display: block;
     }
