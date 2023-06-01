@@ -7,6 +7,8 @@ type AttachedServiceAccount = string[]|null; // TODO: need to check type
 interface CollectorFormState {
     originCollector: CollectorModel|null;
     pluginInfo: CollectorPluginModel|null;
+    version: string;
+    autoUpdate: boolean;
     attachedServiceAccount: AttachedServiceAccount;
 }
 
@@ -17,6 +19,8 @@ export const useCollectorFormStore = defineStore<string, CollectorFormState, Col
     state: () => ({
         originCollector: null,
         pluginInfo: null,
+        version: '',
+        autoUpdate: false,
         attachedServiceAccount: null,
     }),
     actions: {
@@ -29,6 +33,10 @@ export const useCollectorFormStore = defineStore<string, CollectorFormState, Col
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount) {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
             else this.attachedServiceAccount = serviceAccount;
+        },
+        setVersion(version: string, autoUpdate: boolean) {
+            this.version = version;
+            this.autoUpdate = autoUpdate;
         },
     },
 });
