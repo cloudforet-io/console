@@ -16,8 +16,8 @@
         </p-heading>
 
         <div class="schedule-wrapper">
-            <collector-schedule-form :edit-hours="state.isEditMode"
-                                     :utc-hours="state.collectorScheduleUtcHours"
+            <collector-schedule-form :edit-mode="state.isEditMode"
+                                     :utc-hours="state.updatingUtcHours"
                                      @update:hours="handleUpdateHours"
             />
 
@@ -60,7 +60,7 @@ const state = reactive({
 
 const handleClickEdit = () => {
     state.isEditMode = true;
-    state.updatingUtcHours = state.collectorScheduleUtcHours;
+    state.updatingUtcHours = [...state.collectorScheduleUtcHours];
 };
 
 const handleUpdateHours = (hours: string[]) => {
@@ -69,13 +69,13 @@ const handleUpdateHours = (hours: string[]) => {
 
 const handleClickCancel = () => {
     state.isEditMode = false;
-    state.updatingUtcHours = state.collectorScheduleUtcHours;
+    state.updatingUtcHours = [...state.collectorScheduleUtcHours];
 };
 
 const handleClickSave = () => {
     state.isEditMode = false;
     // TODO: Save changes
-    state.collectorScheduleUtcHours = state.updatingUtcHours;
+    state.collectorScheduleUtcHours = [...state.updatingUtcHours];
 };
 
 </script>
