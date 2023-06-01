@@ -61,7 +61,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
 import CollectPluginContents
-    from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
+    from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const emit = defineEmits([

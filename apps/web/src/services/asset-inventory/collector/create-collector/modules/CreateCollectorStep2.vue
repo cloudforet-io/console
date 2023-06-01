@@ -72,10 +72,10 @@ import type { CollectorReferenceMap } from '@/store/modules/reference/collector/
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import CollectPluginContents
+    from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
 import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
-import CollectPluginContents
-    from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 
