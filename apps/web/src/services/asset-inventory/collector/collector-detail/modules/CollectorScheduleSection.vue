@@ -45,7 +45,7 @@ import {
 } from '@spaceone/design-system';
 
 import CollectorScheduleForm
-    from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleForm.vue';
+    from '@/services/asset-inventory/collector/modules/CollectorScheduleForm.vue';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
 const props = defineProps<{}>();
