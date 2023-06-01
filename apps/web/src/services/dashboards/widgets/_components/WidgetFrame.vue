@@ -104,7 +104,7 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -155,7 +155,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
-    currency: CURRENCY.USD,
+    currency: undefined,
     overflowY: undefined,
 });
 
