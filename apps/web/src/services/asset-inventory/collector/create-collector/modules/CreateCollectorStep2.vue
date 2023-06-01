@@ -15,41 +15,10 @@
                     />
                 </template>
             </p-field-group>
-            <div class="version-row">
-                <div class="label-row">
-                    <p-field-title>{{ $t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
-                    <div class="auto-upgrade-wrapper">
-                        <span>{{ $t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
-                        <p-toggle-button :value="state.isAutoUpgrade"
-                                         @change-toggle="handleClickAutoUpgrade"
-                        />
-                    </div>
-                </div>
-                <p-select-dropdown v-model="version"
-                                   :items="state.versions"
-                                   :disabled="state.isAutoUpgrade"
-                                   class="w-full"
-                />
-            </div>
-            <!--            TODO: translation-->
-            <p-field-group :label="$t('Tag')">
-                <template #label-extra>
-                    <div class="mt-1">
-                        <!-- TODO: translation -->
-                        <p class="tag-description">
-                            {{ $t("Set Account's tag.") }}
-                        </p>
-                        <p class="tag-description">
-                            {{ $t("The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.") }}
-                        </p>
-                    </div>
-                </template>
-                <tags-input-group :tags="state.tags"
-                                  show-validation
-                                  :is-valid.sync="state.isTagsValid"
-                                  @update-tags="handleUpdateTags"
-                />
-            </p-field-group>
+            <collector-version-form class="version-row"
+                                    @update:isVersionValid="handleChangeIsVersionValid"
+            />
+            <collector-tag-form @updateIsTagsValid="handleChangeIsTagsValid" />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
@@ -69,7 +38,7 @@
                 <!--                TODO: translation-->
                 {{ $t('Previous') }}
             </p-button>
-            <p-button :disabled="!isAllValid"
+            <p-button :disabled="!state.isAllFormValid"
                       class="step-right-button"
                       size="lg"
                       @click="handleClickNextButton"
@@ -91,22 +60,20 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldTitle, PFieldGroup, PTextInput, PToggleButton, PSelectDropdown, PButton, PTextButton,
+    PFieldGroup, PTextInput, PButton, PTextButton,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectPluginContents.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
@@ -121,21 +88,17 @@ const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
     loading: true,
-    plugin: {},
-    pluginId: computed(() => collectorFormState.originCollector.plugin_id),
-    tags: {},
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
-    versions: [] as any[], // FIXME: type
-    isAutoUpgrade: false,
     isTagsValid: true,
+    isVersionValid: false,
     deleteModalVisible: false,
+    isAllFormValid: computed(() => isAllValid.value && state.isVersionValid && state.isTagsValid),
 });
 
 const {
     forms: {
         name,
-        version,
     },
     setForm,
     invalidState,
@@ -153,41 +116,10 @@ const {
         }
         return '';
     },
-    version(value: string) {
-        if (value.length === 0) {
-            return i18n.t('PLUGIN.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
-        }
-        return '';
-    },
 });
 
-const getVersions = async () => {
-    try {
-        state.versions = [];
-        // TODO: You need to check if there are any API changes.
-        const res = await SpaceConnector.client.repository.plugin.getVersions({
-            plugin_id: state.pluginId,
-        });
-        state.versions = res.results.map((value, index) => {
-            if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
-            return { type: 'item', label: value, name: value };
-        });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
-    }
-};
-
-const initSelectedVersion = () => {
-    setForm('version', state.versions[0].name);
-};
 
 /* event */
-const handleClickAutoUpgrade = () => {
-    state.isAutoUpgrade = !state.isAutoUpgrade;
-};
-const handleUpdateTags = (tags: Tag) => {
-    state.tags = tags;
-};
 
 const handleClickPrevButton = () => {
     state.deleteModalVisible = true;
@@ -199,12 +131,16 @@ const handleClose = () => {
     emit('update:currentStep', 1);
 };
 
+const handleChangeIsVersionValid = (isValid: boolean) => {
+    state.isVersionValid = isValid;
+};
+
+const handleChangeIsTagsValid = (isValid: boolean) => {
+    state.isTagsValid = isValid;
+};
+
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/collector/load', { force: true }),
-        getVersions(),
-    ]);
-    initSelectedVersion();
+    await store.dispatch('reference/collector/load', { force: true });
 })();
 </script>
 <style lang="postcss" scoped>
@@ -213,26 +149,6 @@ const handleClose = () => {
 
     .input-form {
         margin-top: 2rem;
-
-        .version-row {
-            margin: 1.5rem 0;
-            .label-row {
-                @apply flex justify-between;
-                width: 100%;
-
-                .auto-upgrade-wrapper {
-                    @apply flex items-center gap-2;
-                    span {
-                        @apply text-label-sm text-gray-600;
-                    }
-                }
-            }
-        }
-
-        .tag-description {
-            @apply text-label-md text-gray-900;
-            font-weight: 400;
-        }
     }
 
     .step-footer {
