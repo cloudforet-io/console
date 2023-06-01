@@ -65,7 +65,7 @@ export interface CollectorPluginModel {
         description?: string;
         link?: string;
         beta?: string;
-    } & object;
+    } & Record<string, any>;
 }
 
 export interface CollectorModel extends Tags {
