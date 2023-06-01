@@ -12,8 +12,7 @@
                             Checked service account
                         </p>
                         <p class="value">
-                            <!--TODO: real data-->
-                            4
+                            {{ state.accountCount }}
                         </p>
                     </div>
                     <p-divider :vertical="true" />
@@ -23,13 +22,13 @@
                             Total compliance number
                         </p>
                         <p class="value">
-                            <!--TODO: real data-->
-                            880
+                            {{ state.complianceCount }}
                         </p>
                         <div class="diff-wrapper">
                             <p-i name="ic_caret-up-filled"
                                  :color="red[500]"
                             />
+                            <!--TODO: real data-->
                             <span class="diff-value">75</span>
                             <!--TODO: translation-->
                             <span class="diff-text">more than previous 30 days</span>
@@ -39,7 +38,6 @@
                 <div class="chart-wrapper">
                     <p-data-loader class="chart-loader"
                                    :loading="state.loading"
-                                   :data="state.chartData"
                                    loader-type="skeleton"
                                    disable-empty-case
                                    :loader-backdrop-opacity="1"
@@ -61,7 +59,7 @@
                                 <span class="text">{{ status.label }}</span>
                             </div>
                             <p class="value">
-                                345
+                                {{ state.checkCount[status.name] }}
                             </p>
                         </div>
                     </div>
@@ -78,9 +76,9 @@ import {
 } from 'vue';
 
 import { color, percent } from '@amcharts/amcharts5';
+import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
 import { PDataLoader, PDivider, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { random } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -101,98 +99,155 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
-// TODO: replace with real data
+
 interface Data {
-    budget_type: string;
-    budget_count: number;
-    limit: number;
-    usd_cost: number;
-    usage: number;
-    pieSettings?: {
-        fill: ReturnType<typeof color>
-    }
+    compliance_count?: number;
+    fail_check_count?: number;
+    pass_check_count?: number;
+    account_count?: number;
+    score?: number;
 }
 
-interface ChartData {
+interface SeverityData {
+    severity?: string;
+    fail_finding_count?: number;
+}
+
+interface OuterChartData {
     status: string;
-    rate: number;
+    value: number;
     pieSettings?: {
-        fill: string
+        fill?: Color;
+        stroke?: Color;
+    }
+}
+interface InnerChartData {
+    severity: string;
+    value: number;
+    pieSettings?: {
+        fill?: Color;
+        stroke?: Color;
     }
 }
 
 const COMPLIANCE_STATUS_MAP_VALUES = Object.values(COMPLIANCE_STATUS_MAP);
-const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filter((status) => status.name !== 'pass');
+const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filter((status) => status.name !== 'PASS');
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
-const {
-    createDonutChart, createPieSeries, setPieLabelText,
-    disposeRoot, refreshRoot, root,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
-    series: null as null|ReturnType<typeof createPieSeries>,
-    outerChartData: computed<ChartData[]>(() => {
-        if (!state.data) return [];
-        // TODO: replace with real data
-        const randomValue = random(50, 70);
-        const results = [
-            {
-                status: 'pass',
-                rate: randomValue,
-                pieSettings: {
-                    fill: color(COMPLIANCE_STATUS_MAP.PASS.color),
-                },
-            },
-            {
-                status: 'fail',
-                rate: (100 - randomValue),
-                pieSettings: {
-                    fill: color(COMPLIANCE_STATUS_MAP.FAIL.color),
-                },
-            },
-        ];
-        return results;
-    }),
-    innerChartData: computed(() => SEVERITY_FAIL_STATUS_MAP_VALUES.map((status) => ({
-        status: status.name,
-        rate: random(0, 100),
-        pieSettings: {
-            fill: color(status.color),
-        },
-    }))),
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
+    severityData: [] as SeverityData[],
+    outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
+        status: status.label,
+        value: state.checkCount[status.name],
+        pieSettings: {
+            fill: color(status.color),
+            stroke: color(status.color),
+        },
+    }))),
+    innerChartData: computed<InnerChartData[]>(() => SEVERITY_FAIL_STATUS_MAP_VALUES.map((status) => ({
+        severity: status.label,
+        value: state.severityData.find((data) => data.severity === status.name)?.fail_finding_count ?? 0,
+        pieSettings: {
+            fill: color(status.color),
+            stroke: color(status.color),
+        },
+    }))),
+    //
+    accountCount: computed(() => state.data?.account_count ?? 0),
+    complianceCount: computed(() => state.data?.compliance_count ?? 0),
+    checkCount: computed(() => ({
+        [COMPLIANCE_STATUS_MAP.PASS.name]: state.data?.pass_check_count ?? 0,
+        [COMPLIANCE_STATUS_MAP.FAIL.name]: state.data?.fail_check_count ?? 0,
+    })),
+    score: computed(() => Math.round(state.data?.score ?? 0)),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async (): Promise<Data[]> => {
+const fetchData = async (): Promise<Data> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.budgetConsoleFilters);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        apiQueryHelper.setFilters(state.consoleFilters);
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
             query: {
-                granularity: state.options.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
                 fields: {
-                    total_spent: {
-                        key: 'usd_cost',
-                        operator: 'sum',
-                    },
-                    total_budget: {
-                        key: 'limit',
-                        operator: 'sum',
-                    },
-                    budget_count: {
+                    compliance_count: {
                         operator: 'count',
+                    },
+                    pass_check_count: {
+                        key: 'data.stats.checks.pass',
+                        operator: 'sum',
+                    },
+                    fail_check_count: {
+                        key: 'data.stats.checks.fail',
+                        operator: 'sum',
+                    },
+                    pass_score: {
+                        key: 'data.stats.score.pass',
+                        operator: 'sum',
+                    },
+                    total_score: {
+                        key: 'data.stats.score.total',
+                        operator: 'sum',
+                    },
+                    accounts: {
+                        key: 'account',
+                        operator: 'add_to_set',
+                    },
+                },
+                select: {
+                    compliance_count: 'compliance_count',
+                    pass_check_count: 'pass_check_count',
+                    fail_check_count: 'fail_check_count',
+                    account_count: {
+                        key: 'accounts',
+                        operator: 'size',
+                    },
+                    score: {
+                        operator: 'multiply',
+                        fields: [
+                            {
+                                operator: 'divide',
+                                fields: [
+                                    'pass_score',
+                                    'total_score',
+                                ],
+                            },
+                            100,
+                        ],
+                    },
+                },
+                ...apiQueryHelper.data,
+            },
+        });
+        if (results?.length) return results[0];
+        return {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {};
+    }
+};
+const fetchSeverityData = async (): Promise<SeverityData[]> => {
+    try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query: {
+                group_by: ['data.severity'],
+                fields: {
+                    fail_finding_count: {
+                        key: 'data.stats.checks.fail',
+                        operator: 'sum',
                     },
                 },
                 ...apiQueryHelper.data,
@@ -207,7 +262,7 @@ const fetchData = async (): Promise<Data[]> => {
 
 /* Util */
 const drawChart = (outerChartData, innerChartData) => {
-    const chart = createDonutChart({
+    const chart = chartHelper.createDonutChart({
         radius: percent(100),
         innerRadius: percent(80),
         paddingTop: 30,
@@ -216,77 +271,80 @@ const drawChart = (outerChartData, innerChartData) => {
     // outer
     const outerSeriesSettings = {
         categoryField: 'status',
-        valueField: 'rate',
+        valueField: 'value',
         startAngle: 160,
         endAngle: 380,
         radius: percent(250),
         innerRadius: percent(150),
     };
-    const outerSeries = createPieSeries(outerSeriesSettings);
-    chart.series.push(outerSeries);
+    const outerSeries = chartHelper.createPieSeries(outerSeriesSettings);
     outerSeries.labels.template.set('forceHidden', true);
-    outerSeries.ticks.template.set('visible', false);
+    outerSeries.ticks.template.set('forceHidden', true);
+    chart.series.push(outerSeries);
     outerSeries.slices.template.setAll({
-        toggleKey: 'none',
-        forceInactive: true,
         templateField: 'pieSettings',
         strokeOpacity: 0,
     });
+    const outerTooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(outerSeries, outerTooltip);
+    outerSeries.slices.template.set('tooltip', outerTooltip);
     outerSeries.data.setAll(outerChartData);
 
     // inner
     const innerSeriesSettings = {
-        categoryField: 'status',
-        valueField: 'rate',
+        categoryField: 'severity',
+        valueField: 'value',
         startAngle: 160,
         endAngle: 380,
         radius: percent(100),
         innerRadius: percent(70),
     };
-    const innerSeries = createPieSeries(innerSeriesSettings);
+    const innerSeries = chartHelper.createPieSeries(innerSeriesSettings);
     chart.series.push(innerSeries);
     innerSeries.labels.template.set('forceHidden', true);
     innerSeries.ticks.template.set('visible', false);
     innerSeries.slices.template.setAll({
-        toggleKey: 'none',
-        forceInactive: true,
         templateField: 'pieSettings',
         strokeOpacity: 0,
     });
-
-    // TODO: replace with real data
-    setPieLabelText(chart, { text: '[fontSize:16px]Compliance score[/]:\n[fontSize:32px]45[/]' });
+    const innerTooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(innerSeries, innerTooltip);
+    innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
+
+    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]Compliance score[/]:\n[fontSize:32px]${state.score}[/]` });
 };
 
-const initWidget = async (data?: Data[]): Promise<Data[]> => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    if (!data) state.severityData = await fetchSeverityData();
     await nextTick();
-    if (root.value) drawChart(state.outerChartData, state.innerChartData);
+    if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (): Promise<Data[]> => {
+const refreshWidget = async (): Promise<Data> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
-    refreshRoot();
+    state.severityData = await fetchSeverityData();
+    chartHelper.refreshRoot();
     await nextTick();
-    if (root.value) drawChart(state.outerChartData, state.innerChartData);
+    if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
     state.loading = false;
     return state.data;
 };
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
     state,
 });
 
-defineExpose<WidgetExpose<Data[]>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });
