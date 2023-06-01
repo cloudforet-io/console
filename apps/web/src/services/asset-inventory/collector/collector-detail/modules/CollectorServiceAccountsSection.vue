@@ -4,20 +4,45 @@
                    heading-type="sub"
         >
             <template #extra>
-                <p-button size="md"
+                <p-button v-if="!state.isEditMode"
+                          size="md"
                           icon-left="ic_edit"
                           style-type="secondary"
+                          @click="handleClickEdit"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-heading>
         <!-- TODO: bind other props of PToolboxTable -->
-        <p-toolbox-table :fields="fields"
+        <p-toolbox-table v-if="!state.isEditMode"
+                         :fields="fields"
                          :items="state.secrets"
         />
+        <div v-else
+             class="edit-form"
+        >
+            <attached-service-account-form :title="$t('INVENTORY.COLLECTOR.DETAIL.SELECT_SERVICE_ACCOUNT')"
+                                           margin-on-specific
+                                           @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
+            />
+            <p-button style-type="tertiary"
+                      size="lg"
+                      @click="handleClickCancel"
+            >
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="lg"
+                      class="save-changes-button"
+                      @click="handleClickSave"
+            >
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+            </p-button>
+        </div>
     </p-pane-layout>
 </template>
+
 
 <script lang="ts" setup>
 import {
@@ -34,6 +59,8 @@ import { store } from '@/store';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AttachedServiceAccountForm from '@/services/asset-inventory/collector/modules/AttachedServiceAccountForm.vue';
 
 // TODO: Move type declaration to separated file. this is temporary.
 interface SecretModel {
@@ -55,6 +82,7 @@ const fields: DefinitionField[] = [
     { name: 'created_at', label: 'Created' },
 ];
 const state = reactive({
+    isEditMode: false,
     loading: true,
     secrets: null as null|SecretModel[],
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
@@ -101,6 +129,24 @@ const getSecrets = async (providers?: string[]) => {
     state.loading = false;
 };
 
+const handleClickEdit = () => {
+    state.isEditMode = true;
+};
+
+const handleChangeIsAttachedServiceAccountValid = () => {
+    // TODO: implement
+};
+
+const handleClickCancel = () => {
+    state.isEditMode = false;
+};
+
+const handleClickSave = () => {
+    state.isEditMode = false;
+    // TODO: Save changes
+};
+
+
 watch(() => props.providers, async (providers?: string[]) => {
     await getSecrets(providers);
 }, { immediate: true });
@@ -115,5 +161,11 @@ onMounted(async () => {
 <style lang="postcss" scoped>
 .p-toolbox-table {
     border-color: transparent;
+}
+.edit-form {
+    padding: 0 1rem 2.5rem 1rem;
+    .save-changes-button {
+        margin-left: 1rem;
+    }
 }
 </style>
