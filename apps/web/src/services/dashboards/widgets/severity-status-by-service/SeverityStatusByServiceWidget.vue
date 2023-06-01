@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="legend-wrapper">
-                <div v-for="status in Object.values(SEVERITY_STATUS_MAP)"
+                <div v-for="status in SEVERITY_STATUS_MAP_VALUES"
                      :key="`status-${status.label}`"
                      class="legend"
                 >
@@ -51,6 +51,7 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 
 
 const DATE_FORMAT = 'YYYY-MM';
+const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState(props)),
