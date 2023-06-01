@@ -25,13 +25,13 @@
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
                       class="time-block"
-                      :class="{active: state.selectedHours[hour] }"
+                      :class="{active: !!state.timezoneAppliedHours.includes(hour)}"
                       @click="handleClickHour(hour)"
                 >
                     {{ hour }}
                 </span>
                 <p-button class="all-button"
-                          :class="[state.isAllHours ? 'all-selected' : '']"
+                          :class="[state.isAllHoursSelected ? 'all-selected' : '']"
                           style-type="highlight"
                           @click="handleClickAllHours"
                 >
@@ -43,43 +43,80 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, reactive, computed } from 'vue';
+import {
+    defineProps, defineEmits, reactive, computed,
+} from 'vue';
 
 import {
     PFieldGroup, PButton, PFieldTitle, PToggleButton,
 } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
 import { store } from '@/store';
 
-interface ScheduleHours {
-    [time: string]: Dayjs;
-}
-
 const props = defineProps<{
     editHours: boolean;
+    utcHours?: string[];
 }>();
 
-const hoursMatrix = range(24);
+const emits = defineEmits<{(event: 'update:hours', value: string[]): void;
+}>();
+
+const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
+const selectedUtcHoursSet = new Set<string>();
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => store.state.user.timezone),
     isAutoSchedule: true,
-    // TODO: remove temporary data
-    selectedHours: { 1: dayjs() } as ScheduleHours,
-    isAllHours: computed(() => size(state.selectedHours) === 24),
+    isAllHoursSelected: computed<boolean>(() => state.selectedUtcHours.length === size(hoursMatrix)),
+    selectedUtcHours: props.utcHours ?? [] as string[],
+    timezoneAppliedHours: computed<string[]>(() => {
+        if (state.timezone === 'UTC') return state.selectedUtcHours;
+        // set an hour as utc and get the hour in timezone
+        return state.selectedUtcHours.map((utcHour) => dayjs.utc()
+            .hour(Number(utcHour)).tz(state.timezone)
+            .get('hour')
+            .toString());
+    }),
 });
+
+const updateSelectedHoursAndEmit = () => {
+    const hours: string[] = Array.from(selectedUtcHoursSet.values());
+    state.selectedUtcHours = hours;
+    emits('update:hours', hours);
+};
 
 const handleChangeToggle = () => {
     // TODO: change state of toggle button
 };
 
-const handleClickHour = () => {
-    // TODO: change state of selected hours
+const handleClickHour = (hour: string) => {
+    let utcHour: string;
+    if (state.timezone === 'UTC') utcHour = hour;
+    else {
+        // set an hour as timezone and get the hour in utc
+        utcHour = dayjs().tz(state.timezone)
+            .hour(Number(hour)).utc()
+            .get('hour')
+            .toString();
+    }
+    if (selectedUtcHoursSet.has(utcHour)) {
+        selectedUtcHoursSet.delete(utcHour);
+    } else {
+        selectedUtcHoursSet.add(utcHour);
+    }
+
+    updateSelectedHoursAndEmit();
 };
 const handleClickAllHours = () => {
-    // TODO: change state of all hours
+    if (state.isAllHoursSelected) selectedUtcHoursSet.clear();
+    else {
+        hoursMatrix.forEach((hour) => {
+            selectedUtcHoursSet.add(hour);
+        });
+    }
+
+    updateSelectedHoursAndEmit();
 };
 
 </script>

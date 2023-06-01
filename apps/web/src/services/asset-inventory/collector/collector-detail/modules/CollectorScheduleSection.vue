@@ -16,7 +16,10 @@
         </p-heading>
 
         <div class="schedule-wrapper">
-            <collector-schedule-form :edit-hours="state.isEditMode" />
+            <collector-schedule-form :edit-hours="state.isEditMode"
+                                     :utc-hours="state.collectorScheduleUtcHours"
+                                     @update:hours="handleUpdateHours"
+            />
 
             <p-button v-if="state.isEditMode"
                       style-type="tertiary"
@@ -51,20 +54,29 @@ import CollectorScheduleForm
 const props = defineProps<{}>();
 const state = reactive({
     isEditMode: false,
+    collectorScheduleUtcHours: [] as string[],
+    updatingUtcHours: [] as string[],
 });
 
 const handleClickEdit = () => {
     state.isEditMode = true;
+    state.updatingUtcHours = state.collectorScheduleUtcHours;
+};
+
+const handleUpdateHours = (hours: string[]) => {
+    state.updatingUtcHours = hours;
 };
 
 const handleClickCancel = () => {
     state.isEditMode = false;
+    state.updatingUtcHours = state.collectorScheduleUtcHours;
 };
 
 const handleClickSave = () => {
     state.isEditMode = false;
+    // TODO: Save changes
+    state.collectorScheduleUtcHours = state.updatingUtcHours;
 };
-
 
 </script>
 
