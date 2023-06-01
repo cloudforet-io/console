@@ -296,7 +296,7 @@ defineExpose<WidgetExpose>({
                     }
                     .status-content {
                         display: flex;
-                        align-items: end;
+                        align-items: flex-end;
                         .status-value {
                             @apply text-display-md;
                             padding-right: 0.25rem;
