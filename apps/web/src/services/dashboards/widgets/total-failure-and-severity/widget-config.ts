@@ -13,7 +13,7 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
     title: 'Total Failure and Severity',
     labels: ['Asset'],
     description: {
-        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC', // TODO: Add translation
+        translation_id: 'DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.DESC',
         preview_image: 'widget-img_totalFailureAndSeverity--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
@@ -21,7 +21,7 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
         inherit: true,
         inherit_count: 1,
     },
-    sizes: ['lg', 'full'],
+    sizes: ['lg'],
     options: {
         granularity: GRANULARITY.MONTHLY,
     },

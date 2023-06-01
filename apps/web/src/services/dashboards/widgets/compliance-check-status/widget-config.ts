@@ -12,7 +12,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
     title: 'Compliance Check Status',
     labels: ['Asset'],
     description: {
-        // translation_id: 'DASHBOARDS.WIDGET.COST_MAP.DESC', // TODO: Add translation
+        translation_id: 'DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.DESC',
         preview_image: 'widget-img_complianceCheckStatus--thumbnail.png',
     },
     scopes: ['WORKSPACE'],

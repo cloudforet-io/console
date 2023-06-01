@@ -10,8 +10,7 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
     title: 'Count of Fail Findings',
     labels: ['Asset'],
     description: {
-        // TODO: To be added
-        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
+        translation_id: 'DASHBOARDS.WIDGET.COUNT_OF_FAIL_FINDINGS.DESC',
         preview_image: 'widget-img_countOfFailFindings--thumbnail.png',
     },
     scopes: ['WORKSPACE'],

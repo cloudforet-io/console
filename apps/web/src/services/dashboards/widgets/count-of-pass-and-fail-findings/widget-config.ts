@@ -10,7 +10,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     title: 'Count of Pass and Fail Findings',
     labels: ['Asset'],
     description: {
-        // translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC', // TODO: To be added
+        translation_id: 'DASHBOARDS.WIDGET.COUNT_OF_PASS_AND_FAIL_FINDINGS.DESC',
         preview_image: 'widget-img_countOfPassAndFailFindings--thumbnail.png',
     },
     scopes: ['WORKSPACE'],

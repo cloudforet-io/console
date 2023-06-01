@@ -1411,6 +1411,9 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
+			"COMPLIANCE_CHECK_STATUS": {
+				"DESC": "프라울러 Check / Findings 상태 제공"
+			},
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
 			},
@@ -1428,6 +1431,12 @@
 			},
 			"COST_TREND_STACKED": {
 				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 월별 비용 데이터를 보여주는 위젯. "
+			},
+			"COUNT_OF_FAIL_FINDINGS": {
+				"DESC": "Fail 결과 보여주기"
+			},
+			"COUNT_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "Pass & Fail 결과 보여주기"
 			},
 			"DAILY_UPDATES": {
 				"DESC": "당일 클라우드 리소스들의 생성/삭제 현황을 보여주는 위젯. "
@@ -1452,8 +1461,17 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "최근 발생한 얼럿들에 의한 프로젝트별 긴급도를 빠르게 확인할 수 있는 위젯. "
 			},
+			"SEVERITY_STATUS_BY_SERVICE": {
+				"DESC": "서비스별로 Fail/Pass에 대한 전반적인 상태 보여주기"
+			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
+			},
+			"TOTAL_FAILURE_AND_SEVERITY": {
+				"DESC": "Failure 전체 수치에 대한 심각도 제공"
+			},
+			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "\bPass & Fail에 대한 월별 트렌드 데이터 제공"
 			},
 			"UPDATE_TITLE": "위젯 편집",
 			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
@@ -2160,6 +2178,7 @@
 			}
 		}
 	},
+	"INVENTORY.COLLECTOR.DETAIL.CANCEL": "",
 	"INVENTORY.COLLECTOR.DETAIL.EDIT": "",
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
