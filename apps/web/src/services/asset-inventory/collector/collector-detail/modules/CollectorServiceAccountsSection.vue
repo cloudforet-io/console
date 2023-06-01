@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
+        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
                    heading-type="sub"
         >
             <template #extra>
@@ -8,7 +8,7 @@
                           icon-left="ic_edit"
                           style-type="secondary"
                 >
-                    {{ i18n.t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-heading>
@@ -30,7 +30,6 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
@@ -45,7 +44,7 @@ interface SecretModel {
     created_at: string;
 }
 const props = defineProps<{
-    providers?: string[]|null
+    providers?: string[]
 }>();
 
 const fields: DefinitionField[] = [
@@ -90,7 +89,7 @@ const fetchSecrets = async (): Promise<SecretModel[]> => {
         return [];
     }
 };
-const getSecrets = async (providers: string[]|null) => {
+const getSecrets = async (providers?: string[]) => {
     state.loading = true;
 
     if (Array.isArray(providers)) {
@@ -102,7 +101,7 @@ const getSecrets = async (providers: string[]|null) => {
     state.loading = false;
 };
 
-watch(() => props.providers, async (providers) => {
+watch(() => props.providers, async (providers?: string[]) => {
     await getSecrets(providers);
 }, { immediate: true });
 
