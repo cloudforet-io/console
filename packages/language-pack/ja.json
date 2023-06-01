@@ -1411,6 +1411,9 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
+			"COMPLIANCE_CHECK_STATUS": {
+				"DESC": ""
+			},
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
@@ -1428,6 +1431,12 @@
 			},
 			"COST_TREND_STACKED": {
 				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+			},
+			"COUNT_OF_FAIL_FINDINGS": {
+				"DESC": ""
+			},
+			"COUNT_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": ""
 			},
 			"DAILY_UPDATES": {
 				"DESC": "当日の作成または削除されたクラウドリソースの一覧が表示されます。"
@@ -1452,8 +1461,17 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
+			"SEVERITY_STATUS_BY_SERVICE": {
+				"DESC": ""
+			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
+			},
+			"TOTAL_FAILURE_AND_SEVERITY": {
+				"DESC": ""
+			},
+			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": ""
 			},
 			"UPDATE_TITLE": "ウィジェットの更新",
 			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
@@ -2160,6 +2178,7 @@
 			}
 		}
 	},
+	"INVENTORY.COLLECTOR.DETAIL.CANCEL": "",
 	"INVENTORY.COLLECTOR.DETAIL.EDIT": "",
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {

@@ -1411,6 +1411,9 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
+			"COMPLIANCE_CHECK_STATUS": {
+				"DESC": "Providing a status of \"Check\" or \"Findings\" for the reviewer."
+			},
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
 			},
@@ -1428,6 +1431,12 @@
 			},
 			"COST_TREND_STACKED": {
 				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
+			},
+			"COUNT_OF_FAIL_FINDINGS": {
+				"DESC": "Displaying the results for Fail."
+			},
+			"COUNT_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "Displaying the results for Pass and Fail."
 			},
 			"DAILY_UPDATES": {
 				"DESC": "Displays the list of cloud resources created or deleted today. "
@@ -1452,8 +1461,17 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "Displays the urgency of each project by recently occured alerts."
 			},
+			"SEVERITY_STATUS_BY_SERVICE": {
+				"DESC": "Showing an overall status of Fail/Pass for each service."
+			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
+			},
+			"TOTAL_FAILURE_AND_SEVERITY": {
+				"DESC": "Providing severity for the overall number of failures."
+			},
+			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "Providing monthly trend data for Pass and Fail."
 			},
 			"UPDATE_TITLE": "Update Widget",
 			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
@@ -2160,6 +2178,7 @@
 			}
 		}
 	},
+	"INVENTORY.COLLECTOR.DETAIL.CANCEL": "",
 	"INVENTORY.COLLECTOR.DETAIL.EDIT": "",
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
@@ -3046,6 +3065,5 @@
 		}
 	},
 	"SPACEONE_USER_DESC": "Forward to the project members' personal notification channel",
-	"TAB_MEMBER": "Member",
-	"INVENTORY.COLLECTOR.DETAIL.CANCEL": ""
+	"TAB_MEMBER": "Member"
 }
