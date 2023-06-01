@@ -44,16 +44,33 @@
             </template>
         </p-definition-table>
 
-        <collector-base-info-edit v-if="state.isEditMode"
-                                  @cancel="handleEditCancel"
-                                  @save="handleEditSave"
-        />
+        <div v-if="state.isEditMode"
+             class="collector-base-info-edit"
+        >
+            <collector-plugin-contents :plugin="state.plugin" />
+            <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
+            <collector-tag-form @update:isTagsValid="handleUpdateIsTagsValid" />
+            <p-button style-type="tertiary"
+                      size="lg"
+                      @click="handleClickCancel"
+            >
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      size="lg"
+                      class="save-changes-button"
+                      :disabled="!state.isAllValid"
+                      @click="handleClickSave"
+            >
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+            </p-button>
+        </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts" setup>
 import {
-    defineProps, computed, reactive, onMounted,
+    defineProps, computed, reactive,
 } from 'vue';
 
 import {
@@ -66,20 +83,22 @@ import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-
-import CollectorBaseInfoEdit
-    from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoEdit.vue';
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
+import CollectorPluginContents from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
+import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
+import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     loading: boolean;
-    collector: CollectorModel|null;
+    collector?: CollectorModel|null;
 }>();
 
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
+
 const timezone = computed<string>(() => store.state.user.timezone);
-const plugins = computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']);
 const fields = computed<DefinitionField[]>(() => [
     { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
     { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
@@ -91,9 +110,13 @@ const fields = computed<DefinitionField[]>(() => [
 ]);
 
 const state = reactive({
-    pluginName: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.label ?? '' : '')),
-    pluginIcon: computed<string>(() => (props.collector ? plugins.value[props.collector.plugin_info.plugin_id]?.icon ?? '' : '')),
+    plugin: computed<CollectorPluginModel|null>(() => collectorFormState.pluginInfo),
+    pluginName: computed<string>(() => state.plugin?.name ?? ''),
+    pluginIcon: computed<string>(() => state.plugin?.tags.icon ?? ''),
     isEditMode: false,
+    isVersionValid: false,
+    isTagsValid: false,
+    isAllValid: computed(() => state.isVersionValid && state.isTagsValid),
 });
 
 // TODO: Implement isLatestVersion
@@ -104,24 +127,42 @@ const handleClickEdit = () => {
     state.isEditMode = true;
 };
 
-const handleEditCancel = () => {
-    state.isEditMode = false;
-    // TODO: Implement cancel
+const handleUpdateIsVersionValid = (isValid: boolean) => {
+    state.isVersionValid = isValid;
+};
+const handleUpdateIsTagsValid = (isValid: boolean) => {
+    state.isTagsValid = isValid;
 };
 
-const handleEditSave = () => {
+const handleClickCancel = () => {
+    collectorFormStore.resetForm();
     state.isEditMode = false;
-    // TODO: Implement save
 };
-
-onMounted(async () => {
-    await store.dispatch('reference/plugin/load');
-});
+const handleClickSave = () => {
+    state.isEditMode = false;
+    // TODO: change codes below. Call update api and set originCollector with api response
+    if (!collectorFormState.originCollector) return;
+    collectorFormStore.setOriginCollector({
+        ...collectorFormState.originCollector,
+        plugin_info: {
+            ...collectorFormState.originCollector.plugin_info,
+            version: collectorFormState.version,
+            upgrade_mode: collectorFormState.autoUpdate ? 'AUTO' : 'MANUAL',
+        },
+        tags: collectorFormState.tags,
+    });
+};
 
 </script>
 
 <style lang="postcss" scoped>
 .p-definition-table {
     border-color: transparent;
+}
+.collector-base-info-edit {
+    padding: 1rem;
+    .save-changes-button {
+        margin-left: 1rem;
+    }
 }
 </style>

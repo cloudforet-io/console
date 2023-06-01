@@ -31,21 +31,29 @@ import { PFieldGroup } from '@spaceone/design-system';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
-const emit = defineEmits<{(isTagsValid: 'updateIsTagsValid', value: boolean): void; }>();
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+
+
+const emit = defineEmits<{(event: 'update:isTagsValid', value: boolean): void; }>();
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
-    tags: {},
+    tags: collectorFormState.tags as Tag,
     isTagsValid: true,
 });
 
 /* event */
 const handleUpdateTags = (tags: Tag) => {
     state.tags = tags;
+    collectorFormStore.setTags(tags);
 };
 
 watch(() => state.isTagsValid, (isTagsValid) => {
-    emit('updateIsTagsValid', isTagsValid);
-});
+    emit('update:isTagsValid', isTagsValid);
+}, { immediate: true });
+
 
 </script>
 
