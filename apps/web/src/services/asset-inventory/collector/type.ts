@@ -59,7 +59,7 @@ export interface CollectorPluginModel {
     secret_group_id?: string;
     provider?: string;
     upgrade_mode: UpgradeMode;
-    labels: string[];
+    labels?: string[];
     tags: {
         icon?: string;
         description?: string;
