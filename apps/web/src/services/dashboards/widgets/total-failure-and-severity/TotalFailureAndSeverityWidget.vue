@@ -120,6 +120,9 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
+// type Data = CostAnalyzeDataModel['results'];
+type Data = any[];
+
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
@@ -131,7 +134,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => 1),
 });
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     chartData: computed<XYChartData[]>(() => state.data),
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
@@ -157,7 +160,7 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* API */
-const fetchData = async (): Promise<any> => {
+const fetchData = async (): Promise<Data> => {
     try {
         // TODO: change to real data
         const results = await new Promise<any>((resolve) => {
@@ -205,7 +208,7 @@ const drawChart = (chartData: XYChartData[]) => {
     series.data.setAll(cloneDeep(chartData));
 };
 
-const initWidget = async () => {
+const initWidget = async (): Promise<Data> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
@@ -213,7 +216,7 @@ const initWidget = async () => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
