@@ -19,6 +19,7 @@ import countOfFailFindings from '@/services/dashboards/widgets/count-of-fail-fin
 import countOfPassAndFailFindings from '@/services/dashboards/widgets/count-of-pass-and-fail-findings/widget-config';
 import monthlyCost from '@/services/dashboards/widgets/monthly-cost/widget-config';
 import severityStatusByService from '@/services/dashboards/widgets/severity-status-by-service/widget-config';
+import totalFailureAndSeverity from '@/services/dashboards/widgets/total-failure-and-severity/widget-config';
 import trendOfPassAndFailFindings from '@/services/dashboards/widgets/trend-of-pass-and-fail-findings/widget-config';
 // eslint-disable-next-line import/order
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
@@ -41,6 +42,7 @@ export const CONSOLE_WIDGET_LIST = [
     'countOfFailFindings',
     'countOfPassAndFailFindings',
     'trendOfPassAndFailFindings',
+    'totalFailureAndSeverity',
 ] as const;
 
 export type WidgetKey = typeof CONSOLE_WIDGET_LIST[number];
@@ -65,6 +67,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetKey, Partial<WidgetConfig>> = 
     countOfFailFindings,
     countOfPassAndFailFindings,
     trendOfPassAndFailFindings,
+    totalFailureAndSeverity,
 };
 
 export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {

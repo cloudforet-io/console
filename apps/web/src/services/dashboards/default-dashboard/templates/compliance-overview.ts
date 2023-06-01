@@ -5,6 +5,7 @@ import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     // ['complianceCheckStatus'],
+    ['totalFailureAndSeverity'],
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
         widget_options: {
@@ -24,7 +25,6 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
         },
     }],
     ['severityStatusByService'],
-    // ['totalFailureAndSeverity'],
 ];
 
 export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig = {

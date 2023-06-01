@@ -1,3 +1,5 @@
+import { green, red } from '@/styles/colors';
+
 import { ASSET_GROUP_BY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 export const COST_GROUP_BY_ITEM_MAP = {
@@ -26,3 +28,11 @@ export const ASSET_GROUP_BY_ITEM_MAP = {
 export const WIDGET_THEMES = ['violet', 'blue', 'coral', 'yellow', 'gray', 'green', 'indigo', 'peacock'] as const;
 export type WidgetTheme = typeof WIDGET_THEMES[number];
 export type WidgetColorSetType = 'basic'|'massive';
+
+export const SEVERITY_STATUS_MAP = {
+    CRITICAL: { name: 'critical', label: 'Critical', color: red[400] },
+    HIGH: { name: 'high', label: 'High', color: red[300] },
+    MEDIUM: { name: 'medium', label: 'Medium', color: red[200] },
+    LOW: { name: 'low', label: 'Low', color: red[100] },
+    PASS: { name: 'pass', label: 'Pass', color: green[500] },
+};
