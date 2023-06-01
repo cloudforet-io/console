@@ -52,12 +52,20 @@ export interface PluginOptions {
 
 export interface CollectorPluginModel {
     plugin_id: string;
+    name: string;
     version: string;
     options: PluginOptions;
     secret_id?: string;
     secret_group_id?: string;
     provider?: string;
     upgrade_mode: UpgradeMode;
+    labels?: string[];
+    tags: {
+        icon?: string;
+        description?: string;
+        link?: string;
+        beta?: string;
+    } & Record<string, any>;
 }
 
 export interface CollectorModel extends Tags {
