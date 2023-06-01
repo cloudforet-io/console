@@ -298,7 +298,7 @@ defineExpose<WidgetExpose<Data[]>>({
             display: flex;
             justify-content: space-between;
             margin: 0;
-            padding-bottom: 1rem;
+            padding-bottom: 2rem;
             .left-wrapper, .right-wrapper {
                 width: 50%;
                 flex: 1 1 auto;
@@ -333,7 +333,7 @@ defineExpose<WidgetExpose<Data[]>>({
             display: grid;
             gap: 1.5rem;
             height: 15rem;
-            padding-bottom: 2rem;
+            padding-bottom: 1rem;
             .chart-loader {
                 @apply col-span-8;
                 .chart {

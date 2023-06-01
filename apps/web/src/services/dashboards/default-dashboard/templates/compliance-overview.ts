@@ -44,7 +44,7 @@ export const complianceOverviewDashboard: DashboardConfig = {
             enabled: true,
         },
         currency: {
-            enabled: true,
+            enabled: false,
         },
         refresh_interval_option: '5m',
     },
