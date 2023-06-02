@@ -18,7 +18,7 @@
             <collector-version-form class="version-row"
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
-            <collector-tag-form @updateIsTagsValid="handleChangeIsTagsValid" />
+            <collector-tag-form @update:isTagsValid="handleChangeIsTagsValid" />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"

@@ -46,15 +46,19 @@ import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
 import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     collectorId: string;
 }>();
 
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
+
 const collectorName = 'Collector';
 const state = reactive({
     loading: true,
-    collector: null as null|CollectorModel,
+    collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
     // TODO: must be updated after backend api spec is updated
     collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
@@ -76,12 +80,17 @@ const getCollector = async (): Promise<CollectorModel> => {
                     supported_schedule: ['* * * * *'],
                 },
                 plugin_info: {
-                    plugin_id: 'plugin-1',
-                    version: '1.0',
+                    plugin_id: 'plugin-aws-phd-inven-collector',
+                    name: 'AWS Service Health Dashboard Collector Plugin',
+                    version: '1.4.3',
                     upgrade_mode: 'AUTO',
                     options: {
                         supported_resource_type: ['inventory.Server'],
                         filter_format: [],
+                    },
+                    tags: {
+                        description: 'AWS Personal Health Dashboard collector',
+                        icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Personal-Health-Dashboard.svg',
                     },
                 },
                 priority: 1,
@@ -99,7 +108,8 @@ const getCollector = async (): Promise<CollectorModel> => {
 };
 
 onMounted(async () => {
-    state.collector = await getCollector();
+    const collector = await getCollector();
+    collectorFormStore.setOriginCollector(collector);
 });
 
 </script>

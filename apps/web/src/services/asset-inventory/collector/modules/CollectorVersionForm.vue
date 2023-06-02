@@ -43,9 +43,8 @@ import { useCollectorFormStore } from '@/services/asset-inventory/store/collecto
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const emit = defineEmits([
-    'update:isVersionValid',
-]);
+const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
+}>();
 
 const {
     forms: {
@@ -67,17 +66,17 @@ const {
 });
 
 const state = reactive({
-    pluginId: computed<string>(() => collectorFormState.originCollector.plugin_id),
+    pluginId: computed<string|undefined>(() => collectorFormState.pluginInfo?.plugin_id),
     isAutoUpgrade: false,
     versions: [] as any[], // FIXME: type
 });
 
-const getVersions = async () => {
+const getVersions = async (pluginId: string) => {
     try {
         state.versions = [];
         // TODO: You need to check if there are any API changes.
         const res = await SpaceConnector.client.repository.plugin.getVersions({
-            plugin_id: state.pluginId,
+            plugin_id: pluginId,
         });
         state.versions = res.results.map((value, index) => {
             if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
@@ -97,16 +96,18 @@ const handleClickAutoUpgrade = () => {
     state.isAutoUpgrade = !state.isAutoUpgrade;
 };
 
-watch(() => isAllValid.value, (value) => {
+watch(isAllValid, (value) => {
     emit('update:isVersionValid', value);
 }, { immediate: true });
 
-(async () => {
+// get version list when pluginId changed and init selected version
+watch(() => state.pluginId, async (pluginId) => {
+    if (!pluginId) return;
     await Promise.allSettled([
-        getVersions(),
+        getVersions(pluginId),
     ]);
     initSelectedVersion();
-})();
+}, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>
