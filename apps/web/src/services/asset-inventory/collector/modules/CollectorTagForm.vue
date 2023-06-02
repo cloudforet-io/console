@@ -1,16 +1,14 @@
 <template>
-    <!--            TODO: translation-->
     <p-field-group class="collector-tag-form"
-                   :label="$t('Tag')"
+                   :label="$t('INVENTORY.COLLECTOR.CREATE.TAG')"
     >
         <template #label-extra>
             <div class="mt-1">
-                <!-- TODO: translation -->
                 <p class="tag-description">
-                    {{ $t("Set Account's tag.") }}
+                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC1") }}
                 </p>
                 <p class="tag-description">
-                    {{ $t("The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.") }}
+                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC2", {service: props.serviceName}) }}
                 </p>
             </div>
         </template>
@@ -38,6 +36,10 @@ const emit = defineEmits<{(event: 'update:isTagsValid', value: boolean): void; }
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+
+const props = defineProps<{
+    serviceName: string;
+}>();
 
 const state = reactive({
     tags: collectorFormState.tags as Tag,

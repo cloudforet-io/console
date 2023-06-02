@@ -22,8 +22,7 @@
                                           class="select-button"
                                           @click="handleClickNextStep(item)"
                                 >
-                                    <!--                                    // TODO: translation-->
-                                    {{ $t('Select') }}
+                                    {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT') }}
                                 </p-button>
                                 <p-i class="select-icon"
                                      name="ic_chevron-right"

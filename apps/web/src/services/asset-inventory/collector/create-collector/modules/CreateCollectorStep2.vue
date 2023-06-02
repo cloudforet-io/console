@@ -2,7 +2,7 @@
     <div class="collector-page-2">
         <collect-plugin-contents :plugin="collectorFormState.pluginInfo" />
         <div class="input-form">
-            <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')"
+            <p-field-group :label="$t('INVENTORY.COLLECTOR.CREATE.NAME')"
                            :invalid-text="invalidTexts.name"
                            :invalid="invalidState.name"
                            :required="true"
@@ -18,7 +18,9 @@
             <collector-version-form class="version-row"
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
-            <collector-tag-form @update:isTagsValid="handleChangeIsTagsValid" />
+            <collector-tag-form :service-name="state.pluginName"
+                                @update:isTagsValid="handleChangeIsTagsValid"
+            />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
@@ -26,8 +28,7 @@
                            class="step-left-text-button"
                            @click="handleClickPrevButton"
             >
-                <!--                TODO: translation-->
-                {{ $t('Select Other Plugin') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
             </p-text-button>
             <p-button icon-left="ic_arrow-left"
                       style-type="transparent"
@@ -35,22 +36,19 @@
                       size="lg"
                       @click="handleClickPrevButton"
             >
-                <!--                TODO: translation-->
-                {{ $t('Previous') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
             </p-button>
             <p-button :disabled="!state.isAllFormValid"
                       class="step-right-button"
                       size="lg"
                       @click="handleClickNextButton"
             >
-                <!--                TODO: translation-->
-                {{ $t('Continue') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.CONTINUE') }}
             </p-button>
         </div>
-        <!--        TODO: translation-->
-        <delete-modal :header-title="$t('Are you sure you want to start from selecting plugin?')"
+        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
-                      :contents="$t('You cannot undo this action.')"
+                      :contents="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
                       @confirm="handleClose"
         />
     </div>
@@ -94,6 +92,7 @@ const state = reactive({
     isVersionValid: false,
     deleteModalVisible: false,
     isAllFormValid: computed(() => isAllValid.value && state.isVersionValid && state.isTagsValid),
+    pluginName: computed(() => collectorFormState.pluginInfo?.name),
 });
 
 const {
@@ -110,9 +109,9 @@ const {
 }, {
     name(value: string) {
         if (value.length < 2) {
-            return i18n.t('PLUGIN.COLLECTOR.CREATE.NAME_INVALID_MIN');
+            return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_MIN');
         } if (state.collectorNames.includes(value)) {
-            return i18n.t('PLUGIN.COLLECTOR.CREATE.NAME_INVALID_DUPLICATED');
+            return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_DUPLICATED');
         }
         return '';
     },

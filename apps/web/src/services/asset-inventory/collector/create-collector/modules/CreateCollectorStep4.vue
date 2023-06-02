@@ -7,8 +7,7 @@
                            class="step-left-text-button"
                            @click="handleClickOtherPluginButton"
             >
-                <!--                TODO: translation-->
-                {{ $t('Select Other Plugin') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
             </p-text-button>
             <div class="right-area">
                 <p-button icon-left="ic_arrow-left"
@@ -16,37 +15,32 @@
                           size="lg"
                           @click="handleClickPrevButton"
                 >
-                    <!--                TODO: translation-->
-                    {{ $t('Previous') }}
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
                 </p-button>
                 <p-button :disabled="!state.isAbleToCreateCollector"
                           size="lg"
                           @click="handleClickCreateButton"
                 >
-                    <!--                TODO: translation-->
-                    {{ $t('Create New Collector') }}
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
                 </p-button>
             </div>
         </div>
-        <!--        TODO: translation-->
-        <delete-modal :header-title="$t('Are you sure you want to start from selecting plugin?')"
+        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
-                      :contents="$t('You cannot undo this action.')"
+                      :contents="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
                       size="sm"
                       @confirm="handleClose"
         />
         <p-button-modal :visible.sync="state.visibleCreateModal"
-                        :header-title="$t('Do you want to collect data now?')"
+                        :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
                         @confirm="handleConfirmCreateCollector"
                         @cancel="handleRouteToCollectorList"
         >
             <template #close-button>
-                <!--        TODO: translation-->
-                {{ $t('Skip for Later') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
             </template>
             <template #confirm-button>
-                <!--        TODO: translation-->
-                {{ $t('Collect Now') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_COLLECT') }}
             </template>
         </p-button-modal>
     </div>
@@ -61,6 +55,8 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -92,9 +88,9 @@ const handleClickCreateButton = async () => {
     try {
         state.loading = true;
         // TODO: create api call
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
     } catch (e) {
-        // TODO: translation
-        ErrorHandler.handleRequestError(e, i18n.t('Failed to create collector'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
     } finally {
         state.loading = false;
         state.visibleCreateModal = true;

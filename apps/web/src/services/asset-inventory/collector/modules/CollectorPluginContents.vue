@@ -9,7 +9,7 @@
             <p class="plugin-name">
                 {{ state.name }} <span v-if="state.isBeta"
                                        class="beta"
-                >{{ $t('beta') }}</span>
+                >{{ $t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
             </p>
             <div class="plugin-description">
                 <span class="plugin-description-text">
@@ -17,8 +17,7 @@
                 </span><p-anchor size="sm"
                                  :highlight="true"
                 >
-                    <!--                    // TODO: translation-->
-                    {{ $t('learn more') }}
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
                 </p-anchor>
             </div>
             <div class="label-container">

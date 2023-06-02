@@ -10,8 +10,7 @@
                            class="step-left-text-button"
                            @click="handleClickOtherPluginButton"
             >
-                <!--                TODO: translation-->
-                {{ $t('Select Other Plugin') }}
+                {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
             </p-text-button>
             <div class="right-area">
                 <p-button icon-left="ic_arrow-left"
@@ -19,22 +18,19 @@
                           size="lg"
                           @click="handleClickPrevButton"
                 >
-                    <!--                TODO: translation-->
-                    {{ $t('Previous') }}
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
                 </p-button>
                 <p-button :disabled="!state.isAttachedServiceAccountValid"
                           size="lg"
                           @click="handleClickNextButton"
                 >
-                    <!--                TODO: translation-->
-                    {{ $t('Continue') }}
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.CONTINUE') }}
                 </p-button>
             </div>
         </div>
-        <!--        TODO: translation-->
-        <delete-modal :header-title="$t('Are you sure you want to start from selecting plugin?')"
+        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
-                      :contents="$t('You cannot undo this action.')"
+                      :contents="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
                       @confirm="handleClose"
         />
     </div>

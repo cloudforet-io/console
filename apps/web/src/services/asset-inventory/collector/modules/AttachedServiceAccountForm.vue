@@ -1,11 +1,10 @@
 <template>
     <div class="attached-service-account-form">
-        <!--        TODO: translation-->
-        <p-field-group :label="props.title || $t('Attached Service Account')"
+        <p-field-group :label="props.title || $t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
                        :invalid="invalidState.selectedAttachedServiceAccount"
                        :invalid-text="invalidTexts.selectedAttachedServiceAccount"
                        :valid="state.isAttachedServiceAccountValid"
-                       :valid-text="$t('Good')"
+                       :valid-text="$t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT_VALID')"
                        :required="true"
                        :class="{'margin-on-specific': props.marginOnSpecific && state.selectedAttachedServiceAccountType === 'specific'}"
         >
@@ -28,7 +27,7 @@
             />
             <div v-if="state.selectedAttachedServiceAccountType !== 'all'">
                 <p-field-title class="specific-service-account-dropdown-label"
-                               :label="$t('Specific Service Account')"
+                               :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
                 />
                 <p-filterable-dropdown class="specific-service-account-dropdown"
                                        :selected="selectedAttachedServiceAccount"
@@ -72,11 +71,11 @@ const collectorFormStore = useCollectorFormStore();
 
 const attachedServiceAccountList = [
     {
-        label: 'All', // TODO: translation
+        label: i18n.t('INVENTORY.COLLECTOR.CREATE.ALL'),
         name: 'all',
     },
     {
-        label: 'Specific Service Account', // TODO: translation
+        label: i18n.t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT'),
         name: 'specific',
     },
 ];
@@ -122,7 +121,7 @@ const {
             return true;
         }
         if (state.selectedAttachedServiceAccountType !== 'all') {
-            return i18n.t('Required field');
+            return i18n.t('INVENTORY.COLLECTOR.CREATE.REQUIRED_FIELD');
         }
         return true;
     },
