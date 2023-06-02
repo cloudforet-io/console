@@ -6,10 +6,8 @@
         <div class="data-container">
             <div class="summary-wrapper">
                 <div class="left-wrapper">
-                    <!--song-lang-->
                     <p class="title">
-                        <!--TODO: translation-->
-                        Total failure count
+                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
                     </p>
                     <p class="value">
                         <!--TODO: real data-->
@@ -20,15 +18,13 @@
                              :color="red[500]"
                         />
                         <span class="diff-value">86</span>
-                        <!--TODO: translation-->
-                        <span class="diff-text">more than previous 30 days</span>
+                        <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_30_DAYS') }}</span>
                     </div>
                 </div>
                 <p-divider :vertical="true" />
                 <div class="right-wrapper">
-                    <!--TODO: translation-->
                     <p class="title">
-                        Failure rate
+                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
                     </p>
                     <p class="value">
                         15.94%
@@ -53,9 +49,8 @@
                 </p-data-loader>
             </div>
             <div class="severity-wrapper">
-                <!--TODO: translation-->
                 <p class="title">
-                    Severity
+                    {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.SEVERITY') }}
                 </p>
                 <div class="box-wrapper">
                     <div v-for="(data, idx) in state.severityData"
@@ -120,9 +115,9 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
-// type Data = CostAnalyzeDataModel['results'];
 type Data = any[];
 
+const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filter((status) => status.name !== 'PASS');
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
@@ -143,8 +138,7 @@ const state = reactive({
     }),
     severityData: computed(() => {
         const results: any[] = []; // TODO: fix type after get real data
-        Object.values(SEVERITY_STATUS_MAP).forEach((severity) => {
-            if (severity.name === 'pass') return;
+        SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((severity) => {
             const currValue = random(0, 200);
             const prevValue = random(0, 200);
             results.push({

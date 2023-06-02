@@ -8,8 +8,7 @@
                 <div class="summary-wrapper">
                     <div class="left-wrapper">
                         <p class="title">
-                            <!--TODO: translation-->
-                            Checked service account
+                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}
                         </p>
                         <p class="value">
                             {{ state.accountCount }}
@@ -17,9 +16,8 @@
                     </div>
                     <p-divider :vertical="true" />
                     <div class="right-wrapper">
-                        <!--TODO: translation-->
                         <p class="title">
-                            Total compliance number
+                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
                         </p>
                         <p class="value">
                             {{ state.complianceCount }}
@@ -30,8 +28,7 @@
                             />
                             <!--TODO: real data-->
                             <span class="diff-value">75</span>
-                            <!--TODO: translation-->
-                            <span class="diff-text">more than previous 30 days</span>
+                            <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_30_DAYS') }}</span>
                         </div>
                     </div>
                 </div>
@@ -82,6 +79,8 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { i18n } from '@/translations';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
@@ -316,7 +315,7 @@ const drawChart = (outerChartData, innerChartData) => {
     innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
 
-    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]Compliance score[/]:\n[fontSize:32px]${state.score}[/]` });
+    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
 };
 
 const initWidget = async (data?: Data): Promise<Data> => {
