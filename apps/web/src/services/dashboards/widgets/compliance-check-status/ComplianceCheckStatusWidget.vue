@@ -325,15 +325,14 @@ const initWidget = async (data?: Data): Promise<Data> => {
         state.complianceData = data.compliance;
         state.severityData = data.severity;
     } else {
-        Promise.all([
+        const [complianceData, severityData] = await Promise.all([
             fetchComplianceData(),
             fetchSeverityData(),
-        ]).then(([complianceData, severityData]) => {
-            state.data = {
-                compliance: complianceData,
-                severity: severityData,
-            };
-        });
+        ]);
+        state.data = {
+            compliance: complianceData,
+            severity: severityData,
+        };
     }
     await nextTick();
     if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
@@ -344,15 +343,14 @@ const initWidget = async (data?: Data): Promise<Data> => {
 const refreshWidget = async (): Promise<Data> => {
     await nextTick();
     state.loading = true;
-    Promise.all([
+    const [complianceData, severityData] = await Promise.all([
         fetchComplianceData(),
         fetchSeverityData(),
-    ]).then(([complianceData, severityData]) => {
-        state.data = {
-            compliance: complianceData,
-            severity: severityData,
-        };
-    });
+    ]);
+    state.data = {
+        compliance: complianceData,
+        severity: severityData,
+    };
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
