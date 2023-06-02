@@ -13,6 +13,8 @@ export const useCollectorFormStore = defineStore('collector-form', {
         tags: {} as Tag,
         version: '',
         autoUpdate: false,
+        scheduleHours: [] as string[],
+        schedulePower: false,
         attachedServiceAccount: null as AttachedServiceAccount|null,
     }),
     actions: {
@@ -26,6 +28,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.tags = collector?.tags ?? {};
             this.version = collector?.plugin_info.version ?? '';
             this.autoUpdate = collector?.plugin_info.upgrade_mode === 'AUTO' ?? false;
+            this.resetSchedule();
             // TODO: set attached service account from origin data
         },
         setPluginInfo(pluginInfo: CollectorPluginModel) {
@@ -37,6 +40,10 @@ export const useCollectorFormStore = defineStore('collector-form', {
         setVersion(version: string, autoUpdate: boolean) {
             this.version = version;
             this.autoUpdate = autoUpdate;
+        },
+        resetSchedule(hoursOnly = false) {
+            this.scheduleHours = this.originCollector?.schedule.hours ?? [];
+            if (!hoursOnly) this.schedulePower = this.originCollector?.state === 'ENABLED' ?? false;
         },
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount|null) {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
