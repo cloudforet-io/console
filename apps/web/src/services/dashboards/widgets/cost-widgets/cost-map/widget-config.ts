@@ -1,35 +1,38 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const monthlyCostWidgetConfig: WidgetConfig = {
-    widget_config_id: 'monthlyCost',
+const costMapWidgetConfig: WidgetConfig = {
+    widget_config_id: 'costMap',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/monthly-cost/MonthlyCostWidget.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/cost-map/CostMapWidget.vue'),
     }),
-    title: 'Monthly Cost',
+    title: 'Cost Map',
     labels: ['Cost'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
-        preview_image: 'widget-img_monthlyCost--thumbnail.png',
+        translation_id: 'DASHBOARDS.WIDGET.COST_MAP.DESC',
+        preview_image: 'widget-img_costMap--thumbnail.png',
     },
-    scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
+    scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
         inherit: true,
         inherit_count: 1,
     },
-    sizes: ['sm'],
+    sizes: ['md', 'full'],
     options: {
-        granularity: GRANULARITY.MONTHLY,
+        cost_group_by: COST_GROUP_BY.PROJECT,
+        granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account'),
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
+                ...getWidgetOptionsSchema('cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -43,7 +46,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
                     'cost_account',
                 ),
             },
-            order: getWidgetFilterSchemaPropertyNames(
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
                 'service_account',
@@ -54,9 +57,9 @@ const monthlyCostWidgetConfig: WidgetConfig = {
                 'region',
                 'cost_type',
                 'cost_account',
-            ),
+            )],
         },
     },
 };
 
-export default monthlyCostWidgetConfig;
+export default costMapWidgetConfig;

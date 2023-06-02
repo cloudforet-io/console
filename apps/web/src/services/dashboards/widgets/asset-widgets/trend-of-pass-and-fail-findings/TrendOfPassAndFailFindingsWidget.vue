@@ -46,12 +46,11 @@ import type { ReferenceType } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import { green, red } from '@/styles/colors';
-
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
@@ -79,10 +78,6 @@ interface FullData {
 }
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
-const FINDING_STATUS_MAP = {
-    pass: { label: 'Pass', color: green[500] },
-    fail: { label: 'Fail', color: red[400] },
-};
 
 const props = defineProps<WidgetProps>();
 
@@ -96,10 +91,10 @@ const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     // chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     chartData: computed(() => ([
-        { date: '2023-02', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2023-03', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2023-04', pass: random(300, 500), fail: random(0, 100) },
-        { date: '2023-05', pass: random(300, 500), fail: random(0, 100) },
+        { date: '2023-02', PASS: random(300, 500), FAIL: random(0, 100) },
+        { date: '2023-03', PASS: random(300, 500), FAIL: random(0, 100) },
+        { date: '2023-04', PASS: random(300, 500), FAIL: random(0, 100) },
+        { date: '2023-05', PASS: random(300, 500), FAIL: random(0, 100) },
     ])),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
@@ -146,7 +141,7 @@ const drawChart = (chartData: XYChartData[]) => {
         });
     }
 
-    Object.entries(FINDING_STATUS_MAP).forEach(([k, v]) => {
+    Object.entries(COMPLIANCE_STATUS_MAP).forEach(([k, v]) => {
         const seriesSettings = {
             name: v.label,
             valueYField: k,

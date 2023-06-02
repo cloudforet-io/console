@@ -8,7 +8,7 @@ import {
 const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
     widget_config_id: 'totalFailureAndSeverity',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/total-failure-and-severity/TotalFailureAndSeverityWidget.vue'),
+        component: import('@/services/dashboards/widgets/asset-widgets/total-failure-and-severity/TotalFailureAndSeverityWidget.vue'),
     }),
     title: 'Total Failure and Severity',
     labels: ['Asset'],

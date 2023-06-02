@@ -90,8 +90,8 @@ import { red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import { COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';

@@ -103,8 +103,8 @@ import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
-import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';

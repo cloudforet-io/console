@@ -54,8 +54,8 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import countOfFailFindingsWidgetConfig from '@/services/dashboards/widgets/count-of-fail-findings/widget-config';
-import countOfPassAndFailFindingsWidgetConfig from '@/services/dashboards/widgets/count-of-pass-and-fail-findings/widget-config';
+import countOfFailFindingsWidgetConfig from '@/services/dashboards/widgets/asset-widgets/count-of-fail-findings/widget-config';
+import countOfPassAndFailFindingsWidgetConfig from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 
 

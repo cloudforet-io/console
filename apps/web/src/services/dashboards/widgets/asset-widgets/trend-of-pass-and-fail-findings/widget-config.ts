@@ -7,7 +7,7 @@ import {
 const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'trendOfPassAndFailFindings',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/trend-of-pass-and-fail-findings/TrendOfPassAndFailFindingsWidget.vue'),
+        component: import('@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/TrendOfPassAndFailFindingsWidget.vue'),
     }),
     title: 'Trend of Pass and Fail Findings',
     labels: ['Asset'],
