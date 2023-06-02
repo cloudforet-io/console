@@ -7,7 +7,7 @@ import {
 const complianceCheckStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'complianceCheckStatus',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/compliance-check-status/ComplianceCheckStatusWidget.vue'),
+        component: import('@/services/dashboards/widgets/asset-widgets/compliance-check-status/ComplianceCheckStatusWidget.vue'),
     }),
     title: 'Compliance Check Status',
     labels: ['Asset'],

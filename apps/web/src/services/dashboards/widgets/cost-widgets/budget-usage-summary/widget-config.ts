@@ -1,31 +1,29 @@
-import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const budgetStatusWidgetConfig: WidgetConfig = {
-    widget_config_id: 'budgetStatus',
+const budgetUsageSummaryConfig: WidgetConfig = {
+    widget_config_id: 'budgetUsageSummary',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/budget-status/BudgetStatus.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
     }),
-    title: 'Budget Status',
+    title: 'Budget Usage Summary',
     labels: ['Cost'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.BUDGET_STATUS.DESC',
-        preview_image: 'widget-img_budgetStatus--thumbnail.png',
+        translation_id: 'DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.DESC',
+        preview_image: 'widget-img_budgetUsageSummary--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
-        inherit: false,
+        inherit: true,
+        inherit_count: 1,
     },
-    sizes: ['sm'],
+    sizes: ['sm', 'full'],
     options: {
-        chart_type: CHART_TYPE.WAFFLE,
         granularity: GRANULARITY.ACCUMULATED,
-        cost_group_by: 'budget_id',
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
@@ -37,4 +35,4 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     },
 };
 
-export default budgetStatusWidgetConfig;
+export default budgetUsageSummaryConfig;

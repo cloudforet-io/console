@@ -8,7 +8,7 @@ import {
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
     widget_config_id: 'severityStatusByService',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue'),
+        component: import('@/services/dashboards/widgets/asset-widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue'),
     }),
     title: 'Severity Status by Service',
     labels: ['Asset'],

@@ -9,7 +9,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageByTarget',
     title: 'Budget Usage by Target',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/budget-usage-by-target/BudgetUsageByTarget.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTarget.vue'),
     }),
     labels: ['Cost'],
     description: {

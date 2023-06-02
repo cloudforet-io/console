@@ -8,7 +8,7 @@ import {
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-by-region/CostByRegionWidget.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/cost-by-region/CostByRegionWidget.vue'),
     }),
     title: 'Cost by Region',
     labels: ['Cost'],
