@@ -100,17 +100,20 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
-interface Data {
+interface ComplianceData {
     compliance_count?: number;
     fail_check_count?: number;
     pass_check_count?: number;
     account_count?: number;
     score?: number;
 }
-
 interface SeverityData {
     severity?: string;
     fail_finding_count?: number;
+}
+interface Data {
+    compliance?: ComplianceData;
+    severity?: SeverityData;
 }
 
 interface OuterChartData {
@@ -144,7 +147,8 @@ const state = reactive({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    severityData: [] as SeverityData[],
+    complianceData: computed<ComplianceData>(() => state.data?.compliance ?? {}),
+    severityData: computed<SeverityData[]>(() => state.data?.severity ?? []),
     outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
         status: status.label,
         value: state.checkCount[status.name],
@@ -162,19 +166,19 @@ const state = reactive({
         },
     }))),
     //
-    accountCount: computed(() => state.data?.account_count ?? 0),
-    complianceCount: computed(() => state.data?.compliance_count ?? 0),
+    accountCount: computed(() => state.complianceData?.account_count ?? 0),
+    complianceCount: computed(() => state.complianceData?.compliance_count ?? 0),
     checkCount: computed(() => ({
-        [COMPLIANCE_STATUS_MAP.PASS.name]: state.data?.pass_check_count ?? 0,
-        [COMPLIANCE_STATUS_MAP.FAIL.name]: state.data?.fail_check_count ?? 0,
+        [COMPLIANCE_STATUS_MAP.PASS.name]: state.complianceData?.pass_check_count ?? 0,
+        [COMPLIANCE_STATUS_MAP.FAIL.name]: state.complianceData?.fail_check_count ?? 0,
     })),
-    score: computed(() => Math.round(state.data?.score ?? 0)),
+    score: computed(() => Math.round(state.complianceData?.score ?? 0)),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async (): Promise<Data> => {
+const fetchComplianceData = async (): Promise<ComplianceData> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -317,8 +321,20 @@ const drawChart = (outerChartData, innerChartData) => {
 
 const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
-    state.data = data ?? await fetchData();
-    if (!data) state.severityData = await fetchSeverityData();
+    if (data) {
+        state.complianceData = data.compliance;
+        state.severityData = data.severity;
+    } else {
+        Promise.all([
+            fetchComplianceData(),
+            fetchSeverityData(),
+        ]).then(([complianceData, severityData]) => {
+            state.data = {
+                compliance: complianceData,
+                severity: severityData,
+            };
+        });
+    }
     await nextTick();
     if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
     state.loading = false;
@@ -328,8 +344,15 @@ const initWidget = async (data?: Data): Promise<Data> => {
 const refreshWidget = async (): Promise<Data> => {
     await nextTick();
     state.loading = true;
-    state.data = await fetchData();
-    state.severityData = await fetchSeverityData();
+    Promise.all([
+        fetchComplianceData(),
+        fetchSeverityData(),
+    ]).then(([complianceData, severityData]) => {
+        state.data = {
+            compliance: complianceData,
+            severity: severityData,
+        };
+    });
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
