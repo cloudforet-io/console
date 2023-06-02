@@ -74,9 +74,13 @@ const getCollector = async (): Promise<CollectorModel> => {
                 state: 'ENABLED',
                 provider: 'aws',
                 capability: {
+                    supported_providers: ['aws'],
                     supported_schema: ['aws_access_key', 'aws_access_key_pair'],
                     supported_mode: ['FULL', 'DIFF'],
                     supported_schedule: ['* * * * *'],
+                },
+                schedule: {
+                    hours: ['3'],
                 },
                 plugin_info: {
                     plugin_id: 'plugin-aws-phd-inven-collector',
@@ -92,7 +96,6 @@ const getCollector = async (): Promise<CollectorModel> => {
                         icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Personal-Health-Dashboard.svg',
                     },
                 },
-                priority: 1,
                 tags: {
                     'spaceone:region': 'kr',
                     'spaceone:zone': 'kr-1',
@@ -107,6 +110,7 @@ const getCollector = async (): Promise<CollectorModel> => {
 };
 
 onMounted(async () => {
+    collectorFormStore.$reset();
     const collector = await getCollector();
     collectorFormStore.setOriginCollector(collector);
 });
