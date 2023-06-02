@@ -3,10 +3,6 @@ name: "[Dispatch] Release"
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'enter branch (only master and release-x.y.z are allowed)'
-        required: true
-        default: 'master'
       version:
         description: 'enter version(x.y.z)'
         required: true
@@ -22,7 +18,6 @@ on:
 
 env:
   ARCH: ${{ github.event.inputs.container_arch }}
-  BRANCH: ${{ github.event.inputs.branch }}
   VERSION: ${{ github.event.inputs.version }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -38,12 +33,11 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_versioning.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: true
           propagate_failure: true
           wait_interval: 5
           client_payload: '{
-              "branch": "${{ env.BRANCH }}",
+              "branch": "${{ github.ref_name }}",
               "version": "${{ env.VERSION }}"
             }'
 
@@ -59,12 +53,11 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_mirinae_release.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: true
           propagate_failure: true
           wait_interval: 5
           client_payload: '{
-              "branch": "${{ env.BRANCH }}",
+              "branch": "${{ github.ref_name }}",
               "version": "${{ env.VERSION }}"
             }'
 
@@ -79,11 +72,10 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_storybook_release.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: false
           propagate_failure: false
           client_payload: '{
-              "branch": "${{ env.BRANCH }}",
+              "branch": "${{ github.ref_name }}",
               "version": "${{ env.VERSION }}"
             }'
 
@@ -117,7 +109,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.BRANCH }}
           submodules: true
 
       - name: Set up QEMU
@@ -178,7 +169,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.BRANCH }}
 
       - name: Configure git
         run: |
