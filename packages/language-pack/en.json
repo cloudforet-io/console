@@ -1412,7 +1412,11 @@
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
 			"COMPLIANCE_CHECK_STATUS": {
-				"DESC": "Providing a status of \"Check\" or \"Findings\" for the reviewer."
+				"CHECKED_SERVICE_ACCOUNT": "Checked service account",
+				"COMPLIANCE_SCORE": "Compliance score",
+				"DESC": "Providing a status of \"Check\" or \"Findings\" for the reviewer.",
+				"MORE_THAN_PREV_30_DAYS": "more than previous 30 days",
+				"TOTAL_COMPLIANCE_NUMBER": "Total compliance number"
 			},
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
@@ -1468,7 +1472,11 @@
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
 			"TOTAL_FAILURE_AND_SEVERITY": {
-				"DESC": "Providing severity for the overall number of failures."
+				"DESC": "Providing severity for the overall number of failures.",
+				"FAILURE_RATE": "Failure rate",
+				"MORE_THAN_PREV_30_DAYS": "more than previous 30 days",
+				"SEVERITY": "Severity",
+				"TOTAL_FAILURE_COUNT": "Total failure count"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "Providing monthly trend data for Pass and Fail."

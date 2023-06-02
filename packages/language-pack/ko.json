@@ -1412,7 +1412,11 @@
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
 			"COMPLIANCE_CHECK_STATUS": {
-				"DESC": "프라울러 Check / Findings 상태 제공"
+				"CHECKED_SERVICE_ACCOUNT": "",
+				"COMPLIANCE_SCORE": "",
+				"DESC": "프라울러 Check / Findings 상태 제공",
+				"MORE_THAN_PREV_30_DAYS": "",
+				"TOTAL_COMPLIANCE_NUMBER": ""
 			},
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
@@ -1468,7 +1472,11 @@
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
 			"TOTAL_FAILURE_AND_SEVERITY": {
-				"DESC": "Failure 전체 수치에 대한 심각도 제공"
+				"DESC": "Failure 전체 수치에 대한 심각도 제공",
+				"FAILURE_RATE": "",
+				"MORE_THAN_PREV_30_DAYS": "",
+				"SEVERITY": "",
+				"TOTAL_FAILURE_COUNT": ""
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "\bPass & Fail에 대한 월별 트렌드 데이터 제공"
