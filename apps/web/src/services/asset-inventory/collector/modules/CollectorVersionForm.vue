@@ -1,9 +1,9 @@
 <template>
     <div class="collector-version-form">
         <div class="label-row">
-            <p-field-title>{{ $t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
+            <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
             <div class="auto-upgrade-wrapper">
-                <span>{{ $t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
+                <span>{{ $t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
                 <p-toggle-button :value="state.isAutoUpgrade"
                                  @change-toggle="handleClickAutoUpgrade"
                 />
@@ -59,7 +59,7 @@ const {
 }, {
     version(value: string|undefined) {
         if (!value?.length) {
-            return i18n.t('PLUGIN.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
+            return i18n.t('INVENTORY.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
         }
         return '';
     },
@@ -83,7 +83,7 @@ const getVersions = async (pluginId: string) => {
             return { type: 'item', label: value, name: value };
         });
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
     }
 };
 

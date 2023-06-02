@@ -10,8 +10,7 @@
                 <p class="step">
                     Step {{ state.step }}<span>/4</span>
                 </p>
-                <!--                TODO: translation-->
-                <p-heading :title="$t('Create New Collector')" />
+                <p-heading :title="$t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')" />
                 <p class="description">
                     {{ state.descriptionByStep[state.step] }}
                 </p>
@@ -29,10 +28,9 @@
                                     @update:currentStep="handleChangeStep"
             />
         </div>
-        <!--        TODO: translation-->
-        <delete-modal :header-title="$t('Are you sure you want to quit?')"
+        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
-                      :contents="$t('You cannot undo this action.')"
+                      :contents="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
                       @confirm="handleClose"
         />
     </fragment>
@@ -64,11 +62,10 @@ const state = reactive({
     step: 1,
     deleteModalVisible: false,
     descriptionByStep: computed(() => ({
-        // TODO: translation
-        1: i18n.t('Select a plugin first.'),
-        2: i18n.t('Enter Basic Information.'),
-        3: i18n.t('Set Advanced Options.'),
-        4: i18n.t('Set schedule for automate collecting jobs.'),
+        1: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC1'),
+        2: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC2'),
+        3: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC3'),
+        4: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC4'),
     })),
 });
 
