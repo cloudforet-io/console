@@ -2161,8 +2161,11 @@
 				"VERSION": ""
 			},
 			"MAIN": {
+				"ALT_E_EDIT_SCHEDULE": "",
+				"ALT_S_EDIT_SCHEDULE": "",
 				"CREATE": "",
 				"CREATE_COLLECTOR": "",
+				"EDIT_MODAL_TITLE": "",
 				"EDIT_SCHEDULE": "",
 				"HISTORY": "",
 				"NO_DATA": "",

@@ -2161,8 +2161,11 @@
 				"VERSION": "Version"
 			},
 			"MAIN": {
+				"ALT_E_EDIT_SCHEDULE": "Failed To Edited Schedule.",
+				"ALT_S_EDIT_SCHEDULE": "Successfully Edited Schedule.",
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
+				"EDIT_MODAL_TITLE": "Edit Schedule",
 				"EDIT_SCHEDULE": "Edit schedule",
 				"HISTORY": "Collector History",
 				"NO_DATA": "There’s no collector created yet.",
