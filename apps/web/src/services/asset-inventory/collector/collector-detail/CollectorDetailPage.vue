@@ -17,7 +17,6 @@
         </p-heading>
 
         <collector-base-info-section class="section"
-                                     :collector="state.collector"
                                      :loading="state.loading"
         />
         <collector-schedule-section class="section" />

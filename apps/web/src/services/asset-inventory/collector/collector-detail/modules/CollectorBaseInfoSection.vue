@@ -18,7 +18,7 @@
         <p-definition-table v-if="!state.isEditMode"
                             :fields="fields"
                             :loading="props.loading"
-                            :data="props.collector"
+                            :data="collectorFormState.originCollector"
                             style-type="white"
         >
             <template #data-pluginName>
@@ -86,13 +86,12 @@ import { i18n } from '@/translations';
 import CollectorPluginContents from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
 import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
-import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     loading: boolean;
-    collector?: CollectorModel|null;
 }>();
 
 const collectorFormStore = useCollectorFormStore();
