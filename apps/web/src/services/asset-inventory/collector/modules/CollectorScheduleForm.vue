@@ -1,5 +1,9 @@
 <template>
-    <div class="collector-schedule-edit-form">
+    <p-data-loader :loading="state.loading"
+                   :data="true"
+                   show-data-from-scratch
+                   class="collector-schedule-edit-form"
+    >
         <p-field-title :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_ON_OFF')"
                        :description="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_TURN_ON_DESC')"
                        class="schedule-desc"
@@ -48,7 +52,7 @@
                 </p-button>
             </div>
         </p-field-group>
-    </div>
+    </p-data-loader>
 </template>
 
 <script lang="ts" setup>
@@ -57,12 +61,14 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PFieldTitle, PToggleButton,
+    PFieldGroup, PButton, PFieldTitle, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
 import { store } from '@/store';
+
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     editMode?: boolean;
@@ -72,6 +78,9 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:hours', value: string[]): void;
     (event: 'update:editMode', value: boolean): void;
 }>();
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
 const selectedUtcHoursSet = new Set<string>();
@@ -88,6 +97,7 @@ const state = reactive({
             .get('hour')
             .toString()).sort((a, b) => Number(a) - Number(b));
     }),
+    loading: computed<boolean>(() => collectorFormState.originCollector === null),
 });
 
 const updateSelectedHoursAndEmit = () => {
