@@ -1,5 +1,5 @@
 <template>
-    <svgicon :name="name"
+    <svgicon :data="icons[name]"
              :dir="dir"
              :fill="fill"
              :width="width"
@@ -11,13 +11,11 @@
              v-on="$listeners"
     />
 </template>
-<script lang="ts">
-import '@/foundation/icons/p-icons';
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 
 import type { AnimationType } from '@/foundation/icons/config';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import icons from '@/foundation/icons/p-icons/icons';
+
 /* https://www.npmjs.com/package/vue-svgicon */
 interface Props {
     name: string;
@@ -31,53 +29,29 @@ interface Props {
     title?: string;
     animation?: AnimationType;
 }
-export default defineComponent<Props>({
-    name: 'PI',
-    props: {
-        name: {
-            type: String,
-            default: '',
-        },
-        dir: {
-            type: String,
-            default: undefined,
-        },
-        fill: {
-            type: Boolean,
-            default: true,
-        },
-        width: {
-            type: String,
-            default: '1.5rem',
-        },
-        height: {
-            type: String,
-            default: '1.5rem',
-        },
-        scale: {
-            type: String,
-            default: undefined,
-        },
-        color: {
-            type: String,
-            default: undefined,
-        },
-        original: {
-            type: Boolean,
-            default: true,
-        },
-        title: {
-            type: String,
-            default: undefined,
-        },
-        animation: {
-            type: String as PropType<AnimationType|undefined>,
-            default: undefined,
-            validator(animation: AnimationType|undefined) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
-        },
-    },
+
+// TODO: need to add validation
+// {
+//     animation: {
+//         type: String as PropType<AnimationType|undefined>,
+//         default: undefined,
+//         validator(animation: AnimationType|undefined) {
+//             return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+//         },
+//     },
+// },
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = withDefaults(defineProps<Props>(), {
+    name: '',
+    dir: undefined,
+    fill: true,
+    width: '1.5rem',
+    height: '1.5rem',
+    scale: undefined,
+    color: undefined,
+    original: true,
+    title: undefined,
+    animation: undefined,
 });
 </script>
 

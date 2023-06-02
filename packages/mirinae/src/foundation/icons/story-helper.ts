@@ -1,9 +1,10 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import icons from '@/foundation/icons/p-icons/icons';
 
-export const getAllAvailableIcons = () => Object.keys(icon.icons);
+
+export const getAllAvailableIcons = () => Object.keys(icons);
 
 export const getIconsArgTypes = (): ArgTypes => ({
     name: {

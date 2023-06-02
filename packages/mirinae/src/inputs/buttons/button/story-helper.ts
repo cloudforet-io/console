@@ -1,6 +1,6 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
 
+import icons from '@/foundation/icons/p-icons/icons';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export const getButtonArgTypes = (): ArgTypes => ({
@@ -148,7 +148,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
+            options: [null, ...Object.keys(icons)],
         },
     },
     iconRight: {
@@ -167,7 +167,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
+            options: [null, ...Object.keys(icons)],
         },
     },
     // slots

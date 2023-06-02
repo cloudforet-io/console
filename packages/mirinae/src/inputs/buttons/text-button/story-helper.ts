@@ -1,6 +1,6 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
 
+import icons from '@/foundation/icons/p-icons/icons';
 import { TEXT_BUTTON_SIZE, TEXT_BUTTON_STYLE } from '@/inputs/buttons/text-button/type';
 
 
@@ -59,7 +59,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
+            options: [null, ...Object.keys(icons)],
         },
     },
     iconRight: {
@@ -78,7 +78,7 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: [null, ...Object.keys(icon.icons)],
+            options: [null, ...Object.keys(icons)],
         },
     },
     loading: {

@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import copy from 'rollup-plugin-copy';
 import { defineConfig } from 'vite';
 import StylelintPlugin from 'vite-plugin-stylelint';
+import svgicon from 'vite-plugin-svgicon';
 
 export default defineConfig(({ mode }) => ({
     optimizeDeps: {
@@ -46,6 +47,9 @@ export default defineConfig(({ mode }) => ({
                     },
                 },
             },
+        }),
+        svgicon({
+            include: ['**/svg-icon/**/*.svg'],
         }),
         StylelintPlugin({
             include: ['src/**/*.{css,vue,pcss,scss}'],

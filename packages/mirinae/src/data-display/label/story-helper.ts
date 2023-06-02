@@ -1,5 +1,6 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
+
+import icons from '@/foundation/icons/p-icons/icons';
 
 export const getLabelArgTypes = (): ArgTypes => ({
     leftIcon: {
@@ -18,7 +19,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: Object.keys(icon.icons),
+            options: Object.keys(icons),
         },
     },
     // backgroundColor: {

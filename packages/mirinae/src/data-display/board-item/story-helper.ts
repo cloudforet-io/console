@@ -1,9 +1,10 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
 
 import {
     standardIconActionSet,
 } from '@/data-display/board-item/mock';
+import icons from '@/foundation/icons/p-icons/icons';
+
 
 export const getBoardItemArgTypes = (): ArgTypes => ({
     leftIcon: {
@@ -22,7 +23,7 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'select',
-            options: Object.keys(icon.icons),
+            options: Object.keys(icons),
         },
     },
     iconButtonSets: {

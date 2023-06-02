@@ -11,7 +11,7 @@ const path = require('path');
 
 const { Command } = require('commander');
 
-const { build } = require('./build');
+const { generate } = require('./generate');
 
 const program = new Command();
 program
@@ -35,7 +35,7 @@ const targetPath = path.isAbsolute(program.opts().targetPath)
 (async () => {
     try {
         /* TODO: replace to generate function in Vue 3 with @yzfe/svgicon */
-        await build({
+        await generate({
             sourcePath,
             targetPath,
         });

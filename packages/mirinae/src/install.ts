@@ -1,11 +1,12 @@
 import 'floating-vue/dist/style.css';
 import Notifications from '@kyvg/vue3-notification';
+import { setOptions, VueSvgIconPlugin } from '@yzfe/vue3-svgicon';
 import FloatingVue from 'floating-vue';
 import velocity from 'velocity-animate';
 import type { App } from 'vue';
 import type { I18n } from 'vue-i18n';
-import SvgIcon from 'vue-svgicon';
 
+import '@yzfe/svgicon/lib/svgicon.css';
 import { i18n, I18nConnector } from '@/translations';
 
 import { applyAmchartsGlobalSettings } from './plugins/amcharts';
@@ -28,8 +29,11 @@ export class MirinaeInstaller {
         // Install internal plug-ins
         appInstance.use(Notifications, { velocity });
         appInstance.use(FloatingVue, { boundary: document.body });
-        appInstance.use(SvgIcon, {
+        // appInstance.directive('tooltip', VTooltip);
+        appInstance.use(VueSvgIconPlugin, {
             tagName: 'svgicon',
+        });
+        setOptions({
             classPrefix: 'p-i',
         });
 
