@@ -30,14 +30,14 @@ export type WidgetTheme = typeof WIDGET_THEMES[number];
 export type WidgetColorSetType = 'basic'|'massive';
 
 export const SEVERITY_STATUS_MAP = {
-    CRITICAL: { name: 'critical', label: 'Critical', color: red[400] },
-    HIGH: { name: 'high', label: 'High', color: red[300] },
-    MEDIUM: { name: 'medium', label: 'Medium', color: red[200] },
-    LOW: { name: 'low', label: 'Low', color: red[100] },
-    PASS: { name: 'pass', label: 'Pass', color: green[500] },
+    CRITICAL: { name: 'CRITICAL', label: 'Critical', color: red[400] },
+    HIGH: { name: 'HIGH', label: 'High', color: red[300] },
+    MEDIUM: { name: 'MEDIUM', label: 'Medium', color: red[200] },
+    LOW: { name: 'LOW', label: 'Low', color: red[100] },
+    PASS: { name: 'PASS', label: 'Pass', color: green[500] },
 } as const;
 
 export const COMPLIANCE_STATUS_MAP = {
-    PASS: { name: 'pass', label: 'Pass', color: green[500] },
-    FAIL: { name: 'fail', label: 'Fail', color: red[400] },
+    PASS: { name: 'PASS', label: 'Pass', color: green[500] },
+    FAIL: { name: 'FAIL', label: 'Fail', color: red[400] },
 } as const;
