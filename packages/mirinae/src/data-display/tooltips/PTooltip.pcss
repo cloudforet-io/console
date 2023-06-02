@@ -6,7 +6,7 @@ $space: 8px;
     font-size: 0.75rem;
     line-height: 1.5;
 
-    .tooltip-inner {
+    .v-popper__inner {
         @apply rounded-md;
         max-width: 640px;
         background-color: $tooltip-color;
@@ -14,7 +14,7 @@ $space: 8px;
         padding: 5px 8px;
     }
 
-    .tooltip-arrow {
+    .v-popper__arrow-outer {
         width: 0;
         height: 0;
         border-style: solid;
@@ -27,7 +27,7 @@ $space: 8px;
     &[x-placement^="top"] {
         margin-bottom: calc($(space));
 
-        .tooltip-arrow {
+        .v-popper__arrow-outer {
             border-width: 8px 6px 0 6px;
             border-left-color: transparent !important;
             border-right-color: transparent !important;
@@ -42,7 +42,7 @@ $space: 8px;
     &[x-placement^="bottom"] {
         margin-top: calc($(space));
 
-        .tooltip-arrow {
+        .v-popper__arrow-outer {
             border-width: 0 6px 8px 6px;
             border-left-color: transparent !important;
             border-right-color: transparent !important;
@@ -57,7 +57,7 @@ $space: 8px;
     &[x-placement^="right"] {
         margin-left: calc($(space));
 
-        .tooltip-arrow {
+        .v-popper__arrow-outer {
             border-width: 6px 8px 6px 0;
             border-left-color: transparent !important;
             border-top-color: transparent !important;
@@ -72,7 +72,7 @@ $space: 8px;
     &[x-placement^="left"] {
         margin-right: calc($(space));
 
-        .tooltip-arrow {
+        .v-popper__arrow-outer {
             border-width: 6px 0 6px 8px;
             border-top-color: transparent !important;
             border-right-color: transparent !important;
@@ -84,10 +84,10 @@ $space: 8px;
         }
     }
 
-    &.popover {
+    &.v-popper__popper {
         $color: theme('colors.gray.900');
 
-        .popover-inner {
+        .v-popper__inner {
             @apply rounded;
             background: $color;
             color: $color;
@@ -95,7 +95,7 @@ $space: 8px;
             box-shadow: 0 5px 30px rgba(theme('colors.black'), 0.1);
         }
 
-        .popover-arrow {
+        .v-popper__arrow-inner {
             border-color: $color;
         }
     }
@@ -113,13 +113,13 @@ $space: 8px;
     }
 
     @screen tablet {
-        .tooltip-inner {
+        .v-popper__inner {
             max-width: 320px;
         }
     }
 
     @screen mobile {
-        .tooltip-inner {
+        .v-popper__inner {
             max-width: 240px;
         }
     }

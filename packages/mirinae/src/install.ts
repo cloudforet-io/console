@@ -1,6 +1,6 @@
-
+import 'floating-vue/dist/style.css';
 import Notifications from '@kyvg/vue3-notification';
-import VTooltip from 'v-tooltip';
+import FloatingVue from 'floating-vue';
 import velocity from 'velocity-animate';
 import type { App } from 'vue';
 import type { I18n } from 'vue-i18n';
@@ -27,7 +27,7 @@ export class MirinaeInstaller {
 
         // Install internal plug-ins
         appInstance.use(Notifications, { velocity });
-        appInstance.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+        appInstance.use(FloatingVue, { boundary: document.body });
         appInstance.use(SvgIcon, {
             tagName: 'svgicon',
             classPrefix: 'p-i',

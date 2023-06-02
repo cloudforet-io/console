@@ -52,8 +52,6 @@ import {
     computed, defineComponent, ref, watch,
 } from 'vue';
 
-import { VTooltip } from 'v-tooltip';
-
 import PTag from '@/data-display/tags/PTag.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
@@ -67,7 +65,6 @@ import type { QueryItem } from '@/inputs/search/query-search/type';
 
 export default defineComponent<QuerySearchTagsProps>({
     name: 'PQuerySearchTags',
-    directives: { tooltip: VTooltip },
     components: {
         PButton, PTag,
     },
