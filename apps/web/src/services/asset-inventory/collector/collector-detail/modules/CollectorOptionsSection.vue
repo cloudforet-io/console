@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_OPTIONS')"
+        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_OPTIONS')"
                    heading-type="sub"
         >
             <template #extra>
@@ -8,7 +8,7 @@
                           icon-left="ic_edit"
                           style-type="secondary"
                 >
-                    {{ i18n.t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-heading>
@@ -27,8 +27,6 @@ import {
     PHeading, PButton, PPaneLayout, PDefinitionTable,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
-
-import { i18n } from '@/translations';
 
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 

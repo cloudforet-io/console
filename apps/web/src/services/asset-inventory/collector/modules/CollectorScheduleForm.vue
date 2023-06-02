@@ -7,15 +7,27 @@
         <p-toggle-button :value="state.isAutoSchedule"
                          @change-toggle="handleChangeToggle"
         />
-        <i18n v-if="!props.editMode"
-              path="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
-              tag="p"
-              class="collect-data-desc"
+        <div v-if="!props.editMode"
+             class="collect-data-desc"
         >
-            <template #times>
-                <span class="times">{{ state.timezoneAppliedHours.map(hour => `${hour}:00`).join(', ') }}</span>
+            <i18n v-if="state.timezoneAppliedHours.length > 0"
+                  path="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
+                  tag="p"
+            >
+                <template #times>
+                    <span class="times">{{ state.timezoneAppliedHours.map(hour => `${hour}:00`).join(', ') }}</span>
+                </template>
+            </i18n>
+            <template v-else>
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_NOT_SELECTED_YET') }}
+                <p-button style-type="tertiary"
+                          size="sm"
+                          @click="handleClickSelect"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SELECT') }}
+                </p-button>
             </template>
-        </i18n>
+        </div>
         <p-field-group v-else
                        class="hourly-schedule-field-group"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
@@ -29,9 +41,7 @@
                 >
                     {{ hour }}
                 </span>
-                <p-button class="all-button"
-                          :class="[state.isAllHoursSelected ? 'all-selected' : '']"
-                          style-type="highlight"
+                <p-button style-type="tertiary"
                           @click="handleClickAllHours"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
@@ -60,6 +70,7 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{(event: 'update:hours', value: string[]): void;
+    (event: 'update:editMode', value: boolean): void;
 }>();
 
 const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
@@ -87,6 +98,10 @@ const updateSelectedHoursAndEmit = () => {
 
 const handleChangeToggle = () => {
     // TODO: change state of toggle button
+};
+
+const handleClickSelect = () => {
+    emits('update:editMode', true);
 };
 
 const handleClickHour = (hour: string) => {
@@ -145,6 +160,7 @@ watch(() => props.editMode, () => {
 }
 .hourly-schedule-field-group {
     margin-top: 1.5rem;
+    margin-bottom: 1.875rem;
 }
 .hourly-schedule-wrapper {
     display: grid;
@@ -169,19 +185,6 @@ watch(() => props.editMode, () => {
         }
         &.active {
             @apply bg-safe text-white;
-        }
-    }
-    .all-button {
-        @apply bg-white text-black border-gray-300;
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        vertical-align: unset;
-        &:hover {
-            @apply bg-secondary2 border-secondary text-secondary;
-        }
-        &.all-selected {
-            @apply bg-gray-900 text-white;
-            border: none;
         }
     }
 }

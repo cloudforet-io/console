@@ -19,6 +19,7 @@
             <collector-schedule-form :edit-mode="state.isEditMode"
                                      :utc-hours="state.updatingUtcHours"
                                      @update:hours="handleUpdateHours"
+                                     @update:editMode="handleUpdateEditMode"
             />
 
             <p-button v-if="state.isEditMode"
@@ -65,6 +66,10 @@ const handleClickEdit = () => {
 
 const handleUpdateHours = (hours: string[]) => {
     state.updatingUtcHours = hours;
+};
+
+const handleUpdateEditMode = (value: boolean) => {
+    state.isEditMode = value;
 };
 
 const handleClickCancel = () => {
