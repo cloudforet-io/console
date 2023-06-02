@@ -149,6 +149,24 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    uniformWidth: {
+        name: 'uniformWidth',
+        type: { name: 'boolean' },
+        description: 'It ensures that all input forms have the same width, creating a consistent and visually appealing layout.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // slots
     labelExtraSlot: {
         name: 'label-extra',

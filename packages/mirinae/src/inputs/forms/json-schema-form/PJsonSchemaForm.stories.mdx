@@ -43,6 +43,8 @@ export const Template = (args, { argTypes }) => ({
             :reset-on-schema-change="resetOnSchemaChange"
             :custom-error-map="customErrorMap"
             :reference-handler="simpleHandler"
+            :use-fixed-menu-style="useFixedMenuStyle"
+            :uniform-width="uniformWidth"
         />
     `,
     setup(props) {
@@ -375,6 +377,44 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <br/>
 <br/>
 
+
+## Uniform Width
+
+<Canvas>
+    <Story name="Uniform Width" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
+            i18n: I18nConnector.i18n,
+            template: `
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-heading>Json Schema Form</p-heading>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+                            :reference-handler="handler"
+                            uniform-width
+                            style="width: 100%"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {},
+                    handler: getReferenceHandler()
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 
