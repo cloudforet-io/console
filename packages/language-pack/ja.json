@@ -1412,7 +1412,11 @@
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
 			"COMPLIANCE_CHECK_STATUS": {
-				"DESC": ""
+				"CHECKED_SERVICE_ACCOUNT": "",
+				"COMPLIANCE_SCORE": "",
+				"DESC": "",
+				"MORE_THAN_PREV_30_DAYS": "",
+				"TOTAL_COMPLIANCE_NUMBER": ""
 			},
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
@@ -1468,7 +1472,11 @@
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
 			"TOTAL_FAILURE_AND_SEVERITY": {
-				"DESC": ""
+				"DESC": "",
+				"FAILURE_RATE": "",
+				"MORE_THAN_PREV_30_DAYS": "",
+				"SEVERITY": "",
+				"TOTAL_FAILURE_COUNT": ""
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": ""
