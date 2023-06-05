@@ -28,7 +28,7 @@
                             />
                             <!--TODO: real data-->
                             <span class="diff-value">75</span>
-                            <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_30_DAYS') }}</span>
+                            <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTHS', { month: 2 }) }}</span>
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,7 @@
                              :color="red[500]"
                         />
                         <span class="diff-value">86</span>
-                        <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_30_DAYS') }}</span>
+                        <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTHS', { month: 4 }) }}</span>
                     </div>
                 </div>
                 <p-divider :vertical="true" />
