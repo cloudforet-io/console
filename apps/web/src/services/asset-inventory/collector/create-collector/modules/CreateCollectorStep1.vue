@@ -4,7 +4,7 @@
                   @search="handleSearch"
         />
         <div class="contents-container">
-            <step1-search-filter />
+            <step1-search-filter @selectedRepository="handleChangeRepository" />
             <p-data-loader class="right-area"
                            :data="state.pluginList"
                            :loading="state.loading"
@@ -63,6 +63,7 @@ import CollectPluginContents
     from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 const emit = defineEmits([
     'update:currentStep',
@@ -70,11 +71,16 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
+
 
 const state = reactive({
     searchValue: '',
     pluginList: [] as CollectorPluginModel[],
     loading: false,
+    selectedRepository: '',
+    selectedProvider: '',
 });
 
 const pluginApiQuery = new ApiQueryHelper();
@@ -93,7 +99,8 @@ const getPlugins = async () => {
         // }
         const params = {
             service_type: 'inventory.Collector',
-            repository_id: 'repo-f42c8b88ee2b',
+            repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
+            provider: collectorPageState.selectedProvider === 'all' ? '' : collectorPageState.selectedProvider,
             query: pluginApiQuery.data,
         };
         const res = await SpaceConnector.client.repository.plugin.list(params);
@@ -112,11 +119,15 @@ const getPlugins = async () => {
 };
 
 const handleSearch = (value) => {
-    console.log('value', value);
+    state.searchValue = value;
+    getPlugins();
 };
 const handleClickNextStep = (item: CollectorPluginModel) => {
     emit('update:currentStep', 2);
     collectorFormStore.setPluginInfo(item);
+};
+const handleChangeRepository = (value:string) => {
+    state.selectedRepository = value;
 };
 
 (() => {
