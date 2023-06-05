@@ -1415,7 +1415,8 @@
 				"CHECKED_SERVICE_ACCOUNT": "",
 				"COMPLIANCE_SCORE": "",
 				"DESC": "프라울러 Check / Findings 상태 제공",
-				"MORE_THAN_PREV_30_DAYS": "",
+				"LESS_THAN_PREV_MONTHS": "",
+				"MORE_THAN_PREV_MONTHS": "",
 				"TOTAL_COMPLIANCE_NUMBER": ""
 			},
 			"COST_BY_REGION": {
@@ -1474,7 +1475,8 @@
 			"TOTAL_FAILURE_AND_SEVERITY": {
 				"DESC": "Failure 전체 수치에 대한 심각도 제공",
 				"FAILURE_RATE": "",
-				"MORE_THAN_PREV_30_DAYS": "",
+				"LESS_THAN_PREV_MONTHS": "",
+				"MORE_THAN_PREV_MONTHS": "",
 				"SEVERITY": "",
 				"TOTAL_FAILURE_COUNT": ""
 			},
