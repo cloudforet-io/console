@@ -19,12 +19,12 @@
             </div>
             <div class="table-pagination-wrapper">
                 <p-text-pagination :this-page="state.thisPage"
-                                   :disable-next-page="!state.data?.more"
+                                   :disable-next-page="!state.showNextPage"
                                    @update:thisPage="handleUpdateThisPage"
                 >
                     <template #default>
                         <span class="this-page">{{ state.thisPage }}</span>
-                        <span v-if="state.data?.more"> / ...</span>
+                        <span v-if="state.showNextPage"> / ...</span>
                     </template>
                 </p-text-pagination>
             </div>
@@ -98,6 +98,7 @@ const state = reactive({
     }),
     chartData: computed(() => cloneDeep(state.data?.results).reverse()),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
+    showNextPage: computed(() => !!state.data?.more),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
