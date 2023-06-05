@@ -5,7 +5,7 @@
         <template #label-extra>
             <div class="mt-1">
                 <p class="tag-description">
-                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC1") }}
+                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC1", {service: props.serviceName}) }}
                 </p>
                 <p class="tag-description">
                     {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC2", {service: props.serviceName}) }}

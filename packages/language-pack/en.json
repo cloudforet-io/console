@@ -2127,7 +2127,7 @@
 				"STEP_DESC3": "Set Advanced Options.",
 				"STEP_DESC4": "Set schedule for automate collecting jobs.",
 				"TAG": "Tag",
-				"TAG_FORM_DESC1": "Set Account's tag.",
+				"TAG_FORM_DESC1": "Set {service}'s tag.",
 				"TAG_FORM_DESC2": "Each tag consists of a key and an optional value. You can use tags to search and filter your {service}",
 				"VERSION_INVALID_REQUIRED": "Select version.",
 				"VERSION_LABEL": "Version"
