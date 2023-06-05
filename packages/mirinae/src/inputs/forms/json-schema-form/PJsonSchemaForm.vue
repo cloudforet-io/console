@@ -1,5 +1,6 @@
 <template>
     <form class="p-json-schema-form"
+          :class="{'uniform-width': uniformWidth}"
           @submit.prevent
     >
         <p-field-group v-if="isJsonInputMode"
@@ -60,6 +61,7 @@
                                                 :value="rawFormData[schemaProperty.propertyName]"
                                                 :disabled="schemaProperty.disabled"
                                                 :invalid="invalid"
+                                                :full-width="uniformWidth"
                                                 class="input-form"
                                                 @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
@@ -76,6 +78,7 @@
                                                :items="schemaProperty.menuItems"
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
+                                               :button-text-ellipsis="uniformWidth"
                                                class="input-form"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
@@ -236,6 +239,10 @@ export default defineComponent<JsonSchemaFormProps>({
             default: undefined,
         },
         useFixedMenuStyle: {
+            type: Boolean,
+            default: false,
+        },
+        uniformWidth: {
             type: Boolean,
             default: false,
         },
@@ -407,7 +414,7 @@ export default defineComponent<JsonSchemaFormProps>({
     }
     .field-group-default-wrapper {
         display: flex;
-        .input-wrapper {
+        > .input-wrapper {
             flex-grow: 1;
         }
     }
@@ -416,6 +423,11 @@ export default defineComponent<JsonSchemaFormProps>({
         margin-bottom: 0.25rem;
         &:last-of-type {
             margin-bottom: 0;
+        }
+    }
+    &.uniform-width {
+        .field-group-default-wrapper > .input-wrapper > .input-form {
+            width: 100%;
         }
     }
 }

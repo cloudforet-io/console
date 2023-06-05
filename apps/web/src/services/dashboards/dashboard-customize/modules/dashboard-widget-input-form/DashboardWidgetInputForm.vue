@@ -27,12 +27,13 @@
                                 :custom-error-map="inheritOptionsErrorMap"
                                 :validation-mode="widgetKey ? 'all' : 'input'"
                                 use-fixed-menu-style
+                                uniform-width
                                 :reference-handler="referenceHandler"
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
             >
                 <template #label-extra="{ propertyName }">
-                    <div class="inherit-toggle-button">
+                    <div class="inherit-toggle-button-wrapper">
                         <span class="text"
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
@@ -52,8 +53,10 @@
                     />
                 </template>
                 <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)">
-                        <span>{{ selectedItem.label }}</span>
+                    <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)"
+                         class="dropdown-inner"
+                    >
+                        <span class="item-label">{{ selectedItem.label }}</span>
                         <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
                     </div>
                 </template>
@@ -451,27 +454,54 @@ export default defineComponent<Props>({
         }
     }
 
-    /* custom design-system component - p-field-group */
+    .widget-options-form {
+        width: 100%;
+    }
+
+    /* custom design-system component - p-json-schema-form */
     :deep(.widget-options-form) {
-        .field-title-box {
-            pointer-events: none;
+        /* custom design-system component - p-field-group */
+        .p-field-group {
+            .form-label {
+                width: 100%;
+                > .title {
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+
+            /* HACK: remove this when p-select-dropdown is fixed */
+            .input-wrapper {
+                width: calc(100% - 2.5rem);
+            }
         }
-        .form-label {
-            display: -webkit-box;
-            width: 100%;
-            justify-content: space-between;
-            align-content: center;
-        }
-        .input-form {
-            width: 100%;
+
+        /*
+        custom design-system component - p-select-dropdown
+        HACK: remove this when p-select-dropdown is fixed
+         */
+        .p-select-dropdown .dropdown-button {
+            > .text {
+                @apply truncate;
+                max-width: calc(100% - 1.5rem);
+            }
         }
     }
-    .suffix-text {
-        @apply text-gray-500;
-        padding-left: 0.25rem;
+    .dropdown-inner {
+        display: flex;
+        .item-label {
+            @apply truncate;
+            flex-shrink: 0;
+        }
+        .suffix-text {
+            @apply truncate text-gray-500;
+            padding-left: 0.25rem;
+        }
     }
-    .inherit-toggle-button {
-        @apply flex bg-gray-100 rounded;
+    .inherit-toggle-button-wrapper {
+        @apply inline-flex bg-gray-100 rounded;
         line-height: 1.25;
         padding: 0.25rem 0.5rem;
         pointer-events: initial;
