@@ -17,6 +17,8 @@ export const initDayjs = () => {
             { l: 'mm', r: 59, d: 'minute' },
             { l: 'd', r: 1 },
             { l: 'dd', r: 29, d: 'day' },
+            { l: 'h', r: 1 },
+            { l: 'hh', r: 23, d: 'hour' },
             { l: 'M', r: 1 },
             { l: 'MM', r: 11, d: 'month' },
             { l: 'y' },

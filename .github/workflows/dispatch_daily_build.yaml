@@ -131,7 +131,7 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Image:*\n$cloudforetdev/${{ github.event.repository.name }}:${{ needs.docker.outputs.TIME }}
+                      "text": "*Image:*\ncloudforetdev/${{ github.event.repository.name }}:${{ needs.docker.outputs.TIME }}
                     },
                     {
                       "type": "mrkdwn",

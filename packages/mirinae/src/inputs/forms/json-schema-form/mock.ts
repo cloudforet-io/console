@@ -53,12 +53,13 @@ export const getDefaultSchema = () => ({
             title: 'Provider',
             minLength: 1,
             type: 'string',
-            default: 'aws',
-            enum: ['aws', 'google_cloud', 'azure'],
+            default: 'long',
+            enum: ['aws', 'google_cloud', 'azure', 'long'],
             menuItems: [
                 { name: 'aws', label: 'AWS' },
                 { name: 'google_cloud', label: 'Google Cloud' },
                 { name: 'azure', label: 'Azure' },
+                { name: 'long', label: 'this is very long long long long long long long long long long provider name' },
             ],
         },
         age: {
