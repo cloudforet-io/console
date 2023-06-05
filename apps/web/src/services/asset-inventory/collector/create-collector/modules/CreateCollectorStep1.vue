@@ -10,7 +10,9 @@
                            :loading="state.loading"
                            :loader-backdrop-color="BACKGROUND_COLOR"
             >
-                <div class="plugin-card-list">
+                <div ref="pluginCardListRef"
+                     class="plugin-card-list"
+                >
                     <p-board-item v-for="item in state.pluginList"
                                   :key="item.name"
                                   class="plugin-card-item"
@@ -41,7 +43,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { useInfiniteScroll } from '@vueuse/core';
+import {
+    onMounted, reactive, ref, watch,
+} from 'vue';
 
 import {
     PSearch, PDataLoader, PBoardItem, PButton, PI,
@@ -80,23 +85,19 @@ const state = reactive({
     pluginList: [] as CollectorPluginModel[],
     loading: false,
     selectedRepository: '',
-    selectedProvider: '',
+    currentPage: 1,
+    totalCount: 0,
 });
+const pluginCardListRef = ref<HTMLElement | null>(null);
+
 
 const pluginApiQuery = new ApiQueryHelper();
-const getPlugins = async () => {
+const getPlugins = async (): Promise<CollectorPluginModel[]> => {
     state.loading = true;
     try {
-        pluginApiQuery.setPage(getPageStart(1, 10), 10).setSort('name', false)
+        pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
             .setFilters([{ v: state.searchValue }]);
 
-        // if (state.resourceTypeSearchTags.length) {
-        //     pluginApiQuery.setFilters([{
-        //         k: 'labels',
-        //         v: state.resourceTypeSearchTags,
-        //         o: '=',
-        //     }]);
-        // }
         const params = {
             service_type: 'inventory.Collector',
             repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
@@ -104,7 +105,8 @@ const getPlugins = async () => {
             query: pluginApiQuery.data,
         };
         const res = await SpaceConnector.client.repository.plugin.list(params);
-        state.pluginList = [
+        state.totalCount = res.total_count;
+        return [
             ...res.results.map((d) => ({
                 icon: assetUrlConverter(d.tags?.icon),
                 ...d,
@@ -112,15 +114,25 @@ const getPlugins = async () => {
         ];
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.pluginList = [];
+        return [];
     } finally {
         state.loading = false;
     }
 };
 
-const handleSearch = (value) => {
+const loadMorePlugin = async () => {
+    if (state.totalCount <= state.pluginList.length) {
+        return;
+    }
+    state.currentPage += 1;
+    state.loading = true;
+    const additionalPlugin = await getPlugins();
+    state.pluginList = [...state.pluginList, ...additionalPlugin];
+};
+
+const handleSearch = async (value) => {
     state.searchValue = value;
-    getPlugins();
+    state.pluginList = await getPlugins();
 };
 const handleClickNextStep = (item: CollectorPluginModel) => {
     emit('update:currentStep', 2);
@@ -130,9 +142,16 @@ const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
 };
 
-(() => {
-    getPlugins();
-})();
+watch([() => collectorPageState.selectedProvider, () => state.selectedRepository], async () => {
+    state.currentPage = 1;
+    state.pluginList = await getPlugins();
+}, { immediate: true });
+
+onMounted(() => {
+    useInfiniteScroll(pluginCardListRef, () => {
+        loadMorePlugin();
+    });
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -142,15 +161,14 @@ const handleChangeRepository = (value:string) => {
     width: 100%;
     .contents-container {
         @apply flex;
-        height: calc(100vh - 18rem);
         margin-top: 1.5rem;
 
         .right-area {
-            overflow-y: auto;
             max-width: 44.375rem;
-
             .plugin-card-list {
-                @apply flex flex-col flex-wrap gap-2;
+                @apply flex flex-col gap-2;
+                overflow-y: auto;
+                height: calc(100vh - 18rem);
                 :deep(.p-board-item) {
                     .content-area .content {
                         flex-grow: unset;
@@ -161,6 +179,7 @@ const handleChangeRepository = (value:string) => {
                 .plugin-card-item {
                     border-radius: 0.375rem;
                     width: 100%;
+                    min-height: unset;
 
                     .plugin-card-content {
                         @apply flex justify-between;

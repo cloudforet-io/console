@@ -151,7 +151,6 @@ const getRepositories = async () => {
 };
 
 const handleChangeProvider = (provider) => {
-    console.log('provider', provider);
     collectorPageStore.setSelectedProvider(provider);
 };
 
