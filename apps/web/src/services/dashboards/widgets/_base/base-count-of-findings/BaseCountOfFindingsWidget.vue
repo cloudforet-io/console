@@ -18,8 +18,9 @@
                 </p-data-loader>
             </div>
             <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page.sync="state.thisPage"
+                <p-text-pagination :this-page="state.thisPage"
                                    :disable-next-page="!state.showNextPage"
+                                   @update:thisPage="handleUpdateThisPage"
                 >
                     <template #default>
                         <span class="this-page">{{ state.thisPage }}</span>
@@ -33,31 +34,44 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader, PTextPagination } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, random } from 'lodash';
+import { cloneDeep } from 'lodash';
+
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-
-import { green, red } from '@/styles/colors';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import countOfFailFindingsWidgetConfig from '@/services/dashboards/widgets/asset-widgets/count-of-fail-findings/widget-config';
-import countOfPassAndFailFindingsWidgetConfig from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
+import countOfPassAndFailFindingsWidgetConfig
+    from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 
+
+interface Data {
+    [groupBy: string]: string | any;
+    pass_findings_count?: number;
+    fail_findings_count?: number;
+}
+interface FullData {
+    results: Data[];
+    more: boolean;
+}
 
 const DATE_FORMAT = 'YYYY-MM';
 const props = defineProps<WidgetProps>();
@@ -65,50 +79,83 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<FullData>(props)),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    // TODO: remove sampleData
-    legends: computed<Legend[]|undefined>(() => {
-        if (props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id) {
+    legends: computed<Legend[]>(() => {
+        if (state.showPassFindings) {
             return [
-                { name: 'pass', label: 'Pass', color: green[500] },
-                { name: 'fail', label: 'Fail', color: red[400] },
-            ];
-        } if (props.widgetConfigId === countOfFailFindingsWidgetConfig.widget_config_id) {
-            return [
-                { name: 'fail', label: 'Fail', color: red[400] },
+                { name: 'pass_findings_count', label: COMPLIANCE_STATUS_MAP.PASS.label, color: COMPLIANCE_STATUS_MAP.PASS.color },
+                { name: 'fail_findings_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
             ];
         }
-        return undefined;
+        return [
+            { name: 'fail_findings_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
+        ];
     }),
-    showNextPage: computed(() => state.thisPage * 8 <= 20),
-    sampleData: computed(() => [...Array(20)].map(() => ({
-        region_code: `region-${random(0, 1000)}`,
-        service: `service-${random(0, 1000)}`,
-        pass: random(0, 100),
-        fail: random(0, 100),
-    }))),
-    chartData: computed(() => {
-        const start = (state.thisPage - 1) * 8;
-        const end = start + 8;
-        return state.sampleData.slice(start, end);
-    }),
+    chartData: computed(() => cloneDeep(state.data?.results).reverse()),
+    showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
+    showNextPage: computed(() => !!state.data?.more),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const fetchData = async () => {
-    // TODO: fetch data
+const fetchData = async (): Promise<FullData> => {
+    try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        let apiQuery: any = {
+            group_by: [state.groupBy],
+            fields: {
+                fail_findings_count: {
+                    key: 'data.stats.findings.fail',
+                    operator: 'sum',
+                },
+            },
+            sort: [{ key: 'fail_findings_count', desc: true }],
+        };
+        if (state.showPassFindings) {
+            apiQuery = {
+                ...apiQuery,
+                fields: {
+                    ...apiQuery.fields,
+                    pass_findings_count: {
+                        key: 'data.stats.findings.pass',
+                        operator: 'sum',
+                    },
+                },
+                select: {
+                    [state.groupBy]: state.groupBy,
+                    pass_findings_count: 'pass_findings_count',
+                    fail_findings_count: 'fail_findings_count',
+                    total_findings_count: {
+                        operator: 'add',
+                        fields: ['pass_findings_count', 'fail_findings_count'],
+                    },
+                },
+                sort: [{ key: 'total_findings_count', desc: true }],
+            };
+        }
+        return await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query: {
+                ...apiQuery,
+                ...apiQueryHelper.data,
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return { results: [], more: false };
+    }
 };
 const drawChart = (chartData) => {
     if (!state.groupBy || !state.legends) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupBy);
     yAxis.data.setAll(cloneDeep(chartData));
-    // legend
+
     const legend = chartHelper.createLegend({
         nameField: 'name',
     });
@@ -129,12 +176,27 @@ const drawChart = (chartData) => {
         series.columns.template.setAll({
             height: 20,
         });
+        // series.bullets.push(() => {
+        //     const label = chartHelper.createLabel({
+        //         text: `{${_legend.name}}`,
+        //         populateText: true,
+        //         textAlign: 'end',
+        //         centerX: percent(0),
+        //         centerY: percent(50),
+        //         fontSize: 14,
+        //         direction: 'ltr',
+        //     });
+        //     return chartHelper.createBullet({
+        //         sprite: label,
+        //         dynamic: true,
+        //     });
+        // });
         chart.series.push(series);
         series.data.setAll(cloneDeep(chartData));
     });
     legend.data.setAll(chart.series.values);
 };
-const initWidget = async (data) => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -142,7 +204,7 @@ const initWidget = async (data) => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1) => {
+const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
@@ -153,13 +215,18 @@ const refreshWidget = async (thisPage = 1) => {
     return state.data;
 };
 
+const handleUpdateThisPage = (thisPage: number) => {
+    state.thisPage = thisPage;
+    refreshWidget(thisPage);
+};
+
 useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
     state,
 });
-defineExpose<WidgetExpose>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });
