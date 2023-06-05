@@ -24926,7 +24926,28 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MORE_THAN_PREV_30_DAYS</name>
+                                        <name>LESS_THAN_PREV_MONTHS</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>MORE_THAN_PREV_MONTHS</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -25610,7 +25631,28 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MORE_THAN_PREV_30_DAYS</name>
+                                        <name>LESS_THAN_PREV_MONTHS</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>MORE_THAN_PREV_MONTHS</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
