@@ -5,50 +5,45 @@
              [size]: true,
          }"
     >
-        <header v-if="header !== false || $scopedSlots.header">
+        <header v-if="header !== false || $slots.header">
             <slot name="header">
                 {{ header }}
             </slot>
         </header>
-        <div class="body" :class="{ 'no-header': !header.length && !$scopedSlots.header }">
+        <div class="body"
+             :class="{ 'no-header': !header.length && !$slots.header }"
+        >
             <slot />
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
-import type { CardProps } from '@/data-display/cards/card/type';
 
-
-export default defineComponent<CardProps>({
-    name: 'PCard',
-    props: {
-        header: {
-            type: [String, Boolean],
-            default: '',
-        },
-        styleType: {
-            type: String,
-            default: CARD_STYLE_TYPE.gray100,
-            validator(styleType: any) {
-                return Object.values(CARD_STYLE_TYPE).includes(styleType);
-            },
-        },
-        size: {
-            type: String,
-            default: CARD_SIZE.md,
-            validator(size: any) {
-                return Object.values(CARD_SIZE).includes(size);
-            },
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps({
+    header: {
+        type: [String, Boolean],
+        default: '',
+    },
+    styleType: {
+        type: String,
+        default: CARD_STYLE_TYPE.gray100,
+        validator(styleType: any) {
+            return Object.values(CARD_STYLE_TYPE).includes(styleType);
         },
     },
-    setup() {
-        return {};
+    size: {
+        type: String,
+        default: CARD_SIZE.md,
+        validator(size: any) {
+            return Object.values(CARD_SIZE).includes(size);
+        },
     },
 });
+
 </script>
 
 <style lang="postcss">
