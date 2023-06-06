@@ -1,7 +1,6 @@
 <template>
     <div class="p-board-item"
          :class="{'rounded': rounded, 'selected': isSelected}"
-         v-on="$listeners"
     >
         <div class="content-area">
             <slot name="left-content">
