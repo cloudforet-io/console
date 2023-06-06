@@ -22,8 +22,8 @@
             >
                 <div class="overlay-contents">
                     <slot name="overlay-content" />
-                    <div v-if="iconSetList.length">
-                        <p-tooltip v-for="(iconAction, index) in iconSetList"
+                    <div v-if="state.iconSetList.length">
+                        <p-tooltip v-for="(iconAction, index) in state.iconSetList"
                                    :key="`${iconAction.iconName}-desktop-${index}`"
                                    class="overlay-icon-button"
                                    :contents="iconAction.tooltipText"
@@ -36,19 +36,19 @@
                     </div>
                 </div>
             </div>
-            <div v-if="iconSetList.length > 0"
+            <div v-if="state.iconSetList.length > 0"
                  class="right-overlay-wrapper tablet"
             >
                 <div class="overlay-contents">
-                    <p-select-dropdown v-if="iconSetList.length > 1"
-                                       :items="iconSetList"
+                    <p-select-dropdown v-if="state.iconSetList.length > 1"
+                                       :items="state.iconSetList"
                                        style-type="icon-button"
                                        button-icon="ic_more"
                                        use-fixed-menu-style
                     >
                         <template #menu-menu>
                             <div class="custom-button-menu">
-                                <p-icon-button v-for="(iconAction, index) in iconSetList"
+                                <p-icon-button v-for="(iconAction, index) in state.iconSetList"
                                                :key="`${iconAction.iconName}-context-menu-${index}`"
                                                :name="iconAction.iconName"
                                                @click.stop="iconAction.eventAction"
@@ -56,13 +56,13 @@
                             </div>
                         </template>
                     </p-select-dropdown>
-                    <p-tooltip v-else-if="iconSetList.length === 1"
+                    <p-tooltip v-else-if="state.iconSetList.length === 1"
                                class="overlay-icon-button"
-                               :contents="iconSetList[0].tooltipText"
+                               :contents="state.iconSetList[0].tooltipText"
                                position="bottom"
                     >
-                        <p-icon-button :name="iconSetList[0].iconName"
-                                       @click.stop="iconSetList[0].eventAction"
+                        <p-icon-button :name="state.iconSetList[0].iconName"
+                                       @click.stop="state.iconSetList[0].eventAction"
                         />
                     </p-tooltip>
                 </div>
@@ -76,69 +76,34 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
-import type { PropType } from 'vue';
 
-import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
+import type { BoardItemProps } from '@/data-display/board-item/type';
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useSelect } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
-export default defineComponent<BoardItemProps>({
-    name: 'PBoardItem',
-    components: {
-        PTooltip, PIconButton, PSelectDropdown, PI,
-    },
-    model: {
-        prop: 'selected',
-        event: 'change',
-    },
-    props: {
-        leftIcon: {
-            type: String,
-            default: undefined,
-        },
-        selected: {
-            type: String,
-            default: undefined,
-        },
-        rounded: {
-            type: Boolean,
-            default: undefined,
-        },
-        iconButtonSets: {
-            type: Array as PropType<IconSet[]>,
-            default: () => [],
-        },
-        value: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            iconSetList: computed(() => props.iconButtonSets ?? []),
-        });
-
-        const {
-            isSelected,
-        } = useSelect({
-            selected: computed(() => props.selected),
-            value: computed(() => props.value),
-            predicate: () => !!(props.selected && props.value && props.selected === props.value),
-        });
-
-        return {
-            isSelected,
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<BoardItemProps>(), {
+    iconButtonSets: () => [],
 });
+
+const state = reactive({
+    iconSetList: computed(() => props.iconButtonSets ?? []),
+});
+
+const {
+    isSelected,
+} = useSelect({
+    selected: computed(() => props.selected),
+    value: computed(() => props.value),
+    predicate: () => !!(props.selected && props.value && props.selected === props.value),
+});
+
 </script>
 
 <style lang="postcss">
