@@ -60,12 +60,12 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import CollectorContents from '@/services/asset-inventory/collector/modules/CollectorContents.vue';
-import CollectorNoData from '@/services/asset-inventory/collector/modules/CollectorNoData.vue';
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import CollectorContents from '@/services/asset-inventory/collector/collector-main/modules/CollectorContents.vue';
+import CollectorNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorNoData.vue';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;

@@ -69,7 +69,7 @@ import { range, size } from 'lodash';
 
 import { store } from '@/store';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
     editMode?: boolean;

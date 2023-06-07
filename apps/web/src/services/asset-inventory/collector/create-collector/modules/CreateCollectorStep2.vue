@@ -70,11 +70,11 @@ import type { CollectorReferenceMap } from '@/store/modules/reference/collector/
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectPluginContents
-    from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
-import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
-import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+    from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 
 
 const emit = defineEmits([
@@ -104,8 +104,8 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    name: '',
-    version: '',
+    name: collectorFormState.name,
+    version: collectorFormState.version,
 }, {
     name(value: string) {
         if (value.length < 2) {
@@ -124,6 +124,7 @@ const handleClickPrevButton = () => {
     state.deleteModalVisible = true;
 };
 const handleClickNextButton = () => {
+    collectorFormStore.setName(name.value);
     emit('update:currentStep', 3);
 };
 const handleClose = () => {

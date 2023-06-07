@@ -60,7 +60,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AttachedServiceAccountForm from '@/services/asset-inventory/collector/modules/AttachedServiceAccountForm.vue';
+import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 
 // TODO: Move type declaration to separated file. this is temporary.
 interface SecretModel {

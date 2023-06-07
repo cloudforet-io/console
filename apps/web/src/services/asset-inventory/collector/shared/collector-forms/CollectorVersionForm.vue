@@ -38,7 +38,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;

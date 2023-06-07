@@ -14,7 +14,8 @@
             <div class="plugin-description">
                 <span class="plugin-description-text">
                     {{ state.description }}
-                </span><p-anchor size="sm"
+                </span><p-anchor v-if="state.pluginDetailLink"
+                                 size="sm"
                                  :highlight="true"
                 >
                     {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
@@ -32,7 +33,9 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, reactive, computed } from 'vue';
+import {
+    defineProps, reactive, computed,
+} from 'vue';
 
 import {
     PAnchor, PLazyImg, PLabel,
@@ -53,6 +56,7 @@ const state = reactive({
     description: computed(() => props.plugin?.tags.description ?? ''),
     labels: computed<string[]>(() => props.plugin?.labels ?? []),
     isBeta: computed(() => !!props.plugin?.tags.beta ?? false),
+    pluginDetailLink: computed<CollectorPluginModel['tags']['link']>(() => props.plugin?.tags?.link ?? ''),
 });
 
 
