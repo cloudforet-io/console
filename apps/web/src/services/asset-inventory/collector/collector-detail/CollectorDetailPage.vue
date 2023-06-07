@@ -43,9 +43,9 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
 import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     collectorId: string;

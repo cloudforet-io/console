@@ -85,12 +85,12 @@ import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import CollectorPluginContents from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
-import CollectorTagForm from '@/services/asset-inventory/collector/modules/CollectorTagForm.vue';
-import CollectorVersionForm from '@/services/asset-inventory/collector/modules/CollectorVersionForm.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
+import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
+import CollectorTagForm from '@/services/asset-inventory/collector/shared/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/shared/CollectorVersionForm.vue';
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
 const props = defineProps<{
     loading: boolean;

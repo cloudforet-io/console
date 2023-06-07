@@ -29,7 +29,7 @@ import { PFieldGroup } from '@spaceone/design-system';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
 
 
 const emit = defineEmits<{(event: 'update:isTagsValid', value: boolean): void; }>();

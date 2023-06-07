@@ -64,10 +64,10 @@ import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
 import CollectPluginContents
-    from '@/services/asset-inventory/collector/modules/CollectorPluginContents.vue';
+    from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 const emit = defineEmits([

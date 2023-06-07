@@ -11,6 +11,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         originCollector: null as CollectorModel|null,
         pluginInfo: null as CollectorPluginModel|null,
         tags: {} as Tag,
+        name: '',
         version: '',
         autoUpdate: false,
         scheduleHours: [] as string[],
@@ -36,6 +37,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         setTags(tags: Tag) {
             this.tags = tags;
+        },
+        setName(name: string) {
+            this.name = name;
         },
         setVersion(version: string, autoUpdate: boolean) {
             this.version = version;

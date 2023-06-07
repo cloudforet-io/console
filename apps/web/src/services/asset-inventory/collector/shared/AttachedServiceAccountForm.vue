@@ -54,7 +54,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
 
 interface Props {
     title?: TranslateResult;
