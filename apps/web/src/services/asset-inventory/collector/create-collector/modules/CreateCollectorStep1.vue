@@ -4,7 +4,7 @@
                   @search="handleSearch"
         />
         <div class="contents-container">
-            <step1-search-filter @selectedRepository="handleChangeRepository" />
+            <step1-search-filter @selectRepository="handleChangeRepository" />
             <p-data-loader class="right-area"
                            :data="state.pluginList"
                            :loading="state.loading"
@@ -127,7 +127,7 @@ const loadMorePlugin = async () => {
     state.currentPage += 1;
     state.loading = true;
     const additionalPlugin = await getPlugins();
-    state.pluginList = [...state.pluginList, ...additionalPlugin];
+    state.pluginList = state.pluginList.concat(additionalPlugin);
 };
 
 const handleSearch = async (value) => {
@@ -165,6 +165,7 @@ onMounted(() => {
 
         .right-area {
             max-width: 44.375rem;
+            min-height: calc(100vh - 18rem);
             .plugin-card-list {
                 @apply flex flex-col gap-2;
                 overflow-y: auto;

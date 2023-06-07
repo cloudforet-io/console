@@ -110,7 +110,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
-const emit = defineEmits<{(e:'selectedRepository', repository: string):void}>();
+const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 const state = reactive({
@@ -155,7 +155,7 @@ const handleChangeProvider = (provider) => {
 };
 
 watch(() => state.selectedRepository, (repository) => {
-    emit('selectedRepository', repository);
+    emit('selectRepository', repository);
 });
 
 (async () => {
