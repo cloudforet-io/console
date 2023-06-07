@@ -2,19 +2,8 @@ name: "[Dispatch] Mirinae Release"
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Please enter branch (only master and release-x.y.z are allowed)'
-        required: true
-        default: 'master'
-      version:
-        description: 'Please enter version(x.y.z)'
-        required: true
-        default: '1.0.0'
 
 env:
-  BRANCH: ${{ github.event.inputs.branch }}
-  VERSION: ${{ github.event.inputs.version }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TURBO_CACHE_SERVER_URL: ${{ github.event.inputs.turbo-cache-server-url }}
 
@@ -48,7 +37,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.BRANCH }}
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Node.js

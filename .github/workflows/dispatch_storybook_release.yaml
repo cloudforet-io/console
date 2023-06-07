@@ -2,18 +2,8 @@ name: "[Dispatch] Storybook Deploy"
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Please enter branch (only master and release-x.y.z are allowed)'
-        required: true
-        default: 'master'
-      version:
-        description: 'Please enter version(x.y.z)'
-        required: true
-        default: '1.0.0'
 
 env:
-  BRANCH: ${{ github.event.inputs.branch }}
   SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
 
 jobs:
@@ -46,7 +36,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.BRANCH }}
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Node.js
