@@ -24,15 +24,12 @@
              height="1rem"
              class="label-delete-icon"
              color="inherit"
-             @click.stop="$emit('delete')"
+             @click.stop="handleDelete"
         />
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import type { SetupContext } from 'vue';
-
+<script setup lang="ts">
 import PI from '@/foundation/icons/PI.vue';
 
 interface LabelProps {
@@ -44,49 +41,26 @@ interface LabelProps {
     active?: boolean;
 }
 
-export default defineComponent<LabelProps>({
-    name: 'PLabel',
-    components: {
-        PI,
-    },
-    props: {
-        leftIcon: {
-            type: String,
-            default: undefined,
-        },
-        text: {
-            type: String,
-            default: undefined,
-        },
-        clickable: {
-            type: Boolean,
-            default: false,
-        },
-        clickStop: {
-            type: Boolean,
-            default: true,
-        },
-        deletable: {
-            type: Boolean,
-            default: false,
-        },
-        active: {
-            type: Boolean,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const handleClickLabel = (e: Event) => {
-            if (props.clickStop) e.stopPropagation();
-            if (!props.clickable) return;
-            emit('item-click');
-        };
-
-        return {
-            handleClickLabel,
-        };
-    },
+const props = withDefaults(defineProps<LabelProps>(), {
+    leftIcon: undefined,
+    text: undefined,
+    clickable: false,
+    clickStop: true,
+    deletable: false,
+    active: undefined,
 });
+
+const emit = defineEmits(['item-click', 'delete']);
+
+const handleClickLabel = (e: Event) => {
+    if (props.clickStop) e.stopPropagation();
+    if (!props.clickable) return;
+    emit('item-click');
+};
+const handleDelete = (e: Event) => {
+    emit('delete', e);
+};
+
 </script>
 
 <style lang="postcss">

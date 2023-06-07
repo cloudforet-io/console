@@ -7,11 +7,11 @@
                   class="back-button"
             >
                 <p-icon-button name="ic_arrow-left"
-                               @click="$emit('click-back-button',$event)"
+                               @click="handleClickBackButton"
                 />
             </span>
             <slot name="title-left-extra" />
-            <h2 :class="{'has-left': !!$slots['title-left-extra'], 'has-right': useTotalCount || !!$slots['title-right-extra']}">
+            <h2 :class="{'has-left': !!slots['title-left-extra'], 'has-right': useTotalCount || !!slots['title-right-extra']}">
                 <slot>
                     <slot name="title">
                         <span class="title">{{ title }}&zwnj;</span>
@@ -23,14 +23,14 @@
             >
                 <span v-if="useSelectedCount && selectedCount"
                       class="total-count"
-                >({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})</span>
+                >({{ t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})</span>
                 <span v-else
                       class="total-count"
                 >({{ commaFormatter(totalCount) }})</span>
             </slot>
             <slot name="title-right-extra" />
         </div>
-        <div v-if="$slots['extra']"
+        <div v-if="slots['extra']"
              class="extra"
         >
             <slot name="extra" />
@@ -38,11 +38,10 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useSlots } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { HeadingType } from '@/data-display/heading/config';
 import { HEADING_TYPE } from '@/data-display/heading/config';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { commaFormatter } from '@/utils/helpers';
@@ -57,45 +56,25 @@ interface Props {
     selectedCount?: number;
 }
 
-export default defineComponent<Props>({
-    name: 'PHeading',
-    components: { PIconButton },
-    props: {
-        title: {
-            type: String,
-            default: 'Page',
-        },
-        headingType: {
-            type: String as PropType<HeadingType>,
-            default: HEADING_TYPE.MAIN,
-        },
-        showBackButton: {
-            type: Boolean,
-            default: false,
-        },
-        useTotalCount: {
-            type: Boolean,
-            default: false,
-        },
-        useSelectedCount: {
-            type: Boolean,
-            default: false,
-        },
-        totalCount: {
-            type: Number,
-            default: 0,
-        },
-        selectedCount: {
-            type: Number,
-            default: 0,
-        },
-    },
-    setup() {
-        return {
-            commaFormatter,
-        };
-    },
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = withDefaults(defineProps<Props>(), {
+    title: 'Page',
+    headingType: HEADING_TYPE.MAIN,
+    showBackButton: false,
+    useTotalCount: false,
+    useSelectedCount: false,
+    totalCount: 0,
+    selectedCount: 0,
 });
+
+const emit = defineEmits(['click-back-button']);
+const { t } = useI18n();
+const { slots } = useSlots();
+
+const handleClickBackButton = (e: MouseEvent) => {
+    emit('click-back-button', e);
+};
+
 </script>
 
 <style lang="postcss">

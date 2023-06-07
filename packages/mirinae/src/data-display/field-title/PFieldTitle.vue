@@ -1,6 +1,6 @@
 <template>
     <span class="p-field-title"
-          v-on="$listeners"
+          v-on="listeners"
     >
         <span class="title">
             <slot>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { defineProps, useAttrs } from 'vue';
 
 interface FieldTitleProps {
     label?: string;
@@ -27,6 +27,8 @@ const props = withDefaults(defineProps<FieldTitleProps>(), {
     label: '',
     description: undefined,
 });
+const attrs = useAttrs();
+const listeners = { ...attrs };
 
 </script>
 
