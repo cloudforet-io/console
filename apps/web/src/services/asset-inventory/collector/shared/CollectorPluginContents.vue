@@ -56,7 +56,7 @@ const state = reactive({
     description: computed(() => props.plugin?.tags.description ?? ''),
     labels: computed<string[]>(() => props.plugin?.labels ?? []),
     isBeta: computed(() => !!props.plugin?.tags.beta ?? false),
-    pluginDetailLink: computed<CollectorPluginModel['tags']['link']>(() => props.plugin?.tags?.pluginDetailLink ?? ''),
+    pluginDetailLink: computed<CollectorPluginModel['tags']['link']>(() => props.plugin?.tags?.link ?? ''),
 });
 
 
