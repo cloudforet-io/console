@@ -11,8 +11,10 @@
                             width="1.25rem"
                             height="1.25rem"
                 />
-                <span class="plugin-name">{{ props.item.plugin.name }}</span>
-                <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
+                <div class="plugin-info">
+                    <span class="plugin-name">{{ props.item.plugin.name }}</span>
+                    <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
+                </div>
             </div>
         </div>
         <div
@@ -242,14 +244,20 @@ const handleChangeToggle = () => {};
             @apply flex items-center text-label-md;
             gap: 0.25rem;
 
-            .plugin-name {
-                @apply truncate;
-                flex: 1;
-                max-width: 11rem;
-            }
+            .plugin-info {
+                @apply flex items-center;
+                max-width: 14rem;
+                gap: 0.25rem;
 
-            .plugin-version {
-                @apply text-label-sm text-gray-700;
+                .plugin-name {
+                    @apply truncate;
+                    flex: 1;
+                }
+
+                .plugin-version {
+                    @apply truncate text-label-sm text-gray-700;
+                    max-width: 3.5rem;
+                }
             }
         }
 
