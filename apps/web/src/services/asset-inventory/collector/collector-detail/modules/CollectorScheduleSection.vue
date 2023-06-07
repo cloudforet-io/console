@@ -46,6 +46,9 @@ import {
     PHeading, PButton, PPaneLayout,
 } from '@spaceone/design-system';
 
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
