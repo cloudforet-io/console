@@ -8,80 +8,62 @@
                 <slot />
             </div>
             <div class="text"
-                 :class="{collapsed: proxyIsCollapsed}"
+                 :class="{collapsed: state.proxyIsCollapsed}"
                  :style="{'-webkit-line-clamp': lineClamp}"
             >
-                <slot v-if="lineClamp !== 0 || !proxyIsCollapsed" />
+                <slot v-if="lineClamp !== 0 || !state.proxyIsCollapsed" />
             </div>
         </div>
-        <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow"
-                              v-model="proxyIsCollapsed"
+        <p-collapsible-toggle v-if="lineClamp === 0 || state.isOverflow"
+                              v-model="state.proxyIsCollapsed"
         />
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { debounce } from 'lodash';
 import {
-    defineComponent, onMounted, onUnmounted, onUpdated, reactive, toRefs,
+    onMounted, onUnmounted, onUpdated, reactive,
 } from 'vue';
 
-import { debounce } from 'lodash';
 
 import type { CollapsiblePanelProps } from '@/data-display/collapsible/collapsible-panel/type';
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
-
-export default defineComponent<CollapsiblePanelProps>({
-    name: 'PCollapsiblePanel',
-    components: { PCollapsibleToggle },
-    model: {
-        prop: 'isCollapsed',
-        event: 'update:isCollapsed',
-    },
-    props: {
-        /* collapsible props */
-        isCollapsed: {
-            type: Boolean,
-            default: true,
-        },
-        /* collapsible panel props */
-        lineClamp: {
-            type: Number,
-            default: 2,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
-            fakeTextRef: null as null|HTMLElement,
-            isOverflow: false,
-        });
-
-        /* util */
-        const checkTextOverflow = debounce(() => {
-            if (!state.fakeTextRef) return;
-            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight;
-        }, 150);
-
-        onUpdated(() => {
-            checkTextOverflow();
-        });
-
-        onMounted(() => {
-            window.addEventListener('resize', checkTextOverflow);
-            checkTextOverflow();
-        });
-
-        onUnmounted(() => {
-            window.removeEventListener('resize', checkTextOverflow);
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<CollapsiblePanelProps>(), {
+    isCollapsed: true,
+    lineClamp: 2,
 });
+
+const emit = defineEmits(['isCollapsed']);
+
+
+const state = reactive({
+    proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
+    fakeTextRef: null as null|HTMLElement,
+    isOverflow: false,
+});
+
+/* util */
+const checkTextOverflow = debounce(() => {
+    if (!state.fakeTextRef) return;
+    state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight;
+}, 150);
+
+onUpdated(() => {
+    checkTextOverflow();
+});
+
+onMounted(() => {
+    window.addEventListener('resize', checkTextOverflow);
+    checkTextOverflow();
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', checkTextOverflow);
+});
+
 </script>
 
 <style lang="postcss">

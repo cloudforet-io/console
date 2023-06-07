@@ -4,31 +4,28 @@
               @click="handleToggle"
         >
             <span>
-                <slot :is-collapsed="proxyIsCollapsed">
-                    {{ proxyIsCollapsed ? $t('COMPONENT.COLLAPSIBLE_TOGGLE.SHOW_MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
+                <slot :is-collapsed="state.proxyIsCollapsed">
+                    {{ state.proxyIsCollapsed ? t('COMPONENT.COLLAPSIBLE_TOGGLE.SHOW_MORE') : t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
                 </slot>
             </span>
             <p-i width="0.875rem"
                  height="0.875rem"
-                 :name="proxyIsCollapsed ? 'ic_chevron-down' : 'ic_chevron-up'"
+                 :name="state.proxyIsCollapsed ? 'ic_chevron-down' : 'ic_chevron-up'"
                  color="inherit"
             />
         </span>
-        <p-toggle-button
-            v-else-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.switch"
-            :value="!proxyIsCollapsed"
-            :sync="true"
-            @change-toggle="handleToggle"
+        <p-toggle-button v-else-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.switch"
+                         :value="!state.proxyIsCollapsed"
+                         :sync="true"
+                         @change-toggle="handleToggle"
         />
     </span>
 </template>
 
-<script lang="ts">
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { CollapsibleToggleProps } from '@/data-display/collapsible/collapsible-toggle/type';
 import {
     COLLAPSIBLE_TOGGLE_TYPE,
 } from '@/data-display/collapsible/collapsible-toggle/type';
@@ -36,44 +33,35 @@ import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
 
-export default defineComponent<CollapsibleToggleProps>({
-    name: 'PCollapsibleToggle',
-    components: { PToggleButton, PI },
-    model: {
-        prop: 'isCollapsed',
-        event: 'update:isCollapsed',
+const props = defineProps({
+    /* collapsible props */
+    isCollapsed: {
+        type: Boolean,
+        default: true,
     },
-    props: {
-        /* collapsible props */
-        isCollapsed: {
-            type: Boolean,
-            default: true,
+    toggleType: {
+        type: String,
+        default: COLLAPSIBLE_TOGGLE_TYPE.text,
+        validator(type: any) {
+            return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
         },
-        toggleType: {
-            type: String,
-            default: COLLAPSIBLE_TOGGLE_TYPE.text,
-            validator(type: any) {
-                return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
-            },
-        },
-    },
-    setup(props: CollapsibleToggleProps, { emit }) {
-        const state = reactive({
-            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
-        });
-
-        /* event */
-        const handleToggle = () => {
-            state.proxyIsCollapsed = !state.proxyIsCollapsed;
-        };
-
-        return {
-            ...toRefs(state),
-            handleToggle,
-            COLLAPSIBLE_TOGGLE_TYPE,
-        };
     },
 });
+
+const emit = defineEmits(['isCollapsed']);
+
+const { t } = useI18n();
+
+const state = reactive({
+    proxyIsCollapsed: useProxyValue<boolean>('isCollapsed', props, emit),
+});
+
+/* event */
+const handleToggle = () => {
+    state.proxyIsCollapsed = !state.proxyIsCollapsed;
+};
+
+
 </script>
 
 <style lang="postcss">
