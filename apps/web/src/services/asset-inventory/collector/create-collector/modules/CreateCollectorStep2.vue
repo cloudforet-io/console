@@ -70,11 +70,11 @@ import type { CollectorReferenceMap } from '@/store/modules/reference/collector/
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import CollectorTagForm from '@/services/asset-inventory/collector/shared/CollectorTagForm.vue';
-import CollectorVersionForm from '@/services/asset-inventory/collector/shared/CollectorVersionForm.vue';
 
 
 const emit = defineEmits([

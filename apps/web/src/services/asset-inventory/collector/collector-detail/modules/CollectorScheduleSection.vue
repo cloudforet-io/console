@@ -47,7 +47,7 @@ import {
 } from '@spaceone/design-system';
 
 import CollectorScheduleForm
-    from '@/services/asset-inventory/collector/shared/CollectorScheduleForm.vue';
+    from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
 const collectorFormStore = useCollectorFormStore();
 

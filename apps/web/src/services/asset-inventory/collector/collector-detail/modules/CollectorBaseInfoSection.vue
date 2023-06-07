@@ -85,10 +85,10 @@ import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
+import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import CollectorTagForm from '@/services/asset-inventory/collector/shared/CollectorTagForm.vue';
-import CollectorVersionForm from '@/services/asset-inventory/collector/shared/CollectorVersionForm.vue';
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 

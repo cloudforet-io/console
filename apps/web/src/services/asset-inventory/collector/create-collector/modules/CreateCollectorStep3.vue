@@ -46,8 +46,8 @@ import {
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import AttachedServiceAccountForm
-    from '@/services/asset-inventory/collector/shared/AttachedServiceAccountForm.vue';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
+    from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 
 const emit = defineEmits([

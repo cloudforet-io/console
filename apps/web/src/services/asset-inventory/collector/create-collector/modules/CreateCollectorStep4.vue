@@ -61,7 +61,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import CollectorScheduleForm from '@/services/asset-inventory/collector/shared/CollectorScheduleForm.vue';
+import CollectorScheduleForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const emit = defineEmits([

@@ -65,7 +65,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-form-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
