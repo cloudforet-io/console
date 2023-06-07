@@ -161,9 +161,9 @@ import { store } from '@/store';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
-import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
     label: string;

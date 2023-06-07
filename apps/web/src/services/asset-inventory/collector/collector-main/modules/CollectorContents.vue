@@ -72,11 +72,11 @@ import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import CollectorItemInfo from '@/services/asset-inventory/collector/modules/CollectorItemInfo.vue';
-import CollectorListNoData from '@/services/asset-inventory/collector/modules/CollectorListNoData.vue';
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import CollectorItemInfo from '@/services/asset-inventory/collector/collector-main/modules/CollectorItemInfo.vue';
+import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
 
 interface Props {
     keyItemSets?: KeyItemSet[]

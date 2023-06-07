@@ -108,7 +108,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 
 const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
 const collectorPageStore = useCollectorPageStore();
