@@ -8,8 +8,9 @@
                 <p-radio-group direction="vertical">
                     <p-radio v-for="provider in state.providerList"
                              :key="provider.name"
-                             v-model="state.selectedProvider"
+                             :selected="collectorPageState.selectedProvider"
                              :value="provider.name"
+                             @change="handleChangeProvider"
                     >
                         <div class="content-menu-item">
                             <p-lazy-img v-if="provider.name !== 'all'"
@@ -92,16 +93,26 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useCollectorPageStore } from '@/services/asset-inventory/store/collector-page-store';
+
+const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     providerList: computed(() => [
@@ -114,14 +125,42 @@ const state = reactive({
         { name: 'etc', label: 'ETC', img: undefined },
     ]),
     selectedProvider: 'all',
-    repositoryList: [
-        // TODO: need api call-repository
+    repositories: [],
+    repositoryList: computed(() => ([
         { name: 'all', label: 'All Repository' },
-        { name: 'market', label: 'Marketplace' },
-        { name: 'custom', label: 'Custom' },
-    ],
+        ...state.repositories.map((repo) => ({
+            label: repo.name,
+            name: repo.repository_id,
+        })),
+    ])),
     selectedRepository: 'all',
 });
+
+const repoApiQuery = new ApiQueryHelper();
+const getRepositories = async () => {
+    try {
+        repoApiQuery.setSort('repository_type', true);
+        const res = await SpaceConnector.client.repository.repository.list({
+            query: repoApiQuery.data,
+        });
+        state.repositories = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.repositories = [];
+    }
+};
+
+const handleChangeProvider = (provider) => {
+    collectorPageStore.setSelectedProvider(provider);
+};
+
+watch(() => state.selectedRepository, (repository) => {
+    emit('selectRepository', repository);
+});
+
+(async () => {
+    await getRepositories();
+})();
 
 </script>
 
