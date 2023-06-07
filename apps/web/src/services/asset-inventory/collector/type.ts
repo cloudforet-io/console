@@ -68,16 +68,22 @@ export interface CollectorPluginModel {
     } & Record<string, any>;
 }
 
-export interface CollectorModel extends Tags {
+interface Capability {
+    supported_providers?: string[];
+    [key: string]: any;
+}
+
+export interface CollectorModel {
     collector_id: string;
     name: string;
     state: CollectorState;
     provider: string;
-    capability: any;
+    capability: Capability;
+    schedule: Schedule;
     plugin_info: CollectorPluginModel;
-    priority: number;
-    created_at: TimeStamp | string;
-    last_collected_at: TimeStamp | null | string;
+    created_at: string;
+    last_collected_at: string;
+    tags: Tags;
 }
 
 export interface CollectorUpdateParameter extends Tags {
@@ -102,7 +108,6 @@ export interface CollectorCreateParameter extends Tags {
 
 export interface Schedule {
     hours?: string[];
-    interval?: number;
 }
 
 export interface ScheduleAddParameter {
@@ -117,6 +122,7 @@ export interface ScheduleAddParameter {
 export interface CollectorScheduleModel {
     schedule_id: string;
     name: string;
+    state: CollectorState;
     collector_info: CollectorModel;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filter: any;

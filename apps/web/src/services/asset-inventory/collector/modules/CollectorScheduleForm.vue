@@ -1,10 +1,15 @@
 <template>
-    <div class="collector-schedule-edit-form">
+    <p-data-loader :loading="state.loading"
+                   :data="true"
+                   show-data-from-scratch
+                   class="collector-schedule-edit-form"
+    >
         <p-field-title :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_ON_OFF')"
                        :description="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_TURN_ON_DESC')"
                        class="schedule-desc"
         />
-        <p-toggle-button :value="state.isAutoSchedule"
+        <br>
+        <p-toggle-button :value="collectorFormState.schedulePower"
                          @change-toggle="handleChangeToggle"
         />
         <div v-if="!props.editMode"
@@ -48,7 +53,7 @@
                 </p-button>
             </div>
         </p-field-group>
-    </div>
+    </p-data-loader>
 </template>
 
 <script lang="ts" setup>
@@ -57,47 +62,53 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PFieldTitle, PToggleButton,
+    PFieldGroup, PButton, PFieldTitle, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
 import { store } from '@/store';
 
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
+
 const props = defineProps<{
     editMode?: boolean;
-    utcHours?: string[];
 }>();
 
-const emits = defineEmits<{(event: 'update:hours', value: string[]): void;
-    (event: 'update:editMode', value: boolean): void;
+const emits = defineEmits<{(event: 'update:editMode', value: boolean): void;
 }>();
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
 const selectedUtcHoursSet = new Set<string>();
 const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
-    isAutoSchedule: true,
-    isAllHoursSelected: computed<boolean>(() => state.selectedUtcHours.length === size(hoursMatrix)),
-    selectedUtcHours: [] as string[],
+    isAllHoursSelected: computed<boolean>(() => collectorFormState.scheduleHours.length === size(hoursMatrix)),
     timezoneAppliedHours: computed<string[]>(() => {
-        if (state.timezone === 'UTC') return state.selectedUtcHours;
+        if (state.timezone === 'UTC') return collectorFormState.scheduleHours;
         // set an hour as utc and get the hour in timezone
-        return state.selectedUtcHours.map((utcHour) => dayjs.utc()
+        return collectorFormState.scheduleHours.map((utcHour) => dayjs.utc()
             .hour(Number(utcHour)).tz(state.timezone)
             .get('hour')
             .toString()).sort((a, b) => Number(a) - Number(b));
     }),
+    loading: computed<boolean>(() => collectorFormState.originCollector === null),
 });
 
-const updateSelectedHoursAndEmit = () => {
+const updateSelectedHours = () => {
     const hours: string[] = Array.from(selectedUtcHoursSet.values());
-    state.selectedUtcHours = hours;
-    emits('update:hours', hours);
+    collectorFormStore.$patch({
+        scheduleHours: hours,
+    });
 };
 
-const handleChangeToggle = () => {
-    // TODO: change state of toggle button
+const handleChangeToggle = (value: boolean) => {
+    collectorFormStore.$patch({
+        schedulePower: value,
+    });
+    // TODO: update with api call
 };
 
 const handleClickSelect = () => {
@@ -120,7 +131,7 @@ const handleClickHour = (hour: string) => {
         selectedUtcHoursSet.add(utcHour);
     }
 
-    updateSelectedHoursAndEmit();
+    updateSelectedHours();
 };
 const handleClickAllHours = () => {
     if (state.isAllHoursSelected) selectedUtcHoursSet.clear();
@@ -130,16 +141,12 @@ const handleClickAllHours = () => {
         });
     }
 
-    updateSelectedHoursAndEmit();
+    updateSelectedHours();
 };
 
-// reset selected hours and selected hours set every time editMode is changed
-watch(() => props.editMode, () => {
-    selectedUtcHoursSet.clear();
-    props.utcHours?.forEach((hour) => {
-        selectedUtcHoursSet.add(hour);
-    });
-    state.selectedUtcHours = [...(props.utcHours ?? [])];
+// init values with data from originCollector when originCollector changed
+watch(() => collectorFormState.originCollector, () => {
+    collectorFormStore.resetSchedule();
 }, { immediate: true });
 
 </script>

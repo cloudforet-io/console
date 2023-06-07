@@ -49,7 +49,9 @@
         >
             <collector-plugin-contents :plugin="state.plugin" />
             <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
-            <collector-tag-form @update:isTagsValid="handleUpdateIsTagsValid" />
+            <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
+                                @update:isTagsValid="handleUpdateIsTagsValid"
+            />
             <p-button style-type="tertiary"
                       size="lg"
                       @click="handleClickCancel"

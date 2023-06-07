@@ -17,8 +17,6 @@
 
         <div class="schedule-wrapper">
             <collector-schedule-form :edit-mode="state.isEditMode"
-                                     :utc-hours="state.updatingUtcHours"
-                                     @update:hours="handleUpdateHours"
                                      @update:editMode="handleUpdateEditMode"
             />
 
@@ -42,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import {
     PHeading, PButton, PPaneLayout,
@@ -50,22 +48,16 @@ import {
 
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/modules/CollectorScheduleForm.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/store/collector-form-store';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
-const props = defineProps<{}>();
+const collectorFormStore = useCollectorFormStore();
+
 const state = reactive({
     isEditMode: false,
-    collectorScheduleUtcHours: [] as string[],
-    updatingUtcHours: [] as string[],
 });
 
 const handleClickEdit = () => {
     state.isEditMode = true;
-    state.updatingUtcHours = [...state.collectorScheduleUtcHours];
-};
-
-const handleUpdateHours = (hours: string[]) => {
-    state.updatingUtcHours = hours;
 };
 
 const handleUpdateEditMode = (value: boolean) => {
@@ -74,13 +66,12 @@ const handleUpdateEditMode = (value: boolean) => {
 
 const handleClickCancel = () => {
     state.isEditMode = false;
-    state.updatingUtcHours = [...state.collectorScheduleUtcHours];
+    collectorFormStore.resetSchedule(true);
 };
 
 const handleClickSave = () => {
     state.isEditMode = false;
-    // TODO: Save changes
-    state.collectorScheduleUtcHours = [...state.updatingUtcHours];
+    // TODO: Save changes with api call
 };
 
 </script>
