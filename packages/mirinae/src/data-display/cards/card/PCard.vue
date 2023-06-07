@@ -22,8 +22,7 @@
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = defineProps({
+defineProps({
     header: {
         type: [String, Boolean],
         default: '',
