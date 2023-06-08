@@ -10,9 +10,11 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
                     </p>
                     <p class="value">
-                        {{ state.totalFailureCount }}
+                        {{ state.totalFailureCount ? state.totalFailureCount : '--' }}
                     </p>
-                    <div class="diff-wrapper">
+                    <div v-if="state.prevTotalFailureCount !== state.totalFailureCount"
+                         class="diff-wrapper"
+                    >
                         <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
                         />
@@ -28,9 +30,11 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
                     </p>
                     <p class="value">
-                        {{ state.failureRate }}%
+                        {{ state.failureRate ? state.failureRate : '--' }}%
                     </p>
-                    <div class="diff-wrapper">
+                    <div v-if="state.prevFailureRate !== state.failureRate"
+                         class="diff-wrapper"
+                    >
                         <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
                         />
