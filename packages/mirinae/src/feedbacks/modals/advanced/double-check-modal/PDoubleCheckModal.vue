@@ -3,6 +3,7 @@
                     :size="modalSize"
                     :visible.sync="proxyVisible"
                     theme-color="alert"
+                    :loading="loading"
                     :disabled="invalid || inputText.length === 0"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -25,6 +26,7 @@
                     <template #default="{invalid}">
                         <p-text-input v-model="inputText"
                                       :invalid="invalid"
+                                      :disabled="loading"
                                       block
                                       @keyup.enter="handleConfirm()"
                         />
@@ -66,6 +68,10 @@ export default {
         verificationText: {
             type: String,
             required: true,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
