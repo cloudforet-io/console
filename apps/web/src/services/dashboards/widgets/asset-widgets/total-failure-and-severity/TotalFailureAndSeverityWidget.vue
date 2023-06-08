@@ -10,18 +10,16 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
                     </p>
                     <p class="value">
-                        {{ state.totalFailureCount ? state.totalFailureCount : '--' }}
+                        {{ state.totalFailureCount === undefined ? '--' : state.totalFailureCount }}
                     </p>
-                    <div v-if="state.prevTotalFailureCount !== state.totalFailureCount"
+                    <div v-if="state.totalFailureCountHelpText"
                          class="diff-wrapper"
                     >
                         <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
                         />
                         <span class="diff-value">{{ Math.abs(state.prevTotalFailureCount - state.totalFailureCount) }}</span>
-                        <span class="diff-text">
-                            {{ state.totalFailureCountHelpText }}
-                        </span>
+                        <span class="diff-text">{{ state.totalFailureCountHelpText }}</span>
                     </div>
                 </div>
                 <p-divider :vertical="true" />
@@ -30,9 +28,9 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
                     </p>
                     <p class="value">
-                        {{ state.failureRate ? state.failureRate : '--' }}%
+                        {{ state.failureRate === undefined ? '--' : state.failureRate }}%
                     </p>
-                    <div v-if="state.prevFailureRate !== state.failureRate"
+                    <div v-if="state.failureRateHelpText"
                          class="diff-wrapper"
                     >
                         <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
@@ -72,7 +70,7 @@
                                 {{ data.label }}
                             </p>
                             <p class="status-content">
-                                <span class="status-value">{{ data.value }}</span>
+                                <span class="status-value">{{ data.value === undefined ? '--': data.value }}</span>
                                 <span v-if="data.diff"
                                       class="status-rate"
                                 >
@@ -96,6 +94,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PI, PDivider, PDataLoader,
@@ -131,15 +130,15 @@ import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 interface Data {
     severity: Severity;
-    fail_finding_count: number;
-    total_finding_count: number;
+    fail_finding_count?: number | null;
+    total_finding_count?: number | null;
 }
 interface SeverityData {
     name: string;
     label: string;
     color: string;
     rgb: string;
-    value: number;
+    value?: number;
     diff?: number;
 }
 
@@ -206,44 +205,51 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    dateRangeDiff: computed<number>(() => {
-        const end = dayjs.utc(state.settings?.date_range?.end);
-        const start = dayjs.utc(state.settings?.date_range?.start);
-        return end.diff(start, 'month');
-    }),
     severityData: computed<SeverityData[]>(() => {
         const results: SeverityData[] = [];
         SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((severity) => {
-            const currValue = state.data?.find((d) => d.severity === severity.name)?.fail_finding_count || 0;
+            const currValue = state.data?.find((d) => d.severity === severity.name)?.fail_finding_count;
             const prevValue = random(0, 200); // TODO: real data
             results.push({
                 ...severity,
-                value: currValue,
-                diff: currValue - prevValue,
+                value: currValue === null ? undefined : currValue,
+                diff: (currValue && prevValue) ? currValue - prevValue : undefined,
                 rgb: getRGBFromHex(severity.color),
             });
         });
         return results;
     }),
-    prevTotalFailureCount: computed(() => random(0, 200)), // TODO: real data
-    totalFailureCount: computed(() => sum(state.data?.map((d) => d.fail_finding_count))),
-    totalFailureCountHelpText: computed(() => {
-        if (state.prevTotalFailureCount < state.totalFailureCount) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTHS', { month: state.dateRangeDiff });
-        }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTHS', { month: state.dateRangeDiff });
+    prevTotalFailureCount: computed<number|undefined>(() => random(0, 200)), // TODO: real data
+    totalFailureCount: computed<number|undefined>(() => {
+        if (!state.data?.length) return undefined;
+        return sum(state.data.map((d) => d.fail_finding_count));
     }),
-    prevFailureRate: computed(() => random(0, 100)), // TODO: real data
-    failureRate: computed(() => {
-        const total = sum(state.data?.map((d) => d.total_finding_count));
-        const fail = sum(state.data?.map((d) => d.fail_finding_count));
+    totalFailureCountHelpText: computed<TranslateResult|undefined>(() => {
+        if (state.totalFailureCount === undefined
+            || state.prevTotalFailureCount === undefined
+            || state.totalFailureCount === state.prevTotalFailureCount
+        ) return undefined;
+        if (state.prevTotalFailureCount < state.totalFailureCount) {
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
+        }
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
+    }),
+    prevFailureRate: computed<number|undefined>(() => random(0, 100)), // TODO: real data
+    failureRate: computed<number|undefined>(() => {
+        if (!state.data?.length) return undefined;
+        const total = sum(state.data.map((d) => d.total_finding_count));
+        const fail = sum(state.data.map((d) => d.fail_finding_count));
         return total ? Math.round((fail / total) * 100) : 0;
     }),
-    failureRateHelpText: computed(() => {
+    failureRateHelpText: computed<TranslateResult|undefined>(() => {
+        if (state.failureRate === undefined
+            || state.prevFailureRate === undefined
+            || state.failureRate === state.prevFailureRate
+        ) return undefined;
         if (state.prevFailureRate < state.failureRate) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTHS', { month: state.dateRangeDiff });
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTHS', { month: state.dateRangeDiff });
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
