@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onUnmounted, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
@@ -53,11 +53,13 @@ import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-searc
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -70,6 +72,8 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+
+const { query } = SpaceRouter.router.currentRoute;
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -113,9 +117,8 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(collectorPageState.sortBy, true);
 
 /* Components */
-const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
-    refreshCollectorList();
+const handleSelectedProvider = async (providerName: string) => {
+    await collectorPageStore.setSelectedProvider(providerName);
 };
 const handleChangeToolbox = (options) => {
     setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
@@ -145,6 +148,8 @@ const initCollectorList = async () => {
     }
 };
 const refreshCollectorList = async () => {
+    state.initLoading = false;
+    state.hasCollectorList = true;
     collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     try {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
@@ -153,11 +158,9 @@ const refreshCollectorList = async () => {
     }
 };
 
-/* Unmounted */
-onUnmounted(() => {
-    // TODO: Need to discuss for provider state at create collector page.
-    collectorPageStore.$reset();
-    collectorPageStore.$dispose();
+watch(() => collectorPageState.selectedProvider, async (providerName) => {
+    await replaceUrlQuery('provider', providerName);
+    await refreshCollectorList();
 });
 
 /* INIT */
@@ -166,7 +169,16 @@ onUnmounted(() => {
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
     ]);
-    await initCollectorList();
+    await collectorPageStore.$reset();
+    if (Object.keys(query).length > 0) {
+        const { provider } = query;
+        if (provider === 'all') {
+            await initCollectorList();
+        }
+        await handleSelectedProvider(provider as string);
+    } else {
+        await initCollectorList();
+    }
 })();
 </script>
 
