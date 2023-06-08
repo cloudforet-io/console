@@ -61,7 +61,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectPluginContents
@@ -73,9 +72,7 @@ const emit = defineEmits([
 ]);
 
 const collectorFormStore = useCollectorFormStore();
-
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorFormState = collectorFormStore.$state;
 
 
 const state = reactive({
@@ -99,7 +96,7 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
         const params = {
             service_type: 'inventory.Collector',
             repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
-            provider: collectorPageState.selectedProvider === 'all' ? '' : collectorPageState.selectedProvider,
+            provider: collectorFormState.provider === 'all' ? '' : collectorFormState.provider,
             query: pluginApiQuery.data,
         };
         const res = await SpaceConnector.client.repository.plugin.list(params);
@@ -135,7 +132,7 @@ const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
 };
 
-watch([() => collectorPageState.selectedProvider, () => state.selectedRepository], async () => {
+watch([() => collectorFormState.provider, () => state.selectedRepository], async () => {
     state.currentPage = 1;
     state.pluginList = await getPlugins();
 }, { immediate: true });

@@ -15,6 +15,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as RepositoryPluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
         // belows are updatable states by form.
+        provider: 'all',
         tags: {} as Tag,
         name: '',
         version: '' as string,
@@ -41,6 +42,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.resetVersion();
             this.resetSchedule();
             // TODO: set attached service account from origin data
+        },
+        setProvider(provider: string) {
+            this.provider = provider;
         },
         setTags(tags: Tag) {
             this.tags = tags;
