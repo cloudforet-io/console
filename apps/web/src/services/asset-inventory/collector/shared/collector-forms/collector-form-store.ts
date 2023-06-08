@@ -60,7 +60,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             const pluginVersion = this.originCollector?.plugin_info?.version ?? this.repositoryPlugin?.version ?? '';
             const pluginUpgradeMode = this.originCollector?.plugin_info.upgrade_mode ?? 'AUTO';
             this.setVersion(pluginVersion);
-            this.setAutoUpgrade(pluginUpgradeMode === 'AUTO')
+            this.setAutoUpgrade(pluginUpgradeMode === 'AUTO');
         },
         resetSchedule(hoursOnly = false) {
             this.scheduleHours = this.originCollector?.schedule.hours ?? [];

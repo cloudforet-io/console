@@ -42,6 +42,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
 }>();

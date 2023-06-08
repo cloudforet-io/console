@@ -96,7 +96,7 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
         const params = {
             service_type: 'inventory.Collector',
             repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
-            provider: collectorFormState.provider === 'all' ? '' : collectorFormState.provider,
+            provider: collectorFormState.provider === 'all' ? null : collectorFormState.provider,
             query: pluginApiQuery.data,
         };
         const res = await SpaceConnector.client.repository.plugin.list(params);
