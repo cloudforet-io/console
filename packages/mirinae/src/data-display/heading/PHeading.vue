@@ -69,7 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['click-back-button']);
 const { t } = useI18n();
-const { slots } = useSlots();
+const slots = useSlots();
 
 const handleClickBackButton = (e: MouseEvent) => {
     emit('click-back-button', e);
