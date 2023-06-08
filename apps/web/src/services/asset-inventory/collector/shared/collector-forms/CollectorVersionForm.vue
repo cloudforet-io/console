@@ -4,18 +4,18 @@
             <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
             <div class="auto-upgrade-wrapper">
                 <span>{{ $t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
-                <p-toggle-button :value="state.isAutoUpgrade"
+                <p-toggle-button :value="collectorFormState.autoUpgrade"
                                  @change-toggle="handleClickAutoUpgrade"
                 />
             </div>
         </div>
         <p-select-dropdown :selected="version"
                            :items="state.versions"
-                           :disabled="state.isAutoUpgrade"
+                           :disabled="collectorFormState.autoUpgrade"
                            class="w-full"
-                           @update:selected="setForm('version', $event)"
+                           @update:selected="handleChangeVersion"
         />
-        <div v-show="invalidState.version && !state.isAutoUpgrade"
+        <div v-show="invalidState.version && !collectorFormState.autoUpgrade"
              class="invalid-feedback"
         >
             {{ invalidTexts.version }}
@@ -30,6 +30,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PFieldTitle, PToggleButton, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -54,7 +55,7 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    version: '',
+    version: collectorFormState.version ?? '',
 }, {
     version(value: string|undefined) {
         if (!value?.length) {
@@ -66,14 +67,12 @@ const {
 
 const state = reactive({
     pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
-    isAutoUpgrade: false,
-    versions: [] as any[], // FIXME: type
+    versions: [] as MenuItem[],
 });
 
 const getVersions = async (pluginId: string) => {
     try {
         state.versions = [];
-        // TODO: You need to check if there are any API changes.
         const res = await SpaceConnector.client.repository.plugin.getVersions({
             plugin_id: pluginId,
         });
@@ -87,12 +86,20 @@ const getVersions = async (pluginId: string) => {
 };
 
 const initSelectedVersion = () => {
-    setForm('version', state.versions[0]?.name);
+    if (!collectorFormState.version.length) {
+        setForm('version', state.versions[0]?.name);
+        collectorFormStore.setVersion(state.versions[0]?.name ?? '');
+    }
 };
 
 /* event */
+const handleChangeVersion = (value: string) => {
+    setForm('version', value);
+    collectorFormStore.setVersion(value);
+};
+
 const handleClickAutoUpgrade = () => {
-    state.isAutoUpgrade = !state.isAutoUpgrade;
+    collectorFormStore.setAutoUpgrade(!collectorFormState.autoUpgrade);
 };
 
 watch(isAllValid, (value) => {
