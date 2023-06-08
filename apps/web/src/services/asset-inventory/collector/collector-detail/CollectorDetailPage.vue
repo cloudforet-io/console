@@ -1,6 +1,9 @@
 <template>
     <div class="collector-detail-page">
-        <p-heading :title="collectorName">
+        <p-heading :title="collectorName"
+                   show-back-button
+                   @click-back-button="handleClickBackButton"
+        >
             <p-skeleton v-if="!collectorName"
                         width="20rem"
                         height="1.5rem"
@@ -30,12 +33,34 @@
     </div>
 </template>
 
+<script lang="ts">
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
+    },
+});
+</script>
+
 <script lang="ts" setup>
+/* eslint-disable import/first */
 import {
-    defineProps, reactive, onMounted, computed,
+    defineProps, defineExpose, reactive, onMounted, computed,
+// eslint-disable-next-line import/no-duplicates
 } from 'vue';
 
 import { PHeading, PSkeleton, PButton } from '@spaceone/design-system';
+
+import { useGoBack } from '@/common/composables/go-back';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoSection.vue';
 import CollectorOptionsSection
@@ -62,6 +87,12 @@ const state = reactive({
     // TODO: must be updated after backend api spec is updated
     collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
 });
+
+
+
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+
+defineExpose({ setPathFrom });
 
 const getCollector = async (): Promise<CollectorModel> => {
     state.loading = true;
