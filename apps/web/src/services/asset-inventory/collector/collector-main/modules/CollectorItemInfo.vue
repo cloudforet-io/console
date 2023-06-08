@@ -12,8 +12,8 @@
                             height="1.25rem"
                 />
                 <div class="plugin-info">
-                    <span class="plugin-name">{{ props.item.plugin.name }}</span>
-                    <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
+                    <span class="plugin-name">{{ state.plugin.name }}</span>
+                    <span class="plugin-version">{{ state.plugin.version }}</span>
                 </div>
             </div>
         </div>
@@ -205,6 +205,10 @@ const state = reactive({
     diffSchedule: computed(() => {
         const timeDiff = state.nextSchedule.diff(state.current, 'm');
         return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
+    }),
+    plugin: computed(() => {
+        const plugin = props.item.plugin;
+        return { name: plugin.name, version: plugin.info.version };
     }),
 });
 
