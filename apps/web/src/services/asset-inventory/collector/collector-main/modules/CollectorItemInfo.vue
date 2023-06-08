@@ -68,13 +68,16 @@
                                :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
                                position="top"
                     >
-                        <p-i
-                            name="ic_check"
-                            class="icon success"
-                            height="1rem"
-                            width="1rem"
-                            color="inherit"
-                        />
+                        <!-- TODO: link with job detail page using job id after the API is completed -->
+                        <router-link :to="props.item.detailLink">
+                            <p-i
+                                name="ic_check"
+                                class="icon success"
+                                height="1rem"
+                                width="1rem"
+                                color="inherit"
+                            />
+                        </router-link>
                     </p-tooltip>
                     <p-tooltip v-if="jobItems.status === 'progress'"
                                class="icon-fill-wrapper progress"
@@ -297,7 +300,7 @@ const TEMP_JOB_STATUS = [
                         @apply bg-green-600;
 
                         &:hover {
-                            @apply border border-green-700;
+                            @apply border border-green-700 cursor-pointer;
                         }
                     }
 
