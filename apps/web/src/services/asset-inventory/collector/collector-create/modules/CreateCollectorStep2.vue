@@ -2,19 +2,7 @@
     <div class="collector-page-2">
         <collect-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
         <div class="input-form">
-            <p-field-group :label="$t('INVENTORY.COLLECTOR.CREATE.NAME')"
-                           :invalid-text="invalidTexts.name"
-                           :invalid="invalidState.name"
-                           :required="true"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="name"
-                                  class="block"
-                                  :invalid="invalid"
-                                  @update:value="setForm('name', $event)"
-                    />
-                </template>
-            </p-field-group>
+            <collector-name-form @update:isValid="handleUpdateIsValid" />
             <collector-version-form class="version-row"
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
@@ -58,19 +46,18 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PButton, PTextButton,
+    PButton, PTextButton,
 } from '@spaceone/design-system';
 
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectPluginContents
@@ -88,35 +75,13 @@ const state = reactive({
     loading: true,
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
+    isNameValid: false,
     isTagsValid: true,
     isVersionValid: false,
     deleteModalVisible: false,
-    isAllFormValid: computed(() => isAllValid.value && state.isVersionValid && state.isTagsValid),
+    isAllFormValid: computed(() => state.isNameValid && state.isVersionValid && state.isTagsValid),
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
 });
-
-const {
-    forms: {
-        name,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-    isAllValid,
-} = useFormValidator({
-    name: collectorFormState.name,
-    version: collectorFormState.version,
-}, {
-    name(value: string) {
-        if (value.length < 2) {
-            return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_MIN');
-        } if (state.collectorNames.includes(value)) {
-            return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_DUPLICATED');
-        }
-        return '';
-    },
-});
-
 
 /* event */
 
@@ -124,11 +89,15 @@ const handleClickPrevButton = () => {
     state.deleteModalVisible = true;
 };
 const handleClickNextButton = () => {
-    collectorFormStore.setName(name.value);
+    collectorFormStore.setName(collectorFormState.name);
     emit('update:currentStep', 3);
 };
 const handleClose = () => {
     emit('update:currentStep', 1);
+};
+
+const handleUpdateIsValid = (isValid: boolean) => {
+    state.isNameValid = isValid;
 };
 
 const handleChangeIsVersionValid = (isValid: boolean) => {
