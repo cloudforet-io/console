@@ -8,7 +8,7 @@
                 <p-radio-group direction="vertical">
                     <p-radio v-for="provider in state.providerList"
                              :key="provider.name"
-                             :selected="collectorPageState.selectedProvider"
+                             :selected="state.selectedProvider"
                              :value="provider.name"
                              @change="handleChangeProvider"
                     >
@@ -43,9 +43,10 @@
         </div>
         <div class="dropdown-container">
             <div class="provider">
-                <p-select-dropdown v-model="state.selectedProvider"
+                <p-select-dropdown :selected="state.selectedProvider"
                                    :items="state.providerList"
                                    class="select-dropdown"
+                                   @update:selected="handleChangeProvider"
                 >
                     <template #default="{ item }">
                         <span class="content-menu-placeholder">
@@ -108,11 +109,15 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     providerList: computed(() => [
@@ -124,7 +129,7 @@ const state = reactive({
         })),
         { name: 'etc', label: 'ETC', img: undefined },
     ]),
-    selectedProvider: 'all',
+    selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
     repositories: [],
     repositoryList: computed(() => ([
         { name: 'all', label: 'All Repository' },
@@ -151,7 +156,8 @@ const getRepositories = async () => {
 };
 
 const handleChangeProvider = (provider) => {
-    collectorPageStore.setSelectedProvider(provider);
+    const providerValue = provider === 'all' ? null : provider;
+    collectorFormStore.setProvider(providerValue);
 };
 
 watch(() => state.selectedRepository, (repository) => {

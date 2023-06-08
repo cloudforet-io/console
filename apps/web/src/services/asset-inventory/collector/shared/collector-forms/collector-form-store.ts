@@ -11,11 +11,9 @@ type AttachedServiceAccount = string[]; // TODO: need to check type
 
 export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
-        // belows are origin states from backend.
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as RepositoryPluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
-        // belows are updatable states by form.
-        provider: 'all',
+        provider: null as string|null,
         tags: {} as Tag,
         name: '',
         version: '' as string,
