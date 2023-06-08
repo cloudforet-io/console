@@ -60,7 +60,7 @@ const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
     loading: true,
-    pluginId: computed<string|undefined>(() => collectorFormState.pluginInfo?.plugin_id),
+    pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     deleteModalVisible: false,
     isAttachedServiceAccountValid: false,
 });

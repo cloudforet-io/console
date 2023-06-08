@@ -1,5 +1,8 @@
-/* eslint-disable camelcase */
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+
 import type { ListType, Tags, TimeStamp } from '@/models';
+
+import type { MonitoringType } from '@/common/modules/monitoring/config';
 
 export enum COLLECT_MODE {
     all = 'ALL',
@@ -52,23 +55,45 @@ export interface PluginOptions {
 
 export interface CollectorPluginModel {
     plugin_id: string;
-    name: string;
     version: string;
     options: PluginOptions;
-    secret_id?: string;
-    secret_group_id?: string;
-    provider?: string;
+    metadata: object;
     upgrade_mode: UpgradeMode;
-    labels?: string[];
+    secret_filter: object;
+}
+
+export interface RepositoryPluginModel {
+    plugin_id: string;
+    name: string;
+    state: CollectorState;
+    image: string;
+    registry_type: 'DOCKER_HUB'|'AWS_PUBLIC_ECR'|'HARBOR';
+    registry_url: string;
+    registry_config: object;
+    service_type: string;
+    provider?: string;
+    capability: Capability;
+    template: {
+        options: {
+            schema: JsonSchema;
+        }
+    };
+    repository_info: object;
+    project_id: string;
+    labels: string[];
+    version: string;
     tags: {
         icon?: string;
         description?: string;
         link?: string;
         beta?: string;
-    } & Record<string, any>;
+    } & Tags;
 }
 
 interface Capability {
+    supported_schemas: string[];
+    use_resource_secret: boolean;
+    monitoring_type: MonitoringType;
     supported_providers?: string[];
     [key: string]: any;
 }
@@ -86,11 +111,12 @@ export interface CollectorModel {
     tags: Tags;
 }
 
-export interface CollectorUpdateParameter extends Tags {
+export interface CollectorUpdateParameter {
     collector_id: string;
     name?: string;
     plugin_info?: CollectorPluginModel;
     priority?: number;
+    tags: Tags;
 }
 
 export interface CollectorCollectParameter {
@@ -102,19 +128,22 @@ export interface CollectorCollectParameter {
     secret_group_id?: string;
 }
 
-export interface CollectorCreateParameter extends Tags {
+export interface CollectorCreateParameter {
     name: string;
+    tags: Tags;
 }
 
 export interface Schedule {
-    hours?: string[];
+    cron?: string;
+    interval?: number;
+    minutes?: number[];
+    hours?: number[];
 }
 
 export interface ScheduleAddParameter {
     collector_id: string;
     name?: string;
     schedule: Schedule;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filter?: any;
     collect_mode?: COLLECT_MODE;
 }
@@ -122,12 +151,10 @@ export interface ScheduleAddParameter {
 export interface CollectorScheduleModel {
     schedule_id: string;
     name: string;
-    state: CollectorState;
-    collector_info: CollectorModel;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filter: any;
-    collect_mode: COLLECT_MODE;
+    collector_id: string;
     schedule: Schedule;
+    filters: object;
+    collect_mode: COLLECT_MODE;
     created_at: TimeStamp;
     last_schedule_at: TimeStamp;
 }

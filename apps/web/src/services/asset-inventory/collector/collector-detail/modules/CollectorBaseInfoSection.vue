@@ -111,7 +111,7 @@ const fields = computed<DefinitionField[]>(() => [
 ]);
 
 const state = reactive({
-    plugin: computed<CollectorPluginModel|null>(() => collectorFormState.pluginInfo),
+    plugin: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
     pluginName: computed<string>(() => state.plugin?.name ?? ''),
     pluginIcon: computed<string>(() => state.plugin?.tags.icon ?? ''),
     isEditMode: false,

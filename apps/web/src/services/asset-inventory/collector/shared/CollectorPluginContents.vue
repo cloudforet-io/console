@@ -41,23 +41,37 @@ import {
     PAnchor, PLazyImg, PLabel,
 } from '@spaceone/design-system';
 
-import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import { store } from '@/store';
+
+import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
+import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/type';
 
 // TODO: Add plugin data type
 interface Props {
-    plugin?: CollectorPluginModel|null;
+    plugin?: CollectorPluginModel|RepositoryPluginModel|null;
 }
 
 const props = defineProps<Props>();
 
 const state = reactive({
-    icon: computed(() => props.plugin?.tags.icon ?? ''),
-    name: computed(() => props.plugin?.name ?? ''),
-    description: computed(() => props.plugin?.tags.description ?? ''),
-    labels: computed<string[]>(() => props.plugin?.labels ?? []),
-    isBeta: computed(() => !!props.plugin?.tags.beta ?? false),
-    pluginDetailLink: computed<CollectorPluginModel['tags']['link']>(() => props.plugin?.tags?.link ?? ''),
+    icon: computed<string>(() => state.pluginItem?.tags.icon ?? ''),
+    name: computed<string>(() => state.pluginItem?.name ?? state.pluginItem?.key ?? ''),
+    description: computed<string>(() => state.pluginItem?.description ?? ''),
+    labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin
+    isBeta: computed<boolean>(() => !!(props.plugin as RepositoryPluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
+    pluginDetailLink: computed<string>(() => state.pluginItem?.link ?? ''),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    pluginItem: computed<PluginReferenceItem|undefined>(() => {
+        if (!props.plugin) return undefined;
+        return state.plugins[props.plugin.plugin_id];
+    }),
 });
+
+// init reference data
+(async () => {
+    await store.dispatch('reference/plugin/load');
+})();
 
 
 </script>

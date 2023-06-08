@@ -75,16 +75,15 @@ const getCollector = async (): Promise<CollectorModel> => {
                 provider: 'aws',
                 capability: {
                     supported_providers: ['aws'],
-                    supported_schema: ['aws_access_key', 'aws_access_key_pair'],
-                    supported_mode: ['FULL', 'DIFF'],
-                    supported_schedule: ['* * * * *'],
+                    supported_schemas: ['aws_access_key', 'aws_access_key_pair'],
+                    monitoring_type: 'METRIC',
+                    use_resource_secret: true,
                 },
                 schedule: {
-                    hours: ['3'],
+                    hours: [3],
                 },
                 plugin_info: {
                     plugin_id: 'plugin-aws-phd-inven-collector',
-                    name: 'AWS Service Health Dashboard Collector Plugin',
                     version: '1.4.3',
                     upgrade_mode: 'AUTO',
                     options: {
