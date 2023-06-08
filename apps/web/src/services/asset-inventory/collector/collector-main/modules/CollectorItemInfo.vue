@@ -309,7 +309,8 @@ const TEMP_JOB_STATUS = [
                         }
 
                         &:hover {
-                            @apply border border-red-700; }
+                            @apply border border-red-700;
+                        }
                     }
 
                     &.progress {
