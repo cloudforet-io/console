@@ -170,8 +170,12 @@ watch(() => collectorPageState.selectedProvider, async (providerName) => {
         store.dispatch('reference/provider/load'),
     ]);
     await collectorPageStore.$reset();
-    if (query.provider) {
-        await handleSelectedProvider(query.provider as string);
+    if (Object.keys(query).length > 0) {
+        const { provider } = query;
+        if (provider === 'all') {
+            await initCollectorList();
+        }
+        await handleSelectedProvider(provider as string);
     } else {
         await initCollectorList();
     }
