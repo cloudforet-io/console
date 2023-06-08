@@ -67,7 +67,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.setAutoUpgrade(pluginUpgradeMode === 'AUTO');
         },
         resetSchedule(hoursOnly = false) {
-            this.scheduleHours = this.originCollector?.schedule.hours ?? [];
+            this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
             if (!hoursOnly) this.schedulePower = this.originCollector?.state === 'ENABLED' ?? false;
         },
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount|null) {
