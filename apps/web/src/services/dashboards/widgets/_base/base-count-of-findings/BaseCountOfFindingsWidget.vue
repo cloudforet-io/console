@@ -37,6 +37,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
+import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader, PTextPagination } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -105,7 +106,10 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const fetchData = async (): Promise<FullData> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper
+            .setFilters(state.consoleFilters)
+            .addFilter({ k: 'cloud_service_group', v: 'Prowler', o: '=' })
+            .addFilter({ k: 'provider', v: 'aws', o: '=' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
         let apiQuery: any = {
             group_by: [state.groupBy],
@@ -158,6 +162,7 @@ const drawChart = (chartData) => {
 
     const legend = chartHelper.createLegend({
         nameField: 'name',
+        clickTarget: 'none',
     });
     chart.children.push(legend);
 
@@ -171,26 +176,48 @@ const drawChart = (chartData) => {
             baseAxis: yAxis,
             stacked: true,
             fill: _legend.color,
+            stroke: _legend.color,
         };
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         series.columns.template.setAll({
             height: 20,
         });
-        // series.bullets.push(() => {
-        //     const label = chartHelper.createLabel({
-        //         text: `{${_legend.name}}`,
-        //         populateText: true,
-        //         textAlign: 'end',
-        //         centerX: percent(0),
-        //         centerY: percent(50),
-        //         fontSize: 14,
-        //         direction: 'ltr',
-        //     });
-        //     return chartHelper.createBullet({
-        //         sprite: label,
-        //         dynamic: true,
-        //     });
-        // });
+        series.bullets.push(() => {
+            const label = chartHelper.createLabel({
+                text: `{${_legend.name}}`,
+                populateText: true,
+                textAlign: 'end',
+                centerY: percent(50),
+                fontSize: 14,
+            });
+            return chartHelper.createBullet({
+                locationX: 1,
+                locationY: 0.5,
+                sprite: label,
+                dynamic: true,
+            });
+        });
+        series.columns.template.onPrivate(('width'), (width, target) => {
+            array.each(target?.dataItem?.bullets, (bullet) => {
+                if (width && width < 30) {
+                    bullet.get('sprite').hide();
+                }
+            });
+        });
+        const tooltip = chartHelper.createTooltip();
+        tooltip.label.adapters.add('text', (text, target) => {
+            let _text = '';
+            let totalValue = 0;
+            chart.series.each((s) => {
+                const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+                const value = target.dataItem?.dataContext?.[fieldName];
+                totalValue += value;
+                _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+            });
+            _text = `Total: [bold; fontSize: 14px]${totalValue}[/]${_text}`;
+            return _text;
+        });
+        series.set('tooltip', tooltip);
         chart.series.push(series);
         series.data.setAll(cloneDeep(chartData));
     });
