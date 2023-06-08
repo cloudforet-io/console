@@ -113,7 +113,7 @@ export class SpaceConnector {
     }
 
     static get isTokenAlive(): boolean {
-        if (SpaceConnector.mockInfo.all && !SpaceConnector.mockInfo.checkToken) return true;
+        if (SpaceConnector.mockInfo.skipTokenCheck) return true;
         return TokenAPI.checkToken();
     }
 
