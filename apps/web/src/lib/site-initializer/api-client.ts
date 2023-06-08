@@ -49,6 +49,7 @@ const getMockInfo = (config): MockInfo => ({
     endpoints: [config.get('MOCK.ENDPOINT_V1'), config.get('MOCK.ENDPOINT_V2')],
     all: config.get('MOCK.ALL'),
     reflection: config.get('MOCK.REFLECTION'),
+    checkToken: config.get('MOCK.CHECK_TOKEN'),
 });
 
 export const initApiClient = async (store, config) => {

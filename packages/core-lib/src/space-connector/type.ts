@@ -90,4 +90,5 @@ export interface MockInfo {
     all?: boolean;
     endpoints?: string[];
     reflection?: boolean;
+    checkToken?: boolean;
 }

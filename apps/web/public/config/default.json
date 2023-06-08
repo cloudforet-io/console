@@ -16,7 +16,8 @@
     "ALL": false,
     "ENDPOINT_V1": "",
     "ENDPOINT_V2": "",
-    "REFLECTION": false
+    "REFLECTION": false,
+    "CHECK_TOKEN": false
   },
   "ASSET_PATH": {
   },

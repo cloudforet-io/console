@@ -42,7 +42,7 @@ export class SpaceConnector {
 
     private _clientV2: any = {};
 
-    private mockInfo: MockInfo;
+    private static mockInfo: MockInfo;
 
     private readonly afterCallApiMap: AfterCallApiMap;
 
@@ -52,7 +52,7 @@ export class SpaceConnector {
         mockInfo: MockInfo,
         afterCallApiMap: AfterCallApiMap,
     ) {
-        this.mockInfo = mockInfo;
+        SpaceConnector.mockInfo = mockInfo;
         this.tokenApi = tokenApi;
         this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi);
         this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi);
@@ -113,14 +113,15 @@ export class SpaceConnector {
     }
 
     static get isTokenAlive(): boolean {
+        if (SpaceConnector.mockInfo.all && !SpaceConnector.mockInfo.checkToken) return true;
         return TokenAPI.checkToken();
     }
 
     protected async loadAPI(version: number): Promise<void> {
         try {
             let reflectionApi;
-            const mockEndpoint = this.mockInfo.endpoints?.[version - 1];
-            if (this.mockInfo.reflection && mockEndpoint) {
+            const mockEndpoint = SpaceConnector.mockInfo.endpoints?.[version - 1];
+            if (SpaceConnector.mockInfo.reflection && mockEndpoint) {
                 reflectionApi = axios.create({
                     headers: { 'Content-Type': 'application/json' },
                     baseURL: mockEndpoint,
@@ -164,14 +165,14 @@ export class SpaceConnector {
     }
 
     protected APIHandler(path: string, afterCall: AfterCallApi, version: number) {
-        const mockEndpoint = this.mockInfo.endpoints?.[version - 1];
+        const mockEndpoint = SpaceConnector.mockInfo.endpoints?.[version - 1];
         const serviceApi = version === 2 ? this.serviceApiV2 : this.serviceApi;
         if (mockEndpoint) {
             return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
                 const mockConfig = { ...config };
                 let url = path;
 
-                if (this.mockInfo.all || mockConfig.mockMode) {
+                if (SpaceConnector.mockInfo.all || mockConfig.mockMode) {
                     mockConfig.baseURL = mockEndpoint;
                     if (mockConfig.mockPath) {
                         url += mockConfig.mockPath;
