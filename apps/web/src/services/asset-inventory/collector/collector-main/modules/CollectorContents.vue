@@ -97,7 +97,7 @@ const state = reactive({
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: 'Plugin' },
         { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: 'Current Status' },
-        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs (Last 5 days)' },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: 'Schedule' },
     ],
     valueHandlerMap: {
