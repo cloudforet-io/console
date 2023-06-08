@@ -183,7 +183,7 @@ const drawChart = (chartData) => {
         });
         series.bullets.push(() => {
             const label = chartHelper.createLabel({
-                text: `{${_legend.name}}`,
+                text: _legend.name,
                 populateText: true,
                 textAlign: 'end',
                 centerY: percent(50),
