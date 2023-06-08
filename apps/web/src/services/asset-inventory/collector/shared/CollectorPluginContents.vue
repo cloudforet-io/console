@@ -14,9 +14,11 @@
             <div class="plugin-description">
                 <span class="plugin-description-text">
                     {{ state.description }}
-                </span><p-anchor v-if="state.pluginDetailLink"
-                                 size="sm"
-                                 :highlight="true"
+                </span>
+                <p-anchor v-if="state.pluginDetailLink"
+                          :href="state.pluginDetailLink"
+                          size="sm"
+                          :highlight="true"
                 >
                     {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
                 </p-anchor>
@@ -55,7 +57,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const state = reactive({
-    icon: computed<string>(() => state.pluginItem?.tags.icon ?? ''),
+    icon: computed<string>(() => state.pluginItem?.icon ?? ''),
     name: computed<string>(() => state.pluginItem?.name ?? state.pluginItem?.key ?? ''),
     description: computed<string>(() => state.pluginItem?.description ?? ''),
     labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin

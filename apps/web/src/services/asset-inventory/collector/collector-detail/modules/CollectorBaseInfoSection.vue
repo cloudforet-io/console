@@ -27,8 +27,7 @@
                             width="1rem"
                             height="1rem"
                 />
-                <!-- TODO: Remove test code below: 'Name!' -->
-                <span class="ml-2 leading-none">{{ state.pluginName || 'Name!' }}</span>
+                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
             </template>
             <template #data-plugin_info.version="{ value }">
                 {{ value }} {{ isLatestVersion(value) ? ' (latest)' : '' }}
@@ -47,7 +46,7 @@
         <div v-if="state.isEditMode"
              class="collector-base-info-edit"
         >
-            <collector-plugin-contents :plugin="state.plugin" />
+            <collector-plugin-contents :plugin="state.pluginInfo" />
             <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
                                 @update:isTagsValid="handleUpdateIsTagsValid"
@@ -85,6 +84,8 @@ import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
@@ -111,9 +112,14 @@ const fields = computed<DefinitionField[]>(() => [
 ]);
 
 const state = reactive({
-    plugin: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
-    pluginName: computed<string>(() => state.plugin?.name ?? ''),
-    pluginIcon: computed<string>(() => state.plugin?.tags.icon ?? ''),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    pluginItem: computed<PluginReferenceItem|undefined>(() => {
+        if (!state.pluginInfo) return undefined;
+        return state.plugins[state.pluginInfo.plugin_id];
+    }),
+    pluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
+    pluginName: computed<string>(() => state.pluginItem?.label ?? ''),
+    pluginIcon: computed<string>(() => state.pluginItem?.icon ?? ''),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
@@ -154,6 +160,10 @@ const handleClickSave = () => {
     });
 };
 
+// init reference data
+(async () => {
+    await store.dispatch('reference/plugin/load');
+})();
 </script>
 
 <style lang="postcss" scoped>
