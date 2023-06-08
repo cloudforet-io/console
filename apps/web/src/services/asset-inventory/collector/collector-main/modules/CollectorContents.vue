@@ -67,6 +67,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
@@ -95,10 +96,10 @@ const storeState = reactive({
 
 const state = reactive({
     infoItems: [
-        { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: 'Plugin' },
-        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: 'Current Status' },
-        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: 'Recent Collector Jobs (Last 5 days)' },
-        { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: 'Schedule' },
+        { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
     ],
     valueHandlerMap: {
         collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
