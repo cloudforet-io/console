@@ -131,7 +131,7 @@ const state = reactive({
                 info: d.plugin_info,
             },
             detailLink: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                 param: { id: d.collector_id },
                 query: {
                     filters: searchQueryHelper.setFilters([
