@@ -56,8 +56,6 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
@@ -106,12 +104,7 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
         };
         const res = await SpaceConnector.client.repository.plugin.list(params);
         state.totalCount = res.total_count;
-        return [
-            ...res.results.map((d) => ({
-                icon: assetUrlConverter(d.tags?.icon),
-                ...d,
-            })),
-        ];
+        return res.results;
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
