@@ -31,22 +31,42 @@
         <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
                       :contents="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
-                      @confirm="handleClose"
+                      @confirm="handleClickBackButton"
         />
     </fragment>
 </template>
 
+<script lang="ts">
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
+    },
+});
+</script>
+
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+/* eslint-disable import/first */
+// eslint-disable-next-line import/no-duplicates
+import { computed, reactive, defineExpose } from 'vue';
 
 import { PHeading, PIconButton } from '@spaceone/design-system';
 
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useGoBack } from '@/common/composables/go-back';
 
 import CreateCollectorStep1
     from '@/services/asset-inventory/collector/collector-create/modules/CreateCollectorStep1.vue';
@@ -68,18 +88,19 @@ const state = reactive({
         4: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC4'),
     })),
 });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 
 const handleClickClose = () => {
     state.deleteModalVisible = true;
 };
 
-const handleClose = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
-};
-
 const handleChangeStep = (step: number) => {
     state.step = step;
 };
+
+
+defineExpose({ setPathFrom });
+
 
 (() => {
     store.dispatch('reference/provider/load');
