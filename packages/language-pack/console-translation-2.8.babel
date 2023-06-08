@@ -24926,7 +24926,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>LESS_THAN_PREV_MONTHS</name>
+                                        <name>LESS_THAN_PREV_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -24947,7 +24947,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MORE_THAN_PREV_MONTHS</name>
+                                        <name>MORE_THAN_PREV_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -25631,7 +25631,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>LESS_THAN_PREV_MONTHS</name>
+                                        <name>LESS_THAN_PREV_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -25652,7 +25652,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MORE_THAN_PREV_MONTHS</name>
+                                        <name>MORE_THAN_PREV_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>

@@ -1415,8 +1415,8 @@
 				"CHECKED_SERVICE_ACCOUNT": "Checked service account",
 				"COMPLIANCE_SCORE": "Compliance score",
 				"DESC": "Providing a status of \"Check\" or \"Findings\" for the reviewer.",
-				"LESS_THAN_PREV_MONTHS": "less than previous {month} months",
-				"MORE_THAN_PREV_MONTHS": "more than previous {month} months",
+				"LESS_THAN_PREV_MONTH": "less than previous month",
+				"MORE_THAN_PREV_MONTH": "more than previous month",
 				"TOTAL_COMPLIANCE_NUMBER": "Total compliance number"
 			},
 			"COST_BY_REGION": {
@@ -1475,8 +1475,8 @@
 			"TOTAL_FAILURE_AND_SEVERITY": {
 				"DESC": "Providing severity for the overall number of failures.",
 				"FAILURE_RATE": "Failure rate",
-				"LESS_THAN_PREV_MONTHS": "less than previous {month} months",
-				"MORE_THAN_PREV_MONTHS": "more than previous {month} months",
+				"LESS_THAN_PREV_MONTH": "less than previous month",
+				"MORE_THAN_PREV_MONTH": "more than previous month",
 				"SEVERITY": "Severity",
 				"TOTAL_FAILURE_COUNT": "Total failure count"
 			},
