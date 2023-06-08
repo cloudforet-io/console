@@ -35,7 +35,7 @@
                         width="1.25rem"
                         color="inherit"
                     />
-                    <!-- TODO: apply translation later because of license issue -->
+                    <!-- TODO: will be fixed after the API is completed -->
                     <p class="description">
                         Scheduled
                         <span class="emphasis">
