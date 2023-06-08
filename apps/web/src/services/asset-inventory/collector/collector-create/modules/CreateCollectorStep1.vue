@@ -61,7 +61,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import Step1SearchFilter from '@/services/asset-inventory/collector/create-collector/modules/Step1SearchFilter.vue';
+import Step1SearchFilter from '@/services/asset-inventory/collector/collector-create/modules/Step1SearchFilter.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
