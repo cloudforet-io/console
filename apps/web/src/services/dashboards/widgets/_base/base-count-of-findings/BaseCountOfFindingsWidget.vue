@@ -108,8 +108,7 @@ const fetchData = async (): Promise<FullData> => {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.consoleFilters)
-            .addFilter({ k: 'cloud_service_group', v: 'Prowler', o: '=' })
-            .addFilter({ k: 'provider', v: 'aws', o: '=' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
         let apiQuery: any = {
             group_by: [state.groupBy],
