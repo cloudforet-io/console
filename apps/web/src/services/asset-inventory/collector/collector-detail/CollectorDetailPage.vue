@@ -28,7 +28,7 @@
                 </span>
             </template>
             <template #extra>
-                <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
+                <router-link :to="state.collectorHistoryLink">
                     <p-button v-if="props.collectorId"
                               style-type="tertiary"
                     >
@@ -76,10 +76,13 @@ import {
     defineProps, defineExpose, reactive, onMounted, computed,
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
+import type { Location } from 'vue-router';
 
 import {
     PHeading, PSkeleton, PButton, PIconButton,
 } from '@spaceone/design-system';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -101,14 +104,27 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const queryHelper = new QueryHelper();
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
-    collectorName: computed<string>(() => collectorFormState.originCollector?.name ?? ''),
+    collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
     // TODO: must be updated after backend api spec is updated
     collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
+    collectorHistoryLink: computed<Location>(() => ({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        query: {
+            filters: queryHelper.setFilters([
+                {
+                    k: 'collector_id',
+                    v: props.collectorId,
+                    o: '=',
+                },
+            ]).rawQueryStrings,
+        },
+    })),
 });
 
 const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
