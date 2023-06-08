@@ -15,22 +15,22 @@
                     <slot name="head"
                           v-bind="getDefaultSlotProps()"
                     >
-                        <template v-if="showHeader">
-                            <tr v-for="(fieldRow, fieldRowIdx) in tableFieldRows"
+                        <template v-if="state.showHeader">
+                            <tr v-for="(fieldRow, fieldRowIdx) in state.tableFieldRows"
                                 :key="fieldRowIdx"
                                 class="fade-in"
                             >
                                 <th v-if="selectable && fieldRowIdx === 0"
-                                    :rowspan="numOfFieldRows"
+                                    :rowspan="state.numOfFieldRows"
                                     class="all-select"
                                 >
                                     <p-checkbox v-if="multiSelect"
-                                                v-model="allState"
+                                                v-model="state.allState"
                                                 @change="onSelectAllToggle"
                                     />
                                 </th>
                                 <th v-for="(field, fieldColIndex) in fieldRow"
-                                    :key="`th-${contextKey}-${fieldColIndex}-${fieldRowIdx}`"
+                                    :key="`th-${state.contextKey}-${fieldColIndex}-${fieldRowIdx}`"
                                     :rowspan="getFieldRowspan(field, fieldRowIdx)"
                                     :colspan="getFieldColspan(field)"
                                     :style="{
@@ -38,7 +38,7 @@
                                         width: field.width || undefined,
                                     }"
                                     :class="{'fix-width': colCopy}"
-                                    @click="onTheadClick(field, fieldColIndex, $event)"
+                                    @click="onTheadClick(field)"
                                 >
                                     <slot :name="`th-${field.name}`"
                                           v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
@@ -83,13 +83,13 @@
                         </template>
                         <template v-else>
                             <tr>
-                                <th :colspan="selectable ? leafFields.length +1 : leafFields.length" />
+                                <th :colspan="selectable ? state.leafFields.length +1 : state.leafFields.length" />
                             </tr>
                         </template>
                     </slot>
                 </thead>
                 <tbody ref="tbodyRef">
-                    <slot v-if="showNoData"
+                    <slot v-if="state.showNoData"
                           name="no-data"
                           v-bind="getDefaultSlotProps()"
                     >
@@ -97,10 +97,10 @@
                             <slot name="no-data-format"
                                   v-bind="getDefaultSlotProps()"
                             >
-                                {{ $t('COMPONENT.DATA_TABLE.NO_DATA') }}
+                                {{ t('COMPONENT.DATA_TABLE.NO_DATA') }}
                             </slot>
                         </div>
-                        <tr :colspan="selectable ? leafFields.length +1 : leafFields.length"
+                        <tr :colspan="selectable ? state.leafFields.length +1 : state.leafFields.length"
                             class="fake-row"
                         />
                     </slot>
@@ -109,7 +109,7 @@
                           v-bind="getDefaultSlotProps()"
                     >
                         <tr v-for="(item, rowIndex) in items"
-                            :key="`tr-${contextKey}-${rowIndex}`"
+                            :key="`tr-${state.contextKey}-${rowIndex}`"
                             :data-index="rowIndex"
                             class="fade-in"
                             :class="{
@@ -137,8 +137,8 @@
                                          @change="onChangeRadioSelect"
                                 />
                             </td>
-                            <td v-for="(field, colIndex) in leafFields"
-                                :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
+                            <td v-for="(field, colIndex) in state.leafFields"
+                                :key="`td-${state.contextKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
                                     [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
@@ -172,10 +172,10 @@
             </table>
         </div>
 
-        <div v-if="showLoading"
+        <div v-if="state.showLoading"
              class="loading-backdrop fade-in"
         />
-        <div v-if="showLoading"
+        <div v-if="state.showLoading"
              class="loading"
         >
             <slot name="loading">
@@ -188,16 +188,18 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { get, range } from 'lodash';
 import type { PropType } from 'vue';
 import {
-    toRefs, computed, reactive, watch, defineComponent,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-
-import { get, range } from 'lodash';
+import { useI18n } from 'vue-i18n';
 
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
-import type { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
+import type {
+    DataTableField, DataTableFieldType, DataTableProps, DataTableStyleType,
+} from '@/data-display/tables/data-table/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/utils/helpers';
@@ -212,355 +214,326 @@ interface TableField extends DataTableFieldType {
     depth?: number;
 }
 
-export default defineComponent<DataTableProps>({
-    name: 'PDataTable',
-    components: {
-        PSpinner,
-        PTextBeautifier,
-        PI,
-        PCheckbox,
-        PCopyButton,
-        PRadio,
+const props = defineProps({
+    loading: {
+        type: Boolean,
+        default: false,
     },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        fields: {
-            type: Array,
-            required: true,
-            default: () => [],
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        sortable: {
-            type: Boolean,
-            default: false,
-        },
-        sortBy: {
-            type: String,
-            default: undefined,
-        },
-        sortDesc: {
-            type: Boolean,
-            default: undefined,
-        },
-        colCopy: {
-            type: Boolean,
-            default: false,
-        },
-        selectable: {
-            type: Boolean,
-            default: false,
-        },
-        selectIndex: {
-            type: Array,
-            default: () => [],
-        },
-        multiSelect: {
-            type: Boolean,
-            default: true,
-        },
-        rowClickMultiSelectMode: {
-            type: Boolean,
-            default: false,
-        },
-        useCursorLoading: {
-            type: Boolean,
-            default: false,
-        },
-        tableStyleType: {
-            type: String,
-            default: 'default',
-            validator(value: any) {
-                return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
-            },
-        },
-        tableCustomStyle: {
-            type: Object as PropType<{ [key: string]: string }>,
-            default: () => ({}),
-        },
-        striped: {
-            type: Boolean,
-            default: false,
-        },
-        bordered: {
-            type: Boolean,
-            default: true,
-        },
-        disableHover: {
-            type: Boolean,
-            default: false,
-        },
-        rowHeightFixed: {
-            type: Boolean,
-            default: true,
-        },
-        rowCursorPointer: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        getRowClassNames: {
-            type: Function,
-            default: undefined,
-        },
-        getRowSelectable: {
-            type: Function,
-            default: undefined,
-        },
-        beautifyText: {
-            type: Boolean,
-            default: false,
+    fields: {
+        type: Array as PropType<DataTableProps['fields']>,
+        required: true,
+        default: () => [],
+    },
+    items: {
+        type: Array as PropType<DataTableProps['items']>,
+        default: () => [],
+    },
+    sortable: {
+        type: Boolean,
+        default: false,
+    },
+    sortBy: {
+        type: String,
+        default: undefined,
+    },
+    sortDesc: {
+        type: Boolean,
+        default: undefined,
+    },
+    colCopy: {
+        type: Boolean,
+        default: false,
+    },
+    selectable: {
+        type: Boolean,
+        default: false,
+    },
+    selectIndex: {
+        type: Array as PropType<DataTableProps['selectIndex']>,
+        default: () => [],
+    },
+    multiSelect: {
+        type: Boolean,
+        default: true,
+    },
+    rowClickMultiSelectMode: {
+        type: Boolean,
+        default: false,
+    },
+    useCursorLoading: {
+        type: Boolean,
+        default: false,
+    },
+    tableStyleType: {
+        type: String as PropType<DataTableStyleType>,
+        default: 'default',
+        validator(value: any) {
+            return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
         },
     },
-    setup(props, { emit }) {
-        const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map((child) => ({ sortable: true, ...child }));
-
-        const isFieldSortable = (sortable: boolean | undefined): boolean => (props.sortable ? sortable !== false : false);
-
-        const getTableField = (field: string|DataTableFieldType): TableField => {
-            if (typeof field === 'string') return { name: field, label: field, sortable: true };
-
-            const children = getChildFields(field);
-            return { ...field, children, sortable: children?.length ? false : isFieldSortable(field.sortable) };
-        };
-
-        const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
-            fields.forEach((tableField: TableField) => {
-                const row = tableFieldRows[tableField.depth ?? 0] ?? [];
-                if (!tableField.invisible) row.push(tableField);
-                if (row.length) tableFieldRows[tableField.depth ?? 0] = row;
-            });
-            return tableFieldRows;
-        };
-
-        const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
-
-        const getLeafFields = (fields: TableField[]): TableField[] => fields.filter((field) => !field.children?.length);
-
-        const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
-            fields.forEach((f) => {
-                const field = getTableField(f);
-                field.depth = depth;
-                allFields.push(field);
-                if (field.children?.length) getTableFields(field.children, allFields, depth + 1);
-            });
-            return allFields;
-        };
-
-        const proxyState = reactive({
-            proxySelectIndex: useProxyValue<number[]>('selectIndex', props, emit),
-            proxySortBy: useProxyValue<string>('sortBy', props, emit),
-            proxySortDesc: useProxyValue<boolean|undefined>('sortDesc', props, emit),
-        });
-
-        const state = reactive({
-            tbodyRef: null as HTMLElement|null,
-            allState: false,
-            allFields: computed<TableField[]>(() => getTableFields(props.fields)),
-            tableFieldRows: computed<TableField[][]>(() => getTableFieldRows(state.allFields)),
-            leafFields: computed<TableField[]>(() => getLeafFields(state.allFields)),
-            numOfFieldRows: computed<number>(() => state.tableFieldRows.length),
-            copyTargetElement: computed<HTMLCollection>(() => state.tbodyRef?.children || []),
-            showLoading: true,
-            showHeader: props.items && props.items.length > 0 && props.fields.length > 0,
-            showNoData: computed(() => state.showHeader && (
-                !props.items || !Array.isArray(props.items) || props.items.length === 0
-            )),
-            contextKey: Math.floor(Math.random() * Date.now()),
-        });
-
-
-        const getFieldRowspan = (field: DataTableFieldType, rowIndex): number => {
-            if (isLeafField(field)) return state.numOfFieldRows - rowIndex;
-            return 1;
-        };
-
-
-        const getFieldColspan = (field: DataTableFieldType, count = 0): number => {
-            if (isLeafField(field)) return count + 1;
-            let totalCount = 0;
-            if (field.children) {
-                field.children.forEach((child) => {
-                    totalCount += getFieldColspan(child, count);
-                });
-            }
-            return totalCount;
-        };
-
-
-        const getValue = (item, field: DataTableFieldType) => {
-            if (typeof item === 'object') {
-                return get(item, field.name);
-            }
-            return item;
-        };
-
-        const getDefaultSlotProps = () => ({
-            fields: state.tableFieldRows[0] ?? [],
-            fieldRows: state.tableFieldRows,
-        });
-
-        const getHeadSlotProps = (field, colIndex, rowIndex) => ({
-            field, index: colIndex, sortable: props.sortable, colIndex, rowIndex,
-        });
-
-        const getColSlotProps = (item, field, colIndex, rowIndex) => ({
-            item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
-        });
-
-        const getSelectedState = (item, index) => {
-            if (props.getRowSelectable) return props.getRowSelectable(item, index);
-            return props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index;
-        };
-
-        const checkboxToggle = (item, index) => {
-            const newSelected = [...proxyState.proxySelectIndex];
-            if (getSelectedState(item, index)) {
-                const idx = newSelected.indexOf(index);
-                newSelected.splice(idx, 1);
-                state.allState = false;
-            } else {
-                newSelected.push(index);
-            }
-            proxyState.proxySelectIndex = newSelected;
-        };
-
-        /* Event Handlers */
-        const onRowLeftClick = (item, index, event) => {
-            emit('rowLeftClick', item, index, event);
-            if (!props.selectable) return;
-            if (props.multiSelect) {
-                if (props.rowClickMultiSelectMode) {
-                    checkboxToggle(item, index);
-                    return;
-                }
-                if (event.shiftKey) {
-                    checkboxToggle(item, index);
-                    return;
-                }
-            }
-            proxyState.proxySelectIndex = [index];
-        };
-
-        const onTheadClick = (field) => {
-            if (isFieldSortable(field.sortable)) {
-                const clickedKey = field.sortKey || field.name;
-                let sortBy = proxyState.proxySortBy;
-                let sortDesc: undefined|boolean = proxyState.proxySortDesc;
-
-                if (sortBy === clickedKey) {
-                    // set reverse mode
-                    sortDesc = !sortDesc;
-                    // when clicked the other thead
-                } else {
-                    sortBy = clickedKey;
-                    sortDesc = false;
-                }
-                // set changed values
-                proxyState.proxySortBy = sortBy;
-                proxyState.proxySortDesc = sortDesc;
-                emit('changeSort', sortBy, sortDesc);
-            }
-        };
-
-        const onSelectClick = (event) => {
-            event.target.children[0].click();
-        };
-        const onSelectAllToggle = () => {
-            if (state.allState) {
-                proxyState.proxySelectIndex = range(props.items.length);
-            } else {
-                proxyState.proxySelectIndex = [];
-            }
-        };
-        const onClickColCopy = (field: DataTableFieldType) => {
-            let result = '';
-            const arr: Element[] = Array.from(state.copyTargetElement);
-            let idx = state.leafFields.findIndex((d) => d === field);
-            if (idx === -1) return;
-
-            if (props.selectable) idx += 1;
-            arr.forEach((el) => {
-                const children = Array.from(el.children) as HTMLElement[];
-                children.forEach((td, colIdx) => {
-                    if (colIdx === idx) {
-                        if (result) result += `\n${td.innerText}`;
-                        else result = td.innerText;
-                    }
-                });
-            });
-            copyAnyData(result);
-        };
-
-        const onChangeRadioSelect = (e) => {
-            proxyState.proxySelectIndex = [e];
-        };
-
-
-        watch(() => proxyState.proxySelectIndex, (selectIndex) => {
-            state.allState = !!(props.items
-                && props.items.length
-                && props.items.length === selectIndex.length);
-        }, { immediate: true });
-
-        watch(() => props.loading, (value) => {
-            // if (typeof value !== 'boolean') {
-            //     state.showHeader = true;
-            //     state.showLoading = false;
-            //     return;
-            // }
-
-            if (props.useCursorLoading && value) {
-                document.body.style.cursor = 'progress';
-            } else {
-                document.body.style.cursor = 'default';
-            }
-
-            if (value) {
-                state.showLoading = true;
-            } else {
-                if (!state.showHeader) {
-                    state.showHeader = true;
-                }
-                state.showLoading = false;
-            }
-        }, { immediate: true });
-
-        watch([() => props.items, () => props.fields], () => {
-            state.contextKey = Math.floor(Math.random() * Date.now());
-        });
-
-
-        return {
-            proxyState,
-            ...toRefs(state),
-            isFieldSortable,
-            isLeafField,
-            getFieldRowspan,
-            getFieldColspan,
-            getValue,
-            getDefaultSlotProps,
-            getHeadSlotProps,
-            getColSlotProps,
-            getSelectedState,
-            onRowLeftClick,
-            onTheadClick,
-            onSelectClick,
-            onSelectAllToggle,
-            onClickColCopy,
-            onChangeRadioSelect,
-            DATA_TABLE_CELL_TEXT_ALIGN,
-        };
+    tableCustomStyle: {
+        type: Object as PropType<DataTableProps['tableCustomStyle']>,
+        default: () => ({}),
+    },
+    striped: {
+        type: Boolean,
+        default: false,
+    },
+    bordered: {
+        type: Boolean as PropType<DataTableProps['bordered']>,
+        default: true,
+    },
+    disableHover: {
+        type: Boolean,
+        default: false,
+    },
+    rowHeightFixed: {
+        type: Boolean,
+        default: true,
+    },
+    rowCursorPointer: {
+        type: Boolean,
+        default: false,
+    },
+    invalid: {
+        type: Boolean,
+        default: false,
+    },
+    getRowClassNames: {
+        type: Function as PropType<DataTableProps['getRowClassNames']>,
+        default: undefined,
+    },
+    getRowSelectable: {
+        type: Function as PropType<DataTableProps['getRowSelectable']>,
+        default: undefined,
+    },
+    beautifyText: {
+        type: Boolean,
+        default: false,
     },
 });
+
+const emit = defineEmits(['selectIndex', 'sortBy', 'sortDesc', 'rowLeftClick', 'changeSort']);
+const { t } = useI18n();
+
+const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map((child) => ({ sortable: true, ...child }));
+
+const isFieldSortable = (sortable: boolean | undefined): boolean => (props.sortable ? sortable !== false : false);
+
+const getTableField = (field: string|DataTableFieldType): TableField => {
+    if (typeof field === 'string') return { name: field, label: field, sortable: true };
+
+    const children = getChildFields(field);
+    return { ...field, children, sortable: children?.length ? false : isFieldSortable(field.sortable) };
+};
+
+const getTableFieldRows = (fields: TableField[], tableFieldRows: TableField[][] = []): TableField[][] => {
+    fields.forEach((tableField: TableField) => {
+        const row = tableFieldRows[tableField.depth ?? 0] ?? [];
+        if (!tableField.invisible) row.push(tableField);
+        if (row.length) tableFieldRows[tableField.depth ?? 0] = row;
+    });
+    return tableFieldRows;
+};
+
+const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
+
+const getLeafFields = (fields: TableField[]): TableField[] => fields.filter((field) => !field.children?.length);
+
+const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
+    fields.forEach((f) => {
+        const field = getTableField(f);
+        field.depth = depth;
+        allFields.push(field);
+        if (field.children?.length) getTableFields(field.children, allFields, depth + 1);
+    });
+    return allFields;
+};
+
+const proxyState = reactive({
+    proxySelectIndex: useProxyValue<number[]>('selectIndex', props, emit),
+    proxySortBy: useProxyValue<string>('sortBy', props, emit),
+    proxySortDesc: useProxyValue<boolean|undefined>('sortDesc', props, emit),
+});
+
+const state = reactive({
+    tbodyRef: null as HTMLElement|null,
+    allState: false,
+    allFields: computed<TableField[]>(() => getTableFields(props.fields)),
+    tableFieldRows: computed<TableField[][]>(() => getTableFieldRows(state.allFields)),
+    leafFields: computed<TableField[]>(() => getLeafFields(state.allFields)),
+    numOfFieldRows: computed<number>(() => state.tableFieldRows.length),
+    copyTargetElement: computed<HTMLCollection>(() => state.tbodyRef?.children || []),
+    showLoading: true,
+    showHeader: props.items && props.items.length > 0 && props.fields.length > 0,
+    showNoData: computed(() => state.showHeader && (
+        !props.items || !Array.isArray(props.items) || props.items.length === 0
+    )),
+    contextKey: Math.floor(Math.random() * Date.now()),
+});
+
+const getFieldRowspan = (field: DataTableFieldType, rowIndex): number => {
+    if (isLeafField(field)) return state.numOfFieldRows - rowIndex;
+    return 1;
+};
+
+
+const getFieldColspan = (field: DataTableFieldType, count = 0): number => {
+    if (isLeafField(field)) return count + 1;
+    let totalCount = 0;
+    if (field.children) {
+        field.children.forEach((child) => {
+            totalCount += getFieldColspan(child, count);
+        });
+    }
+    return totalCount;
+};
+
+
+const getValue = (item, field: DataTableFieldType) => {
+    if (typeof item === 'object') {
+        return get(item, field.name);
+    }
+    return item;
+};
+
+const getDefaultSlotProps = () => ({
+    fields: state.tableFieldRows[0] ?? [],
+    fieldRows: state.tableFieldRows,
+});
+
+const getHeadSlotProps = (field, colIndex, rowIndex) => ({
+    field, index: colIndex, sortable: props.sortable, colIndex, rowIndex,
+});
+
+const getColSlotProps = (item, field, colIndex, rowIndex) => ({
+    item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
+});
+
+const getSelectedState = (item, index) => {
+    if (props.getRowSelectable) return props.getRowSelectable(item, index);
+    return props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index;
+};
+
+const checkboxToggle = (item, index) => {
+    const newSelected = [...proxyState.proxySelectIndex];
+    if (getSelectedState(item, index)) {
+        const idx = newSelected.indexOf(index);
+        newSelected.splice(idx, 1);
+        state.allState = false;
+    } else {
+        newSelected.push(index);
+    }
+    proxyState.proxySelectIndex = newSelected;
+};
+
+/* Event Handlers */
+const onRowLeftClick = (item, index, event) => {
+    emit('rowLeftClick', item, index, event);
+    if (!props.selectable) return;
+    if (props.multiSelect) {
+        if (props.rowClickMultiSelectMode) {
+            checkboxToggle(item, index);
+            return;
+        }
+        if (event.shiftKey) {
+            checkboxToggle(item, index);
+            return;
+        }
+    }
+    proxyState.proxySelectIndex = [index];
+};
+
+const onTheadClick = (field) => {
+    if (isFieldSortable(field.sortable)) {
+        const clickedKey = field.sortKey || field.name;
+        let sortBy = proxyState.proxySortBy;
+        let sortDesc: undefined|boolean = proxyState.proxySortDesc;
+
+        if (sortBy === clickedKey) {
+            // set reverse mode
+            sortDesc = !sortDesc;
+            // when clicked the other thead
+        } else {
+            sortBy = clickedKey;
+            sortDesc = false;
+        }
+        // set changed values
+        proxyState.proxySortBy = sortBy;
+        proxyState.proxySortDesc = sortDesc;
+        emit('changeSort', sortBy, sortDesc);
+    }
+};
+
+const onSelectClick = (event) => {
+    event.target.children[0].click();
+};
+const onSelectAllToggle = () => {
+    if (state.allState) {
+        proxyState.proxySelectIndex = range(props.items.length);
+    } else {
+        proxyState.proxySelectIndex = [];
+    }
+};
+const onClickColCopy = (field: DataTableFieldType) => {
+    let result = '';
+    const arr: Element[] = Array.from(state.copyTargetElement);
+    let idx = state.leafFields.findIndex((d) => d === field);
+    if (idx === -1) return;
+
+    if (props.selectable) idx += 1;
+    arr.forEach((el) => {
+        const children = Array.from(el.children) as HTMLElement[];
+        children.forEach((td, colIdx) => {
+            if (colIdx === idx) {
+                if (result) result += `\n${td.innerText}`;
+                else result = td.innerText;
+            }
+        });
+    });
+    copyAnyData(result);
+};
+
+const onChangeRadioSelect = (e) => {
+    proxyState.proxySelectIndex = [e];
+};
+
+
+watch(() => proxyState.proxySelectIndex, (selectIndex) => {
+    state.allState = !!(props.items
+                && props.items.length
+                && props.items.length === selectIndex.length);
+}, { immediate: true });
+
+watch(() => props.loading, (value) => {
+    // if (typeof value !== 'boolean') {
+    //     state.showHeader = true;
+    //     state.showLoading = false;
+    //     return;
+    // }
+
+    if (props.useCursorLoading && value) {
+        document.body.style.cursor = 'progress';
+    } else {
+        document.body.style.cursor = 'default';
+    }
+
+    if (value) {
+        state.showLoading = true;
+    } else {
+        if (!state.showHeader) {
+            state.showHeader = true;
+        }
+        state.showLoading = false;
+    }
+}, { immediate: true });
+
+watch([() => props.items, () => props.fields], () => {
+    state.contextKey = Math.floor(Math.random() * Date.now());
+});
+
+const { tbodyRef } = toRefs(state);
+
 </script>
 
 <style lang="postcss">

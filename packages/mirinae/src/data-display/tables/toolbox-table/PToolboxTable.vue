@@ -2,7 +2,11 @@
     <p-pane-layout class="p-toolbox-table">
         <div class="top-wrapper">
             <slot name="toolbox-top" />
-            <p-toolbox :pagination-visible="paginationVisible"
+            <p-toolbox v-model:this-page="proxyState.thisPage"
+                       v-model:page-size="proxyState.pageSize"
+                       v-model:query-tags="proxyState.queryTags"
+                       v-model:search-text="proxyState.searchText"
+                       :pagination-visible="paginationVisible"
                        :page-size-changeable="pageSizeChangeable"
                        :settings-visible="settingsVisible"
                        :exportable="exportable"
@@ -11,21 +15,19 @@
                        :sortable="false"
                        :filters-visible="filtersVisible"
                        :search-type="searchType"
-                       :this-page.sync="proxyState.thisPage"
-                       :page-size.sync="proxyState.pageSize"
                        :total-count="totalCount"
                        :page-size-options="pageSizeOptions"
                        :key-item-sets="keyItemSets"
                        :value-handler-map="valueHandlerMap"
-                       :query-tags.sync="proxyState.queryTags"
-                       :search-text.sync="proxyState.searchText"
                        :timezone="timezone"
-                       @change="emitChange"
-                       @export="$emit('export')"
-                       @refresh="$emit('refresh')"
-                       @click-settings="$emit('click-settings')"
+                       @change="handleChange"
+                       @export="handleExport"
+                       @refresh="handleRefresh"
+                       @click-settings="handleClickSettings"
             >
-                <template v-if="$scopedSlots['toolbox-left']" #left-area>
+                <template v-if="slots['toolbox-left']"
+                          #left-area
+                >
                     <div class="toolbox-left">
                         <slot name="toolbox-left" />
                     </div>
@@ -34,15 +36,15 @@
             <slot name="toolbox-bottom" />
         </div>
 
-        <p-data-table :fields="fields"
+        <p-data-table v-model:select-index="proxyState.selectIndex"
+                      v-model:sort-by="proxyState.sortBy"
+                      v-model:sort-desc="proxyState.sortDesc"
+                      :fields="fields"
                       :items="items"
                       :sortable="sortable"
                       :selectable="selectable"
                       :multi-select="multiSelect"
                       :col-copy="colCopy"
-                      :select-index.sync="proxyState.selectIndex"
-                      :sort-by.sync="proxyState.sortBy"
-                      :sort-desc.sync="proxyState.sortDesc"
                       :table-style-type="tableStyleType"
                       :striped="striped"
                       :bordered="bordered"
@@ -54,22 +56,26 @@
                       :invalid="invalid"
                       :get-row-class-names="getRowClassNames"
                       :get-row-selectable="getRowSelectable"
-                      v-on="$listeners"
-                      @changeSort="changeSort"
+                      v-on="listeners"
+                      @change-sort="changeSort"
         >
-            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
+            <template v-for="(_, slot) of slots"
+                      #[slot]="scope"
+            >
+                <slot v-if="!slot.startsWith('toolbox')"
+                      :name="slot"
+                      v-bind="scope"
+                />
             </template>
         </p-data-table>
         <slot name="toolbox-table-bottom" />
     </p-pane-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    defineComponent, reactive, watch,
+    reactive, useAttrs, useSlots, watch,
 } from 'vue';
-import type { SetupContext } from 'vue';
 
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
@@ -79,217 +85,105 @@ import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import PToolbox from '@/navigation/toolbox/PToolbox.vue';
 
+const props = withDefaults(defineProps<ToolboxTableProps>(), {
+    /* data table props */
+    loading: false,
+    fields: () => [],
+    items: () => [],
+    sortable: false,
+    sortBy: '',
+    sortDesc: true,
+    colCopy: false,
+    selectable: false,
+    selectIndex: () => [],
+    multiSelect: true,
+    useCursorLoading: false,
+    tableStyleType: DATA_TABLE_STYLE_TYPE.default,
+    striped: false,
+    bordered: undefined,
+    disableHover: false,
+    rowHeightFixed: false,
+    rowCursorPointer: false,
+    invalid: false,
 
-export default defineComponent<ToolboxTableProps>({
-    name: 'PToolboxTable',
-    components: {
-        PPaneLayout,
-        PToolbox,
-        PDataTable,
-    },
-    props: {
-        /* data table props */
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        fields: {
-            type: Array,
-            required: true,
-            default: () => [],
-        },
-        items: {
-            type: Array,
-            default: () => [],
-        },
-        sortable: {
-            type: Boolean,
-            default: false,
-        },
-        sortBy: {
-            type: String,
-            default: '',
-        },
-        sortDesc: {
-            type: Boolean,
-            default: true,
-        },
-        colCopy: {
-            type: Boolean,
-            default: false,
-        },
-        selectable: {
-            type: Boolean,
-            default: false,
-        },
-        selectIndex: {
-            type: Array,
-            default: () => [],
-        },
-        multiSelect: {
-            type: Boolean,
-            default: true,
-        },
-        useCursorLoading: {
-            type: Boolean,
-            default: false,
-        },
-        tableStyleType: {
-            type: String,
-            default: DATA_TABLE_STYLE_TYPE.default,
-        },
-        striped: {
-            type: Boolean,
-            default: false,
-        },
-        bordered: {
-            type: Boolean,
-            default: true,
-        },
-        disableHover: {
-            type: Boolean,
-            default: false,
-        },
-        rowHeightFixed: {
-            type: Boolean,
-            default: true,
-        },
-        rowCursorPointer: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        getRowClassNames: {
-            type: Function,
-            default: undefined,
-        },
-        getRowSelectable: {
-            type: Function,
-            default: undefined,
-        },
-        /* toolbox props */
-        paginationVisible: {
-            type: Boolean,
-            default: true,
-        },
-        pageSizeChangeable: {
-            type: Boolean,
-            default: true,
-        },
-        settingsVisible: {
-            type: Boolean,
-            default: false,
-        },
-        exportable: {
-            type: Boolean,
-            default: false,
-        },
-        refreshable: {
-            type: Boolean,
-            default: true,
-        },
-        searchable: {
-            type: Boolean,
-            default: true,
-        },
-        filtersVisible: {
-            type: Boolean,
-            default: true,
-        },
-        searchType: {
-            type: String,
-            default: SEARCH_TYPES.plain,
-        },
-        thisPage: {
-            type: Number,
-            default: 1,
-        },
-        pageSize: {
-            type: Number,
-            default: 15,
-        },
-        totalCount: {
-            type: Number,
-            default: 0,
-        },
-        pageSizeOptions: {
-            type: Array,
-            default: () => [15, 30, 45],
-        },
-        sortByOptions: {
-            type: Array,
-            default: () => [],
-        },
-        keyItemSets: {
-            type: Array,
-            default: () => [],
-        },
-        valueHandlerMap: {
-            type: Object,
-            default: () => ({}),
-        },
-        queryTags: {
-            type: Array,
-            default: () => [],
-        },
-        searchText: {
-            type: String,
-            default: '',
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const proxyState = reactive({
-            selectIndex: useProxyValue<number[]>('selectIndex', props, emit, ['select']),
-            sortBy: useProxyValue<string>('sortBy', props, emit),
-            sortDesc: useProxyValue<boolean>('sortDesc', props, emit),
-            thisPage: useProxyValue<number>('thisPage', props, emit),
-            pageSize: useProxyValue<number>('pageSize', props, emit),
-            queryTags: useProxyValue<number>('queryTags', props, emit),
-            searchText: useProxyValue<number>('searchText', props, emit),
-        });
-
-
-        const emitChange = (options: ToolboxTableOptions) => {
-            emit('change', options);
-        };
-
-        const changeSort = (sortBy, sortDesc) => {
-            proxyState.thisPage = 1;
-            emitChange({ sortBy, sortDesc });
-        };
-
-        const checkSelectIndex = () => {
-            if (!Array.isArray(props.items)) return;
-            const selectIndex: number[] = [];
-            proxyState.selectIndex.forEach((d) => {
-                if (props.items[d] !== undefined) selectIndex.push(d);
-            });
-            if (proxyState.selectIndex.length !== selectIndex.length) {
-                proxyState.selectIndex = selectIndex;
-            }
-        };
-
-        watch(() => props.items, () => {
-            checkSelectIndex();
-        });
-        watch(() => proxyState.thisPage, () => {
-            proxyState.selectIndex = [];
-        }, { immediate: false });
-
-        return {
-            proxyState,
-            changeSort,
-            emitChange,
-        };
-    },
+    /* toolbox props */
+    paginationVisible: true,
+    pageSizeChangeable: true,
+    settingsVisible: true,
+    exportable: true,
+    refreshable: true,
+    searchable: true,
+    filtersVisible: true,
+    searchType: SEARCH_TYPES.plain,
+    thisPage: 1,
+    pageSize: 15,
+    totalCount: 0,
+    pageSizeOptions: () => [15, 30, 45],
+    sortByOptions: () => [],
+    keyItemSets: () => [],
+    valueHandlerMap: () => ({}),
+    queryTags: () => [],
+    searchText: '',
+    timezone: 'UTC',
 });
+const emit = defineEmits(['selectIndex', 'sortBy', 'sortDesc', 'thisPage', 'pageSize', 'queryTags', 'searchText', 'change', 'export', 'refresh', 'click-settings']);
+const attrs = useAttrs();
+const slots = useSlots();
+
+const proxyState = reactive({
+    selectIndex: useProxyValue<number[]>('selectIndex', props, emit, ['select']),
+    sortBy: useProxyValue<string>('sortBy', props, emit),
+    sortDesc: useProxyValue<boolean>('sortDesc', props, emit),
+    thisPage: useProxyValue<number>('thisPage', props, emit),
+    pageSize: useProxyValue<number>('pageSize', props, emit),
+    queryTags: useProxyValue<number>('queryTags', props, emit),
+    searchText: useProxyValue<number>('searchText', props, emit),
+});
+
+const emitChange = (options: ToolboxTableOptions) => {
+    emit('change', options);
+};
+
+const handleChange = (options: ToolboxTableOptions) => {
+    emitChange(options);
+};
+const handleExport = () => {
+    emit('export');
+};
+const handleRefresh = () => {
+    emit('refresh');
+};
+const handleClickSettings = () => {
+    emit('click-settings');
+};
+
+const changeSort = (sortBy, sortDesc) => {
+    proxyState.thisPage = 1;
+    emitChange({ sortBy, sortDesc });
+};
+
+const checkSelectIndex = () => {
+    if (!Array.isArray(props.items)) return;
+    const selectIndex: number[] = [];
+    proxyState.selectIndex.forEach((d) => {
+        if (props.items[d] !== undefined) selectIndex.push(d);
+    });
+    if (proxyState.selectIndex.length !== selectIndex.length) {
+        proxyState.selectIndex = selectIndex;
+    }
+};
+
+const listeners = {
+    ...attrs,
+};
+
+watch(() => props.items, () => {
+    checkSelectIndex();
+});
+watch(() => proxyState.thisPage, () => {
+    proxyState.selectIndex = [];
+}, { immediate: false });
+
 </script>
 
 <style lang="postcss">

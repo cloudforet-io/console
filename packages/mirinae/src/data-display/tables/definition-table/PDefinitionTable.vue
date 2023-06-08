@@ -2,17 +2,17 @@
     <p-data-loader class="p-definition-table"
                    :class="styleType"
                    :loading="loading"
-                   :data="!isNoData"
+                   :data="!state.isNoData"
     >
         <template #no-data>
             <slot name="no-data">
-                {{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
+                {{ t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
             </slot>
         </template>
         <table>
             <tbody>
-                <p-definition v-for="(item, idx) in items"
-                              :key="`${contextKey}-${idx}`"
+                <p-definition v-for="(item, idx) in state.items"
+                              :key="`${state.contextKey}-${idx}`"
                               class="def-row"
                               :label="item.label"
                               :name="item.name"
@@ -26,25 +26,25 @@
                     <template #default="scope">
                         <slot name="data"
                               v-bind="{
-                                  ...scope, index: idx, items}"
+                                  ...scope, index: idx, items: state.items}"
                         >
                             <slot :name="`data-${item.name}`"
-                                  v-bind="{...scope, index: idx, items}"
+                                  v-bind="{...scope, index: idx, items: state.items}"
                             >
                                 <slot :name="`data-${idx}`"
-                                      v-bind="{...scope, index: idx, items}"
+                                      v-bind="{...scope, index: idx, items: state.items}"
                                 />
                             </slot>
                         </slot>
                     </template>
-                    <template v-if="$scopedSlots.key"
+                    <template v-if="slots.key"
                               #key="scope"
                     >
                         <slot name="key"
-                              v-bind="{...scope, index: idx, items}"
+                              v-bind="{...scope, index: idx, items: state.items}"
                         />
                     </template>
-                    <template v-if="$scopedSlots.extra"
+                    <template v-if="slots.extra"
                               #extra="scope"
                     >
                         <slot name="extra"
@@ -61,14 +61,13 @@
     </p-data-loader>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { every, get, range } from 'lodash';
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, reactive, useSlots, watch,
 } from 'vue';
-
-import { every, get, range } from 'lodash';
-
+import { useI18n } from 'vue-i18n';
 
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
@@ -84,63 +83,54 @@ const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|Definitio
     data: get(data, field.name) ?? getValueByPath(data, field.name) ?? '',
 }));
 
-
-export default defineComponent<DefinitionTableProps>({
-    name: 'PDefinitionTable',
-    components: {
-        PDataLoader,
-        PDefinition,
+const props = defineProps({
+    fields: {
+        type: Array as PropType<DefinitionTableProps['fields']>,
+        default: () => [],
     },
-    props: {
-        fields: {
-            type: Array,
-            default: () => [],
-        },
-        data: {
-            type: [Object, Array] as PropType<DefinitionData|DefinitionData[]>,
-            default: undefined,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        skeletonRows: {
-            type: Number,
-            default: 5,
-        },
-        disableCopy: {
-            type: Boolean,
-            default: false,
-        },
-        styleType: {
-            type: String,
-            default: DEFINITION_TABLE_STYLE_TYPE.primary,
-            validator(styleType: any) {
-                return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
-            },
-        },
-        block: {
-            type: Boolean,
-            default: false,
+    data: {
+        type: [Object, Array] as PropType<DefinitionTableProps['data']>,
+        default: undefined,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    skeletonRows: {
+        type: Number,
+        default: 5,
+    },
+    disableCopy: {
+        type: Boolean,
+        default: false,
+    },
+    styleType: {
+        type: String as PropType<DefinitionTableProps['styleType']>,
+        default: DEFINITION_TABLE_STYLE_TYPE.primary,
+        validator(styleType: any) {
+            return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
         },
     },
-    setup(props) {
-        const state = reactive({
-            contextKey: Math.floor(Math.random() * Date.now()),
-            isNoData: computed(() => every(state.items, (def) => !def.data)),
-            skeletons: computed(() => range(props.skeletonRows ?? 5)),
-            items: computed(() => makeDefItems(props.fields, props.data)),
-        });
-
-        watch([() => props.data, () => props.fields], () => {
-            state.contextKey = Math.floor(Math.random() * Date.now());
-        });
-
-        return {
-            ...toRefs(state),
-        };
+    block: {
+        type: Boolean,
+        default: false,
     },
 });
+
+const slots = useSlots();
+const { t } = useI18n();
+
+const state = reactive({
+    contextKey: Math.floor(Math.random() * Date.now()),
+    isNoData: computed(() => every(state.items, (def) => !def.data)),
+    skeletons: computed(() => range(props.skeletonRows ?? 5)),
+    items: computed(() => makeDefItems(props.fields, props.data)),
+});
+
+watch([() => props.data, () => props.fields], () => {
+    state.contextKey = Math.floor(Math.random() * Date.now());
+});
+
 </script>
 
 <style lang="postcss">
