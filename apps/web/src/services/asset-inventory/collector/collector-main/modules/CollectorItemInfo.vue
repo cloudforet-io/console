@@ -207,7 +207,7 @@ const state = reactive({
         return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
     }),
     plugin: computed(() => {
-        const plugin = props.item.plugin;
+        const plugin = props.item?.plugin;
         return { name: plugin.name, version: plugin.info.version };
     }),
 });
