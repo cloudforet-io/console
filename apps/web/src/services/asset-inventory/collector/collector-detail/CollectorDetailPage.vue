@@ -49,6 +49,13 @@
         <collector-service-accounts-section class="section"
                                             :providers="state.collectorProviders"
         />
+        <p-double-check-modal :visible.sync="state.deleteModalVisible"
+                              :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
+                              :verification-text="state.collectorName"
+                              modal-size="sm"
+                              :loading="state.deleteLoading"
+                              @confirm="handleDeleteModalConfirm"
+        />
         <collector-name-edit-modal :visible.sync="state.editModalVisible" />
     </div>
 </template>
@@ -80,11 +87,18 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PHeading, PSkeleton, PButton, PIconButton,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { makeAPIError } from '@cloudforet/core-lib/space-connector/error';
 
+import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -128,6 +142,8 @@ const state = reactive({
             ]).rawQueryStrings,
         },
     })),
+    deleteModalVisible: false,
+    deleteLoading: false,
     editModalVisible: false,
 });
 
@@ -178,12 +194,44 @@ const getCollector = async (): Promise<CollectorModel> => {
     return result;
 };
 
+const fetchDeleteCollector = async () => {
+    // TODO: change to call api
+    await new Promise((resolve, reject) => {
+        setTimeout(() => {
+            reject(makeAPIError('error'));
+        }, 2000);
+    });
+};
+
+const goBackToMainPage = () => {
+    SpaceRouter.router.push({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+    });
+};
+
 const handleClickEditButton = () => {
     state.editModalVisible = true;
 };
 
 const handleClickDeleteButton = () => {
-    // TODO: implement
+    state.deleteModalVisible = true;
+};
+
+const handleDeleteModalConfirm = async () => {
+    state.deleteModalVisible = true;
+    try {
+        state.deleteLoading = true;
+        await fetchDeleteCollector();
+        state.deleteModalVisible = false;
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_DELETE_COLLECTOR'), '');
+        goBackToMainPage();
+        collectorFormStore.$reset();
+    } catch (error) {
+        state.deleteModalVisible = false;
+        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_DELETE_COLLECTOR'));
+    } finally {
+        state.deleteLoading = false;
+    }
 };
 
 onMounted(async () => {
