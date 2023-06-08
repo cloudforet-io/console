@@ -14,7 +14,7 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
 import {
-    createBullet, createCircle, createDataProcessor, createLegend, createTooltip, toggleSeries,
+    createBullet, createCircle, createDataProcessor, createLabel, createLegend, createTooltip, toggleSeries,
 } from '@/common/composables/amcharts5/concepts-helper';
 import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
@@ -151,6 +151,10 @@ export const useAmcharts5 = (
         createBullet: (settings: am5.IBulletSettings): am5.Bullet => {
             if (!state.root) throw new Error('No root');
             return createBullet(state.root as Root, settings);
+        },
+        createLabel: (settings: am5.ILabelSettings): am5.Label => {
+            if (!state.root) throw new Error('No root');
+            return createLabel(state.root as Root, settings);
         },
         createCircle: (settings: am5.ICircleSettings, circleTemplate: am5.Template<am5.Circle>): am5.Circle => {
             if (!state.root) throw new Error('No root');
