@@ -59,52 +59,47 @@
                 {{ props.label }}
             </p>
             <div class="jobs-wrapper">
-                <span class="icon-fill-wrapper">
-                    <!-- FIXME: Replace with real data-->
-                    <p-i
-                        name="ic_check"
-                        class="check-icon"
-                        height="1rem"
-                        width="1rem"
-                        color="inherit"
+                <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
+                     :key="`job-item-${index}`"
+                     class="jobs-contents"
+                >
+                    <p-tooltip v-if="jobItems.status === 'success'"
+                               class="icon-fill-wrapper success"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                               position="top"
+                    >
+                        <p-i
+                            name="ic_check"
+                            class="icon success"
+                            height="1rem"
+                            width="1rem"
+                            color="inherit"
+                        />
+                    </p-tooltip>
+                    <p-tooltip v-if="jobItems.status === 'progress'"
+                               class="icon-fill-wrapper progress"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
+                               position="top"
+                    >
+                        <p-i
+                            name="ic_settings-filled"
+                            class="icon progress"
+                            height="1rem"
+                            width="1rem"
+                            color="inherit"
+                        />
+                    </p-tooltip>
+                    <p-tooltip v-if="jobItems.status === 'error'"
+                               class="icon-fill-wrapper error"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                               position="top"
                     />
-                </span>
-                <span class="icon-fill-wrapper">
-                    <p-i
-                        name="ic_check"
-                        class="check-icon"
-                        height="1rem"
-                        width="1rem"
-                        color="inherit"
+                    <p-tooltip v-if="!jobItems.status"
+                               class="icon-fill-wrapper none"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
+                               position="top"
                     />
-                </span>
-                <span class="icon-fill-wrapper">
-                    <p-i
-                        name="ic_check"
-                        class="check-icon"
-                        height="1rem"
-                        width="1rem"
-                        color="inherit"
-                    />
-                </span>
-                <span class="icon-fill-wrapper">
-                    <p-i
-                        name="ic_check"
-                        class="check-icon"
-                        height="1rem"
-                        width="1rem"
-                        color="inherit"
-                    />
-                </span>
-                <span class="icon-fill-wrapper">
-                    <p-i
-                        name="ic_check"
-                        class="check-icon"
-                        height="1rem"
-                        width="1rem"
-                        color="inherit"
-                    />
-                </span>
+                </div>
             </div>
             <div class="to-history-detail">
                 <router-link :to="props.item.detailLink">
@@ -156,7 +151,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PI, PLazyImg, PToggleButton,
+    PButton, PI, PLazyImg, PToggleButton, PTooltip,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -215,6 +210,25 @@ const state = reactive({
 
 /* Components */
 const handleChangeToggle = () => {};
+
+// TODO: temp data will be deleted.
+const TEMP_JOB_STATUS = [
+    {
+        status: undefined,
+    },
+    {
+        status: 'success',
+    },
+    {
+        status: 'error',
+    },
+    {
+        status: 'success',
+    },
+    {
+        status: 'progress',
+    },
+];
 </script>
 
 <style scoped lang="postcss">
@@ -265,16 +279,79 @@ const handleChangeToggle = () => {};
             @apply flex;
             gap: 0.375rem;
 
-            .icon-fill-wrapper {
-                @apply relative bg-green-600 rounded;
+            .jobs-contents {
+                @apply flex;
                 width: 1rem;
                 height: 1rem;
 
-                .check-icon {
-                    @apply absolute text-white;
-                    left: 50%;
-                    top: 50%;
-                    transform: translate(-35%, -50%);
+                .icon-fill-wrapper {
+                    @apply relative rounded box-border;
+                    width: 1rem;
+                    height: 1rem;
+
+                    &.success {
+                        @apply bg-green-600;
+
+                        &:hover {
+                            @apply border border-green-700;
+                        }
+                    }
+
+                    &.error {
+                        @apply bg-red-500;
+
+                        &::before {
+                            @apply absolute text-white text-label-md;
+                            content: '!';
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-35%, -50%);
+                        }
+
+                        &:hover {
+                            @apply border border-red-700; }
+                    }
+
+                    &.progress {
+                        @apply bg-gray-500;
+
+                        &:hover {
+                            @apply border border-gray-700;
+
+                            .progress {
+                                top: -0.065rem;
+                                left: -0.065rem;
+                                animation: rotate 6s linear infinite;
+                                transform-origin: 50% 50%;
+
+                                @keyframes rotate {
+                                    100% {
+                                        transform: rotate(360deg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    &.none {
+                        @apply bg-gray-200;
+                    }
+
+                    .icon {
+                        @apply absolute text-white;
+
+                        &.success {
+                            @apply text-white;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-35%, -50%);
+                        }
+
+                        &.progress {
+                            top: 0;
+                            left: 0;
+                        }
+                    }
                 }
             }
         }
