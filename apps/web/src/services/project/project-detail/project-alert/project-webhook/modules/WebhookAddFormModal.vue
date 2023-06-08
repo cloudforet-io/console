@@ -59,10 +59,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -96,7 +93,6 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
             webhookName: '',
@@ -190,10 +186,6 @@ export default {
             getListWebhookType();
         }, { immediate: true });
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/plugin/load');
-        })();
 
         return {
             ...toRefs(state),
