@@ -49,13 +49,13 @@ import { i18n } from '@/translations';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import CreateCollectorStep1
-    from '@/services/asset-inventory/collector/create-collector/modules/CreateCollectorStep1.vue';
+    from '@/services/asset-inventory/collector/collector-create/modules/CreateCollectorStep1.vue';
 import CreateCollectorStep2
-    from '@/services/asset-inventory/collector/create-collector/modules/CreateCollectorStep2.vue';
+    from '@/services/asset-inventory/collector/collector-create/modules/CreateCollectorStep2.vue';
 import CreateCollectorStep3
-    from '@/services/asset-inventory/collector/create-collector/modules/CreateCollectorStep3.vue';
+    from '@/services/asset-inventory/collector/collector-create/modules/CreateCollectorStep3.vue';
 import CreateCollectorStep4
-    from '@/services/asset-inventory/collector/create-collector/modules/CreateCollectorStep4.vue';
+    from '@/services/asset-inventory/collector/collector-create/modules/CreateCollectorStep4.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const state = reactive({

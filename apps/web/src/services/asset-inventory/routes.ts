@@ -21,7 +21,7 @@ const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
 const CollectorPage = () => import('@/services/asset-inventory/collector/collector-main/CollectorPage.vue');
-const CreateCollectorPage = () => import('@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
+const CreateCollectorPage = () => import('@/services/asset-inventory/collector/collector-create/CollectorCreatePage.vue');
 
 const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
 const ServiceAccountDetailPage = () => import('@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');

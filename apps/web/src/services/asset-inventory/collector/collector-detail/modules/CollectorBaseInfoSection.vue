@@ -153,8 +153,8 @@ const handleClickSave = () => {
         ...collectorFormState.originCollector,
         plugin_info: {
             ...collectorFormState.originCollector.plugin_info,
-            version: collectorFormState.version,
-            upgrade_mode: collectorFormState.autoUpdate ? 'AUTO' : 'MANUAL',
+            version: collectorFormState.version ?? '',
+            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
         },
         tags: collectorFormState.tags,
     });
