@@ -105,7 +105,7 @@
                 </div>
             </div>
             <div class="to-history-detail">
-                <router-link :to="props.item.detailLink">
+                <router-link :to="props.item.historyLink">
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
                     <p-i
                         name="ic_chevron-right"
@@ -295,6 +295,10 @@ const TEMP_JOB_STATUS = [
                     @apply relative rounded box-border;
                     width: 1rem;
                     height: 1rem;
+
+                    &:hover {
+                        @apply cursor-default;
+                    }
 
                     &.success {
                         @apply bg-green-600;

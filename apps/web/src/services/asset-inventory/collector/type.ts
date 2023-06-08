@@ -192,7 +192,7 @@ interface CollectorPlugin {
     icon?: string;
     info: CollectorPluginModel;
 }
-interface CollectorDetailLink {
+interface CollectorLink {
     name: string;
     param: CollectorDetailLinkParameter;
     query: CollectorDetailLinkQuery;
@@ -202,10 +202,12 @@ interface CollectorDetailLinkParameter {
 }
 interface CollectorDetailLinkQuery {
     filters: string[];
+    collectorId?: string;
 }
 export interface CollectorItemInfo {
     collectorId: string;
     name: string;
     plugin: CollectorPlugin;
-    detailLink: CollectorDetailLink;
+    historyLink: CollectorLink,
+    detailLink: CollectorLink;
 }
