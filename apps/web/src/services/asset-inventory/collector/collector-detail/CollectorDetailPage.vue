@@ -75,25 +75,22 @@ const getCollector = async (): Promise<CollectorModel> => {
                 provider: 'aws',
                 capability: {
                     supported_providers: ['aws'],
-                    supported_schema: ['aws_access_key', 'aws_access_key_pair'],
-                    supported_mode: ['FULL', 'DIFF'],
-                    supported_schedule: ['* * * * *'],
+                    supported_schemas: ['aws_access_key', 'aws_access_key_pair'],
+                    monitoring_type: 'METRIC',
+                    use_resource_secret: true,
                 },
                 schedule: {
-                    hours: ['3'],
+                    hours: [3],
                 },
                 plugin_info: {
                     plugin_id: 'plugin-aws-phd-inven-collector',
-                    name: 'AWS Service Health Dashboard Collector Plugin',
                     version: '1.4.3',
                     upgrade_mode: 'AUTO',
+                    metadata: {},
+                    secret_filter: {},
                     options: {
                         supported_resource_type: ['inventory.Server'],
                         filter_format: [],
-                    },
-                    tags: {
-                        description: 'AWS Personal Health Dashboard collector',
-                        icon: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/cloud-services/aws/AWS-Personal-Health-Dashboard.svg',
                     },
                 },
                 tags: {

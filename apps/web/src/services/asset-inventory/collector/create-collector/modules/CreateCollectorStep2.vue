@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-2">
-        <collect-plugin-contents :plugin="collectorFormState.pluginInfo" />
+        <collect-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
         <div class="input-form">
             <p-field-group :label="$t('INVENTORY.COLLECTOR.CREATE.NAME')"
                            :invalid-text="invalidTexts.name"
@@ -92,7 +92,7 @@ const state = reactive({
     isVersionValid: false,
     deleteModalVisible: false,
     isAllFormValid: computed(() => isAllValid.value && state.isVersionValid && state.isTagsValid),
-    pluginName: computed(() => collectorFormState.pluginInfo?.name),
+    pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
 });
 
 const {

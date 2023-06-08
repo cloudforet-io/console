@@ -81,24 +81,23 @@ const emits = defineEmits<{(event: 'update:editMode', value: boolean): void;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const hoursMatrix: string[] = range(24).map((hour) => hour.toString());
-const selectedUtcHoursSet = new Set<string>();
+const hoursMatrix: number[] = range(24);
+const selectedUtcHoursSet = new Set<number>();
 const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     isAllHoursSelected: computed<boolean>(() => collectorFormState.scheduleHours.length === size(hoursMatrix)),
-    timezoneAppliedHours: computed<string[]>(() => {
+    timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return collectorFormState.scheduleHours;
         // set an hour as utc and get the hour in timezone
         return collectorFormState.scheduleHours.map((utcHour) => dayjs.utc()
-            .hour(Number(utcHour)).tz(state.timezone)
-            .get('hour')
-            .toString()).sort((a, b) => Number(a) - Number(b));
+            .hour(utcHour).tz(state.timezone)
+            .get('hour')).sort((a, b) => a - b);
     }),
     loading: computed<boolean>(() => collectorFormState.originCollector === null),
 });
 
 const updateSelectedHours = () => {
-    const hours: string[] = Array.from(selectedUtcHoursSet.values());
+    const hours: number[] = Array.from(selectedUtcHoursSet.values());
     collectorFormStore.$patch({
         scheduleHours: hours,
     });
@@ -115,15 +114,14 @@ const handleClickSelect = () => {
     emits('update:editMode', true);
 };
 
-const handleClickHour = (hour: string) => {
-    let utcHour: string;
+const handleClickHour = (hour: number) => {
+    let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
         // set an hour as timezone and get the hour in utc
         utcHour = dayjs().tz(state.timezone)
-            .hour(Number(hour)).utc()
-            .get('hour')
-            .toString();
+            .hour(hour).utc()
+            .get('hour');
     }
     if (selectedUtcHoursSet.has(utcHour)) {
         selectedUtcHoursSet.delete(utcHour);
@@ -147,6 +145,10 @@ const handleClickAllHours = () => {
 // init values with data from originCollector when originCollector changed
 watch(() => collectorFormState.originCollector, () => {
     collectorFormStore.resetSchedule();
+    selectedUtcHoursSet.clear();
+    collectorFormState.scheduleHours.forEach((hour) => {
+        selectedUtcHoursSet.add(hour);
+    });
 }, { immediate: true });
 
 </script>

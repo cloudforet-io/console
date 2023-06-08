@@ -68,7 +68,7 @@ import Step1SearchFilter from '@/services/asset-inventory/collector/create-colle
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/type';
 
 const emit = defineEmits([
     'update:currentStep',
@@ -82,7 +82,7 @@ const collectorPageState = collectorPageStore.$state;
 
 const state = reactive({
     searchValue: '',
-    pluginList: [] as CollectorPluginModel[],
+    pluginList: [] as RepositoryPluginModel[],
     loading: false,
     selectedRepository: '',
     currentPage: 1,
@@ -92,7 +92,7 @@ const pluginCardListRef = ref<HTMLElement | null>(null);
 
 
 const pluginApiQuery = new ApiQueryHelper();
-const getPlugins = async (): Promise<CollectorPluginModel[]> => {
+const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
     state.loading = true;
     try {
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
@@ -134,9 +134,9 @@ const handleSearch = async (value) => {
     state.searchValue = value;
     state.pluginList = await getPlugins();
 };
-const handleClickNextStep = (item: CollectorPluginModel) => {
+const handleClickNextStep = (item: RepositoryPluginModel) => {
     emit('update:currentStep', 2);
-    collectorFormStore.setPluginInfo(item);
+    collectorFormStore.setRepositoryPlugin(item);
 };
 const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
