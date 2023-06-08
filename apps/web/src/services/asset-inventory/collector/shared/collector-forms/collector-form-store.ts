@@ -37,6 +37,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         resetForm() {
             this.setTags(this.originCollector?.tags ?? {});
+            this.resetName();
             this.resetVersion();
             this.resetSchedule();
             // TODO: set attached service account from origin data
@@ -49,6 +50,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         setName(name: string) {
             this.name = name;
+        },
+        resetName() {
+            this.name = this.originCollector?.name ?? '';
         },
         setVersion(version: string) {
             this.version = version;
