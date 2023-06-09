@@ -76,7 +76,7 @@ export const ASSET_REFERENCE_SCHEMA = {
         title: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name,
         type: 'array',
         reference: {
-            resource_type: 'cost_analysis.Cost', // TODO: should be changed
+            resource_type: 'inventory.CloudServiceType',
             reference_key: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
         },
     },
@@ -84,7 +84,7 @@ export const ASSET_REFERENCE_SCHEMA = {
         title: ASSET_REFERENCE_TYPE_INFO.asset_account.name,
         type: 'array',
         reference: {
-            resource_type: 'cost_analysis.Cost', // TODO: should be changed
+            resource_type: 'inventory.CloudService',
             reference_key: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
         },
     },
