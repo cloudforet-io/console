@@ -43,24 +43,23 @@
                         </h3>
                         <div v-if="!hideBody"
                              class="modal-body"
-                             :class="allBodyClass"
+                             :class="state.allBodyClass"
                         >
                             <slot name="body" />
                         </div>
                         <div v-if="!hideFooter"
                              class="modal-footer"
                         >
-                            <slot :slot-scope="$props"
+                            <slot :slot-scope="props"
                                   name="footer-extra"
                             />
-                            <p-button
-                                v-if="footerResetButtonVisible"
-                                class="modal-button reset-button"
-                                style-type="tertiary"
-                                :disabled="loading"
-                                @click="onResetClick"
+                            <p-button v-if="footerResetButtonVisible"
+                                      class="modal-button reset-button"
+                                      style-type="tertiary"
+                                      :disabled="loading"
+                                      @click="onResetClick"
                             >
-                                <slot :slot-scope="$props"
+                                <slot :slot-scope="props"
                                       name="reset-button"
                                 >
                                     Reset
@@ -73,24 +72,24 @@
                                       @click="onCancelClick"
                             >
                                 <slot name="close-button"
-                                      v-bind="$props"
+                                      v-bind="props"
                                 >
-                                    {{ $t('COMPONENT.BUTTON_MODAL.CANCEL') }}
+                                    {{ t('COMPONENT.BUTTON_MODAL.CANCEL') }}
                                 </slot>
                             </p-button>
                             <p-button
                                 v-if="!hideFooterConfirmButton"
                                 class="modal-button confirm-button"
                                 :class="{'no-cancel-button': hideFooterCloseButton}"
-                                :style-type="buttonThemeColor"
+                                :style-type="state.buttonThemeColor"
                                 :loading="loading"
                                 :disabled="disabled"
                                 @click="onConfirmClick"
                             >
                                 <slot name="confirm-button"
-                                      v-bind="$props"
+                                      v-bind="props"
                                 >
-                                    {{ $t('COMPONENT.BUTTON_MODAL.CONFIRM') }}
+                                    {{ t('COMPONENT.BUTTON_MODAL.CONFIRM') }}
                                 </slot>
                             </p-button>
                         </div>
@@ -101,12 +100,14 @@
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
+import type { ModalSizeType, ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
@@ -116,145 +117,120 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-
-export default defineComponent<ButtonModalProps>({
-    name: 'PButtonModal',
-    components: {
-        PI,
-        PIconButton,
-        PButton,
+const props = defineProps({
+    visible: { // sync
+        type: Boolean,
+        default: false,
     },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
+    size: {
+        type: String as PropType<ModalSizeType>,
+        default: 'md',
+        validator: (value: string) => Object.keys(SizeMapping).includes(value),
     },
-    props: {
-        visible: { // sync
-            type: Boolean,
-            default: false,
-        },
-        size: {
-            type: String,
-            default: 'md',
-            validator: (value: string) => Object.keys(SizeMapping).includes(value),
-        },
-        backdrop: {
-            type: Boolean,
-            default: true,
-        },
-        absolute: {
-            type: Number,
-            default: undefined,
-        },
-        themeColor: {
-            type: String,
-            default: 'primary',
-            validator(themeColor: any) {
-                return THEME_COLORS.includes(themeColor);
-            },
-        },
-        headerTitle: {
-            type: String,
-            default: '',
-        },
-        hideHeader: {
-            type: Boolean,
-            default: false,
-        },
-        hideBody: {
-            type: Boolean,
-            default: false,
-        },
-        hideFooter: {
-            type: Boolean,
-            default: false,
-        },
-        hideHeaderCloseButton: {
-            type: Boolean,
-            default: false,
-        },
-        hideFooterCloseButton: {
-            type: Boolean,
-            default: false,
-        },
-        hideFooterConfirmButton: {
-            type: Boolean,
-            default: false,
-        },
-        footerResetButtonVisible: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
+    backdrop: {
+        type: Boolean,
+        default: true,
+    },
+    absolute: {
+        type: Number,
+        default: undefined,
+    },
+    themeColor: {
+        type: String as PropType<ModalThemeColor>,
+        default: 'primary',
+        validator(themeColor: any) {
+            return THEME_COLORS.includes(themeColor);
         },
     },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            allBodyClass: computed(() => {
-                const res: string[] = [];
-                if (props.size) res.push(props.size);
-                return res;
-            }),
-            buttonThemeColor: computed(() => {
-                if (props.themeColor === 'primary1') return BUTTON_STYLE.substitutive;
-                if (props.themeColor === 'gray900') return BUTTON_STYLE.tertiary;
-                if (props.themeColor === 'secondary') return BUTTON_STYLE.highlight;
-                if (props.themeColor === 'safe') return BUTTON_STYLE.positive;
-                if (props.themeColor === 'alert') return BUTTON_STYLE['negative-primary'];
-                if (['primary2', 'secondary1'].includes(props.themeColor)) return BUTTON_STYLE.secondary;
-                return BUTTON_STYLE.primary;
-            }),
-        });
-        const dialogClassObject = computed(() => [
-            props.size,
-        ]);
-        const hide = () => {
-            if (props.visible) { emit('update:visible', false); }
-        };
-        const show = () => {
-            if (!props.visible) { emit('update:visible', true); }
-        };
-        const toggle = () => {
-            emit('update:visible', !props.visible);
-        };
-        const onCloseClick = () => {
-            if (props.loading) return;
-            emit('close');
-            state.proxyVisible = false;
-        };
-        const onResetClick = () => {
-            if (props.loading) return;
-            emit('return');
-        };
-        const onCancelClick = () => {
-            if (props.loading) return;
-            emit('cancel');
-            state.proxyVisible = false;
-        };
-        const onConfirmClick = () => {
-            emit('confirm');
-        };
-
-        return {
-            ...toRefs(state),
-            dialogClassObject,
-            show,
-            hide,
-            toggle,
-            onResetClick,
-            onCloseClick,
-            onCancelClick,
-            onConfirmClick,
-        };
+    headerTitle: {
+        type: String,
+        default: '',
+    },
+    hideHeader: {
+        type: Boolean,
+        default: false,
+    },
+    hideBody: {
+        type: Boolean,
+        default: false,
+    },
+    hideFooter: {
+        type: Boolean,
+        default: false,
+    },
+    hideHeaderCloseButton: {
+        type: Boolean,
+        default: false,
+    },
+    hideFooterCloseButton: {
+        type: Boolean,
+        default: false,
+    },
+    hideFooterConfirmButton: {
+        type: Boolean,
+        default: false,
+    },
+    footerResetButtonVisible: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
     },
 });
+const emit = defineEmits([
+    'visible',
+    'update:visible',
+    'close',
+    'return',
+    'cancel',
+    'confirm',
+]);
+const { t } = useI18n();
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    allBodyClass: computed(() => {
+        const res: string[] = [];
+        if (props.size) res.push(props.size);
+        return res;
+    }),
+    buttonThemeColor: computed(() => {
+        if (props.themeColor === 'primary1') return BUTTON_STYLE.substitutive;
+        if (props.themeColor === 'gray900') return BUTTON_STYLE.tertiary;
+        if (props.themeColor === 'secondary') return BUTTON_STYLE.highlight;
+        if (props.themeColor === 'safe') return BUTTON_STYLE.positive;
+        if (props.themeColor === 'alert') return BUTTON_STYLE['negative-primary'];
+        if (['primary2', 'secondary1'].includes(props.themeColor)) return BUTTON_STYLE.secondary;
+        return BUTTON_STYLE.primary;
+    }),
+});
+const dialogClassObject = computed(() => [
+    props.size,
+]);
+
+const onCloseClick = () => {
+    if (props.loading) return;
+    emit('close');
+    state.proxyVisible = false;
+};
+const onResetClick = () => {
+    if (props.loading) return;
+    emit('return');
+};
+const onCancelClick = () => {
+    if (props.loading) return;
+    emit('cancel');
+    state.proxyVisible = false;
+};
+const onConfirmClick = () => {
+    emit('confirm');
+};
 
 </script>
 <style lang="postcss">

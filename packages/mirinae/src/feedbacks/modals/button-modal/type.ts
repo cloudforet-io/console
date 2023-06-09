@@ -25,6 +25,7 @@ export interface ButtonModalProps {
     visible: boolean; // sync
     size: ModalSizeType;
     backdrop: boolean;
+    absolute: boolean;
     themeColor: ModalThemeColor;
     headerTitle: string;
 

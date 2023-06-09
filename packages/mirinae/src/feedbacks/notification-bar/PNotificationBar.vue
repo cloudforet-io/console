@@ -1,7 +1,7 @@
 <template>
     <div class="p-notification-bar">
         <transition name="slide">
-            <div v-if="proxyVisible"
+            <div v-if="state.proxyVisible"
                  class="notification-wrapper"
             >
                 <div class="contents-wrapper">
@@ -17,48 +17,40 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import { reactive } from 'vue';
 
+import type { StyleType } from '@/feedbacks/notification-bar/config';
 import { styleTypes } from '@/feedbacks/notification-bar/config';
 import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-export default defineComponent({
-    name: 'PNotificationBar',
-    components: { PIconButton },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
+const props = defineProps({
+    visible: {
+        type: Boolean,
+        default: false,
+        required: true,
     },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-            required: true,
+    styleType: {
+        type: String as PropType<StyleType>,
+        default: 'dark',
+        validator(val) {
+            return styleTypes.includes(val as any);
         },
-        styleType: {
-            type: String,
-            default: 'dark',
-            validator(val) {
-                return styleTypes.includes(val as any);
-            },
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-        });
-        const onClose = () => {
-            emit('close');
-            state.proxyVisible = false;
-        };
-        return {
-            ...toRefs(state),
-            onClose,
-        };
     },
 });
+const emit = defineEmits(['update:visible', 'visible', 'close']);
+
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+});
+const onClose = () => {
+    emit('close');
+    state.proxyVisible = false;
+};
+
 </script>
 
 <style lang="postcss">

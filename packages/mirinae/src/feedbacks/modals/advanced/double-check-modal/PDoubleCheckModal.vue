@@ -1,10 +1,10 @@
 <template>
-    <p-button-modal :header-title="headerTitle"
+    <p-button-modal v-model:visible="state.proxyVisible"
+                    :header-title="headerTitle"
                     :size="modalSize"
-                    :visible.sync="proxyVisible"
                     theme-color="alert"
                     :loading="loading"
-                    :disabled="invalid || inputText.length === 0"
+                    :disabled="state.invalid || state.inputText.length === 0"
                     @cancel="handleClose"
                     @close="handleClose"
                     @confirm="handleConfirm"
@@ -13,18 +13,18 @@
             <div>
                 <p-field-group
                     :required="true"
-                    :invalid-text="$t('COMPONENT.DOUBLE_CHECK_MODAL.INVALID_TEXT', {text: verificationText})"
-                    :invalid="inputText !== undefined && invalid"
+                    :invalid-text="t('COMPONENT.DOUBLE_CHECK_MODAL.INVALID_TEXT', {text: verificationText})"
+                    :invalid="state.inputText !== undefined && state.invalid"
                 >
                     <template #label>
-                        <i18n path="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC">
+                        <i18n-t keypath="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC">
                             <template #text>
                                 <strong>[{{ verificationText }}]</strong>
                             </template>
-                        </i18n>
+                        </i18n-t>
                     </template>
                     <template #default="{invalid}">
-                        <p-text-input v-model="inputText"
+                        <p-text-input v-model="state.inputText"
                                       :invalid="invalid"
                                       :disabled="loading"
                                       block
@@ -38,8 +38,9 @@
         </template>
     </p-button-modal>
 </template>
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';
@@ -47,57 +48,48 @@ import { useProxyValue } from '@/hooks';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
-
-export default {
-    name: 'PDoubleCheckModal',
-    components: { PButtonModal, PTextInput, PFieldGroup },
-    props: {
-        modalSize: {
-            type: String,
-            default: 'md',
-            validator: (value) => Object.keys(SizeMapping).includes(value),
-        },
-        visible: { // sync
-            type: Boolean,
-            default: false,
-        },
-        headerTitle: {
-            type: String,
-            default: undefined,
-        },
-        verificationText: {
-            type: String,
-            required: true,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
+const props = defineProps({
+    modalSize: {
+        type: String,
+        default: 'md',
+        validator: (value) => Object.keys(SizeMapping).includes(value),
     },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            inputText: undefined,
-            invalid: computed(() => props.verificationText !== state.inputText),
-        });
-
-        const handleClose = () => {
-            state.inputText = undefined;
-            emit('cancel');
-        };
-        const handleConfirm = () => {
-            if (state.invalid) return;
-            state.inputText = undefined;
-            emit('confirm');
-        };
-
-        return {
-            ...toRefs(state),
-            handleClose,
-            handleConfirm,
-        };
+    visible: {
+        type: Boolean,
+        default: false,
     },
+    headerTitle: {
+        type: String,
+        default: undefined,
+    },
+    verificationText: {
+        type: String,
+        required: true,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+});
+const emit = defineEmits(['visible', 'cancel', 'confirm']);
+const { t } = useI18n();
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    inputText: undefined,
+    invalid: computed(() => props.verificationText !== state.inputText),
+});
+
+const handleClose = () => {
+    state.inputText = undefined;
+    emit('cancel');
 };
+const handleConfirm = () => {
+    if (state.invalid) return;
+    state.inputText = undefined;
+    emit('confirm');
+};
+
 </script>
 
 <style lang="postcss" scoped>
