@@ -17,12 +17,14 @@
 
         <div class="schedule-wrapper">
             <collector-schedule-form :edit-mode="state.isEditMode"
+                                     :disabled="state.updateLoading"
                                      @update:editMode="handleUpdateEditMode"
             />
 
             <p-button v-if="state.isEditMode"
                       style-type="tertiary"
                       size="lg"
+                      :disabled="state.updateLoading"
                       @click="handleClickCancel"
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
@@ -30,6 +32,7 @@
             <p-button v-if="state.isEditMode"
                       style-type="primary"
                       size="lg"
+                      :loading="state.updateLoading"
                       class="save-changes-button"
                       @click="handleClickSave"
             >
@@ -46,17 +49,38 @@ import {
     PHeading, PButton, PPaneLayout,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
+import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 
 const collectorFormStore = useCollectorFormStore();
 
 const state = reactive({
     isEditMode: false,
+    updateLoading: false,
 });
+
+const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const params: CollectorUpdateParameter = {
+        collector_id: collectorFormStore.collectorId,
+        schedule: {
+            hours: collectorFormStore.scheduleHours,
+        },
+    };
+    return SpaceConnector.client.inventory.collector.update(params);
+};
 
 const handleClickEdit = () => {
     state.isEditMode = true;
@@ -71,9 +95,19 @@ const handleClickCancel = () => {
     collectorFormStore.resetSchedule(true);
 };
 
-const handleClickSave = () => {
-    state.isEditMode = false;
-    // TODO: Save changes with api call
+const handleClickSave = async () => {
+    try {
+        state.updateLoading = true;
+        const collector = await fetchCollectorUpdate();
+        collectorFormStore.setOriginCollector(collector);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        state.isEditMode = false;
+    } catch (error) {
+        collectorFormStore.resetSchedule();
+        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    } finally {
+        state.updateLoading = false;
+    }
 };
 
 </script>

@@ -114,9 +114,10 @@ export interface CollectorModel {
 export interface CollectorUpdateParameter {
     collector_id: string;
     name?: string;
-    plugin_info?: CollectorPluginModel;
-    priority?: number;
-    tags: Tags;
+    state?: CollectorState;
+    plugin_info?: Partial<CollectorPluginModel>;
+    schedule?: Partial<Schedule>;
+    tags?: Tags;
 }
 
 export interface CollectorCollectParameter {
