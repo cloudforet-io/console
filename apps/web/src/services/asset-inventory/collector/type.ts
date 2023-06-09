@@ -111,6 +111,14 @@ export interface CollectorModel {
     tags: Tags;
 }
 
+export interface SecretModel {
+    secret_id: string;
+    provider: string;
+    service_account_id: string;
+    project_id: string;
+    created_at: string;
+}
+
 export interface CollectorUpdateParameter {
     collector_id: string;
     name?: string;

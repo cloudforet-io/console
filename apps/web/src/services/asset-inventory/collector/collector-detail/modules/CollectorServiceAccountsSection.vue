@@ -61,15 +61,8 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
+import type { SecretModel } from '@/services/asset-inventory/collector/type';
 
-// TODO: Move type declaration to separated file. this is temporary.
-interface SecretModel {
-    secret_id: string;
-    provider: string;
-    service_account_id: string;
-    project_id: string;
-    created_at: string;
-}
 const props = defineProps<{
     providers?: string[]
 }>();
