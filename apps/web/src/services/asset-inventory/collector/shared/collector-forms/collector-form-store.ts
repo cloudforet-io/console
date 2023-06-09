@@ -82,7 +82,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
             else this.attachedServiceAccount = serviceAccount;
         },
-        setPluginMetadata(metadata: object) {
+        setPluginMetadata(metadata: Record<string, any>) {
             this.pluginMetadata = metadata;
         },
     },
