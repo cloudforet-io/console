@@ -23,6 +23,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         attachedServiceAccount: null as AttachedServiceAccount|null,
     }),
     getters: {
+        collectorId(): string|undefined {
+            return this.originCollector?.collector_id;
+        },
         pluginId(): string|undefined {
             return this.originCollector?.plugin_info.plugin_id ?? this.repositoryPlugin?.plugin_id;
         },
