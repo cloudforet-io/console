@@ -2,8 +2,9 @@
     <div class="collector-page-3">
         <div class="input-form">
             <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
-            <!--TODO: "json-schema" will be added-->
-            <plugin-metadata-form @change:isSchemaFormValid="handleChangeIsSchemaFormValid" />
+            <plugin-metadata-form class="plugin-metadata-form"
+                                  @change:isSchemaFormValid="handleChangeIsSchemaFormValid"
+            />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
@@ -102,6 +103,9 @@ const handleClose = () => {
     .input-form {
         margin-top: 2rem;
         min-height: calc(50vh - 5.625rem);
+        .plugin-metadata-form {
+            margin-top: 2rem;
+        }
     }
 
     .step-footer {
