@@ -104,7 +104,7 @@ export interface CollectorModel {
     state: CollectorState;
     provider: string;
     capability: Capability;
-    schedule: Schedule;
+    schedule?: Schedule;
     plugin_info: CollectorPluginModel;
     created_at: string;
     last_collected_at: string;
