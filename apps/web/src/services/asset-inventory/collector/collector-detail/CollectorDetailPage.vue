@@ -1,15 +1,34 @@
 <template>
     <div class="collector-detail-page">
-        <p-heading :title="collectorName"
+        <p-heading :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
         >
-            <p-skeleton v-if="!collectorName"
+            <p-skeleton v-if="state.loading"
                         width="20rem"
                         height="1.5rem"
             />
+            <template v-if="state.collectorName"
+                      #title-right-extra
+            >
+                <span class="title-right-button-wrapper">
+                    <p-icon-button name="ic_delete"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission"
+                                   class="delete-button"
+                                   @click="handleClickDeleteButton"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission"
+                                   @click="handleClickEditButton"
+                    />
+                </span>
+            </template>
             <template #extra>
-                <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
+                <router-link :to="state.collectorHistoryLink">
                     <p-button v-if="props.collectorId"
                               style-type="tertiary"
                     >
@@ -57,10 +76,16 @@ import {
     defineProps, defineExpose, reactive, onMounted, computed,
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
+import type { Location } from 'vue-router';
 
-import { PHeading, PSkeleton, PButton } from '@spaceone/design-system';
+import {
+    PHeading, PSkeleton, PButton, PIconButton,
+} from '@spaceone/design-system';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { useGoBack } from '@/common/composables/go-back';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoSection.vue';
 import CollectorOptionsSection
@@ -79,16 +104,28 @@ const props = defineProps<{
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const collectorName = 'Collector';
+const queryHelper = new QueryHelper();
 const state = reactive({
+    hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
+    collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
     // TODO: must be updated after backend api spec is updated
     collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
+    collectorHistoryLink: computed<Location>(() => ({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        query: {
+            filters: queryHelper.setFilters([
+                {
+                    k: 'collector_id',
+                    v: props.collectorId,
+                    o: '=',
+                },
+            ]).rawQueryStrings,
+        },
+    })),
 });
-
-
 
 const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 
@@ -114,7 +151,7 @@ const getCollector = async (): Promise<CollectorModel> => {
                     hours: [3],
                 },
                 plugin_info: {
-                    plugin_id: 'plugin-aws-phd-inven-collector',
+                    plugin_id: 'plugin-4507e45ad6dd',
                     version: '1.4.3',
                     upgrade_mode: 'AUTO',
                     metadata: {},
@@ -137,6 +174,14 @@ const getCollector = async (): Promise<CollectorModel> => {
     return result;
 };
 
+const handleClickEditButton = () => {
+    // TODO: implement
+};
+
+const handleClickDeleteButton = () => {
+    // TODO: implement
+};
+
 onMounted(async () => {
     collectorFormStore.$reset();
     const collector = await getCollector();
@@ -148,6 +193,12 @@ onMounted(async () => {
 <style lang="postcss" scoped>
 .section {
     margin-bottom: 1rem;
+}
+.title-right-button-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
 }
 
 </style>
