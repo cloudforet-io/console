@@ -89,7 +89,6 @@ const handleClickPrevButton = () => {
     state.deleteModalVisible = true;
 };
 const handleClickNextButton = () => {
-    collectorFormStore.setName(collectorFormState.name);
     emit('update:currentStep', 3);
 };
 const handleClose = () => {
