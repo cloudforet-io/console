@@ -62,6 +62,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PRODUCT'),
             options: {
                 type: 'SEARCH_RESOURCE',
+                resource_type: 'cost_analysis.Cost',
                 resource_key: COST_REFERENCE_TYPE_INFO.cost_product.key,
             },
         },
@@ -73,6 +74,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ACCOUNT'),
             options: {
                 type: 'SEARCH_RESOURCE',
+                resource_type: 'cost_analysis.Cost',
                 resource_key: COST_REFERENCE_TYPE_INFO.cost_account.key,
             },
         },
@@ -85,6 +87,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_TYPE'),
             options: {
                 type: 'SEARCH_RESOURCE',
+                resource_type: 'inventory.CloudServiceType',
                 resource_key: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
             },
         },
@@ -96,6 +99,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT'),
             options: {
                 type: 'SEARCH_RESOURCE',
+                resource_type: 'inventory.CloudService',
                 resource_key: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
             },
         },
