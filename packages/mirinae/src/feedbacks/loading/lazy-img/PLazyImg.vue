@@ -8,15 +8,15 @@
               key="img"
               class="img-container"
         >
-            <img v-show="status === LOAD_STATUS.succeed"
+            <img v-show="state.status === LOAD_STATUS.succeed"
                  :style="{height, width}"
                  :src="src || ''"
                  :alt="alt"
-                 @load="onLoad"
-                 @error="onError"
+                 @load="handleLoad"
+                 @error="handleError"
             >
         </span>
-        <span v-show="!loading && status === LOAD_STATUS.errored"
+        <span v-show="!loading && state.status === LOAD_STATUS.errored"
               key="error-img"
               class="img-container error"
         >
@@ -31,7 +31,7 @@
                 />
             </slot>
         </span>
-        <span v-show="loading || status === LOAD_STATUS.loading"
+        <span v-show="loading || state.status === LOAD_STATUS.loading"
               key="loader"
               class="img-container"
         >
@@ -46,10 +46,9 @@
     </transition-group>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    defineComponent,
-    reactive, toRefs, watch,
+    reactive, watch,
 } from 'vue';
 
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
@@ -71,72 +70,42 @@ enum LOAD_STATUS {
     errored = 'errored'
 }
 
-export default defineComponent<Props>({
-    name: 'PLazyImg',
-    components: {
-        PSkeleton,
-        PI,
-    },
-    props: {
-        height: {
-            type: String,
-            default: '2rem',
-        },
-        width: {
-            type: String,
-            default: '2rem',
-        },
-        src: {
-            type: String,
-            default: undefined,
-        },
-        errorIcon: {
-            type: String,
-            default: 'ic_resource_hexagon',
-        },
-        errorIconColor: {
-            type: String,
-            default: '',
-        },
-        loading: {
-            type: Boolean,
-            default: undefined,
-        },
-        alt: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props: Props) {
-        const state = reactive({
-            status: LOAD_STATUS.loading,
-        });
-
-
-        watch(() => props.src, (src, before) => {
-            if (!src && src === before) {
-                state.status = LOAD_STATUS.errored;
-            } else {
-                state.status = LOAD_STATUS.loading;
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            onLoad() {
-                if (!props.loading) {
-                    state.status = LOAD_STATUS.succeed;
-                }
-            },
-            onError() {
-                if (!props.loading) {
-                    state.status = LOAD_STATUS.errored;
-                }
-            },
-            LOAD_STATUS,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    height: '2rem',
+    width: '2rem',
+    src: undefined,
+    errorIcon: 'ic_resource_hexagon',
+    errorIconColor: '',
+    loading: undefined,
+    alt: undefined,
 });
+
+const state = reactive({
+    status: LOAD_STATUS.loading,
+});
+
+
+watch(() => props.src, (src, before) => {
+    if (!src && src === before) {
+        state.status = LOAD_STATUS.errored;
+    } else {
+        state.status = LOAD_STATUS.loading;
+    }
+}, { immediate: true });
+
+
+const handleLoad = () => {
+    if (!props.loading) {
+        state.status = LOAD_STATUS.succeed;
+    }
+};
+
+const handleError = () => {
+    if (!props.loading) {
+        state.status = LOAD_STATUS.errored;
+    }
+};
+
 </script>
 
 <style lang="postcss">

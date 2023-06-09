@@ -3,31 +3,31 @@
         <svg class="p-spinner-svg"
              :class="[styleType, size]"
              viewBox="0 0 32 32"
-             fill="none" xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             xmlns="http://www.w3.org/2000/svg"
         >
             <g>
                 <circle class="spinner-bg"
-                        cx="16" cy="16" r="14"
+                        cx="16"
+                        cy="16"
+                        r="14"
                         stroke-opacity="0.3"
                         stroke-width="9%"
                 />
                 <circle class="spinner"
-                        cx="16" cy="16" r="14"
+                        cx="16"
+                        cy="16"
+                        r="14"
                         stroke-width="9%"
-                        stroke-linecap="round" stroke-dasharray="32 200"
+                        stroke-linecap="round"
+                        stroke-dasharray="32 200"
                 />
             </g>
         </svg>
     </span>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    defineComponent,
-} from 'vue';
-
-import type { SpinnerSize, SpinnerStyleType } from '@/feedbacks/loading/spinner/type';
+<script setup lang="ts">
 import { SPINNER_SIZE, SPINNER_STYLE_TYPE } from '@/feedbacks/loading/spinner/type';
 
 interface Props {
@@ -35,21 +35,11 @@ interface Props {
     styleType?: string;
 }
 
-export default defineComponent<Props>({
-    name: 'PSpinner',
-    components: {
-    },
-    props: {
-        size: {
-            type: String as PropType<SpinnerSize>,
-            default: SPINNER_SIZE.md,
-        },
-        styleType: {
-            type: String as PropType<SpinnerStyleType>,
-            default: SPINNER_STYLE_TYPE.gray,
-        },
-    },
+withDefaults(defineProps<Props>(), {
+    size: SPINNER_SIZE.md,
+    styleType: SPINNER_STYLE_TYPE.gray,
 });
+
 </script>
 
 <style lang="postcss">

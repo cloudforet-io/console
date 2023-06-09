@@ -1,28 +1,28 @@
 <template>
     <div class="p-data-loader">
         <div class="data-loader-container">
-            <div v-show="(showDataFromScratch || dataLoadOccurred) && showEmptyCase"
+            <div v-show="(showDataFromScratch || state.dataLoadOccurred) && state.showEmptyCase"
                  key="no-data"
                  class="no-data-wrapper"
             >
                 <slot name="no-data">
-                    {{ $t('COMPONENT.DATA_LOADER.NO_DATA') }}
+                    {{ t('COMPONENT.DATA_LOADER.NO_DATA') }}
                 </slot>
             </div>
 
-            <div v-show="(showDataFromScratch || dataLoadOccurred) && !showEmptyCase"
+            <div v-show="(showDataFromScratch || state.dataLoadOccurred) && !state.showEmptyCase"
                  key="data"
                  class="data-wrapper"
             >
                 <slot v-bind="{isEmpty}" />
             </div>
 
-            <div v-show="showLoader"
+            <div v-show="state.showLoader"
                  key="loader"
                  class="loader-wrapper"
                  :class="{
                      'no-empty-case': disableEmptyCase && isEmpty,
-                     'fade-out': isTransitioning,
+                     'fade-out': state.isTransitioning,
                      'fade-out-from': isLoading,
                      'fade-out-to': !isLoading,
                  }"
@@ -30,11 +30,11 @@
                 <div class="loader-backdrop"
                      :style="{
                          opacity: loaderBackdropOpacity,
-                         backgroundColor: refinedLoaderBackdropColor
+                         backgroundColor: state.refinedLoaderBackdropColor
                      }"
                 />
                 <div class="loader"
-                     :class="{[loaderType]: !$scopedSlots.loader}"
+                     :class="{[loaderType]: !slots.loader}"
                 >
                     <slot name="loader">
                         <template v-if="loaderType === LOADER_TYPES.spinner">
@@ -50,13 +50,13 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { isEmpty } from 'lodash';
 import type { ComputedRef, PropType, WatchStopHandle } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, reactive, useSlots, watch,
 } from 'vue';
-
-import { isEmpty } from 'lodash';
+import { useI18n } from 'vue-i18n';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
@@ -65,199 +65,186 @@ import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { getColor } from '@/utils/helpers';
 
-interface Props {
-    loading: boolean;
-    data?: any;
-    loaderType: LOADER_TYPES;
-    disableEmptyCase: boolean;
-    showDataFromScratch: boolean;
-    minLoadingTime: number;
-    lazyLoadingTime: number;
-    loaderBackdropOpacity: number;
-    loaderBackdropColor: string;
-    disableTransition: boolean;
-}
-export default defineComponent<Props>({
-    name: 'PDataLoader',
-    components: { PSpinner, PSkeleton },
-    props: {
-        loading: {
-            type: Boolean,
-            default: true,
-        },
-        data: {
-            type: [Array, Object, Boolean, String, Number],
-            default: undefined,
-        },
-        loaderType: {
-            type: String as PropType<LOADER_TYPES>,
-            default: LOADER_TYPES.spinner,
-            validator(loaderType: LOADER_TYPES) {
-                return Object.values(LOADER_TYPES).includes(loaderType);
-            },
-        },
-        spinnerSize: {
-            type: String as PropType<SpinnerSize>,
-            default: SPINNER_SIZE.xl,
-            validator(spinnerSize: SpinnerSize) {
-                return Object.values(SPINNER_SIZE).includes(spinnerSize);
-            },
-        },
-        disableEmptyCase: {
-            type: Boolean,
-            default: false,
-        },
-        showDataFromScratch: {
-            type: Boolean,
-            default: false,
-        },
-        minLoadingTime: {
-            type: Number,
-            default: 0,
-            validator(minLoadingTime: number) {
-                return minLoadingTime >= 0;
-            },
-        },
-        lazyLoadingTime: {
-            type: Number,
-            default: 0,
-            validator(lazyLoadingTime: number) {
-                return lazyLoadingTime >= 0;
-            },
-        },
-        loaderBackdropOpacity: {
-            type: Number,
-            default: 0.5,
-        },
-        loaderBackdropColor: {
-            type: String,
-            default: 'white',
-        },
-        disableTransition: {
-            type: Boolean,
-            default: false,
+// interface Props {
+//     loading: boolean;
+//     data?: any;
+//     loaderType: LOADER_TYPES;
+//     disableEmptyCase: boolean;
+//     showDataFromScratch: boolean;
+//     minLoadingTime: number;
+//     lazyLoadingTime: number;
+//     loaderBackdropOpacity: number;
+//     loaderBackdropColor: string;
+//     disableTransition: boolean;
+// }
+
+const props = defineProps({
+    loading: {
+        type: Boolean,
+        default: true,
+    },
+    data: {
+        type: [Array, Object, Boolean, String, Number] as PropType<any>,
+        default: undefined,
+    },
+    loaderType: {
+        type: String as PropType<LOADER_TYPES>,
+        default: LOADER_TYPES.spinner,
+        validator(loaderType: LOADER_TYPES) {
+            return Object.values(LOADER_TYPES).includes(loaderType);
         },
     },
-    setup(props) {
-        let isLoading: ComputedRef<boolean>;
-        const state = reactive({
-            dataLoadOccurred: false,
-            showEmptyCase: computed(() => !props.disableEmptyCase && state.isEmpty),
-            isEmpty: computed(() => {
-                // if data is null or undefined, it regards as data is not loaded yet. so it's not empty case.
-                if (props.data === null || props.data === undefined) return false;
+    spinnerSize: {
+        type: String as PropType<SpinnerSize>,
+        default: SPINNER_SIZE.xl,
+        validator(spinnerSize: SpinnerSize) {
+            return Object.values(SPINNER_SIZE).includes(spinnerSize);
+        },
+    },
+    disableEmptyCase: {
+        type: Boolean,
+        default: false,
+    },
+    showDataFromScratch: {
+        type: Boolean,
+        default: false,
+    },
+    minLoadingTime: {
+        type: Number,
+        default: 0,
+    },
+    lazyLoadingTime: {
+        type: Number,
+        default: 0,
+    },
+    loaderBackdropOpacity: {
+        type: Number,
+        default: 0.5,
+    },
+    loaderBackdropColor: {
+        type: String,
+        default: '#fff',
+    },
+    disableTransition: {
+        type: Boolean,
+        default: false,
+    },
+});
+const { t } = useI18n();
+const slots = useSlots();
 
-                // in other cases, it checks if the data is empty.
-                if (Array.isArray(props.data)) return props.data.length === 0;
-                if (typeof props.data === 'boolean') return !props.data;
-                return isEmpty(props.data);
-            }),
-            lazyLoading: props.loading,
-            minLoading: props.loading,
-            isTransitioning: false,
-            showLoader: computed(() => (props.disableTransition ? isLoading.value : (isLoading.value || state.isTransitioning))),
-            refinedLoaderBackdropColor: computed(() => getColor(props.loaderBackdropColor)),
-        });
+let isLoading: ComputedRef<boolean>;
+const state = reactive({
+    dataLoadOccurred: false,
+    showEmptyCase: computed(() => !props.disableEmptyCase && state.isEmpty),
+    isEmpty: computed(() => {
+        // if data is null or undefined, it regards as data is not loaded yet. so it's not empty case.
+        if (props.data === null || props.data === undefined) return false;
 
-        const registerLazyLoadingWatch = () => {
-            let lazyLoadingHandler;
-            watch(() => props.loading, (loading) => {
-                if (loading) {
-                    if (!state.dataLoadOccurred) {
-                        state.lazyLoading = true;
-                        return;
-                    }
+        // in other cases, it checks if the data is empty.
+        if (Array.isArray(props.data)) return props.data.length === 0;
+        if (typeof props.data === 'boolean') return !props.data;
+        return isEmpty(props.data);
+    }),
+    lazyLoading: props.loading,
+    minLoading: props.loading,
+    isTransitioning: false,
+    showLoader: computed(() => (props.disableTransition ? isLoading.value : (isLoading.value || state.isTransitioning))),
+    refinedLoaderBackdropColor: computed(() => getColor(props.loaderBackdropColor)),
+});
 
-                    state.lazyLoading = false;
-
-                    if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
-                    lazyLoadingHandler = setTimeout(() => {
-                        state.lazyLoading = true;
-                    }, props.lazyLoadingTime);
-                } else {
-                    if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
-                    state.lazyLoading = false;
-                }
-            }, { immediate: true });
-
-            if (props.minLoadingTime) {
-                let minLoadingHandler;
-                watch(() => state.lazyLoading, (lazyLoading) => {
-                    if (lazyLoading) {
-                        state.minLoading = true;
-
-                        if (minLoadingHandler) clearTimeout(minLoadingHandler);
-                        minLoadingHandler = setTimeout(() => {
-                            state.minLoading = false;
-                        }, props.minLoadingTime);
-                    }
-                }, { immediate: true });
+const registerLazyLoadingWatch = () => {
+    let lazyLoadingHandler;
+    watch(() => props.loading, (loading) => {
+        if (loading) {
+            if (!state.dataLoadOccurred) {
+                state.lazyLoading = true;
+                return;
             }
-        };
 
-        const registerMinLoadingWatch = () => {
-            let minLoadingHandler;
-            watch(() => props.loading, (loading) => {
-                if (loading) {
-                    state.minLoading = true;
+            state.lazyLoading = false;
 
-                    if (minLoadingHandler) clearTimeout(minLoadingHandler);
-                    minLoadingHandler = setTimeout(() => {
-                        state.minLoading = false;
-                    }, props.minLoadingTime);
-                }
-            }, { immediate: true });
-        };
+            if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
+            lazyLoadingHandler = setTimeout(() => {
+                state.lazyLoading = true;
+            }, props.lazyLoadingTime);
+        } else {
+            if (lazyLoadingHandler) clearTimeout(lazyLoadingHandler);
+            state.lazyLoading = false;
+        }
+    }, { immediate: true });
+
+    if (props.minLoadingTime) {
+        let minLoadingHandler;
+        watch(() => state.lazyLoading, (lazyLoading) => {
+            if (lazyLoading) {
+                state.minLoading = true;
+
+                if (minLoadingHandler) clearTimeout(minLoadingHandler);
+                minLoadingHandler = setTimeout(() => {
+                    state.minLoading = false;
+                }, props.minLoadingTime);
+            }
+        }, { immediate: true });
+    }
+};
+
+const registerMinLoadingWatch = () => {
+    let minLoadingHandler;
+    watch(() => props.loading, (loading) => {
+        if (loading) {
+            state.minLoading = true;
+
+            if (minLoadingHandler) clearTimeout(minLoadingHandler);
+            minLoadingHandler = setTimeout(() => {
+                state.minLoading = false;
+            }, props.minLoadingTime);
+        }
+    }, { immediate: true });
+};
 
 
-        if (props.lazyLoadingTime) {
-            if (props.minLoadingTime) isLoading = computed<boolean>(() => state.minLoading || state.lazyLoading);
-            else isLoading = computed<boolean>(() => state.lazyLoading);
-            registerLazyLoadingWatch();
-        } else if (props.minLoadingTime) {
-            isLoading = computed<boolean>(() => state.minLoading || props.loading);
-            registerMinLoadingWatch();
-        } else isLoading = computed<boolean>(() => props.loading);
+if (props.lazyLoadingTime) {
+    if (props.minLoadingTime) isLoading = computed<boolean>(() => state.minLoading || state.lazyLoading);
+    else isLoading = computed<boolean>(() => state.lazyLoading);
+    registerLazyLoadingWatch();
+} else if (props.minLoadingTime) {
+    isLoading = computed<boolean>(() => state.minLoading || props.loading);
+    registerMinLoadingWatch();
+} else isLoading = computed<boolean>(() => props.loading);
 
 
-        let stopDataLoadCheckWatch: WatchStopHandle;
-        /*
+let stopDataLoadCheckWatch: WatchStopHandle;
+/*
             CAUTION: Do not make stopDataLoadCheckWatch as const variable.
             Related issue: https://github.com/webpack/webpack/issues/12724
          */
-        // eslint-disable-next-line prefer-const
-        stopDataLoadCheckWatch = watch(() => isLoading.value, (loading) => {
-            if (!loading) {
-                state.dataLoadOccurred = true;
-                if (stopDataLoadCheckWatch) stopDataLoadCheckWatch();
-            }
-        }, { immediate: true });
+// eslint-disable-next-line prefer-const
+stopDataLoadCheckWatch = watch(() => isLoading.value, (loading) => {
+    if (!loading) {
+        state.dataLoadOccurred = true;
+        if (stopDataLoadCheckWatch) stopDataLoadCheckWatch();
+    }
+}, { immediate: true });
 
 
-        if (!props.disableTransition) {
-            let transitionTimout;
-            watch(() => isLoading.value, (loading) => {
-                if (!loading) {
-                    state.isTransitioning = true;
-                    transitionTimout = setTimeout(() => {
-                        state.isTransitioning = false;
-                        transitionTimout = undefined;
-                    }, 200);
-                } else if (transitionTimout) {
-                    clearTimeout(transitionTimout);
-                    transitionTimout = undefined;
-                    state.isTransitioning = false;
-                }
-            }, { immediate: true });
+if (!props.disableTransition) {
+    let transitionTimout;
+    watch(() => isLoading.value, (loading) => {
+        if (!loading) {
+            state.isTransitioning = true;
+            transitionTimout = setTimeout(() => {
+                state.isTransitioning = false;
+                transitionTimout = undefined;
+            }, 200);
+        } else if (transitionTimout) {
+            clearTimeout(transitionTimout);
+            transitionTimout = undefined;
+            state.isTransitioning = false;
         }
+    }, { immediate: true });
+}
 
-        return {
-            LOADER_TYPES,
-            ...toRefs(state),
-            isLoading,
-        };
-    },
-});
 </script>
 
 <style lang="postcss">
