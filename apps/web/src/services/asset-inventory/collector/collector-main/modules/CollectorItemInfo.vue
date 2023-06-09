@@ -35,7 +35,7 @@
                         width="1.25rem"
                         color="inherit"
                     />
-                    <!-- TODO: apply translation later because of license issue -->
+                    <!-- TODO: will be fixed after the API is completed -->
                     <p class="description">
                         Scheduled
                         <span class="emphasis">
@@ -68,13 +68,16 @@
                                :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
                                position="top"
                     >
-                        <p-i
-                            name="ic_check"
-                            class="icon success"
-                            height="1rem"
-                            width="1rem"
-                            color="inherit"
-                        />
+                        <!-- TODO: link with job detail page using job id after the API is completed -->
+                        <router-link :to="props.item.detailLink">
+                            <p-i
+                                name="ic_check"
+                                class="icon success"
+                                height="1rem"
+                                width="1rem"
+                                color="inherit"
+                            />
+                        </router-link>
                     </p-tooltip>
                     <p-tooltip v-if="jobItems.status === 'progress'"
                                class="icon-fill-wrapper progress"
@@ -102,7 +105,7 @@
                 </div>
             </div>
             <div class="to-history-detail">
-                <router-link :to="props.item.detailLink">
+                <router-link :to="props.item.historyLink">
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
                     <p-i
                         name="ic_chevron-right"
@@ -293,11 +296,15 @@ const TEMP_JOB_STATUS = [
                     width: 1rem;
                     height: 1rem;
 
+                    &:hover {
+                        @apply cursor-default;
+                    }
+
                     &.success {
                         @apply bg-green-600;
 
                         &:hover {
-                            @apply border border-green-700;
+                            @apply border border-green-700 cursor-pointer;
                         }
                     }
 

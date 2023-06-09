@@ -27,25 +27,27 @@
                        class="collector-list-wrapper"
         >
             <div class="collector-lists">
-                <p-card
-                    v-for="item in state.items"
-                    :key="item.collectorId"
-                    :header="false"
-                    style-type="white"
+                <div v-for="item in state.items"
+                     :key="item.collectorId"
+                     @click.stop="handleClickListItem(item.detailLink)"
                 >
-                    <div class="collector-item-wrapper">
-                        <span class="collector-item-name">{{ item.name }}</span>
-                        <div class="collector-info-wrapper">
-                            <collector-item-info
-                                v-for="info in state.infoItems"
-                                :key="info.key"
-                                :label="info.label"
-                                :type="info.key"
-                                :item="item"
-                            />
+                    <p-card :header="false"
+                            style-type="white"
+                    >
+                        <div class="collector-item-wrapper">
+                            <span class="collector-item-name">{{ item.name }}</span>
+                            <div class="collector-info-wrapper">
+                                <collector-item-info
+                                    v-for="info in state.infoItems"
+                                    :key="info.key"
+                                    :label="info.label"
+                                    :type="info.key"
+                                    :item="item"
+                                />
+                            </div>
                         </div>
-                    </div>
-                </p-card>
+                    </p-card>
+                </div>
             </div>
             <template #no-data>
                 <collector-list-no-data class="collector-no-data" />
@@ -122,17 +124,9 @@ const state = reactive({
     searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
     items: computed(() => {
         const plugins = storeState.plugins;
-        return collectorPageState.collectors?.map((d) => ({
-            collectorId: d.collector_id,
-            name: d.name,
-            plugin: {
-                name: plugins[d.plugin_info.plugin_id]?.label,
-                icon: plugins[d.plugin_info.plugin_id]?.icon,
-                info: d.plugin_info,
-            },
-            detailLink: {
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
-                param: { id: d.collector_id },
+        return collectorPageState.collectors?.map((d) => {
+            const linkData = {
+                params: { id: d.collector_id },
                 query: {
                     filters: searchQueryHelper.setFilters([
                         {
@@ -142,8 +136,28 @@ const state = reactive({
                         },
                     ]).rawQueryStrings,
                 },
-            },
-        }));
+            };
+            return {
+                collectorId: d.collector_id,
+                name: d.name,
+                plugin: {
+                    name: plugins[d.plugin_info.plugin_id]?.label,
+                    icon: plugins[d.plugin_info.plugin_id]?.icon,
+                    info: d.plugin_info,
+                },
+                historyLink: {
+                    ...linkData,
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+                },
+                detailLink: {
+                    ...linkData,
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                    params: {
+                        collectorId: d.collector_id,
+                    },
+                },
+            };
+        });
     }),
 });
 
@@ -165,6 +179,9 @@ const handleChangeToolbox = async (options) => {
         await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
     }
     emit('change-toolbox', options);
+};
+const handleClickListItem = (detailLink) => {
+    SpaceRouter.router.push(detailLink);
 };
 
 // TODO: will be checked after API is ready
@@ -195,6 +212,16 @@ const handleChangeToolbox = async (options) => {
 
         .collector-lists {
             @apply grid grid-cols-2 gap-4;
+
+            /* custom design-system component - p-card */
+            :deep(.p-card) {
+                &:hover {
+                    @apply cursor-pointer;
+                    .body {
+                        @apply bg-blue-100;
+                    }
+                }
+            }
 
             .collector-item-wrapper {
                 @apply flex flex-col;
