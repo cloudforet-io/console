@@ -35,12 +35,12 @@
     "access": "public"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build && npm run css && npm run vue-tsc || true",
+    "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build && npm run css && npm run vue-tsc || true && npm run tsc-alias",
     "dev": "concurrently \"npm run build:watch\" \"npm run tsc:watch\"",
     "build:watch": "NODE_OPTIONS=--max_old_space_size=8192 vite build --watch",
-    "tsc:watch": "tsc-watch --compiler vue-tsc/bin/vue-tsc.js -p tsconfig.build.json --silent --onCompilationComplete \"tsc-alias -w -p tsconfig.build.json\"",
+    "tsc:watch": "tsc-watch --compiler vue-tsc/bin/vue-tsc.js -p tsconfig.build.json --silent --onCompilationComplete \"tsc-alias -w -p tsconfig.alias.json\"",
     "vue-tsc": "vue-tsc -p tsconfig.build.json",
-    "tsc-alias": "tsc-alias -p tsconfig.build.json",
+    "tsc-alias": "tsc-alias -p tsconfig.alias.json",
     "build:storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -o .out -s public",
     "storybook": "start-storybook -p 6006 -s public",
     "css": "node scripts/css.js",
