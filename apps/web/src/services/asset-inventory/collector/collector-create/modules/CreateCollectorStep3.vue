@@ -3,6 +3,7 @@
         <div class="input-form">
             <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
             <!--TODO: "json-schema" will be added-->
+            <plugin-metadata-form @change:isSchemaFormValid="handleChangeIsSchemaFormValid" />
         </div>
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
@@ -20,7 +21,7 @@
                 >
                     {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
                 </p-button>
-                <p-button :disabled="!state.isAttachedServiceAccountValid"
+                <p-button :disabled="!state.isAllFormValid"
                           size="lg"
                           @click="handleClickNextButton"
                 >
@@ -48,6 +49,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import AttachedServiceAccountForm
     from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import PluginMetadataForm from '@/services/asset-inventory/collector/shared/collector-forms/PluginMetadataForm.vue';
 
 
 const emit = defineEmits([
@@ -63,12 +65,18 @@ const state = reactive({
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     deleteModalVisible: false,
     isAttachedServiceAccountValid: false,
+    isSchemaFormValid: false,
+    isAllFormValid: computed<boolean>(() => state.isAttachedServiceAccountValid && state.isSchemaFormValid),
 });
 
 /* event */
 
 const handleChangeIsAttachedServiceAccountValid = (isValid: boolean) => {
     state.isAttachedServiceAccountValid = isValid;
+};
+
+const handleChangeIsSchemaFormValid = (isValid: boolean) => {
+    state.isSchemaFormValid = isValid;
 };
 
 const handleClickOtherPluginButton = () => {
@@ -85,8 +93,7 @@ const handleClose = () => {
     emit('update:currentStep', 1);
 };
 
-(() => {
-})();
+
 </script>
 <style lang="postcss" scoped>
 .collector-page-3 {
@@ -94,6 +101,7 @@ const handleClose = () => {
 
     .input-form {
         margin-top: 2rem;
+        min-height: calc(50vh - 5.625rem);
     }
 
     .step-footer {
@@ -113,6 +121,10 @@ const handleClose = () => {
     .collector-page-3 {
         min-width: unset;
         max-width: 100vw;
+
+        .input-form {
+            min-height: unset;
+        }
 
         .step-footer {
             @apply flex justify-between items-center;
