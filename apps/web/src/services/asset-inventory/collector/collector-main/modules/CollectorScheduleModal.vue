@@ -4,7 +4,7 @@
                     size="md"
                     fade
                     backdrop
-                    :visible="collectorPageState.visibleModal"
+                    :visible="collectorPageState.visibleScheduleModal"
                     @close="handleCloseModal"
     >
         <template #body>
@@ -37,7 +37,7 @@ const collectorFormStore = useCollectorFormStore();
 /* Components */
 const handleCloseModal = () => {
     collectorPageStore.$patch({
-        visibleModal: false,
+        visibleScheduleModal: false,
     });
 };
 

@@ -227,7 +227,7 @@ const handleChangeToggle = () => {};
 const handleClickSchedule = async () => {
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
     await collectorPageStore.$patch({
-        visibleModal: true,
+        visibleScheduleModal: true,
     });
 };
 
