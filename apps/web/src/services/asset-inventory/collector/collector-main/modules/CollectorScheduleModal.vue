@@ -22,11 +22,11 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
-interface IProps {
+interface Props {
     editMode: boolean
 }
 
-const props = withDefaults(defineProps<IProps>(), {
+const props = withDefaults(defineProps<Props>(), {
     editMode: false,
 });
 
