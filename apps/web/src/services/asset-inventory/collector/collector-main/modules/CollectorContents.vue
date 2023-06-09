@@ -29,7 +29,7 @@
             <div class="collector-lists">
                 <div v-for="item in state.items"
                      :key="item.collectorId"
-                     @click.stop="handleClickListItem(item.detailLink)"
+                     @click="handleClickListItem(item.detailLink)"
                 >
                     <p-card :header="false"
                             style-type="white"
@@ -53,6 +53,8 @@
                 <collector-list-no-data class="collector-no-data" />
             </template>
         </p-data-loader>
+        <!-- TODO: changed condition after API spec checking -->
+        <collector-schedule-modal edit-mode />
     </div>
 </template>
 
@@ -78,7 +80,12 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemInfo from '@/services/asset-inventory/collector/collector-main/modules/CollectorItemInfo.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
-import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/type';
+import CollectorScheduleModal
+    from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
+import {
+    COLLECTOR_ITEM_INFO_TYPE,
+    COLLECTOR_QUERY_HELPER_SET,
+} from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
@@ -156,6 +163,7 @@ const state = reactive({
                         collectorId: d.collector_id,
                     },
                 },
+                origin: d,
             };
         });
     }),

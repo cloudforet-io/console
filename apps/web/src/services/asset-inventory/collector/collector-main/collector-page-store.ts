@@ -19,6 +19,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as CollectorScheduleModel[],
+        visibleModal: false,
 
     }),
     getters: {
