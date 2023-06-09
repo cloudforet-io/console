@@ -18,7 +18,7 @@ export const ASSET_GROUP_BY_ITEM_MAP = {
     [ASSET_GROUP_BY.PROVIDER]: { name: ASSET_GROUP_BY.PROVIDER, label: 'Provider' },
     [ASSET_GROUP_BY.REGION]: { name: ASSET_GROUP_BY.REGION, label: 'Region' },
     [ASSET_GROUP_BY.COMPLIANCE_TYPE]: { name: ASSET_GROUP_BY.COMPLIANCE_TYPE, label: 'Compliance Type' },
-    [ASSET_GROUP_BY.COMPLIANCE_NUMBER]: { name: ASSET_GROUP_BY.COMPLIANCE_NUMBER, label: 'Compliance Number' },
+    [ASSET_GROUP_BY.REQUIREMENT_ID]: { name: ASSET_GROUP_BY.REQUIREMENT_ID, label: 'Requirement ID' },
     [ASSET_GROUP_BY.SERVICE]: { name: ASSET_GROUP_BY.SERVICE, label: 'Service' },
     [ASSET_GROUP_BY.ACCOUNT]: { name: ASSET_GROUP_BY.ACCOUNT, label: 'AWS Account ID' },
 };
