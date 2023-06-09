@@ -53,6 +53,7 @@
             />
             <p-button style-type="tertiary"
                       size="lg"
+                      :disabled="state.updateLoading"
                       @click="handleClickCancel"
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
@@ -61,6 +62,7 @@
                       size="lg"
                       class="save-changes-button"
                       :disabled="!state.isAllValid"
+                      :loading="state.updateLoading"
                       @click="handleClickSave"
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -80,17 +82,22 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib/index';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
 const props = defineProps<{
@@ -124,12 +131,21 @@ const state = reactive({
     isVersionValid: false,
     isTagsValid: false,
     isAllValid: computed(() => state.isVersionValid && state.isTagsValid),
+    updateLoading: false,
 });
 
 // TODO: Implement isLatestVersion
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isLatestVersion = (version: string) => true;
 
+const fetchCollectorUpdate = async (): Promise<CollectorModel> => SpaceConnector.client.inventory.collector.update({
+    collector_id: collectorFormStore.collectorId,
+    plugin_info: {
+        version: collectorFormState.version,
+        upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+    },
+    tags: collectorFormState.tags,
+});
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -145,19 +161,22 @@ const handleClickCancel = () => {
     collectorFormStore.resetForm();
     state.isEditMode = false;
 };
-const handleClickSave = () => {
-    state.isEditMode = false;
-    // TODO: change codes below. Call update api and set originCollector with api response
-    if (!collectorFormState.originCollector) return;
-    collectorFormStore.setOriginCollector({
-        ...collectorFormState.originCollector,
-        plugin_info: {
-            ...collectorFormState.originCollector.plugin_info,
-            version: collectorFormState.version ?? '',
-            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-        },
-        tags: collectorFormState.tags,
-    });
+const handleClickSave = async () => {
+    try {
+        state.updateLoading = true;
+        if (!collectorFormState.originCollector) return;
+        const collector = await fetchCollectorUpdate();
+        collectorFormStore.setOriginCollector(collector);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+    } catch (e) {
+        collectorFormStore.resetVersion();
+        collectorFormStore.resetAutoUpgrade();
+        collectorFormStore.resetTags();
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+    } finally {
+        state.updateLoading = false;
+        state.isEditMode = false;
+    }
 };
 
 // init reference data
