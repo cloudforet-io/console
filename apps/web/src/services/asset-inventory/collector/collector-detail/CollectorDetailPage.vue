@@ -46,9 +46,7 @@
                                    :loading="state.loading"
                                    :collector-options="state.collectorOptions"
         />
-        <collector-service-accounts-section class="section"
-                                            :providers="state.collectorProviders"
-        />
+        <collector-service-accounts-section class="section" />
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
                               :verification-text="state.collectorName"
