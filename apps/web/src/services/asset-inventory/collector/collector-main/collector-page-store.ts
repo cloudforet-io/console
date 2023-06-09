@@ -16,6 +16,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         sortBy: '',
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
+        selectedCollect: {} as CollectorModel,
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as CollectorScheduleModel[],
@@ -63,6 +64,12 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             }
+        },
+        async setSelectedCollector(id) {
+            const itemIndex = this.collectors.findIndex(
+                (item) => item.collector_id === id,
+            );
+            this.selectedCollect = this.collectors[itemIndex];
         },
     },
 });

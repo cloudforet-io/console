@@ -18,6 +18,7 @@
 import { PButtonModal } from '@spaceone/design-system';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
@@ -31,6 +32,7 @@ const props = withDefaults(defineProps<IProps>(), {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+const collectorFormStore = useCollectorFormStore();
 
 /* Components */
 const handleCloseModal = () => {
@@ -38,4 +40,10 @@ const handleCloseModal = () => {
         visibleModal: false,
     });
 };
+
+/* Init */
+(async () => {
+    const originCollector = collectorPageState.selectedCollect;
+    await collectorFormStore.setOriginCollector(originCollector);
+})();
 </script>
