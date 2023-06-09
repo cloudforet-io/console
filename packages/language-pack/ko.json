@@ -1285,6 +1285,8 @@
 				"DELETE": "삭제",
 				"DELETE_TITLE": "이 변수를 삭제하시겠습니까?",
 				"DESCRIPTION_ACCOUNT": "AWS 계정 생성 시 할당되는 계정 ID",
+				"DESCRIPTION_ASSET_ACCOUNT": "",
+				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "",
 				"DESCRIPTION_GROUP_BY": "특정 옵션 기반 데이터를 그룹화하고 해당 그룹의 트렌드나 패턴을 파악하는데 사용가능",
 				"DESCRIPTION_PRODUCT": "각 클라우드 프로바이더가 제공하는 클라우드 컴퓨팅 제품 및 서비스",
 				"DESCRIPTION_PROJECT": "프로젝트로 그룹화된 클라우드 자원 및 서비스의 모음",
