@@ -49,6 +49,7 @@
         <collector-service-accounts-section class="section"
                                             :providers="state.collectorProviders"
         />
+        <collector-name-edit-modal :visible.sync="state.editModalVisible" />
     </div>
 </template>
 
@@ -88,6 +89,8 @@ import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoSection.vue';
+import CollectorNameEditModal
+    from '@/services/asset-inventory/collector/collector-detail/modules/CollectorNameEditModal.vue';
 import CollectorOptionsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorOptionsSection.vue';
 import CollectorScheduleSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleSection.vue';
@@ -125,6 +128,7 @@ const state = reactive({
             ]).rawQueryStrings,
         },
     })),
+    editModalVisible: false,
 });
 
 const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
@@ -175,7 +179,7 @@ const getCollector = async (): Promise<CollectorModel> => {
 };
 
 const handleClickEditButton = () => {
-    // TODO: implement
+    state.editModalVisible = true;
 };
 
 const handleClickDeleteButton = () => {
