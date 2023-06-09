@@ -1,7 +1,7 @@
 export const ASSET_REFERENCE_TYPE_INFO = {
     asset_compliance_type: {
         type: 'asset_compliance_type',
-        key: 'compliance_type',
+        key: 'name',
         name: 'Compliance Type',
     },
     asset_account: {
@@ -9,14 +9,14 @@ export const ASSET_REFERENCE_TYPE_INFO = {
         key: 'account',
         name: 'AWS Account ID (Asset)',
     },
-    asset_compliance_number: {
-        type: 'asset_compliance_number',
-        key: 'compliance_number',
-        name: 'Compliance Number',
+    asset_requirement_id: {
+        type: 'asset_requirement_id',
+        key: 'data.requirement_id',
+        name: 'Requirement ID',
     },
     asset_service: {
         type: 'asset_service',
-        key: 'service',
+        key: 'data.service',
         name: 'Service',
     },
 } as const;

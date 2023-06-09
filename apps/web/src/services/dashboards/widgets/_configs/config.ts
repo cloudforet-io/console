@@ -53,9 +53,9 @@ export const ASSET_GROUP_BY = {
     PROVIDER: REFERENCE_TYPE_INFO.provider.key,
     REGION: REFERENCE_TYPE_INFO.region.key,
     // asset reference
-    COMPLIANCE_NUMBER: ASSET_REFERENCE_TYPE_INFO.asset_compliance_number.key,
+    REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
     SERVICE: ASSET_REFERENCE_TYPE_INFO.asset_service.key,
-    COMPLIANCE_TYPE: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
+    COMPLIANCE_TYPE: 'cloud_service_type',
     ACCOUNT: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
 };
 

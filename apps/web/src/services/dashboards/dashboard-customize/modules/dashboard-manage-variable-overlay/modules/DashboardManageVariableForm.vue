@@ -186,6 +186,7 @@ const handleSave = () => {
         options = {
             type: 'SEARCH_RESOURCE',
             resource_key: '',
+            resource_type: '',
         } as SearchResourceOptions;
     }
     const variableToSave = {
