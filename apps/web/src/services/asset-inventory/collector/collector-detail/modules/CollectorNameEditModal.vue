@@ -18,6 +18,8 @@ import { defineProps, defineEmits, reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -45,14 +47,9 @@ const state = reactive({
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-// TODO: change to call api
-const fetchUpdateCollectorName = async (): Promise<CollectorModel> => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve({
-            ...collectorFormState.originCollector,
-            name: collectorFormState.name,
-        } as CollectorModel);
-    }, 1000);
+const fetchUpdateCollectorName = async (): Promise<CollectorModel> => SpaceConnector.client.inventory.collector.update({
+    collector_id: collectorFormStore.collectorId,
+    name: collectorFormState.name,
 });
 
 const handleUpdateIsValid = (value: boolean) => {

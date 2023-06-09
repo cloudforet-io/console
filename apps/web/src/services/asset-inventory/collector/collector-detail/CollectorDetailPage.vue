@@ -93,7 +93,7 @@ import {
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { makeAPIError } from '@cloudforet/core-lib/space-connector/error';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -155,55 +155,16 @@ defineExpose({ setPathFrom });
 
 const getCollector = async (): Promise<CollectorModel> => {
     state.loading = true;
-    // TODO: change to real data
-    const result = await new Promise<CollectorModel>((resolve) => {
-        setTimeout(() => {
-            resolve({
-                collector_id: 'collector-1',
-                name: 'collector-1',
-                state: 'ENABLED',
-                provider: 'aws',
-                capability: {
-                    supported_providers: ['aws'],
-                    supported_schemas: ['aws_access_key', 'aws_access_key_pair'],
-                    monitoring_type: 'METRIC',
-                    use_resource_secret: true,
-                },
-                schedule: {
-                    hours: [3],
-                },
-                plugin_info: {
-                    plugin_id: 'plugin-4507e45ad6dd',
-                    version: '1.4.3',
-                    upgrade_mode: 'AUTO',
-                    metadata: {},
-                    secret_filter: {},
-                    options: {
-                        supported_resource_type: ['inventory.Server'],
-                        filter_format: [],
-                    },
-                },
-                tags: {
-                    'spaceone:region': 'kr',
-                    'spaceone:zone': 'kr-1',
-                },
-                last_collected_at: '2021-08-31T00:00:00Z',
-                created_at: '2021-08-31T00:00:00Z',
-            });
-        }, 2000);
+    const result = await SpaceConnector.client.inventory.collector.get({
+        collector_id: props.collectorId,
     });
     state.loading = false;
     return result;
 };
 
-const fetchDeleteCollector = async () => {
-    // TODO: change to call api
-    await new Promise((resolve, reject) => {
-        setTimeout(() => {
-            reject(makeAPIError('error'));
-        }, 2000);
-    });
-};
+const fetchDeleteCollector = async () => SpaceConnector.client.inventory.collector.delete({
+    collectors: [collectorFormStore.collectorId],
+});
 
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
