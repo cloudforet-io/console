@@ -97,7 +97,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel, CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
 const props = defineProps<{
@@ -138,14 +138,18 @@ const state = reactive({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isLatestVersion = (version: string) => true;
 
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => SpaceConnector.client.inventory.collector.update({
-    collector_id: collectorFormStore.collectorId,
-    plugin_info: {
-        version: collectorFormState.version,
-        upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-    },
-    tags: collectorFormState.tags,
-});
+const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const params: CollectorUpdateParameter = {
+        collector_id: collectorFormStore.collectorId,
+        plugin_info: {
+            version: collectorFormState.version,
+            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+        },
+        tags: collectorFormState.tags,
+    };
+    return SpaceConnector.client.inventory.collector.update(params);
+};
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -164,7 +168,6 @@ const handleClickCancel = () => {
 const handleClickSave = async () => {
     try {
         state.updateLoading = true;
-        if (!collectorFormState.originCollector) return;
         const collector = await fetchCollectorUpdate();
         collectorFormStore.setOriginCollector(collector);
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');

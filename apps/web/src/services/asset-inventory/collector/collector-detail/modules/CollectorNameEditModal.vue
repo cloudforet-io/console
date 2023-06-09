@@ -28,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
-import type { CollectorModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 
 
 
@@ -47,10 +47,14 @@ const state = reactive({
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const fetchUpdateCollectorName = async (): Promise<CollectorModel> => SpaceConnector.client.inventory.collector.update({
-    collector_id: collectorFormStore.collectorId,
-    name: collectorFormState.name,
-});
+const fetchUpdateCollectorName = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const params: CollectorUpdateParameter = {
+        collector_id: collectorFormStore.collectorId,
+        name: collectorFormState.name,
+    };
+    return SpaceConnector.client.inventory.collector.update(params);
+};
 
 const handleUpdateIsValid = (value: boolean) => {
     state.isAllValid = value;
