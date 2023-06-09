@@ -123,13 +123,17 @@
             <p class="info-label">
                 {{ props.label }}
             </p>
-            <p-toggle-button
-                :value="state.collectorState === COLLECTOR_STATE.ENABLED"
-                :label="state.toggleStatus"
-                :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
-                @change-toggle="handleChangeToggle"
-            />
-            <p-button style-type="transparent">
+            <div @click.stop="handleChangeToggle">
+                <p-toggle-button
+                    :value="state.collectorState === COLLECTOR_STATE.ENABLED"
+                    :label="state.toggleStatus"
+                    :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
+                    @change-toggle="handleChangeToggle"
+                />
+            </div>
+            <p-button style-type="transparent"
+                      @click.stop="handleClickSchedule"
+            >
                 <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
                      name="ic_edit"
                      height="0.75rem"
@@ -217,6 +221,7 @@ const state = reactive({
 
 /* Components */
 const handleChangeToggle = () => {};
+const handleClickSchedule = () => {};
 
 // TODO: temp data will be deleted.
 const TEMP_JOB_STATUS = [

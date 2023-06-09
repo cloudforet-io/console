@@ -194,11 +194,12 @@ interface CollectorPlugin {
 }
 interface CollectorLink {
     name: string;
-    param: CollectorDetailLinkParameter;
+    params: CollectorDetailLinkParameter;
     query: CollectorDetailLinkQuery;
 }
 interface CollectorDetailLinkParameter {
-    id: string;
+    id?: string;
+    collectorId?: string;
 }
 interface CollectorDetailLinkQuery {
     filters: string[];

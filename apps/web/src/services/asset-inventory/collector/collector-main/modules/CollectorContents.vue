@@ -29,7 +29,7 @@
             <div class="collector-lists">
                 <div v-for="item in state.items"
                      :key="item.collectorId"
-                     @click.stop="handleClickListItem(item.detailLink)"
+                     @click="handleClickListItem(item.detailLink)"
                 >
                     <p-card :header="false"
                             style-type="white"
