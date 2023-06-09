@@ -28,7 +28,7 @@
                             />
                             <!--TODO: real data-->
                             <span class="diff-value">75</span>
-                            <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTHS', { month: 2 }) }}</span>
+                            <span class="diff-text">{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH') }}</span>
                         </div>
                     </div>
                 </div>
@@ -177,10 +177,12 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+const apiQueryHelper = new ApiQueryHelper();
 const fetchComplianceData = async (): Promise<ComplianceData> => {
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper
+            .setFilters(state.consoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
             query: {
                 fields: {
@@ -242,8 +244,9 @@ const fetchComplianceData = async (): Promise<ComplianceData> => {
 };
 const fetchSeverityData = async (): Promise<SeverityData[]> => {
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper
+            .setFilters(state.consoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
             query: {
                 group_by: ['data.severity'],
@@ -264,7 +267,7 @@ const fetchSeverityData = async (): Promise<SeverityData[]> => {
 };
 
 /* Util */
-const drawChart = (outerChartData, innerChartData) => {
+const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartData[]) => {
     const chart = chartHelper.createDonutChart({
         radius: percent(100),
         innerRadius: percent(80),
