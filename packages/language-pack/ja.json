@@ -1285,6 +1285,8 @@
 				"DELETE": "削除",
 				"DELETE_TITLE": "この変数を削除しますか？",
 				"DESCRIPTION_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
+				"DESCRIPTION_ASSET_ACCOUNT": "",
+				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "",
 				"DESCRIPTION_GROUP_BY": "特定のオプションに基づいてデータをグループ化し、そのグループのトレンドやパターンを把握することができます。",
 				"DESCRIPTION_PRODUCT": "各クラウドプロバイダーが提供するクラウドコンピューティング製品やサービス",
 				"DESCRIPTION_PROJECT": "プロジェクトにグループ化されたクラウドリソースやサービスの集合体",

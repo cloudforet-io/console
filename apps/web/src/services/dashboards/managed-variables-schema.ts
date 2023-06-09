@@ -82,7 +82,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
-            description: 'Compliance Type Description', // song-lang
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_TYPE'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_key: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
@@ -93,7 +93,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
-            description: 'Account Description', // song-lang
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_key: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
