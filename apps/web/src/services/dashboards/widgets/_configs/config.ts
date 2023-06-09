@@ -55,10 +55,6 @@ export const ASSET_GROUP_BY = {
     // asset reference
     REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
     SERVICE: ASSET_REFERENCE_TYPE_INFO.asset_service.key,
-    /* HACK:
-    *   The group_by originally matched the reference_key(for autocomplete), but the COMPLIANCE_TYPE is different.
-    *   For now, it is hardcoded, but there's a need to manage it through config in the future.
-    */
     COMPLIANCE_TYPE: 'cloud_service_type',
     ACCOUNT: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
 };
