@@ -39,8 +39,8 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.repositoryPlugin = pluginInfo;
         },
         resetForm() {
-            this.setTags(this.originCollector?.tags ?? {});
             this.resetName();
+            this.resetTags();
             this.resetVersion();
             this.resetSchedule();
             // TODO: set attached service account from origin data
@@ -51,6 +51,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         setTags(tags: Tag) {
             this.tags = tags;
         },
+        resetTags() {
+            this.tags = this.originCollector?.tags ?? {};
+        },
         setName(name: string) {
             this.name = name;
         },
@@ -60,14 +63,15 @@ export const useCollectorFormStore = defineStore('collector-form', {
         setVersion(version: string) {
             this.version = version;
         },
+        resetVersion() {
+            this.version = this.originCollector?.plugin_info?.version ?? this.repositoryPlugin?.version ?? '';
+        },
         setAutoUpgrade(autoUpgrade: boolean) {
             this.autoUpgrade = autoUpgrade;
         },
-        resetVersion() {
-            const pluginVersion = this.originCollector?.plugin_info?.version ?? this.repositoryPlugin?.version ?? '';
+        resetAutoUpgrade() {
             const pluginUpgradeMode = this.originCollector?.plugin_info.upgrade_mode ?? 'AUTO';
-            this.setVersion(pluginVersion);
-            this.setAutoUpgrade(pluginUpgradeMode === 'AUTO');
+            this.autoUpgrade = pluginUpgradeMode === 'AUTO';
         },
         resetSchedule(hoursOnly = false) {
             this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
