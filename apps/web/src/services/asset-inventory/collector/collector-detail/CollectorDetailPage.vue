@@ -56,7 +56,9 @@
                               :loading="state.deleteLoading"
                               @confirm="handleDeleteModalConfirm"
         />
-        <collector-name-edit-modal :visible.sync="state.editModalVisible" />
+        <collector-name-edit-modal :visible="state.editModalVisible"
+                                   @update:visible="handleUpdateEditModalVisible"
+        />
     </div>
 </template>
 
@@ -233,7 +235,9 @@ const handleDeleteModalConfirm = async () => {
         state.deleteLoading = false;
     }
 };
-
+const handleUpdateEditModalVisible = (value: boolean) => {
+    state.editModalVisible = value;
+};
 onMounted(async () => {
     collectorFormStore.$reset();
     const collector = await getCollector();
