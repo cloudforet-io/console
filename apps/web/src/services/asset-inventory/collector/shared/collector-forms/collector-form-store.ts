@@ -29,6 +29,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         pluginId(): string|undefined {
             return this.originCollector?.plugin_info.plugin_id ?? this.repositoryPlugin?.plugin_id;
         },
+        provider(): string|undefined {
+            return this.originCollector?.provider;
+        },
     },
     actions: {
         setOriginCollector(collector: CollectorModel) {

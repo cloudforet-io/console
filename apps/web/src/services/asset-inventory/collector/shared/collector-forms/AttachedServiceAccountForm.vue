@@ -32,7 +32,7 @@
                 <p-filterable-dropdown class="specific-service-account-dropdown"
                                        :selected="selectedAttachedServiceAccount"
                                        multi-selectable
-                                       :menu="state.serviceAccountMenu"
+                                       :handler="serviceAccountHandler"
                                        appearance-type="badge"
                                        @update:selected="handleSelectAttachedServiceAccount"
                 />
@@ -48,13 +48,21 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type {
+    AutocompleteHandler,
+} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+
+
 
 interface Props {
     title?: TranslateResult;
@@ -80,30 +88,47 @@ const attachedServiceAccountList = [
     },
 ];
 
+const queryHelper = new QueryHelper();
 const state = reactive({
     selectedAttachedServiceAccountType: 'all' as SelectType,
-    serviceAccountMenu: [{ // TODO: need to change to real data
-        name: 'f5d14ee6-35b4-409c-973b-ebb0420548b5',
-        label: 'Mouse',
-        type: 'item',
-    },
-    {
-        name: '82f0bd12-a630-4307-b9a3-d44f867a72d0',
-        label: 'vortals',
-        type: 'item',
-    },
-    {
-        name: '8845d702-4f89-478e-9227-d90b33c42a60',
-        label: 'Lempira',
-        type: 'item',
-    }] as MenuItem[],
     isAttachedServiceAccountValid: computed<boolean>(() => {
         if (invalidState.selectedAttachedServiceAccount === undefined || state.selectedAttachedServiceAccountType === 'all') {
             return false;
         }
         return !invalidState.selectedAttachedServiceAccount;
     }),
+    handlerParams: computed(() => {
+        queryHelper.setFilters([]); // init filters
+        if (collectorFormStore.provider) {
+            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.provider, o: '=' });
+        }
+        return {
+            resource_type: 'identity.ServiceAccount',
+            options: {
+                limit: 10,
+                filter: queryHelper.apiQuery.filter,
+            },
+        };
+    }),
 });
+
+const serviceAccountHandler: AutocompleteHandler = async (keyword: string) => {
+    try {
+        const res = await SpaceConnector.client.addOns.autocomplete.resource({
+            ...state.handlerParams, search: keyword,
+        });
+        return {
+            results: res.results.map((d) => ({ label: d.name, name: d.key })),
+            totalCount: res.total_count,
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+            totalCount: 0,
+        };
+    }
+};
 
 const {
     forms: {
