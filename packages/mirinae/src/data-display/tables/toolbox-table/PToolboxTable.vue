@@ -126,7 +126,19 @@ const props = withDefaults(defineProps<ToolboxTableProps>(), {
     searchText: '',
     timezone: 'UTC',
 });
-const emit = defineEmits(['selectIndex', 'sortBy', 'sortDesc', 'thisPage', 'pageSize', 'queryTags', 'searchText', 'change', 'export', 'refresh', 'click-settings']);
+const emit = defineEmits([
+    'update:selectIndex',
+    'update:sortBy',
+    'update:sortDesc',
+    'update:thisPage',
+    'update:pageSize',
+    'update:queryTags',
+    'update:searchText',
+    'change',
+    'export',
+    'refresh',
+    'click-settings',
+]);
 const attrs = useAttrs();
 const slots = useSlots();
 

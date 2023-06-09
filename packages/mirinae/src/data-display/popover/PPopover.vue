@@ -75,7 +75,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['isVisible']);
+const emit = defineEmits(['update:isVisible']);
 const attrs = useAttrs();
 
 const listeners = {

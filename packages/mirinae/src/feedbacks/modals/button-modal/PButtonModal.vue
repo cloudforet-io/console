@@ -184,7 +184,6 @@ const props = defineProps({
     },
 });
 const emit = defineEmits([
-    'visible',
     'update:visible',
     'close',
     'return',

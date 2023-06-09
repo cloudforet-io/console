@@ -88,7 +88,7 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(['visible', 'cancel', 'confirm']);
+const emit = defineEmits(['update:visible', 'cancel', 'confirm']);
 const slots = useSlots();
 
 const state = reactive({

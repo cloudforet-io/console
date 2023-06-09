@@ -71,7 +71,7 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(['visible', 'cancel', 'confirm']);
+const emit = defineEmits(['update:visible', 'cancel', 'confirm']);
 const { t } = useI18n();
 
 const state = reactive({

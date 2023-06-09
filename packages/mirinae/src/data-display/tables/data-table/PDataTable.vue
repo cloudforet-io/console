@@ -313,7 +313,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['selectIndex', 'sortBy', 'sortDesc', 'rowLeftClick', 'changeSort']);
+const emit = defineEmits(['update:selectIndex', 'update:sortBy', 'update:sortDesc', 'rowLeftClick', 'changeSort']);
 const { t } = useI18n();
 
 const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map((child) => ({ sortable: true, ...child }));

@@ -100,7 +100,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['unfoldedIndices']);
+const emit = defineEmits(['update:unfoldedIndices']);
 const state = reactive({
     proxyUnfoldedIndices: useProxyValue<number[]>('unfoldedIndices', props, emit),
     collapsibleItems: computed<CollapsibleItem[]>(() => props.items.map((d) => {

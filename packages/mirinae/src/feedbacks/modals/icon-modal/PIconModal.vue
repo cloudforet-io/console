@@ -85,7 +85,7 @@ const props = withDefaults(defineProps<IconModalProps>(), {
     buttonStyleType: BUTTON_STYLE.tertiary,
     backdrop: true,
 });
-const emit = defineEmits<{(e: 'clickButton'): void;}>();
+const emit = defineEmits(['update:visible', 'clickButton']);
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
