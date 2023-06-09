@@ -1,155 +1,158 @@
 <template>
-    <div class="collector-item">
-        <div v-if="props.type === COLLECTOR_ITEM_INFO_TYPE.PLUGIN"
-             class="info-item"
-        >
-            <p class="info-label">
-                {{ props.label }}
-            </p>
-            <div class="plugin">
-                <p-lazy-img :src="props.item.plugin.icon"
-                            width="1.25rem"
-                            height="1.25rem"
-                />
-                <div class="plugin-info">
-                    <span class="plugin-name">{{ state.plugin.name }}</span>
-                    <span class="plugin-version">{{ state.plugin.version }}</span>
-                </div>
-            </div>
-        </div>
-        <div
-            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.STATUS"
-            class="info-item"
-        >
-            <p class="info-label">
-                {{ props.label }}
-            </p>
-            <div class="label-description">
-                <div v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
-                     class="scheduled"
-                >
-                    <p-i
-                        name="ic_alarm-clock"
-                        class="alarm-icon"
-                        height="1.25rem"
-                        width="1.25rem"
-                        color="inherit"
+    <div>
+        <div class="collector-item">
+            <div v-if="props.type === COLLECTOR_ITEM_INFO_TYPE.PLUGIN"
+                 class="info-item"
+            >
+                <p class="info-label">
+                    {{ props.label }}
+                </p>
+                <div class="plugin">
+                    <p-lazy-img :src="props.item.plugin.icon"
+                                width="1.25rem"
+                                height="1.25rem"
                     />
-                    <!-- TODO: will be fixed after the API is completed -->
-                    <p class="description">
-                        Scheduled
-                        <span class="emphasis">
-                            in
-                            <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
-                            <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
-                        </span>
-                    </p>
+                    <div class="plugin-info">
+                        <span class="plugin-name">{{ state.plugin.name }}</span>
+                        <span class="plugin-version">{{ state.plugin.version }}</span>
+                    </div>
                 </div>
-                <!-- TODO: add in-progress state -->
-                <span v-else>
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-                </span>
             </div>
-        </div>
-        <div
-            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.JOBS"
-            class="info-item"
-        >
-            <p class="info-label">
-                {{ props.label }}
-            </p>
-            <div class="jobs-wrapper">
-                <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
-                     :key="`job-item-${index}`"
-                     class="jobs-contents"
-                >
-                    <p-tooltip v-if="jobItems.status === 'success'"
-                               class="icon-fill-wrapper success"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
-                               position="top"
+            <div
+                v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.STATUS"
+                class="info-item"
+            >
+                <p class="info-label">
+                    {{ props.label }}
+                </p>
+                <div class="label-description">
+                    <div v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
+                         class="scheduled"
                     >
-                        <!-- TODO: link with job detail page using job id after the API is completed -->
-                        <router-link :to="props.item.detailLink">
+                        <p-i
+                            name="ic_alarm-clock"
+                            class="alarm-icon"
+                            height="1.25rem"
+                            width="1.25rem"
+                            color="inherit"
+                        />
+                        <!-- TODO: will be fixed after the API is completed -->
+                        <p class="description">
+                            Scheduled
+                            <span class="emphasis">
+                                in
+                                <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
+                                <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
+                            </span>
+                        </p>
+                    </div>
+                    <!-- TODO: add in-progress state -->
+                    <span v-else>
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                    </span>
+                </div>
+            </div>
+            <div
+                v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.JOBS"
+                class="info-item"
+            >
+                <p class="info-label">
+                    {{ props.label }}
+                </p>
+                <div class="jobs-wrapper">
+                    <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
+                         :key="`job-item-${index}`"
+                         class="jobs-contents"
+                    >
+                        <p-tooltip v-if="jobItems.status === 'success'"
+                                   class="icon-fill-wrapper success"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   position="top"
+                        >
+                            <!-- TODO: link with job detail page using job id after the API is completed -->
+                            <router-link :to="props.item.detailLink">
+                                <p-i
+                                    name="ic_check"
+                                    class="icon success"
+                                    height="1rem"
+                                    width="1rem"
+                                    color="inherit"
+                                />
+                            </router-link>
+                        </p-tooltip>
+                        <p-tooltip v-if="jobItems.status === 'progress'"
+                                   class="icon-fill-wrapper progress"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
+                                   position="top"
+                        >
                             <p-i
-                                name="ic_check"
-                                class="icon success"
+                                name="ic_settings-filled"
+                                class="icon progress"
                                 height="1rem"
                                 width="1rem"
                                 color="inherit"
                             />
-                        </router-link>
-                    </p-tooltip>
-                    <p-tooltip v-if="jobItems.status === 'progress'"
-                               class="icon-fill-wrapper progress"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
-                               position="top"
-                    >
-                        <p-i
-                            name="ic_settings-filled"
-                            class="icon progress"
-                            height="1rem"
-                            width="1rem"
-                            color="inherit"
+                        </p-tooltip>
+                        <p-tooltip v-if="jobItems.status === 'error'"
+                                   class="icon-fill-wrapper error"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   position="top"
                         />
-                    </p-tooltip>
-                    <p-tooltip v-if="jobItems.status === 'error'"
-                               class="icon-fill-wrapper error"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
-                               position="top"
-                    />
-                    <p-tooltip v-if="!jobItems.status"
-                               class="icon-fill-wrapper none"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
-                               position="top"
-                    />
+                        <p-tooltip v-if="!jobItems.status"
+                                   class="icon-fill-wrapper none"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
+                                   position="top"
+                        />
+                    </div>
+                </div>
+                <div class="to-history-detail">
+                    <router-link :to="props.item.historyLink">
+                        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+                        <p-i
+                            name="ic_chevron-right"
+                            width="0.75rem"
+                            height="0.75rem"
+                            color="inherit transparent"
+                        />
+                    </router-link>
                 </div>
             </div>
-            <div class="to-history-detail">
-                <router-link :to="props.item.historyLink">
-                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-                    <p-i
-                        name="ic_chevron-right"
-                        width="0.75rem"
-                        height="0.75rem"
-                        color="inherit transparent"
-                    />
-                </router-link>
-            </div>
-        </div>
-        <div
-            v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE"
-            class="info-item"
-        >
-            <p class="info-label">
-                {{ props.label }}
-            </p>
-            <div @click.stop="handleChangeToggle">
-                <p-toggle-button
-                    :value="state.collectorState === COLLECTOR_STATE.ENABLED"
-                    :label="state.toggleStatus"
-                    :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
-                    @change-toggle="handleChangeToggle"
-                />
-            </div>
-            <p-button style-type="transparent"
-                      @click.stop="handleClickSchedule"
+            <div
+                v-else-if="props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE"
+                class="info-item"
             >
-                <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
-                     name="ic_edit"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                <p-i v-else
-                     name="ic_settings-filled"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                {{ state.collectorState === COLLECTOR_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
-            </p-button>
+                <p class="info-label">
+                    {{ props.label }}
+                </p>
+                <div @click.stop="handleChangeToggle">
+                    <p-toggle-button
+                        :value="state.collectorState === COLLECTOR_STATE.ENABLED"
+                        :label="state.toggleStatus"
+                        :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
+                        @change-toggle="handleChangeToggle"
+                    />
+                </div>
+                <p-button style-type="transparent"
+                          @click.stop="handleClickSchedule"
+                >
+                    <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
+                         name="ic_edit"
+                         height="0.75rem"
+                         width="0.75rem"
+                         color="inherit"
+                         class="icon-schedule"
+                    />
+                    <p-i v-else
+                         name="ic_settings-filled"
+                         height="0.75rem"
+                         width="0.75rem"
+                         color="inherit"
+                         class="icon-schedule"
+                    />
+                    <!-- TODO: changed condition after API spec checking -->
+                    {{ state.collectorState === COLLECTOR_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                </p-button>
+            </div>
         </div>
     </div>
 </template>
@@ -166,6 +169,7 @@ import { store } from '@/store';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
 
@@ -183,6 +187,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+const collectorScheduleStore = useCollectorFormStore();
 
 const { i18nDayjs } = useI18nDayjs();
 
@@ -221,7 +226,12 @@ const state = reactive({
 
 /* Components */
 const handleChangeToggle = () => {};
-const handleClickSchedule = () => {};
+const handleClickSchedule = () => {
+    collectorPageStore.$patch({
+        visibleModal: true,
+    });
+    collectorScheduleStore.setOriginCollector(props.item.origin);
+};
 
 // TODO: temp data will be deleted.
 const TEMP_JOB_STATUS = [
