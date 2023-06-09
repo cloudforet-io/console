@@ -29,7 +29,7 @@
         />
     </nav>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
@@ -37,129 +37,116 @@ import {
 import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-export default {
-    name: 'PPagination',
-    components: { PIconButton },
-    props: {
-        thisPage: {
-            type: Number,
-            validator(value) {
-                return value > 0;
-            },
-            default: 1,
+const props = defineProps({
+    thisPage: {
+        type: Number,
+        validator(value: number) {
+            return value > 0;
         },
-        pageSize: {
-            type: Number,
-            default: 15,
-        },
-        totalCount: {
-            type: Number,
-            required: true,
-        },
+        default: 1,
     },
-    setup(props, { emit }) {
-        // pagination logic
-        const paginate = (
-            totalItems,
-            currentPage,
-            pageSize,
-            maxPages,
-        ) => {
-            // calculate total pages
-            const totalPages = Math.ceil(totalItems / pageSize);
-
-            // ensure current page isn't out of range
-            if (currentPage < 1) {
-                // eslint-disable-next-line no-param-reassign
-                currentPage = 1;
-            } else if (currentPage > totalPages) {
-                // eslint-disable-next-line no-param-reassign
-                currentPage = totalPages;
-            }
-
-            let startPage: number; let endPage: number;
-            if (totalPages <= maxPages) {
-                // total pages less than max so show all pages
-                startPage = 1;
-                endPage = totalPages > startPage ? totalPages : startPage;
-            } else {
-                // total pages more than max so calculate start and end pages
-                const maxPagesBeforeCurrentPage = Math.floor(maxPages / 2);
-                const maxPagesAfterCurrentPage = Math.ceil(maxPages / 2) - 1;
-                if (currentPage <= maxPagesBeforeCurrentPage) {
-                    // current page near the start
-                    startPage = 1;
-                    endPage = maxPages;
-                } else if (currentPage + maxPagesAfterCurrentPage >= totalPages) {
-                    // current page near the end
-                    startPage = totalPages - maxPages + 1;
-                    endPage = totalPages;
-                } else {
-                    // current page somewhere in the middle
-                    startPage = currentPage - maxPagesBeforeCurrentPage;
-                    endPage = currentPage + maxPagesAfterCurrentPage;
-                }
-            }
-
-            // calculate start and end item indexes
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
-
-            // create an array of pages to ng-repeat in the pager control
-            const pages = Array.from(Array((endPage + 1) - startPage).keys()).map((i) => startPage + i);
-
-            // return object with all pager properties required by the view
-            return {
-                totalItems,
-                currentPage,
-                pageSize,
-                totalPages,
-                startPage,
-                endPage,
-                startIndex,
-                endIndex,
-                pages,
-            };
-        };
-        const pageList = computed(() => paginate(props.totalCount, props.thisPage, props.pageSize, 10));
-
-        const proxyState = reactive({
-            thisPage: useProxyValue<number>('thisPage', props, emit),
-            pageSize: useProxyValue<number>('pageSize', props, emit),
-        });
-
-        const clickPage = (page) => {
-            proxyState.thisPage = page;
-            emit('click-page', page);
-            emit('change', page);
-        };
-
-        const prevPage = () => {
-            let page = proxyState.thisPage - 1;
-            if (page <= 0) page = 1;
-            proxyState.thisPage = page;
-            emit('click-prev', page);
-            emit('change', page);
-        };
-
-        const nextPage = () => {
-            const page = proxyState.thisPage + 1;
-            proxyState.thisPage = page;
-            emit('click-next', page);
-            emit('change', page);
-        };
-
-        return {
-            paginate,
-            pageList,
-            proxyState,
-            clickPage,
-            // updatePage,
-            prevPage,
-            nextPage,
-        };
+    pageSize: {
+        type: Number,
+        default: 15,
     },
+    totalCount: {
+        type: Number,
+        required: true,
+    },
+});
+const emit = defineEmits(['update:thisPage', 'update:pageSize', 'change', 'click-page', 'click-prev', 'click-next']);
+
+// pagination logic
+const paginate = (
+    totalItems,
+    currentPage,
+    pageSize,
+    maxPages,
+) => {
+    // calculate total pages
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // ensure current page isn't out of range
+    if (currentPage < 1) {
+        // eslint-disable-next-line no-param-reassign
+        currentPage = 1;
+    } else if (currentPage > totalPages) {
+        // eslint-disable-next-line no-param-reassign
+        currentPage = totalPages;
+    }
+
+    let startPage: number; let endPage: number;
+    if (totalPages <= maxPages) {
+        // total pages less than max so show all pages
+        startPage = 1;
+        endPage = totalPages > startPage ? totalPages : startPage;
+    } else {
+        // total pages more than max so calculate start and end pages
+        const maxPagesBeforeCurrentPage = Math.floor(maxPages / 2);
+        const maxPagesAfterCurrentPage = Math.ceil(maxPages / 2) - 1;
+        if (currentPage <= maxPagesBeforeCurrentPage) {
+            // current page near the start
+            startPage = 1;
+            endPage = maxPages;
+        } else if (currentPage + maxPagesAfterCurrentPage >= totalPages) {
+            // current page near the end
+            startPage = totalPages - maxPages + 1;
+            endPage = totalPages;
+        } else {
+            // current page somewhere in the middle
+            startPage = currentPage - maxPagesBeforeCurrentPage;
+            endPage = currentPage + maxPagesAfterCurrentPage;
+        }
+    }
+
+    // calculate start and end item indexes
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
+
+    // create an array of pages to ng-repeat in the pager control
+    const pages = Array.from(Array((endPage + 1) - startPage).keys()).map((i) => startPage + i);
+
+    // return object with all pager properties required by the view
+    return {
+        totalItems,
+        currentPage,
+        pageSize,
+        totalPages,
+        startPage,
+        endPage,
+        startIndex,
+        endIndex,
+        pages,
+    };
 };
+const pageList = computed(() => paginate(props.totalCount, props.thisPage, props.pageSize, 10));
+
+const proxyState = reactive({
+    thisPage: useProxyValue<number>('thisPage', props, emit),
+    pageSize: useProxyValue<number>('pageSize', props, emit),
+});
+
+const clickPage = (page) => {
+    proxyState.thisPage = page;
+    emit('click-page', page);
+    emit('change', page);
+};
+
+const prevPage = () => {
+    let page = proxyState.thisPage - 1;
+    if (page <= 0) page = 1;
+    proxyState.thisPage = page;
+    emit('click-prev', page);
+    emit('change', page);
+};
+
+const nextPage = () => {
+    const page = proxyState.thisPage + 1;
+    proxyState.thisPage = page;
+    emit('click-next', page);
+    emit('change', page);
+};
+
 </script>
 
 <style lang="postcss" scoped>

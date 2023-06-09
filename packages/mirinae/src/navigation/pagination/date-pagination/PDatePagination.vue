@@ -2,7 +2,7 @@
     <nav class="p-date-pagination">
         <div class="date-text-wrapper">
             <div class="date-text">
-                {{ dateText }}
+                {{ state.dateText }}
             </div>
         </div>
         <p-icon-button class="text"
@@ -13,100 +13,78 @@
         <p-icon-button class="text"
                        name="ic_chevron-right"
                        color="inherit transparent"
-                       :disabled="nextButtonDisabled"
+                       :disabled="state.nextButtonDisabled"
                        @click="onClickNext"
         />
     </nav>
 </template>
 
-<script lang="ts">
-import {
-    reactive, toRefs, computed,
-} from 'vue';
+<script setup lang="ts">
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-
+import {
+    reactive, computed,
+} from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import type { DatePaginationProps } from '@/navigation/pagination/date-pagination/type';
 
 dayjs.extend(isSameOrAfter);
 
-export default {
-    name: 'PDatePagination',
-    components: { PIconButton },
-    props: {
-        date: {
-            type: Object,
-            default: () => dayjs(),
-        },
-        type: {
-            type: String,
-            default: 'month',
-        },
-        allowFuture: {
-            type: Boolean,
-            default: false,
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-    },
-    setup(props: DatePaginationProps, { emit }) {
-        const state = reactive({
-            dateText: computed(() => {
-                const weekStart = props.date.startOf('week').format('MM');
-                const weekEnd = props.date.endOf('week').format('MM');
-                if (props.type === 'week') {
-                    if (weekStart !== weekEnd) {
-                        return `${weekStart} - ${weekEnd}, ${props.date.format('YYYY')}`;
-                    }
-                    return `${props.date.format('MM')}, ${props.date.format('YYYY')}`;
-                }
-                return props.date.format('YYYY-MM');
-            }),
-            nextButtonDisabled: computed(() => {
-                if (props.allowFuture) {
-                    return false;
-                }
-                const now = dayjs().tz(props.timezone);
-                if (props.type === 'month') {
-                    return now.format('YYYY-MM') === state.dateText;
-                }
-                const weekStart = now.startOf('week');
-                return props.date.isSameOrAfter(weekStart, 'day');
-            }),
-        });
+const props = withDefaults(defineProps<DatePaginationProps>(), {
+    date: () => dayjs(),
+    type: 'month',
+    allowFuture: false,
+    timezone: 'UTC',
+});
+const emit = defineEmits(['update:date']);
 
-        const onClickPrev = () => {
-            let prevDate: Dayjs;
-            if (props.type === 'month') {
-                prevDate = props.date.subtract(1, 'month').endOf('month');
-            } else {
-                prevDate = props.date.subtract(1, 'week').endOf('week');
+const state = reactive({
+    dateText: computed(() => {
+        const weekStart = props.date.startOf('week').format('MM');
+        const weekEnd = props.date.endOf('week').format('MM');
+        if (props.type === 'week') {
+            if (weekStart !== weekEnd) {
+                return `${weekStart} - ${weekEnd}, ${props.date.format('YYYY')}`;
             }
-            emit('update:date', prevDate);
-        };
-        const onClickNext = () => {
-            let nextDate: Dayjs;
-            if (props.type === 'month') {
-                nextDate = props.date.add(1, 'month').endOf('month');
-            } else {
-                nextDate = props.date.add(1, 'week').endOf('week');
-            }
-            emit('update:date', nextDate);
-        };
+            return `${props.date.format('MM')}, ${props.date.format('YYYY')}`;
+        }
+        return props.date.format('YYYY-MM');
+    }),
+    nextButtonDisabled: computed(() => {
+        if (props.allowFuture) {
+            return false;
+        }
+        const now = dayjs().tz(props.timezone);
+        if (props.type === 'month') {
+            return now.format('YYYY-MM') === state.dateText;
+        }
+        const weekStart = now.startOf('week');
+        return props.date.isSameOrAfter(weekStart, 'day');
+    }),
+});
 
-        return {
-            ...toRefs(state),
-            onClickPrev,
-            onClickNext,
-        };
-    },
+const onClickPrev = () => {
+    let prevDate: Dayjs;
+    if (props.type === 'month') {
+        prevDate = props.date.subtract(1, 'month').endOf('month');
+    } else {
+        prevDate = props.date.subtract(1, 'week').endOf('week');
+    }
+    emit('update:date', prevDate);
 };
+const onClickNext = () => {
+    let nextDate: Dayjs;
+    if (props.type === 'month') {
+        nextDate = props.date.add(1, 'month').endOf('month');
+    } else {
+        nextDate = props.date.add(1, 'week').endOf('week');
+    }
+    emit('update:date', nextDate);
+};
+
 </script>
 
 <style lang="postcss">

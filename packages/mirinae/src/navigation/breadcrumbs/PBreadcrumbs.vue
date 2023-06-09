@@ -36,7 +36,7 @@
                 >
                     <span v-if="idx !== routes.length - 1"
                           class="link"
-                          @click="$emit('click', route, idx)"
+                          @click="handleClick(route, idx)"
                     >{{ route.name }}</span>
                     <span v-else
                           class="current-page"
@@ -71,9 +71,8 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent, reactive } from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
 import type { RouteLocation } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -90,42 +89,26 @@ interface Props {
     copiable?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'PBreadcrumbs',
-    components: {
-        PCopyButton,
-        PI,
-    },
-    props: {
-        routes: {
-            type: Array as PropType<Route[]>,
-            default: () => [],
-        },
-        copiable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            isShown: false,
-        });
-        const getLocation = (route: Route): Location => {
-            if (route.to) return route.to;
-            if (route.path) return { path: route.path };
-            return {};
-        };
-        const showHidden = () => { state.isShown = true; };
-        const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
-
-        return {
-            state,
-            getLocation,
-            showHidden,
-            isLengthOverFive,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    routes: () => [],
+    copiable: false,
 });
+const emit = defineEmits(['click']);
+
+const state = reactive({
+    isShown: false,
+});
+const getLocation = (route: Route): RouteLocation => {
+    if (route.to) return route.to;
+    if (route.path) return { path: route.path } as RouteLocation;
+    return {} as RouteLocation;
+};
+const showHidden = () => { state.isShown = true; };
+const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
+const handleClick = (route: Route, index: number) => {
+    emit('click', route, index);
+};
+
 </script>
 
 <style lang="postcss">
