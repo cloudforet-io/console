@@ -2,7 +2,7 @@
     <span v-tooltip.bottom="invalid ? errorMessage : ''"
           class="p-tag"
           :class="{deletable: deletable, selected: selected, outline: outline, invalid: invalid}"
-          v-on="$listeners"
+          v-on="listeners"
     >
         <p-i v-if="invalid"
              class="invalid-icon"
@@ -29,14 +29,13 @@
              height="1rem"
              class="delete-icon"
              color="inherit"
-             @click.stop="$emit('delete')"
+             @click.stop="handleDelete"
         />
     </span>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useAttrs } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import type { CategoryItem, KeyItem, ValueItem } from '@/inputs/search/query-search/type';
@@ -52,49 +51,26 @@ interface Props {
     errorMessage?: string;
 }
 
-export default defineComponent<Props>({
-    name: 'PTag',
-    components: {
-        PI,
-    },
-    props: {
-        keyItem: {
-            type: Object as PropType<KeyItem>,
-            default: undefined,
-        },
-        valueItem: {
-            type: Object as PropType<ValueItem>,
-            default: undefined,
-        },
-        categoryItem: {
-            type: Object as PropType<CategoryItem>,
-            default: undefined,
-        },
-        deletable: {
-            type: Boolean,
-            default: true,
-        },
-        outline: {
-            type: Boolean,
-            default: false,
-        },
-        selected: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        errorMessage: {
-            type: String,
-            default: '',
-        },
-    },
-    setup() {
-        return { };
-    },
+withDefaults(defineProps<Props>(), {
+    keyItem: undefined,
+    categoryItem: undefined,
+    deletable: true,
+    outline: false,
+    selected: false,
+    invalid: false,
+    errorMessage: '',
 });
+const emit = defineEmits(['delete']);
+const attrs = useAttrs();
+
+const handleDelete = () => {
+    emit('delete');
+};
+
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss">

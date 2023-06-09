@@ -3,18 +3,15 @@
     <div class="p-markdown" v-html="md" :class="{'remove-spacing': removeSpacing}" />
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
-
+<script setup lang="ts">
 import DOMPurify from 'dompurify';
 import { render } from 'ejs';
 import hljs from 'highlight.js';
 import { get } from 'lodash';
 import { marked } from 'marked';
+import { computed } from 'vue';
 
 import type { MarkdownProps } from '@/data-display/markdown/type';
-
-
 
 marked.setOptions({
     gfm: true,
@@ -28,48 +25,24 @@ marked.setOptions({
 });
 const DEFAULT_LANGUAGE = 'en';
 
-export default defineComponent<MarkdownProps>({
-    name: 'PMarkdown',
-    props: {
-        markdown: {
-            type: [String, Object],
-            default: '',
-        },
-        data: {
-            type: Object,
-            default: undefined,
-        },
-        language: {
-            type: String,
-            default: 'en',
-        },
-        removeSpacing: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
-        const md = computed(() => {
-            let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
-            if (props.data) {
-                doc = render(doc, props.data);
-            }
-            marked.parse(doc, (error, parseResult) => {
-                if (error) console.error('[Mirinae] Markdown parsing error: ', error);
-                else {
-                    doc = parseResult.replace(/<pre>/g, '<pre class="hljs"').replace(/<a /g, '<a target="_blank"');
-                }
-            });
+const props = defineProps<MarkdownProps>();
 
-            return DOMPurify.sanitize(doc, { ADD_ATTR: ['target'] });
-        });
+const getI18nMd = (md: any) => get(md, props.language, md[DEFAULT_LANGUAGE] || Object.values(md)[0] || '');
+const md = computed(() => {
+    let doc = typeof props.markdown === 'object' ? getI18nMd(props.markdown) : props.markdown || '';
+    if (props.data) {
+        doc = render(doc, props.data);
+    }
+    marked.parse(doc, (error, parseResult) => {
+        if (error) console.error('[Mirinae] Markdown parsing error: ', error);
+        else {
+            doc = parseResult.replace(/<pre>/g, '<pre class="hljs"').replace(/<a /g, '<a target="_blank"');
+        }
+    });
 
-        return {
-            md,
-        };
-    },
+    return DOMPurify.sanitize(doc, { ADD_ATTR: ['target'] });
 });
+
 </script>
 
 <style lang="postcss">

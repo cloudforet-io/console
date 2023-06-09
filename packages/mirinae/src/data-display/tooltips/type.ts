@@ -12,3 +12,5 @@ export const POSITIONS = {
     'left-start': 'left-start',
     'left-end': 'left-end',
 } as const;
+
+export type TooltipPositions = typeof POSITIONS[keyof typeof POSITIONS];

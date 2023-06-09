@@ -1,7 +1,7 @@
 <template>
     <span class="p-status"
           :class="{[theme]: !!theme}"
-          v-on="$listeners"
+          v-on="listeners"
     >
         <template v-if="theme">
             <p-i v-if="icon"
@@ -40,69 +40,65 @@
     </span>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed, useAttrs } from 'vue';
 
 import { themes } from '@/data-display/status/config';
-import type { StatusProps } from '@/data-display/status/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import { getColor } from '@/utils/helpers';
 
-export default defineComponent<StatusProps>({
-    name: 'PStatus',
-    components: { PI },
-    props: {
-        icon: {
-            type: String,
-            default: null,
-        },
-        text: {
-            type: String,
-            default: null,
-        },
-        textColor: {
-            type: String,
-            default: null,
-        },
-        iconColor: {
-            type: String,
-            default: null,
-        },
-        theme: {
-            type: String,
-            default: null,
-            validator(theme: string|null) {
-                return theme === null || themes.includes(theme);
-            },
-        },
-        disableIcon: {
-            type: Boolean,
-            default: false,
-        },
-        iconSize: {
-            type: Number,
-            default: 1,
-        },
-        iconAnimation: {
-            type: String,
-            default: undefined,
-            validator(animation: any) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
+const props = defineProps({
+    icon: {
+        type: String,
+        default: null,
+    },
+    text: {
+        type: String,
+        default: null,
+    },
+    textColor: {
+        type: String,
+        default: null,
+    },
+    iconColor: {
+        type: String,
+        default: null,
+    },
+    theme: {
+        type: String,
+        default: null,
+        validator(theme: string|null) {
+            return theme === null || themes.includes(theme);
         },
     },
-    setup(props: StatusProps) {
-        const labelColor = computed(() => getColor(props.textColor));
-        const circleColor = computed(() => getColor(props.iconColor));
-        const realIconColor = computed(() => getColor(props.iconColor));
-        return {
-            labelColor,
-            circleColor,
-            realIconColor,
-        };
+    disableIcon: {
+        type: Boolean,
+        default: false,
+    },
+    iconSize: {
+        type: Number,
+        default: 1,
+    },
+    iconAnimation: {
+        type: String,
+        default: undefined,
+        validator(animation: any) {
+            return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+        },
     },
 });
+
+const attrs = useAttrs();
+
+const labelColor = computed(() => getColor(props.textColor));
+const circleColor = computed(() => getColor(props.iconColor));
+const realIconColor = computed(() => getColor(props.iconColor));
+
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss">

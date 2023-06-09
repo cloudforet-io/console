@@ -2,95 +2,99 @@
     <div class="progress-bar"
          :class="size"
     >
-        <label v-if="label || $scopedSlots.label" class="label">
+        <label v-if="label || slots.label"
+               class="label"
+        >
             <slot name="label">
                 {{ label }}
             </slot>
         </label>
-        <div ref="backgroundBar" class="background-bar" />
-        <transition appear @before-appear="beforeEnter"
+        <div ref="backgroundBar"
+             class="background-bar"
+        />
+        <transition appear
+                    @before-appear="beforeEnter"
                     @after-appear="enter"
         >
-            <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
+            <div ref="progressBar"
+                 class="tracker-bar"
+                 :style="state.progressBarStyle"
+            />
         </transition>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, reactive, toRefs, useSlots, watch,
 } from 'vue';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
-import type { ProgressBarProps } from '@/data-display/progress-bar/type';
 
-
-export default defineComponent<ProgressBarProps>({
-    name: 'PProgressBar',
-    props: {
-        percentage: {
-            type: Number,
-            default: 0,
-        },
-        label: {
-            type: String,
-            default: undefined,
-        },
-        color: {
-            type: String,
-            default: undefined,
-        },
-        gradient: {
-            type: Object,
-            default: undefined,
-        },
-        size: {
-            type: String,
-            default: PROGRESS_BAR_SIZE.md,
-            validator(size: any) {
-                return Object.values(PROGRESS_BAR_SIZE).includes(size);
-            },
-        },
-        disableAnimation: {
-            type: Boolean,
-            default: false,
+const props = defineProps({
+    percentage: {
+        type: Number,
+        default: 0,
+    },
+    label: {
+        type: String,
+        default: undefined,
+    },
+    color: {
+        type: String,
+        default: undefined,
+    },
+    gradient: {
+        type: Object,
+        default: undefined,
+    },
+    size: {
+        type: String,
+        default: PROGRESS_BAR_SIZE.md,
+        validator(size: any) {
+            return Object.values(PROGRESS_BAR_SIZE).includes(size);
         },
     },
-    setup(props) {
-        const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
-        const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
-
-        const state = reactive({
-            progressBar: null as HTMLElement | null,
-            progressBarStyle: computed(() => ({
-                background: props.gradient ? linearGradientProperty
-                    : (props.color ?? defaultTrackerBarColor),
-                transition: props.disableAnimation ? undefined : 'width 0.5s linear',
-            })),
-        });
-
-        const beforeEnter = (element) => {
-            element.style.width = props.disableAnimation ? `${props.percentage}%` : 0;
-        };
-
-        const enter = (element) => {
-            element.style.width = `${props.percentage}%`;
-            element.style.transition = 'width 1s linear';
-        };
-
-        watch(() => props.percentage, (after, before) => {
-            if (after !== before) {
-                enter(state.progressBar);
-            }
-        });
-
-        return {
-            ...toRefs(state),
-            beforeEnter,
-            enter,
-        };
+    disableAnimation: {
+        type: Boolean,
+        default: false,
     },
 });
+
+const slots = useSlots();
+
+const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
+const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
+
+const state = reactive({
+    progressBarStyle: computed(() => ({
+        background: props.gradient ? linearGradientProperty
+            : (props.color ?? defaultTrackerBarColor),
+        transition: props.disableAnimation ? undefined : 'width 0.5s linear',
+    })),
+});
+
+const refState = reactive({
+    progressBar: null as HTMLElement | null,
+});
+
+const beforeEnter = (element) => {
+    element.style.width = props.disableAnimation ? `${props.percentage}%` : 0;
+};
+
+const enter = (element) => {
+    element.style.width = `${props.percentage}%`;
+    element.style.transition = 'width 1s linear';
+};
+
+watch(() => props.percentage, (after, before) => {
+    if (after !== before) {
+        enter(refState.progressBar);
+    }
+});
+
+const { progressBar } = toRefs(refState);
+
 </script>
 
 <style lang="postcss">

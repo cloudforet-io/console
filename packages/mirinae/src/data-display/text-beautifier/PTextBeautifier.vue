@@ -1,60 +1,50 @@
 <template>
-    <component :is="tag" class="p-text-beautifier">
-        <template v-if="matchList.length > 0">
-            {{ matchList[0].index > 0 ? stringValue.substring(0, matchList[0].index) : '' }}
-            <template v-for="({ lastIndex, text, url}, matchIndex) in matchList">
-                <a :key="matchIndex" :href="url" target="_blank">
+    <component :is="tag"
+               class="p-text-beautifier"
+    >
+        <template v-if="state.matchList.length > 0">
+            {{ state.matchList[0].index > 0 ? state.stringValue.substring(0, state.matchList[0].index) : '' }}
+            <template v-for="({ lastIndex, text, url}, matchIndex) in state.matchList"
+                      :key="matchIndex"
+            >
+                <a :href="url"
+                   target="_blank"
+                >
                     {{ text }}
                 </a>
-                {{ stringValue.substring(lastIndex, matchList[matchIndex + 1] ? matchList[matchIndex + 1].index : undefined) }}
+                {{ state.stringValue.substring(lastIndex, state.matchList[matchIndex + 1] ? state.matchList[matchIndex + 1].index : undefined) }}
             </template>
         </template>
         <template v-else>
-            {{ stringValue }}
+            {{ state.stringValue }}
         </template>
     </component>
 </template>
 
-<script lang="ts">
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from 'vue';
-
+<script setup lang="ts">
 import linkifyIt from 'linkify-it';
+import { computed, reactive } from 'vue';
 
 interface TextBeautifierProps {
-    value: any
+    value: any,
+    tag?: string,
 }
 
 const linkify = linkifyIt();
 
-export default defineComponent<TextBeautifierProps>({
-    name: 'PTextBeautifier',
-    props: {
-        value: {
-            type: [String, Number, Boolean, Array, Object],
-            default: '',
-        },
-        tag: {
-            type: String,
-            default: 'span',
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            stringValue: computed(() => {
-                if (typeof props.value === 'string') return props.value;
-                return props.value?.toString() ?? '';
-            }),
-            matchList: computed(() => linkify.match(props.value) ?? []),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<TextBeautifierProps>(), {
+    value: '',
+    tag: 'span',
 });
+
+const state = reactive({
+    stringValue: computed(() => {
+        if (typeof props.value === 'string') return props.value;
+        return props.value?.toString() ?? '';
+    }),
+    matchList: computed(() => linkify.match(props.value) ?? []),
+});
+
 </script>
 
 <style lang="postcss">
