@@ -6,7 +6,7 @@
             <slot name="default" />
         </div>
         <transition name="slide-fade">
-            <div v-if="proxyVisible"
+            <div v-if="state.proxyVisible"
                  class="sidebar-wrapper"
                  :class="{[size]: true, 'fixed-size': isFixedSize}"
             >
@@ -14,7 +14,7 @@
                      :style="{'overflow-y': disableScroll ? 'unset' : 'auto'}"
                 >
                     <p class="title"
-                       :class="{'mb-4': !!title || !!$scopedSlots.title}"
+                       :class="{'mb-4': !!title || !!slots.title}"
                     >
                         <slot name="title">
                             {{ title }}
@@ -38,9 +38,9 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, useAttrs, useSlots,
 } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
@@ -49,69 +49,63 @@ import {
     SIZE as SIDEBAR_SIZE,
 } from '@/layouts/sidebar/type';
 
-export default defineComponent({
-    name: 'PSidebar',
-    components: { PIconButton },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
+const props = defineProps({
+    visible: {
+        type: Boolean,
+        default: false,
+        required: true,
     },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-            required: true,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        styleType: {
-            type: String,
-            default: SIDEBAR_STYLE_TYPE.primary,
-            validator: (value) => Object.keys(SIDEBAR_STYLE_TYPE).includes(value as string),
-        },
-        size: {
-            type: String,
-            default: SIDEBAR_SIZE.md,
-            validator: (value) => Object.keys(SIDEBAR_SIZE).includes(value as string),
-        },
-        isFixedSize: {
-            type: Boolean,
-            default: false,
-        },
-        hideCloseButton: {
-            type: Boolean,
-            default: false,
-        },
-        disableScroll: {
-            type: Boolean,
-            default: false,
-        },
+    title: {
+        type: String,
+        default: '',
     },
-    setup(props, { emit, listeners }) {
-        const state = reactive({
-            proxyVisible: listeners.close || listeners['update:visible'] ? computed({
-                get() {
-                    return props.visible;
-                },
-                set() {
-                    emit('update:visible');
-                    emit('close');
-                },
-            }) : props.visible,
-        });
-
-        const onClickClose = () => {
-            state.proxyVisible = false;
-        };
-
-        return {
-            ...toRefs(state),
-            onClickClose,
-        };
+    styleType: {
+        type: String,
+        default: SIDEBAR_STYLE_TYPE.primary,
+        validator: (value) => Object.keys(SIDEBAR_STYLE_TYPE).includes(value as string),
+    },
+    size: {
+        type: String,
+        default: SIDEBAR_SIZE.md,
+        validator: (value) => Object.keys(SIDEBAR_SIZE).includes(value as string),
+    },
+    isFixedSize: {
+        type: Boolean,
+        default: false,
+    },
+    hideCloseButton: {
+        type: Boolean,
+        default: false,
+    },
+    disableScroll: {
+        type: Boolean,
+        default: false,
     },
 });
+const emit = defineEmits(['update:visible', 'close']);
+const attrs = useAttrs();
+const slots = useSlots();
+
+const listeners = {
+    ...attrs,
+};
+
+const state = reactive({
+    proxyVisible: (listeners.close && typeof listeners.close) || listeners['update:visible'] ? computed({
+        get() {
+            return props.visible;
+        },
+        set() {
+            emit('update:visible');
+            emit('close');
+        },
+    }) : props.visible,
+});
+
+const onClickClose = () => {
+    state.proxyVisible = false;
+};
+
 </script>
 
 <style lang="postcss">

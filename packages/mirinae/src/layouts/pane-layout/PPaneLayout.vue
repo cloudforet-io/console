@@ -1,13 +1,19 @@
 <template>
-    <div class="p-pane-layout" v-on="$listeners">
+    <div class="p-pane-layout"
+         v-on="listeners"
+    >
         <slot />
     </div>
 </template>
 
-<script lang="ts">
-export default {
-    name: 'PPaneLayout',
+<script setup lang="ts">
+import { useAttrs } from 'vue';
+
+const attrs = useAttrs();
+const listeners = {
+    ...attrs,
 };
+
 </script>
 
 <style lang="postcss">
