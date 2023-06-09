@@ -1,6 +1,6 @@
 <template>
     <p-button-modal class="collector-schedule-modal"
-                    :header-title="props.state === 'set' ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') "
+                    :header-title="props.editMode ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') "
                     size="md"
                     fade
                     backdrop
@@ -22,11 +22,11 @@ import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
 interface IProps {
-    state: string
+    editMode: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
-    state: 'set',
+    editMode: false,
 });
 
 const collectorPageStore = useCollectorPageStore();

@@ -54,7 +54,7 @@
             </template>
         </p-data-loader>
         <!-- TODO: changed condition after API spec checking -->
-        <collector-schedule-modal :state="'edit'" />
+        <collector-schedule-modal edit-mode />
     </div>
 </template>
 
