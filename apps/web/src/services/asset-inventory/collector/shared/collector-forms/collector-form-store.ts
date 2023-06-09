@@ -21,6 +21,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         scheduleHours: [] as number[],
         schedulePower: false,
         attachedServiceAccount: null as AttachedServiceAccount|null,
+        pluginMetadata: {} as Record<string, any>,
     }),
     getters: {
         collectorId(): string|undefined {
@@ -80,6 +81,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount|null) {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
             else this.attachedServiceAccount = serviceAccount;
+        },
+        setPluginMetadata(metadata: object) {
+            this.pluginMetadata = metadata;
         },
     },
 });
