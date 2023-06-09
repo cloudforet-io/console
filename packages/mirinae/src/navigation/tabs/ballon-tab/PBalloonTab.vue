@@ -1,7 +1,7 @@
 <template>
     <div ref="tabContainerRef"
          class="p-balloon-tab"
-         :class="[tabPosition, styleType, size]"
+         :class="[state.tabPosition, styleType, size]"
     >
         <div class="balloon-group"
              :class="{stretch}"
@@ -11,7 +11,7 @@
                     ref="buttonRefs"
                     :class="{
                         active: activeTab === tab.name,
-                        tail: tail && !isTabItemsOverTwoLines
+                        tail: tail && !state.isTabItemsOverTwoLines
                     }"
                     @click="handleClickTab(tab, idx)"
             >
@@ -40,7 +40,8 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import type { PropType } from 'vue';
 import {
     reactive, toRefs, computed, onMounted, onUnmounted, onUpdated,
 } from 'vue';
@@ -50,139 +51,128 @@ import { useTab } from '@/hooks/tab';
 import {
     BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
 } from '@/navigation/tabs/ballon-tab/config';
-import type { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 import screens from '@/styles/screens.cjs';
 
-
-export default {
-    name: 'PBalloonTab',
-    model: {
-        prop: 'activeTab',
-        event: 'update:activeTab',
+const props = defineProps({
+    /* tab item props */
+    tabs: {
+        type: Array as PropType<(TabItem|string)[]>,
+        default: () => [],
     },
-    props: {
-        /* tab item props */
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            default: '',
-        },
-        /* balloon props */
-        tail: {
-            type: Boolean,
-            default: false,
-        },
-        styleType: {
-            type: String,
-            default: BALLOON_TAB_STYLE_TYPE.primary,
-            validator(styleType: any) {
-                return Object.values(BALLOON_TAB_STYLE_TYPE).includes(styleType);
-            },
-        },
-        size: {
-            type: String,
-            default: BALLOON_TAB_SIZE.md,
-            validator(size: any) {
-                return Object.values(BALLOON_TAB_SIZE).includes(size);
-            },
-        },
-        position: {
-            type: String,
-            default: BALLOON_TAB_POSITION.top,
-            validator(position: any) {
-                return Object.values(BALLOON_TAB_POSITION).includes(position);
-            },
-        },
-        stretch: {
-            type: Boolean,
-            default: false,
+    activeTab: {
+        type: String,
+        default: '',
+    },
+    /* balloon props */
+    tail: {
+        type: Boolean,
+        default: false,
+    },
+    styleType: {
+        type: String,
+        default: BALLOON_TAB_STYLE_TYPE.primary,
+        validator(styleType: any) {
+            return Object.values(BALLOON_TAB_STYLE_TYPE).includes(styleType);
         },
     },
-    setup(props: BalloonTabProps, { emit }) {
-        const {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-        } = useTab({
-            tabs: computed(() => props.tabs),
-            activeTab: computed(() => props.activeTab),
-        });
-
-        const state = reactive({
-            tabContainerRef: null as HTMLElement|null,
-            buttonRefs: [] as HTMLElement[],
-            paneRef: null as HTMLElement|null,
-            isTabItemsOverTwoLines: false,
-            tabPosition: props.position,
-        });
-
-        /* util */
-        const checkTabItemsOverflows = () => {
-            if (!state.buttonRefs[0] || !state.paneRef) return;
-
-            const button = state.buttonRefs[0].getBoundingClientRect();
-            const pane = state.paneRef.getBoundingClientRect();
-            let diff = 0;
-
-            switch (state.tabPosition) {
-            case BALLOON_TAB_POSITION.top: diff = pane.top - button.bottom; break;
-            case BALLOON_TAB_POSITION.left: diff = button.right - pane.left; break;
-            case BALLOON_TAB_POSITION.right: diff = button.left - pane.right; break;
-            default: break;
-            }
-
-            state.isTabItemsOverTwoLines = diff > 10;
-        };
-        const setPosition = () => {
-            if (window.innerWidth < screens.mobile.max) {
-                state.tabPosition = BALLOON_TAB_POSITION.top;
-            } else {
-                state.tabPosition = props.position;
-            }
-        };
-        const checkStyles = () => {
-            checkTabItemsOverflows();
-            setPosition();
-        };
-
-        /* event */
-        const handleClickTab = (tab: TabItem, idx: number) => {
-            if (props.activeTab !== tab.name) {
-                emit('update:activeTab', tab.name);
-                emit('change', tab.name, idx);
-            }
-        };
-
-        onUpdated(() => {
-            checkStyles();
-        });
-
-        onMounted(() => {
-            checkStyles();
-        });
-
-        window.addEventListener('resize', checkStyles);
-
-        onUnmounted(() => {
-            window.removeEventListener('resize', checkStyles);
-        });
-
-        return {
-            ...toRefs(state),
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-            handleClickTab,
-        };
+    size: {
+        type: String,
+        default: BALLOON_TAB_SIZE.md,
+        validator(size: any) {
+            return Object.values(BALLOON_TAB_SIZE).includes(size);
+        },
     },
+    position: {
+        type: String,
+        default: BALLOON_TAB_POSITION.top,
+        validator(position: any) {
+            return Object.values(BALLOON_TAB_POSITION).includes(position);
+        },
+    },
+    stretch: {
+        type: Boolean,
+        default: false,
+    },
+});
+const emit = defineEmits(['update:activeTab', 'change']);
+
+const {
+    tabItems,
+    keepAliveTabNames,
+    nonKeepAliveTabNames,
+    currentTabItem,
+} = useTab({
+    tabs: computed(() => props.tabs),
+    activeTab: computed(() => props.activeTab),
+});
+
+const state = reactive({
+    tabContainerRef: null as HTMLElement|null,
+    buttonRefs: [] as HTMLElement[],
+    paneRef: null as HTMLElement|null,
+    isTabItemsOverTwoLines: false,
+    tabPosition: props.position,
+});
+
+/* util */
+const checkTabItemsOverflows = () => {
+    if (!state.buttonRefs[0] || !state.paneRef) return;
+
+    const button = state.buttonRefs[0].getBoundingClientRect();
+    const pane = state.paneRef.getBoundingClientRect();
+    let diff = 0;
+
+    switch (state.tabPosition) {
+    case BALLOON_TAB_POSITION.top: diff = pane.top - button.bottom; break;
+    case BALLOON_TAB_POSITION.left: diff = button.right - pane.left; break;
+    case BALLOON_TAB_POSITION.right: diff = button.left - pane.right; break;
+    default: break;
+    }
+
+    state.isTabItemsOverTwoLines = diff > 10;
 };
+const setPosition = () => {
+    if (window.innerWidth < screens.mobile.max) {
+        state.tabPosition = BALLOON_TAB_POSITION.top;
+    } else {
+        state.tabPosition = props.position;
+    }
+};
+const checkStyles = () => {
+    checkTabItemsOverflows();
+    setPosition();
+};
+
+/* event */
+const handleClickTab = (tab: TabItem, idx: number) => {
+    if (props.activeTab !== tab.name) {
+        emit('update:activeTab', tab.name);
+        emit('change', tab.name, idx);
+    }
+};
+
+onUpdated(() => {
+    checkStyles();
+});
+
+onMounted(() => {
+    checkStyles();
+});
+
+window.addEventListener('resize', checkStyles);
+
+onUnmounted(() => {
+    window.removeEventListener('resize', checkStyles);
+});
+
+const {
+    paneRef,
+    buttonRefs,
+    tabContainerRef,
+} = toRefs(state);
+
 </script>
 
 <style lang="postcss">

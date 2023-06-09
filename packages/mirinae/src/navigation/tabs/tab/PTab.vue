@@ -1,7 +1,10 @@
 <template>
     <div class="p-tab">
-        <ul class="tab-item-wrapper" :class="{stretch}">
-            <li v-for="(tab, idx) in tabItems" :key="tab.name"
+        <ul class="tab-item-wrapper"
+            :class="{stretch}"
+        >
+            <li v-for="(tab, idx) in tabItems"
+                :key="tab.name"
                 :class="{active: activeTab === tab.name}"
                 role="tab"
                 :tabindex="0"
@@ -12,16 +15,24 @@
                     {{ tab.label }}
                 </span>
                 <span class="extra">
-                    <slot name="extra" v-bind="tab" />
+                    <slot name="extra"
+                          v-bind="tab"
+                    />
                 </span>
             </li>
         </ul>
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)"
+                      :name="activeTab"
+                      v-bind="currentTabItem"
+                />
             </keep-alive>
-            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)"
+                  :name="activeTab"
+                  v-bind="currentTabItem"
+            />
         </div>
         <div class="footer">
             <slot name="footer" />
@@ -29,65 +40,38 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent,
+    computed,
 } from 'vue';
 
 import { useTab } from '@/hooks/tab';
 import type { TabItem, TabProps } from '@/navigation/tabs/tab/type';
 
-
-export default defineComponent<TabProps>({
-    name: 'PTab',
-    model: {
-        prop: 'activeTab',
-        event: 'update:activeTab',
-    },
-    props: {
-        /* tab item props */
-        tabs: {
-            type: Array as PropType<Array<string|TabItem>>,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            required: true,
-        },
-        /* tab props */
-        stretch: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-        } = useTab({
-            tabs: computed(() => props.tabs),
-            activeTab: computed(() => props.activeTab),
-        });
-
-        const selectTab = (tab: TabItem, idx: number) => {
-            if (props.activeTab !== tab.name) {
-                emit('update:activeTab', tab.name);
-                emit('change', tab.name, idx);
-            }
-        };
-
-        return {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-            selectTab,
-        };
-    },
+const props = withDefaults(defineProps<TabProps>(), {
+    tabs: () => [],
+    activeTab: '',
+    stretch: false,
 });
+const emit = defineEmits(['update:activeTab', 'change']);
+
+const {
+    tabItems,
+    keepAliveTabNames,
+    nonKeepAliveTabNames,
+    currentTabItem,
+} = useTab({
+    tabs: computed(() => props.tabs),
+    activeTab: computed(() => props.activeTab),
+});
+
+const selectTab = (tab: TabItem, idx: number) => {
+    if (props.activeTab !== tab.name) {
+        emit('update:activeTab', tab.name);
+        emit('change', tab.name, idx);
+    }
+};
+
 </script>
 
 <style lang="postcss">

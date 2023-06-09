@@ -31,69 +31,54 @@
     </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import { computed } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useTab } from '@/hooks/tab';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
-
-export default defineComponent({
-    name: 'PBoxTab',
-    components: { PI },
-    model: {
-        prop: 'activeTab',
-        event: 'update:activeTab',
+const props = defineProps({
+    /* tab item props */
+    tabs: {
+        type: Array as PropType<(TabItem|string)[]>,
+        default: () => [],
     },
-    props: {
-        /* tab item props */
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            default: '',
-        },
-        /* box tab props */
-        styleType: {
-            type: String,
-            default: BOX_TAB_STYLE_TYPE.white,
-            validator(styleType: any) {
-                return Object.values(BOX_TAB_STYLE_TYPE).includes(styleType);
-            },
-        },
+    activeTab: {
+        type: String,
+        default: '',
     },
-    setup(props, { emit }) {
-        const {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-        } = useTab({
-            tabs: computed(() => props.tabs),
-            activeTab: computed(() => props.activeTab),
-        });
-
-        /* event */
-        const handleClickTab = (tab: TabItem, idx: number) => {
-            if (props.activeTab !== tab.name) {
-                emit('update:activeTab', tab.name);
-                emit('change', tab.name, idx);
-            }
-        };
-
-        return {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-            handleClickTab,
-        };
+    /* box tab props */
+    styleType: {
+        type: String,
+        default: BOX_TAB_STYLE_TYPE.white,
+        validator(styleType: any) {
+            return Object.values(BOX_TAB_STYLE_TYPE).includes(styleType);
+        },
     },
 });
+const emit = defineEmits(['update:activeTab', 'change']);
+
+const {
+    tabItems,
+    keepAliveTabNames,
+    nonKeepAliveTabNames,
+    currentTabItem,
+} = useTab({
+    tabs: computed(() => props.tabs),
+    activeTab: computed(() => props.activeTab),
+});
+
+/* event */
+const handleClickTab = (tab: TabItem, idx: number) => {
+    if (props.activeTab !== tab.name) {
+        emit('update:activeTab', tab.name);
+        emit('change', tab.name, idx);
+    }
+};
+
 </script>
 
 <style lang="postcss">

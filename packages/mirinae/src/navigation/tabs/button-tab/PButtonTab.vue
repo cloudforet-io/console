@@ -32,83 +32,61 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import { useTab } from '@/hooks/tab';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
+interface Props {
+    tabs: (string|TabItem)[];
+    activeTab: string;
+}
 
-export default defineComponent({
-    name: 'PButtonTab',
-    model: {
-        prop: 'activeTab',
-        event: 'update:activeTab',
-    },
-    props: {
-        tabs: {
-            // FIXME:: below any type
-            type: Array as PropType<any>,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }) {
-        const {
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-        } = useTab({
-            tabs: computed(() => props.tabs),
-            activeTab: computed(() => props.activeTab),
-        });
+const props = defineProps<Props>();
+const emit = defineEmits(['update:activeTab', 'change']);
 
-        const state = reactive({
-            buttonRefs: null as HTMLElement[] | null,
-        });
-
-        /* event */
-        const focusButton = (current: number, moveTo: 1|-1) => {
-            if (!state.buttonRefs) return;
-            let next = state.buttonRefs[current + moveTo];
-            if (!next) {
-                if (moveTo > 0) next = state.buttonRefs[0];
-                else next = state.buttonRefs[state.buttonRefs.length - 1];
-            }
-            next.focus();
-        };
-        const handleClickTab = (tab: TabItem, idx: number) => {
-            if (props.activeTab !== tab.name) {
-                emit('update:activeTab', tab.name);
-                emit('change', tab.name, idx);
-            }
-        };
-        const handleKeydownLeft = (current: number) => {
-            focusButton(current, -1);
-        };
-        const handleKeydownRight = (current: number) => {
-            focusButton(current, 1);
-        };
-
-        return {
-            ...toRefs(state),
-            tabItems,
-            keepAliveTabNames,
-            nonKeepAliveTabNames,
-            currentTabItem,
-            handleClickTab,
-            handleKeydownLeft,
-            handleKeydownRight,
-        };
-    },
+const {
+    tabItems,
+    keepAliveTabNames,
+    nonKeepAliveTabNames,
+    currentTabItem,
+} = useTab({
+    tabs: computed(() => props.tabs),
+    activeTab: computed(() => props.activeTab),
 });
+
+const state = reactive({
+    buttonRefs: null as HTMLElement[] | null,
+});
+
+/* event */
+const focusButton = (current: number, moveTo: 1|-1) => {
+    if (!state.buttonRefs) return;
+    let next = state.buttonRefs[current + moveTo];
+    if (!next) {
+        if (moveTo > 0) next = state.buttonRefs[0];
+        else next = state.buttonRefs[state.buttonRefs.length - 1];
+    }
+    next.focus();
+};
+const handleClickTab = (tab: TabItem, idx: number) => {
+    if (props.activeTab !== tab.name) {
+        emit('update:activeTab', tab.name);
+        emit('change', tab.name, idx);
+    }
+};
+const handleKeydownLeft = (current: number) => {
+    focusButton(current, -1);
+};
+const handleKeydownRight = (current: number) => {
+    focusButton(current, 1);
+};
+
+const { buttonRefs } = toRefs(state);
+
 </script>
 
 <style lang="postcss">
