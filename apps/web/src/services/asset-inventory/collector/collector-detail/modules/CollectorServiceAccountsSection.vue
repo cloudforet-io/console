@@ -14,7 +14,6 @@
                 </p-button>
             </template>
         </p-heading>
-        <!-- TODO: bind other props of PToolboxTable -->
         <p-toolbox-table v-if="!state.isEditMode"
                          :fields="fields"
                          :items="state.secrets"
