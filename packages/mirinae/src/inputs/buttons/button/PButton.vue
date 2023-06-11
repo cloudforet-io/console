@@ -1,5 +1,5 @@
 <template>
-    <component :is="component"
+    <component :is="state.component"
                :href="disabled ? undefined : href"
                class="p-button"
                :class="{
@@ -10,50 +10,39 @@
                    'disabled': !!disabled,
                    readonly
                } "
-               v-on="{
-                   ...$listeners,
-                   click: (event) => {
-                       if (!disabled && !readonly && !loading) {
-                           if (!$listeners.click) return;
-
-                           if (typeof $listeners.click === 'function') $listeners.click(event);
-                           else if(Array.isArray($listeners.click)) $listeners.click.forEach(func => func(event));
-                           else console.error(new Error(`[p-button] Wrong type of click listener: ${typeof $listeners.click}`))
-                       }
-                   }
-               }"
+               v-on="listeners"
     >
         <p-spinner v-if="loading"
-                   :size="loadingIconSize"
+                   :size="state.loadingIconSize"
         />
         <p-i v-if="iconLeft"
              :name="iconLeft"
-             :width="iconSize"
-             :height="iconSize"
+             :width="state.iconSize"
+             :height="state.iconSize"
              color="inherit"
              class="icon left"
         />
         <slot name="default" />
         <p-i v-if="iconRight"
              :name="iconRight"
-             :width="iconSize"
-             :height="iconSize"
+             :width="state.iconSize"
+             :height="state.iconSize"
              color="inherit"
              class="icon right"
         />
     </component>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
+<script setup lang="ts">
+import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, useAttrs,
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
-import type { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
+import type { ButtonSize, ButtonStyle } from '@/inputs/buttons/button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 
@@ -67,76 +56,69 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
     md: SPINNER_SIZE.sm,
     lg: SPINNER_SIZE.sm,
 };
-export default defineComponent<ButtonProps>({
-    name: 'PButton',
-    components: {
-        PI,
-        PSpinner,
-    },
-    props: {
-        styleType: {
-            type: String,
-            default: BUTTON_STYLE.primary,
-            validator(value: string): boolean {
-                return Object.keys(BUTTON_STYLE).includes(value);
-            },
-        },
-        size: {
-            type: String,
-            default: BUTTON_SIZE.md,
-            validator(value: string): boolean {
-                return Object.keys(BUTTON_SIZE).includes(value);
-            },
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-        iconLeft: {
-            type: String,
-            default: undefined,
-        },
-        iconRight: {
-            type: String,
-            default: undefined,
-        },
-        block: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        readonly: {
-            type: Boolean,
-            default: false,
+
+const props = defineProps({
+    styleType: {
+        type: String as PropType<ButtonStyle>,
+        default: BUTTON_STYLE.primary,
+        validator(value: string): boolean {
+            return Object.keys(BUTTON_STYLE).includes(value);
         },
     },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            component: computed(() => (props.href ? 'a' : 'button')),
-            iconSize: computed(() => ICON_SIZE[props.size ?? ''] ?? ICON_SIZE.md),
-            loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
-        });
-
-        /* Event */
-        const handleClick = () => {
-            if (!props.disabled && !props.loading) {
-                emit('click');
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            handleClick,
-        };
+    size: {
+        type: String as PropType<ButtonSize>,
+        default: BUTTON_SIZE.md,
+        validator(value: string): boolean {
+            return Object.keys(BUTTON_SIZE).includes(value);
+        },
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    href: {
+        type: String,
+        default: undefined,
+    },
+    iconLeft: {
+        type: String,
+        default: undefined,
+    },
+    iconRight: {
+        type: String,
+        default: undefined,
+    },
+    block: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    readonly: {
+        type: Boolean,
+        default: false,
     },
 });
+const emit = defineEmits(['click']);
+const attrs = useAttrs();
+
+const state = reactive({
+    component: computed(() => (props.href ? 'a' : 'button')),
+    iconSize: computed(() => ICON_SIZE[props.size ?? ''] ?? ICON_SIZE.md),
+    loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+});
+
+const listeners = {
+    ...attrs,
+    click: (event) => {
+        if (!props.disabled && !props.readonly && !props.loading) {
+            emit('click', event);
+        }
+    },
+};
+
 </script>
 
 <style lang="postcss">

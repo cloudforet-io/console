@@ -1,6 +1,6 @@
 import type { ButtonProps } from '@/inputs/buttons/button/type';
 
-type ButtonType = 'default' | 'text';
+export type ButtonType = 'default' | 'text';
 
 export interface SelectButtonType extends ButtonProps {
     label: string;

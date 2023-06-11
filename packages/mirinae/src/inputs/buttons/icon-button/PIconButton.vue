@@ -4,15 +4,15 @@
         :class="{ activated, [size]: true, loading, [shape]: true }"
         :style-type="styleType"
         :disabled="disabled || loading"
-        v-on="$listeners"
+        v-on="listeners"
     >
         <p-spinner v-if="loading"
-                   :size="loadingSize"
+                   :size="state.loadingSize"
         />
         <slot v-else>
             <p-i :name="name"
-                 :width="sizeValue"
-                 :height="sizeValue"
+                 :width="state.sizeValue"
+                 :height="state.sizeValue"
                  :color="color"
                  :animation="animation"
             />
@@ -20,10 +20,10 @@
     </p-button>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, useAttrs,
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
@@ -34,7 +34,7 @@ import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import type { ButtonSize } from '@/inputs/buttons/button/type';
 import type {
-    IconButtonProps, IconButtonShape, IconButtonSize, IconButtonStyleType,
+    IconButtonShape, IconButtonSize, IconButtonStyleType,
 } from '@/inputs/buttons/icon-button/type';
 import {
     ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
@@ -46,69 +46,73 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
     md: SPINNER_SIZE.lg,
     lg: SPINNER_SIZE.xl,
 };
-export default defineComponent<IconButtonProps>({
-    name: 'PIconButton',
-    components: { PSpinner, PButton, PI },
-    props: {
-        name: {
-            type: String,
-            default: '',
-        },
-        styleType: {
-            type: String,
-            default: ICON_BUTTON_STYLE_TYPE.transparent,
-            validator(value: IconButtonStyleType) {
-                return Object.values(ICON_BUTTON_STYLE_TYPE).includes(value);
-            },
-        },
-        color: {
-            type: String,
-            default: 'inherit',
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        activated: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        size: {
-            type: String,
-            default: 'md',
-            validator(value: IconButtonSize) {
-                return Object.keys(ICON_BUTTON_SIZE).includes(value);
-            },
-        },
-        animation: {
-            type: String as PropType<AnimationType|undefined>,
-            default: undefined,
-            validator(animation: AnimationType|undefined) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
-        },
-        shape: {
-            type: String,
-            default: ICON_BUTTON_SHAPE.circle,
-            validator(value: IconButtonShape) {
-                return Object.values(ICON_BUTTON_SHAPE).includes(value);
-            },
+
+const props = defineProps({
+    name: {
+        type: String,
+        default: '',
+    },
+    styleType: {
+        type: String as PropType<IconButtonStyleType>,
+        default: ICON_BUTTON_STYLE_TYPE.transparent,
+        validator(value: IconButtonStyleType) {
+            return Object.values(ICON_BUTTON_STYLE_TYPE).includes(value);
         },
     },
-    setup(props) {
-        const state = reactive({
-            sizeValue: computed(() => ICON_BUTTON_SIZE[props.size] || '1.5rem'),
-            loadingSize: computed(() => LOADING_SIZE[props.size] ?? LOADING_SIZE.md),
-        });
-        return {
-            ...toRefs(state),
-        };
+    color: {
+        type: String,
+        default: 'inherit',
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    activated: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    size: {
+        type: String as PropType<IconButtonSize>,
+        default: 'md',
+        validator(value: IconButtonSize) {
+            return Object.keys(ICON_BUTTON_SIZE).includes(value);
+        },
+    },
+    animation: {
+        type: String as PropType<AnimationType|undefined>,
+        default: undefined,
+        validator(animation: AnimationType|undefined) {
+            return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+        },
+    },
+    shape: {
+        type: String as PropType<IconButtonShape>,
+        default: ICON_BUTTON_SHAPE.circle,
+        validator(value: IconButtonShape) {
+            return Object.values(ICON_BUTTON_SHAPE).includes(value);
+        },
     },
 });
+
+const state = reactive({
+    sizeValue: computed(() => ICON_BUTTON_SIZE[props.size] || '1.5rem'),
+    loadingSize: computed(() => LOADING_SIZE[props.size] ?? LOADING_SIZE.md),
+});
+
+const emit = defineEmits(['click']);
+const attrs = useAttrs();
+
+const listeners = {
+    ...attrs,
+    click: (event) => {
+        emit('click', event);
+    },
+};
+
 </script>
 
 <style lang="postcss">

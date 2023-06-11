@@ -7,49 +7,40 @@
                 disabled: !!disabled,
                 readonly
             } "
-            v-on="{
-                ...$listeners,
-                click: (event) => {
-                    if (!disabled && !loading) {
-                        if (typeof $listeners.click === 'function') $listeners.click(event);
-                        if (Array.isArray($listeners.click)) $listeners.click.forEach(func => func(event));
-                    }
-                }
-            }"
+            v-on="listeners"
     >
         <p-spinner v-if="loading"
-                   :size="loadingIconSize"
+                   :size="state.loadingIconSize"
         />
         <p-i v-if="iconLeft"
              :name="iconLeft"
-             :width="iconSize"
-             :height="iconSize"
+             :width="state.iconSize"
+             :height="state.iconSize"
              color="inherit"
              class="icon left"
         />
         <slot name="default" />
         <p-i v-if="iconRight"
              :name="iconRight"
-             :width="iconSize"
-             :height="iconSize"
+             :width="state.iconSize"
+             :height="state.iconSize"
              color="inherit"
              class="icon right"
         />
     </button>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, useAttrs,
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
-import type { TextButtonSize, TextButtonStyle, TextButtonProps } from '@/inputs/buttons/text-button/type';
+import type { TextButtonSize, TextButtonStyle } from '@/inputs/buttons/text-button/type';
 import { TEXT_BUTTON_SIZE, TEXT_BUTTON_STYLE } from '@/inputs/buttons/text-button/type';
-
 
 const ICON_WIDTH: Record<TextButtonSize, string> = {
     sm: '0.75rem',
@@ -62,56 +53,59 @@ const LOADING_SIZE: Record<TextButtonSize, string> = {
     lg: SPINNER_SIZE.sm,
 };
 
-export default defineComponent<TextButtonProps>({
-    name: 'PTextButton',
-    components: { PI, PSpinner },
-    props: {
-        styleType: {
-            type: String as PropType<TextButtonStyle>,
-            default: TEXT_BUTTON_STYLE.default,
-            validator(value: TextButtonStyle): boolean {
-                return Object.values(TEXT_BUTTON_STYLE).includes(value);
-            },
-        },
-        size: {
-            type: String as PropType<TextButtonSize>,
-            default: TEXT_BUTTON_SIZE.md,
-            validator(value: TextButtonSize): boolean {
-                return Object.values(TEXT_BUTTON_SIZE).includes(value);
-            },
-        },
-        iconLeft: {
-            type: String,
-            default: undefined,
-        },
-        iconRight: {
-            type: String,
-            default: undefined,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        readonly: {
-            type: Boolean,
-            default: false,
+const props = defineProps({
+    styleType: {
+        type: String as PropType<TextButtonStyle>,
+        default: TEXT_BUTTON_STYLE.default,
+        validator(value: TextButtonStyle): boolean {
+            return Object.values(TEXT_BUTTON_STYLE).includes(value);
         },
     },
-    setup(props) {
-        const state = reactive({
-            iconSize: computed(() => ICON_WIDTH[props.size ?? ''] ?? ICON_WIDTH.md),
-            loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
-        });
-
-        return {
-            ...toRefs(state),
-        };
+    size: {
+        type: String as PropType<TextButtonSize>,
+        default: TEXT_BUTTON_SIZE.md,
+        validator(value: TextButtonSize): boolean {
+            return Object.values(TEXT_BUTTON_SIZE).includes(value);
+        },
+    },
+    iconLeft: {
+        type: String,
+        default: undefined,
+    },
+    iconRight: {
+        type: String,
+        default: undefined,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    readonly: {
+        type: Boolean,
+        default: false,
     },
 });
+const emit = defineEmits(['click']);
+const attrs = useAttrs();
+
+const state = reactive({
+    iconSize: computed(() => ICON_WIDTH[props.size ?? ''] ?? ICON_WIDTH.md),
+    loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+});
+
+const listeners = {
+    ...attrs,
+    click: (event) => {
+        if (!props.disabled && !props.loading) {
+            emit('click', event);
+        }
+    },
+};
+
 </script>
 
 <style lang="postcss">

@@ -1,7 +1,7 @@
 <template>
     <div class="p-select-button-group">
         <div class="button-group">
-            <button v-for="(button, idx) in formattedButtons"
+            <button v-for="(button, idx) in state.formattedButtons"
                     :key="`${button.name}-${idx}`"
                     class="select-button"
                     :class="[{ active:selected === button.name }, theme]"
@@ -19,69 +19,63 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import type { PropType } from 'vue';
 import {
-    reactive, computed, toRefs,
+    reactive, computed,
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';
-import type { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
+import type { SelectButtonType, ButtonType } from '@/inputs/buttons/select-button-group/type';
 
 import { secondary } from '@/styles/colors.cjs';
 
-export default {
-    name: 'PSelectButtonGroup',
-    components: {
-        PI,
+const props = defineProps({
+    buttons: {
+        type: Array as PropType<(SelectButtonType|string)[]>,
+        default: () => ([]),
     },
-    props: {
-        buttons: {
-            type: Array,
-            default: () => ([]),
-        },
-        selected: {
-            type: String,
-            default: '',
-        },
-        theme: {
-            type: String,
-            default: SELECT_BUTTON_GROUP_THEME.default,
-            validator(theme) {
-                return Object.keys(SELECT_BUTTON_GROUP_THEME).includes(theme);
-            },
+    selected: {
+        type: [String, Number],
+        default: '',
+    },
+    theme: {
+        type: String as PropType<ButtonType>,
+        default: SELECT_BUTTON_GROUP_THEME.default,
+        validator(theme: string) {
+            return Object.keys(SELECT_BUTTON_GROUP_THEME).includes(theme);
         },
     },
-    setup(props: SelectButtonGroupProps, context) {
-        const state = reactive({
-            formattedButtons: computed(() => {
-                const buttons: SelectButtonType[] = [];
-                props.buttons.forEach((value: string|SelectButtonType) => {
-                    if (typeof value === 'string') {
-                        buttons.push({ name: value, label: value });
-                    } else {
-                        value.label = value.label || value.name;
-                        buttons.push(value);
-                    }
-                });
-                return buttons;
-            }),
-        });
+});
+const emit = defineEmits<{(e: 'update:selected', name: string): void;
+    (e: 'clickButton', name: string, idx: number): void;
+    (e: string, name: string, idx: number): void;
+}>();
 
-        const onClickButton = (name, idx) => {
-            if (props.selected !== name) {
-                context.emit('update:selected', name);
-                context.emit('clickButton', name, idx);
-                context.emit(`click-${name}`, name, idx);
+const state = reactive({
+    formattedButtons: computed(() => {
+        const buttons: SelectButtonType[] = [];
+        props.buttons.forEach((value: string|SelectButtonType) => {
+            if (typeof value === 'string') {
+                buttons.push({ name: value, label: value });
+            } else {
+                value.label = value.label || value.name;
+                buttons.push(value);
             }
-        };
-        return {
-            ...toRefs(state),
-            secondary,
-            onClickButton,
-        };
-    },
+        });
+        return buttons;
+    }),
+});
+
+const onClickButton = (name: string, idx: number) => {
+    if (props.selected !== name) {
+        emit('update:selected', name);
+        emit('clickButton', name, idx);
+        emit(`click-${name}`, name, idx);
+    }
 };
+
 </script>
 
 <style lang="postcss">
