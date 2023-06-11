@@ -2,10 +2,10 @@
     <span class="p-checkbox"
           :class="{disabled, invalid}"
           @click.stop.prevent="onClick"
-          v-on="$listeners"
+          v-on="listeners"
     >
         <input type="checkbox">
-        <slot :slot-scope="$props"
+        <slot :slot-scope="props"
               name="icon"
               v-bind="{isSelected}"
         >
@@ -16,7 +16,7 @@
                  :name="iconName"
             />
         </slot>
-        <span v-if="$scopedSlots.default"
+        <span v-if="$slots.default"
               class="text"
               @click.stop="onClick"
         >
@@ -27,9 +27,9 @@
     </span>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent,
+    computed, useAttrs,
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -40,72 +40,47 @@ interface CheckboxProps extends SelectProps {
     invalid?: boolean;
 }
 
-export default defineComponent<CheckboxProps>({
-    name: 'PCheckbox',
-    components: { PI },
-    model: {
-        prop: 'selected',
-        event: 'change',
-    },
-    props: {
-        /* select props */
-        value: {
-            type: [Boolean, String, Number, Object, Array],
-            default: true,
-        },
-        selected: {
-            type: [Boolean, String, Number, Object, Array],
-            default: () => ([]),
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        predicate: {
-            type: Function,
-            default: undefined,
-        },
-        /* checkbox props */
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: CheckboxProps, { emit }) {
-        const {
-            isSelected,
-            getSelected,
-        } = useMultiSelect({
-            value: computed(() => props.value),
-            selected: computed(() => props.selected),
-            predicate: computed(() => props.predicate),
-            disabled: computed(() => props.disabled),
-        });
-
-        const iconName = computed(() => {
-            if (props.disabled) {
-                if (isSelected.value) return 'ic_checkbox-disabled-selected';
-                return 'ic_checkbox-disabled';
-            }
-            if (isSelected.value) return 'ic_checkbox-selected';
-            return 'ic_checkbox';
-        });
-
-        /* event */
-        const onClick = () => {
-            if (!props.disabled) {
-                const newSelected = getSelected();
-                emit('change', newSelected, !isSelected.value);
-            }
-        };
-
-        return {
-            isSelected,
-            iconName,
-            onClick,
-        };
-    },
+const props = withDefaults(defineProps<CheckboxProps>(), {
+    value: true,
+    invalid: false,
+    selected: () => [],
+    disabled: false,
 });
+const emit = defineEmits(['change']);
+const attrs = useAttrs();
+
+const {
+    isSelected,
+    getSelected,
+} = useMultiSelect({
+    value: computed(() => props.value),
+    selected: computed(() => props.selected),
+    predicate: computed(() => props.predicate),
+    disabled: computed(() => props.disabled),
+});
+
+const iconName = computed(() => {
+    if (props.disabled) {
+        if (isSelected.value) return 'ic_checkbox-disabled-selected';
+        return 'ic_checkbox-disabled';
+    }
+    if (isSelected.value) return 'ic_checkbox-selected';
+    return 'ic_checkbox';
+});
+
+/* event */
+const onClick = () => {
+    if (!props.disabled) {
+        const newSelected = getSelected();
+        emit('change', newSelected, !isSelected.value);
+    }
+};
+
+const listeners = {
+    ...attrs,
+    onClick,
+};
+
 </script>
 
 <style lang="postcss">

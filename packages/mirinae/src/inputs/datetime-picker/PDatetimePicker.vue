@@ -3,14 +3,14 @@
          class="p-datetime-picker"
          :class="{
              [styleType] : true,
-             open : visiblePicker,
+             open : state.visiblePicker,
              'time-type': dataType === DATA_TYPE.time,
              invalid,
          }"
     >
         <div class="input-sizer">
             <input type="text"
-                   :placeholder="dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
+                   :placeholder="dataType === DATA_TYPE.time ? t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
             >
         </div>
@@ -23,22 +23,22 @@
     </div>
 </template>
 
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
+<script setup lang="ts">
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import Flatpickr from 'flatpickr';
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
+import type { DateOption } from 'flatpickr/dist/types/options';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
-import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
-import { I18nConnector } from '@/translations';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
@@ -61,180 +61,167 @@ const FLATPICKR_MODE = Object.freeze({
 } as const);
 type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE];
 
-export default {
-    name: 'PDatetimePicker',
-    components: {
-        PI,
+const props = defineProps({
+    selectedDates: {
+        type: Array as PropType<string[]>,
+        default: () => ([]),
     },
-    model: {
-        prop: 'selectedDates',
-        event: 'update:selectedDates',
+    styleType: {
+        type: String as PropType<STYLE_TYPE>,
+        default: STYLE_TYPE.default,
+        validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
     },
-    props: {
-        selectedDates: {
-            type: Array,
-            default: () => ([]),
-        },
-        styleType: {
-            type: String,
-            default: STYLE_TYPE.default,
-            validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-        minDate: {
-            type: [String, Date],
-            default: undefined,
-        },
-        maxDate: {
-            type: [String, Date],
-            default: undefined,
-        },
-        selectMode: {
-            type: String,
-            default: SELECT_MODE.single,
-            validator: (selectMode: any) => Object.values(SELECT_MODE).includes(selectMode),
-        },
-        dataType: {
-            type: String,
-            default: DATA_TYPE.yearToDate,
-            validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
+    timezone: {
+        type: String,
+        default: 'UTC',
     },
-    setup(props: DatetimePickerProps, { emit }) {
-        const state = reactive({
-            datePickerRef: null as null | HTMLElement,
-            datePicker: null as null | Instance,
-            proxySelectedDates: useProxyValue<string[]>('selectedDates', props, emit),
-            dateString: '',
-            visiblePicker: false,
-            plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
-                monthSelectPlugin({
-                    shorthand: false,
-                    dateFormat: 'F Y',
-                    altFormat: 'F Y',
-                    theme: 'light',
-                }),
-            ] : [])),
-            localeFile: computed(() => {
-                const localeFile = getLocaleFile(I18nConnector.i18n.locale);
-                if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
-                return { rangeSeparator: ' ~ ' };
-            }),
-            mode: computed<FlatpickrMode>(() => {
-                if (props.dataType === DATA_TYPE.time) return FLATPICKR_MODE.time;
-                if (props.dataType === DATA_TYPE.yearToMonth) return FLATPICKR_MODE.single;
-                return props.selectMode as FlatpickrMode;
-            }),
-            enableTime: computed(() => props.dataType === DATA_TYPE.time || props.dataType === DATA_TYPE.yearToTime),
-        });
-
-        /* util */
-        const resizeInputWidth = (dateString, instance) => {
-            const inputSizer = instance.element.childNodes[0];
-            inputSizer.dataset.value = dateString;
-            inputSizer.style.minWidth = 'auto';
-        };
-
-        /* event */
-        const handleReady = (selectedDates, dateString, instance: Flatpickr.Instance) => {
-            const calendarContainer = instance.calendarContainer;
-            if (calendarContainer) {
-                calendarContainer.classList.add('p-datetime-picker-calendar');
-            }
-
-            if (selectedDates.length) {
-                state.dateString = dateString;
-                resizeInputWidth(dateString, instance);
-            }
-        };
-        const handleUpdateValue = (selectedDates, dateString, instance) => {
-            resizeInputWidth(dateString, instance);
-        };
-        const handleClosePicker = (selectedDates: Date[], dateStr, instance) => {
-            if (props.selectMode !== SELECT_MODE.range || (props.selectMode === SELECT_MODE.range && selectedDates.length === 2)) {
-                state.proxySelectedDates = selectedDates.map((d) => {
-                    const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-                    return dayjs.tz(dateString, props.timezone).format();
-                });
-                state.dateString = dateStr;
-            } else {
-                // init selectedDates
-                state.proxySelectedDates = props.selectedDates;
-                if (state.datePicker) state.datePicker.setDate(props.selectedDates);
-            }
-            state.visiblePicker = false;
-            resizeInputWidth(state.dateString, instance);
-            emit('close');
-        };
-        const handleOpenPicker = () => {
-            state.visiblePicker = true;
-        };
-
-        /* util */
-        const createDatePicker = (datePickerRef: HTMLElement) => {
-            if (props.dataType === DATA_TYPE.time) {
-                state.datePicker = Flatpickr(datePickerRef, {
-                    mode: state.mode,
-                    dateFormat: 'H:i',
-                    enableTime: true,
-                    wrap: true,
-                    locale: state.localeFile,
-                    onReady: handleReady,
-                    onValueUpdate: handleUpdateValue,
-                    onOpen: handleOpenPicker,
-                    onClose: handleClosePicker,
-                });
-            } else {
-                let defaultDate;
-                if (state.proxySelectedDates.length) {
-                    if (props.dataType === DATA_TYPE.yearToMonth) {
-                        defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
-                    } else {
-                        defaultDate = state.proxySelectedDates.map((d) => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
-                    }
-                }
-                state.datePicker = Flatpickr(datePickerRef, {
-                    mode: state.mode,
-                    defaultDate,
-                    altInput: true,
-                    altFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
-                    dateFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
-                    enableTime: state.enableTime,
-                    minDate: props.minDate,
-                    maxDate: props.maxDate,
-                    wrap: true,
-                    locale: state.localeFile,
-                    onReady: handleReady,
-                    onValueUpdate: handleUpdateValue,
-                    onOpen: handleOpenPicker,
-                    onClose: handleClosePicker,
-                    plugins: state.plugins,
-                });
-            }
-        };
-
-        watch(() => state.datePickerRef, (datePickerRef) => {
-            if (datePickerRef) {
-                createDatePicker(datePickerRef);
-            }
-        });
-        watch([() => props.selectedDates, () => props.minDate, () => props.maxDate, () => state.enableTime, () => state.localeFile], () => {
-            if (state.datePickerRef) createDatePicker(state.datePickerRef);
-        });
-
-        return {
-            ...toRefs(state),
-            DATA_TYPE,
-        };
+    minDate: {
+        type: [String, Date] as PropType<DateOption>,
+        default: undefined,
     },
+    maxDate: {
+        type: [String, Date] as PropType<DateOption>,
+        default: undefined,
+    },
+    selectMode: {
+        type: String as PropType<SELECT_MODE>,
+        default: SELECT_MODE.single,
+        validator: (selectMode: any) => Object.values(SELECT_MODE).includes(selectMode),
+    },
+    dataType: {
+        type: String as PropType<DATA_TYPE>,
+        default: DATA_TYPE.yearToDate,
+        validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
+    },
+    invalid: {
+        type: Boolean,
+        default: false,
+    },
+});
+const emit = defineEmits(['update:selectedDates', 'close']);
+const { t, locale } = useI18n();
+
+const state = reactive({
+    datePickerRef: null as null | HTMLElement,
+    datePicker: null as null | Instance,
+    proxySelectedDates: useProxyValue<string[]>('selectedDates', props, emit),
+    dateString: '',
+    visiblePicker: false,
+    plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
+        monthSelectPlugin({
+            shorthand: false,
+            dateFormat: 'F Y',
+            altFormat: 'F Y',
+            theme: 'light',
+        }),
+    ] : [])),
+    localeFile: computed(() => {
+        const localeFile = getLocaleFile(locale.value);
+        if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
+        return { rangeSeparator: ' ~ ' };
+    }),
+    mode: computed<FlatpickrMode>(() => {
+        if (props.dataType === DATA_TYPE.time) return FLATPICKR_MODE.time;
+        if (props.dataType === DATA_TYPE.yearToMonth) return FLATPICKR_MODE.single;
+        return props.selectMode as FlatpickrMode;
+    }),
+    enableTime: computed(() => props.dataType === DATA_TYPE.time || props.dataType === DATA_TYPE.yearToTime),
+});
+
+/* util */
+const resizeInputWidth = (dateString, instance) => {
+    const inputSizer = instance.element.childNodes[0];
+    inputSizer.dataset.value = dateString;
+    inputSizer.style.minWidth = 'auto';
 };
+
+/* event */
+const handleReady = (selectedDates, dateString, instance: Flatpickr.Instance) => {
+    const calendarContainer = instance.calendarContainer;
+    if (calendarContainer) {
+        calendarContainer.classList.add('p-datetime-picker-calendar');
+    }
+
+    if (selectedDates.length) {
+        state.dateString = dateString;
+        resizeInputWidth(dateString, instance);
+    }
+};
+const handleUpdateValue = (selectedDates, dateString, instance) => {
+    resizeInputWidth(dateString, instance);
+};
+const handleClosePicker = (selectedDates: Date[], dateStr, instance) => {
+    if (props.selectMode !== SELECT_MODE.range || (props.selectMode === SELECT_MODE.range && selectedDates.length === 2)) {
+        state.proxySelectedDates = selectedDates.map((d) => {
+            const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+            return dayjs.tz(dateString, props.timezone).format();
+        });
+        state.dateString = dateStr;
+    } else {
+        // init selectedDates
+        state.proxySelectedDates = props.selectedDates;
+        if (state.datePicker) state.datePicker.setDate(props.selectedDates);
+    }
+    state.visiblePicker = false;
+    resizeInputWidth(state.dateString, instance);
+    emit('close');
+};
+const handleOpenPicker = () => {
+    state.visiblePicker = true;
+};
+
+/* util */
+const createDatePicker = (datePickerRef: HTMLElement) => {
+    if (props.dataType === DATA_TYPE.time) {
+        state.datePicker = Flatpickr(datePickerRef, {
+            mode: state.mode,
+            dateFormat: 'H:i',
+            enableTime: true,
+            wrap: true,
+            locale: state.localeFile,
+            onReady: handleReady,
+            onValueUpdate: handleUpdateValue,
+            onOpen: handleOpenPicker,
+            onClose: handleClosePicker,
+        });
+    } else {
+        let defaultDate;
+        if (state.proxySelectedDates.length) {
+            if (props.dataType === DATA_TYPE.yearToMonth) {
+                defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
+            } else {
+                defaultDate = state.proxySelectedDates.map((d) => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
+            }
+        }
+        state.datePicker = Flatpickr(datePickerRef, {
+            mode: state.mode,
+            defaultDate,
+            altInput: true,
+            altFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
+            dateFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
+            enableTime: state.enableTime,
+            minDate: props.minDate,
+            maxDate: props.maxDate,
+            wrap: true,
+            locale: state.localeFile,
+            onReady: handleReady,
+            onValueUpdate: handleUpdateValue,
+            onOpen: handleOpenPicker,
+            onClose: handleClosePicker,
+            plugins: state.plugins,
+        });
+    }
+};
+
+watch(() => state.datePickerRef, (datePickerRef) => {
+    if (datePickerRef) {
+        createDatePicker(datePickerRef);
+    }
+});
+watch([() => props.selectedDates, () => props.minDate, () => props.maxDate, () => state.enableTime, () => state.localeFile], () => {
+    if (state.datePickerRef) createDatePicker(state.datePickerRef);
+});
+
 </script>
 <style lang="postcss">
 @import 'flatpickr/dist/flatpickr.css';

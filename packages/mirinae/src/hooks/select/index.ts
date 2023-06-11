@@ -1,9 +1,9 @@
+import { pull, remove } from 'lodash';
 import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { pull, remove } from 'lodash';
 
 export interface SelectProps {
     value?: any;
@@ -13,7 +13,7 @@ export interface SelectProps {
     multiSelectable?: boolean;
 }
 
-interface Predicate {
+export interface Predicate {
     (value: any, current: any): boolean;
 }
 interface SelectStateArgs {

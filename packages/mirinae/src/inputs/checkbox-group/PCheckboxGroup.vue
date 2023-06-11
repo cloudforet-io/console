@@ -6,31 +6,22 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue';
-import {
-    defineComponent,
-} from 'vue';
 
 import type { Direction } from '@/inputs/checkbox-group/type';
 import { DIRECTION } from '@/inputs/checkbox-group/type';
 
-interface CheckboxGroupProps {
-    direction?: Direction;
-}
-export default defineComponent<CheckboxGroupProps>({
-    name: 'PRadioGroup',
-    components: { },
-    props: {
-        direction: {
-            type: String as PropType<Direction>,
-            default: DIRECTION.horizontal,
-            validator(value: Direction) {
-                return Object.values(DIRECTION).includes(value);
-            },
+defineProps({
+    direction: {
+        type: String as PropType<Direction>,
+        default: DIRECTION.horizontal,
+        validator(value: Direction) {
+            return Object.values(DIRECTION).includes(value);
         },
     },
 });
+
 </script>
 
 <style lang="postcss">
