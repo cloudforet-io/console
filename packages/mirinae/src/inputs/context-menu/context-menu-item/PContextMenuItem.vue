@@ -1,13 +1,13 @@
 <template>
-    <component :is="isAnchor ? 'router-link' : 'span'"
+    <component :is="state.isAnchor ? 'router-link' : 'span'"
                class="p-context-menu-item"
-               :class="{selected, disabled, 'is-anchor': isAnchor, readonly}"
-               v-bind="{...routerLinkProps, ...$attrs}"
-               v-on="$listeners"
+               :class="{selected, disabled, 'is-anchor': state.isAnchor, readonly}"
+               v-bind="{...state.routerLinkProps, ...attrs}"
+               v-on="listeners"
     >
-        <p-i v-if="selectIcon"
+        <p-i v-if="state.selectIcon"
              class="select-marker"
-             :name="selectIcon"
+             :name="state.selectIcon"
              width="1em"
              height="1em"
         />
@@ -26,7 +26,7 @@
         <span class="label-wrapper"
               :class="{ellipsis}"
         >
-            <p-text-highlighting v-if="highlightTerm && !$slots.default"
+            <p-text-highlighting v-if="highlightTerm && !slots.default"
                                  :text="label"
                                  :term="highlightTerm"
                                  class="text"
@@ -34,7 +34,7 @@
             >
                 <template #default="textHighlightingSlotProps">
                     <slot name="text-list"
-                          v-bind="{...textHighlightingSlotProps, ...$props}"
+                          v-bind="{...textHighlightingSlotProps, ...props}"
                     />
                 </template>
             </p-text-highlighting>
@@ -42,7 +42,7 @@
                   class="text"
             >
                 <slot name="default"
-                      v-bind="$props"
+                      v-bind="props"
                 >
                     {{ label }}
                 </slot>
@@ -57,11 +57,10 @@
     </component>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed,
-    defineComponent, reactive, toRefs,
+    computed, reactive, useAttrs, useSlots,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
@@ -70,116 +69,94 @@ import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlightin
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
+import type { SelectMarker } from '@/inputs/context-menu/context-menu-item/type';
 
-
-export type SelectMarker = typeof SELECT_MARKERS[number];
-export interface ContextMenuItemProps {
-    name?: string | number;
-    label?: number | TranslateResult;
-    link?: string;
-    to?: RouteLocation;
-    disabled?: boolean;
-    selected?: boolean;
-    selectMarker?: SelectMarker;
-    ellipsis?: boolean;
-    highlightTerm?: string;
-    readonly?: boolean;
-    icon?: string;
-    imageUrl?: string;
-}
-
-export default defineComponent<ContextMenuItemProps>({
-    name: 'PContextMenuItem',
-    components: {
-        PLazyImg,
-        PTextHighlighting,
-        PI,
+const props = defineProps({
+    name: {
+        type: [String, Number],
+        default: '',
     },
-    props: {
-        name: {
-            type: [String, Number],
-            default: '',
-        },
-        label: {
-            type: [String, Number],
-            default: '',
-        },
-        link: {
-            type: String,
-            default: '',
-        },
-        to: {
-            type: Object as PropType<Location>,
-            default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        selected: {
-            type: Boolean,
-            default: false,
-        },
-        selectMarker: {
-            type: String as PropType<SelectMarker|undefined>,
-            default: undefined,
-            validator(marker?: SelectMarker) {
-                return marker === undefined || SELECT_MARKERS.includes(marker);
-            },
-        },
-        ellipsis: {
-            type: Boolean,
-            default: false,
-        },
-        highlightTerm: {
-            type: String,
-            default: '',
-        },
-        readonly: {
-            type: Boolean,
-            default: false,
-        },
-        icon: {
-            type: String,
-            default: undefined,
-        },
-        imageUrl: {
-            type: String,
-            default: undefined,
+    label: {
+        type: [String, Number] as PropType< number | TranslateResult>,
+        default: '',
+    },
+    link: {
+        type: String,
+        default: '',
+    },
+    to: {
+        type: Object as PropType<RouteLocation>,
+        default: undefined,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    selected: {
+        type: Boolean,
+        default: false,
+    },
+    selectMarker: {
+        type: String as PropType<SelectMarker|undefined>,
+        default: undefined,
+        validator(marker?: SelectMarker) {
+            return marker === undefined || SELECT_MARKERS.includes(marker);
         },
     },
-    setup(props) {
-        const state = reactive({
-            selectIcon: computed<string|undefined>(() => {
-                if (props.selectMarker === 'checkbox') {
-                    if (props.selected) {
-                        return props.disabled ? 'ic_checkbox-disabled-selected' : 'ic_checkbox-selected';
-                    }
-                    return props.disabled ? 'ic_checkbox-disabled' : 'ic_checkbox';
-                }
-                if (props.selectMarker === 'radio') {
-                    if (props.disabled) return 'ic_radio-disabled';
-                    return props.selected ? 'ic_radio-selected' : 'ic_radio';
-                }
-                return undefined;
-            }),
-            isAnchor: computed(() => !props.disabled && (props.link || props.to)),
-            routerLinkProps: computed(() => {
-                if (state.isAnchor) {
-                    return {
-                        to: props.to && !props.disabled ? props.to : {},
-                        href: props.link,
-                        target: props.link ? '_blank' : undefined,
-                    };
-                }
-                return {};
-            }),
-        });
-        return {
-            ...toRefs(state),
-        };
+    ellipsis: {
+        type: Boolean,
+        default: false,
+    },
+    highlightTerm: {
+        type: String,
+        default: '',
+    },
+    readonly: {
+        type: Boolean,
+        default: false,
+    },
+    icon: {
+        type: String,
+        default: undefined,
+    },
+    imageUrl: {
+        type: String,
+        default: undefined,
     },
 });
+const attrs = useAttrs();
+const slots = useSlots();
+
+const state = reactive({
+    selectIcon: computed<string|undefined>(() => {
+        if (props.selectMarker === 'checkbox') {
+            if (props.selected) {
+                return props.disabled ? 'ic_checkbox-disabled-selected' : 'ic_checkbox-selected';
+            }
+            return props.disabled ? 'ic_checkbox-disabled' : 'ic_checkbox';
+        }
+        if (props.selectMarker === 'radio') {
+            if (props.disabled) return 'ic_radio-disabled';
+            return props.selected ? 'ic_radio-selected' : 'ic_radio';
+        }
+        return undefined;
+    }),
+    isAnchor: computed(() => !props.disabled && (props.link || props.to)),
+    routerLinkProps: computed(() => {
+        if (state.isAnchor) {
+            return {
+                to: props.to && !props.disabled ? props.to : {},
+                href: props.link,
+                target: props.link ? '_blank' : undefined,
+            };
+        }
+        return {};
+    }),
+});
+
+const listeners = {
+    ...attrs,
+};
 
 </script>
 

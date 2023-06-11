@@ -11,26 +11,26 @@
                      class="selected-list-wrapper"
                 >
                     <div>
-                        <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
+                        <b>{{ t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
                         <span class="pl-2">({{ state.selectedCount }})</span>
                     </div>
                     <p-button size="sm"
                               style-type="primary"
                               :disabled="!state.proxySelected.length"
                               :readonly="readonly"
-                              @click="$emit('click-done', $event)"
+                              @click="handleClickDone"
                     >
-                        {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
+                        {{ t('COMPONENT.CONTEXT_MENU.DONE') }}
                     </p-button>
                 </div>
                 <div v-if="props.searchable"
                      class="search-wrapper"
                 >
-                    <p-search :value="state.proxySearchText"
-                              :is-focused.sync="state.isFocusedOnSearch"
+                    <p-search v-model:is-focused="state.isFocusedOnSearch"
+                              :value="state.proxySearchText"
                               @update:value="handleUpdateSearchText"
-                              @keydown.up.native="onKeyUp()"
-                              @keydown.down.native="onKeyDown()"
+                              @keydown.up="onKeyUp()"
+                              @keydown.down="onKeyDown()"
                     >
                         <template v-for="(_, slot) of searchSlots"
                                   #[slot]="scope"
@@ -48,7 +48,7 @@
                                :readonly="readonly"
                                @click.stop="handleClickClearSelection"
                 >
-                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.clearableSelectedCount }})
+                    {{ t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.clearableSelectedCount }})
                 </p-text-button>
                 <slot name="items">
                     <template v-for="(item, index) in props.menu">
@@ -68,8 +68,8 @@
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="index"
-                                             @click.stop="onClickMenu(item, index, $event)"
-                                             @keyup.enter="onClickMenu(item, index, $event)"
+                                             @click.stop="onClickMenu"
+                                             @keyup.enter="onClickMenu"
                                              @keydown.up="onKeyUp(index)"
                                              @keydown.down="onKeyDown(index)"
                         >
@@ -109,7 +109,7 @@
                                       :block="true"
                                       :icon-left="item.icon"
                                       :readonly="readonly"
-                                      @click="$emit('click-button', item, index, $event)"
+                                      @click="handleClickButton"
                             >
                                 {{ item.label }}
                             </p-button>
@@ -122,9 +122,9 @@
                                            size="sm"
                                            icon-right="ic_chevron-down"
                                            :disabled="loading"
-                                           @click="$emit('click-show-more', item, index, $event)"
+                                           @click="handleClickShowMore"
                             >
-                                {{ item.label ? item.label : $t('COMPONENT.CONTEXT_MENU.SHOW_MORE') }}
+                                {{ item.label ? item.label : t('COMPONENT.CONTEXT_MENU.SHOW_MORE') }}
                             </p-text-button>
                         </div>
                     </template>
@@ -141,7 +141,7 @@
                 <slot name="no-data-format"
                       v-bind="{...props}"
                 >
-                    {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
+                    {{ t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
                 </slot>
             </div>
         </div>
@@ -155,11 +155,11 @@
 </template>
 
 <script setup lang="ts">
+import { reduce } from 'lodash';
 import {
     computed, onUnmounted, reactive, useSlots, watch,
 } from 'vue';
-
-import { reduce } from 'lodash';
+import { useI18n } from 'vue-i18n';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useListFocus } from '@/hooks/list-focus';
@@ -194,7 +194,7 @@ interface ContextMenuEmits {
     (e: 'blur'): void,
     (e: 'keyup:up:end'): void,
     (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index: number): void,
+    (e: 'select', item: MenuItem, index: number, event: Event): void,
     (e: 'update:search-text', searchText: string): void,
     (e: 'keyup:esc', mouseEvent: MouseEvent): void,
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
@@ -211,6 +211,7 @@ const props = withDefaults(defineProps<ContextMenuProps>(), {
 });
 const emit = defineEmits<ContextMenuEmits>();
 const slots = useSlots();
+const { t } = useI18n();
 
 const state = reactive({
     proxySearchText: props.searchText ?? '',
@@ -276,7 +277,7 @@ const onKeyDown = (idx?: number) => {
     const focusedIdx = handleMoveDown(idx);
     if (focusedIdx === undefined) emit('keyup:down:end');
 };
-const onClickMenu = (item: MenuItem, index) => {
+const onClickMenu = (item: MenuItem, index: number, event) => {
     if (item.disabled) return;
     if (props.readonly) return;
 
@@ -293,7 +294,7 @@ const onClickMenu = (item: MenuItem, index) => {
         state.proxySelected = [item];
     }
 
-    emit('select', item, index);
+    emit('select', item, index, event);
 };
 const onClickEsc = (e: MouseEvent) => {
     emit('keyup:esc', e);
@@ -305,6 +306,16 @@ const handleClickClearSelection = () => {
 const handleUpdateSearchText = async (value: string) => {
     state.proxySearchText = value;
     emit('update:search-text', value);
+};
+
+const handleClickDone = (event) => {
+    emit('click-done', event);
+};
+const handleClickButton = (item: MenuItem, index: number, event) => {
+    emit('click-button', item, index, event);
+};
+const handleClickShowMore = (item: MenuItem, index: number, event) => {
+    emit('click-show-more', item, index, event);
 };
 
 watch(() => props.searchText, (searchText) => {
