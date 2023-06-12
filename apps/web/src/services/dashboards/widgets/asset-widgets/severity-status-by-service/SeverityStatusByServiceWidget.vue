@@ -108,6 +108,10 @@ const fetchData = async (): Promise<Data[]> => {
                         key: 'data.severity',
                         operator: 'add_to_set',
                     },
+                    pass_finding_count: {
+                        key: 'data.stats.findings.pass',
+                        operator: 'sum',
+                    },
                     fail_finding_count: {
                         key: 'data.stats.checks.fail',
                         operator: 'sum',
@@ -143,7 +147,7 @@ const refineData = (data): Data[] => {
             service: result.service,
             severity,
             complianceStatus,
-            value: result.fail_finding_count,
+            value: complianceStatus === 'FAIL' ? result.fail_finding_count : result.pass_finding_count,
         };
     });
 };
