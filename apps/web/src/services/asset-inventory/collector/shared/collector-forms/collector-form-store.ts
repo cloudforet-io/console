@@ -79,7 +79,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         resetSchedule(hoursOnly = false) {
             this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
-            if (!hoursOnly) this.schedulePower = this.originCollector?.state === 'ENABLED' ?? false;
+            if (!hoursOnly) this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         setAttachedServiceAccount(serviceAccount: AttachedServiceAccount|null) {
             if (!serviceAccount?.length) this.attachedServiceAccount = null;
