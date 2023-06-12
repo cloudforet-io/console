@@ -8,81 +8,47 @@
                         height="1.75rem"
             />
             <p-dynamic-field v-else
-                             :type="valueOptions.type"
-                             :data="value"
-                             :options="valueOptions.options"
-                             :extra-data="valueOptions"
+                             :type="state.valueOptions.type"
+                             :data="state.value"
+                             :options="state.valueOptions.options"
+                             :extra-data="state.valueOptions"
                              :handler="fieldHandler"
             />
         </span>
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed,
-    defineComponent,
-    reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
 import type {
-    DynamicWidgetFieldHandler,
     DynamicWidgetProps,
-    DynamicWidgetSchemaOptions,
-    DynamicWidgetViewOptions,
 } from '@/data-display/dynamic/dynamic-widget/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
 type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>;
 
-export default defineComponent<DynamicWidgetSummaryProps>({
-    name: 'PDynamicWidgetSummary',
-    components: { PDynamicField, PSkeleton },
-    props: {
-        name: {
-            type: String,
-            default: '',
-        },
-        schemaOptions: {
-            type: Object as () => DynamicWidgetSchemaOptions,
-            default: () => ({}),
-        },
-        data: {
-            type: [Object, String, Number, Array],
-            default: undefined,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        viewOptions: {
-            type: Object as () => DynamicWidgetViewOptions,
-            default: () => ({}),
-        },
-        fieldHandler: {
-            type: Function as PropType<DynamicWidgetFieldHandler|undefined>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            valueOptions: computed(() => props.schemaOptions?.value_options ?? DEFAULT_VALUE_OPTIONS),
-            value: computed(() => {
-                let value = getValueByPath(props.data, state.valueOptions.key);
-                if (Array.isArray(value)) value = value[0];
-                return value ?? '-';
-            }),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<DynamicWidgetSummaryProps>(), {
+    name: '',
+    schemaOptions: () => ({}),
+    loading: false,
+    viewOptions: () => ({}),
 });
+
+const state = reactive({
+    valueOptions: computed(() => props.schemaOptions?.value_options ?? DEFAULT_VALUE_OPTIONS),
+    value: computed(() => {
+        let value = getValueByPath(props.data, state.valueOptions.key);
+        if (Array.isArray(value)) value = value[0];
+        return value ?? '-';
+    }),
+});
+
 </script>
 
 <style lang="postcss">
