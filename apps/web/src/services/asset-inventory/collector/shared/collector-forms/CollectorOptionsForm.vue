@@ -58,7 +58,7 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    loading: true,
+    loading: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     schema: null as null|JsonSchema|object,
 });
@@ -98,6 +98,7 @@ const handleClickReloadButton = () => {
 watch(() => collectorFormStore.collectorId, (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
+    getPluginMetadata();
 }, { immediate: true });
 
 </script>
