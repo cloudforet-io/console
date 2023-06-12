@@ -186,6 +186,7 @@ interface ContextMenuProps {
     searchable?: boolean;
     searchText?: string;
     readonly?: boolean;
+    resetSelectedOnUnmounted: boolean;
 }
 interface ContextMenuEmits {
     (e: 'update:selected', selected: MenuItem[]): void,
@@ -206,6 +207,7 @@ const props = withDefaults(defineProps<ContextMenuProps>(), {
     highlightTerm: '',
     searchText: '',
     readonly: false,
+    resetSelectedOnUnmounted: true,
 });
 const emit = defineEmits<ContextMenuEmits>();
 const slots = useSlots();
@@ -311,7 +313,7 @@ watch(() => props.searchText, (searchText) => {
 });
 
 onUnmounted(() => {
-    state.proxySelected = [];
+    if (props.resetSelectedOnUnmounted) state.proxySelected = [];
 });
 
 /* slots */
