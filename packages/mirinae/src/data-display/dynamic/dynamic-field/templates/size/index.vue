@@ -1,8 +1,7 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
-
 import bytes from 'bytes';
+import { h, useAttrs } from 'vue';
+
 
 import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
@@ -43,8 +42,10 @@ export default {
             default: undefined,
         },
     },
-    setup(props: SizeDynamicFieldProps, { attrs }: SetupContext) {
+    setup(props: SizeDynamicFieldProps) {
         let value: number|null;
+
+        const attrs = useAttrs();
 
         // eslint-disable-next-line vue/no-setup-props-destructure
         if (typeof props.data === 'number') value = props.data;
