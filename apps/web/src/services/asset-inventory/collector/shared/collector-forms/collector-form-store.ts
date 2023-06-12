@@ -3,11 +3,13 @@ import { defineStore } from 'pinia';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import type {
-    CollectorModel,
+    CollectorModel, CollectorOptions,
     RepositoryPluginModel,
 } from '@/services/asset-inventory/collector/model';
 
 type AttachedServiceAccount = string[]; // TODO: need to check type
+
+export type AttachedServiceAccountType = 'all'|'specific';
 
 export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
@@ -20,8 +22,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         autoUpgrade: false,
         scheduleHours: [] as number[],
         schedulePower: false,
-        attachedServiceAccount: null as AttachedServiceAccount|null,
-        pluginMetadata: {} as Record<string, any>,
+        attachedServiceAccount: [] as AttachedServiceAccount,
+        attachedServiceAccountType: 'all' as AttachedServiceAccountType,
+        options: {} as CollectorOptions,
     }),
     getters: {
         collectorId(): string|undefined {
@@ -47,7 +50,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.resetTags();
             this.resetVersion();
             this.resetSchedule();
-            // TODO: set attached service account from origin data
+            this.resetOptions();
         },
         setProvider(provider: string) {
             this.provider = provider;
@@ -81,12 +84,15 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
             if (!hoursOnly) this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
-        setAttachedServiceAccount(serviceAccount: AttachedServiceAccount|null) {
-            if (!serviceAccount?.length) this.attachedServiceAccount = null;
-            else this.attachedServiceAccount = serviceAccount;
+        resetAttachedServiceAccount() {
+            this.attachedServiceAccount = this.originCollector?.secret_filter?.service_accounts ?? [];
+            this.attachedServiceAccountType = this.originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
         },
-        setPluginMetadata(metadata: Record<string, any>) {
-            this.pluginMetadata = metadata;
+        setOptions(options: CollectorOptions) {
+            this.options = options;
+        },
+        resetOptions() {
+            this.options = this.originCollector?.plugin_info?.options ?? {};
         },
     },
 });
