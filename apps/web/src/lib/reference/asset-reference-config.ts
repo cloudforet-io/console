@@ -9,14 +9,14 @@ export const ASSET_REFERENCE_TYPE_INFO = {
         key: 'account',
         name: 'AWS Account ID (Asset)',
     },
-    asset_requirement_id: {
-        type: 'asset_requirement_id',
-        key: 'data.requirement_id',
-        name: 'Requirement ID',
-    },
+    // asset_requirement_id: {
+    //     type: 'asset_requirement_id',
+    //     key: 'data.requirement_id',
+    //     name: 'Requirement ID',
+    // },
     asset_service: {
         type: 'asset_service',
-        key: 'data.service',
+        key: 'additional_info.service',
         name: 'Service',
     },
 } as const;
