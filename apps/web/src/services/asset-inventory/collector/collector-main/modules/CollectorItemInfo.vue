@@ -169,7 +169,6 @@ import { store } from '@/store';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
 import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
 
@@ -187,7 +186,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-const collectorScheduleStore = useCollectorFormStore();
 
 const { i18nDayjs } = useI18nDayjs();
 
@@ -227,10 +225,10 @@ const state = reactive({
 /* Components */
 const handleChangeToggle = () => {};
 const handleClickSchedule = () => {
+    collectorPageStore.setSelectedCollector(props.item.collectorId);
     collectorPageStore.$patch({
-        visibleModal: true,
+        visibleScheduleModal: true,
     });
-    collectorScheduleStore.setOriginCollector(props.item.origin);
 };
 
 // TODO: temp data will be deleted.

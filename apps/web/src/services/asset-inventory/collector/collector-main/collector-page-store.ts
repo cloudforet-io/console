@@ -16,10 +16,11 @@ export const useCollectorPageStore = defineStore('collector-page', {
         sortBy: '',
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
+        selectedCollect: {} as CollectorModel,
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as CollectorScheduleModel[],
-        visibleModal: false,
+        visibleScheduleModal: false,
 
     }),
     getters: {
@@ -47,12 +48,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 this.loading = false;
             }
         },
-        async setSelectedProvider(provider) {
-            this.selectedProvider = provider;
-        },
-        async setFilteredCollectorList(filters) {
-            this.searchFilters = filters;
-        },
         async getCollectorSchedule(id) {
             try {
                 const res = await SpaceConnector.client.inventory.collector.schedule.list({
@@ -63,6 +58,18 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             }
+        },
+        setSelectedProvider(provider) {
+            this.selectedProvider = provider;
+        },
+        setFilteredCollectorList(filters) {
+            this.searchFilters = filters;
+        },
+        setSelectedCollector(id) {
+            const itemIndex = this.collectors.findIndex(
+                (item) => item.collector_id === id,
+            );
+            this.selectedCollect = this.collectors[itemIndex];
         },
     },
 });

@@ -211,5 +211,4 @@ export interface CollectorItemInfo {
     plugin: CollectorPlugin;
     historyLink: CollectorLink,
     detailLink: CollectorLink;
-    origin: CollectorModel;
 }
