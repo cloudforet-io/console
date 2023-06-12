@@ -30,7 +30,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    defineProps, computed, reactive, watch,
+} from 'vue';
 
 import {
     PJsonSchemaForm, PButton, PI, PDataLoader,
@@ -41,6 +43,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -48,22 +51,32 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const props = defineProps<{
+    hasMetadata?: boolean;
+    resetOnCollectorIdChange?: boolean;
+}>();
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    loading: true,
+    loading: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     schema: null as null|JsonSchema|object,
+});
+
+const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
+    plugin_id: state.pluginId,
+    version: collectorFormState.version,
 });
 
 const getPluginMetadata = async () => {
     try {
         state.loading = true;
-        const res = await SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
-            plugin_id: state.pluginId,
-            version: collectorFormState.version,
-        });
-        state.schema = res.metadata?.options_schema ?? null;
+        if (!props.hasMetadata) {
+            const res = await fetchGetPluginMetadata();
+            state.schema = res.metadata?.options_schema ?? null;
+        } else {
+            state.schema = collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {};
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
         state.schema = {};
@@ -83,7 +96,9 @@ const handleClickReloadButton = () => {
 
 
 watch(() => collectorFormStore.collectorId, (collectorId) => {
-    if (collectorId) getPluginMetadata();
+    if (props.resetOnCollectorIdChange && !collectorId) return;
+    collectorFormStore.resetAttachedServiceAccount();
+    getPluginMetadata();
 }, { immediate: true });
 
 </script>

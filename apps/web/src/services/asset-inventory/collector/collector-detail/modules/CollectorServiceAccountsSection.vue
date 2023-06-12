@@ -35,6 +35,7 @@
         >
             <attached-service-account-form :title="$t('INVENTORY.COLLECTOR.DETAIL.SELECT_SERVICE_ACCOUNT')"
                                            margin-on-specific
+                                           reset-on-collector-id-change
                                            @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
             />
             <p-button style-type="tertiary"

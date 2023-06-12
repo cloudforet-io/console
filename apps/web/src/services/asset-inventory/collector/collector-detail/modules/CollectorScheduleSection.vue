@@ -18,6 +18,7 @@
         <div class="schedule-wrapper">
             <collector-schedule-form :edit-mode="state.isEditMode"
                                      :disabled="state.updateLoading"
+                                     reset-on-collector-id-change
                                      @update:editMode="handleUpdateEditMode"
             />
 

@@ -16,6 +16,7 @@ export interface CollectorOptions {
     [key: string]: any;
 }
 export interface CollectorMetadata {
+    options_schema: JsonSchema;
     [key: string]: any;
 }
 export interface CollectorPluginModel {
