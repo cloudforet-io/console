@@ -26,7 +26,7 @@
                     {{ props.label }}
                 </p>
                 <div class="label-description">
-                    <div v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
+                    <div v-if="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
                          class="scheduled"
                     >
                         <p-i
@@ -126,16 +126,16 @@
                 </p>
                 <div @click.stop="handleChangeToggle">
                     <p-toggle-button
-                        :value="state.collectorState === COLLECTOR_STATE.ENABLED"
+                        :value="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
                         :label="state.toggleStatus"
-                        :class="state.collectorState === COLLECTOR_STATE.ENABLED ? 'toggle-active' : ''"
+                        :class="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'toggle-active' : ''"
                         @change-toggle="handleChangeToggle"
                     />
                 </div>
                 <p-button style-type="transparent"
                           @click.stop="handleClickSchedule"
                 >
-                    <p-i v-if="state.collectorState === COLLECTOR_STATE.ENABLED"
+                    <p-i v-if="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
                          name="ic_edit"
                          height="0.75rem"
                          width="0.75rem"
@@ -150,7 +150,7 @@
                          class="icon-schedule"
                     />
                     <!-- TODO: changed condition after API spec checking -->
-                    {{ state.collectorState === COLLECTOR_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                    {{ state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                 </p-button>
             </div>
         </div>
@@ -169,8 +169,14 @@ import { store } from '@/store';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/type';
-import { COLLECTOR_ITEM_INFO_TYPE, COLLECTOR_STATE } from '@/services/asset-inventory/collector/type';
+import type {
+    CollectorItemInfo,
+    CollectorScheduleState,
+} from '@/services/asset-inventory/collector/type';
+import {
+    COLLECTOR_ITEM_INFO_TYPE,
+    COLLECTOR_SCHEDULE_STATE,
+} from '@/services/asset-inventory/collector/type';
 
 interface Props {
     label: string;
@@ -195,9 +201,9 @@ const storeState = reactive({
 
 const state = reactive({
     current: computed(() => i18nDayjs.value.tz(i18nDayjs.value(), storeState.timezone)),
-    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_info.collector_id === props.item.collectorId)),
-    collectorState: computed(() => state.schedule?.collector_info.state),
-    toggleStatus: computed(() => (state.collectorState === COLLECTOR_STATE.ENABLED ? 'ON' : 'OFF')),
+    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_id === props.item.collectorId)),
+    scheduleState: computed<CollectorScheduleState>(() => state.schedule?.collector_info.state),
+    toggleStatus: computed(() => (state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
     nextSchedule: computed(() => {
         if (state.schedule) {
             const hours = state.schedule.schedule?.hours ?? [];

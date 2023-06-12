@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import type { ListType, Tags, TimeStamp } from '@/models';
+import type { Tags } from '@/models';
 
 import type { MonitoringType } from '@/common/modules/monitoring/config';
 
@@ -9,12 +9,6 @@ export enum COLLECT_MODE {
     create = 'CREATE',
     update = 'UPDATE'
 }
-
-export const COLLECTOR_STATE = {
-    ENABLED: 'ENABLED',
-    DISABLED: 'DISABLED',
-} as const;
-export type CollectorState = typeof COLLECTOR_STATE[keyof typeof COLLECTOR_STATE];
 
 export const UPGRADE_MODE = {
     AUTO: 'AUTO',
@@ -59,13 +53,11 @@ export interface CollectorPluginModel {
     options: PluginOptions;
     metadata: object;
     upgrade_mode: UpgradeMode;
-    secret_filter: object;
 }
 
 export interface RepositoryPluginModel {
     plugin_id: string;
     name: string;
-    state: CollectorState;
     image: string;
     registry_type: 'DOCKER_HUB'|'AWS_PUBLIC_ECR'|'HARBOR';
     registry_url: string;
@@ -98,13 +90,36 @@ interface Capability {
     [key: string]: any;
 }
 
+export const COLLECTOR_SECRET_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type CollectorSecretState = typeof COLLECTOR_SECRET_STATE[keyof typeof COLLECTOR_SECRET_STATE];
+interface SecretFilter {
+    state: CollectorSecretState;
+    secrets?: string[];
+    service_accounts?: string[];
+    schemas?: string[];
+}
+
+export const COLLECTOR_SCHEDULE_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type CollectorScheduleState = typeof COLLECTOR_SCHEDULE_STATE[keyof typeof COLLECTOR_SCHEDULE_STATE];
+
+export interface Schedule {
+    state: CollectorScheduleState;
+    hours?: number[];
+}
+
 export interface CollectorModel {
     collector_id: string;
     name: string;
-    state: CollectorState;
     provider: string;
     capability: Capability;
     schedule?: Schedule;
+    secret_filter: SecretFilter;
     plugin_info: CollectorPluginModel;
     created_at: string;
     last_collected_at: string;
@@ -122,7 +137,6 @@ export interface SecretModel {
 export interface CollectorUpdateParameter {
     collector_id: string;
     name?: string;
-    state?: CollectorState;
     plugin_info?: Partial<CollectorPluginModel>;
     schedule?: Partial<Schedule>;
     tags?: Tags;
@@ -142,60 +156,9 @@ export interface CollectorCreateParameter {
     tags: Tags;
 }
 
-export interface Schedule {
-    cron?: string;
-    interval?: number;
-    minutes?: number[];
-    hours?: number[];
-}
 
-export interface ScheduleAddParameter {
-    collector_id: string;
-    name?: string;
-    schedule: Schedule;
-    filter?: any;
-    collect_mode?: COLLECT_MODE;
-}
 
-export interface CollectorScheduleModel {
-    schedule_id: string;
-    name: string;
-    collector_id: string;
-    schedule: Schedule;
-    filters: object;
-    collect_mode: COLLECT_MODE;
-    created_at: TimeStamp;
-    last_schedule_at: TimeStamp;
-}
-
-export interface ScheduleUpdateParameter {
-    schedule_id: string;
-    collector_id: string;
-    name?: string;
-    schedule?: Schedule;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filter?: any;
-    collect_mode?: COLLECT_MODE;
-}
-
-export interface ScheduleDeleteParameter {
-    schedule_id: string;
-    collector_id: string;
-}
-
-export interface ScheduleListParameter {
-    collector_id: string;
-    schedule_id?: string;
-}
-
-export interface ScheduleGetParameter {
-    collector_id: string;
-    schedule_id: string;
-}
-
-export type CollectorListResp = ListType<CollectorModel>;
-export type CollectorScheduleListResp = ListType<CollectorScheduleModel>;
-
+// TODO: Interfaces below must be moved to other directory that uses. (these are not global type for collector service)
 interface CollectorPlugin {
     name?: string;
     icon?: string;

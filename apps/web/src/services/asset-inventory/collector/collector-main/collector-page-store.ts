@@ -6,7 +6,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, CollectorScheduleModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel, Schedule } from '@/services/asset-inventory/collector/type';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
@@ -19,7 +19,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         selectedCollect: {} as CollectorModel,
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
-        schedules: [] as CollectorScheduleModel[],
+        schedules: [] as Schedule[],
         visibleScheduleModal: false,
 
     }),
