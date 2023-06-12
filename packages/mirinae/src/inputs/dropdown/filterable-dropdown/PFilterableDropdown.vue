@@ -75,6 +75,7 @@
                         show-clear-selection
                         :style="contextMenuStyle"
                         :class="{ default: !props.showSelectMarker }"
+                        :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
                         @select="handleSelectMenuItem"
                         @click-done="hideMenu"
                         @click-show-more="handleClickShowMore"
@@ -142,6 +143,7 @@ interface FilterableDropdownProps {
     appearanceType?: FilterableDropdownAppearanceType;
     // eslint-disable-next-line vue/require-default-prop
     pageSize?: number;
+    resetSelectedOnUnmounted: boolean;
 }
 const props = withDefaults(defineProps<FilterableDropdownProps>(), {
     menu: () => [],
@@ -151,6 +153,7 @@ const props = withDefaults(defineProps<FilterableDropdownProps>(), {
     visibleMenu: undefined,
     placeholder: undefined,
     appearanceType: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
+    resetSelectedOnUnmounted: true,
 });
 
 /* event emits */

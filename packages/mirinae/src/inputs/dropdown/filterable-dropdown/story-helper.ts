@@ -170,6 +170,24 @@ const extraArgTypes: ArgTypes = {
             options: { min: 0 },
         },
     },
+    resetSelectedOnUnmounted: {
+        name: 'resetSelectedOnUnmounted',
+        type: { name: 'boolean' },
+        description: 'Whether to reset selected items when unmounted or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* events */
     onHideMenu: {
         name: 'hide-menu',
