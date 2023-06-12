@@ -132,7 +132,6 @@ const state = reactive({
     ...toRefs(useWidgetState<CloudServiceStatsModel[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
     })),
     outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
@@ -144,7 +143,7 @@ const state = reactive({
         },
     }))),
     innerChartData: computed<InnerChartData[]>(() => {
-        const targetDataList = state.data?.filter((d) => d.date === state.dateRange.end && d.key === 'fail_finding_count') ?? [];
+        const targetDataList = state.data?.filter((d) => d.date === state.dateRange.end && d.key === 'fail_check_count') ?? [];
         return targetDataList.map((data) => ({
             severity: SEVERITY_STATUS_MAP[data.severity].label,
             value: data.value,
@@ -158,7 +157,8 @@ const state = reactive({
     accountCount: 0, // TODO: should be changed to real data when api is ready
     prevComplianceCount: computed<number|undefined>(() => {
         if (!state.data) return undefined;
-        const targetDataList = state.data.filter((d) => d.date === state.dateRange.start && d.key === 'compliance_count');
+        const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
+        const targetDataList = state.data.filter((d) => d.date === prevMonth && d.key === 'compliance_count');
         return sum(targetDataList.map((d) => d.value));
     }),
     complianceCount: computed<number|undefined>(() => {
@@ -206,10 +206,11 @@ const fetchData = async (): Promise<CloudServiceStatsModel[]> => {
         apiQueryHelper
             .setFilters(state.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.start,
+                start: prevMonth,
                 end: state.dateRange.end,
                 group_by: ['key', 'unit', 'additional_info.severity'],
                 fields: {
