@@ -93,7 +93,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import type {
+    CollectorModel, CollectorPluginModel, CollectorUpdateParameter, CollectorUpdatePluginParameter,
+} from '@/services/asset-inventory/collector/model';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
@@ -130,7 +132,16 @@ const state = reactive({
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
-    isAllValid: computed(() => state.isVersionValid && state.isTagsValid),
+    isPluginUpdated: computed<boolean>(() => {
+        if (!state.pluginInfo) return false;
+        return state.pluginInfo.version !== collectorFormState.version
+            || (state.pluginInfo.upgrade_mode === UPGRADE_MODE.AUTO) !== collectorFormState.autoUpgrade;
+    }),
+    isTagsUpdated: computed<boolean>(() => {
+        if (!collectorFormState.originCollector) return false;
+        return JSON.stringify(collectorFormState.originCollector.tags) !== JSON.stringify(collectorFormState.tags);
+    }),
+    isAllValid: computed(() => (state.isPluginUpdated || state.isTagsUpdated) && state.isVersionValid && state.isTagsValid),
     updateLoading: false,
 });
 
@@ -138,18 +149,25 @@ const state = reactive({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isLatestVersion = (version: string) => true;
 
+const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const params: CollectorUpdatePluginParameter = {
+        collector_id: collectorFormStore.collectorId,
+        version: collectorFormState.version,
+        upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+    };
+    return SpaceConnector.client.inventory.collector.updatePlugin(params);
+};
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
     const params: CollectorUpdateParameter = {
         collector_id: collectorFormStore.collectorId,
-        plugin_info: {
-            version: collectorFormState.version,
-            upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
-        },
         tags: collectorFormState.tags,
     };
     return SpaceConnector.client.inventory.collector.update(params);
 };
+
+
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -166,9 +184,19 @@ const handleClickCancel = () => {
     state.isEditMode = false;
 };
 const handleClickSave = async () => {
+    if (!state.isAllValid) return;
     try {
         state.updateLoading = true;
-        const collector = await fetchCollectorUpdate();
+        let collector: CollectorModel|undefined;
+        if (state.isPluginUpdated) {
+            collector = await fetchCollectorPluginUpdate();
+        }
+        if (state.isTagsUpdated) {
+            const result = await fetchCollectorUpdate();
+            if (collector) collector = { ...collector, ...result };
+            collector = result;
+        }
+        if (!collector) throw new Error('collector is undefined'); // collector must be defined if all valid
         collectorFormStore.setOriginCollector(collector);
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
     } catch (e) {
