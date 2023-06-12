@@ -13,7 +13,7 @@
                          :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"
         />
-        <div v-if="!props.editMode"
+        <div v-if="!props.editMode && !props.createMode"
              class="collect-data-desc"
         >
             <i18n v-if="state.timezoneAppliedHours.length > 0"
@@ -78,6 +78,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 const props = defineProps<{
     editMode?: boolean;
+    createMode?: boolean;
     disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
 }>();
@@ -100,7 +101,10 @@ const state = reactive({
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
-    loading: computed<boolean>(() => collectorFormState.originCollector === null),
+    loading: computed<boolean>(() => {
+        if (props.createMode) return false;
+        return collectorFormState.originCollector === null;
+    }),
 });
 
 const updateSelectedHours = () => {

@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-4">
-        <collector-schedule-form edit-mode />
+        <collector-schedule-form create-mode />
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
                            style-type="highlight"
