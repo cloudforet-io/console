@@ -1,16 +1,17 @@
 <template>
-    <div v-click-outside="hideMenu"
+    <div ref="containerRef"
+         v-click-outside="hideMenu"
          class="p-filterable-query-dropdown"
     >
         <p-search ref="targetRef"
+                  v-model:is-focused="querySearchState.isFocused"
                   :class="{'no-menu': querySearchState.menu ? querySearchState.menu.length === 0 : false}"
                   :value="querySearchState.searchText"
                   :placeholder="placeholder ? placeholder : 'Select Key: value'"
                   disable-icon
-                  :is-focused.sync="querySearchState.isFocused"
         >
             <template #default="scope">
-                <p-tag v-for="(selectedItem, index) in proxySelected"
+                <p-tag v-for="(selectedItem, index) in state.proxySelected"
                        :key="`tag-box-${index}`"
                        :key-item="selectedItem.key"
                        :value-item="selectedItem.value"
@@ -24,7 +25,6 @@
                         {{ keyItem.label }}:
                     </span>
                     <input ref="inputRef"
-                           v-focus.lazy="querySearchState.isFocused"
                            class="input-element"
                            :value="querySearchState.searchText"
                            :placeholder="querySearchState.currentPlaceholder || scope.placeholder"
@@ -59,14 +59,14 @@
                           @click="handleClickDropdownButton"
                     >
                         <p-i class="icon"
-                             :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                             :name="state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                              color="inherit"
                         />
                     </span>
                 </div>
             </template>
         </p-search>
-        <p-context-menu v-show="proxyVisibleMenu"
+        <p-context-menu v-show="state.proxyVisibleMenu"
                         ref="menuRef"
                         :loading="querySearchState.lazyLoading"
                         :menu="querySearchState.menu"
@@ -81,17 +81,12 @@
     </div>
 </template>
 
-<script lang="ts">
-import type {
-    PropType, DirectiveFunction, SetupContext,
-} from 'vue';
+<script setup lang="ts">
+import { useFocus, onClickOutside } from '@vueuse/core';
 import {
-    computed,
-    defineComponent, reactive, toRefs, toRef,
+    computed, ref,
+    reactive, toRef,
 } from 'vue';
-
-import { vOnClickOutside } from '@vueuse/components';
-import { focus as vFocus } from 'vue-focus';
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
@@ -103,142 +98,89 @@ import type { FilterableQueryDropdownProps } from '@/inputs/dropdown/filterable-
 import type { KeyMenuItem, ValueMenuItem, QueryItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 
-export default defineComponent<FilterableQueryDropdownProps>({
-    name: 'PFilterableQueryDropdown',
-    components: {
-        PContextMenu,
-        PSearch,
-        PTag,
-        PI,
-    },
-    directives: {
-        focus: vFocus,
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
-    model: {
-        prop: 'value',
-        event: 'update:value',
-    },
-    props: {
-        placeholder: {
-            type: String,
-            default: undefined,
-        },
-        focused: {
-            type: Boolean,
-            default: false,
-        },
-        visibleMenu: {
-            type: Boolean,
-            default: undefined,
-        },
-        useFixedMenuStyle: {
-            type: Boolean,
-            default: false,
-        },
-        keyItemSets: {
-            // FIXME:: below any type
-            type: Array as PropType<any>,
-            default: () => [],
-        },
-        valueHandlerMap: {
-            type: Object,
-            default: () => ({}),
-        },
-        selected: {
-            type: Array,
-            default: () => [],
-        },
-        multiSelectable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxySelected: useProxyValue('selected', props, emit),
-            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-        });
-
-        const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: toRef(state, 'proxyVisibleMenu'),
-        });
-        const contextMenuFixedStyleState = reactive({
-            targetRef, targetElement, contextMenuStyle,
-        });
-
-        const {
-            state: querySearchState,
-            focus, blur, hideMenu, showMenu,
-            onInput,
-            onKeydownCheck,
-            onKeyupEnter,
-            onPaste,
-            onDeleteAll,
-            preTreatSelectedMenuItem,
-        } = useQuerySearch(
-            {
-                focused: props.focused,
-                valueHandlerMap: toRef(props, 'valueHandlerMap'),
-                keyItemSets: toRef(props, 'keyItemSets'),
-                visibleMenu: toRef(state, 'proxyVisibleMenu'),
-            },
-            { strict: true },
-        );
-
-
-        /* util */
-        const selectItem = (queryItem: QueryItem) => {
-            if (props.multiSelectable) {
-                state.proxySelected = [...state.proxySelected, queryItem];
-            } else {
-                state.proxySelected = [queryItem];
-            }
-        };
-
-        /* event */
-        const onDeleteTag = (item: FilterableDropdownMenuItem, index: number) => {
-            state.proxySelected.splice(index, 1);
-            state.proxySelected = [...state.proxySelected];
-        };
-
-        const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
-            const queryItem = await preTreatSelectedMenuItem(item);
-            if (queryItem) selectItem(queryItem);
-        };
-
-        const onEnter = async () => {
-            const queryItem = await onKeyupEnter();
-            if (queryItem) selectItem(queryItem);
-        };
-
-        const handleClickDropdownButton = () => {
-            if (state.proxyVisibleMenu) hideMenu();
-            else showMenu(true);
-        };
-
-        return {
-            querySearchState,
-            ...toRefs(state),
-            ...toRefs(contextMenuFixedStyleState),
-            focus,
-            blur,
-            showMenu,
-            hideMenu,
-            onInput,
-            onEnter,
-            onKeydownCheck,
-            onPaste,
-            onDeleteAll,
-            onMenuSelect,
-            onDeleteTag,
-            handleClickDropdownButton,
-        };
-    },
+const props = withDefaults(defineProps<FilterableQueryDropdownProps>(), {
+    placeholder: undefined,
+    focused: false,
+    visibleMenu: undefined,
+    useFixedMenuStyle: false,
+    keyItemSets: () => [],
+    valueHandlerMap: () => ({}),
+    selected: () => [],
+    multiSelectable: false,
 });
+const emit = defineEmits(['update:selected', 'update:visibleMenu']);
+
+const inputRef = ref<HTMLElement| null>(null);
+const { focused: isInputFocused } = useFocus(inputRef);
+
+const containerRef = ref<HTMLElement| null>(null);
+
+const state = reactive({
+    proxySelected: useProxyValue('selected', props, emit),
+    proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
+});
+
+const {
+    targetRef, contextMenuStyle,
+} = useContextMenuFixedStyle({
+    useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+    visibleMenu: toRef(state, 'proxyVisibleMenu'),
+});
+
+const {
+    state: querySearchState,
+    focus, blur, hideMenu, showMenu,
+    onInput,
+    onKeydownCheck,
+    onKeyupEnter,
+    onPaste,
+    onDeleteAll,
+    preTreatSelectedMenuItem,
+} = useQuerySearch(
+    {
+        focused: props.focused || isInputFocused,
+        valueHandlerMap: toRef(props, 'valueHandlerMap'),
+        keyItemSets: toRef(props, 'keyItemSets'),
+        visibleMenu: toRef(state, 'proxyVisibleMenu'),
+    },
+    { strict: true },
+);
+
+
+/* util */
+const selectItem = (queryItem: QueryItem) => {
+    if (props.multiSelectable) {
+        state.proxySelected = [...state.proxySelected, queryItem];
+    } else {
+        state.proxySelected = [queryItem];
+    }
+};
+
+/* event */
+const onDeleteTag = (item: FilterableDropdownMenuItem, index: number) => {
+    state.proxySelected.splice(index, 1);
+    state.proxySelected = [...state.proxySelected];
+};
+
+const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
+    const queryItem = await preTreatSelectedMenuItem(item);
+    if (queryItem) selectItem(queryItem);
+};
+
+const onEnter = async () => {
+    const queryItem = await onKeyupEnter();
+    if (queryItem) selectItem(queryItem);
+};
+
+const handleClickDropdownButton = () => {
+    if (state.proxyVisibleMenu) hideMenu();
+    else showMenu(true);
+};
+
+onClickOutside(containerRef, () => {
+    if (state.proxyVisibleMenu) hideMenu();
+});
+
 </script>
 
 <style lang="postcss">

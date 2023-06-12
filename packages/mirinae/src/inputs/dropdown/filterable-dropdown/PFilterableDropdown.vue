@@ -15,7 +15,7 @@
                 <span v-if="displayValueOnDropdownButton === undefined"
                       class="placeholder"
                 >
-                    {{ props.placeholder || $t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
+                    {{ props.placeholder || t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
                 </span>
                 <span v-else-if="displayValueOnDropdownButton"
                       class="selected-item"
@@ -97,12 +97,12 @@
 </template>
 
 <script setup lang="ts">
+import { onClickOutside, useFocus } from '@vueuse/core';
+import { debounce, isEqual, reduce } from 'lodash';
 import {
     computed, watch, useSlots, ref, toRef,
 } from 'vue';
-
-import { onClickOutside, useFocus } from '@vueuse/core';
-import { debounce, isEqual, reduce } from 'lodash';
+import { useI18n } from 'vue-i18n';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
@@ -165,6 +165,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
     (e: 'click-show-more'): void;
 }>();
 
+const { t } = useI18n();
 
 /* selection */
 const proxySelected = ref<MenuItem[]>(props.selected);
