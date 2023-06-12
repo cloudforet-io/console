@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => ({
             template: {
                 compilerOptions: {
                     compatConfig: {
-                        Mode: 2,
+                        Mode: 3,
                     },
                 },
             },
