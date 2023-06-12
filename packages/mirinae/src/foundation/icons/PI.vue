@@ -8,10 +8,12 @@
              :color="color"
              :original="original"
              :class="animation"
-             v-on="$listeners"
+             v-on="listeners"
     />
 </template>
 <script setup lang="ts">
+
+import { useAttrs } from 'vue';
 
 import type { AnimationType } from '@/foundation/icons/config';
 import icons from '@/foundation/icons/p-icons/icons';
@@ -30,18 +32,7 @@ interface Props {
     animation?: AnimationType;
 }
 
-// TODO: need to add validation
-// {
-//     animation: {
-//         type: String as PropType<AnimationType|undefined>,
-//         default: undefined,
-//         validator(animation: AnimationType|undefined) {
-//             return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-//         },
-//     },
-// },
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     name: '',
     dir: undefined,
     fill: true,
@@ -53,6 +44,12 @@ const props = withDefaults(defineProps<Props>(), {
     title: undefined,
     animation: undefined,
 });
+const attrs = useAttrs();
+
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss">
