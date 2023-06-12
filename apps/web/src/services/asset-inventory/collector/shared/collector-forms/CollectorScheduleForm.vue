@@ -10,6 +10,7 @@
         />
         <br>
         <p-toggle-button :value="collectorFormState.schedulePower"
+                         :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"
         />
         <div v-if="!props.editMode"
@@ -41,12 +42,16 @@
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
                       class="time-block"
-                      :class="{active: !!state.timezoneAppliedHours.includes(hour)}"
+                      :class="{
+                          active: !!state.timezoneAppliedHours.includes(hour),
+                          disabled: props.disabled
+                      }"
                       @click="handleClickHour(hour)"
                 >
                     {{ hour }}
                 </span>
                 <p-button style-type="tertiary"
+                          :disabled="props.disabled"
                           @click="handleClickAllHours"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
@@ -73,6 +78,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 const props = defineProps<{
     editMode?: boolean;
+    disabled?: boolean;
 }>();
 
 const emits = defineEmits<{(event: 'update:editMode', value: boolean): void;
@@ -115,6 +121,7 @@ const handleClickSelect = () => {
 };
 
 const handleClickHour = (hour: number) => {
+    if (props.disabled) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
@@ -189,11 +196,14 @@ watch(() => collectorFormState.originCollector, () => {
         text-align: center;
         font-size: 0.875rem;
         cursor: pointer;
-        &:hover {
+        &:hover:not(.disabled) {
             @apply bg-secondary2 border-secondary text-secondary;
         }
         &.active {
             @apply bg-safe text-white;
+        }
+        &.disabled {
+            cursor: not-allowed;
         }
     }
 }
