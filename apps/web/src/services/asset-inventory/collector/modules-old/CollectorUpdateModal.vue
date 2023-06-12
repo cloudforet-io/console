@@ -88,8 +88,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
-import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
+import type { CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import { UPGRADE_MODE } from '@/services/asset-inventory/collector/model';
 
 interface Props {
     visible: boolean;

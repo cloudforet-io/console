@@ -5,7 +5,7 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import type {
     CollectorModel,
     RepositoryPluginModel,
-} from '@/services/asset-inventory/collector/type';
+} from '@/services/asset-inventory/collector/model';
 
 type AttachedServiceAccount = string[]; // TODO: need to check type
 

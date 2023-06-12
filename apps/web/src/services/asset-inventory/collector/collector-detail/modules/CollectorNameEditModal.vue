@@ -26,9 +26,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
-import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 
 
 

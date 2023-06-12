@@ -93,12 +93,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CollectorModel, CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import { UPGRADE_MODE } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-import type { CollectorModel, CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
-import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 
 const props = defineProps<{
     loading: boolean;

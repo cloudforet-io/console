@@ -10,7 +10,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/type';
+import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 
 let lastLoadedTime = 0;
 

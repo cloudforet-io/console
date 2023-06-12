@@ -172,11 +172,11 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import type {
     CollectorItemInfo,
     CollectorScheduleState,
-} from '@/services/asset-inventory/collector/type';
+} from '@/services/asset-inventory/collector/model';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_SCHEDULE_STATE,
-} from '@/services/asset-inventory/collector/type';
+} from '@/services/asset-inventory/collector/model';
 
 interface Props {
     label: string;

@@ -4,57 +4,36 @@ import type { Tags } from '@/models';
 
 import type { MonitoringType } from '@/common/modules/monitoring/config';
 
-export enum COLLECT_MODE {
-    all = 'ALL',
-    create = 'CREATE',
-    update = 'UPDATE'
-}
 
+// CollectorPluginModel
 export const UPGRADE_MODE = {
     AUTO: 'AUTO',
     MANUAL: 'MANUAL',
 } as const;
 export type UpgradeMode = typeof UPGRADE_MODE[keyof typeof UPGRADE_MODE];
 
-export const COLLECTOR_QUERY_HELPER_SET = {
-    COLLECTOR_ID: 'collector_id',
-    NAME: 'name',
-    LAST_COLLECTED_AT: 'last_collected_at',
-    PROVIDER: 'provider',
-    TAGS: 'tags',
-    PLUGIN_INFO: 'plugin_info',
-    STATE: 'state',
-} as const;
-
-export const COLLECTOR_ITEM_INFO_TYPE = {
-    PLUGIN: 'PLUGIN',
-    STATUS: 'STATUS',
-    JOBS: 'JOBS',
-    SCHEDULE: 'SCHEDULE',
-} as const;
-export interface FilterFormat {
-    name: string;
-    type: string;
-    change_key: string[];
-    resource_type: string;
-    object_key?: string;
-}
-
-export interface PluginOptions {
-    supported_resource_type: string[];
-    filter_format: FilterFormat[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface CollectorOptions {
     [key: string]: any;
 }
-
+export interface CollectorMetadata {
+    [key: string]: any;
+}
 export interface CollectorPluginModel {
     plugin_id: string;
     version: string;
-    options: PluginOptions;
-    metadata: object;
+    options: CollectorOptions;
+    metadata: CollectorMetadata;
     upgrade_mode: UpgradeMode;
 }
 
+// RepositoryPluginModel
+interface Capability {
+    supported_schemas: string[];
+    use_resource_secret: boolean;
+    monitoring_type: MonitoringType;
+    supported_providers?: string[];
+    [key: string]: any;
+}
 export interface RepositoryPluginModel {
     plugin_id: string;
     name: string;
@@ -82,14 +61,8 @@ export interface RepositoryPluginModel {
     } & Tags;
 }
 
-interface Capability {
-    supported_schemas: string[];
-    use_resource_secret: boolean;
-    monitoring_type: MonitoringType;
-    supported_providers?: string[];
-    [key: string]: any;
-}
 
+// CollectorModel
 export const COLLECTOR_SECRET_STATE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
@@ -101,18 +74,15 @@ interface SecretFilter {
     service_accounts?: string[];
     schemas?: string[];
 }
-
 export const COLLECTOR_SCHEDULE_STATE = {
     ENABLED: 'ENABLED',
     DISABLED: 'DISABLED',
 } as const;
 export type CollectorScheduleState = typeof COLLECTOR_SCHEDULE_STATE[keyof typeof COLLECTOR_SCHEDULE_STATE];
-
 export interface Schedule {
     state: CollectorScheduleState;
     hours?: number[];
 }
-
 export interface CollectorModel {
     collector_id: string;
     name: string;
@@ -126,6 +96,7 @@ export interface CollectorModel {
     tags: Tags;
 }
 
+// SecretModel
 export interface SecretModel {
     secret_id: string;
     provider: string;
@@ -134,28 +105,27 @@ export interface SecretModel {
     created_at: string;
 }
 
+// collector api parameters
 export interface CollectorUpdateParameter {
     collector_id: string;
     name?: string;
-    plugin_info?: Partial<CollectorPluginModel>;
-    schedule?: Partial<Schedule>;
+    schedule?: Schedule; // backend api will replace whole schedule object
+    secret_filter?: SecretFilter; // backend api will replace whole schedule object
     tags?: Tags;
 }
-
-export interface CollectorCollectParameter {
+export interface CollectorCreateParameter extends CollectorUpdateParameter {
+    plugin_info?: Partial<CollectorPluginModel>;
+    provider?: string;
+}
+export interface CollectorUpdatePluginParameter {
     collector_id: string;
-    collect_mode?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filter?: any;
-    secret_id?: string;
-    secret_group_id?: string;
+    version?: string;
+    options?: CollectorOptions; // backend api will replace whole schedule object
+    upgrade_mode?: UpgradeMode;
 }
-
-export interface CollectorCreateParameter {
-    name: string;
-    tags: Tags;
+export interface CollectorDeleteParameter {
+    collectors: [string, ...string[]];
 }
-
 
 
 // TODO: Interfaces below must be moved to other directory that uses. (these are not global type for collector service)
@@ -184,3 +154,19 @@ export interface CollectorItemInfo {
     historyLink: CollectorLink,
     detailLink: CollectorLink;
 }
+export const COLLECTOR_QUERY_HELPER_SET = {
+    COLLECTOR_ID: 'collector_id',
+    NAME: 'name',
+    LAST_COLLECTED_AT: 'last_collected_at',
+    PROVIDER: 'provider',
+    TAGS: 'tags',
+    PLUGIN_INFO: 'plugin_info',
+    STATE: 'state',
+} as const;
+
+export const COLLECTOR_ITEM_INFO_TYPE = {
+    PLUGIN: 'PLUGIN',
+    STATUS: 'STATUS',
+    JOBS: 'JOBS',
+    SCHEDULE: 'SCHEDULE',
+} as const;
