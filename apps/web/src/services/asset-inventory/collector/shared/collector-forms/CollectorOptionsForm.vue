@@ -4,7 +4,7 @@
                    :data="state.schema"
     >
         <p-json-schema-form :schema="state.schema"
-                            :form-data="collectorFormState.pluginMetadata"
+                            :form-data="collectorFormState.options"
                             validation-mode="all"
                             :language="$store.state.user.language"
                             uniform-width
@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PJsonSchemaForm, PButton, PI, PDataLoader,
@@ -74,16 +74,18 @@ const getPluginMetadata = async () => {
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
     emit('update:isValid', isValid);
-    collectorFormStore.setPluginMetadata(value);
+    collectorFormStore.setOptions(value);
 };
 
 const handleClickReloadButton = () => {
     getPluginMetadata();
 };
 
-(() => {
-    getPluginMetadata();
-})();
+
+watch(() => collectorFormStore.collectorId, (collectorId) => {
+    if (collectorId) getPluginMetadata();
+}, { immediate: true });
+
 </script>
 
 <style lang="postcss" scoped>

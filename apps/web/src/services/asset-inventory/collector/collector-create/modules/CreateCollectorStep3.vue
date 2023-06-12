@@ -2,8 +2,8 @@
     <div class="collector-page-3">
         <div class="input-form">
             <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
-            <plugin-metadata-form class="plugin-metadata-form"
-                                  @update:isValid="handleChangeIsSchemaFormValid"
+            <collector-options-form class="collector-options-form"
+                                    @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>
         <div class="step-footer">
@@ -50,7 +50,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import AttachedServiceAccountForm
     from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-import PluginMetadataForm from '@/services/asset-inventory/collector/shared/collector-forms/PluginMetadataForm.vue';
+import CollectorOptionsForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorOptionsForm.vue';
 
 
 const emit = defineEmits([
@@ -103,7 +103,7 @@ const handleClose = () => {
     .input-form {
         margin-top: 2rem;
         min-height: calc(50vh - 5.625rem);
-        .plugin-metadata-form {
+        .collector-options-form {
             margin-top: 2rem;
         }
     }
