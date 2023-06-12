@@ -79,7 +79,7 @@ export default {
             }, [datetimeEl]);
         }
 
-        return datetimeEl;
+        return () => datetimeEl;
     },
 };
 </script>
