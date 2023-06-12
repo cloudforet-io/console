@@ -205,7 +205,18 @@ const fetchData = async (): Promise<CloudServiceStatsModel[]> => {
     try {
         apiQueryHelper
             .setFilters(state.consoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
+            .addFilter({
+                k: 'key',
+                v: [
+                    'compliance_count',
+                    'pass_check_count',
+                    'fail_check_count',
+                    'pass_score',
+                    'fail_score',
+                ],
+                o: '',
+            });
         const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
