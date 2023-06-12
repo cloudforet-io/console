@@ -14,10 +14,21 @@
                 </p-button>
             </template>
         </p-heading>
-        <!-- TODO: bind other props of PToolboxTable -->
         <p-toolbox-table v-if="!state.isEditMode"
                          :fields="fields"
                          :items="state.secrets"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :query-tags="apiQueryHelper.queryTags"
+                         :key-item-sets="querySearchHandlers.keyItemSets"
+                         :value-handler-map="querySearchHandlers.valueHandlerMap"
+                         :sort-by.sync="state.sortBy"
+                         :sort-desc.sync="state.sortDesc"
+                         :page-size.sync="state.pageLimit"
+                         search-type="query"
+                         searchable
+                         use-cursor-loading
+                         @change="handleToolboxTableChange"
         />
         <div v-else
              class="edit-form"
@@ -46,33 +57,32 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, reactive, watch, onMounted, computed,
+    reactive, watch, onMounted, computed,
 } from 'vue';
 
 import {
     PHeading, PButton, PPaneLayout, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
+import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
+
+import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import type { SecretModel } from '@/services/asset-inventory/collector/type';
 
-// TODO: Move type declaration to separated file. this is temporary.
-interface SecretModel {
-    secret_id: string;
-    provider: string;
-    service_account_id: string;
-    project_id: string;
-    created_at: string;
-}
-const props = defineProps<{
-    providers?: string[]
-}>();
+
+const collectorFormStore = useCollectorFormStore();
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -86,45 +96,66 @@ const state = reactive({
     loading: true,
     secrets: null as null|SecretModel[],
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    // query states
+    pageLimit: 15,
+    pageStart: 1,
+    sortBy: 'name',
+    sortDesc: true,
+    totalCount: 0,
 });
 
-const fetchSecrets = async (): Promise<SecretModel[]> => {
+const querySearchHandlers = {
+    keyItemSets: [{
+        title: 'Properties',
+        items: [
+            {
+                name: 'service_account_id',
+                label: 'Service Account',
+            },
+            {
+                name: 'project_id',
+                label: 'Project',
+            },
+        ],
+    }],
+    valueHandlerMap: {
+        service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
+        project_id: makeReferenceValueHandler('identity.Project'),
+    },
+};
+
+const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSets });
+const apiQueryHelper = new ApiQueryHelper();
+
+const getQuery = (provider?: string) => {
+    apiQueryHelper.setPage(state.pageStart, state.pageLimit)
+        .setSort(state.sortBy, state.sortDesc)
+        .setFilters(queryTagHelper.filters.value);
+
+    if (provider) {
+        apiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+    }
+
+    return apiQueryHelper.data;
+};
+
+const fetchSecrets = async (provider?: string): Promise<{ results: SecretModel[]; total_count: number }> => {
     try {
-        // TODO: change to real data
-        const results = await new Promise<SecretModel[]>((resolve) => {
-            setTimeout(() => {
-                resolve([
-                    {
-                        secret_id: 'secret-1',
-                        provider: 'aws',
-                        service_account_id: 'service-account-1',
-                        project_id: 'project-1',
-                        created_at: '2021-08-31T00:00:00Z',
-                    },
-                    {
-                        secret_id: 'secret-2',
-                        provider: 'azure',
-                        service_account_id: 'service-account-2',
-                        project_id: 'project-2',
-                        created_at: '2021-08-31T00:00:00Z',
-                    },
-                ]);
-            }, 2000);
+        const results = await SpaceConnector.client.secret.secret.list({
+            query: getQuery(provider),
         });
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
+        return { results: [], total_count: 0 };
     }
 };
-const getSecrets = async (providers?: string[]) => {
+const getSecrets = async (provider?: string) => {
     state.loading = true;
 
-    if (Array.isArray(providers)) {
-        state.secrets = await fetchSecrets();
-    } else {
-        state.secrets = null;
-    }
+    const { results, total_count } = await fetchSecrets(provider);
+    state.secrets = results;
+    state.totalCount = total_count;
 
     state.loading = false;
 };
@@ -137,6 +168,18 @@ const handleChangeIsAttachedServiceAccountValid = () => {
     // TODO: implement
 };
 
+const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
+    if (options.sortBy !== undefined) {
+        state.sortBy = options.sortBy;
+        state.sortDesc = options.sortDesc as boolean;
+    }
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
+
+    await getSecrets(collectorFormStore.provider);
+};
+
 const handleClickCancel = () => {
     state.isEditMode = false;
 };
@@ -147,8 +190,8 @@ const handleClickSave = () => {
 };
 
 
-watch(() => props.providers, async (providers?: string[]) => {
-    await getSecrets(providers);
+watch(() => collectorFormStore.provider, async (provider?: string) => {
+    await getSecrets(provider);
 }, { immediate: true });
 
 
