@@ -179,11 +179,11 @@ const handleCreate = () => {
 const handleExportExcel = async () => {
     emit('export-excel', state.excelFields);
 };
-const handleChangeToolbox = async (options) => {
+const handleChangeToolbox = (options) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        await collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
-        await replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
+        collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
+        replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
     }
     emit('change-toolbox', options);
 };

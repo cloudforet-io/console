@@ -224,9 +224,9 @@ const state = reactive({
 
 /* Components */
 const handleChangeToggle = () => {};
-const handleClickSchedule = async () => {
-    await collectorPageStore.setSelectedCollector(props.item.collectorId);
-    await collectorPageStore.$patch({
+const handleClickSchedule = () => {
+    collectorPageStore.setSelectedCollector(props.item.collectorId);
+    collectorPageStore.$patch({
         visibleScheduleModal: true,
     });
 };

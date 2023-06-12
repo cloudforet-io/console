@@ -117,8 +117,8 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setSort(collectorPageState.sortBy, true);
 
 /* Components */
-const handleSelectedProvider = async (providerName: string) => {
-    await collectorPageStore.setSelectedProvider(providerName);
+const handleSelectedProvider = (providerName: string) => {
+    collectorPageStore.setSelectedProvider(providerName);
 };
 const handleChangeToolbox = (options) => {
     setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
