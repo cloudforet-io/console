@@ -6,14 +6,14 @@
                        :valid="state.isAttachedServiceAccountValid"
                        :valid-text="$t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT_VALID')"
                        :required="true"
-                       :class="{'margin-on-specific': props.marginOnSpecific && state.selectedAttachedServiceAccountType === 'specific'}"
+                       :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
         >
             <!-- NOTE: screen desktop size-->
             <p-radio-group class="attached-service-account-radio-group">
                 <p-radio v-for="(item) in attachedServiceAccountList"
                          :key="`${item.name}`"
                          :value="item.name"
-                         :selected="state.selectedAttachedServiceAccountType"
+                         :selected="collectorFormState.attachedServiceAccountType"
                          @change="handleChangeAttachedServiceAccountType"
                 >
                     {{ item.label }}
@@ -21,11 +21,11 @@
             </p-radio-group>
             <!-- NOTE: screen mobile size-->
             <p-select-dropdown class="attached-service-account-dropdown"
-                               :selected="state.selectedAttachedServiceAccountType"
+                               :selected="collectorFormState.attachedServiceAccountType"
                                :items="attachedServiceAccountList"
                                @update:selected="handleChangeAttachedServiceAccountType"
             />
-            <div v-if="state.selectedAttachedServiceAccountType !== 'all'">
+            <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
                 <p-field-title class="specific-service-account-dropdown-label"
                                :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
                 />
@@ -60,7 +60,10 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import type { AttachedServiceAccountType } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 
 
@@ -69,13 +72,13 @@ interface Props {
     marginOnSpecific?: boolean;
 }
 
-type SelectType = 'all'|'specific';
 
 const emit = defineEmits<{(e: 'update:isAttachedServiceAccountValid', value: boolean): void;
 }>();
 
 const props = defineProps<Props>();
 const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const attachedServiceAccountList = [
     {
@@ -90,9 +93,8 @@ const attachedServiceAccountList = [
 
 const queryHelper = new QueryHelper();
 const state = reactive({
-    selectedAttachedServiceAccountType: 'all' as SelectType,
     isAttachedServiceAccountValid: computed<boolean>(() => {
-        if (invalidState.selectedAttachedServiceAccount === undefined || state.selectedAttachedServiceAccountType === 'all') {
+        if (invalidState.selectedAttachedServiceAccount === undefined || collectorFormState.attachedServiceAccountType === 'all') {
             return false;
         }
         return !invalidState.selectedAttachedServiceAccount;
@@ -142,32 +144,36 @@ const {
     selectedAttachedServiceAccount: [],
 }, {
     selectedAttachedServiceAccount(value: string[]|null) {
-        if (state.selectedAttachedServiceAccountType !== 'all' && value && value.length) {
+        if (collectorFormState.attachedServiceAccountType !== 'all' && value && value.length) {
             return true;
         }
-        if (state.selectedAttachedServiceAccountType !== 'all') {
+        if (collectorFormState.attachedServiceAccountType !== 'all') {
             return i18n.t('INVENTORY.COLLECTOR.CREATE.REQUIRED_FIELD');
         }
         return true;
     },
 });
 
-const handleChangeAttachedServiceAccountType = (selectedValue: SelectType) => {
-    state.selectedAttachedServiceAccountType = selectedValue;
-    if (selectedValue === 'all') {
-        collectorFormStore.setAttachedServiceAccount(null);
-    } else {
-        collectorFormStore.setAttachedServiceAccount(selectedAttachedServiceAccount.value);
-    }
+const handleChangeAttachedServiceAccountType = (selectedValue: AttachedServiceAccountType) => {
+    collectorFormStore.$patch({
+        attachedServiceAccountType: selectedValue,
+        attachedServiceAccount: [],
+    });
 };
 
 const handleSelectAttachedServiceAccount = (selectedValue: string[]) => {
     setForm('selectedAttachedServiceAccount', selectedValue);
-    collectorFormStore.setAttachedServiceAccount(selectedValue);
+    collectorFormStore.$patch({
+        attachedServiceAccount: selectedValue,
+    });
 };
 
 watch(() => isAllValid.value, (value) => {
     emit('update:isAttachedServiceAccountValid', value);
+}, { immediate: true });
+
+watch(() => collectorFormStore.collectorId, (collectorId) => {
+    if (collectorId) collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 </script>
