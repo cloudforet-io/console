@@ -5,9 +5,9 @@
         />
         <div class="contents-container">
             <step1-search-filter @selectRepository="handleChangeRepository" />
-            <div>
+            <div class="right-area">
                 <p-field-title class="contents-title">
-                    Plugin
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') }}
                 </p-field-title>
                 <p-data-loader class="right-area"
                                :data="state.pluginList"
@@ -165,6 +165,7 @@ onMounted(() => {
         .right-area {
             max-width: 44.375rem;
             min-height: calc(100vh - 18rem);
+            flex-grow: 1;
             .plugin-card-list {
                 @apply flex flex-col gap-2;
                 overflow-y: auto;
