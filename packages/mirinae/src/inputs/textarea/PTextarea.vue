@@ -1,63 +1,48 @@
 <template>
-    <textarea v-model="proxyValue"
+    <textarea v-model="state.proxyValue"
               :placeholder="placeholder"
               :readonly="readonly"
               :autofocus="autofocus"
               :disabled="disabled"
               class="p-textarea"
               :class="{invalid}"
-              v-on="$listeners"
+              v-on="listeners"
     />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    defineComponent, reactive, toRefs,
+    reactive, useAttrs,
 } from 'vue';
 
 import { useProxyValue } from '@/hooks';
 
-export default defineComponent({
-    name: 'PTextarea',
-    model: {
-        prop: 'value',
-        event: 'update:value',
-    },
-    props: {
-        value: {
-            type: [String, Number],
-            default: '',
-        },
-        placeholder: {
-            type: [String, Number],
-            default: '',
-        },
-        autofocus: {
-            type: Boolean,
-            default: false,
-        },
-        readonly: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyValue: useProxyValue('value', props, emit),
-        });
-        return {
-            ...toRefs(state),
-        };
-    },
+interface Props {
+    value: string | number;
+    placeholder: string | number;
+    autofocus: boolean;
+    readonly: boolean;
+    disabled: boolean;
+    invalid: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    placeholder: '',
+    autofocus: false,
+    readonly: false,
+    disabled: false,
+    invalid: false,
 });
+const emit = defineEmits(['update:value']);
+const attrs = useAttrs();
+const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
+});
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss">

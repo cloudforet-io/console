@@ -13,7 +13,7 @@ export interface SelectProps {
     multiSelectable?: boolean;
 }
 
-export interface Predicate {
+interface Predicate {
     (value: any, current: any): boolean;
 }
 interface SelectStateArgs {

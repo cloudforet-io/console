@@ -11,91 +11,82 @@
     </p-status>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import { computed } from 'vue';
 
 import PStatus from '@/data-display/status/PStatus.vue';
+import type { AnimationType } from '@/foundation/icons/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import type { SelectProps } from '@/hooks/select';
 import { useSelect } from '@/hooks/select';
 
-interface Props extends SelectProps {
-    icon?: string;
-    iconAnimation?: ANIMATION_TYPE;
-    disableCheckIcon?: boolean;
-}
+/* NOTE: this is not used in the component, but it is used in the story
+    interface Props extends SelectProps {
+        icon?: string;
+        iconAnimation?: ANIMATION_TYPE;
+        disableCheckIcon?: boolean;
+    }
+ */
 
-export default defineComponent<Props>({
-    name: 'PSelectStatus',
-    components: { PStatus },
-    model: {
-        prop: 'selected',
-        event: 'change',
+const props = defineProps({
+    /* select props */
+    selected: {
+        type: [Boolean, String, Number, Object, Array],
+        default: undefined,
     },
-    props: {
-        /* select props */
-        selected: {
-            type: [Boolean, String, Number, Object, Array],
-            default: undefined,
-        },
-        value: {
-            type: [Boolean, String, Number, Object, Array],
-            default: '',
-        },
-        predicate: {
-            type: Function,
-            default: undefined,
-        },
-        multiSelectable: {
-            type: Boolean,
-            default: false,
-        },
-        /* status props */
-        icon: {
-            type: String,
-            default: undefined,
-        },
-        iconAnimation: {
-            type: String,
-            default: undefined,
-            validator(animation: any) {
-                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-            },
-        },
-        disableCheckIcon: {
-            type: Boolean,
-            default: false,
+    value: {
+        type: [Boolean, String, Number, Object, Array],
+        default: '',
+    },
+    predicate: {
+        type: Function as PropType<SelectProps['predicate']>,
+        default: undefined,
+    },
+    multiSelectable: {
+        type: Boolean,
+        default: false,
+    },
+    /* status props */
+    icon: {
+        type: String,
+        default: undefined,
+    },
+    iconAnimation: {
+        type: String as PropType<AnimationType>,
+        default: undefined,
+        validator(animation: string) {
+            return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
         },
     },
-    setup(props: Props, { emit }) {
-        const {
-            isSelected,
-            getSelected,
-        } = useSelect({
-            value: computed(() => props.value),
-            selected: computed(() => props.selected),
-            predicate: computed(() => props.predicate),
-            multiSelectable: computed(() => props.multiSelectable),
-        });
-        const withIcon = computed(() => props.icon);
-
-        /* event */
-        const onClick = () => {
-            const newSelected = getSelected();
-            if (props.multiSelectable) {
-                emit('change', newSelected, !isSelected.value);
-            } else {
-                emit('change', newSelected, true);
-            }
-        };
-
-        return {
-            isSelected,
-            withIcon,
-            onClick,
-        };
+    disableCheckIcon: {
+        type: Boolean,
+        default: false,
     },
 });
+const emit = defineEmits(['change']);
+
+const {
+    isSelected,
+    getSelected,
+} = useSelect({
+    value: computed(() => props.value),
+    selected: computed(() => props.selected),
+    predicate: computed(() => props.predicate),
+    multiSelectable: computed(() => props.multiSelectable),
+});
+const withIcon = computed(() => props.icon);
+
+/* event */
+const onClick = () => {
+    const newSelected = getSelected();
+    if (props.multiSelectable) {
+        emit('change', newSelected, !isSelected.value);
+    } else {
+        emit('change', newSelected, true);
+    }
+};
+
 </script>
 
 <style lang="postcss">

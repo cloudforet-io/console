@@ -1,91 +1,88 @@
 <template>
-    <button class="p-select-button" :class="{selected: isSelected, [styleType]: true, [size]: true}"
+    <button class="p-select-button"
+            :class="{selected: isSelected, [styleType]: true, [size]: true}"
             @click="onClick"
-            v-on="$listeners"
+            v-on="listeners"
     >
         <slot />
     </button>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import { computed, useAttrs } from 'vue';
 
 import type { SelectProps } from '@/hooks/select';
 import { useSelect } from '@/hooks/select';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
-interface Props extends SelectProps {
-    styleType?: SELECT_BUTTON_STYLE_TYPE;
-    size?: SELECT_BUTTON_SIZE;
-}
-
-export default defineComponent<Props>({
-    name: 'PSelectButton',
-    model: {
-        prop: 'selected',
-        event: 'change',
+/* NOTE: this is not used in the component, but it is used in the story
+    interface Props extends SelectProps {
+        styleType?: SELECT_BUTTON_STYLE_TYPE;
+        size?: SELECT_BUTTON_SIZE;
+    }
+*/
+const props = defineProps({
+    /* select props */
+    selected: {
+        type: [Boolean, String, Number, Object, Array],
+        default: undefined,
     },
-    props: {
-        /* select props */
-        selected: {
-            type: [Boolean, String, Number, Object, Array],
-            default: undefined,
-        },
-        value: {
-            type: [Boolean, String, Number, Object, Array],
-            default: true,
-        },
-        predicate: {
-            type: Function,
-            default: undefined,
-        },
-        multiSelectable: {
-            type: Boolean,
-            default: false,
-        },
-        /* select button props */
-        styleType: {
-            type: String,
-            default: SELECT_BUTTON_STYLE_TYPE.secondary,
-            validator(styleType: any) {
-                return Object.values(SELECT_BUTTON_STYLE_TYPE).includes(styleType);
-            },
-        },
-        size: {
-            type: String,
-            default: SELECT_BUTTON_SIZE.md,
-            validator(size: any) {
-                return Object.values(SELECT_BUTTON_SIZE).includes(size);
-            },
+    value: {
+        type: [Boolean, String, Number, Object, Array],
+        default: true,
+    },
+    predicate: {
+        type: Function as PropType<SelectProps['predicate']>,
+        default: undefined,
+    },
+    multiSelectable: {
+        type: Boolean,
+        default: false,
+    },
+    /* select button props */
+    styleType: {
+        type: String as PropType<SELECT_BUTTON_STYLE_TYPE>,
+        default: SELECT_BUTTON_STYLE_TYPE.secondary,
+        validator(styleType: any) {
+            return Object.values(SELECT_BUTTON_STYLE_TYPE).includes(styleType);
         },
     },
-    setup(props, { emit }) {
-        const {
-            isSelected,
-            getSelected,
-        } = useSelect({
-            value: computed(() => props.value),
-            selected: computed(() => props.selected),
-            predicate: computed(() => props.predicate),
-            multiSelectable: computed(() => props.multiSelectable),
-        });
-
-        /* event */
-        const onClick = () => {
-            const newSelected = getSelected();
-            if (props.multiSelectable) {
-                emit('change', newSelected, !isSelected.value);
-            } else {
-                emit('change', newSelected, true);
-            }
-        };
-
-        return {
-            isSelected,
-            onClick,
-        };
+    size: {
+        type: String as PropType<SELECT_BUTTON_SIZE>,
+        default: SELECT_BUTTON_SIZE.md,
+        validator(size: any) {
+            return Object.values(SELECT_BUTTON_SIZE).includes(size);
+        },
     },
 });
+const emit = defineEmits(['change']);
+const attrs = useAttrs();
+
+const {
+    isSelected,
+    getSelected,
+} = useSelect({
+    value: computed(() => props.value),
+    selected: computed(() => props.selected),
+    predicate: computed(() => props.predicate),
+    multiSelectable: computed(() => props.multiSelectable),
+});
+
+/* event */
+const onClick = () => {
+    const newSelected = getSelected();
+    if (props.multiSelectable) {
+        emit('change', newSelected, !isSelected.value);
+    } else {
+        emit('change', newSelected, true);
+    }
+};
+
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss" scoped>

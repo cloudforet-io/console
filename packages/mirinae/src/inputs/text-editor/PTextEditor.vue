@@ -15,7 +15,7 @@
 </template>
 
 
-<script lang="ts">
+<script setup lang="ts">
 /**
   * Used library: codemirror
   * https://github.com/codemirror/codemirror5
@@ -26,16 +26,15 @@
  * CodeMirror can get String ONLY
  */
 
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent,
-    getCurrentInstance, onBeforeUnmount,
-    reactive, toRefs, watch,
-} from 'vue';
 
 import type { EditorConfiguration } from 'codemirror';
 import CodeMirror from 'codemirror';
 import { forEach } from 'lodash';
+import {
+    computed, nextTick,
+    toRef, onBeforeUnmount,
+    reactive, watch,
+} from 'vue';
 
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
@@ -61,169 +60,142 @@ interface Props {
     disableAutoReformat?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'PTextEditor',
-    components: { PDataLoader },
-    props: {
-        code: {
-            type: [Array, Object, String, Number] as PropType<any>,
-            default: '',
-        },
-        options: {
-            type: Object as PropType<EditorConfiguration>,
-            default: () => ({
-                tabSize: 4,
-                styleActiveLine: true,
-                lineNumbers: true,
-                line: true,
-                mode: 'application/json',
-                lineWrapping: true,
-                theme: 'dracula',
-                matchBrackets: true,
-                autoCloseBrackets: true,
-                autoCloseTags: true,
-                foldGutter: true,
-                gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
-            }),
-        },
-        readOnly: {
-            type: Boolean,
-            default: false,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        folded: {
-            type: Boolean,
-            default: false,
-        },
-        highlightLines: {
-            type: Array as PropType<Array<number>>,
-            default: () => [],
-        },
-        disableAutoReformat: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            content: '',
-            cmInstance: null as CodeMirror.Editor|null,
-            textareaRef: null as HTMLTextAreaElement|null,
-            mergedOptions: computed<EditorConfiguration>(() => ({ ...props.options, readOnly: props.readOnly })),
-        });
+const defaultOptions = {
+    tabSize: 4,
+    styleActiveLine: true,
+    lineNumbers: true,
+    line: true,
+    mode: 'application/json',
+    lineWrapping: true,
+    theme: 'dracula',
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    autoCloseTags: true,
+    foldGutter: true,
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
+};
 
-        const refineCode = (code: any): string => {
-            if (typeof code === 'string') {
-                const trimmedCode = code.trim();
-                if (trimmedCode.startsWith('{') || trimmedCode.startsWith('[')) {
-                    try {
-                        // Object encased in String
-                        // "{height: 182}"
-                        const obj = JSON.parse(trimmedCode);
-                        if (props.disableAutoReformat) return code;
+const props = withDefaults(defineProps<Props>(), {
+    code: '',
+    options: () => (defaultOptions),
+    readOnly: false,
+    loading: false,
+    folded: false,
+    highlightLines: () => [],
+    disableAutoReformat: false,
+});
+const emit = defineEmits(['update:code']);
 
-                        return JSON.stringify(obj, undefined, 4);
-                    } catch {
-                        // Looks like Object encased in String, BUT Pure String
-                        // "{haha}"
-                        return code;
-                    }
-                }
-                // Pure String
-                // "haha"
+const state = reactive({
+    content: '',
+    cmInstance: null as CodeMirror.Editor|null,
+    textareaRef: null as HTMLTextAreaElement|null,
+    mergedOptions: computed<EditorConfiguration>(() => ({ ...props.options, readOnly: props.readOnly })),
+});
+const textareaRef = toRef(state, 'textareaRef');
+
+const refineCode = (code: any): string => {
+    if (typeof code === 'string') {
+        const trimmedCode = code.trim();
+        if (trimmedCode.startsWith('{') || trimmedCode.startsWith('[')) {
+            try {
+                // Object encased in String
+                // "{height: 182}"
+                const obj = JSON.parse(trimmedCode);
+                if (props.disableAutoReformat) return code;
+
+                return JSON.stringify(obj, undefined, 4);
+            } catch {
+                // Looks like Object encased in String, BUT Pure String
+                // "{haha}"
                 return code;
             }
-            // Object, null, undefined, Number
-            return JSON.stringify(code, undefined, 4);
-        };
+        }
+        // Pure String
+        // "haha"
+        return code;
+    }
+    // Object, null, undefined, Number
+    return JSON.stringify(code, undefined, 4);
+};
 
-        const forceFold = (cmInstance) => {
-            if (props.folded && cmInstance && props.code && cmInstance.foldCode) {
-                cmInstance.operation(() => {
-                    for (let l = cmInstance.firstLine() + 1;
-                        l <= cmInstance.lastLine(); ++l) {
-                        cmInstance.foldCode({ line: l, ch: 0 }, null, 'fold');
-                    }
-                });
+const forceFold = (cmInstance) => {
+    if (props.folded && cmInstance && props.code && cmInstance.foldCode) {
+        cmInstance.operation(() => {
+            for (let l = cmInstance.firstLine() + 1;
+                l <= cmInstance.lastLine(); ++l) {
+                cmInstance.foldCode({ line: l, ch: 0 }, null, 'fold');
             }
-        };
-
-        const setCode = (cmInstance, code) => {
-            if (code !== cmInstance.getValue()) {
-                const scrollInfo = cmInstance.getScrollInfo();
-                cmInstance.setValue(code);
-                cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
-            }
-        };
-
-        const setHighlightLines = (cmInstance, lines: Array<number>|undefined) => {
-            forEach(lines, (line) => {
-                cmInstance.setGutterMarker(line, 'CodeMirror-addedline', (() => {
-                    const marker = document.createElement('span');
-                    marker.innerHTML = '৹';
-                    return marker;
-                })());
-                cmInstance.addLineClass(line, 'wrap', 'CodeMirror-activeline');
-                cmInstance.addLineClass(line, 'background', 'CodeMirror-activeline-background');
-                cmInstance.addLineClass(line, 'gutter', 'CodeMirror-activeline-gutter');
-            });
-        };
-
-        const refresh = (cmInstance) => {
-            vm.$nextTick(() => {
-                cmInstance.refresh();
-            });
-        };
-
-        const destroy = (cmInstance) => {
-            // garbage cleanup
-            const element = cmInstance?.doc?.cm?.getWrapperElement();
-            if (element?.remove) element.remove();
-            state.cmInstance = null;
-        };
-
-        const init = (textareaRef: HTMLTextAreaElement) => {
-            const editor = CodeMirror.fromTextArea(textareaRef, state.mergedOptions);
-
-            watch(() => state.mergedOptions, (options) => {
-                if (options && editor) {
-                    forEach(options, (d, k) => {
-                        editor.setOption(k as keyof EditorConfiguration, d);
-                    });
-                }
-            }, { deep: true });
-
-            editor.on('change', (cm) => {
-                emit('update:code', cm.getValue());
-            });
-
-            state.cmInstance = editor;
-        };
-
-        watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat], ([textareaRef, code]) => {
-            if (!textareaRef) return;
-            if (!state.cmInstance) init(textareaRef);
-
-            setCode(state.cmInstance, refineCode(code));
-            if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
-            forceFold(state.cmInstance);
-            refresh(state.cmInstance);
-        }, { immediate: true });
-
-        onBeforeUnmount(() => {
-            destroy(state.cmInstance);
         });
+    }
+};
 
+const setCode = (cmInstance, code) => {
+    if (code !== cmInstance.getValue()) {
+        const scrollInfo = cmInstance.getScrollInfo();
+        cmInstance.setValue(code);
+        cmInstance.scrollTo(scrollInfo.left, scrollInfo.top);
+    }
+};
 
-        return {
-            ...toRefs(state),
-        };
-    },
+const setHighlightLines = (cmInstance, lines: Array<number>|undefined) => {
+    forEach(lines, (line) => {
+        cmInstance.setGutterMarker(line, 'CodeMirror-addedline', (() => {
+            const marker = document.createElement('span');
+            marker.innerHTML = '৹';
+            return marker;
+        })());
+        cmInstance.addLineClass(line, 'wrap', 'CodeMirror-activeline');
+        cmInstance.addLineClass(line, 'background', 'CodeMirror-activeline-background');
+        cmInstance.addLineClass(line, 'gutter', 'CodeMirror-activeline-gutter');
+    });
+};
+
+const refresh = (cmInstance) => {
+    nextTick(() => {
+        cmInstance.refresh();
+    });
+};
+
+const destroy = (cmInstance) => {
+    // garbage cleanup
+    const element = cmInstance?.doc?.cm?.getWrapperElement();
+    if (element?.remove) element.remove();
+    state.cmInstance = null;
+};
+
+const init = (_textareaRef: HTMLTextAreaElement) => {
+    const editor = CodeMirror.fromTextArea(_textareaRef, state.mergedOptions);
+
+    watch(() => state.mergedOptions, (options) => {
+        if (options && editor) {
+            forEach(options, (d, k) => {
+                editor.setOption(k as keyof EditorConfiguration, d);
+            });
+        }
+    }, { deep: true });
+
+    editor.on('change', (cm) => {
+        emit('update:code', cm.getValue());
+    });
+
+    state.cmInstance = editor;
+};
+
+watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat], ([_textareaRef, code]) => {
+    if (!_textareaRef) return;
+    if (!state.cmInstance) init(_textareaRef);
+
+    setCode(state.cmInstance, refineCode(code));
+    if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
+    forceFold(state.cmInstance);
+    refresh(state.cmInstance);
+}, { immediate: true });
+
+onBeforeUnmount(() => {
+    destroy(state.cmInstance);
 });
+
 </script>
 
 <style lang="postcss">
