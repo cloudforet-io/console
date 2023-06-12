@@ -44,6 +44,8 @@ import { min } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { ComplianceStatus, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
@@ -62,6 +64,11 @@ interface Data {
     severity: Severity;
     value: number;
 }
+
+const BOX_MIN_WIDTH = 112;
+const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
+Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
+
 const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
@@ -72,11 +79,11 @@ const state = reactive({
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     boxWidth: computed<number>(() => {
-        if (!props.width) return 112;
+        if (!props.width) return BOX_MIN_WIDTH;
         const widgetPadding = 24;
         const widgetContentWidth = props.width - (widgetPadding * 2);
         if (props.width >= 990) return widgetContentWidth / 8;
-        return widgetContentWidth / 7 < 112 ? 112 : widgetContentWidth / 7;
+        return widgetContentWidth / 7 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 7;
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -119,7 +126,7 @@ const fetchData = async (): Promise<Data[]> => {
         });
         return refineData(results);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
         return [];
     }
 };
@@ -129,9 +136,8 @@ const fetchData = async (): Promise<Data[]> => {
 const refineData = (data): Data[] => {
     const { results } = data;
     return results.map((result) => {
-        const minSeverityPriority = min(result.severity.map((s) => SEVERITY_STATUS_MAP[s].priority)); // ex. 1
-        const severity = Object.values(SEVERITY_STATUS_MAP)
-            .filter((s) => s.priority === minSeverityPriority)[0].name; // ex. 'CRITICAL'
+        const minSeverityPriority: number = min(result.severity.map((s) => SEVERITY_STATUS_MAP[s].priority)) ?? 0; // ex. 1
+        const severity = SEVERITY_PRIORITY_MAP[minSeverityPriority]; // ex. 'CRITICAL'
         const complianceStatus = result.status.includes('FAIL') ? 'FAIL' : 'PASS';
         return {
             service: result.service,
