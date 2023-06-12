@@ -1,11 +1,10 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { h, useAttrs } from 'vue';
 
 import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
@@ -43,7 +42,8 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DatetimeDynamicFieldProps, { attrs }: SetupContext) {
+    setup(props: DatetimeDynamicFieldProps) {
+        const attrs = useAttrs();
         let result = '';
         // eslint-disable-next-line vue/no-setup-props-destructure
         const options: DatetimeOptions = props.options;
@@ -79,7 +79,7 @@ export default {
             }, [datetimeEl]);
         }
 
-        return () => datetimeEl;
+        return datetimeEl;
     },
 };
 </script>

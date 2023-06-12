@@ -3,7 +3,7 @@
         <p-anchor v-if="options.link"
                   :href="options.link"
         >
-            <p-tag v-for="([objKey, objValue], idx) in Object.entries(dictData)"
+            <p-tag v-for="([objKey, objValue], idx) in Object.entries(state.dictData)"
                    :key="`tag-${idx}-${objKey}`"
                    :key-item="{ name: objKey, label: objKey }"
                    :value-item="{ name: objValue, label: `${options.prefix || ''}${objValue}${options.postfix || ''}` }"
@@ -11,7 +11,7 @@
             />
         </p-anchor>
         <template v-else>
-            <p-tag v-for="([objKey, objValue], idx) in Object.entries(dictData)"
+            <p-tag v-for="([objKey, objValue], idx) in Object.entries(state.dictData)"
                    :key="`tag-${idx}-${objKey}`"
                    :key-item="{ name: objKey, label: objKey }"
                    :value-item="{ name: objValue, label: `${options.prefix || ''}${objValue}${options.postfix || ''}` }"
@@ -20,52 +20,23 @@
         </template>
     </span>
 </template>
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
-import type { DictDynamicFieldProps, DictTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
+import type { DictDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
 import PTag from '@/data-display/tags/PTag.vue';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
-export default defineComponent<DictDynamicFieldProps>({
-    name: 'PDynamicFieldDict',
-    components: {
-        PTag,
-        PAnchor,
-    },
-    props: {
-        options: {
-            type: Object as PropType<DictTypeOptions>,
-            default: () => ({}),
-        },
-        data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: undefined,
-        },
-        typeOptions: {
-            type: Object,
-            default: () => ({}),
-        },
-        extraData: {
-            type: Object,
-            default: () => ({}),
-        },
-        handler: {
-            type: Function,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            dictData: computed(() => (props.data === undefined || props.data === null ? props.options.default : props.data)),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<DictDynamicFieldProps>(), {
+    options: () => ({}),
+    typeOptions: () => ({}),
+    extraData: () => ({}),
 });
+
+const state = reactive({
+    dictData: computed(() => (props.data === undefined || props.data === null ? props.options.default : props.data)),
+});
+
 </script>

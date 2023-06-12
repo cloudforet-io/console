@@ -54,6 +54,7 @@ const props = withDefaults(defineProps<DynamicChartProps>(), {
     theme: DYNAMIC_CHART_THEMES[0],
 });
 
+// TODO: this (any) must be refactored
 const state = reactive({
     component: null as null|any,
 });
