@@ -1,4 +1,4 @@
-import type { LocaleMessage, I18n } from 'vue-i18n';
+import type { I18n, I18nOptions } from 'vue-i18n';
 import { createI18n } from 'vue-i18n';
 
 import en from '@/translations/language-pack/en.json';
@@ -9,7 +9,7 @@ export const supportLanguages = ['en', 'ko', 'ja'] as const;
 export type SupportLanguage = typeof supportLanguages[number];
 
 // simple recursive remove keys with empty value
-const removeEmpty = (obj: object | any): LocaleMessage => Object.keys(obj)
+const removeEmpty = (obj: object | any) => Object.keys(obj)
     .filter((k: string) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
     .reduce(
         (newObj, k) => (typeof obj[k] === 'object'
@@ -18,7 +18,7 @@ const removeEmpty = (obj: object | any): LocaleMessage => Object.keys(obj)
         {},
     );
 
-export const messages: Record<SupportLanguage, any> = {
+export const messages: I18nOptions['messages'] = {
     en: removeEmpty({ COMPONENT: en }),
     ko: removeEmpty({ COMPONENT: ko }),
     ja: removeEmpty({ COMPONENT: ja }),
@@ -29,7 +29,7 @@ export const i18n = createI18n({
     fallbackLocale: 'en',
     messages,
     silentFallbackWarn: true,
-    // legacy: true, // TODO: Remove this option when vue 3 migration is done.
+    legacy: false,
 });
 
 export class I18nConnector {
