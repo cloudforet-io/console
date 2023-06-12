@@ -1,24 +1,38 @@
 <template>
     <div class="p-field-group">
         <div class="field-title-box">
-            <p-field-title v-if="label || $scopedSlots.label" class="form-label" @click="$emit('click-field-title')">
+            <p-field-title v-if="label || slots.label"
+                           class="form-label"
+                           @click="handleClickFieldTitle"
+            >
                 <slot name="label">
                     {{ label }}
                 </slot>
-                <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
+                <span v-if="!required"
+                      class="optional-mark"
+                >({{ t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
                 <slot name="label-extra" />
             </p-field-title>
         </div>
-        <small v-if="$scopedSlots.help || helpText" class="help-msg">
+        <small v-if="slots.help || helpText"
+               class="help-msg"
+        >
             <slot name="help">{{ helpText }}</slot>
         </small>
-        <slot name="default" v-bind="$props" />
-        <div v-show="invalid" class="invalid-feedback">
+        <slot name="default"
+              v-bind="$props"
+        />
+        <div v-show="invalid"
+             class="invalid-feedback"
+        >
             <slot name="invalid">
                 {{ invalidText }}
             </slot>
         </div>
-        <div v-if="validText" class="valid-feedback" :style="{display: valid&&!invalid? 'block':'none'}">
+        <div v-if="validText"
+             class="valid-feedback"
+             :style="{display: valid&&!invalid? 'block':'none'}"
+        >
             <slot name="valid">
                 {{ validText }}
             </slot>
@@ -26,45 +40,39 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useSlots } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import PFieldTitle from '@/data-display/field-title/PFieldTitle.vue';
 
-export default defineComponent({
-    name: 'PFieldGroup',
-    components: { PFieldTitle },
-    props: {
-        label: {
-            type: String,
-            default: '',
-        },
-        helpText: {
-            type: String,
-            default: '',
-        },
-        invalidText: {
-            type: String,
-            default: '',
-        },
-        validText: {
-            type: String,
-            default: '',
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        valid: {
-            type: Boolean,
-            default: false,
-        },
-        required: {
-            type: Boolean,
-            default: false,
-        },
-    },
+interface Props {
+    label?: string;
+    helpText?: string;
+    invalidText?: string;
+    validText?: string;
+    invalid?: boolean;
+    valid?: boolean;
+    required?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    label: '',
+    helpText: '',
+    invalidText: '',
+    validText: '',
+    invalid: false,
+    valid: false,
+    required: false,
 });
+const emit = defineEmits(['click-field-title']);
+const slots = useSlots();
+const { t } = useI18n();
+
+const handleClickFieldTitle = () => {
+    emit('click-field-title');
+};
+
 </script>
 
 <style lang="postcss">

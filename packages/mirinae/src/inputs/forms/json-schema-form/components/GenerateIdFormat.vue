@@ -5,7 +5,7 @@
                   :disabled="disabled"
                   @click="handleClickGenerate"
         >
-            {{ $t('COMPONENT.JSON_SCHEMA_FORM.GENERATE') }}
+            {{ t('COMPONENT.JSON_SCHEMA_FORM.GENERATE') }}
         </p-button>
         <p-text-input :value="value"
                       :invalid="invalid"
@@ -19,13 +19,10 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    defineComponent,
-} from 'vue';
+<script setup lang="ts">
 
 import { v4 as uuidV4 } from 'uuid';
+import { useI18n } from 'vue-i18n';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
@@ -34,53 +31,27 @@ import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 interface Props {
     value?: string;
     disabled?: boolean;
+    invalid?: boolean;
+    fullWidth?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'GenerateIdFormat',
-    components: {
-        PTextInput,
-        PCopyButton,
-        PButton,
-    },
-    props: {
-        value: {
-            type: String,
-            default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-        fullWidth: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const handleClickGenerate = () => {
-            emit('update:value', uuidV4());
-        };
-
-        const handleClickDelete = () => {
-            emit('update:value', '');
-        };
-
-        const handleUpdateValue = (value?: string) => {
-            emit('update:value', value?.trim());
-        };
-
-        return {
-            handleClickGenerate,
-            handleClickDelete,
-            handleUpdateValue,
-        };
-    },
+withDefaults(defineProps<Props>(), {
+    value: undefined,
+    disabled: false,
+    invalid: false,
+    fullWidth: false,
 });
+const emit = defineEmits(['update:value']);
+const { t } = useI18n();
+
+const handleClickGenerate = () => {
+    emit('update:value', uuidV4());
+};
+
+const handleUpdateValue = (value?: string) => {
+    emit('update:value', value?.trim());
+};
+
 </script>
 
 <style lang="postcss">

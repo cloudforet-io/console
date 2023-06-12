@@ -60,4 +60,5 @@ export interface JsonSchemaFormProps {
     customErrorMap?: CustomErrorMap;
     referenceHandler?: ReferenceHandler;
     useFixedMenuStyle?: boolean;
+    uniformWidth?: boolean;
 }
