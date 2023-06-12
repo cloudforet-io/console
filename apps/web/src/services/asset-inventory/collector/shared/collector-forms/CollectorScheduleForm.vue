@@ -79,6 +79,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 const props = defineProps<{
     editMode?: boolean;
     disabled?: boolean;
+    resetOnCollectorIdChange?: boolean;
 }>();
 
 const emits = defineEmits<{(event: 'update:editMode', value: boolean): void;
@@ -149,8 +150,8 @@ const handleClickAllHours = () => {
     updateSelectedHours();
 };
 
-// init values with data from originCollector when originCollector changed
-watch(() => collectorFormState.originCollector, () => {
+watch(() => collectorFormStore.collectorId, (collectorId) => {
+    if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetSchedule();
     selectedUtcHoursSet.clear();
     collectorFormState.scheduleHours.forEach((hour) => {

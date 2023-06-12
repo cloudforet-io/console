@@ -70,6 +70,7 @@ import {
 interface Props {
     title?: TranslateResult;
     marginOnSpecific?: boolean;
+    resetOnCollectorIdChange?: boolean;
 }
 
 
@@ -173,7 +174,8 @@ watch(() => isAllValid.value, (value) => {
 }, { immediate: true });
 
 watch(() => collectorFormStore.collectorId, (collectorId) => {
-    if (collectorId) collectorFormStore.resetAttachedServiceAccount();
+    if (props.resetOnCollectorIdChange && !collectorId) return;
+    collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 </script>

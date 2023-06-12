@@ -53,6 +53,7 @@ const collectorFormState = collectorFormStore.$state;
 
 const props = defineProps<{
     hasMetadata?: boolean;
+    resetOnCollectorIdChange?: boolean;
 }>();
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
@@ -95,7 +96,8 @@ const handleClickReloadButton = () => {
 
 
 watch(() => collectorFormStore.collectorId, (collectorId) => {
-    if (collectorId) getPluginMetadata();
+    if (props.resetOnCollectorIdChange && !collectorId) return;
+    collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
 
 </script>

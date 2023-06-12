@@ -12,7 +12,7 @@
                 </p>
             </div>
         </template>
-        <tags-input-group :tags="state.tags"
+        <tags-input-group :tags="collectorFormState.tags"
                           show-validation
                           :is-valid.sync="state.isTagsValid"
                           @update-tags="handleUpdateTags"
@@ -42,13 +42,11 @@ const props = defineProps<{
 }>();
 
 const state = reactive({
-    tags: collectorFormState.tags as Tag,
     isTagsValid: true,
 });
 
 /* event */
 const handleUpdateTags = (tags: Tag) => {
-    state.tags = tags;
     collectorFormStore.setTags(tags);
 };
 
