@@ -93,7 +93,7 @@ import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { Severity } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
 } from '@/services/dashboards/widgets/_configs/asset-config';
@@ -104,22 +104,6 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
-
-interface CloudServiceStatsModel {
-    date: string;
-    key: string; // ex. pass_check_count
-    unit: string; // ex. Count
-    severity: Severity;
-    value: number;
-}
-// interface SeverityData {
-//     severity?: string;
-//     fail_finding_count?: number;
-// }
-// interface Data {
-//     compliance?: CloudServiceStatsModel[];
-//     severity?: SeverityData;
-// }
 
 interface OuterChartData {
     status: string;

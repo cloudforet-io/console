@@ -24,3 +24,16 @@ export const COMPLIANCE_STATUS_MAP = {
     FAIL: { name: 'FAIL', label: 'Fail', color: red[400] },
 } as const;
 export type ComplianceStatus = keyof typeof COMPLIANCE_STATUS_MAP;
+
+type CloudServiceStatsKey = 'compliance_count'|
+    'pass_check_count'|'fail_check_count'|
+    'pass_finding_count'|'fail_finding_count'|
+    'pass_score'|'fail_score';
+
+export interface CloudServiceStatsModel {
+    date: string;
+    key: CloudServiceStatsKey;
+    unit: string; // ex. Count
+    severity: Severity;
+    value: number;
+}
