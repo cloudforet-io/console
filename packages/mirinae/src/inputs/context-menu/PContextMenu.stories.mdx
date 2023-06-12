@@ -1,7 +1,5 @@
 import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs, watch } from 'vue';
-import {debounce} from "lodash";
-import { faker } from '@faker-js/faker';
 
 import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
@@ -40,6 +38,7 @@ export const Template = (args, { argTypes }) => ({
             :show-select-header="showSelectHeader"
             :show-clear-selection="showClearSelection"
             :readonly="readonly"
+            :reset-selected-on-unmounted="resetSelectedOnUnmounted"
         />
     </div>
     `,
