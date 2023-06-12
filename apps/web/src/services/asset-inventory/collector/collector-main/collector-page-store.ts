@@ -48,12 +48,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 this.loading = false;
             }
         },
-        async setSelectedProvider(provider) {
-            this.selectedProvider = provider;
-        },
-        async setFilteredCollectorList(filters) {
-            this.searchFilters = filters;
-        },
         async getCollectorSchedule(id) {
             try {
                 const res = await SpaceConnector.client.inventory.collector.schedule.list({
@@ -65,7 +59,13 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 throw e;
             }
         },
-        async setSelectedCollector(id) {
+        setSelectedProvider(provider) {
+            this.selectedProvider = provider;
+        },
+        setFilteredCollectorList(filters) {
+            this.searchFilters = filters;
+        },
+        setSelectedCollector(id) {
             const itemIndex = this.collectors.findIndex(
                 (item) => item.collector_id === id,
             );
