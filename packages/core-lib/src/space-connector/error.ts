@@ -81,14 +81,13 @@ export const isInstanceOfAuthenticationError = (e: unknown): e is Authentication
 
 export const isInstanceOfAuthorizationError = (e: unknown): e is AuthorizationError => e instanceof AuthorizationError;
 
-export const makeAPIError = (message: string, status = 500, code = 'ERROR_UNKNOWN'): APIError => new APIError({
-    response: {
-        status,
-        data: {
-            error: {
-                message,
-                code,
-            },
-        },
-    },
-} as AxiosError);
+export const makeError = (message: string, status = 500): APIError|NotFoundError|BadRequestError|AuthenticationError|AuthorizationError => {
+    const axiosError = { message } as AxiosError;
+    switch (status) {
+    case 400: return new BadRequestError(axiosError);
+    case 401: return new AuthenticationError(axiosError);
+    case 403: return new AuthorizationError(axiosError);
+    case 404: return new NotFoundError(axiosError);
+    default: return new APIError(axiosError);
+    }
+};
