@@ -48,7 +48,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const emit = defineEmits<{(e: 'change:isValid', isValid: boolean): void;}>();
+const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
     loading: true,
@@ -73,7 +73,7 @@ const getPluginMetadata = async () => {
 };
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    emit('change:isValid', isValid);
+    emit('update:isValid', isValid);
     collectorFormStore.setPluginMetadata(value);
 };
 

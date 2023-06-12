@@ -3,7 +3,7 @@
         <div class="input-form">
             <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
             <plugin-metadata-form class="plugin-metadata-form"
-                                  @change:isValid="handleChangeIsSchemaFormValid"
+                                  @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>
         <div class="step-footer">
