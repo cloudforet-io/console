@@ -14,19 +14,18 @@
     </div>
 </template>
 
-<script lang="ts">
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
-
+<script setup lang="ts">
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-import vueFilePond from 'vue-filepond';
+import {
+    reactive, toRef,
+} from 'vue';
+import VueFilePond from 'vue-filepond';
 
 import { useProxyValue } from '@/hooks';
 import type { FileUploaderProps } from '@/inputs/file-uploader/type';
 
 
-const FilePond = vueFilePond(
+const FilePond = VueFilePond(
     FilePondPluginFileValidateType,
 );
 const ACCEPTED_FILE_TYPES = [
@@ -35,71 +34,51 @@ const ACCEPTED_FILE_TYPES = [
     'application/x-msdownload',
     'text/csv',
 ];
-export default defineComponent<FileUploaderProps>({
-    name: 'PFileUploader',
-    components: {
-        FilePond,
-    },
-    model: {
-        prop: 'uploadedFiles',
-        event: 'update:uploadedFiles',
-    },
-    props: {
-        uploadedFiles: {
-            type: Array as () => File[],
-            default: () => ([]),
-        },
-        serverEndpoint: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyUploadedFiles: useProxyValue<File[]>('uploadedFiles', props, emit),
-            fileRef: null as Element|null,
-        });
 
-        const serverOption = {
-            process: (fieldName, file, metadata, load, error, progress, abort) => {
-                const formData = new FormData();
-                formData.append(fieldName, file, file.name);
+const props = withDefaults(defineProps<FileUploaderProps>(), {
+    uploadedFiles: () => [],
+    serverEndpoint: '',
+});
+const emit = defineEmits(['update:uploadedFiles']);
 
-                const request = new XMLHttpRequest();
-                request.open('POST', props.serverEndpoint ?? '');
-                request.upload.onprogress = (e) => {
-                    progress(e.lengthComputable, e.loaded, e.total);
-                };
-                request.onload = () => {
-                    if (request.status >= 200 && request.status < 300) {
-                        load(request.responseText);
-                    } else {
-                        error('Upload Error!');
-                    }
-                };
-                request.send(formData);
+const state = reactive({
+    proxyUploadedFiles: useProxyValue<File[]>('uploadedFiles', props, emit),
+    fileRef: null as Element|null,
+});
+const fileRef = toRef(state, 'fileRef');
 
-                return {
-                    abort: () => {
-                        request.abort();
-                        abort();
-                    },
-                };
-            },
+const serverOption = {
+    process: (fieldName, file, metadata, load, error, progress, abort) => {
+        const formData = new FormData();
+        formData.append(fieldName, file, file.name);
+
+        const request = new XMLHttpRequest();
+        request.open('POST', props.serverEndpoint ?? '');
+        request.upload.onprogress = (e) => {
+            progress(e.lengthComputable, e.loaded, e.total);
         };
-
-        const handleUpdateFiles = (files: File[]) => {
-            state.proxyUploadedFiles = files.map((fileItems) => fileItems);
+        request.onload = () => {
+            if (request.status >= 200 && request.status < 300) {
+                load(request.responseText);
+            } else {
+                error('Upload Error!');
+            }
         };
+        request.send(formData);
 
         return {
-            ...toRefs(state),
-            ACCEPTED_FILE_TYPES,
-            serverOption,
-            handleUpdateFiles,
+            abort: () => {
+                request.abort();
+                abort();
+            },
         };
     },
-});
+};
+
+const handleUpdateFiles = (files: File[]) => {
+    state.proxyUploadedFiles = files.map((fileItems) => fileItems);
+};
+
 </script>
 
 <style lang="postcss">
