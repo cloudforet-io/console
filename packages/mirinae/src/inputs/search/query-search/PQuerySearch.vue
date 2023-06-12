@@ -1,33 +1,32 @@
 <template>
-    <div v-click-outside="hideMenu"
+    <div ref="containerRef"
          class="p-query-search"
     >
-        <p-search :class="{'no-menu': menu ? menu.length === 0 : false}"
-                  :value="searchText"
+        <p-search v-model:is-focused="isFocused"
+                  :class="{'no-menu': querySearchState.menu ? querySearchState.menu.length === 0 : false}"
+                  :value="querySearchState.searchText"
                   :placeholder="placeholder"
-                  :disable-icon="!!selectedKey"
-                  :is-focused.sync="isFocused"
+                  :disable-icon="!!querySearchState.selectedKey"
         >
             <template #left>
-                <span v-for="(keyItem, idx) in selectedKeys"
+                <span v-for="(keyItem, idx) in querySearchState.selectedKeys"
                       :key="idx"
                       class="key-tag"
-                      :class="{active: isFocused || visibleMenu}"
+                      :class="{active: isFocused || state.visibleMenu}"
                 >
                     {{ keyItem.label }}
                 </span>
-                <span v-if="operator"
+                <span v-if="querySearchState.operator"
                       class="operator-tag"
-                >{{ operator }}</span>
+                >{{ querySearchState.operator }}</span>
             </template>
             <template #default="scope">
                 <input ref="inputRef"
-                       v-focus.lazy="isFocused"
-                       :value="searchText"
-                       :placeholder="currentPlaceholder || scope.placeholder"
-                       :type="inputElType"
-                       :step="currentDataType === 'integer' ? 1 : undefined"
-                       :min="currentDataType === 'integer' ? 0 : undefined"
+                       :value="querySearchState.searchText"
+                       :placeholder="querySearchState.currentPlaceholder || scope.placeholder"
+                       :type="querySearchState.inputElType"
+                       :step="querySearchState.currentDataType === 'integer' ? 1 : undefined"
+                       :min="querySearchState.currentDataType === 'integer' ? 0 : undefined"
                        @input="onInput"
                        @keyup.enter="onEnter"
                        @keydown="onKeydownCheck"
@@ -39,7 +38,7 @@
             </template>
             <template #right="scope">
                 <div class="right">
-                    <span v-if="selectedKey || scope.value"
+                    <span v-if="querySearchState.selectedKey || scope.value"
                           class="delete-btn"
                           @click="onDeleteAll"
                     >
@@ -59,12 +58,12 @@
                 />
             </template>
         </p-search>
-        <div v-show="visibleMenu && menu.length"
+        <div v-show="state.visibleMenu && querySearchState.menu.length"
              class="menu-container"
         >
             <p-context-menu ref="menuRef"
-                            :loading="lazyLoading"
-                            :menu="menu"
+                            :loading="querySearchState.lazyLoading"
+                            :menu="querySearchState.menu"
                             no-select-indication
                             @keyup:up:end="focus"
                             @keyup:down:end="focus"
@@ -83,141 +82,107 @@
     </div>
 </template>
 
-<script lang="ts">
-import type {
-    PropType, SetupContext,
-} from 'vue';
-import {
-    computed, defineComponent, reactive, toRef, toRefs,
-} from 'vue';
+<script setup lang="ts">
 
 
+import { useFocus, onClickOutside } from '@vueuse/core';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import {
     reduce,
 } from 'lodash';
-import vClickOutside from 'v-click-outside';
-import { focus as vFocus } from 'vue-focus';
+import {
+    computed, reactive, toRef, useSlots, ref,
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useQuerySearch } from '@/hooks/query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { KeyMenuItem, ValueMenuItem } from '@/inputs/search/query-search/type';
+import type {
+    KeyMenuItem, ValueMenuItem, KeyItemSet, ValueHandlerMap,
+} from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default defineComponent({
-    name: 'PQuerySearch',
-    components: {
-        PContextMenu,
-        PSearch,
-        PI,
-    },
-    directives: {
-        focus: vFocus,
-        clickOutside: vClickOutside.directive,
-    },
-    model: {
-        prop: 'value',
-        event: 'update:value',
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        placeholder: {
-            type: String,
-            default: undefined,
-        },
-        focused: {
-            type: Boolean,
-            default: false,
-        },
-        keyItemSets: {
-            // FIXME:: below any type
-            type: Array as PropType<any>,
-            default: () => [],
-        },
-        valueHandlerMap: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props, context: SetupContext) {
-        const { slots, emit } = context;
-        const state = reactive({
-            visibleMenu: false,
-            value: props.value,
-        });
-        const {
-            state: querySearchState,
-            focus, blur, hideMenu, showMenu,
-            onInput,
-            onKeydownCheck,
-            onKeyupEnter,
-            onPaste,
-            onDeleteAll,
-            preTreatSelectedMenuItem,
-        } = useQuerySearch(
-            {
-                focused: props.focused,
-                valueHandlerMap: toRef(props, 'valueHandlerMap'),
-                keyItemSets: toRef(props, 'keyItemSets'),
-                visibleMenu: toRef(state, 'visibleMenu'),
-                value: toRef(state, 'value'),
-            },
-        );
+interface Props {
+    value: string;
+    placeholder: string;
+    focused: boolean;
+    keyItemSets: KeyItemSet[];
+    valueHandlerMap: ValueHandlerMap;
+}
 
-        /* event */
-        const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
-            const queryItem = await preTreatSelectedMenuItem(item);
-            if (queryItem) emit('search', queryItem);
-        };
-        const onEnter = async () => {
-            const queryItem = await onKeyupEnter();
-            if (queryItem) emit('search', queryItem);
-        };
-
-        /* Slots */
-        const menuSlots = computed(() => reduce(slots, (res, d, name) => {
-            if (name.startsWith('menu-') && !['menu-no-data'].includes(name)) {
-                res[`${name.substring(5)}`] = d;
-            }
-            return res;
-        }, {}));
-
-        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
-            if (name.startsWith('search-') && !['search-left', 'search-default', 'search-right'].includes(name)) {
-                res[`${name.substring(7)}`] = d;
-            }
-            return res;
-        }, {}));
-
-        return {
-            ...toRefs(querySearchState),
-            focus,
-            blur,
-            showMenu,
-            hideMenu,
-            onInput,
-            onEnter,
-            onKeydownCheck,
-            onPaste,
-            onDeleteAll,
-            onMenuSelect,
-
-            /* slots */
-            menuSlots,
-            searchSlots,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    placeholder: undefined,
+    focused: false,
+    keyItemSets: () => [],
+    valueHandlerMap: () => ({}),
 });
+const emit = defineEmits(['update:value', 'search']);
+const slots = useSlots();
+
+/* on click outside */
+const containerRef = ref<HTMLElement|null>(null);
+
+const inputRef = ref<HTMLInputElement|null>(null);
+const { focused: isFocused } = useFocus(inputRef);
+
+const menuRef = ref<HTMLElement|null>(null);
+
+const state = reactive({
+    visibleMenu: false,
+    value: props.value,
+});
+const {
+    state: querySearchState,
+    focus, blur, hideMenu, showMenu,
+    onInput,
+    onKeydownCheck,
+    onKeyupEnter,
+    onPaste,
+    onDeleteAll,
+    preTreatSelectedMenuItem,
+} = useQuerySearch(
+    {
+        focused: props.focused || isFocused,
+        valueHandlerMap: toRef(props, 'valueHandlerMap'),
+        keyItemSets: toRef(props, 'keyItemSets'),
+        visibleMenu: toRef(state, 'visibleMenu'),
+        value: toRef(state, 'value'),
+    },
+);
+
+/* event */
+const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
+    const queryItem = await preTreatSelectedMenuItem(item);
+    if (queryItem) emit('search', queryItem);
+};
+const onEnter = async () => {
+    const queryItem = await onKeyupEnter();
+    if (queryItem) emit('search', queryItem);
+};
+
+/* Slots */
+const menuSlots = computed(() => reduce(slots, (res, d, name) => {
+    if (name.startsWith('menu-') && !['menu-no-data'].includes(name)) {
+        res[`${name.substring(5)}`] = d;
+    }
+    return res;
+}, {}));
+
+const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+    if (name.startsWith('search-') && !['search-left', 'search-default', 'search-right'].includes(name)) {
+        res[`${name.substring(7)}`] = d;
+    }
+    return res;
+}, {}));
+
+onClickOutside(containerRef, hideMenu);
+
 </script>
 
 <style lang="postcss">

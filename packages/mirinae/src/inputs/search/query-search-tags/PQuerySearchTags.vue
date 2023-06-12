@@ -8,9 +8,9 @@
                           class="delete-btn"
                           size="sm"
                           style-type="tertiary"
-                          @click="deleteAllTags"
+                          @click="publicFunctions.deleteAllTags"
                 >
-                    {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
+                    {{ t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
                 </p-button>
             </div>
             <div class="tags-wrapper">
@@ -22,7 +22,7 @@
                        :outline="true"
                        :selected="!tag.invalid"
                        :error-message="tag.description"
-                       @delete="deleteTag(idx)"
+                       @delete="publicFunctions.deleteTag(idx)"
                 >
                     <template v-if="tag.key">
                         <span class="key-label">
@@ -30,7 +30,7 @@
                         </span>
                         <span class="operator">:{{ tag.operator }}</span>
                         <slot :name="`data-type-${tag.key.dataType || 'string'}`"
-                              v-bind="{ ...$props, tag }"
+                              v-bind="{ ...props, tag }"
                         >
                             <span class="value-label">
                                 {{ tag.value.label || tag.value.name }}
@@ -46,11 +46,11 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, ref, watch,
+    computed, ref, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -62,97 +62,79 @@ import type {
 } from '@/inputs/search/query-search-tags/type';
 import type { QueryItem } from '@/inputs/search/query-search/type';
 
+const props = withDefaults(defineProps<QuerySearchTagsProps>(), {
+    tags: () => [],
+    timezone: 'UTC',
+    validator: undefined,
+    converter: undefined,
+    readOnly: false,
+});
+const emit = defineEmits([
+    'add',
+    'delete',
+    'delete:tag',
+    'delete:all',
+    'change',
+    'update:tags',
+]);
+const { t } = useI18n();
 
-export default defineComponent<QuerySearchTagsProps>({
-    name: 'PQuerySearchTags',
-    components: {
-        PButton, PTag,
+const timezone = computed(() => props.timezone);
+const validator = computed<QueryTagValidator>(() => props.validator ?? defaultValidator);
+const converter = computed<QueryTagConverter>(() => props.converter ?? defaultConverter);
+const proxyTags = ref<QueryTag[]>([]);
+
+const getConvertedQueryTags = (queries: QueryItem[], tags: QueryTag[]): QueryTag[] => queries.reduce((validatedTags, query) => {
+    const converted = converter.value(query, timezone.value);
+    if (validator.value(converted, validatedTags)) {
+        validatedTags.push(converted);
+    }
+    return validatedTags;
+}, [...tags]);
+
+const publicFunctions: QuerySearchTagsFunctions = {
+    addTag(...queries: QueryItem[]) {
+        proxyTags.value = getConvertedQueryTags(queries, proxyTags.value);
+        emit('add', proxyTags.value);
     },
-    props: {
-        tags: {
-            type: Array as PropType<QueryTag[]>,
-            required: true,
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-        validator: {
-            type: Function as PropType<QueryTagValidator|undefined>,
-            default: undefined,
-        },
-        converter: {
-            type: Function as PropType<QueryTagConverter|undefined>,
-            default: undefined,
-        },
-        readOnly: {
-            type: Boolean,
-            default: false,
-        },
+    deleteTag(idx: number) {
+        proxyTags.value.splice(idx, 1);
+        emit('delete', proxyTags.value);
+        emit('delete:tag', proxyTags.value);
     },
-    setup(props, { emit }) {
-        const timezone = computed(() => props.timezone);
-        const validator = computed<QueryTagValidator>(() => props.validator ?? defaultValidator);
-        const converter = computed<QueryTagConverter>(() => props.converter ?? defaultConverter);
-        const proxyTags = ref<QueryTag[]>([]);
+    deleteAllTags() {
+        proxyTags.value = [];
+        emit('delete', proxyTags.value);
+        emit('delete:all', proxyTags.value);
+    },
+};
 
-        const getConvertedQueryTags = (queries: QueryItem[], tags: QueryTag[]): QueryTag[] => queries.reduce((validatedTags, query) => {
-            const converted = converter.value(query, timezone.value);
-            if (validator.value(converted, validatedTags)) {
-                validatedTags.push(converted);
-            }
-            return validatedTags;
-        }, [...tags]);
+const isTagsSame = (tagsA: QueryTag[], tagsB: QueryTag[]) => {
+    if (tagsA.length !== tagsB.length) return false;
+    return tagsA.map((d) => d.value.name).toString() === tagsB.map((d) => d.value.name).toString();
+};
 
-        const publicFunctions: QuerySearchTagsFunctions = {
-            addTag(...queries: QueryItem[]) {
-                proxyTags.value = getConvertedQueryTags(queries, proxyTags.value);
-                emit('add', proxyTags.value);
-            },
-            deleteTag(idx: number) {
-                proxyTags.value.splice(idx, 1);
-                emit('delete', proxyTags.value);
-                emit('delete:tag', proxyTags.value);
-            },
-            deleteAllTags() {
-                proxyTags.value = [];
-                emit('delete', proxyTags.value);
-                emit('delete:all', proxyTags.value);
-            },
-        };
+watch(() => props.tags, (tags) => {
+    if (tags !== proxyTags.value) {
+        proxyTags.value = getConvertedQueryTags(tags, []);
+    }
+}, { immediate: true });
 
-        const isTagsSame = (tagsA: QueryTag[], tagsB: QueryTag[]) => {
-            if (tagsA.length !== tagsB.length) return false;
-            return tagsA.map((d) => d.value.name).toString() === tagsB.map((d) => d.value.name).toString();
-        };
+watch([() => converter.value, () => validator.value, () => timezone.value], () => {
+    proxyTags.value = getConvertedQueryTags(proxyTags.value, []);
+});
 
-        watch(() => props.tags, (tags) => {
-            if (tags !== proxyTags.value) {
-                proxyTags.value = getConvertedQueryTags(tags, []);
-            }
-        }, { immediate: true });
-
-        watch([() => converter.value, () => validator.value, () => timezone.value], () => {
-            proxyTags.value = getConvertedQueryTags(proxyTags.value, []);
-        });
-
-        /*
+/*
             CAUTION: Do not change it to watch proxyTags.value directly.
             Related Issue: https://github.com/vuejs/core/issues/2116#issuecomment-718667557
          */
-        watch(() => [...proxyTags.value], (tags, prevTags) => {
-            if (prevTags && !isTagsSame(tags, prevTags)) {
-                emit('change', tags);
-                emit('update:tags', tags);
-            }
-        }, { immediate: true });
+watch(() => [...proxyTags.value], (tags, prevTags) => {
+    if (prevTags && !isTagsSame(tags, prevTags)) {
+        emit('change', tags);
+        emit('update:tags', tags);
+    }
+}, { immediate: true });
 
-        return {
-            proxyTags,
-            ...publicFunctions,
-        };
-    },
-});
 </script>
 
 <style lang="postcss">
