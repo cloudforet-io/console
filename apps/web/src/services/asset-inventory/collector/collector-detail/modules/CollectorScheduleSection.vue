@@ -57,12 +57,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
-import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 
 const collectorFormStore = useCollectorFormStore();
 

@@ -28,7 +28,7 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
-import type { CollectorPluginModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorPluginModel } from '@/services/asset-inventory/collector/model';
 
 const props = defineProps<{
     loading: boolean;

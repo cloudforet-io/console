@@ -77,9 +77,9 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-import type { SecretModel } from '@/services/asset-inventory/collector/type';
 
 
 const collectorFormStore = useCollectorFormStore();

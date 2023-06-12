@@ -136,8 +136,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/asset-inventory/collector/type';
-
 interface ScheduleHours {
     [time: string]: Dayjs;
 }
@@ -318,7 +316,7 @@ export default {
         };
         const addSchedule = async () => {
             try {
-                const params: ScheduleAddParameter = {
+                const params: any = {
                     // eslint-disable-next-line camelcase
                     collector_id: props.collectorId,
                     name: formState.name,
@@ -337,7 +335,7 @@ export default {
         };
         const updateSchedule = async () => {
             try {
-                const params: ScheduleUpdateParameter = {
+                const params: any = {
                     schedule_id: props.scheduleId,
                     collector_id: props.collectorId,
                     name: formState.name,

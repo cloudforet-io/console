@@ -85,7 +85,7 @@ import CollectorScheduleModal
 import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET,
-} from '@/services/asset-inventory/collector/type';
+} from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {

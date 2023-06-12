@@ -85,7 +85,7 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorProgressWizard from '@/services/asset-inventory/collector/create-collector-old/CollectorProgressWizard.vue';
-import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
+import { UPGRADE_MODE } from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 export default {

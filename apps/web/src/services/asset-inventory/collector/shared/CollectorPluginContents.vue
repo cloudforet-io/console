@@ -47,7 +47,7 @@ import { store } from '@/store';
 
 import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
-import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 
 // TODO: Add plugin data type
 interface Props {
