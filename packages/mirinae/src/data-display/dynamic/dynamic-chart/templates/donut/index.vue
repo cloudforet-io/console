@@ -4,9 +4,9 @@
              class="donut-chart"
         />
         <div class="legend-group">
-            <p-status v-for="(item, idx) in filteredData"
-                      :key="`${contextKey}-${idx}`"
-                      :icon-color="colors[idx]"
+            <p-status v-for="(item, idx) in state.filteredData"
+                      :key="`${state.contextKey}-${idx}`"
+                      :icon-color="state.colors[idx]"
             >
                 <span class="name">
                     <p-dynamic-field :type="nameOptions.type"
@@ -29,16 +29,15 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    defineComponent, onMounted, onUnmounted,
-    reactive, toRefs, watch,
-} from 'vue';
-
+<script setup lang="ts">
 import { PieChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import {
+    computed,
+    onMounted, onUnmounted,
+    reactive, toRef, watch,
+} from 'vue';
+
 
 import {
     DEFAULT_NAME_OPTIONS,
@@ -47,7 +46,6 @@ import {
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawPieChart } from '@/data-display/dynamic/dynamic-chart/templates/donut/helper';
 import type {
-    DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
@@ -57,7 +55,6 @@ import PStatus from '@/data-display/status/PStatus.vue';
 import { getContextKey } from '@/utils/helpers';
 
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
-
 
 const getColorSet = (start: number, limit?: number): string[] => {
     if (typeof limit !== 'number') return BASIC_CHART_COLORS;
@@ -74,106 +71,77 @@ const getColorSet = (start: number, limit?: number): string[] => {
 };
 
 type DynamicChartDonutProps = DynamicChartTemplateProps & { limit: number };
-export default defineComponent<DynamicChartDonutProps>({
-    name: 'PDynamicChartDonut',
-    components: { PDynamicField, PStatus },
-    props: {
-        data: {
-            type: Array,
-            default: () => [],
-        },
-        valueOptions: {
-            type: Object as () => DynamicChartTemplateProps['valueOptions'],
-            default: () => ({ ...DEFAULT_VALUE_OPTIONS }),
-        },
-        nameOptions: {
-            type: Object as () => DynamicChartTemplateProps['nameOptions'],
-            default: () => ({ ...DEFAULT_NAME_OPTIONS }),
-        },
-        fieldHandler: {
-            type: Function as PropType<DynamicChartFieldHandler|undefined>,
-            default: undefined,
-        },
-        theme: {
-            type: String as PropType<DynamicChartTheme>,
-            default: DYNAMIC_CHART_THEMES[0],
-        },
-        limit: {
-            type: Number,
-            default: DYNAMIC_CHART_LIMIT_MAP.COLUMN,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            filteredData: computed<any[]>(() => {
-                if (props.data.length > props.limit) return props.data.slice(0, props.limit);
-                return props.data;
-            }),
-            chart: null as null|PieChart,
-            chartRef: null as null|HTMLElement,
-            themeColorSetMap: computed<Record<DynamicChartTheme, string[]>>(() => ({
-                VIOLET: getColorSet(0, props.limit),
-                BLUE: getColorSet(1, props.limit),
-                CORAL: getColorSet(2, props.limit),
-                YELLOW: getColorSet(3, props.limit),
-                GREEN: getColorSet(4, props.limit),
-                PEACOCK: getColorSet(5, props.limit),
-                RED: getColorSet(6, props.limit),
-                INDIGO: getColorSet(7, props.limit),
-            })),
-            colors: computed<string[]>(() => state.themeColorSetMap[props.theme] ?? state.themeColorSetMap[DYNAMIC_CHART_THEMES[0]]),
-            contextKey: getContextKey(),
-        });
 
-        const getValue = (item: any): string|number|undefined => getValueByPath(item, props.valueOptions.key) ?? '';
-
-        const disposeChart = () => {
-            if (state.chart) state.chart.dispose();
-        };
-
-        const drawChart = () => {
-            const ctx = state.chartRef;
-            if (!ctx) return;
-
-            const chart = am4core.create(ctx, PieChart);
-
-            drawPieChart(chart, props.nameOptions, props.valueOptions, state.colors);
-
-            chart.data = state.filteredData;
-
-            state.chart = chart;
-        };
-
-        const updateChartData = (data: any[]) => {
-            if (state.chart) {
-                state.chart.data = data;
-            }
-        };
-
-        onMounted(() => {
-            drawChart();
-        });
-
-        const stopDataWatch = watch(() => state.filteredData, (data) => {
-            state.contextKey = getContextKey();
-            updateChartData(data);
-        });
-
-        onUnmounted(() => {
-            if (stopDataWatch) stopDataWatch();
-            disposeChart();
-        });
-
-        return {
-            ...toRefs(state),
-            disposeChart,
-            drawChart,
-            updateChartData,
-            getValueByPath,
-            getValue,
-        };
-    },
+const props = withDefaults(defineProps<DynamicChartDonutProps>(), {
+    data: () => [],
+    valueOptions: () => ({ ...DEFAULT_VALUE_OPTIONS }),
+    nameOptions: () => ({ ...DEFAULT_NAME_OPTIONS }),
+    fieldHandler: undefined,
+    theme: DYNAMIC_CHART_THEMES[0],
+    limit: DYNAMIC_CHART_LIMIT_MAP.COLUMN,
 });
+
+const state = reactive({
+    filteredData: computed<any[]>(() => {
+        if (props.data.length > props.limit) return props.data.slice(0, props.limit);
+        return props.data;
+    }),
+    chart: null as null|PieChart,
+    chartRef: null as null|HTMLElement,
+    themeColorSetMap: computed<Record<DynamicChartTheme, string[]>>(() => ({
+        VIOLET: getColorSet(0, props.limit),
+        BLUE: getColorSet(1, props.limit),
+        CORAL: getColorSet(2, props.limit),
+        YELLOW: getColorSet(3, props.limit),
+        GREEN: getColorSet(4, props.limit),
+        PEACOCK: getColorSet(5, props.limit),
+        RED: getColorSet(6, props.limit),
+        INDIGO: getColorSet(7, props.limit),
+    })),
+    colors: computed<string[]>(() => state.themeColorSetMap[props.theme] ?? state.themeColorSetMap[DYNAMIC_CHART_THEMES[0]]),
+    contextKey: getContextKey(),
+});
+const chartRef = toRef(state, 'chartRef');
+
+const getValue = (item: any): string|number|undefined => getValueByPath(item, props.valueOptions.key) ?? '';
+
+const disposeChart = () => {
+    if (state.chart) state.chart.dispose();
+};
+
+const drawChart = () => {
+    const ctx = state.chartRef;
+    if (!ctx) return;
+
+    const chart = am4core.create(ctx, PieChart);
+
+    drawPieChart(chart, props.nameOptions, props.valueOptions, state.colors);
+
+    chart.data = state.filteredData;
+
+    state.chart = chart;
+};
+
+const updateChartData = (data: any[]) => {
+    if (state.chart) {
+        state.chart.data = data;
+    }
+};
+
+onMounted(() => {
+    drawChart();
+});
+
+const stopDataWatch = watch(() => state.filteredData, (data) => {
+    state.contextKey = getContextKey();
+    updateChartData(data);
+});
+
+onUnmounted(() => {
+    if (stopDataWatch) stopDataWatch();
+    disposeChart();
+});
+
 </script>
 
 <style lang="postcss">

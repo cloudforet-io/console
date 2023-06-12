@@ -4,7 +4,7 @@
                        :data="data"
                        loader-type="skeleton"
         >
-            <component :is="component"
+            <component :is="state.component"
                        :data="data"
                        :value-options="valueOptions"
                        :name-options="nameOptions"
@@ -17,13 +17,11 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    defineComponent,
-    reactive, toRefs, watch,
+    reactive, watch,
+    defineAsyncComponent,
 } from 'vue';
-import type { PropType, AsyncComponent } from 'vue';
-import type { ImportedComponent } from 'vue/types/options';
 
 import {
     DEFAULT_NAME_OPTIONS,
@@ -31,90 +29,54 @@ import {
     DYNAMIC_CHART_THEMES,
 } from '@/data-display/dynamic/dynamic-chart/config';
 import type {
-    DynamicChartFieldHandler,
-    DynamicChartProps, DynamicChartTheme, DynamicChartType,
+    DynamicChartProps, DynamicChartType,
 } from '@/data-display/dynamic/dynamic-chart/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-
-const componentMap: Record<DynamicChartType, AsyncComponent> = {
-    COLUMN: () => ({
-        component: import('./templates/column/index.vue') as Promise<ImportedComponent>,
-    }),
-    DONUT: () => ({
-        component: import('./templates/donut/index.vue') as Promise<ImportedComponent>,
-    }),
-    TREEMAP: () => ({
-        component: import('./templates/treemap/index.vue') as Promise<ImportedComponent>,
-    }),
+// TODO: this (any) must be refactored
+const componentMap: Record<DynamicChartType, any> = {
+    COLUMN: {
+        component: defineAsyncComponent(() => import('./templates/column/index.vue')),
+    },
+    DONUT: {
+        component: defineAsyncComponent(() => import('./templates/donut/index.vue')),
+    },
+    TREEMAP: {
+        component: defineAsyncComponent(() => import('./templates/treemap/index.vue')),
+    },
 };
 
-export default defineComponent<DynamicChartProps>({
-    name: 'PDynamicChart',
-    components: { PDataLoader },
-    props: {
-        type: {
-            type: String,
-            required: true,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        data: {
-            type: Array,
-            default: () => [],
-        },
-        valueOptions: {
-            type: Object as () => DynamicChartProps['valueOptions'],
-            default: () => ({ ...DEFAULT_VALUE_OPTIONS }),
-        },
-        nameOptions: {
-            type: Object as () => DynamicChartProps['nameOptions'],
-            default: () => ({ ...DEFAULT_NAME_OPTIONS }),
-        },
-        fieldHandler: {
-            type: Function as PropType<DynamicChartFieldHandler|undefined>,
-            default: undefined,
-        },
-        theme: {
-            type: String as PropType<DynamicChartTheme>,
-            default: DYNAMIC_CHART_THEMES[0],
-        },
-        limit: {
-            type: Number,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            component: null as null|AsyncComponent,
-        });
-
-        const getComponent = async () => {
-            try {
-                if (!DYNAMIC_CHART_TYPE.includes(props.type)) {
-                    throw new Error(`[Dynamic Chart] Unacceptable chart type: chart type must be one of ${DYNAMIC_CHART_TYPE}. ${props.type} is not acceptable.`);
-                }
-
-                state.component = componentMap[props.type];
-            } catch (e) {
-                console.error(e);
-                state.component = null;
-            }
-        };
-
-        watch(() => props.type, (aft, bef) => {
-            if (aft !== bef) {
-                getComponent();
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<DynamicChartProps>(), {
+    loading: false,
+    data: () => [],
+    valueOptions: () => ({ ...DEFAULT_VALUE_OPTIONS }),
+    nameOptions: () => ({ ...DEFAULT_NAME_OPTIONS }),
+    theme: DYNAMIC_CHART_THEMES[0],
 });
+
+const state = reactive({
+    component: null as null|any,
+});
+
+const getComponent = async () => {
+    try {
+        if (!DYNAMIC_CHART_TYPE.includes(props.type)) {
+            throw new Error(`[Dynamic Chart] Unacceptable chart type: chart type must be one of ${DYNAMIC_CHART_TYPE}. ${props.type} is not acceptable.`);
+        }
+
+        state.component = componentMap[props.type];
+    } catch (e) {
+        console.error(e);
+        state.component = null;
+    }
+};
+
+watch(() => props.type, (aft, bef) => {
+    if (aft !== bef) {
+        getComponent();
+    }
+}, { immediate: true });
+
 </script>
 <style lang="postcss">
 .p-dynamic-chart {

@@ -4,18 +4,16 @@
     />
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    defineComponent,
-    onMounted, onUnmounted,
-    reactive, toRefs, watch,
-} from 'vue';
+<script setup lang="ts">
 
 import { TreeMap } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { maxBy, minBy, sum } from 'lodash';
+import {
+    computed,
+    onMounted, onUnmounted,
+    reactive, toRef, watch,
+} from 'vue';
 
 import {
     DEFAULT_NAME_OPTIONS,
@@ -24,7 +22,6 @@ import {
 } from '@/data-display/dynamic/dynamic-chart/config';
 import { drawTreemapChart } from '@/data-display/dynamic/dynamic-chart/templates/treemap/helper';
 import type {
-    DynamicChartFieldHandler,
     DynamicChartTemplateProps,
     DynamicChartTheme,
 } from '@/data-display/dynamic/dynamic-chart/type';
@@ -78,89 +75,62 @@ const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions
 };
 
 type DynamicChartTreemapProps = DynamicChartTemplateProps & { limit: number };
-export default defineComponent<DynamicChartTreemapProps>({
-    name: 'PDynamicChartTreemap',
-    props: {
-        data: {
-            type: Array,
-            default: () => [],
-        },
-        valueOptions: {
-            type: Object as () => DynamicChartTemplateProps['valueOptions'],
-            default: () => ({ ...DEFAULT_VALUE_OPTIONS }),
-        },
-        nameOptions: {
-            type: Object as () => DynamicChartTemplateProps['nameOptions'],
-            default: () => ({ ...DEFAULT_NAME_OPTIONS }),
-        },
-        fieldHandler: {
-            type: Function as PropType<DynamicChartFieldHandler|undefined>,
-            default: undefined,
-        },
-        theme: {
-            type: String as PropType<DynamicChartTheme>,
-            default: DYNAMIC_CHART_THEMES[0],
-        },
-        limit: {
-            type: Number,
-            default: DYNAMIC_CHART_LIMIT_MAP.TREEMAP,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            chart: null as null|TreeMap,
-            chartRef: null as null|HTMLElement,
-            filteredData: computed<any[]>(() => {
-                if (props.data.length > props.limit) return props.data.slice(0, props.limit);
-                return props.data;
-            }),
-        });
 
-        const disposeChart = () => {
-            if (state.chart) {
-                state.chart.dispose();
-                state.chart = null;
-            }
-        };
-
-        const drawChart = () => {
-            const ctx = state.chartRef;
-            if (!ctx) return;
-
-            const chart = am4core.create(ctx, TreeMap);
-
-            const totalValue = sum(state.filteredData.map((d) => d[props.valueOptions.key] ?? 0));
-            drawTreemapChart(chart, props.nameOptions, props.valueOptions, totalValue);
-            state.chart = chart;
-
-            state.chart.data = getColoredData(state.filteredData, props.theme, props.valueOptions);
-        };
-
-        const updateChartData = (data: any[]) => {
-            if (state.chart) state.chart.data = data;
-        };
-
-        onMounted(() => {
-            drawChart();
-        });
-
-        const stopDataWatch = watch([() => state.filteredData, () => props.theme], ([data, theme]) => {
-            updateChartData(getColoredData(data as any[], theme as DynamicChartTheme, props.valueOptions));
-        });
-
-        onUnmounted(() => {
-            if (stopDataWatch) stopDataWatch();
-            disposeChart();
-        });
-
-        return {
-            ...toRefs(state),
-            disposeChart,
-            drawChart,
-            updateChartData,
-        };
-    },
+const props = withDefaults(defineProps<DynamicChartTreemapProps>(), {
+    data: () => [],
+    valueOptions: () => ({ ...DEFAULT_VALUE_OPTIONS }),
+    nameOptions: () => ({ ...DEFAULT_NAME_OPTIONS }),
+    theme: DYNAMIC_CHART_THEMES[0],
+    limit: DYNAMIC_CHART_LIMIT_MAP.TREEMAP,
 });
+
+const state = reactive({
+    chart: null as null|TreeMap,
+    chartRef: null as null|HTMLElement,
+    filteredData: computed<any[]>(() => {
+        if (props.data.length > props.limit) return props.data.slice(0, props.limit);
+        return props.data;
+    }),
+});
+const chartRef = toRef(state, 'chartRef');
+
+const disposeChart = () => {
+    if (state.chart) {
+        state.chart.dispose();
+        state.chart = null;
+    }
+};
+
+const drawChart = () => {
+    const ctx = state.chartRef;
+    if (!ctx) return;
+
+    const chart = am4core.create(ctx, TreeMap);
+
+    const totalValue = sum(state.filteredData.map((d) => d[props.valueOptions.key] ?? 0));
+    drawTreemapChart(chart, props.nameOptions, props.valueOptions, totalValue);
+    state.chart = chart;
+
+    state.chart.data = getColoredData(state.filteredData, props.theme, props.valueOptions);
+};
+
+const updateChartData = (data: any[]) => {
+    if (state.chart) state.chart.data = data;
+};
+
+onMounted(() => {
+    drawChart();
+});
+
+const stopDataWatch = watch([() => state.filteredData, () => props.theme], ([data, theme]) => {
+    updateChartData(getColoredData(data as any[], theme as DynamicChartTheme, props.valueOptions));
+});
+
+onUnmounted(() => {
+    if (stopDataWatch) stopDataWatch();
+    disposeChart();
+});
+
 </script>
 
 <style lang="postcss">
