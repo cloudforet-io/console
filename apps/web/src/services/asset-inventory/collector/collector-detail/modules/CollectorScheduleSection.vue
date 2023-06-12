@@ -65,6 +65,7 @@ import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
 const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
     isEditMode: false,
@@ -76,7 +77,8 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     const params: CollectorUpdateParameter = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
-            hours: collectorFormStore.scheduleHours,
+            state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
+            hours: collectorFormState.scheduleHours,
         },
     };
     return SpaceConnector.client.inventory.collector.update(params);
