@@ -7,12 +7,13 @@
             <div class="chart-wrapper"
                  :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
             >
-                <div v-for="(data, idx) in state.sampleData"
+                <div v-for="(data, idx) in state.data"
                      :key="`box-${idx}`"
+                     v-tooltip.bottom="`${data.service}: ${data.value}`"
                      class="status-box"
-                     :style="{'background-color': data.color}"
+                     :style="{'background-color': SEVERITY_STATUS_MAP[data.severity].color}"
                 >
-                    <span class="text">{{ data.label }}</span>
+                    <span class="text">{{ data.service }}</span>
                 </div>
             </div>
             <div class="legend-wrapper">
@@ -38,11 +39,18 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
+import { min } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { ComplianceStatus, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -50,36 +58,106 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
+interface Data {
+    service: string;
+    complianceStatus: ComplianceStatus;
+    severity: Severity;
+    value: number;
+}
+
+const BOX_MIN_WIDTH = 112;
+const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
+Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
+
 const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<Data[]>(props)),
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    sampleData: computed(() => [...Array(20)].map(() => Object.values(SEVERITY_STATUS_MAP)[Math.floor(Math.random() * 5)])),
     boxWidth: computed<number>(() => {
-        if (!props.width) return 112;
+        if (!props.width) return BOX_MIN_WIDTH;
         const widgetPadding = 24;
         const widgetContentWidth = props.width - (widgetPadding * 2);
         if (props.width >= 990) return widgetContentWidth / 8;
-        return widgetContentWidth / 7;
+        return widgetContentWidth / 7 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 7;
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const fetchData = async () => {
-    //
+
+/* Api */
+const fetchData = async (): Promise<Data[]> => {
+    try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper
+            .setFilters(state.consoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        const results = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query: {
+                group_by: ['data.service'],
+                fields: {
+                    status: {
+                        key: 'data.status',
+                        operator: 'add_to_set',
+                    },
+                    severity: {
+                        key: 'data.severity',
+                        operator: 'add_to_set',
+                    },
+                    pass_finding_count: {
+                        key: 'data.stats.findings.pass',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'data.stats.checks.fail',
+                        operator: 'sum',
+                    },
+                },
+                sort: [{
+                    key: 'service',
+                    desc: false,
+                }],
+                page: {
+                    limit: 80,
+                    start: 1,
+                },
+                ...apiQueryHelper.data,
+            },
+        });
+        return refineData(results);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
 };
-const initWidget = async () => {
+
+
+/* Util */
+const refineData = (data): Data[] => {
+    const { results } = data;
+    return results.map((result) => {
+        const minSeverityPriority: number = min(result.severity.map((s) => SEVERITY_STATUS_MAP[s].priority)) ?? 0; // ex. 1
+        const severity = SEVERITY_PRIORITY_MAP[minSeverityPriority]; // ex. 'CRITICAL'
+        const complianceStatus = result.status.includes('FAIL') ? 'FAIL' : 'PASS';
+        return {
+            service: result.service,
+            severity,
+            complianceStatus,
+            value: complianceStatus === 'FAIL' ? result.fail_finding_count : result.pass_finding_count,
+        };
+    });
+};
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
