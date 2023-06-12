@@ -56,13 +56,15 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, CollectorOptions } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorOptionsForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorOptionsForm.vue';
 
@@ -90,22 +92,14 @@ const state = reactive({
     isUpdating: false,
 });
 
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
-    // TODO: change to call api
-    if (!collectorFormState.originCollector) throw new Error('collector is required');
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                ...collectorFormState.originCollector,
-                plugin_info: {
-                    ...(collectorFormState.originCollector as CollectorModel).plugin_info,
-                    options: collectorFormState.options,
-                },
-            } as CollectorModel);
-        }, 1000);
-    });
+const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const params: CollectorUpdatePluginParameter = {
+        collector_id: collectorFormStore.collectorId,
+        options: collectorFormState.options,
+    };
+    return SpaceConnector.client.inventory.collector.updatePlugin(params);
 };
-
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
@@ -121,7 +115,7 @@ const handleClickCancel = () => {
 const handleClickSave = async () => {
     try {
         state.isUpdating = true;
-        const collector = await fetchCollectorUpdate();
+        const collector = await fetchCollectorPluginUpdate();
         collectorFormStore.setOriginCollector(collector);
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR_OPTIONS'), '');
         state.isEditMode = false;
