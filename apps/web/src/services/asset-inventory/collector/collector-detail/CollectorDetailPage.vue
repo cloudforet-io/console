@@ -42,10 +42,7 @@
                                      :loading="state.loading"
         />
         <collector-schedule-section class="section" />
-        <collector-options-section class="section"
-                                   :loading="state.loading"
-                                   :collector-options="state.collectorOptions"
-        />
+        <collector-options-section class="section" />
         <collector-service-accounts-section class="section" />
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
@@ -110,7 +107,7 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
-import type { CollectorModel, CollectorPluginModel } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -127,7 +124,6 @@ const state = reactive({
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
-    collectorOptions: computed<null|CollectorPluginModel['options']>(() => state.collector?.plugin_info?.options ?? null),
     // TODO: must be updated after backend api spec is updated
     collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
     collectorHistoryLink: computed<Location>(() => ({

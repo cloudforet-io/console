@@ -1,5 +1,5 @@
 <template>
-    <p-data-loader class="plugin-metadata-form"
+    <p-data-loader class="collector-options-form"
                    :loading="state.loading"
                    :data="state.schema"
     >
@@ -104,7 +104,7 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
 </script>
 
 <style lang="postcss" scoped>
-.plugin-metadata-form {
+.collector-options-form {
     min-height: 6rem;
 
     .error-box {
