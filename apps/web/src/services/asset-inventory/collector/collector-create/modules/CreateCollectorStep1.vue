@@ -5,39 +5,44 @@
         />
         <div class="contents-container">
             <step1-search-filter @selectRepository="handleChangeRepository" />
-            <p-data-loader class="right-area"
-                           :data="state.pluginList"
-                           :loading="state.loading"
-                           :loader-backdrop-color="BACKGROUND_COLOR"
-            >
-                <div ref="pluginCardListRef"
-                     class="plugin-card-list"
+            <div>
+                <p-field-title class="contents-title">
+                    Plugin
+                </p-field-title>
+                <p-data-loader class="right-area"
+                               :data="state.pluginList"
+                               :loading="state.loading"
+                               :loader-backdrop-color="BACKGROUND_COLOR"
                 >
-                    <p-board-item v-for="item in state.pluginList"
-                                  :key="item.name"
-                                  class="plugin-card-item"
+                    <div ref="pluginCardListRef"
+                         class="plugin-card-list"
                     >
-                        <template #content>
-                            <div class="plugin-card-content">
-                                <collect-plugin-contents :plugin="item" />
-                                <p-button style-type="secondary"
-                                          class="select-button"
-                                          @click="handleClickNextStep(item)"
-                                >
-                                    {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT') }}
-                                </p-button>
-                                <p-i class="select-icon"
-                                     name="ic_chevron-right"
-                                     :color="gray[300]"
-                                     width="1.5rem"
-                                     height="1.5rem"
-                                     @click="handleClickNextStep(item)"
-                                />
-                            </div>
-                        </template>
-                    </p-board-item>
-                </div>
-            </p-data-loader>
+                        <p-board-item v-for="item in state.pluginList"
+                                      :key="item.name"
+                                      class="plugin-card-item"
+                        >
+                            <template #content>
+                                <div class="plugin-card-content">
+                                    <collect-plugin-contents :plugin="item" />
+                                    <p-button style-type="secondary"
+                                              class="select-button"
+                                              @click="handleClickNextStep(item)"
+                                    >
+                                        {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT') }}
+                                    </p-button>
+                                    <p-i class="select-icon"
+                                         name="ic_chevron-right"
+                                         :color="gray[300]"
+                                         width="1.5rem"
+                                         height="1.5rem"
+                                         @click="handleClickNextStep(item)"
+                                    />
+                                </div>
+                            </template>
+                        </p-board-item>
+                    </div>
+                </p-data-loader>
+            </div>
         </div>
     </div>
 </template>
@@ -49,7 +54,7 @@ import {
 } from 'vue';
 
 import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI,
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -150,8 +155,12 @@ onMounted(() => {
     max-height: 100vh;
     width: 100%;
     .contents-container {
-        @apply flex;
+        @apply flex justify-between;
         margin-top: 1.5rem;
+
+        .contents-title {
+            margin-bottom: 0.5rem;
+        }
 
         .right-area {
             max-width: 44.375rem;

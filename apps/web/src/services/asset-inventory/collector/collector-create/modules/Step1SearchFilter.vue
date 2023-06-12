@@ -10,6 +10,7 @@
                              :key="provider.name"
                              :selected="state.selectedProvider"
                              :value="provider.name"
+                             class="provider-item"
                              @change="handleChangeProvider"
                     >
                         <div class="content-menu-item">
@@ -33,6 +34,7 @@
                              :key="repo.name"
                              v-model="state.selectedRepository"
                              :value="repo.name"
+                             class="repository-item"
                     >
                         <div class="content-menu-item">
                             {{ repo.label }}
@@ -195,6 +197,16 @@ watch(() => state.selectedRepository, (repository) => {
 
     .provider {
         margin-bottom: 1.625rem;
+
+        .provider-item {
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    .repository {
+        .repository-item {
+            margin-bottom: 0.25rem;
+        }
     }
     .dropdown-container {
         width: 100%;
