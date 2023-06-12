@@ -25,55 +25,48 @@
         />
     </nav>
 </template>
-<script lang="ts">
-import type { SetupContext } from 'vue';
+<script setup lang="ts">
 import { watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-export default {
-    name: 'PTextPagination',
-    components: { PIconButton },
-    props: {
-        thisPage: {
-            type: Number,
-            validator(value) {
-                return value > 0;
-            },
-            default: undefined,
+const props = defineProps({
+    thisPage: {
+        type: Number,
+        validator(value: number) {
+            return value > 0;
         },
-        allPage: {
-            type: Number,
-            validator(value) {
-                return value > 0;
-            },
-            default: undefined,
-        },
-        showPageNumber: {
-            type: Boolean,
-            default: true,
-        },
-        disableNextPage: {
-            type: Boolean,
-            default: false,
-        },
+        default: undefined,
     },
-    setup(props, { emit }: SetupContext) {
-        const update = (page: number) => {
-            emit('update:thisPage', page);
-            emit('pageChange', page);
-        };
-        watch([() => props.allPage, () => props.thisPage], ([allPage, thisPage]) => {
-            if (thisPage > allPage) {
-                update(allPage);
-            }
-        }, { immediate: true });
+    allPage: {
+        type: Number,
+        validator(value: number) {
+            return value > 0;
+        },
+        default: undefined,
+    },
+    showPageNumber: {
+        type: Boolean,
+        default: true,
+    },
+    disableNextPage: {
+        type: Boolean,
+        default: false,
+    },
+});
+const emit = defineEmits(['update:thisPage', 'pageChange']);
 
-        return {
-            update,
-        };
-    },
+const update = (page: number) => {
+    emit('update:thisPage', page);
+    emit('pageChange', page);
 };
+watch([() => props.allPage, () => props.thisPage], ([allPage, thisPage]) => {
+    if (!allPage || !thisPage) return;
+    if (thisPage > allPage) {
+        update(allPage);
+    }
+}, { immediate: true });
+
 </script>
 
 <style lang="postcss" scoped>

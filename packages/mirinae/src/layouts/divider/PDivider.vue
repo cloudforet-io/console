@@ -1,6 +1,5 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
+import { h, useAttrs } from 'vue';
 
 export default {
     name: 'PDivider',
@@ -10,7 +9,8 @@ export default {
             default: false,
         },
     },
-    setup(props, { attrs }: SetupContext) {
+    setup(props) {
+        const attrs = useAttrs();
         return () => h(props.vertical ? 'div' : 'hr', {
             ...attrs,
             class: {

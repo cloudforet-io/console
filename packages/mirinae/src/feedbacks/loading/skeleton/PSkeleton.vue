@@ -1,6 +1,5 @@
 <script lang="ts">
-import { h } from 'vue';
-import type { SetupContext } from 'vue';
+import { h, useAttrs, useSlots } from 'vue';
 
 import { getBindClass } from '@/utils/functional-helpers';
 
@@ -51,7 +50,9 @@ export default {
             default: 0.4,
         },
     },
-    setup(props, { slots, attrs }: SetupContext) {
+    setup(props) {
+        const slots = useSlots();
+        const attrs = useAttrs();
         // eslint-disable-next-line vue/no-setup-props-destructure
         const {
             loading, duration, width, height, tag, animation, opacity,
