@@ -22,14 +22,14 @@
                         <p class="value">
                             {{ state.complianceCount === undefined ? '--' : state.complianceCount }}
                         </p>
-                        <div v-if="state.complianceCountHelpText"
+                        <div v-if="state.complianceCountComparingMessage"
                              class="diff-wrapper"
                         >
                             <p-i :name="state.prevComplianceCount < state.complianceCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                                  :color="state.prevComplianceCount < state.complianceCount ? red[500] : green[500]"
                             />
                             <span class="diff-value">{{ Math.abs(state.complianceCount - state.prevComplianceCount) }}</span>
-                            <span class="diff-text">{{ state.complianceCountHelpText }}</span>
+                            <span class="diff-text">{{ state.complianceCountComparingMessage }}</span>
                         </div>
                     </div>
                 </div>
@@ -166,7 +166,7 @@ const state = reactive({
         const targetDataList = state.data.filter((d) => d.date === state.dateRange.end && d.key === 'compliance_count');
         return sum(targetDataList.map((d) => d.value));
     }),
-    complianceCountHelpText: computed<TranslateResult|undefined>(() => {
+    complianceCountComparingMessage: computed<TranslateResult|undefined>(() => {
         if (state.complianceCount === undefined
             || state.prevComplianceCount === undefined
             || state.complianceCount === state.prevComplianceCount
