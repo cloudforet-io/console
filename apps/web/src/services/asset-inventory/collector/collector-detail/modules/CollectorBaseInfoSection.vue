@@ -194,7 +194,7 @@ const handleClickSave = async () => {
         if (state.isTagsUpdated) {
             const result = await fetchCollectorUpdate();
             if (collector) collector = { ...collector, ...result };
-            collector = result;
+            else collector = result;
         }
         if (!collector) throw new Error('collector is undefined'); // collector must be defined if all valid
         collectorFormStore.setOriginCollector(collector);
