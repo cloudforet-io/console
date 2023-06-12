@@ -1,5 +1,5 @@
 <template>
-    <div v-on-click-outside="hideMenu"
+    <div ref="containerRef"
          class="p-query-input"
          :class="{'container-block': props.block, [props.size]: true}"
     >
@@ -91,14 +91,13 @@
 </template>
 
 <script setup lang="ts">
+
+import { useFocus, onClickOutside } from '@vueuse/core';
+import { isEqual } from 'lodash';
 import {
     computed,
     ref, toRef, toRefs, watch,
 } from 'vue';
-
-import { vOnClickOutside } from '@vueuse/components';
-import { useFocus } from '@vueuse/core';
-import { isEqual } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
@@ -153,6 +152,9 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
 /* input focusing */
 const inputRef = ref<HTMLElement|null>(null);
 const { focused: isInputFocused } = useFocus(inputRef);
+
+/* on click outside */
+const containerRef = ref<HTMLElement|null>(null);
 
 /* context menu style */
 const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);
@@ -267,6 +269,7 @@ const selectedDisplayValue = computed(() => {
     return '';
 });
 
+onClickOutside(containerRef, hideMenu);
 
 </script>
 
