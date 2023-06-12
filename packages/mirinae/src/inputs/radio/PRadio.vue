@@ -3,12 +3,12 @@
           :tabindex="0"
           @click.stop.prevent="handleClick"
           @keypress.stop.prevent="handleClick"
-          v-on="$listeners"
+          v-on="listeners"
     >
         <slot name="radio-left"
               v-bind="{isSelected}"
         />
-        <slot :slot-scope="$props"
+        <slot :slot-scope="props"
               name="icon"
               v-bind="{isSelected, iconName}"
         >
@@ -20,7 +20,7 @@
                  :name="iconName"
             />
         </slot>
-        <span v-if="$scopedSlots.default"
+        <span v-if="slots.default"
               class="text"
               :class="{disabled,invalid}"
               @click.stop="handleClick"
@@ -32,9 +32,9 @@
     </span>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent,
+    computed, useAttrs, useSlots,
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -44,68 +44,43 @@ import { useSingleSelect } from '@/hooks/select';
 interface Props extends SelectProps {
     invalid?: boolean;
 }
-export default defineComponent<Props>({
-    name: 'PRadio',
-    components: { PI },
-    model: {
-        prop: 'selected',
-        event: 'change',
-    },
-    props: {
-        /* select props */
-        value: {
-            type: [Boolean, String, Number, Object, Array],
-            default: true,
-        },
-        selected: {
-            type: [Boolean, String, Number, Object, Array],
-            default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        predicate: {
-            type: Function,
-            default: undefined,
-        },
-        /* radio props */
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: Props, { emit }) {
-        const {
-            isSelected,
-            getSelected,
-        } = useSingleSelect({
-            value: computed(() => props.value),
-            selected: computed(() => props.selected),
-            predicate: computed(() => props.predicate),
-            disabled: computed(() => props.disabled),
-        });
 
-        const iconName = computed(() => {
-            if (props.disabled) return 'ic_radio-disabled';
-            if (isSelected.value) return 'ic_radio-selected';
-            return 'ic_radio';
-        });
-
-        /* event */
-        const handleClick = () => {
-            if (props.disabled) return;
-            const newSelected = getSelected();
-            emit('change', newSelected, true);
-        };
-
-        return {
-            isSelected,
-            iconName,
-            handleClick,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    value: true,
+    disabled: false,
+    invalid: false,
 });
+const emit = defineEmits(['change']);
+const attrs = useAttrs();
+const slots = useSlots();
+
+const {
+    isSelected,
+    getSelected,
+} = useSingleSelect({
+    value: computed(() => props.value),
+    selected: computed(() => props.selected),
+    predicate: computed(() => props.predicate),
+    disabled: computed(() => props.disabled),
+});
+
+const iconName = computed(() => {
+    if (props.disabled) return 'ic_radio-disabled';
+    if (isSelected.value) return 'ic_radio-selected';
+    return 'ic_radio';
+});
+
+/* event */
+const handleClick = () => {
+    if (props.disabled) return;
+    const newSelected = getSelected();
+    emit('change', newSelected, true);
+};
+
+const listeners = {
+    ...attrs,
+};
+
 </script>
 
 <style lang="postcss">
