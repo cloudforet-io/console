@@ -47,6 +47,7 @@
             <p-button style-type="primary"
                       size="lg"
                       class="save-changes-button"
+                      :disalbed="state.updateLoading"
                       @click="handleClickSave"
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -72,18 +73,22 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import type { SecretModel } from '@/services/asset-inventory/collector/model';
+import type { SecretModel, CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 
 const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -97,12 +102,15 @@ const state = reactive({
     loading: true,
     secrets: null as null|SecretModel[],
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    isServiceAccountValid: false,
     // query states
     pageLimit: 15,
     pageStart: 1,
     sortBy: 'name',
     sortDesc: true,
     totalCount: 0,
+    // updating
+    updateLoading: false,
 });
 
 const querySearchHandlers = {
@@ -161,12 +169,29 @@ const getSecrets = async (provider?: string) => {
     state.loading = false;
 };
 
+const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+    const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
+    const params: CollectorUpdateParameter = {
+        collector_id: collectorFormStore.collectorId,
+        secret_filter: {
+            ...originSecretFilter,
+            state: collectorFormState.attachedServiceAccountType === 'specific' ? 'ENABLED' : 'DISABLED',
+            service_accounts: collectorFormState.attachedServiceAccountType === 'specific'
+                ? collectorFormState.attachedServiceAccount
+                : [],
+        },
+    };
+    return SpaceConnector.client.inventory.collector.update(params);
+};
+
+
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
 
-const handleChangeIsAttachedServiceAccountValid = () => {
-    // TODO: implement
+const handleChangeIsAttachedServiceAccountValid = (value: boolean) => {
+    state.isServiceAccountValid = value;
 };
 
 const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
@@ -185,9 +210,19 @@ const handleClickCancel = () => {
     state.isEditMode = false;
 };
 
-const handleClickSave = () => {
-    state.isEditMode = false;
-    // TODO: Save changes
+const handleClickSave = async () => {
+    try {
+        state.updateLoading = true;
+        const collector = await fetchCollectorUpdate();
+        collectorFormStore.setOriginCollector(collector);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SERVICE_ACCOUNTS'), '');
+        state.isEditMode = false;
+    } catch (error) {
+        collectorFormStore.resetAttachedServiceAccount();
+        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SERVICE_ACCOUNTS'));
+    } finally {
+        state.updateLoading = false;
+    }
 };
 
 
