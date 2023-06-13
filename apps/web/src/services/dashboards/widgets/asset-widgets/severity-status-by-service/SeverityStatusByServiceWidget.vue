@@ -7,7 +7,7 @@
             <div class="chart-wrapper"
                  :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
             >
-                <div v-for="(data, idx) in state.data"
+                <div v-for="(data, idx) in state.refinedData"
                      :key="`box-${idx}`"
                      v-tooltip.bottom="`${data.service}: ${data.value}`"
                      class="status-box"
@@ -39,7 +39,7 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { min } from 'lodash';
+import { flattenDeep, min } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -48,7 +48,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { ComplianceStatus, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
+import type {
+    CloudServiceStatsModel, ComplianceStatus, Severity,
+} from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -58,9 +60,14 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
-interface Data {
+interface Data extends CloudServiceStatsModel {
     service: string;
-    complianceStatus: ComplianceStatus;
+    value: number;
+    severity: Severity[];
+    status: ComplianceStatus[];
+}
+interface RefinedData {
+    service: string;
     severity: Severity;
     value: number;
 }
@@ -75,7 +82,6 @@ const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     boxWidth: computed<number>(() => {
@@ -85,6 +91,7 @@ const state = reactive({
         if (props.width >= 990) return widgetContentWidth / 8;
         return widgetContentWidth / 7 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 7;
     }),
+    refinedData: computed<RefinedData[]>(() => refineData(state.data)),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -95,32 +102,30 @@ const fetchData = async (): Promise<Data[]> => {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.consoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        const results = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
+            .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
+        const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
-                group_by: ['data.service'],
+                group_by: ['key', 'unit', 'additional_info.service'],
+                granularity: 'MONTHLY',
+                start: prevMonth,
+                end: state.dateRange.end,
                 fields: {
+                    value: {
+                        key: 'value',
+                        operator: 'sum',
+                    },
                     status: {
-                        key: 'data.status',
+                        key: 'additional_info.status',
                         operator: 'add_to_set',
                     },
                     severity: {
-                        key: 'data.severity',
+                        key: 'additional_info.severity',
                         operator: 'add_to_set',
                     },
-                    pass_finding_count: {
-                        key: 'data.stats.findings.pass',
-                        operator: 'sum',
-                    },
-                    fail_finding_count: {
-                        key: 'data.stats.checks.fail',
-                        operator: 'sum',
-                    },
                 },
-                sort: [{
-                    key: 'service',
-                    desc: false,
-                }],
+                sort: [{ key: 'service' }, { key: 'key' }],
                 page: {
                     limit: 80,
                     start: 1,
@@ -128,7 +133,7 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        return refineData(results);
+        return results;
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
@@ -137,19 +142,34 @@ const fetchData = async (): Promise<Data[]> => {
 
 
 /* Util */
-const refineData = (data): Data[] => {
-    const { results } = data;
-    return results.map((result) => {
-        const minSeverityPriority: number = min(result.severity.map((s) => SEVERITY_STATUS_MAP[s].priority)) ?? 0; // ex. 1
-        const severity = SEVERITY_PRIORITY_MAP[minSeverityPriority]; // ex. 'CRITICAL'
-        const complianceStatus = result.status.includes('FAIL') ? 'FAIL' : 'PASS';
-        return {
-            service: result.service,
+const refineData = (data?: Data[]): RefinedData[] => {
+    if (!data?.length) return [];
+    const serviceSet = new Set();
+    data.forEach((result) => serviceSet.add(result.service));
+    const refinedData: RefinedData[] = [];
+    serviceSet.forEach((service) => {
+        const targetServiceDataList = data.filter((result) => result.service === service);
+        const statusList = flattenDeep(targetServiceDataList.map((d) => d.status));
+        const status = statusList.includes('FAIL') ? 'FAIL' : 'PASS';
+        let severity: Severity = 'PASS';
+        let value: number;
+
+        if (status === 'FAIL') {
+            const severityList = flattenDeep(targetServiceDataList.map((d) => d.severity));
+            const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
+            if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
+            value = targetServiceDataList.find((d) => d.key === 'fail_finding_count')?.value ?? 0;
+        } else {
+            value = targetServiceDataList.find((d) => d.key === 'pass_finding_count')?.value ?? 0;
+        }
+
+        refinedData.push({
+            service: service as string,
             severity,
-            complianceStatus,
-            value: complianceStatus === 'FAIL' ? result.fail_finding_count : result.pass_finding_count,
-        };
+            value,
+        });
     });
+    return refinedData;
 };
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
