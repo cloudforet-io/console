@@ -128,7 +128,7 @@
                 <div @click.stop="handleChangeToggle">
                     <p-toggle-button
                         :value="state.isScheduleActivated"
-                        :label="state.toggleStatus"
+                        :label="state.isScheduleActivated ? 'ON' : 'OFF'"
                         :class="state.isScheduleActivated ? 'toggle-active' : ''"
                         @change-toggle="handleChangeToggle"
                     />
@@ -150,7 +150,7 @@
                          color="inherit"
                          class="icon-schedule"
                     />
-                    <!-- TODO: changed condition after API spec checking -->
+                    {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                     {{ props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                 </p-button>
             </div>
