@@ -26,7 +26,7 @@
                     {{ props.label }}
                 </p>
                 <div class="label-description">
-                    <div v-if="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
+                    <div v-if="state.isScheduleActivated"
                          class="scheduled"
                     >
                         <p-i
@@ -36,17 +36,17 @@
                             width="1.25rem"
                             color="inherit"
                         />
-                        <!-- TODO: will be fixed after the API is completed -->
                         <p class="description">
-                            Scheduled
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
                             <span class="emphasis">
-                                in
-                                <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
-                                <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
+                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
                             </span>
                         </p>
                     </div>
                     <!-- TODO: add in-progress state -->
+                    <span v-else-if="props.item">
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                    </span>
                     <span v-else>
                         {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                     </span>
@@ -63,6 +63,7 @@
                     <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
                          :key="`job-item-${index}`"
                          class="jobs-contents"
+                         @click.stop
                     >
                         <p-tooltip v-if="jobItems.status === 'success'"
                                    class="icon-fill-wrapper success"
@@ -126,16 +127,16 @@
                 </p>
                 <div @click.stop="handleChangeToggle">
                     <p-toggle-button
-                        :value="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
+                        :value="state.isScheduleActivated"
                         :label="state.toggleStatus"
-                        :class="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'toggle-active' : ''"
+                        :class="state.isScheduleActivated ? 'toggle-active' : ''"
                         @change-toggle="handleChangeToggle"
                     />
                 </div>
                 <p-button style-type="transparent"
                           @click.stop="handleClickSchedule"
                 >
-                    <p-i v-if="state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED"
+                    <p-i v-if="state.isScheduleActivated"
                          name="ic_edit"
                          height="0.75rem"
                          width="0.75rem"
@@ -150,7 +151,7 @@
                          class="icon-schedule"
                     />
                     <!-- TODO: changed condition after API spec checking -->
-                    {{ state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                    {{ props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                 </p-button>
             </div>
         </div>
@@ -163,15 +164,13 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PI, PLazyImg, PToggleButton, PTooltip,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { store } from '@/store';
-
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type {
     CollectorItemInfo,
-    CollectorScheduleState,
 } from '@/services/asset-inventory/collector/model';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
@@ -191,36 +190,30 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
-
-const { i18nDayjs } = useI18nDayjs();
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
 
 const state = reactive({
-    current: computed(() => i18nDayjs.value.tz(i18nDayjs.value(), storeState.timezone)),
-    schedule: computed(() => collectorPageState.schedules.find((schedule) => schedule.collector_id === props.item.collectorId)),
-    scheduleState: computed<CollectorScheduleState>(() => state.schedule?.collector_info.state),
-    toggleStatus: computed(() => (state.scheduleState === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
-    nextSchedule: computed(() => {
-        if (state.schedule) {
-            const hours = state.schedule.schedule?.hours ?? [];
-            const sortedHours = hours.sort((a, b) => a - b);
-            const currentHour = state.current.hour();
-            const closestHour = sortedHours.find((num) => num > currentHour);
-
-            if (closestHour) {
-                return state.current.set('h', closestHour).set('m', 0);
-            }
-            return state.current.set('h', sortedHours[0] ?? 0).set('m', 0).add(1, 'd');
-        }
-        return null;
+    isScheduleActivated: computed(() => {
+        const schedule = props.item.schedule;
+        return !!schedule;
     }),
+    toggleStatus: computed(() => (props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
     diffSchedule: computed(() => {
-        const timeDiff = state.nextSchedule.diff(state.current, 'm');
-        return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
+        if (props.item.schedule) {
+            const current = dayjs().utc();
+
+            const userCurrentTime = dayjs.tz(current, storeState.timezone);
+            const hours = props.item.schedule.hours ?? [];
+            const nextScheduledHour = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
+
+            const nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            const timeDiff = nextScheduledTime.diff(current, 'm');
+            return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
+        }
+        return { diffHour: 0, diffMin: 0 };
     }),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
