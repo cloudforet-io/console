@@ -59,6 +59,39 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 throw e;
             }
         },
+        async setCollectorJobs(ids) {
+            try {
+                await SpaceConnector.clientV2.inventory.job.analyze({
+                    query: {
+                        filter: [
+                            {
+                                k: 'created_at',
+                                v: 'now - 5d',
+                                o: 'timediff_gte',
+                            },
+                            {
+                                k: 'collector_id',
+                                v: ids,
+                                o: 'in',
+                            },
+                        ],
+                        group_by: ['collector_id'],
+                        fields: {
+                            job_status: {
+                                operator: 'push',
+                                fields: {
+                                    status: 'status',
+                                    job_id: 'job_id',
+                                },
+                            },
+                        },
+                    },
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
         setSelectedProvider(provider) {
             this.selectedProvider = provider;
         },
