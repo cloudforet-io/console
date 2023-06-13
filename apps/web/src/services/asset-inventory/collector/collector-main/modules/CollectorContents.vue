@@ -163,6 +163,7 @@ const state = reactive({
                         collectorId: d.collector_id,
                     },
                 },
+                schedule: d.schedule,
             };
         });
     }),

@@ -154,6 +154,7 @@ export interface CollectorItemInfo {
     plugin: CollectorPlugin;
     historyLink: CollectorLink,
     detailLink: CollectorLink;
+    schedule: Schedule;
 }
 export const COLLECTOR_QUERY_HELPER_SET = {
     COLLECTOR_ID: 'collector_id',
