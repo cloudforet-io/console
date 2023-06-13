@@ -6,7 +6,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, jobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
@@ -17,6 +17,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
+        collectorJobStatus: [] as jobAnalyzeModel[],
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as Schedule[],
@@ -50,7 +51,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
         async setCollectorJobs(ids) {
             try {
-                await SpaceConnector.clientV2.inventory.job.analyze({
+                const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
                     query: {
                         filter: [
                             {
@@ -76,6 +77,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                         },
                     },
                 });
+                this.collectorJobStatus = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
