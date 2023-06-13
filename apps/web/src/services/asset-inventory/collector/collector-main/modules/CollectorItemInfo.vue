@@ -170,6 +170,7 @@ import { store } from '@/store';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/collector-main/type';
+import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
 
 interface Props {
     label: string;
@@ -190,10 +191,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    isScheduleActivated: computed(() => {
-        const schedule = props.item.schedule;
-        return !!schedule;
-    }),
+    isScheduleActivated: computed(() => props.item.schedule && props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
