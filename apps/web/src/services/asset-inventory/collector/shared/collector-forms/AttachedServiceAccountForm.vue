@@ -102,8 +102,8 @@ const state = reactive({
     }),
     handlerParams: computed(() => {
         queryHelper.setFilters([]); // init filters
-        if (collectorFormStore.provider) {
-            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.provider, o: '=' });
+        if (collectorFormStore.collectorProvider) {
+            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
         }
         return {
             resource_type: 'identity.ServiceAccount',
