@@ -7,7 +7,7 @@
       "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
-        "!./**/LICENSE", "!./**/__tests__/**", "!./**/*.babel"
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
@@ -16,7 +16,7 @@
         "inputs": [
           "src/**", "postcss.config.cjs", "tailwind.config.cjs",
           "package.json", "tsconfig.build.json", "vite.config.js",
-          "!./**/LICENSE", "!./**/__tests__/**", "!./**/*.babel"
+          "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
         ],
       "cache": true
     },
@@ -28,7 +28,7 @@
         "src/**", "!src/assets/**", "src/assets/images/**",
         "package.json", "package-lock.json", "tsconfig.json",
         "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs",
-        "!./**/LICENSE", "!./**/__tests__/**", "!./**/*.babel"
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
@@ -37,7 +37,7 @@
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
-        "!./**/LICENSE", "!./**/__tests__/**", "!./**/*.babel"
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
