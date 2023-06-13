@@ -17,13 +17,13 @@
 
         <p-definition-table v-if="!state.isEditMode"
                             :fields="fields"
-                            :loading="props.loading"
+                            :loading="state.loading"
                             :data="collectorFormState.originCollector"
                             style-type="white"
         >
             <template #data-pluginName>
                 <p-lazy-img :src="state.pluginIcon"
-                            :loading="props.loading"
+                            :loading="state.loading"
                             width="1rem"
                             height="1rem"
                 />
@@ -73,7 +73,7 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, computed, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -102,10 +102,6 @@ import CollectorTagForm from '@/services/asset-inventory/collector/shared/collec
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 
-const props = defineProps<{
-    loading: boolean;
-}>();
-
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
@@ -121,6 +117,7 @@ const fields = computed<DefinitionField[]>(() => [
 ]);
 
 const state = reactive({
+    loading: computed<boolean>(() => !collectorFormState.originCollector),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     pluginItem: computed<PluginReferenceItem|undefined>(() => {
         if (!state.pluginInfo) return undefined;

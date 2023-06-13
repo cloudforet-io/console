@@ -21,7 +21,7 @@
                   tag="p"
             >
                 <template #times>
-                    <span class="times">{{ state.timezoneAppliedHours.map(hour => `${hour}:00`).join(', ') }}</span>
+                    <span class="times">{{ state.timezoneAppliedHoursDisplayText }}</span>
                 </template>
             </i18n>
             <template v-else>
@@ -72,8 +72,16 @@ import {
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 
-import { store } from '@/store';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
+import { i18n as i18nTranslator } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
@@ -81,6 +89,7 @@ const props = defineProps<{
     disableFirstLoading?: boolean;
     disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
+    callApiOnPowerChange?: boolean;
 }>();
 
 const emits = defineEmits<{(event: 'update:enableHoursEdit', value: boolean): void;
@@ -101,6 +110,7 @@ const state = reactive({
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
+    timezoneAppliedHoursDisplayText: computed(() => state.timezoneAppliedHours.map((hour) => `${hour}:00`).join(', ')),
     loading: computed<boolean>(() => {
         if (props.disableFirstLoading) return false;
         return collectorFormState.originCollector === null;
@@ -113,12 +123,33 @@ const updateSelectedHours = () => {
         scheduleHours: hours,
     });
 };
+const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+    if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
+    const schedule = collectorFormState.originCollector?.schedule ?? {};
+    const params: CollectorUpdateParameter = {
+        collector_id: collectorFormStore.collectorId,
+        schedule: {
+            ...schedule,
+            state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
+        },
+    };
+    return SpaceConnector.client.inventory.collector.update(params);
+};
 
-const handleChangeToggle = (value: boolean) => {
+const handleChangeToggle = async (value: boolean) => {
     collectorFormStore.$patch({
         schedulePower: value,
     });
-    // TODO: update with api call
+    if (props.callApiOnPowerChange) {
+        try {
+            const collector = await fetchCollectorUpdate();
+            collectorFormStore.setOriginCollector(collector);
+            showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        } catch (e) {
+            collectorFormStore.resetSchedulePower();
+            ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        }
+    }
 };
 
 const handleClickSelect = () => {

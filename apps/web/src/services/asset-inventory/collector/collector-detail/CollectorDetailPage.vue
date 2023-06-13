@@ -38,12 +38,11 @@
             </template>
         </p-heading>
 
-        <collector-base-info-section class="section"
-                                     :loading="state.loading"
-        />
+        <collector-base-info-section class="section" />
         <collector-schedule-section class="section" />
         <collector-options-section class="section" />
         <collector-service-accounts-section class="section" />
+
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
                               :verification-text="state.collectorName"
@@ -124,8 +123,6 @@ const state = reactive({
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
-    // TODO: must be updated after backend api spec is updated
-    collectorProviders: computed<undefined|string[]>(() => (state.collector?.provider ? [state.collector.provider] : undefined)),
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -147,13 +144,19 @@ const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY
 
 defineExpose({ setPathFrom });
 
-const getCollector = async (): Promise<CollectorModel> => {
+const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
-    const result = await SpaceConnector.client.inventory.collector.get({
-        collector_id: props.collectorId,
-    });
-    state.loading = false;
-    return result;
+    try {
+        const result = await SpaceConnector.client.inventory.collector.get({
+            collector_id: props.collectorId,
+        });
+        return result;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    } finally {
+        state.loading = false;
+    }
 };
 
 const fetchDeleteCollector = async () => SpaceConnector.client.inventory.collector.delete({
@@ -196,7 +199,7 @@ const handleUpdateEditModalVisible = (value: boolean) => {
 onMounted(async () => {
     collectorFormStore.$reset();
     const collector = await getCollector();
-    collectorFormStore.setOriginCollector(collector);
+    if (collector) collectorFormStore.setOriginCollector(collector);
 });
 
 </script>
