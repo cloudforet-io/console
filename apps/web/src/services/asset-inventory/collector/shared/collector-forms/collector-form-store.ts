@@ -1,3 +1,4 @@
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { defineStore } from 'pinia';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -7,7 +8,7 @@ import type {
     RepositoryPluginModel,
 } from '@/services/asset-inventory/collector/model';
 
-type AttachedServiceAccount = string[]; // TODO: need to check type
+export type AttachedServiceAccount = FilterableDropdownMenuItem[];
 
 export type AttachedServiceAccountType = 'all'|'specific';
 

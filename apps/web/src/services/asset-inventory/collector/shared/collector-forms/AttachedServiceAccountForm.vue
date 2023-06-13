@@ -34,6 +34,7 @@
                                        multi-selectable
                                        :handler="serviceAccountHandler"
                                        appearance-type="badge"
+                                       :reset-selected-on-unmounted="false"
                                        @update:selected="handleSelectAttachedServiceAccount"
                 />
             </div>
@@ -48,9 +49,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
 } from '@spaceone/design-system';
-import type {
-    AutocompleteHandler,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -60,7 +59,10 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { AttachedServiceAccountType } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import type {
+    AttachedServiceAccount,
+    AttachedServiceAccountType,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -141,8 +143,8 @@ const {
     invalidState,
     invalidTexts,
     isAllValid,
-} = useFormValidator<{selectedAttachedServiceAccount : string[]|null}>({
-    selectedAttachedServiceAccount: [],
+} = useFormValidator<{selectedAttachedServiceAccount : AttachedServiceAccount}>({
+    selectedAttachedServiceAccount: collectorFormState.attachedServiceAccount ?? [],
 }, {
     selectedAttachedServiceAccount(value: string[]|null) {
         if (collectorFormState.attachedServiceAccountType !== 'all' && value && value.length) {
@@ -162,7 +164,7 @@ const handleChangeAttachedServiceAccountType = (selectedValue: AttachedServiceAc
     });
 };
 
-const handleSelectAttachedServiceAccount = (selectedValue: string[]) => {
+const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccount) => {
     setForm('selectedAttachedServiceAccount', selectedValue);
     collectorFormStore.$patch({
         attachedServiceAccount: selectedValue,
