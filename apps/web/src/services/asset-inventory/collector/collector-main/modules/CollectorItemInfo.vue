@@ -169,11 +169,9 @@ import dayjs from 'dayjs';
 import { store } from '@/store';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type {
-    CollectorItemInfo,
-} from '@/services/asset-inventory/collector/model';
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/collector-main/type';
 import {
-    COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_SCHEDULE_STATE,
 } from '@/services/asset-inventory/collector/model';
 
