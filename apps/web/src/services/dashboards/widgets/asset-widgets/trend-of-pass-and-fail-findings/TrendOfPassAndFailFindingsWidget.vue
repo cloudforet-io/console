@@ -101,7 +101,7 @@ const { colorSet } = useWidgetColorSet({
 });
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    groupByKey: computed<string>(() => {
+    groupByKey: computed<string|undefined>(() => {
         // ex. additional_info.service -> service
         if (!state.groupBy) return undefined;
         const dotIndex = state.groupBy.indexOf('.');

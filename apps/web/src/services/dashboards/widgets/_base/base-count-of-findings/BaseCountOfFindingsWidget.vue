@@ -82,7 +82,7 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
-    groupByKey: computed<string>(() => {
+    groupByKey: computed<string|undefined>(() => {
         // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
         // ex. additional_info.service -> service
         if (!state.groupBy) return undefined;
