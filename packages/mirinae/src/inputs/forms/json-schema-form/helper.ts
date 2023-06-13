@@ -32,7 +32,7 @@ const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined 
         items = schemaProperty.enum;
     } else if (schemaProperty.type === 'array') {
         // PTextInput multi input case (array, non-strict select) - not used yet
-        if (isStrictArraySelectMode(schemaProperty)) {
+        if (!isStrictArraySelectMode(schemaProperty)) {
             if (Array.isArray(schemaProperty.items)) {
                 schemaProperty.items.forEach((item) => {
                     if (typeof item === 'object' && Array.isArray(item.enum)) {
