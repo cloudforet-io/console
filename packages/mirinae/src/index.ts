@@ -3,12 +3,12 @@ import type { Plugin } from 'vue';
 import type { MirinaeOptions } from './install';
 import { MirinaeInstaller } from './install';
 
-const mirinaeOptions: Plugin<MirinaeOptions> = {
+const mirinaePlugin: Plugin<MirinaeOptions> = {
     install: MirinaeInstaller.install,
 };
 
 /* Plugin */
-export default mirinaeOptions;
+export default mirinaePlugin;
 
 /* Languages */
 export { messages } from './translations';
