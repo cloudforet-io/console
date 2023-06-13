@@ -9,7 +9,7 @@
                 />
             </div>
         </div>
-        <p-select-dropdown :selected="version"
+        <p-select-dropdown :selected="collectorFormState.version"
                            :items="state.versions"
                            :disabled="collectorFormState.autoUpgrade"
                            class="w-full"
