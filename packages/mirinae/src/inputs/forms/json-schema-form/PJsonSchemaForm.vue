@@ -114,6 +114,7 @@
                                               :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
                                               :type="schemaProperty.inputType"
                                               :invalid="invalid"
+                                              :menu="schemaProperty.menuItems"
                                               :placeholder="schemaProperty.inputPlaceholder"
                                               :appearance-type="schemaProperty.appearanceType"
                                               :autocomplete="false"
