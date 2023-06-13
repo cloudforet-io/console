@@ -168,8 +168,6 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type {
     CollectorItemInfo,
@@ -193,8 +191,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const collectorPageStore = useCollectorPageStore();
 
-const { i18nDayjs } = useI18nDayjs();
-
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
@@ -207,12 +203,13 @@ const state = reactive({
     toggleStatus: computed(() => (props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
-            const userCurrentTime = i18nDayjs.value.tz(i18nDayjs.value(), storeState.timezone);
+            const current = dayjs().utc();
+
+            const userCurrentTime = dayjs.tz(current, storeState.timezone);
             const hours = props.item.schedule.hours ?? [];
             const nextSchedule = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
 
-            const current = dayjs().utc();
-            const setNextSchedule = dayjs().utc().set('h', nextSchedule || 0).set('m', 0);
+            const setNextSchedule = current.set('h', nextSchedule || 0).set('m', 0);
             const timeDiff = setNextSchedule.diff(current, 'm');
             return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
