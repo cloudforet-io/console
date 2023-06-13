@@ -103,7 +103,7 @@ const handleClickPrevButton = () => {
 const handleClickCreateButton = async () => {
     try {
         state.createLoading = true;
-        const params: Partial<CollectorCreateParameter> = {
+        const params: CollectorCreateParameter = {
             name: collectorFormState.name,
             provider: collectorFormState.repositoryPlugin?.provider,
             plugin_info: {
