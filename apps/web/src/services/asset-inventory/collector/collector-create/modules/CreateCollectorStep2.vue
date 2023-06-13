@@ -6,7 +6,7 @@
             <collector-version-form class="version-row"
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
-            <collector-tag-form :service-name="state.pluginName"
+            <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
                                 @update:isTagsValid="handleChangeIsTagsValid"
             />
         </div>
