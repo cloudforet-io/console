@@ -145,6 +145,7 @@ const handleClose = () => {
 const handleConfirmCreateCollector = async () => {
     try {
         state.collectLoading = true;
+        // After the collector created, if the user clicks the collect button, the collector will be executed.
         await SpaceConnector.client.inventory.collector.collect({
             collector_id: state.createdCollectorId,
         });
