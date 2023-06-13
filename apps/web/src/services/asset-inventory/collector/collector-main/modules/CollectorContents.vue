@@ -147,8 +147,8 @@ const state = reactive({
                 },
             };
 
-            const matchedJobIndex = collectorPageState.collectorJobStatus.findIndex((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = collectorPageState.collectorJobStatus[matchedJobIndex]?.job_status.slice(-5) || [];
+            const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
+            const recentJobAnalyze = matchedJob?.job_status.slice(-5) || [];
 
             while (recentJobAnalyze.length < RECENT_COUNT) {
                 const noneValue = {
