@@ -1,14 +1,19 @@
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
     CollectorModel, CollectorOptions,
     RepositoryPluginModel,
 } from '@/services/asset-inventory/collector/model';
+
 
 export type AttachedServiceAccount = FilterableDropdownMenuItem[];
 
@@ -28,6 +33,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         attachedServiceAccount: [] as AttachedServiceAccount,
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
         options: {} as CollectorOptions,
+        versions: [] as string[],
     }),
     getters: {
         collectorId(): string|undefined {
@@ -108,6 +114,18 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         resetOptions() {
             this.options = this.originCollector?.plugin_info?.options ?? {};
+        },
+        async getVersions() {
+            if (!this.pluginId) throw new Error('pluginId is not defined');
+            try {
+                const res = await SpaceConnector.client.repository.plugin.getVersions({
+                    plugin_id: this.pluginId,
+                });
+                this.versions = res.results;
+            } catch (e) {
+                this.versions = [];
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
+            }
         },
     },
 });
