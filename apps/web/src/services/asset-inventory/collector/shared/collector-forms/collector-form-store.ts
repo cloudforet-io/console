@@ -51,6 +51,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.resetTags();
             this.resetVersion();
             this.resetSchedule();
+            this.resetAttachedServiceAccount();
             this.resetOptions();
         },
         setProvider(provider: string) {
@@ -84,6 +85,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         resetSchedule(hoursOnly = false) {
             this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
             if (!hoursOnly) this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
+        },
+        resetSchedulePower() {
+            this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         resetAttachedServiceAccount() {
             this.attachedServiceAccount = this.originCollector?.secret_filter?.service_accounts ?? [];
