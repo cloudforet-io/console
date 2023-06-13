@@ -26,7 +26,7 @@
                     {{ props.label }}
                 </p>
                 <div class="label-description">
-                    <div v-if="state.scheduleActive"
+                    <div v-if="state.isScheduleActivated"
                          class="scheduled"
                     >
                         <p-i
@@ -127,16 +127,16 @@
                 </p>
                 <div @click.stop="handleChangeToggle">
                     <p-toggle-button
-                        :value="state.scheduleActive"
+                        :value="state.isScheduleActivated"
                         :label="state.toggleStatus"
-                        :class="state.scheduleActive ? 'toggle-active' : ''"
+                        :class="state.isScheduleActivated ? 'toggle-active' : ''"
                         @change-toggle="handleChangeToggle"
                     />
                 </div>
                 <p-button style-type="transparent"
                           @click.stop="handleClickSchedule"
                 >
-                    <p-i v-if="state.scheduleActive"
+                    <p-i v-if="state.isScheduleActivated"
                          name="ic_edit"
                          height="0.75rem"
                          width="0.75rem"
@@ -196,7 +196,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    scheduleActive: computed(() => {
+    isScheduleActivated: computed(() => {
         const schedule = props.item.schedule;
         return !!schedule;
     }),
