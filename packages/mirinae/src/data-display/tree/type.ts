@@ -60,7 +60,8 @@ export interface GetClassNames<T=any> {
 }
 
 
-export interface Tree<T=any> {
+// TODO: this need to be applied to console or rollback to the previous name
+export interface TreeType<T=any> {
     fetchData: (node?: TreeNode<T>|null) => Promise<TreeNode<T>[]>;
     changeSelectState: (node: TreeNode<T>, path: number[], value?: boolean) => void;
     addNode: (data: T[]|T) => void;

@@ -10,7 +10,7 @@
         >
             <div class="tree-node-back"
                  :class="{selected: getSelectedState(index)}"
-                 :style="indentStyle"
+                 :style="state.indentStyle"
             >
                 <div class="tree-node">
                     <slot v-bind="{node, index, path: getTreeNodePath(index)}">
@@ -37,10 +37,9 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed,
-    defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 interface ChildrenListProps {
@@ -52,54 +51,26 @@ interface ChildrenListProps {
   rootNode: any;
   selectedPaths: number[][];
 }
-export default defineComponent<ChildrenListProps>({
-    name: 'ChildrenList',
-    props: {
-        rtl: {
-            type: Boolean,
-            default: false,
-        },
-        parentPath: {
-            type: Array,
-            default: () => [],
-        },
-        indent: {
-            type: Number,
-            default: 16,
-        },
-        nodes: {
-            type: Array,
-            default: () => [],
-        },
-        parent: {
-            type: Object,
-            default: () => ({}),
-        },
-        rootNode: {
-            type: Object,
-            default: () => ({}),
-        },
-        selectedPaths: {
-            type: Array,
-            default: () => [],
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            indentStyle: computed(() => ({
-                [!props.rtl ? 'paddingLeft' : 'paddingRight']: `${props.parentPath.length * props.indent}px`,
-            })),
-        });
-        const getTreeNodePath = (index: number) => [...props.parentPath, index];
-        const getSelectedState = (index: number): boolean => {
-            const path = JSON.stringify(getTreeNodePath(index));
-            return props.selectedPaths.some((p) => JSON.stringify(p) === path);
-        };
-        return {
-            ...toRefs(state),
-            getTreeNodePath,
-            getSelectedState,
-        };
-    },
+
+const props = withDefaults(defineProps<ChildrenListProps>(), {
+    rtl: false,
+    parentPath: () => [],
+    indent: 16,
+    nodes: () => [],
+    parent: () => ({}),
+    rootNode: () => ({}),
+    selectedPaths: () => [],
 });
+
+const state = reactive({
+    indentStyle: computed(() => ({
+        [!props.rtl ? 'paddingLeft' : 'paddingRight']: `${props.parentPath.length * props.indent}px`,
+    })),
+});
+const getTreeNodePath = (index: number) => [...props.parentPath, index];
+const getSelectedState = (index: number): boolean => {
+    const path = JSON.stringify(getTreeNodePath(index));
+    return props.selectedPaths.some((p) => JSON.stringify(p) === path);
+};
+
 </script>
