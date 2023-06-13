@@ -207,10 +207,10 @@ const state = reactive({
 
             const userCurrentTime = dayjs.tz(current, storeState.timezone);
             const hours = props.item.schedule.hours ?? [];
-            const nextSchedule = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
+            const nextScheduledHour = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
 
-            const setNextSchedule = current.set('h', nextSchedule || 0).set('m', 0);
-            const timeDiff = setNextSchedule.diff(current, 'm');
+            const nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            const timeDiff = nextScheduledTime.diff(current, 'm');
             return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
         return { diffHour: 0, diffMin: 0 };
