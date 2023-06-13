@@ -132,6 +132,7 @@ const handleClickOtherPluginButton = () => {
 
 const handleClose = () => {
     emit('update:currentStep', 1);
+    state.deleteModalVisible = false;
 };
 
 const handleConfirmCreateCollector = () => {
