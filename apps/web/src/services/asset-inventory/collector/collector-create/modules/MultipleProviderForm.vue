@@ -1,7 +1,7 @@
 <template>
     <div class="multiple-provider-form">
         <p-field-title class="title">
-            Provider
+            {{ $t('INVENTORY.COLLECTOR.CREATE.PROVIDER') }}
         </p-field-title>
         <div class="radio-container">
             <p-radio-group>
@@ -18,7 +18,7 @@
                 </p-radio>
             </p-radio-group>
         </div>
-        <!-- MEMO: screen mobile size-->
+        <!-- NOTE: screen mobile size-->
         <div class="dropdown-container">
             <p-select-dropdown :selected="state.selectedProvider"
                                :items="state.providerList"
@@ -73,7 +73,7 @@ const handleChangeProvider = (provider) => {
 
 
 (() => {
-    collectorFormStore.setProvider(state.providerList[0].name);
+    collectorFormStore.setProvider(state.providerList[0]?.name);
 })();
 
 </script>
