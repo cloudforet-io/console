@@ -26,27 +26,29 @@
                     {{ props.label }}
                 </p>
                 <div class="label-description">
-                    <div v-if="state.isScheduleActivated"
-                         class="scheduled"
-                    >
-                        <p-i
-                            name="ic_alarm-clock"
-                            class="alarm-icon"
-                            height="1.25rem"
-                            width="1.25rem"
-                            color="inherit"
-                        />
-                        <p class="description">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
-                            <span class="emphasis">
-                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
-                            </span>
-                        </p>
+                    <div v-if="props.item.schedule">
+                        <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                             class="scheduled"
+                        >
+                            <p-i
+                                name="ic_alarm-clock"
+                                class="alarm-icon"
+                                height="1.25rem"
+                                width="1.25rem"
+                                color="inherit"
+                            />
+                            <p class="description">
+                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
+                                <span class="emphasis">
+                                    {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                                </span>
+                            </p>
+                        </div>
+                        <!-- TODO: add in-progress state -->
+                        <span v-else-if="props.item">
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}
+                        </span>
                     </div>
-                    <!-- TODO: add in-progress state -->
-                    <span v-else-if="props.item">
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-                    </span>
                     <span v-else>
                         {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                     </span>
@@ -128,7 +130,7 @@
                 <div @click.stop="handleChangeToggle">
                     <p-toggle-button
                         :value="state.isScheduleActivated"
-                        :label="state.toggleStatus"
+                        :label="state.isScheduleActivated ? 'ON' : 'OFF'"
                         :class="state.isScheduleActivated ? 'toggle-active' : ''"
                         @change-toggle="handleChangeToggle"
                     />
@@ -150,8 +152,7 @@
                          color="inherit"
                          class="icon-schedule"
                     />
-                    <!-- TODO: changed condition after API spec checking -->
-                    {{ props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                    {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                 </p-button>
             </div>
         </div>
@@ -171,9 +172,7 @@ import { store } from '@/store';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/collector-main/type';
-import {
-    COLLECTOR_SCHEDULE_STATE,
-} from '@/services/asset-inventory/collector/model';
+import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
 
 interface Props {
     label: string;
@@ -194,11 +193,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    isScheduleActivated: computed(() => {
-        const schedule = props.item.schedule;
-        return !!schedule;
-    }),
-    toggleStatus: computed(() => (props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
+    isScheduleActivated: computed(() => props.item.schedule && props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
