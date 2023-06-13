@@ -6,15 +6,15 @@
         <div class="compliance-check-status">
             <div class="data-container">
                 <div class="summary-wrapper">
-                    <div class="left-wrapper">
-                        <p class="title">
-                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}
-                        </p>
-                        <p class="value">
-                            {{ state.accountCount }}
-                        </p>
-                    </div>
-                    <p-divider :vertical="true" />
+                    <!--                    <div class="left-wrapper">-->
+                    <!--                        <p class="title">-->
+                    <!--                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
+                    <!--                        </p>-->
+                    <!--                        <p class="value">-->
+                    <!--                            {{ state.accountCount }}-->
+                    <!--                        </p>-->
+                    <!--                    </div>-->
+                    <!--                    <p-divider :vertical="true" />-->
                     <div class="right-wrapper">
                         <p class="title">
                             {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
@@ -76,7 +76,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { PDataLoader, PDivider, PI } from '@spaceone/design-system';
+import { PDataLoader, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
