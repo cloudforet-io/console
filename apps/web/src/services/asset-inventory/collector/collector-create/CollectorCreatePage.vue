@@ -18,15 +18,19 @@
             <create-collector-step1 v-if="state.step===1"
                                     @update:currentStep="handleChangeStep"
             />
-            <create-collector-step2 v-if="state.step===2"
-                                    @update:currentStep="handleChangeStep"
-            />
-            <create-collector-step3 v-if="state.step===3"
-                                    @update:currentStep="handleChangeStep"
-            />
-            <create-collector-step4 v-if="state.step===4"
-                                    @update:currentStep="handleChangeStep"
-            />
+            <div v-if="state.step !== 1">
+                <keep-alive>
+                    <create-collector-step2 v-if="state.step===2"
+                                            @update:currentStep="handleChangeStep"
+                    />
+                    <create-collector-step3 v-if="state.step===3"
+                                            @update:currentStep="handleChangeStep"
+                    />
+                    <create-collector-step4 v-if="state.step===4"
+                                            @update:currentStep="handleChangeStep"
+                    />
+                </keep-alive>
+            </div>
         </div>
         <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
