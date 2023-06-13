@@ -90,7 +90,7 @@ watch(() => state.isVersionValid, (value) => {
 // get version list when pluginId changed and init selected version
 watch(() => state.pluginId, async (pluginId) => {
     if (!pluginId) return;
-    if (props.getVersionsOnPluginIdChange) await collectorFormStore.getVersions();
+    if (props.getVersionsOnPluginIdChange) await collectorFormStore.getVersions(pluginId);
     initSelectedVersion();
 }, { immediate: true });
 </script>

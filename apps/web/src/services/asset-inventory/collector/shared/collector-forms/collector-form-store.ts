@@ -115,11 +115,10 @@ export const useCollectorFormStore = defineStore('collector-form', {
         resetOptions() {
             this.options = this.originCollector?.plugin_info?.options ?? {};
         },
-        async getVersions() {
-            if (!this.pluginId) throw new Error('pluginId is not defined');
+        async getVersions(pluginId: string) {
             try {
                 const res = await SpaceConnector.client.repository.plugin.getVersions({
-                    plugin_id: this.pluginId,
+                    plugin_id: pluginId,
                 });
                 this.versions = res.results;
             } catch (e) {

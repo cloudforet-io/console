@@ -16,7 +16,7 @@
         </p-heading>
 
         <p-definition-table v-if="!state.isEditMode"
-                            :fields="state.fields"
+                            :fields="fields"
                             :loading="state.loading"
                             :data="collectorFormState.originCollector"
                             style-type="white"
@@ -30,7 +30,7 @@
                 <span class="ml-2 leading-none">{{ state.pluginName }}</span>
             </template>
             <template #data-plugin_info.version="{ value }">
-                {{ state.isCollectorAutoUpgrade ? '-' : value }} {{ isLatestVersion(value) ? ' (latest)' : '' }}
+                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
             </template>
             <template #data-plugin_info.upgrade_mode="{ value }">
                 {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
@@ -106,17 +106,17 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const timezone = computed<string>(() => store.state.user.timezone);
+const fields = computed<DefinitionField[]>(() => [
+    { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
+    { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
+    { name: 'plugin_info.version', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.VERSION') },
+    { name: 'tags', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.TAG') },
+    { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
+    { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
+    { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
+]);
 
 const state = reactive({
-    fields: computed<DefinitionField[]>(() => [
-        { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-        { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
-        { name: 'plugin_info.version', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.VERSION'), disableCopy: state.isCollectorAutoUpgrade },
-        { name: 'tags', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.TAG') },
-        { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
-        { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
-        { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
-    ]),
     loading: computed<boolean>(() => !collectorFormState.originCollector),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     pluginItem: computed<PluginReferenceItem|undefined>(() => {
@@ -127,6 +127,13 @@ const state = reactive({
     pluginName: computed<string>(() => state.pluginItem?.label ?? ''),
     pluginIcon: computed<string>(() => state.pluginItem?.icon ?? ''),
     isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO),
+    isLatestVersion: computed<boolean>(() => {
+        const version = state.pluginInfo?.version;
+        if (!version) return false;
+        const latestVersion = collectorFormState.versions[0];
+        if (latestVersion) return latestVersion === version;
+        return false;
+    }),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
@@ -143,12 +150,6 @@ const state = reactive({
     updateLoading: false,
 });
 
-const isLatestVersion = (version: string) => {
-    if (state.isCollectorAutoUpgrade) return false;
-    const latestVersion = collectorFormState.versions[0];
-    if (latestVersion) return latestVersion === version;
-    return false;
-};
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
@@ -211,8 +212,8 @@ const handleClickSave = async () => {
     }
 };
 
-watch(() => collectorFormStore.pluginId, async () => {
-    await collectorFormStore.getVersions();
+watch(() => collectorFormStore.pluginId, async (pluginId) => {
+    if (pluginId) await collectorFormStore.getVersions(pluginId);
 }, { immediate: true });
 
 // init reference data
