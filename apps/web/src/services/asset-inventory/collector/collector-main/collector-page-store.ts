@@ -6,7 +6,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, jobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
@@ -17,6 +17,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
+        collectorJobStatus: [] as jobAnalyzeModel[],
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as Schedule[],
@@ -48,12 +49,35 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 this.loading = false;
             }
         },
-        async getCollectorSchedule(id) {
+        async setCollectorJobs(ids) {
             try {
-                const res = await SpaceConnector.client.inventory.collector.schedule.list({
-                    collector_id: id,
+                const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
+                    query: {
+                        filter: [
+                            {
+                                k: 'created_at',
+                                v: 'now - 5d',
+                                o: 'timediff_gte',
+                            },
+                            {
+                                k: 'collector_id',
+                                v: ids,
+                                o: 'in',
+                            },
+                        ],
+                        group_by: ['collector_id'],
+                        fields: {
+                            job_status: {
+                                operator: 'push',
+                                fields: {
+                                    status: 'status',
+                                    job_id: 'job_id',
+                                },
+                            },
+                        },
+                    },
                 });
-                this.schedules.push(...res.results);
+                this.collectorJobStatus = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

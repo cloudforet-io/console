@@ -10,10 +10,7 @@
                     @confirm="handleConfirm"
     >
         <template #body>
-            <!-- TODO: changed condition after API spec checking -->
-            <collector-schedule-form enable-hours-edit
-                                     :call-api-on-power-change="false"
-            />
+            <collector-schedule-form enable-hours-edit />
         </template>
     </p-button-modal>
 </template>

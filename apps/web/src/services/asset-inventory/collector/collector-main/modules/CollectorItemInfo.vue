@@ -62,18 +62,17 @@
                     {{ props.label }}
                 </p>
                 <div class="jobs-wrapper">
-                    <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
+                    <div v-for="(jobStatus, index) in props.item.recentJobAnalyze"
                          :key="`job-item-${index}`"
                          class="jobs-contents"
                          @click.stop
                     >
-                        <p-tooltip v-if="jobItems.status === 'success'"
+                        <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
                                    class="icon-fill-wrapper success"
                                    :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
                                    position="top"
                         >
-                            <!-- TODO: link with job detail page using job id after the API is completed -->
-                            <router-link :to="props.item.detailLink">
+                            <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
                                 <p-i
                                     name="ic_check"
                                     class="icon success"
@@ -83,7 +82,7 @@
                                 />
                             </router-link>
                         </p-tooltip>
-                        <p-tooltip v-if="jobItems.status === 'progress'"
+                        <p-tooltip v-else-if="jobStatus.status === JOB_STATE.IN_PROGRESS"
                                    class="icon-fill-wrapper progress"
                                    :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
                                    position="top"
@@ -96,14 +95,14 @@
                                 color="inherit"
                             />
                         </p-tooltip>
-                        <p-tooltip v-if="jobItems.status === 'error'"
-                                   class="icon-fill-wrapper error"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
-                                   position="top"
-                        />
-                        <p-tooltip v-if="!jobItems.status"
+                        <p-tooltip v-else-if="jobStatus.status === JOB_STATE.NONE"
                                    class="icon-fill-wrapper none"
                                    :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
+                                   position="top"
+                        />
+                        <p-tooltip v-else
+                                   class="icon-fill-wrapper error"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
                                    position="top"
                         />
                     </div>
@@ -171,8 +170,9 @@ import { store } from '@/store';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/collector-main/type';
+import { COLLECTOR_ITEM_INFO_TYPE, JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
     label: string;
@@ -222,25 +222,6 @@ const handleClickSchedule = () => {
         visibleScheduleModal: true,
     });
 };
-
-// TODO: temp data will be deleted.
-const TEMP_JOB_STATUS = [
-    {
-        status: undefined,
-    },
-    {
-        status: 'success',
-    },
-    {
-        status: 'error',
-    },
-    {
-        status: 'success',
-    },
-    {
-        status: 'progress',
-    },
-];
 </script>
 
 <style scoped lang="postcss">

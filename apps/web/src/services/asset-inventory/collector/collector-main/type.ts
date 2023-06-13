@@ -1,4 +1,6 @@
-import type { CollectorPluginModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type {
+    CollectorPluginModel, Schedule, JobStatus,
+} from '@/services/asset-inventory/collector/model';
 
 export const COLLECTOR_QUERY_HELPER_SET = {
     COLLECTOR_ID: 'collector_id',
@@ -15,6 +17,16 @@ export const COLLECTOR_ITEM_INFO_TYPE = {
     STATUS: 'STATUS',
     JOBS: 'JOBS',
     SCHEDULE: 'SCHEDULE',
+} as const;
+
+export const JOB_STATE = {
+    SUCCESS: 'SUCCESS',
+    ERROR: 'ERROR',
+    CREATED: 'CREATED',
+    IN_PROGRESS: 'IN_PROGRESS',
+    TIMEOUT: 'TIMEOUT',
+    CANCELED: 'CANCELED',
+    NONE: 'NONE',
 } as const;
 
 interface CollectorPlugin {
@@ -45,4 +57,5 @@ export interface CollectorItemInfo {
     historyLink: CollectorLink,
     detailLink: CollectorLink;
     schedule: Schedule;
+    recentJobAnalyze: JobStatus[];
 }

@@ -137,3 +137,13 @@ export interface CollectorUpdatePluginParameter {
 export interface CollectorDeleteParameter {
     collectors: [string, ...string[]];
 }
+
+// JobAnalyzeModel
+export interface JobStatus {
+    job_id: string;
+    status: string;
+}
+export interface jobAnalyzeModel {
+    collector_id: string;
+    job_status: JobStatus[]
+}
