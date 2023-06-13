@@ -35,6 +35,7 @@
                         :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
                         @confirm="handleConfirmCreateCollector"
                         @cancel="handleRouteToCollectorList"
+                        @close="handleRouteToCollectorList"
         >
             <template #close-button>
                 {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
@@ -53,6 +54,8 @@ import {
     PButton, PTextButton, PButtonModal,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -61,8 +64,14 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorScheduleForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits([
     'update:currentStep',
@@ -84,16 +93,37 @@ const handleClickPrevButton = () => {
     emit('update:currentStep', 3);
 };
 
+const convertAttachedServiceAccountToIds = () => (collectorFormState.attachedServiceAccount)?.map((d) => d.name) ?? [];
+
+
 const handleClickCreateButton = async () => {
     try {
         state.loading = true;
-        // TODO: create api call
+        await SpaceConnector.client.inventory.collector.create({
+            name: collectorFormState.name,
+            provider: collectorFormState.repositoryPlugin?.provider,
+            plugin_info: {
+                plugin_id: collectorFormState.repositoryPlugin?.plugin_id,
+                version: collectorFormState.version,
+                secret_filter: {
+                    state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
+                    service_accounts: convertAttachedServiceAccountToIds(),
+                },
+                options: collectorFormState.options,
+                upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+            },
+            schedule: {
+                state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
+                hours: collectorFormState.scheduleHours,
+            },
+            tags: collectorFormState.tags,
+        });
+        state.visibleCreateModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
     } finally {
         state.loading = false;
-        state.visibleCreateModal = true;
     }
 };
 
