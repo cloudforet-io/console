@@ -378,10 +378,14 @@ const handleClickRow = (rowData) => {
         white-space: nowrap;
 
         .th-contents {
-            @apply flex justify-between pl-4;
+            @apply flex justify-between;
+            padding: 0.25rem 0 0.25rem 1rem;
             line-height: 2;
             .th-text {
                 @apply inline-flex items-center gap-1;
+                white-space: pre-line;
+                text-align: right;
+                line-height: 1.25;
             }
             &.right {
                 justify-content: flex-end;
