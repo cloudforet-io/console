@@ -64,6 +64,7 @@ const handleConfirm = async () => {
         const collector = await fetchCollectorUpdate();
         await collectorFormStore.setOriginCollector(collector);
         showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        handleCloseModal();
     } catch (e) {
         collectorFormStore.resetSchedulePower();
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
