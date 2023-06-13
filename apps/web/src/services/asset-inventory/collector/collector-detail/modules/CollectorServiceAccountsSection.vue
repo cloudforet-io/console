@@ -203,7 +203,7 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 
-    await getSecrets(collectorFormStore.provider);
+    await getSecrets(collectorFormStore.collectorProvider);
 };
 
 const handleClickCancel = () => {
@@ -226,7 +226,7 @@ const handleClickSave = async () => {
 };
 
 
-watch(() => collectorFormStore.provider, async (provider?: string) => {
+watch(() => collectorFormStore.collectorProvider, async (provider?: string) => {
     await getSecrets(provider);
 }, { immediate: true });
 

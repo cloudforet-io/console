@@ -16,10 +16,10 @@
         </p-heading>
 
         <div class="schedule-wrapper">
-            <collector-schedule-form :edit-mode="state.isEditMode"
+            <collector-schedule-form :enable-hours-edit="state.isEditMode"
                                      :disabled="state.updateLoading"
                                      reset-on-collector-id-change
-                                     @update:editMode="handleUpdateEditMode"
+                                     @update:enableHoursEdit="handleUpdateEditMode"
             />
 
             <p-button v-if="state.isEditMode"

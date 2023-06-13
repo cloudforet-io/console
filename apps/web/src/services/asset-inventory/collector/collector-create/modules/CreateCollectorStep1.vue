@@ -120,7 +120,6 @@ const loadMorePlugin = async () => {
         return;
     }
     state.currentPage += 1;
-    state.loading = true;
     const additionalPlugin = await getPlugins();
     state.pluginList = state.pluginList.concat(additionalPlugin);
 };

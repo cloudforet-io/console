@@ -13,7 +13,7 @@
                          :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"
         />
-        <div v-if="!props.editMode"
+        <div v-if="!props.enableHoursEdit && !props.disableFirstLoading"
              class="collect-data-desc"
         >
             <i18n v-if="state.timezoneAppliedHours.length > 0"
@@ -77,12 +77,13 @@ import { store } from '@/store';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
-    editMode?: boolean;
+    enableHoursEdit?: boolean;
+    disableFirstLoading?: boolean;
     disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
 }>();
 
-const emits = defineEmits<{(event: 'update:editMode', value: boolean): void;
+const emits = defineEmits<{(event: 'update:enableHoursEdit', value: boolean): void;
 }>();
 
 const collectorFormStore = useCollectorFormStore();
@@ -100,7 +101,10 @@ const state = reactive({
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
-    loading: computed<boolean>(() => collectorFormState.originCollector === null),
+    loading: computed<boolean>(() => {
+        if (props.disableFirstLoading) return false;
+        return collectorFormState.originCollector === null;
+    }),
 });
 
 const updateSelectedHours = () => {
@@ -118,7 +122,7 @@ const handleChangeToggle = (value: boolean) => {
 };
 
 const handleClickSelect = () => {
-    emits('update:editMode', true);
+    emits('update:enableHoursEdit', true);
 };
 
 const handleClickHour = (hour: number) => {

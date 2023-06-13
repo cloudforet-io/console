@@ -9,7 +9,7 @@
     >
         <template #body>
             <!-- TODO: changed condition after API spec checking -->
-            <collector-schedule-form :edit-mode="false" />
+            <collector-schedule-form :enable-hours-edit="false" />
         </template>
     </p-button-modal>
 </template>
