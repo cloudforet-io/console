@@ -48,17 +48,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 this.loading = false;
             }
         },
-        async getCollectorSchedule(id) {
-            try {
-                const res = await SpaceConnector.client.inventory.collector.schedule.list({
-                    collector_id: id,
-                });
-                this.schedules.push(...res.results);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
         async setCollectorJobs(ids) {
             try {
                 await SpaceConnector.clientV2.inventory.job.analyze({
