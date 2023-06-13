@@ -26,7 +26,7 @@
                     {{ props.label }}
                 </p>
                 <div class="label-description">
-                    <div v-if="state.isScheduleActivated"
+                    <div v-if="state.isScheduleActivated && props.item.schedule.hours?.length > 0"
                          class="scheduled"
                     >
                         <p-i
@@ -151,7 +151,6 @@
                          class="icon-schedule"
                     />
                     {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
-                    {{ props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
                 </p-button>
             </div>
         </div>
@@ -171,9 +170,6 @@ import { store } from '@/store';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_ITEM_INFO_TYPE } from '@/services/asset-inventory/collector/collector-main/type';
-import {
-    COLLECTOR_SCHEDULE_STATE,
-} from '@/services/asset-inventory/collector/model';
 
 interface Props {
     label: string;
@@ -198,7 +194,6 @@ const state = reactive({
         const schedule = props.item.schedule;
         return !!schedule;
     }),
-    toggleStatus: computed(() => (props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED ? 'ON' : 'OFF')),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
