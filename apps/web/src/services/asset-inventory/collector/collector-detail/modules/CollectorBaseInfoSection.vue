@@ -144,6 +144,7 @@ const state = reactive({
 });
 
 const isLatestVersion = (version: string) => {
+    if (state.isCollectorAutoUpgrade) return false;
     const latestVersion = collectorFormState.versions[0];
     if (latestVersion) return latestVersion === version;
     return false;
