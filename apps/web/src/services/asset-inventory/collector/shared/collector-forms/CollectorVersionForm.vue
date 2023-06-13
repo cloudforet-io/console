@@ -88,8 +88,12 @@ const getVersions = async (pluginId: string) => {
 
 const initSelectedVersion = () => {
     if (!collectorFormState.version.length) {
-        setForm('version', state.versions[0]?.name);
-        collectorFormStore.setVersion(state.versions[0]?.name ?? '');
+        const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
+        const originVersion = collectorFormState.originCollector?.plugin_info?.version;
+        collectorFormStore.$patch({
+            version: originVersion ?? state.versions[0]?.name ?? '',
+            autoUpgrade: originAutoUpgrade ?? true,
+        });
     }
 };
 
