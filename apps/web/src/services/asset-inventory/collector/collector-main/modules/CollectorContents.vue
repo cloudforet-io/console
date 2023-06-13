@@ -207,7 +207,7 @@ const handleClickListItem = (detailLink) => {
 
 /* Watcher */
 watch(() => collectorPageState.collectors, async () => {
-    const ids = state.items?.map((item) => item.collectorId);
+    const ids = state.items?.map((item) => item.collectorId) || [];
     if (ids.length > 0) {
         await collectorPageStore.setCollectorJobs(ids);
     }
