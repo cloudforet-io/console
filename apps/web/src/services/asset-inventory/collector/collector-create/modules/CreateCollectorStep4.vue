@@ -105,7 +105,7 @@ const handleClickCreateButton = async () => {
         state.createLoading = true;
         const params: CollectorCreateParameter = {
             name: collectorFormState.name,
-            provider: collectorFormState.repositoryPlugin?.provider,
+            provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
             plugin_info: {
                 plugin_id: collectorFormState.repositoryPlugin?.plugin_id,
                 version: collectorFormState.version,
