@@ -12,7 +12,7 @@
         <template #body>
             <!-- TODO: changed condition after API spec checking -->
             <collector-schedule-form enable-hours-edit
-                                     call-api-on-power-change
+                                     :call-api-on-power-change="false"
             />
         </template>
     </p-button-modal>
