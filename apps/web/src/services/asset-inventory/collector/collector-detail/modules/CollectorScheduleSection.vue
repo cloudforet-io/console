@@ -19,6 +19,7 @@
             <collector-schedule-form :enable-hours-edit="state.isEditMode"
                                      :disabled="state.updateLoading"
                                      reset-on-collector-id-change
+                                     call-api-on-power-change
                                      @update:enableHoursEdit="handleUpdateEditMode"
             />
 
