@@ -18,6 +18,7 @@
                 </p-radio>
             </p-radio-group>
         </div>
+        <!-- MEMO: screen mobile size-->
         <div class="dropdown-container">
             <p-select-dropdown :selected="state.selectedProvider"
                                :items="state.providerList"
