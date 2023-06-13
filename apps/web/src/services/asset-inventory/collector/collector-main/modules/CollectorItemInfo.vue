@@ -38,9 +38,9 @@
                         />
                         <!-- TODO: will be fixed after the API is completed -->
                         <p class="description">
-                            Scheduled
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
                             <span class="emphasis">
-                                in
+                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
                                 <span v-if="state.diffSchedule.diffHour"> {{ state.diffSchedule.diffHour }} hr</span>
                                 <span v-if="state.diffSchedule.diffMin"> {{ state.diffSchedule.diffMin }} mins</span>
                             </span>
@@ -63,6 +63,7 @@
                     <div v-for="(jobItems, index) in TEMP_JOB_STATUS"
                          :key="`job-item-${index}`"
                          class="jobs-contents"
+                         @click.stop
                     >
                         <p-tooltip v-if="jobItems.status === 'success'"
                                    class="icon-fill-wrapper success"
