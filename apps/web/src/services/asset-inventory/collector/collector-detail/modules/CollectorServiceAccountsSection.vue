@@ -29,7 +29,26 @@
                          searchable
                          use-cursor-loading
                          @change="handleToolboxTableChange"
-        />
+        >
+            <template #col-service_account_id-format="{value}">
+                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
+            </template>
+            <template #col-project_id-format="{value}">
+                <p-anchor v-if="state.projects[value]"
+                          :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                >
+                    {{ state.projects[value].label }}
+                </p-anchor>
+            </template>
+            <template #col-provider-format="{value}">
+                <p-badge v-if="state.providers[value]"
+                         :background-color="state.providers[value].color"
+                         text-color="white"
+                >
+                    {{ state.providers[value].label }}
+                </p-badge>
+            </template>
+        </p-toolbox-table>
         <div v-else
              class="edit-form"
         >
@@ -63,7 +82,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PButton, PPaneLayout, PToolboxTable,
+    PHeading, PButton, PPaneLayout, PToolboxTable, PBadge, PAnchor,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
@@ -75,9 +94,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -85,7 +107,6 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import type { SecretModel, CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -102,6 +123,8 @@ const state = reactive({
     loading: true,
     secrets: null as null|SecretModel[],
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     isServiceAccountValid: false,
     // query states
     pageLimit: 15,
@@ -145,7 +168,6 @@ const getQuery = (provider?: string) => {
     if (provider) {
         apiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
     }
-
     return apiQueryHelper.data;
 };
 
@@ -233,7 +255,11 @@ watch(() => collectorFormStore.collectorProvider, async (provider?: string) => {
 
 
 onMounted(async () => {
-    await store.dispatch('reference/serviceAccount/load');
+    await Promise.allSettled([
+        store.dispatch('reference/serviceAccount/load'),
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/provider/load'),
+    ]);
 });
 
 </script>
