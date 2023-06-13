@@ -53,7 +53,6 @@ import { reactive } from 'vue';
 import {
     PButton, PTextButton, PButtonModal,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -95,9 +94,6 @@ const handleClickPrevButton = () => {
     emit('update:currentStep', 3);
 };
 
-const convertAttachedServiceAccountToIds = () => (collectorFormState.attachedServiceAccount)?.map((d: FilterableDropdownMenuItem) => d.name) ?? [];
-
-
 const handleClickCreateButton = async () => {
     try {
         state.loading = true;
@@ -109,7 +105,7 @@ const handleClickCreateButton = async () => {
                 version: collectorFormState.version,
                 secret_filter: {
                     state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
-                    service_accounts: convertAttachedServiceAccountToIds(),
+                    service_accounts: collectorFormStore.serviceAccounts,
                 },
                 options: collectorFormState.options,
                 upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
