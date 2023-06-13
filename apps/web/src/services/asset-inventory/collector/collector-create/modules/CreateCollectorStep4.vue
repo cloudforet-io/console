@@ -19,6 +19,7 @@
                 </p-button>
                 <p-button :disabled="!state.isAbleToCreateCollector"
                           size="lg"
+                          :loading="state.createLoading"
                           @click="handleClickCreateButton"
                 >
                     {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
@@ -31,8 +32,9 @@
                       size="sm"
                       @confirm="handleClose"
         />
-        <p-button-modal :visible.sync="state.visibleCreateModal"
+        <p-button-modal :visible.sync="state.visibleCreateCompleteModal"
                         :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
+                        :loading="state.collectLoading"
                         @confirm="handleConfirmCreateCollector"
                         @cancel="handleRouteToCollectorList"
                         @close="handleRouteToCollectorList"
@@ -64,7 +66,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorCreateParameter } from '@/services/asset-inventory/collector/model';
+import type { CollectorCreateParameter, CollectorModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -81,13 +83,17 @@ const emit = defineEmits([
 const state = reactive<{
     deleteModalVisible: boolean;
     isAbleToCreateCollector: boolean;
-    visibleCreateModal: boolean;
-    loading: boolean;
+    visibleCreateCompleteModal: boolean;
+    createLoading: boolean;
+    collectLoading: boolean;
+    createdCollectorId?: string;
 }>({
     deleteModalVisible: false,
     isAbleToCreateCollector: true,
-    visibleCreateModal: false,
-    loading: false,
+    visibleCreateCompleteModal: false,
+    createLoading: false,
+    collectLoading: false,
+    createdCollectorId: undefined,
 });
 
 const handleClickPrevButton = () => {
@@ -96,8 +102,8 @@ const handleClickPrevButton = () => {
 
 const handleClickCreateButton = async () => {
     try {
-        state.loading = true;
-        const params: Partial<CollectorCreateParameter> = {
+        state.createLoading = true;
+        const params: CollectorCreateParameter = {
             name: collectorFormState.name,
             provider: collectorFormState.repositoryPlugin?.provider,
             plugin_info: {
@@ -116,13 +122,14 @@ const handleClickCreateButton = async () => {
             },
             tags: collectorFormState.tags,
         };
-        await SpaceConnector.client.inventory.collector.create(params);
-        state.visibleCreateModal = true;
+        const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
+        state.createdCollectorId = res?.collector_id;
+        state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
     } finally {
-        state.loading = false;
+        state.createLoading = false;
     }
 };
 
@@ -135,13 +142,24 @@ const handleClose = () => {
     state.deleteModalVisible = false;
 };
 
-const handleConfirmCreateCollector = () => {
-    // TODO: logic for collect now
-    state.visibleCreateModal = false;
+const handleConfirmCreateCollector = async () => {
+    try {
+        state.collectLoading = true;
+        // After the collector created, if the user clicks the collect button, the collector will be executed.
+        await SpaceConnector.client.inventory.collector.collect({
+            collector_id: state.createdCollectorId,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+        handleRouteToCollectorList();
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+    } finally {
+        state.collectLoading = false;
+    }
 };
 
 const handleRouteToCollectorList = () => {
-    state.visibleCreateModal = false;
+    state.visibleCreateCompleteModal = false;
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 };
 
