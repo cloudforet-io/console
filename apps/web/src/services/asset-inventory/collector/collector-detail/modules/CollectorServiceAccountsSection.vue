@@ -178,7 +178,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             ...originSecretFilter,
             state: collectorFormState.attachedServiceAccountType === 'specific' ? 'ENABLED' : 'DISABLED',
             service_accounts: collectorFormState.attachedServiceAccountType === 'specific'
-                ? collectorFormState.attachedServiceAccount
+                ? collectorFormStore.serviceAccounts
                 : [],
         },
     };

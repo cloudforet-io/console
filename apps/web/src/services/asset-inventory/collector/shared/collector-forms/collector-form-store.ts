@@ -1,6 +1,8 @@
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { defineStore } from 'pinia';
 
+import { store } from '@/store';
+
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import type {
@@ -37,22 +39,25 @@ export const useCollectorFormStore = defineStore('collector-form', {
         collectorProvider(): string|undefined {
             return this.originCollector?.provider;
         },
+        serviceAccounts(): string[] {
+            return this.attachedServiceAccount.map((d) => d.name as string);
+        },
     },
     actions: {
-        setOriginCollector(collector: CollectorModel) {
+        async setOriginCollector(collector: CollectorModel) {
             this.originCollector = collector;
-            this.resetForm();
+            await this.resetForm();
         },
         setRepositoryPlugin(pluginInfo: RepositoryPluginModel|null) {
             this.repositoryPlugin = pluginInfo;
         },
-        resetForm() {
+        async resetForm() {
             this.resetName();
             this.resetTags();
             this.resetVersion();
             this.resetSchedule();
-            this.resetAttachedServiceAccount();
             this.resetOptions();
+            await this.resetAttachedServiceAccount();
         },
         setProvider(provider: string) {
             this.provider = provider;
@@ -89,8 +94,13 @@ export const useCollectorFormStore = defineStore('collector-form', {
         resetSchedulePower() {
             this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
-        resetAttachedServiceAccount() {
-            this.attachedServiceAccount = this.originCollector?.secret_filter?.service_accounts ?? [];
+        async resetAttachedServiceAccount() {
+            await store.dispatch('reference/serviceAccount/load');
+            const accountItems = store.getters['reference/serviceAccountItems'];
+            this.attachedServiceAccount = this.originCollector?.secret_filter?.service_accounts?.map((d) => ({
+                label: accountItems[d]?.label ?? d,
+                name: d,
+            })) ?? [];
             this.attachedServiceAccountType = this.originCollector?.secret_filter?.state === 'ENABLED' ? 'specific' : 'all';
         },
         setOptions(options: CollectorOptions) {
