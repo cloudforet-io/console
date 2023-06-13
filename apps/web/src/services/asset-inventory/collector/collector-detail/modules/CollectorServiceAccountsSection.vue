@@ -48,6 +48,15 @@
                     {{ state.providers[value].label }}
                 </p-badge>
             </template>
+            <template #col-collect-format="{item}">
+                <p-button size="sm"
+                          style-type="tertiary"
+                          :disabled="props.manageDisabled"
+                          @click.stop="handleClickCollect(item)"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+                </p-button>
+            </template>
         </p-toolbox-table>
         <div v-else
              class="edit-form"
@@ -111,21 +120,27 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const props = defineProps<{
+    manageDisabled?: boolean;
+}>();
+
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
     { name: 'secret_id', label: 'Account ID' },
     { name: 'project_id', label: 'Project ID' },
     { name: 'provider', label: 'Provider' },
     { name: 'created_at', label: 'Created' },
+    { name: 'collect', label: ' ' },
 ];
 const state = reactive({
     isEditMode: false,
+    // table data
     loading: true,
     secrets: null as null|SecretModel[],
+    // reference data
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    isServiceAccountValid: false,
     // query states
     pageLimit: 15,
     pageStart: 1,
@@ -133,8 +148,10 @@ const state = reactive({
     sortDesc: true,
     totalCount: 0,
     // updating
+    isServiceAccountValid: false,
     updateLoading: false,
 });
+
 
 const querySearchHandlers = {
     keyItemSets: [{
@@ -160,21 +177,18 @@ const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSe
 const { queryTags } = queryTagHelper;
 const apiQueryHelper = new ApiQueryHelper();
 
-const getQuery = (provider?: string) => {
-    apiQueryHelper.setPage(state.pageStart, state.pageLimit)
-        .setSort(state.sortBy, state.sortDesc)
-        .setFilters(queryTagHelper.filters.value);
-
-    if (provider) {
-        apiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
-    }
-    return apiQueryHelper.data;
-};
-
+/* api fetchers */
 const fetchSecrets = async (provider?: string): Promise<{ results: SecretModel[]; total_count: number }> => {
     try {
+        apiQueryHelper.setPage(state.pageStart, state.pageLimit)
+            .setSort(state.sortBy, state.sortDesc)
+            .setFilters(queryTagHelper.filters.value);
+
+        if (provider) {
+            apiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+        }
         const results = await SpaceConnector.client.secret.secret.list({
-            query: getQuery(provider),
+            query: apiQueryHelper.data,
         });
         return results;
     } catch (e) {
@@ -182,16 +196,6 @@ const fetchSecrets = async (provider?: string): Promise<{ results: SecretModel[]
         return { results: [], total_count: 0 };
     }
 };
-const getSecrets = async (provider?: string) => {
-    state.loading = true;
-
-    const { results, total_count } = await fetchSecrets(provider);
-    state.secrets = results;
-    state.totalCount = total_count;
-
-    state.loading = false;
-};
-
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
     const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
@@ -207,16 +211,37 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     };
     return SpaceConnector.client.inventory.collector.update(params);
 };
+const fetchCollectBySecret = async (secretId: string) => {
+    try {
+        if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
+        await SpaceConnector.client.inventory.collector.collect({
+            collector_id: collectorFormStore.collectorId,
+            secret_id: secretId,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+    }
+};
 
+/* reused functions */
+const getSecrets = async (provider?: string) => {
+    state.loading = true;
 
+    const { results, total_count } = await fetchSecrets(provider);
+    state.secrets = results;
+    state.totalCount = total_count;
+
+    state.loading = false;
+};
+
+/* event handlers */
 const handleClickEdit = () => {
     state.isEditMode = true;
 };
-
 const handleChangeIsAttachedServiceAccountValid = (value: boolean) => {
     state.isServiceAccountValid = value;
 };
-
 const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.sortBy !== undefined) {
         state.sortBy = options.sortBy;
@@ -228,11 +253,9 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
 
     await getSecrets(collectorFormStore.collectorProvider);
 };
-
 const handleClickCancel = () => {
     state.isEditMode = false;
 };
-
 const handleClickSave = async () => {
     try {
         state.updateLoading = true;
@@ -247,12 +270,15 @@ const handleClickSave = async () => {
         state.updateLoading = false;
     }
 };
+const handleClickCollect = async (secret: SecretModel) => {
+    const secretId = secret.secret_id;
+    await fetchCollectBySecret(secretId);
+};
 
-
+/* watcher, lifecycle */
 watch(() => collectorFormStore.collectorProvider, async (provider?: string) => {
     await getSecrets(provider);
 }, { immediate: true });
-
 
 onMounted(async () => {
     await Promise.allSettled([

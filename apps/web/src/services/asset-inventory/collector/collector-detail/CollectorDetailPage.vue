@@ -41,7 +41,9 @@
         <collector-base-info-section class="section" />
         <collector-schedule-section class="section" />
         <collector-options-section class="section" />
-        <collector-service-accounts-section class="section" />
+        <collector-service-accounts-section class="section"
+                                            :manage-disabled="!state.hasManagePermission"
+        />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
