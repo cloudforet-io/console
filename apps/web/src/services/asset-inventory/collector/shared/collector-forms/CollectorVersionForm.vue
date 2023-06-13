@@ -9,16 +9,16 @@
                 />
             </div>
         </div>
-        <p-select-dropdown :selected="version"
+        <p-select-dropdown :selected="collectorFormState.version"
                            :items="state.versions"
                            :disabled="collectorFormState.autoUpgrade"
                            class="w-full"
                            @update:selected="handleChangeVersion"
         />
-        <div v-show="invalidState.version && !collectorFormState.autoUpgrade"
+        <div v-show="state.isVersionValid && !collectorFormState.autoUpgrade"
              class="invalid-feedback"
         >
-            {{ invalidTexts.version }}
+            {{ state.versionInvalidText }}
         </div>
     </div>
 </template>
@@ -26,6 +26,7 @@
 <script lang="ts" setup>
 
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldTitle, PToggleButton, PSelectDropdown,
@@ -37,7 +38,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
@@ -47,28 +47,17 @@ const collectorFormState = collectorFormStore.$state;
 const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
 }>();
 
-const {
-    forms: {
-        version,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-    isAllValid,
-} = useFormValidator({
-    version: collectorFormState.version ?? '',
-}, {
-    version(value: string|undefined) {
+const state = reactive({
+    pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
+    versions: [] as MenuItem[],
+    versionInvalidText: computed<TranslateResult>(() => {
+        const value = collectorFormState.version;
         if (!value?.length) {
             return i18n.t('INVENTORY.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
         }
         return '';
-    },
-});
-
-const state = reactive({
-    pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
-    versions: [] as MenuItem[],
+    }),
+    isVersionValid: computed(() => !state.versionInvalidText),
 });
 
 const getVersions = async (pluginId: string) => {
@@ -88,14 +77,17 @@ const getVersions = async (pluginId: string) => {
 
 const initSelectedVersion = () => {
     if (!collectorFormState.version.length) {
-        setForm('version', state.versions[0]?.name);
-        collectorFormStore.setVersion(state.versions[0]?.name ?? '');
+        const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
+        const originVersion = collectorFormState.originCollector?.plugin_info?.version;
+        collectorFormStore.$patch({
+            version: originVersion ?? state.versions[0]?.name ?? '',
+            autoUpgrade: originAutoUpgrade ?? true,
+        });
     }
 };
 
 /* event */
 const handleChangeVersion = (value: string) => {
-    setForm('version', value);
     collectorFormStore.setVersion(value);
 };
 
@@ -103,7 +95,7 @@ const handleClickAutoUpgrade = () => {
     collectorFormStore.setAutoUpgrade(!collectorFormState.autoUpgrade);
 };
 
-watch(isAllValid, (value) => {
+watch(() => state.isVersionValid, (value) => {
     emit('update:isVersionValid', value);
 }, { immediate: true });
 
