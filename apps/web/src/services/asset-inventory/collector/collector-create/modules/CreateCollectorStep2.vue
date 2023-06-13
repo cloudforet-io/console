@@ -2,7 +2,12 @@
     <div class="collector-page-2">
         <collect-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
         <div class="input-form">
-            <collector-name-form @update:isValid="handleUpdateIsValid" />
+            <collector-name-form class="name-form"
+                                 @update:isValid="handleUpdateIsValid"
+            />
+            <multiple-provider-form v-if="state.supportedProviders.length"
+                                    class="multiple-provider-form"
+            />
             <collector-version-form class="version-row"
                                     get-versions-on-plugin-id-change
                                     @update:isVersionValid="handleChangeIsVersionValid"
@@ -57,6 +62,8 @@ import type { CollectorReferenceMap } from '@/store/modules/reference/collector/
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
+import MultipleProviderForm
+    from '@/services/asset-inventory/collector/collector-create/modules/MultipleProviderForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
@@ -82,6 +89,7 @@ const state = reactive({
     deleteModalVisible: false,
     isAllFormValid: computed(() => state.isNameValid && state.isVersionValid && state.isTagsValid),
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
+    supportedProviders: computed<string[]>(() => collectorFormState.repositoryPlugin?.capability?.supported_providers ?? []),
 });
 
 /* event */
@@ -119,6 +127,14 @@ const handleChangeIsTagsValid = (isValid: boolean) => {
 
     .input-form {
         margin-top: 2rem;
+
+        .name-form {
+            margin-bottom: 1.5rem;
+        }
+
+        .multiple-provider-form {
+            margin-bottom: 1.5rem;
+        }
     }
 
     .step-footer {
