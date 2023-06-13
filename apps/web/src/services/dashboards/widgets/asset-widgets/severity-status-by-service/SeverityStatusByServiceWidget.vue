@@ -142,6 +142,26 @@ const fetchData = async (): Promise<Data[]> => {
 
 
 /* Util */
+const _getStatus = (targetServiceDataList: Data[]): ComplianceStatus => {
+    const statusList = flattenDeep(targetServiceDataList.map((d) => d.status));
+    if (statusList.includes('FAIL')) return 'FAIL';
+    return 'PASS';
+};
+const _getSeverity = (targetServiceDataList: Data[], status: ComplianceStatus): Severity => {
+    let severity: Severity = 'PASS';
+    if (status === 'FAIL') {
+        const severityList = flattenDeep(targetServiceDataList.map((d) => d.severity));
+        const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
+        if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
+    }
+    return severity;
+};
+const _getValue = (targetServiceDataList: Data[], status: ComplianceStatus): number => {
+    if (status === 'FAIL') {
+        return targetServiceDataList.find((d) => d.key === 'fail_finding_count')?.value ?? 0;
+    }
+    return targetServiceDataList.find((d) => d.key === 'pass_finding_count')?.value ?? 0;
+};
 const refineData = (data?: Data[]): RefinedData[] => {
     if (!data?.length) return [];
     const serviceSet = new Set();
@@ -149,19 +169,9 @@ const refineData = (data?: Data[]): RefinedData[] => {
     const refinedData: RefinedData[] = [];
     serviceSet.forEach((service) => {
         const targetServiceDataList = data.filter((result) => result.service === service);
-        const statusList = flattenDeep(targetServiceDataList.map((d) => d.status));
-        const status = statusList.includes('FAIL') ? 'FAIL' : 'PASS';
-        let severity: Severity = 'PASS';
-        let value: number;
-
-        if (status === 'FAIL') {
-            const severityList = flattenDeep(targetServiceDataList.map((d) => d.severity));
-            const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
-            if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
-            value = targetServiceDataList.find((d) => d.key === 'fail_finding_count')?.value ?? 0;
-        } else {
-            value = targetServiceDataList.find((d) => d.key === 'pass_finding_count')?.value ?? 0;
-        }
+        const status = _getStatus(targetServiceDataList);
+        const severity = _getSeverity(targetServiceDataList, status);
+        const value = _getValue(targetServiceDataList, status);
 
         refinedData.push({
             service: service as string,
