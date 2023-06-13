@@ -84,7 +84,7 @@ import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
-    COLLECTOR_QUERY_HELPER_SET,
+    COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -144,6 +144,18 @@ const state = reactive({
                     ]).rawQueryStrings,
                 },
             };
+
+            const matchedJobIndex = collectorPageState.collectorJobStatus.findIndex((status) => status.collector_id === d.collector_id);
+            const recentJobAnalyze = collectorPageState.collectorJobStatus[matchedJobIndex]?.job_status.slice(-5) || [];
+
+            while (recentJobAnalyze.length < 5) {
+                const fillerValue = {
+                    job_id: '',
+                    status: JOB_STATE.NONE,
+                };
+                recentJobAnalyze.unshift(fillerValue);
+            }
+
             return {
                 collectorId: d.collector_id,
                 name: d.name,
@@ -164,6 +176,7 @@ const state = reactive({
                     },
                 },
                 schedule: d.schedule,
+                recentJobAnalyze,
             };
         });
     }),
@@ -193,8 +206,8 @@ const handleClickListItem = (detailLink) => {
 };
 
 /* Watcher */
-watch(() => state.items, async (value) => {
-    const ids = value?.map((item) => item.collectorId);
+watch(() => collectorPageState.collectors, async () => {
+    const ids = state.items?.map((item) => item.collectorId);
     if (ids.length > 0) {
         await collectorPageStore.setCollectorJobs(ids);
     }
