@@ -44,7 +44,16 @@
                                 </span>
                             </p>
                         </div>
-                        <span v-else-if="props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS">
+                        <span v-else-if="props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS"
+                              class="current-status-progress"
+                        >
+                            <p-i
+                                name="ic_settings-filled"
+                                class="setting-icon"
+                                height="1.25rem"
+                                width="1.25rem"
+                                color="inherit"
+                            />
                             {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}
                         </span>
                         <span v-else>
@@ -281,6 +290,15 @@ watch(() => props.item, (value) => {
 
                 .emphasis {
                     @apply font-bold text-gray-900 not-italic;
+                }
+            }
+
+            .current-status-progress {
+                @apply flex items-center;
+                gap: 0.25rem;
+
+                .setting-icon {
+                    @apply text-gray-400;
                 }
             }
         }
