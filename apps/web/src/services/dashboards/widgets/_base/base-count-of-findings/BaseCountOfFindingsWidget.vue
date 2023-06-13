@@ -159,7 +159,7 @@ const refineChartData = (data: Data[]): ChartData[] => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
         refinedChartData.push({
-            [state.groupByKey]: d[state.groupByKey],
+            [state.groupByKey]: d[state.groupByKey] ?? `no_${state.groupByKey}`,
             fail_finding_count,
             pass_finding_count,
         });
@@ -211,7 +211,7 @@ const drawChart = (chartData) => {
         });
         series.columns.template.onPrivate(('width'), (width, target) => {
             array.each(target?.dataItem?.bullets, (bullet) => {
-                if (width && width < 30) {
+                if ((width !== undefined) && width < 30) {
                     bullet.get('sprite').hide();
                 }
             });

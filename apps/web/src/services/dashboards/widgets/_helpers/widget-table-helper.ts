@@ -18,7 +18,7 @@ export const getWidgetTableDateFields = (
     granularity: Granularity,
     dateRange: DateRange,
     textOptions: Field['textOptions'],
-    fieldsKey = 'usd_cost',
+    fieldsKey = 'usd_cost_sum',
 ): Field[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: Field[] = [];
@@ -37,7 +37,7 @@ export const getWidgetTableDateFields = (
     let count = 0;
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
-            name: `${fieldsKey}_sum.${count}.value`,
+            name: `${fieldsKey}.${count}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             textOptions,

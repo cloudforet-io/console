@@ -108,15 +108,15 @@ const { colorSet } = useWidgetColorSet({
 });
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
-    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
+    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost_sum' : 'usage_quantity_sum')),
     chartData: computed<XYChartData[]>(() => {
-        const valueKey = `${state.fieldsKey}_sum`;
+        const valueKey = state.fieldsKey;
         return getRefinedXYChartData(state.data, state.groupBy, DATE_FIELD_NAME, valueKey);
     }),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const _textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
+            type: state.fieldsKey === 'usd_cost_sum' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, _textOptions, state.fieldsKey);

@@ -115,7 +115,7 @@ import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
@@ -128,9 +128,13 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
+interface Data extends CloudServiceStatsModel {
+    value: number;
+    severity: Severity;
+}
 interface FullData {
-    trendData?: CloudServiceStatsModel[];
-    realtimeData?: CloudServiceStatsModel[];
+    trendData?: Data[];
+    realtimeData?: Data[];
 }
 interface SeverityData {
     name: string;
@@ -225,7 +229,7 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* API */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchTrendData = async (): Promise<CloudServiceStatsModel[]> => {
+const fetchTrendData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(state.consoleFilters)
@@ -243,6 +247,10 @@ const fetchTrendData = async (): Promise<CloudServiceStatsModel[]> => {
                         operator: 'sum',
                     },
                 },
+                sort: [{
+                    key: 'date',
+                    desc: false,
+                }],
                 ...apiQueryHelper.data,
             },
         });
@@ -252,7 +260,7 @@ const fetchTrendData = async (): Promise<CloudServiceStatsModel[]> => {
         return [];
     }
 };
-const fetchRealtimeData = async (): Promise<CloudServiceStatsModel[]> => {
+const fetchRealtimeData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(state.consoleFilters)
@@ -282,13 +290,14 @@ const fetchRealtimeData = async (): Promise<CloudServiceStatsModel[]> => {
 };
 
 /* Util */
-const getFailureRate = (targetDataList: CloudServiceStatsModel[]): number => {
+const getFailureRate = (targetDataList: Data[]): number => {
     const passCount = sum(targetDataList.filter((d) => d.key === 'pass_finding_count').map((d) => d.value));
     const failCount = sum(targetDataList.filter((d) => d.key === 'fail_finding_count').map((d) => d.value));
     const totalCount = passCount + failCount;
     return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
 };
 const drawChart = (chartData: XYChartData[]) => {
+    if (!chartData?.length) return;
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     chartHelper.setChartColors(chart, colorSet.value);
