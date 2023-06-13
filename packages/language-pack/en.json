@@ -2098,8 +2098,10 @@
 			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "Attached Service Accounts successfully updated",
 			"CREATE": {
 				"ALL": "All",
+				"ALT_E_COLLECT_EXECUTION": "Data collection failed to start",
 				"ALT_E_CREATE_COLLECTOR": "Failed to create collector",
 				"ALT_E_GET_VERSION_TITLE": "Failed to Get Version",
+				"ALT_S_COLLECT_EXECUTION": "Data collection is now in progress",
 				"ALT_S_CREATE_COLLECTOR": "Collector successfully created",
 				"ATTACHED_SERVICE_ACCOUNT": "Attached Service Account",
 				"ATTACHED_SERVICE_ACCOUNT_VALID": "Good!",
