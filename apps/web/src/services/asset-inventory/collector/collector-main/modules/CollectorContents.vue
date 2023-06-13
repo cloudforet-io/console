@@ -88,6 +88,8 @@ import {
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+const RECENT_COUNT = 5;
+
 interface Props {
     keyItemSets?: KeyItemSet[]
 }
@@ -148,7 +150,7 @@ const state = reactive({
             const matchedJobIndex = collectorPageState.collectorJobStatus.findIndex((status) => status.collector_id === d.collector_id);
             const recentJobAnalyze = collectorPageState.collectorJobStatus[matchedJobIndex]?.job_status.slice(-5) || [];
 
-            while (recentJobAnalyze.length < 5) {
+            while (recentJobAnalyze.length < RECENT_COUNT) {
                 const noneValue = {
                     job_id: '',
                     status: JOB_STATE.NONE,
