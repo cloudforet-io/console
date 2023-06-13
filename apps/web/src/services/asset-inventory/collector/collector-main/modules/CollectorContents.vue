@@ -149,11 +149,11 @@ const state = reactive({
             const recentJobAnalyze = collectorPageState.collectorJobStatus[matchedJobIndex]?.job_status.slice(-5) || [];
 
             while (recentJobAnalyze.length < 5) {
-                const fillerValue = {
+                const noneValue = {
                     job_id: '',
                     status: JOB_STATE.NONE,
                 };
-                recentJobAnalyze.unshift(fillerValue);
+                recentJobAnalyze.unshift(noneValue);
             }
 
             return {
