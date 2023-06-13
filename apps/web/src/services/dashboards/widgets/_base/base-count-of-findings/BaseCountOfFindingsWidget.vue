@@ -52,6 +52,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -64,14 +65,14 @@ import countOfPassAndFailFindingsWidgetConfig
 import type { Legend } from '@/services/dashboards/widgets/type';
 
 
-interface Data {
+interface Data extends CloudServiceStatsModel {
     [groupBy: string]: string | any;
-    pass_findings_count?: number;
-    fail_findings_count?: number;
+    value: { key: string, value: number }[];
 }
-interface FullData {
-    results: Data[];
-    more: boolean;
+interface ChartData {
+    [key: string]: number;
+    fail_finding_count: number;
+    pass_finding_count: number;
 }
 
 const DATE_FORMAT = 'YYYY-MM';
@@ -80,83 +81,95 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    ...toRefs(useWidgetState<Data[]>(props)),
+    groupByKey: computed<string>(() => {
+        // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
+        // ex. additional_info.service -> service
+        if (!state.groupBy) return undefined;
+        const dotIndex = state.groupBy.indexOf('.');
+        if (dotIndex !== -1) {
+            return state.groupBy.slice(dotIndex + 1);
+        }
+        return state.groupBy;
+    }),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
             return [
-                { name: 'pass_findings_count', label: COMPLIANCE_STATUS_MAP.PASS.label, color: COMPLIANCE_STATUS_MAP.PASS.color },
-                { name: 'fail_findings_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
+                { name: 'pass_finding_count', label: COMPLIANCE_STATUS_MAP.PASS.label, color: COMPLIANCE_STATUS_MAP.PASS.color },
+                { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
             ];
         }
         return [
-            { name: 'fail_findings_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
+            { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
         ];
     }),
-    chartData: computed(() => cloneDeep(state.data?.results).reverse()),
+    chartData: computed(() => refineChartData(state.data)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const fetchData = async (): Promise<FullData> => {
+/* Api */
+const fetchData = async (): Promise<Data[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        let apiQuery: any = {
-            group_by: [state.groupBy],
-            fields: {
-                fail_findings_count: {
-                    key: 'data.stats.findings.fail',
-                    operator: 'sum',
-                },
-            },
-            sort: [{ key: 'fail_findings_count', desc: true }],
-        };
+
         if (state.showPassFindings) {
-            apiQuery = {
-                ...apiQuery,
+            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
+        } else {
+            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
+        }
+        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+            query: {
+                granularity: 'MONTHLY',
+                start: state.dateRange.end,
+                end: state.dateRange.end,
+                group_by: ['key', 'unit', state.groupBy],
                 fields: {
-                    ...apiQuery.fields,
-                    pass_findings_count: {
-                        key: 'data.stats.findings.pass',
+                    value: {
+                        key: 'value',
                         operator: 'sum',
                     },
                 },
-                select: {
-                    [state.groupBy]: state.groupBy,
-                    pass_findings_count: 'pass_findings_count',
-                    fail_findings_count: 'fail_findings_count',
-                    total_findings_count: {
-                        operator: 'add',
-                        fields: ['pass_findings_count', 'fail_findings_count'],
-                    },
-                },
-                sort: [{ key: 'total_findings_count', desc: true }],
-            };
-        }
-        return await SpaceConnector.clientV2.inventory.cloudService.analyze({
-            query: {
-                ...apiQuery,
+                field_group: ['key'],
+                sort: [{ key: 'value', desc: false }],
                 ...apiQueryHelper.data,
             },
         });
+        return results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
+        return [];
     }
 };
+
+/* Util */
+const refineChartData = (data: Data[]): ChartData[] => {
+    if (!data?.length) return [];
+    const refinedChartData: ChartData[] = [];
+    data.forEach((d) => {
+        const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
+        const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
+        refinedChartData.push({
+            [state.groupByKey]: d[state.groupByKey],
+            fail_finding_count,
+            pass_finding_count,
+        });
+    });
+    return refinedChartData;
+};
 const drawChart = (chartData) => {
-    if (!state.groupBy || !state.legends) return;
+    if (!state.groupByKey || !state.legends) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
-    yAxis.set('categoryField', state.groupBy);
+    yAxis.set('categoryField', state.groupByKey);
     yAxis.data.setAll(cloneDeep(chartData));
 
     const legend = chartHelper.createLegend({
@@ -169,7 +182,7 @@ const drawChart = (chartData) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: _legend.label,
             valueXField: _legend.name,
-            categoryYField: state.groupBy,
+            categoryYField: state.groupByKey,
             xAxis,
             yAxis,
             baseAxis: yAxis,
@@ -222,7 +235,7 @@ const drawChart = (chartData) => {
     });
     legend.data.setAll(chart.series.values);
 };
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -230,7 +243,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (thisPage = 1): Promise<Data[]> => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
@@ -252,7 +265,7 @@ useWidgetLifecycle({
     props,
     state,
 });
-defineExpose<WidgetExpose<FullData>>({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });
