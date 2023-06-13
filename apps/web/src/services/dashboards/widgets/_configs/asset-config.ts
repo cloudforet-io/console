@@ -34,6 +34,4 @@ export interface CloudServiceStatsModel {
     date: string;
     key: CloudServiceStatsKey;
     unit: string; // ex. Count
-    severity: Severity;
-    value: number;
 }
