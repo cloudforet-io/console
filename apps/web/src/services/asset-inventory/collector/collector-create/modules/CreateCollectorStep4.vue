@@ -53,6 +53,7 @@ import { reactive } from 'vue';
 import {
     PButton, PTextButton, PButtonModal,
 } from '@spaceone/design-system';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -64,6 +65,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CollectorCreateParameter } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -93,13 +95,13 @@ const handleClickPrevButton = () => {
     emit('update:currentStep', 3);
 };
 
-const convertAttachedServiceAccountToIds = () => (collectorFormState.attachedServiceAccount)?.map((d) => d.name) ?? [];
+const convertAttachedServiceAccountToIds = () => (collectorFormState.attachedServiceAccount)?.map((d: FilterableDropdownMenuItem) => d.name) ?? [];
 
 
 const handleClickCreateButton = async () => {
     try {
         state.loading = true;
-        await SpaceConnector.client.inventory.collector.create({
+        const params: Partial<CollectorCreateParameter> = {
             name: collectorFormState.name,
             provider: collectorFormState.repositoryPlugin?.provider,
             plugin_info: {
@@ -117,7 +119,8 @@ const handleClickCreateButton = async () => {
                 hours: collectorFormState.scheduleHours,
             },
             tags: collectorFormState.tags,
-        });
+        };
+        await SpaceConnector.client.inventory.collector.create(params);
         state.visibleCreateModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
     } catch (e) {

@@ -25,6 +25,12 @@ export interface CollectorPluginModel {
     options: CollectorOptions;
     metadata: CollectorMetadata;
     upgrade_mode: UpgradeMode;
+    secret_filter?: {
+        state: 'ENABLED'|'DISABLED';
+        service_accounts?: string[];
+        schemas?: string[];
+        secrets?: string[];
+    }
 }
 
 // RepositoryPluginModel
