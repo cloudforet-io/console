@@ -19,7 +19,7 @@
                          :items="state.secrets"
                          :loading="state.loading"
                          :total-count="state.totalCount"
-                         :query-tags="apiQueryHelper.queryTags"
+                         :query-tags="queryTags"
                          :key-item-sets="querySearchHandlers.keyItemSets"
                          :value-handler-map="querySearchHandlers.valueHandlerMap"
                          :sort-by.sync="state.sortBy"
@@ -134,6 +134,7 @@ const querySearchHandlers = {
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSets });
+const { queryTags } = queryTagHelper;
 const apiQueryHelper = new ApiQueryHelper();
 
 const getQuery = (provider?: string) => {
