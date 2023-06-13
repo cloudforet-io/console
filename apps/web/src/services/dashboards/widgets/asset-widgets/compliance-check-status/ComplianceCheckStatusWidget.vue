@@ -93,7 +93,7 @@ import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
 } from '@/services/dashboards/widgets/_configs/asset-config';
@@ -105,6 +105,10 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
+interface Data extends CloudServiceStatsModel {
+    value: number;
+    severity: Severity;
+}
 interface OuterChartData {
     status: string;
     value: number;
@@ -129,7 +133,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
-    ...toRefs(useWidgetState<CloudServiceStatsModel[]>(props)),
+    ...toRefs(useWidgetState<Data[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
     dateRange: computed<DateRange>(() => ({
         end: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
@@ -201,7 +205,7 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchData = async (): Promise<CloudServiceStatsModel[]> => {
+const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(state.consoleFilters)
@@ -295,7 +299,7 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
 };
 
-const initWidget = async (data?: CloudServiceStatsModel[]): Promise<CloudServiceStatsModel[]> => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -304,7 +308,7 @@ const initWidget = async (data?: CloudServiceStatsModel[]): Promise<CloudService
     return state.data;
 };
 
-const refreshWidget = async (): Promise<CloudServiceStatsModel[]> => {
+const refreshWidget = async (): Promise<Data[]> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
@@ -322,7 +326,7 @@ useWidgetLifecycle({
     state,
 });
 
-defineExpose<WidgetExpose<CloudServiceStatsModel[]>>({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });
@@ -337,7 +341,6 @@ defineExpose<WidgetExpose<CloudServiceStatsModel[]>>({
             margin: 0;
             padding-bottom: 2rem;
             .left-wrapper, .right-wrapper {
-                width: 50%;
                 flex: 1 1 auto;
                 position: relative;
                 padding: 0.375rem 1.5rem;
