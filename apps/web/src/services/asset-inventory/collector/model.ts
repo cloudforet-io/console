@@ -143,7 +143,7 @@ export interface JobStatus {
     job_id: string;
     status: string;
 }
-export interface jobAnalyzeModel {
+export interface JobAnalyzeModel {
     collector_id: string;
     job_status: JobStatus[]
 }

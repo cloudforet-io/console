@@ -6,7 +6,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, jobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
@@ -17,7 +17,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
-        collectorJobStatus: [] as jobAnalyzeModel[],
+        collectorJobStatus: [] as JobAnalyzeModel[],
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as Schedule[],
