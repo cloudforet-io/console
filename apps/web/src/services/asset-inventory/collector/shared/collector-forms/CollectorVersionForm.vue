@@ -10,7 +10,7 @@
             </div>
         </div>
         <p-select-dropdown :selected="collectorFormState.version"
-                           :items="state.versions"
+                           :items="state.versionItems"
                            :disabled="collectorFormState.autoUpgrade"
                            class="w-full"
                            @update:selected="handleChangeVersion"
@@ -33,23 +33,26 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const props = defineProps<{
+    getVersionsOnPluginIdChange?: boolean;
+}>();
+
 const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
 }>();
 
 const state = reactive({
     pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
-    versions: [] as MenuItem[],
+    versionItems: computed<MenuItem[]>(() => collectorFormState.versions.map((value, index) => {
+        if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
+        return { type: 'item', label: value, name: value };
+    })),
     versionInvalidText: computed<TranslateResult>(() => {
         const value = collectorFormState.version;
         if (!value?.length) {
@@ -60,27 +63,12 @@ const state = reactive({
     isVersionValid: computed(() => !state.versionInvalidText),
 });
 
-const getVersions = async (pluginId: string) => {
-    try {
-        state.versions = [];
-        const res = await SpaceConnector.client.repository.plugin.getVersions({
-            plugin_id: pluginId,
-        });
-        state.versions = res.results.map((value, index) => {
-            if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
-            return { type: 'item', label: value, name: value };
-        });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
-    }
-};
-
 const initSelectedVersion = () => {
     if (!collectorFormState.version.length) {
         const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
         const originVersion = collectorFormState.originCollector?.plugin_info?.version;
         collectorFormStore.$patch({
-            version: originVersion ?? state.versions[0]?.name ?? '',
+            version: originVersion ?? collectorFormState.versions[0] ?? '',
             autoUpgrade: originAutoUpgrade ?? true,
         });
     }
@@ -102,9 +90,7 @@ watch(() => state.isVersionValid, (value) => {
 // get version list when pluginId changed and init selected version
 watch(() => state.pluginId, async (pluginId) => {
     if (!pluginId) return;
-    await Promise.allSettled([
-        getVersions(pluginId),
-    ]);
+    if (props.getVersionsOnPluginIdChange) await collectorFormStore.getVersions(pluginId);
     initSelectedVersion();
 }, { immediate: true });
 </script>

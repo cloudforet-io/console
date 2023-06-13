@@ -30,7 +30,7 @@
                 <span class="ml-2 leading-none">{{ state.pluginName }}</span>
             </template>
             <template #data-plugin_info.version="{ value }">
-                {{ value }} {{ isLatestVersion(value) ? ' (latest)' : '' }}
+                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
             </template>
             <template #data-plugin_info.upgrade_mode="{ value }">
                 {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
@@ -73,7 +73,7 @@
 
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -111,7 +111,7 @@ const fields = computed<DefinitionField[]>(() => [
     { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
     { name: 'plugin_info.version', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.VERSION') },
     { name: 'tags', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.TAG') },
-    { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE') },
+    { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
     { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
     { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
 ]);
@@ -126,6 +126,14 @@ const state = reactive({
     pluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
     pluginName: computed<string>(() => state.pluginItem?.label ?? ''),
     pluginIcon: computed<string>(() => state.pluginItem?.icon ?? ''),
+    isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO),
+    isLatestVersion: computed<boolean>(() => {
+        const version = state.pluginInfo?.version;
+        if (!version) return false;
+        const latestVersion = collectorFormState.versions[0];
+        if (latestVersion) return latestVersion === version;
+        return false;
+    }),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
@@ -142,9 +150,6 @@ const state = reactive({
     updateLoading: false,
 });
 
-// TODO: Implement isLatestVersion
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isLatestVersion = (version: string) => true;
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
@@ -206,6 +211,10 @@ const handleClickSave = async () => {
         state.isEditMode = false;
     }
 };
+
+watch(() => collectorFormStore.pluginId, async (pluginId) => {
+    if (pluginId) await collectorFormStore.getVersions(pluginId);
+}, { immediate: true });
 
 // init reference data
 (async () => {

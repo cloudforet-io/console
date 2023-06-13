@@ -4,6 +4,7 @@
         <div class="input-form">
             <collector-name-form @update:isValid="handleUpdateIsValid" />
             <collector-version-form class="version-row"
+                                    get-versions-on-plugin-id-change
                                     @update:isVersionValid="handleChangeIsVersionValid"
             />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
