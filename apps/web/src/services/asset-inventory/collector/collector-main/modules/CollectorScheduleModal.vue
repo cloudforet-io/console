@@ -37,8 +37,6 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorScheduleForm
     from '@/services/asset-inventory/collector/shared/collector-forms/CollectorScheduleForm.vue';
 
-
-
 interface Props {
     editMode: boolean
 }
@@ -86,7 +84,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 };
 
 /* Watcher */
-watch(() => collectorPageState.selectedCollect, async (value) => {
+watch(() => collectorPageState.selectedCollector, async (value) => {
     if (collectorPageState.visibleScheduleModal) {
         await collectorFormStore.setOriginCollector(value);
     }

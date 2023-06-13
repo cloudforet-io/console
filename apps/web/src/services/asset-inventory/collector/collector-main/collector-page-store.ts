@@ -16,7 +16,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         sortBy: '',
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
-        selectedCollect: {} as CollectorModel,
+        selectedCollector: {} as CollectorModel,
         searchFilters: [] as ConsoleFilter[],
         totalCount: 0,
         schedules: [] as Schedule[],
@@ -69,7 +69,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
             const itemIndex = this.collectors.findIndex(
                 (item) => item.collector_id === id,
             );
-            this.selectedCollect = this.collectors[itemIndex];
+            this.selectedCollector = this.collectors[itemIndex];
         },
     },
 });
