@@ -78,12 +78,16 @@ const getPluginMetadata = async () => {
         if (!props.hasMetadata) {
             const res = await fetchGetPluginMetadata();
             state.schema = res.metadata?.options_schema ?? null;
+            if (!state.schema) {
+                emit('update:isValid', true);
+            }
         } else {
             state.schema = collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {};
         }
     } catch (e) {
         ErrorHandler.handleError(e);
         state.schema = {};
+        emit('update:isValid', false);
     } finally {
         state.loading = false;
     }
