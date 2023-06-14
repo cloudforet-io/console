@@ -1,12 +1,13 @@
 <template>
-    <p-data-loader class="collector-options-form"
+    <p-data-loader class="collector-options-form-container"
                    :loading="state.loading"
                    :data="state.schema"
     >
         <p-json-schema-form :schema="state.schema"
                             :form-data="collectorFormState.options"
-                            validation-mode="all"
                             :language="$store.state.user.language"
+                            use-fixed-menu-style
+                            reset-on-schema-change
                             uniform-width
                             @change="handleUpdateSchemaForm"
         />
@@ -66,6 +67,9 @@ const state = reactive({
 const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
     plugin_id: state.pluginId,
     version: collectorFormState.version,
+    options: {
+        provider: collectorFormState.provider,
+    },
 });
 
 const getPluginMetadata = async () => {
@@ -104,7 +108,7 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
 </script>
 
 <style lang="postcss" scoped>
-.collector-options-form {
+.collector-options-form-container {
     min-height: 6rem;
 
     .error-box {
