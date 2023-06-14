@@ -1,6 +1,6 @@
 <template>
     <div class="provider-list"
-         :class="{'low-count-provider-list': providerList?.length < 6, isScrollable}"
+         :class="{'low-count-provider-list': providerList?.length < 6}"
     >
         <p-button v-for="item in providerList"
                   :key="item.key"
@@ -32,13 +32,11 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 interface Props {
     providerList?: ReferenceItem[];
     selectedProvider: string;
-    isScrollable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     providerList: undefined,
     selectedProvider: 'all',
-    isScrollable: false,
 });
 
 const emit = defineEmits<{(e: 'change-provider', providerName: string): void}>();
@@ -57,14 +55,6 @@ const handleSelectProvider = (providerName) => {
     @apply grid w-full gap-2;
     grid-template-columns: repeat(6, minmax(10rem, auto));
     overflow-x: auto;
-
-    &.isScrollable {
-        @apply flex;
-
-        ::-webkit-scrollbar {
-            width: 0.375rem;
-        }
-    }
 
     /* custom design-system component - p-button */
     :deep(.p-button) {
