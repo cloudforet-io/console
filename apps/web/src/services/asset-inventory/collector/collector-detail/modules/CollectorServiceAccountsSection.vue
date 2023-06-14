@@ -113,7 +113,11 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import type { SecretModel, CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import type {
+    SecretModel,
+    CollectorModel,
+    CollectorUpdateParameter,
+} from '@/services/asset-inventory/collector/model';
 import AttachedServiceAccountForm from '@/services/asset-inventory/collector/shared/collector-forms/AttachedServiceAccountForm.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
@@ -137,10 +141,16 @@ const state = reactive({
     // table data
     loading: true,
     secrets: null as null|SecretModel[],
-    // reference data
+    // reference data, store data
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    serviceAccountsFilter: computed<string[]>(() => {
+        const secretFilter = collectorFormState.originCollector?.secret_filter;
+        if (!secretFilter) return [];
+        if (secretFilter.state === 'DISABLED') return [];
+        return secretFilter.service_accounts ?? [];
+    }),
     // query states
     pageLimit: 15,
     pageStart: 1,
@@ -175,18 +185,20 @@ const querySearchHandlers = {
 
 const queryTagHelper = useQueryTags({ keyItemSets: querySearchHandlers.keyItemSets });
 const { queryTags } = queryTagHelper;
-const apiQueryHelper = new ApiQueryHelper();
 
 /* api fetchers */
-const fetchSecrets = async (provider?: string): Promise<{ results: SecretModel[]; total_count: number }> => {
+const apiQueryHelper = new ApiQueryHelper();
+const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promise<{ results: SecretModel[]; total_count: number }> => {
     try {
         apiQueryHelper.setPage(state.pageStart, state.pageLimit)
             .setSort(state.sortBy, state.sortDesc)
-            .setFilters(queryTagHelper.filters.value);
+            .setFilters(queryTagHelper.filters.value)
+            .addFilter({ k: 'provider', v: provider, o: '=' });
 
-        if (provider) {
-            apiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+        if (serviceAccounts?.length) {
+            apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
         }
+
         const results = await SpaceConnector.client.secret.secret.list({
             query: apiQueryHelper.data,
         });
@@ -225,10 +237,10 @@ const fetchCollectBySecret = async (secretId: string) => {
 };
 
 /* reused functions */
-const getSecrets = async (provider?: string) => {
+const getSecrets = async (provider: string, serviceAccounts?: string[]) => {
     state.loading = true;
 
-    const { results, total_count } = await fetchSecrets(provider);
+    const { results, total_count } = await fetchSecrets(provider, serviceAccounts);
     state.secrets = results;
     state.totalCount = total_count;
 
@@ -251,7 +263,7 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 
-    await getSecrets(collectorFormStore.collectorProvider);
+    if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
 };
 const handleClickCancel = () => {
     state.isEditMode = false;
@@ -276,8 +288,9 @@ const handleClickCollect = async (secret: SecretModel) => {
 };
 
 /* watcher, lifecycle */
-watch(() => collectorFormStore.collectorProvider, async (provider?: string) => {
-    await getSecrets(provider);
+watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
+    if (!provider) return;
+    await getSecrets(provider, serviceAccounts);
 }, { immediate: true });
 
 onMounted(async () => {
