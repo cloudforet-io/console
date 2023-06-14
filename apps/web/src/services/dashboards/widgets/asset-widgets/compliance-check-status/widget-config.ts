@@ -24,7 +24,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'service_account', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
@@ -32,6 +32,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'provider',
+                    'region',
                     'asset_compliance_type',
                     'asset_account',
                 ),
@@ -40,6 +41,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
                 'project',
                 'service_account',
                 'provider',
+                'region',
                 'asset_compliance_type',
                 'asset_account',
             ),
