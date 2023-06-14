@@ -207,6 +207,8 @@ export default defineComponent<Props>({
         const handleDeleteProperty = (property: string) => {
             const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
             handleUpdateSchemaProperties(_properties);
+            state.schemaFormData[property] = undefined;
+            state.schemaFormData = { ...state.schemaFormData };
         };
 
         /* utils */
