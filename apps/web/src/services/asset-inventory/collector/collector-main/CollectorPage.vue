@@ -28,7 +28,6 @@
                 <provider-list
                     :provider-list="state.providerList"
                     :selected-provider="collectorPageState.selectedProvider"
-                    is-scrollable
                     @change-provider="handleSelectedProvider"
                 />
                 <collector-contents
