@@ -182,7 +182,6 @@ const state = reactive({
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                 },
                 detailLink: {
-                    ...linkData,
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     params: {
                         collectorId: d.collector_id,
