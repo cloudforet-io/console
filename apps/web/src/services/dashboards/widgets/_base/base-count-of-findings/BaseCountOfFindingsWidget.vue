@@ -155,11 +155,14 @@ const fetchData = async (): Promise<Data[]> => {
 const refineChartData = (data: Data[]): ChartData[] => {
     if (!data?.length) return [];
     const refinedChartData: ChartData[] = [];
+    const referenceMap = Object.values(props.allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
     data.forEach((d) => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
+        const rawValue = d[state.groupByKey];
+        const refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
         refinedChartData.push({
-            [state.groupByKey]: d[state.groupByKey] ?? `no_${state.groupByKey}`,
+            [state.groupByKey]: refinedValue ?? `no_${state.groupByKey}`,
             fail_finding_count,
             pass_finding_count,
         });
