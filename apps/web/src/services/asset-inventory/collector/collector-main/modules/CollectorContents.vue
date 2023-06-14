@@ -49,7 +49,7 @@
                         <p-button class="collect-data-button"
                                   :class="item.schedule && item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED && 'active'"
                                   style-type="tertiary"
-                                  @click.stop="handleClickCollectData"
+                                  @click.stop="handleClickCollectData(item.collectorId)"
                         >
                             {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
                         </p-button>
@@ -60,7 +60,6 @@
                 <collector-list-no-data class="collector-no-data" />
             </template>
         </p-data-loader>
-        <!-- TODO: changed condition after API spec checking -->
         <collector-schedule-modal edit-mode
                                   @refresh-collector-list="handleRefreshCollectorList"
         />
@@ -219,7 +218,9 @@ const handleClickListItem = (detailLink) => {
 const handleRefreshCollectorList = () => {
     emit('refresh-collector-list');
 };
-const handleClickCollectData = () => {};
+const handleClickCollectData = async () => {
+    handleRefreshCollectorList();
+};
 
 /* Watcher */
 watch(() => collectorPageState.collectors, async () => {
