@@ -127,6 +127,7 @@ interface InnerChartData {
 }
 
 const COMPLIANCE_STATUS_MAP_VALUES = Object.values(COMPLIANCE_STATUS_MAP);
+const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
@@ -147,18 +148,22 @@ const state = reactive({
         },
     }))),
     innerChartData: computed<InnerChartData[]>(() => {
-        const targetDataList = state.data?.filter((d) => d.date === state.dateRange.end && d.key === 'fail_check_count') ?? [];
-        return targetDataList.map((data) => ({
-            severity: SEVERITY_STATUS_MAP[data.severity].label,
-            value: data.value,
-            pieSettings: {
-                fill: color(SEVERITY_STATUS_MAP[data.severity].color),
-                stroke: color(SEVERITY_STATUS_MAP[data.severity].color),
-            },
-        }));
+        const failCheckDataList = state.data?.filter((d) => d.date === state.dateRange.end && d.key === 'fail_check_count') ?? [];
+        const innerChartData: InnerChartData[] = [];
+        SEVERITY_STATUS_MAP_VALUES.forEach((severity) => {
+            const targetSeverityData = failCheckDataList.find((d) => d.severity === severity.name);
+            if (!targetSeverityData) return;
+            innerChartData.push({
+                severity: severity.label,
+                value: targetSeverityData.value,
+                pieSettings: {
+                    fill: color(severity.color),
+                    stroke: color(severity.color),
+                },
+            });
+        });
+        return innerChartData;
     }),
-    //
-    accountCount: 0, // TODO: should be changed to real data when api is ready
     prevComplianceCount: computed<number|undefined>(() => {
         if (!state.data) return undefined;
         const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);

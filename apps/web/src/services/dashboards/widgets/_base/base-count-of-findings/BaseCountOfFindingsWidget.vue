@@ -216,20 +216,22 @@ const drawChart = (chartData) => {
                 }
             });
         });
-        const tooltip = chartHelper.createTooltip();
-        tooltip.label.adapters.add('text', (text, target) => {
-            let _text = '';
-            let totalValue = 0;
-            chart.series.each((s) => {
-                const fieldName = s.get('valueYField') || s.get('valueXField') || '';
-                const value = target.dataItem?.dataContext?.[fieldName];
-                totalValue += value;
-                _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+        if (state.showPassFindings) {
+            const tooltip = chartHelper.createTooltip();
+            tooltip.label.adapters.add('text', (text, target) => {
+                let _text = '';
+                let totalValue = 0;
+                chart.series.each((s) => {
+                    const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+                    const value = target.dataItem?.dataContext?.[fieldName];
+                    totalValue += value;
+                    _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+                });
+                _text = `Total: [bold; fontSize: 14px]${totalValue}[/]${_text}`;
+                return _text;
             });
-            _text = `Total: [bold; fontSize: 14px]${totalValue}[/]${_text}`;
-            return _text;
-        });
-        series.set('tooltip', tooltip);
+            series.set('tooltip', tooltip);
+        }
         chart.series.push(series);
         series.data.setAll(cloneDeep(chartData));
     });
