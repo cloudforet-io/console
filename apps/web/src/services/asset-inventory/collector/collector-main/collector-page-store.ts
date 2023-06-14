@@ -73,6 +73,9 @@ export const useCollectorPageStore = defineStore('collector-page', {
                                 fields: {
                                     status: 'status',
                                     job_id: 'job_id',
+                                    total_tasks: 'total_tasks',
+                                    remained_tasks: 'remained_tasks',
+                                    finished_at: 'finished_at',
                                 },
                             },
                         },

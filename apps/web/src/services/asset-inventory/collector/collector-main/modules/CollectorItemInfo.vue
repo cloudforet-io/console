@@ -81,7 +81,7 @@
                     >
                         <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
                                    class="icon-fill-wrapper success"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs(jobStatus.finished_at).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
                         >
                             <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
@@ -114,9 +114,13 @@
                         />
                         <p-tooltip v-else
                                    class="icon-fill-wrapper error"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs(jobStatus.finished_at).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
-                        />
+                        >
+                            <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
+                                <span class="exclamation-mark">!</span>
+                            </router-link>
+                        </p-tooltip>
                     </div>
                 </div>
                 <div class="to-history-detail">
@@ -387,18 +391,16 @@ watch(() => props.item, (value) => {
                         }
 
                         &.error {
-                            @apply bg-red-500;
+                            @apply flex items-center justify-center bg-red-500;
 
-                            &::before {
-                                @apply absolute text-white text-label-md;
-                                content: '!';
-                                top: 50%;
-                                left: 50%;
-                                transform: translate(-35%, -50%);
+                            .exclamation-mark {
+                                @apply text-white text-label-md;
+                                width: 1rem;
+                                height: 1rem;
                             }
 
                             &:hover {
-                                @apply border border-red-700;
+                                @apply border border-red-700 cursor-pointer;
                             }
                         }
 
