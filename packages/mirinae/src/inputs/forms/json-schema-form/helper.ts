@@ -59,7 +59,7 @@ const isStrictArraySelectMode = (schemaProperty: JsonSchema): boolean => {
 
 export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
     const { type, disabled } = schema;
-    if (disabled) return undefined;
+    if (disabled) return schema?.default ?? undefined;
     if (type === 'object') return val; // In case of object, child JsonSchemaForm refines the data.
     if (type === 'array') return refineArrayTypeValue(schema, val);
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
