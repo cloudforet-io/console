@@ -126,7 +126,7 @@ const state = reactive({
     pluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
     pluginName: computed<string>(() => state.pluginItem?.label ?? ''),
     pluginIcon: computed<string>(() => state.pluginItem?.icon ?? ''),
-    isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO),
+    isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {
         const version = state.pluginInfo?.version;
         if (!version) return false;
