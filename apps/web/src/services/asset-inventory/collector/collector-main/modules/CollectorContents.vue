@@ -49,7 +49,7 @@
                         <p-button class="collect-data-button"
                                   :class="item.schedule && item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED && 'active'"
                                   style-type="tertiary"
-                                  @click.stop="handleClickCollectData(item.collectorId)"
+                                  @click.stop="handleRefreshCollectorList"
                         >
                             {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
                         </p-button>
@@ -217,9 +217,6 @@ const handleClickListItem = (detailLink) => {
 };
 const handleRefreshCollectorList = () => {
     emit('refresh-collector-list');
-};
-const handleClickCollectData = async () => {
-    handleRefreshCollectorList();
 };
 
 /* Watcher */
