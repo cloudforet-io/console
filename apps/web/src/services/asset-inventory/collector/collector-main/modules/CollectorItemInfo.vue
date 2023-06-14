@@ -45,7 +45,7 @@
                                 </span>
                             </p>
                         </div>
-                        <span v-else-if="props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS"
+                        <span v-else-if="state.isInProgress"
                               class="current-status-progress"
                         >
                             <p-i
@@ -218,6 +218,7 @@ const storeState = reactive({
 
 const state = reactive({
     isScheduleActivated: false,
+    isInProgress: computed(() => props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
