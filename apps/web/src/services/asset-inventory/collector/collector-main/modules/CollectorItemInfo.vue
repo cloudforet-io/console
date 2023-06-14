@@ -225,9 +225,15 @@ const state = reactive({
 
             const userCurrentTime = dayjs.tz(current, storeState.timezone);
             const hours = props.item.schedule.hours ?? [];
-            const nextScheduledHour = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
+            const sortedHours = hours.sort((a, b) => a - b);
+            const nextScheduledHour = sortedHours.find((num) => num > userCurrentTime.hour());
 
-            const nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            let nextScheduledTime;
+            if (nextScheduledHour) {
+                nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            } else {
+                nextScheduledTime = current.add(1, 'day').set('h', sortedHours[0]).set('m', 0);
+            }
             const timeDiff = nextScheduledTime.diff(current, 'm');
             return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
