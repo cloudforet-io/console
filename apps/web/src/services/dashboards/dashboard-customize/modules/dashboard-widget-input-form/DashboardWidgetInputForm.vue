@@ -322,6 +322,11 @@ export default defineComponent<Props>({
             });
             if (!props.widgetKey) {
                 let _inheritOptions = widgetFormState.inheritOptions;
+                // set default value to fixed properties
+                widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
+                    state.schemaFormData[propertyName] = state.widgetConfig?.options?.[propertyName];
+                });
+                // set default value to default properties
                 widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
                     state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
                     _inheritOptions = {
