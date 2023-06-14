@@ -180,7 +180,7 @@ import dayjs from 'dayjs';
 
 
 import { store } from '@/store';
-import { i18n as i18nTranslator } from '@/translations';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -252,9 +252,9 @@ const handleChangeToggle = async (value) => {
         };
         const response = await collectorPageStore.updateCollectorSchedule(params);
         await collectorFormStore.setOriginCollector(response);
-        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
 const handleClickSchedule = () => {
