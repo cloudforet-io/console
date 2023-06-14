@@ -54,7 +54,9 @@
             </template>
         </p-data-loader>
         <!-- TODO: changed condition after API spec checking -->
-        <collector-schedule-modal edit-mode />
+        <collector-schedule-modal edit-mode
+                                  @refresh-collector-list="$emit('refresh-collector-list')"
+        />
     </div>
 </template>
 
@@ -101,6 +103,8 @@ const props = withDefaults(defineProps<Props>(), {
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
+const emit = defineEmits(['change-toolbox', 'export-excel', 'refresh-collector-list']);
+
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
@@ -108,8 +112,8 @@ const storeState = reactive({
 const state = reactive({
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
     ],
     valueHandlerMap: {
@@ -147,8 +151,8 @@ const state = reactive({
                 },
             };
 
-            const matchedJobIndex = collectorPageState.collectorJobStatus.findIndex((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = collectorPageState.collectorJobStatus[matchedJobIndex]?.job_status.slice(-5) || [];
+            const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
+            const recentJobAnalyze = matchedJob?.job_status.slice(-5) || [];
 
             while (recentJobAnalyze.length < RECENT_COUNT) {
                 const noneValue = {
@@ -183,8 +187,6 @@ const state = reactive({
         });
     }),
 });
-
-const emit = defineEmits(['change-toolbox', 'export-excel']);
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
 
@@ -235,8 +237,13 @@ watch(() => collectorPageState.collectors, async () => {
         .collector-lists {
             @apply grid grid-cols-2 gap-4;
 
+            @screen mobile {
+                @apply flex flex-col;
+            }
+
             /* custom design-system component - p-card */
             :deep(.p-card) {
+
                 &:hover {
                     @apply cursor-pointer;
                     .body {
@@ -254,7 +261,12 @@ watch(() => collectorPageState.collectors, async () => {
                     @apply text-label-xl font-bold;
                 }
                 .collector-info-wrapper {
-                    @apply grid grid-cols-2 gap-6;
+                    @apply grid grid-rows-2 grid-flow-col gap-2;
+
+                    @screen tablet {
+                        @apply flex flex-col;
+                        gap: 1rem;
+                    }
                 }
             }
         }

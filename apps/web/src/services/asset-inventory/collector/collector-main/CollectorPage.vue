@@ -35,6 +35,7 @@
                     :key-item-sets="handlerState.keyItemSets"
                     @change-toolbox="handleChangeToolbox"
                     @export-excel="handleExportExcel"
+                    @refresh-collector-list="refreshCollectorList"
                 />
             </div>
             <template #no-data>
@@ -158,6 +159,7 @@ const refreshCollectorList = async () => {
     }
 };
 
+/* Watcher */
 watch(() => collectorPageState.selectedProvider, async (providerName) => {
     await replaceUrlQuery('provider', providerName);
     await refreshCollectorList();

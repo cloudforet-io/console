@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="collector-item-info">
         <div class="collector-item">
             <div v-if="props.type === COLLECTOR_ITEM_INFO_TYPE.PLUGIN"
                  class="info-item"
@@ -11,10 +11,11 @@
                     <p-lazy-img :src="props.item.plugin.icon"
                                 width="1.25rem"
                                 height="1.25rem"
+                                class="plugin-icon"
                     />
                     <div class="plugin-info">
                         <span class="plugin-name">{{ state.plugin.name }}</span>
-                        <span class="plugin-version">{{ state.plugin.version }}</span>
+                        <span class="plugin-version">v{{ state.plugin.version }}</span>
                     </div>
                 </div>
             </div>
@@ -44,9 +45,20 @@
                                 </span>
                             </p>
                         </div>
-                        <!-- TODO: add in-progress state -->
-                        <span v-else-if="props.item">
+                        <span v-else-if="state.isInProgress"
+                              class="current-status-progress"
+                        >
+                            <p-i
+                                name="ic_settings-filled"
+                                class="setting-icon"
+                                height="1.25rem"
+                                width="1.25rem"
+                                color="inherit"
+                            />
                             {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}
+                        </span>
+                        <span v-else>
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                         </span>
                     </div>
                     <span v-else>
@@ -159,20 +171,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PI, PLazyImg, PToggleButton, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_ITEM_INFO_TYPE, JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
-import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
+import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import {
+    COLLECTOR_SCHEDULE_STATE,
+} from '@/services/asset-inventory/collector/model';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 
 interface Props {
     label: string;
@@ -187,13 +210,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorPageStore = useCollectorPageStore();
+const collectorFormStore = useCollectorFormStore();
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
 
 const state = reactive({
-    isScheduleActivated: computed(() => props.item.schedule && props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED),
+    isScheduleActivated: false,
+    isInProgress: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
@@ -215,177 +240,239 @@ const state = reactive({
 });
 
 /* Components */
-const handleChangeToggle = () => {};
+const handleChangeToggle = async (value) => {
+    if (Object.keys(value).length > 0) return;
+    try {
+        state.isScheduleActivated = !state.isScheduleActivated;
+        const params: CollectorUpdateParameter = {
+            collector_id: props.item.collectorId,
+            schedule: {
+                ...props.item.schedule,
+                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
+            },
+        };
+        const response = await collectorPageStore.updateCollectorSchedule(params);
+        await collectorFormStore.setOriginCollector(response);
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+    }
+};
 const handleClickSchedule = () => {
     collectorPageStore.setSelectedCollector(props.item.collectorId);
     collectorPageStore.$patch({
         visibleScheduleModal: true,
     });
 };
+
+/* Watcher */
+watch(() => props.item, (value) => {
+    if (Object.keys(value).length > 0 && (props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE)) {
+        state.isScheduleActivated = value.schedule ? value.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED : false;
+    }
+}, { immediate: true });
 </script>
 
 <style scoped lang="postcss">
-.collector-item {
-    .info-item {
-        @apply flex flex-col;
-        gap: 0.5rem;
+.collector-item-info {
+    @apply relative;
+    min-width: 15.125rem;
+    flex: 1;
 
-        .info-label {
-            @apply text-label-sm text-gray-500;
-        }
+    @screen tablet {
+        min-width: 100%;
+        min-height: 2.625rem;
+    }
 
-        .label-description {
-            @apply text-label-md text-gray-700;
+    .collector-item {
+        .info-item {
+            @apply flex flex-col;
+            gap: 0.5rem;
 
-            .scheduled {
-                @apply flex items-center;
-                gap: 0.25rem;
+            .info-label {
+                @apply text-label-sm text-gray-500;
+            }
 
-                .emphasis {
-                    @apply font-bold text-gray-900 not-italic;
+            .label-description {
+                @apply text-label-md text-gray-700;
+
+                .scheduled {
+                    @apply flex items-center;
+                    gap: 0.25rem;
+
+                    .emphasis {
+                        @apply font-bold text-gray-900 not-italic;
+                    }
+
+                    .alarm-icon {
+                        min-width: 1.25rem;
+                    }
+
+                    .current-status-progress {
+                        @apply flex items-center;
+                        gap: 0.25rem;
+
+                        .setting-icon {
+                            @apply text-gray-400;
+                            min-width: 1.25rem;
+                        }
+                    }
                 }
             }
-        }
 
-        .plugin {
-            @apply flex items-center text-label-md;
-            gap: 0.25rem;
-
-            .plugin-info {
-                @apply flex items-center;
-                max-width: 14rem;
+            .plugin {
+                @apply absolute flex text-label-md;
+                top: 1.5rem;
+                right: 0;
+                left: 0;
                 gap: 0.25rem;
 
-                .plugin-name {
-                    @apply truncate;
+                .plugin-icon {
+                    min-width: 1.25rem;
+                }
+
+                .plugin-info {
+                    @apply relative items-center;
+                    max-width: 13.625rem;
                     flex: 1;
-                }
+                    gap: 0.25rem;
 
-                .plugin-version {
-                    @apply truncate text-label-sm text-gray-700;
-                    max-width: 3.5rem;
+                    .plugin-name {
+                        @apply absolute truncate;
+                        width: 75%;
+                        top: 0;
+                        left: 0;
+                    }
+
+                    .plugin-version {
+                        @apply absolute truncate text-label-sm text-gray-700;
+                        width: 25%;
+                        top: 0;
+                        right: 0;
+                        line-height: 1.125rem;
+                    }
                 }
             }
-        }
 
-        .jobs-wrapper {
-            @apply flex;
-            gap: 0.375rem;
-
-            .jobs-contents {
+            .jobs-wrapper {
                 @apply flex;
-                width: 1rem;
-                height: 1rem;
+                gap: 0.375rem;
 
-                .icon-fill-wrapper {
-                    @apply relative rounded box-border;
+                .jobs-contents {
+                    @apply flex;
                     width: 1rem;
                     height: 1rem;
 
-                    &:hover {
-                        @apply cursor-default;
-                    }
-
-                    &.success {
-                        @apply bg-green-600;
+                    .icon-fill-wrapper {
+                        @apply relative rounded box-border;
+                        width: 1rem;
+                        height: 1rem;
 
                         &:hover {
-                            @apply border border-green-700 cursor-pointer;
-                        }
-                    }
-
-                    &.error {
-                        @apply bg-red-500;
-
-                        &::before {
-                            @apply absolute text-white text-label-md;
-                            content: '!';
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-35%, -50%);
+                            @apply cursor-default;
                         }
 
-                        &:hover {
-                            @apply border border-red-700;
+                        &.success {
+                            @apply bg-green-600;
+
+                            &:hover {
+                                @apply border border-green-700 cursor-pointer;
+                            }
                         }
-                    }
 
-                    &.progress {
-                        @apply bg-gray-500;
+                        &.error {
+                            @apply bg-red-500;
 
-                        &:hover {
-                            @apply border border-gray-700;
+                            &::before {
+                                @apply absolute text-white text-label-md;
+                                content: '!';
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-35%, -50%);
+                            }
 
-                            .progress {
-                                top: -0.065rem;
-                                left: -0.065rem;
-                                animation: rotate 6s linear infinite;
-                                transform-origin: 50% 50%;
+                            &:hover {
+                                @apply border border-red-700;
+                            }
+                        }
 
-                                @keyframes rotate {
-                                    100% {
-                                        transform: rotate(360deg);
+                        &.progress {
+                            @apply bg-gray-500;
+
+                            &:hover {
+                                @apply border border-gray-700;
+
+                                .progress {
+                                    top: -0.065rem;
+                                    left: -0.065rem;
+                                    animation: rotate 6s linear infinite;
+                                    transform-origin: 50% 50%;
+
+                                    @keyframes rotate {
+                                        100% {
+                                            transform: rotate(360deg);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    &.none {
-                        @apply bg-gray-200;
-                    }
-
-                    .icon {
-                        @apply absolute text-white;
-
-                        &.success {
-                            @apply text-white;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-35%, -50%);
+                        &.none {
+                            @apply bg-gray-200;
                         }
 
-                        &.progress {
-                            top: 0;
-                            left: 0;
+                        .icon {
+                            @apply absolute text-white;
+
+                            &.success {
+                                @apply text-white;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-35%, -50%);
+                            }
+
+                            &.progress {
+                                top: 0;
+                                left: 0;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        .to-history-detail {
-            @apply text-label-sm text-blue-700;
-        }
-
-        /* FIXME: Reducing dependencies on the design system */
-
-        /* custom design-system component - p-toggle-button */
-        :deep(.p-toggle-button) {
-            .label {
-                @apply text-gray-400;
+            .to-history-detail {
+                @apply text-label-sm text-blue-700;
             }
-            &.toggle-active {
+
+            /* FIXME: Reducing dependencies on the design system */
+
+            /* custom design-system component - p-toggle-button */
+            :deep(.p-toggle-button) {
                 .label {
+                    @apply text-gray-400;
+                }
+                &.toggle-active {
+                    .label {
+                        @apply text-blue-600;
+                    }
+                }
+            }
+
+            /* FIXME: Reducing dependencies on the design system */
+
+            /* custom design-system component - p-button */
+            :deep(.p-button) {
+                @apply text-label-sm text-blue-600 font-normal;
+                width: 5.75rem;
+                min-width: initial;
+                height: 0.875rem;
+                padding: 0;
+                &:hover {
+                    background-color: initial;
+                }
+                .icon-schedule {
                     @apply text-blue-600;
                 }
-            }
-        }
-
-        /* FIXME: Reducing dependencies on the design system */
-
-        /* custom design-system component - p-button */
-        :deep(.p-button) {
-            @apply text-label-sm text-blue-600 font-normal;
-            width: 5.75rem;
-            min-width: initial;
-            height: 0.875rem;
-            padding: 0;
-            &:hover {
-                background-color: initial;
-            }
-            .icon-schedule {
-                @apply text-blue-600;
             }
         }
     }
