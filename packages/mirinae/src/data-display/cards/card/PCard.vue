@@ -20,6 +20,8 @@
 
 <script setup lang="ts">
 
+import type { PropType } from 'vue';
+
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
 defineProps({
@@ -28,14 +30,14 @@ defineProps({
         default: '',
     },
     styleType: {
-        type: String,
+        type: String as PropType<CARD_STYLE_TYPE>,
         default: CARD_STYLE_TYPE.gray100,
         validator(styleType: any) {
             return Object.values(CARD_STYLE_TYPE).includes(styleType);
         },
     },
     size: {
-        type: String,
+        type: String as PropType<CARD_SIZE>,
         default: CARD_SIZE.md,
         validator(size: any) {
             return Object.values(CARD_SIZE).includes(size);
