@@ -13,6 +13,11 @@ export interface SearchEnumItem {
 export type SearchDataType = KeyDataType;
 export type SearchEnums = Record<string, SearchEnumItem|string>|string[];
 
+export type Sort = {
+    key: string;
+    desc?: boolean;
+};
+
 export interface SearchKeyOptions {
     key: string; // Key to retrieve actual data
     name: string; // Name to display in search bar
@@ -57,12 +62,14 @@ export interface RawTableOptions extends CommonOptions {
 export interface TableOptions extends CommonOptions {
     fields: DynamicField[];
     disable_search?: boolean;
+    default_sort?: Sort;
 }
 
 export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
     search: SearchSchema;
     disable_search?: boolean;
+    default_sort?: Sort;
 }
 
 export type RawOptions = CommonOptions;
