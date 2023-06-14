@@ -143,7 +143,7 @@ interface FilterableDropdownProps {
     appearanceType?: FilterableDropdownAppearanceType;
     // eslint-disable-next-line vue/require-default-prop
     pageSize?: number;
-    resetSelectedOnUnmounted: boolean;
+    resetSelectedOnUnmounted?: boolean;
 }
 const props = withDefaults(defineProps<FilterableDropdownProps>(), {
     menu: () => [],
