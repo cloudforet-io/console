@@ -112,8 +112,8 @@ const storeState = reactive({
 const state = reactive({
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
     ],
     valueHandlerMap: {
@@ -240,8 +240,13 @@ watch(() => collectorPageState.collectors, async () => {
         .collector-lists {
             @apply grid grid-cols-2 gap-4;
 
+            @screen mobile {
+                @apply flex flex-col;
+            }
+
             /* custom design-system component - p-card */
             :deep(.p-card) {
+
                 &:hover {
                     @apply cursor-pointer;
                     .body {
@@ -259,7 +264,12 @@ watch(() => collectorPageState.collectors, async () => {
                     @apply text-label-xl font-bold;
                 }
                 .collector-info-wrapper {
-                    @apply grid grid-cols-2 gap-6;
+                    @apply grid grid-rows-2 grid-flow-col gap-2;
+
+                    @screen tablet {
+                        @apply flex flex-col;
+                        gap: 1rem;
+                    }
                 }
             }
         }
