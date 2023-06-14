@@ -46,6 +46,13 @@
                                 />
                             </div>
                         </div>
+                        <p-button class="collect-data-button"
+                                  :class="item.schedule && item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED && 'active'"
+                                  style-type="tertiary"
+                                  @click.stop="handleRefreshCollectorList"
+                        >
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
+                        </p-button>
                     </p-card>
                 </div>
             </div>
@@ -53,9 +60,8 @@
                 <collector-list-no-data class="collector-no-data" />
             </template>
         </p-data-loader>
-        <!-- TODO: changed condition after API spec checking -->
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="$emit('refresh-collector-list')"
+                                  @refresh-collector-list="handleRefreshCollectorList"
         />
     </div>
 </template>
@@ -88,6 +94,7 @@ import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
 } from '@/services/asset-inventory/collector/collector-main/type';
+import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const RECENT_COUNT = 5;
@@ -208,6 +215,9 @@ const handleChangeToolbox = (options) => {
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
 };
+const handleRefreshCollectorList = () => {
+    emit('refresh-collector-list');
+};
 
 /* Watcher */
 watch(() => collectorPageState.collectors, async () => {
@@ -243,12 +253,27 @@ watch(() => collectorPageState.collectors, async () => {
 
             /* custom design-system component - p-card */
             :deep(.p-card) {
+                @apply relative;
 
                 &:hover {
                     @apply cursor-pointer;
                     .body {
                         @apply bg-blue-100;
                     }
+
+                    .collect-data-button {
+                        &.active {
+                            @apply block absolute;
+                            opacity: 1;
+                            top: 1.25rem;
+                            right: 1.5rem;
+                        }
+                    }
+                }
+
+                .collect-data-button {
+                    @apply hidden;
+                    opacity: 0;
                 }
             }
 
