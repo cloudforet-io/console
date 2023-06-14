@@ -266,7 +266,7 @@ const handleClickSchedule = () => {
 
 /* Watcher */
 watch(() => props.item, (value) => {
-    if (props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE) {
+    if (Object.keys(value).length > 0 && (props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE)) {
         state.isScheduleActivated = value.schedule ? value.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED : false;
     }
 }, { immediate: true });
