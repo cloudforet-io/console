@@ -90,7 +90,6 @@ const handlerState = reactive({
             { name: 'plugin_info.plugin_id', label: 'Plugin' },
             { name: 'plugin_info.version', label: 'Version' },
             { name: 'provider', label: 'Provider', valueSet: storeState.providers },
-            { name: 'supported_resource_type', label: 'Resource Type' },
             { name: 'created_at', label: 'Created' },
             { name: 'last_collected_at', label: 'Last Collected' },
         ],
