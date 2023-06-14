@@ -20,8 +20,6 @@ import { watch } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { i18n as i18nTranslator } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -48,6 +46,8 @@ const collectorPageState = collectorPageStore.$state;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+
 /* Components */
 const handleCloseModal = () => {
     collectorPageStore.$patch({
@@ -56,10 +56,10 @@ const handleCloseModal = () => {
 };
 const handleConfirm = async () => {
     try {
-        const collector = await fetchCollectorUpdate();
-        await collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        await fetchCollectorUpdate();
         handleCloseModal();
+        emit('refresh-collector-list');
+        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
     } catch (e) {
         collectorFormStore.resetSchedulePower();
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
@@ -77,13 +77,11 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };
-    return SpaceConnector.client.inventory.collector.update(params);
+    return collectorPageStore.updateCollectorSchedule(params);
 };
 
 /* Watcher */
 watch(() => collectorPageState.selectedCollector, async (value) => {
-    if (collectorPageState.visibleScheduleModal) {
-        await collectorFormStore.setOriginCollector(value);
-    }
-});
+    await collectorFormStore.setOriginCollector(value);
+}, { immediate: true });
 </script>

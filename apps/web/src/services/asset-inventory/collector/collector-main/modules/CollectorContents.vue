@@ -54,7 +54,9 @@
             </template>
         </p-data-loader>
         <!-- TODO: changed condition after API spec checking -->
-        <collector-schedule-modal edit-mode />
+        <collector-schedule-modal edit-mode
+                                  @refresh-collector-list="handleRefreshCollectorList"
+        />
     </div>
 </template>
 
@@ -100,6 +102,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+
+const emit = defineEmits(['change-toolbox', 'export-excel', 'refresh-collector-list']);
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -184,8 +188,6 @@ const state = reactive({
     }),
 });
 
-const emit = defineEmits(['change-toolbox', 'export-excel']);
-
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
 
 /* Components */
@@ -205,6 +207,9 @@ const handleChangeToolbox = (options) => {
 };
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
+};
+const handleRefreshCollectorList = () => {
+    emit('refresh-collector-list');
 };
 
 /* Watcher */

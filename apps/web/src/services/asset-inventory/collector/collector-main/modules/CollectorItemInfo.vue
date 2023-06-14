@@ -159,20 +159,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PI, PLazyImg, PToggleButton, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+
 import { store } from '@/store';
+import { i18n as i18nTranslator } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_ITEM_INFO_TYPE, JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
-import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
+import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import {
+    COLLECTOR_SCHEDULE_STATE,
+} from '@/services/asset-inventory/collector/model';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 
 interface Props {
     label: string;
@@ -187,13 +198,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorPageStore = useCollectorPageStore();
+const collectorFormStore = useCollectorFormStore();
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
 
 const state = reactive({
-    isScheduleActivated: computed(() => props.item.schedule && props.item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED),
+    isScheduleActivated: false,
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
@@ -215,13 +227,37 @@ const state = reactive({
 });
 
 /* Components */
-const handleChangeToggle = () => {};
+const handleChangeToggle = async (value) => {
+    if (Object.keys(value).length > 0) return;
+    try {
+        state.isScheduleActivated = !state.isScheduleActivated;
+        const params: CollectorUpdateParameter = {
+            collector_id: props.item.collectorId,
+            schedule: {
+                ...props.item.schedule,
+                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
+            },
+        };
+        const response = await collectorPageStore.updateCollectorSchedule(params);
+        await collectorFormStore.setOriginCollector(response);
+        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+    }
+};
 const handleClickSchedule = () => {
     collectorPageStore.setSelectedCollector(props.item.collectorId);
     collectorPageStore.$patch({
         visibleScheduleModal: true,
     });
 };
+
+/* Watcher */
+watch(() => props.item, (value) => {
+    if (props.type === COLLECTOR_ITEM_INFO_TYPE.SCHEDULE) {
+        state.isScheduleActivated = value.schedule ? value.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED : false;
+    }
+}, { immediate: true });
 </script>
 
 <style scoped lang="postcss">
