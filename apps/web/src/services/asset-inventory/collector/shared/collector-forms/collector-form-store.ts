@@ -40,7 +40,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             return this.originCollector?.collector_id;
         },
         pluginId(): string|undefined {
-            return this.originCollector?.plugin_info.plugin_id ?? this.repositoryPlugin?.plugin_id;
+            return this.originCollector?.plugin_info?.plugin_id ?? this.repositoryPlugin?.plugin_id;
         },
         collectorProvider(): string|undefined {
             return this.originCollector?.provider;
