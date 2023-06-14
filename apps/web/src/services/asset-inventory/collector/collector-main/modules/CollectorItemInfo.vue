@@ -44,9 +44,11 @@
                                 </span>
                             </p>
                         </div>
-                        <!-- TODO: add in-progress state -->
-                        <span v-else-if="props.item">
+                        <span v-else-if="props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS">
                             {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}
+                        </span>
+                        <span v-else>
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                         </span>
                     </div>
                     <span v-else>
