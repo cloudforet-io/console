@@ -85,7 +85,7 @@ export interface MarkdownOptions extends CommonOptions {
 }
 
 export interface PopupOptions extends CommonOptions {
-    layout: DynamicLayout
+    layout: DynamicLayout;
 }
 
 export interface ListOptions extends CommonOptions {
