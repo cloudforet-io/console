@@ -218,7 +218,7 @@ const storeState = reactive({
 
 const state = reactive({
     isScheduleActivated: false,
-    isInProgress: computed(() => props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS),
+    isInProgress: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
