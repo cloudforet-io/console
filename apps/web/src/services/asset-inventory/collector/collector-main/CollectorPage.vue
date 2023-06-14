@@ -113,6 +113,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
         COLLECTOR_QUERY_HELPER_SET.TAGS,
         COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
         COLLECTOR_QUERY_HELPER_SET.STATE,
+        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
     )
     .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
     .setSort(collectorPageState.sortBy, true);
