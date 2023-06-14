@@ -10,6 +10,7 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     TAGS: 'tags',
     PLUGIN_INFO: 'plugin_info',
     STATE: 'state',
+    SCHEDULE: 'schedule',
 } as const;
 
 export const COLLECTOR_ITEM_INFO_TYPE = {
