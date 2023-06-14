@@ -55,7 +55,7 @@
         </p-data-loader>
         <!-- TODO: changed condition after API spec checking -->
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="handleRefreshCollectorList"
+                                  @refresh-collector-list="$emit('refresh-collector-list')"
         />
     </div>
 </template>
@@ -207,9 +207,6 @@ const handleChangeToolbox = (options) => {
 };
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
-};
-const handleRefreshCollectorList = () => {
-    emit('refresh-collector-list');
 };
 
 /* Watcher */
