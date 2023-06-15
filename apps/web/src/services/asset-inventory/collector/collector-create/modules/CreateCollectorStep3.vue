@@ -3,6 +3,7 @@
         <div class="input-form">
             <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
             <collector-options-form class="collector-options-form"
+                                    show-title-if-no-schema
                                     @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>

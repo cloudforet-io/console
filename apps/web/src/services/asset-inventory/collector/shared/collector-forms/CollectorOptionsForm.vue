@@ -76,13 +76,14 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const props = defineProps<{
-    hasMetadata?: boolean;
+    hasMetadata?: boolean; // MEMO: if true, use metadata(state.schema) of collectorFormState.originCollector. And if false, call api for get metadata(state.schema).
+    showTitle?: boolean;
     resetOnCollectorIdChange?: boolean;
 }>();
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    isVisibleTitle: computed<boolean>(() => (!props.hasMetadata && !Object.keys(state.schema ?? {}).length)),
+    isVisibleTitle: computed<boolean>(() => (!!props.showTitle && (!props.hasMetadata && !Object.keys(state.schema ?? {}).length))),
     loading: false,
     isLoadFailed: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
