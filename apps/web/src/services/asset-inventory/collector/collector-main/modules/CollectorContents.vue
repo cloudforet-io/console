@@ -16,7 +16,7 @@
                 <p-button
                     icon-left="ic_plus_bold"
                     class="create-button"
-                    @click="handleCreate"
+                    @click="routeToCreatePage"
                 >
                     {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
                 </p-button>
@@ -48,7 +48,7 @@
                         </div>
                         <p-button class="collect-data-button"
                                   style-type="tertiary"
-                                  @click.stop="handleRefreshCollectorList"
+                                  @click.stop="handleClickCollectData"
                         >
                             {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
                         </p-button>
@@ -60,7 +60,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="handleRefreshCollectorList"
+                                  @refresh-collector-list="refreshCollectorList"
         />
     </div>
 </template>
@@ -198,8 +198,11 @@ const state = reactive({
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
 
 /* Components */
-const handleCreate = () => {
+const routeToCreatePage = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+};
+const refreshCollectorList = () => {
+    emit('refresh-collector-list');
 };
 const handleExportExcel = async () => {
     emit('export-excel', state.excelFields);
@@ -215,9 +218,7 @@ const handleChangeToolbox = (options) => {
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
 };
-const handleRefreshCollectorList = () => {
-    emit('refresh-collector-list');
-};
+const handleClickCollectData = () => {};
 
 /* Watcher */
 watch(() => collectorPageState.collectors, async () => {
