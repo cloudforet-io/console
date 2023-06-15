@@ -9,7 +9,7 @@
                 <p-field-title class="contents-title">
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') }}
                 </p-field-title>
-                <p-data-loader class="right-area"
+                <p-data-loader class="right-area-contents"
                                :data="state.pluginList"
                                :loading="state.loading"
                                :loader-backdrop-color="BACKGROUND_COLOR"
@@ -160,42 +160,36 @@ onMounted(() => {
 
         .right-area {
             max-width: 44.375rem;
-            min-height: calc(100vh - 18rem);
             flex-grow: 1;
-            .plugin-card-list {
-                @apply flex flex-col gap-2;
-                overflow-y: auto;
-                height: calc(100vh - 18rem);
-                :deep(.p-board-item) {
-                    .content-area .content {
-                        flex-grow: unset;
-                        width: 100%;
-                    }
-                }
-
-                .plugin-card-item {
-                    border-radius: 0.375rem;
-                    width: 100%;
-                    min-height: unset;
-
-                    .plugin-card-content {
-                        @apply flex justify-between;
-                        width: 100%;
-                        .select-button {
-                            flex-shrink: 0;
-                        }
-                        .select-icon {
-                            display: none;
+            .right-area-contents {
+                .plugin-card-list {
+                    @apply flex flex-col gap-2;
+                    overflow-y: auto;
+                    height: 41.0625rem;
+                    :deep(.p-board-item) {
+                        .content-area .content {
+                            flex-grow: unset;
+                            width: 100%;
                         }
                     }
+
+                    .plugin-card-item {
+                        border-radius: 0.375rem;
+                        width: 100%;
+                        min-height: unset;
+
+                        .plugin-card-content {
+                            @apply flex justify-between;
+                            width: 100%;
+                            .select-button {
+                                flex-shrink: 0;
+                            }
+                            .select-icon {
+                                display: none;
+                            }
+                        }
+                    }
                 }
-            }
-            .beta {
-                @apply text-coral;
-                font-size: 0.5rem;
-                font-weight: bold;
-                vertical-align: super;
-                margin-left: 0.2rem;
             }
         }
     }
@@ -207,17 +201,19 @@ onMounted(() => {
         .contents-container {
             @apply flex-col;
             .right-area {
-                .plugin-card-list {
-                    .plugin-card-item {
-                        .plugin-card-content {
-                            @apply flex items-center;
-                            .select-button {
-                                display: none;
-                            }
-                            .select-icon {
-                                flex-shrink: 0;
-                                display: inline-block;
-                                cursor: pointer;
+                .right-area-contents {
+                    .plugin-card-list {
+                        .plugin-card-item {
+                            .plugin-card-content {
+                                @apply flex items-center;
+                                .select-button {
+                                    display: none;
+                                }
+                                .select-icon {
+                                    flex-shrink: 0;
+                                    display: inline-block;
+                                    cursor: pointer;
+                                }
                             }
                         }
                     }
