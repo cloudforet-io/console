@@ -76,6 +76,7 @@ import {
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -228,7 +229,9 @@ const handleClickListItem = (detailLink) => {
 const handleClickCollectData = async (collectorId) => {
     state.collectLoading = true;
     try {
-        await collectorPageStore.restartCollectJob(collectorId);
+        await SpaceConnector.client.inventory.collector.collect({
+            collector_id: collectorId,
+        });
         refreshCollectorList();
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
     } catch (e) {

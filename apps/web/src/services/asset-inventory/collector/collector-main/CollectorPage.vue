@@ -149,7 +149,11 @@ const refreshCollectorList = async () => {
     state.initLoading = false;
     state.hasCollectorList = true;
     collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
-    await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
+    try {
+        await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
+    } catch (e) {
+        await collectorPageStore.$reset();
+    }
 };
 
 /* Watcher */
