@@ -41,6 +41,20 @@
                             </template>
                         </p-board-item>
                     </div>
+                    <template #no-data>
+                        <div class="no-data-box">
+                            <p-empty image-size="md"
+                                     show-image
+                            >
+                                <template #image>
+                                    <img src="@/assets/images/illust_microscope.svg"
+                                         alt="empty-options"
+                                    >
+                                </template>
+                                {{ $t('INVENTORY.COLLECTOR.NO_DATA') }}
+                            </p-empty>
+                        </div>
+                    </template>
                 </p-data-loader>
             </div>
         </div>
@@ -54,7 +68,7 @@ import {
 } from 'vue';
 
 import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle,
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -189,6 +203,11 @@ onMounted(() => {
                             }
                         }
                     }
+                }
+
+                .no-data-box {
+                    @apply flex flex-col justify-end;
+                    height: 13.625rem;
                 }
             }
         }
