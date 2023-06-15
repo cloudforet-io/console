@@ -55,6 +55,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -160,7 +161,8 @@ const refineChartData = (data: Data[]): ChartData[] => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
         const rawValue = d[state.groupByKey];
-        const refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
+        let refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
+        if (state.groupBy === ASSET_GROUP_BY.REGION) refinedValue = referenceMap?.[rawValue]?.name ?? rawValue;
         refinedChartData.push({
             [state.groupByKey]: refinedValue ?? `no_${state.groupByKey}`,
             fail_finding_count,
@@ -278,6 +280,9 @@ defineExpose<WidgetExpose<Data[]>>({
 </script>
 <style lang="postcss" scoped>
 .count-of-findings-widget {
+    &.full {
+        height: 23.5rem;
+    }
     .data-container {
         display: flex;
         flex-direction: column;

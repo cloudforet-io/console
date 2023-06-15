@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="trend-of-pass-and-fail-findings"
+                  refresh-on-resize
                   @refresh="refreshWidget"
     >
         <div class="data-container">
@@ -42,6 +43,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -192,7 +194,10 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                     },
                 },
                 field_group: [DATE_FIELD_NAME],
-                sort: [{ key: DATE_FIELD_NAME, desc: false }],
+                sort: [
+                    { key: DATE_FIELD_NAME, desc: false },
+                    { key: '_total_value', desc: true },
+                ],
                 ...apiQueryHelper.data,
             },
         });
@@ -259,10 +264,10 @@ const drawChart = (chartData: XYChartData[]) => {
                     value: value ?? 0,
                 });
             });
-            let _text = `Total: [bold; fontSize: 14px]${totalValue}[/]`;
+            let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
             seriesList.forEach((s) => {
                 const rate = Math.round((s.value / totalValue) * 100);
-                _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${s.value}[/] (${rate}%)`;
+                _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
             });
             return _text;
         });

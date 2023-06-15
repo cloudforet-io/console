@@ -38,7 +38,7 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
         cursor,
         pinchZoomX: false,
         paddingLeft: 0,
-        paddingRight: 0,
+        paddingRight: 20,
         paddingBottom: 0,
         ...settings,
     }));

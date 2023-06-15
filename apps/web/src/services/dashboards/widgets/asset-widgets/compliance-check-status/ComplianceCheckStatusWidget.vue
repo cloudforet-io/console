@@ -20,7 +20,7 @@
                             {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
                         </p>
                         <p class="value">
-                            {{ state.complianceCount === undefined ? '--' : state.complianceCount }}
+                            {{ state.complianceCount === undefined ? '--' : commaFormatter(state.complianceCount) }}
                         </p>
                         <div v-if="state.complianceCountComparingMessage"
                              class="diff-wrapper"
@@ -57,7 +57,7 @@
                                 <span class="text">{{ status.label }}</span>
                             </div>
                             <p class="value">
-                                {{ state.checkCount ? state.checkCount[status.name] : '--' }}
+                                {{ state.checkCount === undefined ? '--' : commaFormatter(state.checkCount[status.name]) }}
                             </p>
                         </div>
                     </div>
@@ -80,6 +80,7 @@ import { PDataLoader, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
+import { commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
