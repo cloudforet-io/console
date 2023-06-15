@@ -1,6 +1,6 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_OPTIONS')"
+        <p-heading :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                    heading-type="sub"
         >
             <template #extra>

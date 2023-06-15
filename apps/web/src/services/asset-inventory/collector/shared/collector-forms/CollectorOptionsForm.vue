@@ -1,33 +1,56 @@
 <template>
-    <p-data-loader class="collector-options-form"
-                   :loading="state.loading"
-                   :data="state.schema"
-    >
-        <p-json-schema-form :schema="state.schema"
-                            :form-data="collectorFormState.options"
-                            :language="$store.state.user.language"
-                            use-fixed-menu-style
-                            reset-on-schema-change
-                            uniform-width
-                            @change="handleUpdateSchemaForm"
+    <div class="collector-options-form">
+        <p-field-title v-if="state.isVisibleTitle"
+                       class="additional-options-label"
+                       :label="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
         />
-        <template #no-data>
-            <div class="error-box">
-                <div class="error-message">
-                    <p-i width="1.25rem"
-                         height="1.25rem"
-                         name="ic_error-filled"
-                    /><span>{{ $t('INVENTORY.COLLECTOR.CREATE.FORM_LOAD_FAILED') }}</span>
-                </div>
-                <p-button style-type="tertiary"
-                          icon-left="ic_refresh"
-                          @click="handleClickReloadButton"
+        <p-data-loader class="collector-options-form-contents"
+                       :loading="state.loading"
+                       :data="state.schema"
+        >
+            <p-json-schema-form :schema="state.schema"
+                                :form-data="collectorFormState.options"
+                                :language="$store.state.user.language"
+                                use-fixed-menu-style
+                                reset-on-schema-change
+                                uniform-width
+                                @change="handleUpdateSchemaForm"
+            />
+            <template #no-data>
+                <div v-if="state.isLoadFailed"
+                     class="error-box"
                 >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.RELOAD') }}
-                </p-button>
-            </div>
-        </template>
-    </p-data-loader>
+                    <div class="error-message">
+                        <p-i width="1.25rem"
+                             height="1.25rem"
+                             name="ic_error-filled"
+                        /><span>{{ $t('INVENTORY.COLLECTOR.CREATE.FORM_LOAD_FAILED') }}</span>
+                    </div>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_refresh"
+                              @click="handleClickReloadButton"
+                    >
+                        {{ $t('INVENTORY.COLLECTOR.CREATE.RELOAD') }}
+                    </p-button>
+                </div>
+                <div v-else
+                     class="no-data-box"
+                >
+                    <p-empty image-size="sm"
+                             show-image
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_circle_boy.svg"
+                                 alt="empty-options"
+                                 class="empty-options-image"
+                            >
+                        </template>
+                        {{ $t('INVENTORY.COLLECTOR.NO_OPTIONS') }}
+                    </p-empty>
+                </div>
+            </template>
+        </p-data-loader>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -36,7 +59,7 @@ import {
 } from 'vue';
 
 import {
-    PJsonSchemaForm, PButton, PI, PDataLoader,
+    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
@@ -59,7 +82,9 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
+    isVisibleTitle: computed<boolean>(() => (!props.hasMetadata && !Object.keys(state.schema ?? {}).length)),
     loading: false,
+    isLoadFailed: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     schema: null as null|JsonSchema|object,
 });
@@ -75,9 +100,10 @@ const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnect
 const getPluginMetadata = async () => {
     try {
         state.loading = true;
+        state.isLoadFailed = false;
         if (!props.hasMetadata) {
             const res = await fetchGetPluginMetadata();
-            state.schema = res.metadata?.options_schema ?? null;
+            state.schema = res.metadata?.options_schema ?? {};
             if (!state.schema) {
                 emit('update:isValid', true);
             }
@@ -87,6 +113,7 @@ const getPluginMetadata = async () => {
     } catch (e) {
         ErrorHandler.handleError(e);
         state.schema = {};
+        state.isLoadFailed = true;
         emit('update:isValid', false);
     } finally {
         state.loading = false;
@@ -112,16 +139,32 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
 </script>
 
 <style lang="postcss" scoped>
+
 .collector-options-form {
-    min-height: 6rem;
+    .additional-options-label {
+        margin-bottom: 0.25rem;
+    }
 
-    .error-box {
-        @apply flex flex-col items-center justify-center w-full;
-        background-color: rgba(theme('colors.white'), 0.5);
-        padding: 1.125rem;
+    .collector-options-form-contents {
+        min-height: 6rem;
 
-        .error-message {
-            @apply flex items-center gap-2 mb-2 text-label-md text-gray-700;
+        .error-box {
+            @apply flex flex-col items-center justify-center w-full;
+            background-color: rgba(theme('colors.white'), 0.5);
+            padding: 1.125rem;
+
+            .error-message {
+                @apply flex items-center gap-2 mb-2 text-label-md text-gray-700;
+            }
+        }
+
+        .no-data-box {
+            @apply flex flex-col justify-end;
+            height: 10.625rem;
+
+            .empty-options-image {
+                height: 100%;
+            }
         }
     }
 }
