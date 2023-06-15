@@ -281,7 +281,7 @@ defineExpose<WidgetExpose<Data[]>>({
     .data-container {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: 23.5rem;
         .chart-wrapper {
             height: 85%;
             margin-bottom: 1rem;
