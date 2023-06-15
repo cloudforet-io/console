@@ -155,6 +155,7 @@ const refreshCollectorList = async () => {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
     } catch (e) {
         ErrorHandler.handleError(e);
+        await collectorPageStore.$reset();
     }
 };
 

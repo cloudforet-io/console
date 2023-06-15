@@ -16,7 +16,7 @@
                 <p-button
                     icon-left="ic_plus_bold"
                     class="create-button"
-                    @click="handleCreate"
+                    @click="routeToCreatePage"
                 >
                     {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
                 </p-button>
@@ -47,11 +47,11 @@
                             </div>
                         </div>
                         <p-button class="collect-data-button"
-                                  :class="item.schedule && item.schedule.state === COLLECTOR_SCHEDULE_STATE.ENABLED && 'active'"
                                   style-type="tertiary"
-                                  @click.stop="handleRefreshCollectorList"
+                                  :loading="state.collectLoading"
+                                  @click.stop="handleClickCollectData(item.collectorId)"
                         >
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
+                            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                         </p-button>
                     </p-card>
                 </div>
@@ -61,7 +61,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="handleRefreshCollectorList"
+                                  @refresh-collector-list="refreshCollectorList"
         />
     </div>
 </template>
@@ -76,6 +76,7 @@ import {
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -83,7 +84,10 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemInfo from '@/services/asset-inventory/collector/collector-main/modules/CollectorItemInfo.vue';
@@ -94,7 +98,6 @@ import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
 } from '@/services/asset-inventory/collector/collector-main/type';
-import { COLLECTOR_SCHEDULE_STATE } from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const RECENT_COUNT = 5;
@@ -117,6 +120,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    collectLoading: false,
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
@@ -200,8 +204,11 @@ const state = reactive({
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
 
 /* Components */
-const handleCreate = () => {
+const routeToCreatePage = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+};
+const refreshCollectorList = () => {
+    emit('refresh-collector-list');
 };
 const handleExportExcel = async () => {
     emit('export-excel', state.excelFields);
@@ -217,8 +224,21 @@ const handleChangeToolbox = (options) => {
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
 };
-const handleRefreshCollectorList = () => {
-    emit('refresh-collector-list');
+
+/* API */
+const handleClickCollectData = async (collectorId) => {
+    state.collectLoading = true;
+    try {
+        await SpaceConnector.client.inventory.collector.collect({
+            collector_id: collectorId,
+        });
+        refreshCollectorList();
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+    } finally {
+        state.collectLoading = false;
+    }
 };
 
 /* Watcher */
@@ -264,12 +284,11 @@ watch(() => collectorPageState.collectors, async () => {
                     }
 
                     .collect-data-button {
-                        &.active {
-                            @apply block absolute;
-                            opacity: 1;
-                            top: 1.25rem;
-                            right: 1.5rem;
-                        }
+                        @apply flex absolute;
+                        opacity: 1;
+                        top: 1.25rem;
+                        right: 1.5rem;
+                        gap: 0.25rem;
                     }
                 }
 
