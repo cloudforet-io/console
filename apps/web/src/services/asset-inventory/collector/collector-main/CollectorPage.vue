@@ -61,6 +61,8 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorContents from '@/services/asset-inventory/collector/collector-main/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorNoData.vue';
@@ -152,6 +154,7 @@ const refreshCollectorList = async () => {
     try {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
     } catch (e) {
+        ErrorHandler.handleError(e);
         await collectorPageStore.$reset();
     }
 };
