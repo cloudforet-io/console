@@ -81,7 +81,7 @@
                     >
                         <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
                                    class="icon-fill-wrapper success"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs(jobStatus.finished_at).format('YYYY-MM-DD hh:mm:ss')})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
                         >
                             <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
@@ -114,7 +114,7 @@
                         />
                         <p-tooltip v-else
                                    class="icon-fill-wrapper error"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs(jobStatus.finished_at).format('YYYY-MM-DD hh:mm:ss')})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
                         >
                             <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
