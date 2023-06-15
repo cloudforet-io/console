@@ -42,6 +42,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -259,10 +260,10 @@ const drawChart = (chartData: XYChartData[]) => {
                     value: value ?? 0,
                 });
             });
-            let _text = `Total: [bold; fontSize: 14px]${totalValue}[/]`;
+            let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
             seriesList.forEach((s) => {
                 const rate = Math.round((s.value / totalValue) * 100);
-                _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${s.value}[/] (${rate}%)`;
+                _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
             });
             return _text;
         });

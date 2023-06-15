@@ -10,7 +10,7 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
                     </p>
                     <p class="value">
-                        {{ state.totalFailureCount === undefined ? '--' : state.totalFailureCount }}
+                        {{ state.totalFailureCount === undefined ? '--' : commaFormatter(state.totalFailureCount) }}
                     </p>
                     <div v-if="state.totalFailureComparingMessage"
                          class="diff-wrapper"
@@ -18,7 +18,7 @@
                         <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
                         />
-                        <span class="diff-value">{{ Math.abs(state.prevTotalFailureCount - state.totalFailureCount) }}</span>
+                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
                         <span class="diff-text">{{ state.totalFailureComparingMessage }}</span>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
                     </p>
                     <p class="value">
-                        {{ state.failureRate === undefined ? '--' : state.failureRate }}%
+                        {{ state.failureRate === undefined ? '--' : commaFormatter(state.failureRate) }}%
                     </p>
                     <div v-if="state.failureRateComparingMessage"
                          class="diff-wrapper"
@@ -36,7 +36,7 @@
                         <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
                         />
-                        <span class="diff-value">{{ Math.abs(state.prevFailureRate - state.failureRate) }}%</span>
+                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
                         <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 
-import { getRGBFromHex } from '@cloudforet/core-lib';
+import { getRGBFromHex, commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -265,7 +265,7 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
         apiQueryHelper
             .setFilters(state.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_findings_count'], o: '' });
+            .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
         const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
