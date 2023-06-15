@@ -32,8 +32,9 @@
                 <p-filterable-dropdown class="specific-service-account-dropdown"
                                        :selected="selectedAttachedServiceAccount"
                                        multi-selectable
+                                       show-select-marker
                                        :handler="serviceAccountHandler"
-                                       appearance-type="badge"
+                                       appearance-type="stack"
                                        :reset-selected-on-unmounted="false"
                                        @update:selected="handleSelectAttachedServiceAccount"
                 />
