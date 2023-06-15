@@ -379,6 +379,12 @@ defineExpose<WidgetExpose>({
                     @apply text-display-md;
                 }
                 .diff-wrapper {
+                    @screen mobile {
+                        .diff-text {
+                            display: none;
+                        }
+                    }
+
                     @apply text-gray-700;
                     .diff-value {
                         @apply text-label-lg;

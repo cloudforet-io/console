@@ -4,7 +4,13 @@
                   @refresh="refreshWidget"
     >
         <div class="data-container">
-            <div class="chart-wrapper">
+            <p-data-loader class="chart-wrapper"
+                           :loading="state.loading"
+                           :data="state.refinedData"
+                           loader-type="skeleton"
+                           :loader-backdrop-opacity="1"
+                           show-data-from-scratch
+            >
                 <div class="box-wrapper"
                      :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
                 >
@@ -17,7 +23,7 @@
                         <span class="text">{{ data.service }}</span>
                     </div>
                 </div>
-            </div>
+            </p-data-loader>
             <div class="legend-wrapper">
                 <div v-for="status in SEVERITY_STATUS_MAP_VALUES"
                      :key="`status-${status.label}`"
@@ -40,6 +46,7 @@ import {
     computed, defineExpose, defineProps, reactive, toRefs,
 } from 'vue';
 
+import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { flattenDeep, min } from 'lodash';
 
@@ -213,6 +220,7 @@ defineExpose<WidgetExpose>({
         .chart-wrapper {
             min-height: 16.5rem;
             .box-wrapper {
+                height: 100%;
                 display: grid;
                 grid-auto-flow: row;
                 gap: 0.25rem;
