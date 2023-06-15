@@ -53,125 +53,109 @@ export const Template = (args, { argTypes }) => ({
 
 
 # Dynamic Layout
-<br/>
-<br/>
+
+Dynamic layout is a component that can display data in various ways. <br/>
+The way to display the data is determined by the type of the layout. <br/>
+There are several types of layouts, and each type has its own options. <br/>
 
 ## Supported Types
 
-| Type | Description |
-| ---- | ----------- |
-| item | key / value |
-| simple-table | table without search and pagination |
-| table | table view (keyword search) |
-| raw-table | table view with .csv data (keyword search) |
-| query-search-table | table view (query search) |
-| raw | - |
-| markdown | - |
-| html | - |
-| popup | modal view |
-| list | list(<dynamic_layout>) |
+| Type               | Description                                |
+|--------------------|--------------------------------------------|
+| item               | key / value                                |
+| simple-table       | table without search and pagination        |
+| table              | table view (keyword search)                |
+| raw-table          | table view with .csv data (keyword search) |
+| query-search-table | table view (query search)                  |
+| raw                | -                                          |
+| markdown           | -                                          |
+| html               | -                                          |
+| popup              | modal view                                 |
+| list               | list(<dynamic_layout>)                     |
+
+<br/>
+
+## (Schema) Options vs TypeOptions
+Options are different for each type of layout. <br/>
+The options are used to display the layout in a specific way. <br/>
+The options are divided into two types: `options(schema options)` and `type-options`. <br/>
+`options` is from the server, and `type-options` is from the client. <br/>
+So, `options` is fixed, and `type-options` can be changed by the user's behavior. <br/>
+
+## (Schema) Options Description
+| Name            | Type                              | Description                                                                                                       |
+|-----------------|-----------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| root_path       | string                            | The path for the data that is used to render the layout.                                                          |
+| translation_id  | string                            | Reserved code for translation.                                                                                    |
+| fields          | DynamicField[]                    | Fields to display. It is used as a template for each item.                                                        |
+| markdown        | string or { [language]: string; } | Markdown string to display.                                                                                       |
+| layouts         | DynamicLayout[]                   | List of layouts to display data with multiple layouts.                                                            |
+| search          | SearchSchema                      | Search schema that is used in query search.                                                                       |
+| disable_search  | boolean                           | If the type of the layout is available for search, and this is set to true, the search bar will not be displayed. |
+| headers         | string[]                          | Header names for raw table.                                                                                       |
+| layout          | DynamicLayout                     | Dynamic layout schema to display in popup.                                                                        |
+| default_sort    | { key: string; desc?: boolean; }  | Default sort option that will be applied when the table or query search table is loaded.                          |
 
 <br/>
 <br/>
 
-
-## Options by Types
-| Type | Options Properties |
-| ---- | ----------- |
-| item | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
-| simple-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
-| table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
-| raw-table | ```root_path?: string translation_id?: string``` |
-| query-search-table | ```root_path?: string, translation_id?: string, fields: DynamicField[], search: SearchSchema``` |
-| raw | ```root_path?: string translation_id?: string``` |
-| markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
-| html | ```root_path?: string, translation_id?: string``` |
-| popup | ```sub_key?: string, layout?: DynamicLayout``` |
-| list | ```root_path?: string, layouts: DynamicLayout[]``` |
-
-
-
-## Fetch Options by Types
-| Type | Fetch Options Properties |
-| ---- | ----------- |
-| item | - |
-| simple-table | - |
-| table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
-| raw-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
-| query-search-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```queryTags``` |
-| raw | - |
-| markdown | - |
-| html | - |
-| popup | - |
-| list | The fetch options required for all layouts in the list are applied collectively. |
+### Supported (Schema) Options by Types
+| Name           | item | simple-table | table | raw-table | query-search-table | raw | markdown | html | popup | list |
+|----------------|------|--------------|-------|-----------|--------------------|-----|----------|------|-------|------|
+| root_path      | O    | O            | O     | O         | O                  | O   | O        | O    | O     | O    |
+| translation_id | O    | O            | O     | O         | O                  | O   | O        | O    | O     | O    |
+| fields         | X    | O            | O     | X         | O                  | X   | X        | X    | X     | X    |
+| markdown       | X    | X            | X     | X         | X                  | X   | O        | X    | X     | X    |
+| layouts        | X    | X            | X     | X         | X                  | X   | X        | X    | X     | O    |
+| search         | X    | X            | X     | X         | O                  | X   | X        | X    | X     | X    |
+| disable_search | X    | X            | X     | O         | O                  | X   | X        | X    | X     | X    |
+| headers        | X    | X            | X     | O         | X                  | X   | X        | X    | X     | X    |
+| layout         | X    | X            | X     | X         | X                  | X   | X        | X    | O     | X    |
+| default_sort   | X    | X            | O     | X         | O                  | X   | X        | X    | X     | X    |
 
 <br/>
 <br/>
 
-```typescript
-interface DynamicLayoutFetchOptions {
-    sortBy?: string;
-    sortDesc?: boolean;
-    pageStart?: number;
-    pageLimit?: number;
-    queryTags?: QueryTag[];
-    searchText?: string;
-}
-```
+## TypeOptions Description
 
-## Components by Types
-Each type of dynamic layout corresponds to each component as the table below.<br/>
+TypeOptions are different by which component is used to display the data. <br/>
 
-| Type | Component |
-| ---- | ----------- |
-| item | DefinitionTable |
-| simple-table | DataTable |
-| table | ToolboxTable |
-| raw-table | ToolboxTable |
-| query-search-table | ToolboxTable |
-| raw | Raw |
-| markdown | Markdown |
-| html | - |
-| popup | ButtonModal |
-| list | - |
+| Name            | Type            | Default                          | Description                                                                    |
+|-----------------|-----------------|----------------------------------|--------------------------------------------------------------------------------|
+| loading         | boolean         | ```false```                      | Displays loading spinner.                                                      |
+| totalCount      | number          | ```0```                          | Calculate pagination, displaying count next to the title.                      |
+| timezone        | string          | ```'UTC'```                      | Display datetime.                                                              |
+| selectIndex     | number[]        | ```[]```                         | Initiate selectIndex of tables. Works only when 'selectable' is ```true```.    |
+| selectable      | boolean         | ```false```                      | Make tables selectable.                                                        |
+| multiSelect     | boolean         | ```true```                       | Make tables multi-selectable. Works only when 'selectable' is ```true```.      |
+| invalid         | boolean         | ```false```                      | Display invalid style.                                                         |
+| colCopy         | boolean         | ```false```                      | Determine whether to each column copiable or not.                              |
+| excelVisible    | boolean         | ```false```                      | Determine whether to show export button or not.                                |
+| settingsVisible | boolean         | ```false```                      | Determine whether to show settings button or not.                              |
+| keyItemSets     | KeyItemSet[]    | ```options.fields``` or ```[]``` | Only for query-search-table's key items.                                       |
+| valueHandlerMap | ValueHandlerMap | ```{}```                         | Only for query-search-table's value handler map.                               |
+| language        | string          | ```'en'```                       | NOT supported yet except markdown type.                                        |
+| popupVisible    | boolean         | ```false```                      | Determine whether to show popup modal or not. Supported only for `popup` type. |
 
 <br/>
-<br/>
 
-## TypeOptions by Types
-| Type | Type Options Properties |
-| ---- | ----------- |
-| item | ```loading```, ```timezone``` |
-| simple-table | ```loading```, ```timezone```, ```colCopy``` |
-| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```,  ```excelVisible```, ```settingsVisible``` |
-| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible```  |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```excelVisible```, ```settingsVisible``` , ```keyItemSets```, ```valueHandlerMap``` |
-| raw | ```loading``` |
-| markdown | ```language``` |
-| html | - |
-| popup | ```popupVisible``` |
-| list | all |
-
-<br/>
-<br/>
-
-## Type Options Description
-| Name | Type | Default | Description |
-| ---- | ---- | ------- | ----------- |
-| loading | boolean | ```false``` | Displays loading spinner. |
-| totalCount | number | ```0``` | Calculate pagination, displaying count next to the title. |
-| timezone | string |```'UTC'``` | Display datetime. |
-| selectIndex | number[] |```[]``` | Initiate selectIndex of tables. Works only when 'selectable' is ```true```. |
-| selectable | boolean | ```false``` | Make tables selectable. |
-| multiSelect | boolean | ```true``` | Make tables multi-selectable. Works only when 'selectable' is ```true```. |
-| invalid | boolean | ```false``` | Display invalid style. |
-| colCopy | boolean | ```false``` | Determine whether to each column copiable or not. |
-| excelVisible | boolean | ```false``` | Determine whether to show export button or not. |
-| settingsVisible | boolean | ```false``` | Determine whether to show settings button or not. |
-| keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
-| valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
-| language | string | ```'en'``` | NOT supported yet except markdown type. |
-| popupVisible | boolean | ```false``` | Determine whether to show popup modal or not. Supported only for `popup` type. |
+### Supported TypeOptions by Types
+| Name            | item | simple-table | table | raw-table | query-search-table | raw  | markdown | html | popup | list |
+|-----------------|------|--------------|-------|-----------|--------------------|------|----------|------|-------|------|
+| loading         | O    | O            | O     | O         | O                  | O    | X        | X    | X     | O    |
+| timezone        | O    | O            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| colCopy         | X    | O            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| language        | X    | X            | X     | X         | X                  | X    | O        | X    | X     | O    |
+| popupVisible    | X    | X            | X     | X         | X                  | X    | X        | X    | O     | O    |
+| totalCount      | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| selectIndex     | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| selectable      | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| multiSelect     | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| invalid         | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| excelVisible    | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| settingsVisible | X    | X            | O     | O         | O                  | X    | X        | X    | X     | O    |
+| keyItemSets     | X    | X            | X     | X         | O                  | X    | X        | X    | X     | O    |
+| valueHandlerMap | X    | X            | X     | X         | O                  | X    | X        | X    | X     | O    |
 
 ```typescript
 interface DynamicLayoutTypeOptions {
@@ -192,21 +176,89 @@ interface DynamicLayoutTypeOptions {
 }
 ```
 
+### Components by Types
+Each type of dynamic layout corresponds to each component as the table below.<br/>
+
+| Type               | Component        |
+|--------------------|------------------|
+| item               | DefinitionTable  |
+| simple-table       | DataTable        |
+| table              | ToolboxTable     |
+| raw-table          | ToolboxTable     |
+| query-search-table | ToolboxTable     |
+| raw                | Raw              |
+| markdown           | Markdown         |
+| html               | -                |
+| popup              | ButtonModal      |
+| list               | -                |
+
+<br/>
+<br/>
+
+## FetchOptions Description
+
+FetchOptions are used to fetch data from the server. <br/>
+They must be set to the `fetch-options` prop of the `<p-dynamic-layout>` component. <br/>
+And the `fetch` event will be emitted when the action which triggers fetching data is executed. <br/>
+As the event parameter, the `fetchOptions` will be passed. <br/>
+The following options are available.
+
+| Name       | Type       | Description                              |
+|------------|------------|------------------------------------------|
+| sortBy     | string     | The key of the field to sort.            |
+| sortDesc   | boolean    | Whether to sort in descending order.     |
+| pageStart  | number     | The index of the page to start.          |
+| pageLimit  | number     | The number of items to display per page. |
+| searchText | string     | The keyword to search.                   |
+| queryTags  | QueryTag[] | The query tags to search.                |
+
+<br/>
+
+### Supported FetchOptions by Types
+| Name         | item | simple-table | table | raw-table | query-search-table | raw | markdown | html | popup | list |
+|--------------|------|--------------|-------|-----------|--------------------|-----|----------|------|-------|------|
+| sortBy       | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| sortDesc     | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| pageStart    | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| pageLimit    | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| searchText   | X    | X            | O     | O         | X                  | X   | X        | X    | X     | O    |
+| queryTags    | X    | X            | X     | X         | O                  | X   | X        | X    | X     | O    |
+
+The fetch options required for list type to fetch data of each layout.
+
+```typescript
+interface DynamicLayoutFetchOptions {
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    searchText?: string;
+}
+```
+
+<br/>
+<br/>
 
 ## Event Description
-| Event Name | Description |
-| ---------- | ----------- |
-| fetch | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
-| select | Emitted when row(item) has been selected. |
-| export | Emitted when clicked export button. |
-| click-settings | Emitted when clicked settings button. |
-| click-row | Emitted when clicked row. |
-| update-popup-visible | Emitted when popupVisible typeOptions is updated. |
+
+The following events are emitted from the `<p-dynamic-layout>` component. <br/>
+The event handlers must be set to the `event-listeners` prop of the `<p-dynamic-layout>` component. <br/>
+The following events are available.
+
+| Event Name           | Description                                                                             |
+|----------------------|-----------------------------------------------------------------------------------------|
+| fetch                | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
+| select               | Emitted when row(item) has been selected.                                               |
+| export               | Emitted when clicked export button.                                                     |
+| click-settings       | Emitted when clicked settings button.                                                   |
+| click-row            | Emitted when clicked row.                                                               |
+| update-popup-visible | Emitted when popupVisible typeOptions is updated.                                       |
 
 <br/>
 <br/>
 
-## Event Handlers and Event Parameters
+### Event Handlers and Event Parameters
 
 ```typescript
 interface DynamicLayoutEventListeners {
@@ -219,30 +271,27 @@ interface DynamicLayoutEventListeners {
 }
 ```
 
-| Event Parameter Name | Description |
-| ---------- | ----------- |
-| options | All layout fetch options. Different by layout types. |
-| selectIndex | Selected row(item) indexes. |
-| layoutName | Name props. Only provided when layout type is 'list'. |
-| layoutIndex | Layout index. Only provided when layout type is 'list'. |
-| popupVisible | Is popup visible or not. |
+| Event Parameter Name | Description                                             |
+|----------------------|---------------------------------------------------------|
+| options              | All layout fetch options. Different by layout types.    |
+| selectIndex          | Selected row(item) indexes.                             |
+| layoutName           | Name props. Only provided when layout type is 'list'.   |
+| layoutIndex          | Layout index. Only provided when layout type is 'list'. |
+| popupVisible         | Is popup visible or not.                                |
 
 <br/>
 <br/>
 
-## Supported Events by Types
-| Type | Type Options Properties |
-| ---- | ----------- |
-| item | - |
-| simple-table | - |
-| table | fetch, select, export |
-| raw-table | fetch, select, export |
-| query-search-table | fetch, select, export, click-row, click-settings |
-| raw | - |
-| markdown | - |
-| html | - |
-| popup | update-popup-visible |
-| list | fetch, select, export |
+### Supported Events by Types
+| Name           | item | simple-table | table | raw-table | query-search-table | raw | markdown | html | popup | list |
+|----------------|------|--------------|-------|-----------|--------------------|-----|----------|------|-------|------|
+| popup          | X    | X            | X     | X         | X                  | X   | X        | X    | O     | X    |
+| fetch          | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| select         | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| export         | X    | X            | O     | O         | O                  | X   | X        | X    | X     | O    |
+| click-row      | X    | X            | X     | X         | O                  | X   | X        | X    | X     | X    |
+| click-settings | X    | X            | X     | X         | O                  | X   | X        | X    | X     | O    |
+
 
 <br/>
 <br/>
