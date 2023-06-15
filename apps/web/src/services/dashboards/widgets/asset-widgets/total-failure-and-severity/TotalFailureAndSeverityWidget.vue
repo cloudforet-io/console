@@ -301,6 +301,9 @@ const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     chartHelper.setChartColors(chart, colorSet.value);
+    chart.get('cursor')?.lineX.setAll({
+        visible: true,
+    });
 
     const seriesSettings = {
         name: 'value',
@@ -313,6 +316,11 @@ const drawChart = (chartData: XYChartData[]) => {
         dateFormat: DATE_FORMAT,
         dateFields: [DATE_FIELD_NAME],
     });
+
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setXYSingleTooltipText(chart, tooltip);
+    series.set('tooltip', tooltip);
+
     series.data.setAll(cloneDeep(chartData));
 };
 
