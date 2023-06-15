@@ -9,12 +9,12 @@
                 <p-field-title class="contents-title">
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') }}
                 </p-field-title>
-                <p-data-loader class="right-area"
+                <p-data-loader class="right-area-contents"
                                :data="state.pluginList"
                                :loading="state.loading"
                                :loader-backdrop-color="BACKGROUND_COLOR"
                 >
-                    <div ref="pluginCardListRef"
+                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
@@ -41,6 +41,20 @@
                             </template>
                         </p-board-item>
                     </div>
+                    <template #no-data>
+                        <div class="no-data-box">
+                            <p-empty image-size="md"
+                                     show-image
+                            >
+                                <template #image>
+                                    <img src="@/assets/images/illust_microscope.svg"
+                                         alt="empty-options"
+                                    >
+                                </template>
+                                {{ $t('INVENTORY.COLLECTOR.NO_DATA') }}
+                            </p-empty>
+                        </div>
+                    </template>
                 </p-data-loader>
             </div>
         </div>
@@ -48,13 +62,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useInfiniteScroll } from '@vueuse/core';
+import { vInfiniteScroll } from '@vueuse/components';
 import {
-    onMounted, reactive, ref, watch,
+    onMounted, reactive, watch,
 } from 'vue';
 
 import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle,
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -88,7 +102,6 @@ const state = reactive({
     currentPage: 1,
     totalCount: 0,
 });
-const pluginCardListRef = ref<HTMLElement | null>(null);
 
 
 const pluginApiQuery = new ApiQueryHelper();
@@ -143,9 +156,6 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 
 onMounted(() => {
     collectorFormStore.$reset();
-    useInfiniteScroll(pluginCardListRef, () => {
-        loadMorePlugin();
-    });
 });
 </script>
 
@@ -164,42 +174,41 @@ onMounted(() => {
 
         .right-area {
             max-width: 44.375rem;
-            min-height: calc(100vh - 18rem);
             flex-grow: 1;
-            .plugin-card-list {
-                @apply flex flex-col gap-2;
-                overflow-y: auto;
-                height: calc(100vh - 18rem);
-                :deep(.p-board-item) {
-                    .content-area .content {
-                        flex-grow: unset;
+            .right-area-contents {
+                .plugin-card-list {
+                    @apply flex flex-col gap-2;
+                    overflow-y: auto;
+                    height: 41.0625rem;
+                    :deep(.p-board-item) {
+                        .content-area .content {
+                            flex-grow: unset;
+                            width: 100%;
+                        }
+                    }
+
+                    .plugin-card-item {
+                        border-radius: 0.375rem;
                         width: 100%;
+                        min-height: unset;
+
+                        .plugin-card-content {
+                            @apply flex justify-between;
+                            width: 100%;
+                            .select-button {
+                                flex-shrink: 0;
+                            }
+                            .select-icon {
+                                display: none;
+                            }
+                        }
                     }
                 }
 
-                .plugin-card-item {
-                    border-radius: 0.375rem;
-                    width: 100%;
-                    min-height: unset;
-
-                    .plugin-card-content {
-                        @apply flex justify-between;
-                        width: 100%;
-                        .select-button {
-                            flex-shrink: 0;
-                        }
-                        .select-icon {
-                            display: none;
-                        }
-                    }
+                .no-data-box {
+                    @apply flex flex-col justify-end;
+                    height: 13.625rem;
                 }
-            }
-            .beta {
-                @apply text-coral;
-                font-size: 0.5rem;
-                font-weight: bold;
-                vertical-align: super;
-                margin-left: 0.2rem;
             }
         }
     }
@@ -211,17 +220,19 @@ onMounted(() => {
         .contents-container {
             @apply flex-col;
             .right-area {
-                .plugin-card-list {
-                    .plugin-card-item {
-                        .plugin-card-content {
-                            @apply flex items-center;
-                            .select-button {
-                                display: none;
-                            }
-                            .select-icon {
-                                flex-shrink: 0;
-                                display: inline-block;
-                                cursor: pointer;
+                .right-area-contents {
+                    .plugin-card-list {
+                        .plugin-card-item {
+                            .plugin-card-content {
+                                @apply flex items-center;
+                                .select-button {
+                                    display: none;
+                                }
+                                .select-icon {
+                                    flex-shrink: 0;
+                                    display: inline-block;
+                                    cursor: pointer;
+                                }
                             }
                         }
                     }

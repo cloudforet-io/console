@@ -2198,6 +2198,7 @@
 				"TITLE": "コレクタ",
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
 			},
+			"NO_DATA": "データがありません",
 			"NO_OPTIONS": ""
 		},
 		"SERVER": {

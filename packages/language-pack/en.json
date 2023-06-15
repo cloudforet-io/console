@@ -2198,6 +2198,7 @@
 				"TITLE": "Collector",
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
+			"NO_DATA": "No Data",
 			"NO_OPTIONS": "No Options"
 		},
 		"SERVER": {
