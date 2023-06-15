@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 
 // eslint-disable-next-line import/no-cycle
 import dashboard from './modules/dashboard';
@@ -15,9 +14,7 @@ import settings from './modules/settings';
 import user from './modules/user';
 import plugins from './plugins';
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store<any>({
+const store = createStore({
     modules: {
         user,
         dashboard,
@@ -32,6 +29,7 @@ const store = new Vuex.Store<any>({
         error,
     },
     plugins,
+    devtools: true,
 });
 
 export { store };
