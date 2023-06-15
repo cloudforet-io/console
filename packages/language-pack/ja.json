@@ -2080,6 +2080,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ADDITIONAL_OPTIONS": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
 			"ALT_E_DELETE_COLLECTOR": "コレクター削除に失敗",
@@ -2196,7 +2197,8 @@
 				"SET_SCHEDULE": "スケジュールを設定する",
 				"TITLE": "コレクタ",
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
-			}
+			},
+			"NO_OPTIONS": ""
 		},
 		"SERVER": {
 			"MAIN": {

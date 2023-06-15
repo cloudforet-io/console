@@ -2080,6 +2080,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
 			"ALT_E_DELETE_COLLECTOR": "Failed to Delete Collector",
@@ -2196,7 +2197,8 @@
 				"SET_SCHEDULE": "Set schedule",
 				"TITLE": "Collector",
 				"VIEW_HISTORY_DETAIL": "View history details"
-			}
+			},
+			"NO_OPTIONS": "No Options"
 		},
 		"SERVER": {
 			"MAIN": {

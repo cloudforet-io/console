@@ -142,7 +142,7 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 }, { immediate: true });
 
 onMounted(() => {
-    collectorFormStore.resetForm();
+    collectorFormStore.$reset();
     useInfiniteScroll(pluginCardListRef, () => {
         loadMorePlugin();
     });
