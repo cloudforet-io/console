@@ -119,8 +119,8 @@ defineExpose({ setPathFrom });
 }
 
 .collector-creator-page {
-    padding: 1.875rem 0;
-    margin: 0 2.5rem;
+    margin: 2rem 2.5rem;
+    max-height: calc(100% - 4rem);
 
     .header {
         margin-bottom: 2rem;
