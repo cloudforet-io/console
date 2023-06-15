@@ -14,7 +14,7 @@
                                :loading="state.loading"
                                :loader-backdrop-color="BACKGROUND_COLOR"
                 >
-                    <div ref="pluginCardListRef"
+                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
@@ -48,9 +48,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useInfiniteScroll } from '@vueuse/core';
+import { vInfiniteScroll } from '@vueuse/components';
 import {
-    onMounted, reactive, ref, watch,
+    onMounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -88,7 +88,6 @@ const state = reactive({
     currentPage: 1,
     totalCount: 0,
 });
-const pluginCardListRef = ref<HTMLElement | null>(null);
 
 
 const pluginApiQuery = new ApiQueryHelper();
@@ -143,9 +142,6 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 
 onMounted(() => {
     collectorFormStore.$reset();
-    useInfiniteScroll(pluginCardListRef, () => {
-        loadMorePlugin();
-    });
 });
 </script>
 
