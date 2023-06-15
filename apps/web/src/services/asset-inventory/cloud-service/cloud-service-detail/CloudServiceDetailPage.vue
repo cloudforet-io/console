@@ -66,7 +66,9 @@
                         >
                             <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
                                                           :filters="tableState.searchFilters"
+                                                          :hidden-filters="hiddenFilters"
                                                           :period="overviewState.period"
+                                                          :key-item-sets="keyItemSets"
                             />
                         </template>
                     </p-dynamic-layout>
@@ -332,6 +334,20 @@ export default {
             params: null as any,
         });
 
+        const hiddenFilterHelper = new QueryHelper();
+        const hiddenFilters = computed<ConsoleFilter[]>(() => {
+            if (props.isServerPage) {
+                hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
+            } else {
+                hiddenFilterHelper.addFilter(
+                    { k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_group', o: '=', v: props.group },
+                    { k: 'cloud_service_type', o: '=', v: props.name },
+                );
+            }
+            return hiddenFilterHelper.filters;
+        });
+
         const overviewState = reactive({
             period: queryStringToObject(vm.$route.query.period) as Period|undefined,
         });
@@ -377,17 +393,9 @@ export default {
         const getQuery = (schema?) => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters(tableState.searchFilters);
+                .setFilters(hiddenFilters.value)
+                .addFilter(...tableState.searchFilters);
 
-            if (props.isServerPage) {
-                apiQuery.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
-            } else {
-                apiQuery.addFilter(
-                    { k: 'provider', o: '=', v: props.provider },
-                    { k: 'cloud_service_group', o: '=', v: props.group },
-                    { k: 'cloud_service_type', o: '=', v: props.name },
-                );
-            }
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
                 apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
@@ -577,6 +585,8 @@ export default {
         return {
             /* Sidebar */
             cloudServiceDetailPageState,
+            /* Filter */
+            hiddenFilters,
             /* Main Table */
             tableState,
             fetchOptionState,
