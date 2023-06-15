@@ -4,7 +4,7 @@
                    heading-type="sub"
         >
             <template #extra>
-                <p-button v-if="!state.isEditMode"
+                <p-button v-if="!state.isEditMode && !state.isCollectorOptionsSchemaEmpty"
                           size="md"
                           icon-left="ic_edit"
                           style-type="secondary"
@@ -96,6 +96,7 @@ const state = reactive({
         type: 'object',
         properties: {},
     }),
+    isCollectorOptionsSchemaEmpty: computed<boolean>(() => Object.keys(state.collectorOptionsSchema?.properties ?? {}).length === 0),
     fields: computed<DefinitionField[]>(() => {
         const properties = state.collectorOptionsSchema?.properties ?? {};
         return Object.entries<JsonSchema['properties']>(properties).map(([key, property]) => ({
