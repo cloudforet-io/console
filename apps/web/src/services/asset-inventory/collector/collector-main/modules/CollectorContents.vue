@@ -140,7 +140,7 @@ const state = reactive({
     } as ValueHandlerMap,
     excelFields: [
         { key: 'name', name: 'Name' },
-        { key: 'state', name: 'State' },
+        { key: 'schedule.state', name: 'Schedule state' },
         { key: 'plugin_info.plugin_id', name: 'Plugin' },
         { key: 'plugin_info.version', name: 'Version' },
         { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
