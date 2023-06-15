@@ -95,6 +95,16 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 throw e;
             }
         },
+        async restartCollectJob(collectorId) {
+            try {
+                return await SpaceConnector.client.inventory.collector.collect({
+                    collector_id: collectorId,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
         setSelectedProvider(provider) {
             this.selectedProvider = provider;
         },

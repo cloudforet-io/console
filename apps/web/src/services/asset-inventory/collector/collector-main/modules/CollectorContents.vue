@@ -48,9 +48,10 @@
                         </div>
                         <p-button class="collect-data-button"
                                   style-type="tertiary"
-                                  @click.stop="handleClickCollectData"
+                                  :loading="state.collectLoading"
+                                  @click.stop="handleClickCollectData(item.collectorId)"
                         >
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
+                            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                         </p-button>
                     </p-card>
                 </div>
@@ -82,7 +83,10 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemInfo from '@/services/asset-inventory/collector/collector-main/modules/CollectorItemInfo.vue';
@@ -115,6 +119,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    collectLoading: false,
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
@@ -218,7 +223,20 @@ const handleChangeToolbox = (options) => {
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
 };
-const handleClickCollectData = () => {};
+
+/* API */
+const handleClickCollectData = async (collectorId) => {
+    state.collectLoading = true;
+    try {
+        await collectorPageStore.restartCollectJob(collectorId);
+        refreshCollectorList();
+        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.collectLoading = false;
+    }
+};
 
 /* Watcher */
 watch(() => collectorPageState.collectors, async () => {
@@ -263,10 +281,11 @@ watch(() => collectorPageState.collectors, async () => {
                     }
 
                     .collect-data-button {
-                        @apply block absolute;
+                        @apply flex absolute;
                         opacity: 1;
                         top: 1.25rem;
                         right: 1.5rem;
+                        gap: 0.25rem;
                     }
                 }
 
