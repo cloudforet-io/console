@@ -193,7 +193,10 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                     },
                 },
                 field_group: [DATE_FIELD_NAME],
-                sort: [{ key: DATE_FIELD_NAME, desc: false }],
+                sort: [
+                    { key: DATE_FIELD_NAME, desc: false },
+                    { key: '_total_value', desc: true },
+                ],
                 ...apiQueryHelper.data,
             },
         });
