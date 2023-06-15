@@ -1,29 +1,31 @@
 <template>
-    <p-card :header="false"
-            style-type="white"
-            class="collector-item"
-    >
-        <div class="collector-item-wrapper">
-            <span class="collector-item-name">{{ props.item.name }}</span>
-            <div class="collector-info-wrapper">
-                <div class="collector-info-view">
-                    <collector-item-plugin :item="props.item" />
-                    <collector-item-job-list :item="props.item" />
-                </div>
-                <div class="collector-info-view">
-                    <collector-item-status :item="props.item" />
-                    <collector-item-schedule :item="props.item" />
+    <div class="collector-list-item">
+        <p-card :header="false"
+                style-type="white"
+                class="collector-item"
+        >
+            <div class="collector-item-wrapper">
+                <span class="collector-item-name">{{ props.item.name }}</span>
+                <div class="collector-info-wrapper">
+                    <div class="collector-info-view">
+                        <collector-item-plugin :item="props.item" />
+                        <collector-item-job-list :item="props.item" />
+                    </div>
+                    <div class="collector-info-view">
+                        <collector-item-status :item="props.item" />
+                        <collector-item-schedule :item="props.item" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <p-button class="collect-data-button"
-                  style-type="tertiary"
-                  :loading="state.collectLoading"
-                  @click.stop="handleClickCollectData(props.item.collectorId)"
-        >
-            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
-        </p-button>
-    </p-card>
+            <p-button class="collect-data-button"
+                      style-type="tertiary"
+                      :loading="state.collectLoading"
+                      @click.stop="handleClickCollectData(props.item.collectorId)"
+            >
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
+            </p-button>
+        </p-card>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -78,16 +80,21 @@ const handleClickCollectData = async (collectorId) => {
 </script>
 
 <style lang="postcss" scoped>
-.collector-item {
+.collector-list-item {
     /* custom design-system component - p-card */
     :deep(.p-card) {
+        &:hover {
+            .body {
+                @apply bg-blue-100;
+            }
+        }
+    }
+
+    .collector-item {
         @apply relative;
 
         &:hover {
             @apply cursor-pointer;
-            .body {
-                @apply bg-blue-100;
-            }
 
             .collect-data-button {
                 @apply flex absolute;
@@ -102,21 +109,29 @@ const handleClickCollectData = async (collectorId) => {
             @apply hidden;
             opacity: 0;
         }
-    }
 
-    .collector-item-wrapper {
-        @apply flex flex-col;
-        gap: 1.25rem;
-        padding: 0.5rem 0.625rem;
+        .collector-item-wrapper {
+            @apply flex flex-col;
+            gap: 1.25rem;
+            padding: 0.5rem 0.625rem;
 
-        .collector-item-name {
-            @apply text-label-xl font-bold;
-        }
-        .collector-info-wrapper {
-            @apply flex;
+            .collector-item-name {
+                @apply text-label-xl font-bold;
+            }
+            .collector-info-wrapper {
+                @apply flex flex-wrap;
+                gap: 1.5rem;
 
-            .collector-info-view {
-                flex: 1;
+                @screen tablet {
+                    @apply flex-col;
+                    gap: 1rem;
+                }
+
+                .collector-info-view {
+                    @apply flex flex-col flex-wrap;
+                    gap: 1.5rem;
+                    flex: 1;
+                }
             }
         }
     }

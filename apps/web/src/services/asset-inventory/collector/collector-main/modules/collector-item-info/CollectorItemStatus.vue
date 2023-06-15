@@ -101,5 +101,32 @@ const state = reactive({
     .info-label {
         @apply text-label-sm text-gray-500;
     }
+
+    .label-description {
+        @apply text-label-md text-gray-700;
+
+        .scheduled {
+            @apply flex items-center;
+            gap: 0.25rem;
+
+            .emphasis {
+                @apply font-bold text-gray-900 not-italic;
+            }
+
+            .alarm-icon {
+                min-width: 1.25rem;
+            }
+
+            .current-status-progress {
+                @apply flex items-center;
+                gap: 0.25rem;
+
+                .setting-icon {
+                    @apply text-gray-400;
+                    min-width: 1.25rem;
+                }
+            }
+        }
+    }
 }
 </style>

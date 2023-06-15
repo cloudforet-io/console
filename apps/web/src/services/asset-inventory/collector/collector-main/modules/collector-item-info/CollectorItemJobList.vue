@@ -100,5 +100,93 @@ const storeState = reactive({
     .info-label {
         @apply text-label-sm text-gray-500;
     }
+
+    .jobs-wrapper {
+        @apply flex;
+        gap: 0.375rem;
+
+        .jobs-contents {
+            @apply flex;
+            width: 1rem;
+            height: 1rem;
+
+            .icon-fill-wrapper {
+                @apply relative rounded box-border;
+                width: 1rem;
+                height: 1rem;
+
+                &:hover {
+                    @apply cursor-default;
+                }
+
+                &.success {
+                    @apply bg-green-600;
+
+                    &:hover {
+                        @apply border border-green-700 cursor-pointer;
+                    }
+                }
+
+                &.error {
+                    @apply flex items-center justify-center bg-red-500;
+
+                    .exclamation-mark {
+                        @apply text-white text-label-md;
+                        width: 1rem;
+                        height: 1rem;
+                    }
+
+                    &:hover {
+                        @apply border border-red-700 cursor-pointer;
+                    }
+                }
+
+                &.progress {
+                    @apply bg-gray-500;
+
+                    &:hover {
+                        @apply border border-gray-700;
+
+                        .progress {
+                            top: -0.065rem;
+                            left: -0.065rem;
+                            animation: rotate 6s linear infinite;
+                            transform-origin: 50% 50%;
+
+                            @keyframes rotate {
+                                100% {
+                                    transform: rotate(360deg);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &.none {
+                    @apply bg-gray-200;
+                }
+
+                .icon {
+                    @apply absolute text-white;
+
+                    &.success {
+                        @apply text-white;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-35%, -50%);
+                    }
+
+                    &.progress {
+                        top: 0;
+                        left: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .to-history-detail {
+        @apply text-label-sm text-blue-700;
+    }
 }
 </style>

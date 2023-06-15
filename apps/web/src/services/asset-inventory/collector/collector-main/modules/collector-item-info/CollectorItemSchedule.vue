@@ -11,8 +11,8 @@
                 @change-toggle="handleChangeToggle"
             />
         </div>
-        <p-button style-type="transparent"
-                  @click.stop="handleClickSchedule"
+        <button class="schedule-button"
+                @click.stop="handleClickSchedule"
         >
             <p-i v-if="state.isScheduleActivated"
                  name="ic_edit"
@@ -29,14 +29,14 @@
                  class="icon-schedule"
             />
             {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
-        </p-button>
+        </button>
     </div>
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PToggleButton, PButton, PI } from '@spaceone/design-system';
+import { PToggleButton, PI } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -93,11 +93,35 @@ const handleClickSchedule = () => {
 
 <style lang="postcss" scoped>
 .info-item {
-    @apply flex flex-col;
+    @apply flex flex-col items-start;
     gap: 0.5rem;
 
     .info-label {
         @apply text-label-sm text-gray-500;
+    }
+
+    /* custom design-system component - p-toggle-button */
+    :deep(.p-toggle-button) {
+        .label {
+            @apply text-gray-400;
+        }
+        &.toggle-active {
+            .label {
+                @apply text-blue-600;
+            }
+        }
+    }
+
+    .schedule-button {
+        @apply flex items-center text-label-sm text-blue-600 font-normal;
+        gap: 0.25rem;
+
+        &:hover {
+            background-color: initial;
+        }
+        .icon-schedule {
+            @apply text-blue-600;
+        }
     }
 }
 </style>
