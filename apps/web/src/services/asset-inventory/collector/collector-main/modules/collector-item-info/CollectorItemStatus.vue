@@ -95,9 +95,6 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .info-item {
-    @apply flex flex-col;
-    gap: 0.5rem;
-
     .info-label {
         @apply text-label-sm text-gray-500;
     }
