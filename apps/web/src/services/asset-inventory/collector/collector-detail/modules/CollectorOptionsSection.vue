@@ -19,7 +19,23 @@
                             :loading="state.loading"
                             :data="state.collectorOptions"
                             style-type="white"
-        />
+        >
+            <template #no-data>
+                <div class="no-data-box">
+                    <p-empty image-size="sm"
+                             show-image
+                             :title="$t('INVENTORY.COLLECTOR.NO_OPTIONS')"
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_circle_boy.svg"
+                                 alt="empty-options"
+                                 class="empty-options-image"
+                            >
+                        </template>
+                    </p-empty>
+                </div>
+            </template>
+        </p-definition-table>
         <collector-options-form v-else
                                 has-metadata
                                 reset-on-collector-id-change
@@ -51,7 +67,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PHeading, PButton, PPaneLayout, PDefinitionTable,
+    PHeading, PButton, PPaneLayout, PDefinitionTable, PEmpty,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
@@ -136,6 +152,16 @@ const handleClickSave = async () => {
 .collector-options-form {
     padding: 0 1rem;
 }
+
+.no-data-box {
+    @apply flex flex-col justify-end;
+    height: 10.8125rem;
+
+    .empty-options-image {
+        height: 100%;
+    }
+}
+
 .button-group {
     padding: 1rem;
     margin-bottom: 1.5rem;
