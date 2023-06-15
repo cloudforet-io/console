@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="trend-of-pass-and-fail-findings"
+                  refresh-on-resize
                   @refresh="refreshWidget"
     >
         <div class="data-container">
