@@ -43,7 +43,6 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -51,6 +50,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ReferenceType } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
@@ -251,26 +251,7 @@ const drawChart = (chartData: XYChartData[]) => {
             dateFields: [DATE_FIELD_NAME],
         });
         const tooltip = chartHelper.createTooltip();
-        tooltip.label.adapters.add('text', (text, target) => {
-            let totalValue = 0;
-            const seriesList: any[] = []; // { color: string, name: string, value: number }[]
-            chart.series.each((s) => {
-                const fieldName = s.get('valueYField') || s.get('valueXField') || '';
-                const value = target.dataItem?.dataContext?.[fieldName];
-                totalValue += value;
-                seriesList.push({
-                    color: s.get('stroke')?.toString() ?? '',
-                    name: s.get('name') ?? '',
-                    value: value ?? 0,
-                });
-            });
-            let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
-            seriesList.forEach((s) => {
-                const rate = Math.round((s.value / totalValue) * 100);
-                _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
-            });
-            return _text;
-        });
+        setXYSharedTooltipTextWithRate(chart, tooltip);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
     });

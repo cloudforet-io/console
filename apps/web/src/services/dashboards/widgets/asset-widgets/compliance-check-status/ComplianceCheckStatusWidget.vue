@@ -358,6 +358,8 @@ defineExpose<WidgetExpose<Data[]>>({
                 }
                 .diff-wrapper {
                     @apply text-gray-700;
+                    display: flex;
+                    align-items: center;
                     .diff-value {
                         @apply text-label-lg;
                         padding-right: 0.25rem;
