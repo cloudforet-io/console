@@ -278,10 +278,13 @@ defineExpose<WidgetExpose<Data[]>>({
 </script>
 <style lang="postcss" scoped>
 .count-of-findings-widget {
+    &.full {
+        height: 23.5rem;
+    }
     .data-container {
         display: flex;
         flex-direction: column;
-        height: 23.5rem;
+        height: 100%;
         .chart-wrapper {
             height: 85%;
             margin-bottom: 1rem;
