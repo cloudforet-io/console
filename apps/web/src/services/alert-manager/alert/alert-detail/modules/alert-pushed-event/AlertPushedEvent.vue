@@ -55,9 +55,9 @@
         </p-button>
         <p-button-modal
             v-if="modalVisible"
+            v-model:visible="modalVisible"
             :header-title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.EVENT_DETAILS')"
             size="lg"
-            :visible.sync="modalVisible"
             @confirm="onClickConfirm"
         >
             <template #body>
@@ -98,17 +98,17 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs,
-} from 'vue';
 
-import {
-    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
-} from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 
@@ -273,7 +273,7 @@ export default {
     &.fade-enter-active, &.fade-leave-active {
         transition: opacity 0.3s;
     }
-    &.fade-enter, &.fade-leave-to {
+    &.fade-enter-from, &.fade-leave-to {
         opacity: 0;
     }
 }

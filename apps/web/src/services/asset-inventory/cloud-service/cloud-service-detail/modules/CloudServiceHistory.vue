@@ -5,19 +5,19 @@
                    :total-count="totalCount"
                    use-total-count
         />
-        <p-toolbox search-type="query"
+        <p-toolbox v-model:search-text="searchText"
+                   search-type="query"
                    searchable
                    :pagination-visible="false"
                    :page-size-changeable="false"
-                   :search-text.sync="searchText"
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChange"
                    @refresh="handleChange()"
         >
             <template #left-area>
-                <cloud-service-history-date-select-dropdown :selected-year.sync="selectedYear"
-                                                            :selected-month.sync="selectedMonth"
+                <cloud-service-history-date-select-dropdown v-model:selected-year="selectedYear"
+                                                            v-model:selected-month="selectedMonth"
                 />
             </template>
         </p-toolbox>
@@ -77,9 +77,9 @@
         </p-data-loader>
         <transition name="slide-up">
             <cloud-service-history-detail-overlay v-if="showDetailOverlay"
+                                                  v-model:selected-history-item="selectedHistoryItem"
                                                   :loading="loading"
                                                   :history-items="items"
-                                                  :selected-history-item.sync="selectedHistoryItem"
                                                   :selected-key-name="selectedKeyName"
                                                   :total-count="totalCount"
                                                   :provider="provider"
@@ -93,18 +93,7 @@
 
 <script lang="ts">
 
-import { useInfiniteScroll } from '@vueuse/core';
-import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
 
-import {
-    PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
-} from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
-import localeData from 'dayjs/plugin/localeData';
 
 import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -112,6 +101,17 @@ import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
+} from '@spaceone/design-system';
+import { useInfiniteScroll } from '@vueuse/core';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import localeData from 'dayjs/plugin/localeData';
+import {
+    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -417,7 +417,7 @@ export default {
 .slide-up-leave-active {
     transition: all 0.3s ease-out;
 }
-.slide-up-enter, .slide-up-leave-to {
+.slide-up-enter-from, .slide-up-leave-to {
     transform: translateY(100px);
     opacity: 0;
 }
