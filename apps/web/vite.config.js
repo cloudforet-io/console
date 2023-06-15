@@ -52,10 +52,10 @@ export default defineConfig(async ({ command, mode }) => {
         },
         resolve: {
             alias: {
+                vue: '@vue/compat',
                 '@': path.resolve(__dirname, './src'),
                 '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
                 '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
-                vue: path.resolve(__dirname, '../../node_modules/vue/dist/vue.js'),
             },
         },
         define: {
