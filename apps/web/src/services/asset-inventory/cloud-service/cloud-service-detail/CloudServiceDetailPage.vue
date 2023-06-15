@@ -173,10 +173,13 @@ import {
     PHeading, PEmpty, PTableCheckModal, PButton,
 } from '@spaceone/design-system';
 import type {
-    DynamicLayoutEventListener,
+    DynamicLayoutEventListener, DynamicLayoutFetchOptions,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type {
+    DynamicLayout,
+    DynamicLayoutOptions,
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
@@ -389,6 +392,17 @@ export default {
             }
         };
 
+        const resetSort = (schemaOptions: DynamicLayoutOptions) => {
+            const defaultSort = schemaOptions.default_sort;
+            if (defaultSort) {
+                fetchOptionState.sortBy = defaultSort.key;
+                fetchOptionState.sortDesc = defaultSort.desc ?? false;
+            } else {
+                fetchOptionState.sortBy = 'created_at';
+                fetchOptionState.sortDesc = true;
+            }
+        };
+
         const apiQuery = new ApiQueryHelper();
         const getQuery = (schema?) => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
@@ -429,7 +443,7 @@ export default {
             }
         };
 
-        const fetchTableData = async (changed: any = {}) => {
+        const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
@@ -495,6 +509,7 @@ export default {
 
         const reloadTable = async () => {
             tableState.schema = await getTableSchema();
+            resetSort(tableState.schema.options);
             await fetchTableData();
         };
 
@@ -579,6 +594,7 @@ export default {
         debouncedWatch([() => props.group, () => props.name], async () => {
             if (!props.isServerPage && !props.name) return;
             tableState.schema = await getTableSchema();
+            resetSort(tableState.schema.options);
             await fetchTableData();
         }, { immediate: true, debounce: 200 });
 
