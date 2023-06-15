@@ -727,6 +727,16 @@ export default {
     table: {
         options: {
             fields: makeTableFields(),
+            default_sort: {
+                key: 'name',
+                desc: false,
+            },
+        },
+        data: makeTableData(),
+    },
+    simpleTable: {
+        options: {
+            fields: makeTableFields(),
         },
         data: makeTableData(),
     },
@@ -740,6 +750,10 @@ export default {
     querySearchTable: {
         options: {
             fields: makeTableFields(),
+            default_sort: {
+                key: 'name',
+                desc: false,
+            },
         },
         data: makeTableData(),
     },

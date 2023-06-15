@@ -186,7 +186,7 @@ interface ContextMenuProps {
     searchable?: boolean;
     searchText?: string;
     readonly?: boolean;
-    resetSelectedOnUnmounted: boolean;
+    resetSelectedOnUnmounted?: boolean;
 }
 interface ContextMenuEmits {
     (e: 'update:selected', selected: MenuItem[]): void,
