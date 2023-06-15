@@ -89,7 +89,10 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
         async updateCollectorSchedule(params) {
             try {
-                return await SpaceConnector.client.inventory.collector.update(params);
+                const response = await SpaceConnector.client.inventory.collector.update(params);
+                const updatedCollectorIndex = this.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
+                this.collectors[updatedCollectorIndex] = response;
+                return response;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
