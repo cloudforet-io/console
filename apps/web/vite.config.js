@@ -1,7 +1,7 @@
 import path from 'path';
 import process from 'process';
 
-import vuePlugin from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv } from 'vite';
 import StylelintPlugin from 'vite-plugin-stylelint';
@@ -17,7 +17,15 @@ export default defineConfig(async ({ command, mode }) => {
             include: ['@spaceone/design-system/tailwind.config.cjs'],
         },
         plugins: [
-            vuePlugin(),
+            vue({
+                template: {
+                    compilerOptions: {
+                        compatConfig: {
+                            MODE: 2,
+                        },
+                    },
+                },
+            }),
             VueTypeImports(),
             StylelintPlugin({
                 include: ['src/**/*.{css,vue,pcss,scss}'],

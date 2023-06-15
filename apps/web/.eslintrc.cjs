@@ -10,11 +10,6 @@ module.exports = {
                 groups: ['builtin', 'external', 'internal', 'index'],
                 pathGroups: [
                     {
-                        pattern: '@vue/test-utils',
-                        group: 'builtin',
-                        position: 'before',
-                    },
-                    {
                         pattern: '{@vue*,@vue*/**,vue*,vue*/**}',
                         group: 'builtin',
                         position: 'before',
@@ -65,7 +60,6 @@ module.exports = {
                         position: 'after',
                     },
                 ],
-                pathGroupsExcludedImportTypes: ['@vue/test-utils'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,
