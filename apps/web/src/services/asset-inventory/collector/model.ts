@@ -142,6 +142,9 @@ export interface CollectorDeleteParameter {
 export interface JobStatus {
     job_id: string;
     status: string;
+    finished_at: string;
+    remained_tasks: number;
+    total_tasks: number;
 }
 export interface JobAnalyzeModel {
     collector_id: string;

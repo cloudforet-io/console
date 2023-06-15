@@ -81,7 +81,7 @@
                     >
                         <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
                                    class="icon-fill-wrapper success"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
                         >
                             <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
@@ -114,9 +114,13 @@
                         />
                         <p-tooltip v-else
                                    class="icon-fill-wrapper error"
-                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: 'yyyy-mm-dd hh:mm:ss'})"
+                                   :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                    position="top"
-                        />
+                        >
+                            <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
+                                <span class="exclamation-mark">!</span>
+                            </router-link>
+                        </p-tooltip>
                     </div>
                 </div>
                 <div class="to-history-detail">
@@ -225,9 +229,15 @@ const state = reactive({
 
             const userCurrentTime = dayjs.tz(current, storeState.timezone);
             const hours = props.item.schedule.hours ?? [];
-            const nextScheduledHour = hours.sort((a, b) => a - b).find((num) => num > userCurrentTime.hour());
+            const sortedHours = hours.sort((a, b) => a - b);
+            const nextScheduledHour = sortedHours.find((num) => num > userCurrentTime.hour());
 
-            const nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            let nextScheduledTime;
+            if (nextScheduledHour) {
+                nextScheduledTime = current.set('h', nextScheduledHour || 0).set('m', 0);
+            } else {
+                nextScheduledTime = current.add(1, 'day').set('h', sortedHours[0]).set('m', 0);
+            }
             const timeDiff = nextScheduledTime.diff(current, 'm');
             return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
@@ -381,18 +391,16 @@ watch(() => props.item, (value) => {
                         }
 
                         &.error {
-                            @apply bg-red-500;
+                            @apply flex items-center justify-center bg-red-500;
 
-                            &::before {
-                                @apply absolute text-white text-label-md;
-                                content: '!';
-                                top: 50%;
-                                left: 50%;
-                                transform: translate(-35%, -50%);
+                            .exclamation-mark {
+                                @apply text-white text-label-md;
+                                width: 1rem;
+                                height: 1rem;
                             }
 
                             &:hover {
-                                @apply border border-red-700;
+                                @apply border border-red-700 cursor-pointer;
                             }
                         }
 

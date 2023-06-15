@@ -165,6 +165,9 @@ const state = reactive({
                 const noneValue = {
                     job_id: '',
                     status: JOB_STATE.NONE,
+                    finished_at: '',
+                    remained_tasks: 0,
+                    total_tasks: 0,
                 };
                 recentJobAnalyze.unshift(noneValue);
             }
