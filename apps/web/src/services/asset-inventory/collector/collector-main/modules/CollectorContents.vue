@@ -232,7 +232,7 @@ const handleClickCollectData = async (collectorId) => {
         refreshCollectorList();
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
     } finally {
         state.collectLoading = false;
     }
