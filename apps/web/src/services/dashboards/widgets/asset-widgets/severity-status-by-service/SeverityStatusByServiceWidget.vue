@@ -4,16 +4,18 @@
                   @refresh="refreshWidget"
     >
         <div class="data-container">
-            <div class="chart-wrapper"
-                 :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
-            >
-                <div v-for="(data, idx) in state.refinedData"
-                     :key="`box-${idx}`"
-                     v-tooltip.bottom="`${data.service}: ${data.value}`"
-                     class="status-box"
-                     :style="{'background-color': SEVERITY_STATUS_MAP[data.severity].color}"
+            <div class="chart-wrapper">
+                <div class="box-wrapper"
+                     :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
                 >
-                    <span class="text">{{ data.service }}</span>
+                    <div v-for="(data, idx) in state.refinedData"
+                         :key="`box-${idx}`"
+                         v-tooltip.bottom="`${data.service}: ${data.value}`"
+                         class="status-box"
+                         :style="{'background-color': SEVERITY_STATUS_MAP[data.severity].color}"
+                    >
+                        <span class="text">{{ data.service }}</span>
+                    </div>
                 </div>
             </div>
             <div class="legend-wrapper">
@@ -209,13 +211,16 @@ defineExpose<WidgetExpose>({
 .severity-status-by-service {
     .data-container {
         .chart-wrapper {
-            display: grid;
-            grid-auto-flow: row;
-            gap: 0.25rem;
-            .status-box {
-                height: 4.5rem;
-                font-weight: 500;
-                padding: 0.5rem;
+            min-height: 16.5rem;
+            .box-wrapper {
+                display: grid;
+                grid-auto-flow: row;
+                gap: 0.25rem;
+                .status-box {
+                    height: 4.5rem;
+                    font-weight: 500;
+                    padding: 0.5rem;
+                }
             }
         }
         .legend-wrapper {
