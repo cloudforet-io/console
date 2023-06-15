@@ -71,6 +71,7 @@
 </template>
 
 <script lang="ts">
+import type Vue from 'vue';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
@@ -167,10 +168,10 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
 
             /** get data from fetch options */
-            sortBy: computed(() => props.fetchOptions?.sortBy || ''),
-            sortDesc: computed(() => ((props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true)),
-            pageSize: computed(() => props.fetchOptions?.pageLimit || 15),
-            queryTags: computed(() => props.fetchOptions?.queryTags || []),
+            sortBy: computed<string>(() => props.fetchOptions?.sortBy ?? props.options.default_sort?.key ?? ''),
+            sortDesc: computed<boolean>(() => props.fetchOptions?.sortDesc ?? props.options.default_sort?.desc ?? true),
+            pageSize: computed(() => props.fetchOptions?.pageLimit ?? 15),
+            queryTags: computed(() => props.fetchOptions?.queryTags ?? []),
 
             /** others */
             rootData: computed<any[]>(() => {
