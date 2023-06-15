@@ -48,6 +48,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
@@ -223,18 +224,7 @@ const drawChart = (chartData) => {
         });
         if (state.showPassFindings) {
             const tooltip = chartHelper.createTooltip();
-            tooltip.label.adapters.add('text', (text, target) => {
-                let _text = '';
-                let totalValue = 0;
-                chart.series.each((s) => {
-                    const fieldName = s.get('valueYField') || s.get('valueXField') || '';
-                    const value = target.dataItem?.dataContext?.[fieldName];
-                    totalValue += value;
-                    _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
-                });
-                _text = `Total: [bold; fontSize: 14px]${totalValue}[/]${_text}`;
-                return _text;
-            });
+            setXYSharedTooltipTextWithRate(chart, tooltip);
             series.set('tooltip', tooltip);
         }
         chart.series.push(series);
