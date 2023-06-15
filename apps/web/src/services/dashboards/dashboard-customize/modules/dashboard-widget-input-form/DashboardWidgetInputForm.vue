@@ -65,7 +65,7 @@
         <dashboard-widget-more-options class="more-option-container"
                                        :widget-config-id="widgetConfigId"
                                        :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleUpdateSchemaProperties"
+                                       @update:selected-properties="handleSelectWidgetOptions"
         />
     </div>
 </template>
@@ -80,7 +80,9 @@ import {
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { cloneDeep, isEmpty, union } from 'lodash';
+import {
+    cloneDeep, isEmpty, union, xor,
+} from 'lodash';
 
 import {
     useReferenceStore,
@@ -178,7 +180,23 @@ export default defineComponent<Props>({
         const { referenceStoreState } = useReferenceStore();
 
         /* more options */
-        const handleUpdateSchemaProperties = (properties: string[]) => {
+        const updateSchemaFormDataBySchemaProperties = (oldSchemaProperties: string[], newSchemaProperties: string[]) => {
+            if (oldSchemaProperties.length > newSchemaProperties.length) { // delete case
+                const deletedProperties = xor(oldSchemaProperties, newSchemaProperties);
+                deletedProperties.forEach((propertyName) => {
+                    delete state.schemaFormData[propertyName];
+                });
+            } else if (oldSchemaProperties.length < newSchemaProperties.length) { // add case
+                const addedProperties = xor(oldSchemaProperties, newSchemaProperties);
+                addedProperties.forEach((propertyName) => {
+                    state.schemaFormData[propertyName] = undefined;
+                });
+            }
+            state.schemaFormData = { ...state.schemaFormData };
+        };
+        const updateSchemaProperties = (properties: string[]) => {
+            updateSchemaFormDataBySchemaProperties(widgetFormState.schemaProperties ?? [], properties);
+
             widgetFormStore.$patch((_state) => {
                 _state.schemaProperties = properties;
             });
@@ -204,11 +222,12 @@ export default defineComponent<Props>({
                 dashboardDetailState.projectId,
             );
         };
+        const handleSelectWidgetOptions = (selectedProperties: string[]) => {
+            updateSchemaProperties(selectedProperties);
+        };
         const handleDeleteProperty = (property: string) => {
             const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
-            handleUpdateSchemaProperties(_properties);
-            state.schemaFormData[property] = undefined;
-            state.schemaFormData = { ...state.schemaFormData };
+            updateSchemaProperties(_properties);
         };
 
         /* utils */
@@ -424,7 +443,7 @@ export default defineComponent<Props>({
             /* reference store */
             referenceStoreState,
             /* more options */
-            handleUpdateSchemaProperties,
+            handleSelectWidgetOptions,
             handleDeleteProperty,
             /* inherit */
             handleChangeInheritToggle,
