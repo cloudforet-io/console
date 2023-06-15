@@ -2080,6 +2080,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ADDITIONAL_OPTIONS": "",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
 			"ALT_E_DELETE_COLLECTOR": "컬렉터 삭제 실패",
@@ -2196,7 +2197,8 @@
 				"SET_SCHEDULE": "스케줄 설정",
 				"TITLE": "컬렉터",
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
-			}
+			},
+			"NO_OPTIONS": ""
 		},
 		"SERVER": {
 			"MAIN": {
