@@ -28,6 +28,7 @@
         "src/**", "!src/assets/**", "src/assets/images/**",
         "package.json", "package-lock.json", "tsconfig.json",
         "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs",
+        "../../packages/language-pack/*.json", "!../../packages/language-pack/package.json",
         "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
