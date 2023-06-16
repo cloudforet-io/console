@@ -2080,7 +2080,7 @@
 			}
 		},
 		"COLLECTOR": {
-			"ADDITIONAL_OPTIONS": "",
+			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
 			"ALT_E_DELETE_COLLECTOR": "컬렉터 삭제 실패",
@@ -2124,7 +2124,7 @@
 				"PREVIOUS": "뒤로가기",
 				"PREV_MODAL_CONTENT": "이 작업은 취소 할 수 없습니다.",
 				"PREV_MODAL_TITLE": "플러그인 선택단계로 돌아가시겠습니까? ",
-				"PROVIDER": "",
+				"PROVIDER": "프로바이더",
 				"RELOAD": "다시시도",
 				"REQUIRED_FIELD": "필수 입력 항목입니다.",
 				"SELECT": "선택 ",
@@ -2149,7 +2149,7 @@
 				"CANCEL": "취소",
 				"COLLECTOR_HISTORY": "컬렉터 히스토리",
 				"COLLECTOR_OPTIONS": "컬렉터 옵션",
-				"COLLECT_DATA": "",
+				"COLLECT_DATA": "데이터 수집",
 				"CREATED": "생성 날짜",
 				"DELETE_COLLECTOR": "컬렉터 삭제",
 				"EDIT": "수정",
@@ -2199,7 +2199,7 @@
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
 			},
 			"NO_DATA": "데이터가 없습니다.",
-			"NO_OPTIONS": ""
+			"NO_OPTIONS": "옵션 없음"
 		},
 		"SERVER": {
 			"MAIN": {
