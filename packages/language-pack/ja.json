@@ -2080,7 +2080,7 @@
 			}
 		},
 		"COLLECTOR": {
-			"ADDITIONAL_OPTIONS": "",
+			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
 			"ALT_E_DELETE_COLLECTOR": "コレクター削除に失敗",
@@ -2124,7 +2124,7 @@
 				"PREVIOUS": "前へ",
 				"PREV_MODAL_CONTENT": "この操作は取り消すことができません。",
 				"PREV_MODAL_TITLE": "プラグインの選択から再開してもよろしいですか？",
-				"PROVIDER": "",
+				"PROVIDER": "プロバイダー",
 				"RELOAD": "リロード",
 				"REQUIRED_FIELD": "必須入力項目です。",
 				"SELECT": "選択",
@@ -2149,7 +2149,7 @@
 				"CANCEL": "キャンセル",
 				"COLLECTOR_HISTORY": "コレクターの履歴",
 				"COLLECTOR_OPTIONS": "コレクターオプション",
-				"COLLECT_DATA": "",
+				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
 				"EDIT": "編集",
@@ -2191,7 +2191,7 @@
 				"NO_DATA": "作成されたコレクターはありません。",
 				"NO_SCHEDULE": "スケジュールが設定されていません",
 				"PLUGIN": "プラグイン",
-				"RECENT_JOBS": "最近の収集結果 (過去5日間)",
+				"RECENT_JOBS": "過去5日間の最新のデータ収集結果です",
 				"SCHEDULED": "予定された収集:",
 				"SCHEDULED_TIME": "{hr}時間{m}分後",
 				"SET_SCHEDULE": "スケジュールを設定する",
@@ -2199,7 +2199,7 @@
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
 			},
 			"NO_DATA": "データがありません",
-			"NO_OPTIONS": ""
+			"NO_OPTIONS": "옵션 없음"
 		},
 		"SERVER": {
 			"MAIN": {
