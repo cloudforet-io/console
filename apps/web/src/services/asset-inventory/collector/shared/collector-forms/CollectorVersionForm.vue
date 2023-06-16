@@ -81,6 +81,9 @@ const handleChangeVersion = (value: string) => {
 
 const handleClickAutoUpgrade = () => {
     collectorFormStore.setAutoUpgrade(!collectorFormState.autoUpgrade);
+    if (collectorFormState.autoUpgrade) {
+        collectorFormStore.setVersion(collectorFormState.versions[0] ?? '');
+    }
 };
 
 watch(() => state.isVersionValid, (value) => {

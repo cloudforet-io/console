@@ -62,6 +62,7 @@ import {
     PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -83,7 +84,8 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    isVisibleTitle: computed<boolean>(() => (!!props.showTitleOnEmptySchema && !Object.keys(state.schema ?? {}).length)),
+    isSchemaEmpty: computed<boolean>(() => isEmpty(state.schema)),
+    isVisibleTitle: computed<boolean>(() => (!!props.showTitleOnEmptySchema && state.isSchemaEmpty)),
     loading: false,
     isLoadFailed: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
@@ -105,7 +107,7 @@ const getPluginMetadata = async () => {
         if (!props.hasMetadata) {
             const res = await fetchGetPluginMetadata();
             state.schema = res.metadata?.options_schema ?? {};
-            if (!state.schema) {
+            if (state.isSchemaEmpty) {
                 emit('update:isValid', true);
             }
         } else {
