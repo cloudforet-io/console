@@ -105,7 +105,8 @@ const getPluginMetadata = async () => {
         if (!props.hasMetadata) {
             const res = await fetchGetPluginMetadata();
             state.schema = res.metadata?.options_schema ?? {};
-            if (!state.schema) {
+            const isSchemaEmpty = !Object.keys(state.schema ?? {}).length;
+            if (isSchemaEmpty) {
                 emit('update:isValid', true);
             }
         } else {
