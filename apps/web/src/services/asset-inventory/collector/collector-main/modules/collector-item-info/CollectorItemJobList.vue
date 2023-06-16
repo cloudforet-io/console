@@ -120,7 +120,7 @@ const storeState = reactive({
                     @apply bg-green-600;
 
                     &:hover {
-                        @apply border border-green-700 cursor-pointer;
+                        @apply bg-green-500 border border-green-700 cursor-pointer;
                     }
                 }
 
@@ -134,7 +134,7 @@ const storeState = reactive({
                     }
 
                     &:hover {
-                        @apply border border-red-700 cursor-pointer;
+                        @apply bg-red-300 border border-red-700 cursor-pointer;
                     }
                 }
 
