@@ -25,14 +25,7 @@
                 <span v-else-if="state.isInProgress"
                       class="current-status-progress"
                 >
-                    <p-i
-                        name="ic_settings-filled"
-                        class="setting-icon"
-                        height="1.25rem"
-                        width="1.25rem"
-                        color="inherit"
-                    />
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} - <span class="remained-task">{{ state.remained_tasks }}%</span>
                 </span>
                 <span v-else>
                     {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
@@ -51,10 +44,14 @@ import { computed, reactive } from 'vue';
 import { PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { numberFormatter } from '@cloudforet/core-lib';
+
 import { store } from '@/store';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+
+const RECENT_COUNT = 5;
 
 interface Props {
     item?: CollectorItemInfo;
@@ -90,6 +87,10 @@ const state = reactive({
         }
         return { diffHour: 0, diffMin: 0 };
     }),
+    remained_tasks: computed(() => {
+        const recentJob = props.item.recentJobAnalyze[RECENT_COUNT - 1];
+        return recentJob.total_tasks > 0 ? numberFormatter(((recentJob.total_tasks - recentJob.remained_tasks) / recentJob.total_tasks) * 100) : 100;
+    }),
 });
 </script>
 
@@ -123,6 +124,10 @@ const state = reactive({
                     min-width: 1.25rem;
                 }
             }
+        }
+
+        .remained-task {
+            @apply text-label-md font-bold text-gray-900;
         }
     }
 }

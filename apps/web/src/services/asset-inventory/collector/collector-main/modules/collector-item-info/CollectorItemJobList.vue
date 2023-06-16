@@ -18,8 +18,8 @@
                         <p-i
                             name="ic_check"
                             class="icon success"
-                            height="1rem"
-                            width="1rem"
+                            height="1.125rem"
+                            width="1.125rem"
                             color="inherit"
                         />
                     </router-link>
@@ -32,8 +32,8 @@
                     <p-i
                         name="ic_settings-filled"
                         class="icon progress"
-                        height="1rem"
-                        width="1rem"
+                        height="1.125rem"
+                        width="1.125rem"
                         color="inherit"
                     />
                 </p-tooltip>
@@ -53,17 +53,17 @@
                 </p-tooltip>
             </div>
         </div>
-        <div class="to-history-detail">
-            <router-link :to="props.item.historyLink">
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-                <p-i
-                    name="ic_chevron-right"
-                    width="0.75rem"
-                    height="0.75rem"
-                    color="inherit transparent"
-                />
-            </router-link>
-        </div>
+        <router-link :to="props.item.historyLink"
+                     class="to-history-detail"
+        >
+            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+            <p-i
+                name="ic_chevron-right"
+                width="0.75rem"
+                height="0.75rem"
+                color="inherit transparent"
+            />
+        </router-link>
     </div>
 </template>
 
@@ -104,13 +104,13 @@ const storeState = reactive({
 
         .jobs-contents {
             @apply flex;
-            width: 1rem;
-            height: 1rem;
+            width: 1.125rem;
+            height: 1.125rem;
 
             .icon-fill-wrapper {
                 @apply relative rounded box-border;
-                width: 1rem;
-                height: 1rem;
+                width: 1.125rem;
+                height: 1.125rem;
 
                 &:hover {
                     @apply cursor-default;
@@ -129,8 +129,8 @@ const storeState = reactive({
 
                     .exclamation-mark {
                         @apply text-white text-label-md;
-                        width: 1rem;
-                        height: 1rem;
+                        width: 1.125rem;
+                        height: 1.125rem;
                     }
 
                     &:hover {
@@ -183,7 +183,13 @@ const storeState = reactive({
     }
 
     .to-history-detail {
-        @apply text-label-sm text-blue-700;
+        @apply flex items-center text-label-sm text-blue-700;
+        height: 1.875rem;
+        margin-top: -0.5rem;
+
+        &:hover {
+            @apply underline;
+        }
     }
 }
 </style>

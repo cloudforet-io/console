@@ -2181,7 +2181,7 @@
 				"CREATE_COLLECTOR": "Create Collector",
 				"CURRENT_STATUS": "Current Status",
 				"EDIT_MODAL_TITLE": "Edit Schedule",
-				"EDIT_SCHEDULE": "Edit schedule",
+				"EDIT_SCHEDULE": "Edit",
 				"HISTORY": "Collector History",
 				"IN_PROGRESS": "In-Progress",
 				"JOB_ERROR": "Status: Failed,\nCollected: {date}",
@@ -2194,7 +2194,7 @@
 				"RECENT_JOBS": "Recent data collection results within the past 5 days",
 				"SCHEDULED": "Scheduled",
 				"SCHEDULED_TIME": "in {hr} hr {m} mins",
-				"SET_SCHEDULE": "Set schedule",
+				"SET_SCHEDULE": "Set",
 				"TITLE": "Collector",
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},

@@ -6,9 +6,17 @@
         >
             <div class="collector-item-wrapper">
                 <span class="collector-item-name">{{ props.item.name }}</span>
+                <div class="collector-plugin">
+                    <p-lazy-img :src="props.item.plugin.icon"
+                                width="1.25rem"
+                                height="1.25rem"
+                                class="plugin-icon"
+                    />
+                    <span class="plugin-name">{{ state.plugin.name }}</span>
+                    <span class="plugin-version">v{{ state.plugin.version }}</span>
+                </div>
                 <div class="collector-info-wrapper">
                     <div class="collector-info-view">
-                        <collector-item-plugin :item="props.item" />
                         <collector-item-job-list :item="props.item" />
                     </div>
                     <div class="collector-info-view">
@@ -29,9 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { PButton, PCard } from '@spaceone/design-system';
+import { PButton, PCard, PLazyImg } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -42,7 +50,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
-import CollectorItemPlugin from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemPlugin.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
@@ -60,6 +67,10 @@ const emit = defineEmits(['refresh-collector-list']);
 
 const state = reactive({
     collectLoading: false,
+    plugin: computed(() => {
+        const plugin = props.item?.plugin;
+        return { name: plugin.name, version: plugin.info.version };
+    }),
 });
 
 /* API */
@@ -113,11 +124,21 @@ const handleClickCollectData = async (collectorId) => {
         .collector-item-wrapper {
             @apply flex flex-col;
             gap: 1.25rem;
-            padding: 0.5rem 0.625rem;
+            padding: 0.75rem 0.625rem;
 
             .collector-item-name {
                 @apply text-label-xl font-bold;
             }
+
+            .collector-plugin {
+                @apply flex items-center;
+                gap: 0.5rem;
+
+                .plugin-version {
+                    @apply text-label-md text-gray-700;
+                }
+            }
+
             .collector-info-wrapper {
                 @apply flex;
                 gap: 1.5rem;
