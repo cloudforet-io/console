@@ -31,29 +31,9 @@
                      :key="item.collectorId"
                      @click="handleClickListItem(item.detailLink)"
                 >
-                    <p-card :header="false"
-                            style-type="white"
-                    >
-                        <div class="collector-item-wrapper">
-                            <span class="collector-item-name">{{ item.name }}</span>
-                            <div class="collector-info-wrapper">
-                                <collector-item-info
-                                    v-for="info in state.infoItems"
-                                    :key="info.key"
-                                    :label="info.label"
-                                    :type="info.key"
-                                    :item="item"
-                                />
-                            </div>
-                        </div>
-                        <p-button class="collect-data-button"
-                                  style-type="tertiary"
-                                  :loading="state.collectLoading"
-                                  @click.stop="handleClickCollectData(item.collectorId)"
-                        >
-                            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
-                        </p-button>
-                    </p-card>
+                    <collector-list-item :item="item"
+                                         @refresh-collector-list="$emit('refresh-collector-list');"
+                    />
                 </div>
             </div>
             <template #no-data>
@@ -61,7 +41,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="refreshCollectorList"
+                                  @refresh-collector-list="$emit('refresh-collector-list');"
         />
     </div>
 </template>
@@ -69,14 +49,11 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PToolbox, PButton, PCard, PDataLoader,
-} from '@spaceone/design-system';
+import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -84,13 +61,10 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import CollectorItemInfo from '@/services/asset-inventory/collector/collector-main/modules/CollectorItemInfo.vue';
+import CollectorListItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorListItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
@@ -120,7 +94,6 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    collectLoading: false,
     infoItems: [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
@@ -207,9 +180,6 @@ const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? 
 const routeToCreatePage = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
-const refreshCollectorList = () => {
-    emit('refresh-collector-list');
-};
 const handleExportExcel = async () => {
     emit('export-excel', state.excelFields);
 };
@@ -223,22 +193,6 @@ const handleChangeToolbox = (options) => {
 };
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
-};
-
-/* API */
-const handleClickCollectData = async (collectorId) => {
-    state.collectLoading = true;
-    try {
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: collectorId,
-        });
-        refreshCollectorList();
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-    } finally {
-        state.collectLoading = false;
-    }
 };
 
 /* Watcher */
@@ -271,49 +225,6 @@ watch(() => collectorPageState.collectors, async () => {
 
             @screen mobile {
                 @apply flex flex-col;
-            }
-
-            /* custom design-system component - p-card */
-            :deep(.p-card) {
-                @apply relative;
-
-                &:hover {
-                    @apply cursor-pointer;
-                    .body {
-                        @apply bg-blue-100;
-                    }
-
-                    .collect-data-button {
-                        @apply flex absolute;
-                        opacity: 1;
-                        top: 1.25rem;
-                        right: 1.5rem;
-                        gap: 0.25rem;
-                    }
-                }
-
-                .collect-data-button {
-                    @apply hidden;
-                    opacity: 0;
-                }
-            }
-
-            .collector-item-wrapper {
-                @apply flex flex-col;
-                gap: 1.25rem;
-                padding: 0.5rem 0.625rem;
-
-                .collector-item-name {
-                    @apply text-label-xl font-bold;
-                }
-                .collector-info-wrapper {
-                    @apply grid grid-rows-2 grid-flow-col gap-2;
-
-                    @screen tablet {
-                        @apply flex flex-col;
-                        gap: 1rem;
-                    }
-                }
             }
         }
     }
