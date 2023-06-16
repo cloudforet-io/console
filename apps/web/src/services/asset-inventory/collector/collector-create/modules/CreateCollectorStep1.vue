@@ -189,11 +189,13 @@ onMounted(() => {
 
                     .plugin-card-item {
                         border-radius: 0.375rem;
+                        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
                         width: 100%;
                         min-height: unset;
+                        padding: 1.5rem;
 
                         .plugin-card-content {
-                            @apply flex justify-between;
+                            @apply flex justify-between gap-4;
                             width: 100%;
                             .select-button {
                                 flex-shrink: 0;

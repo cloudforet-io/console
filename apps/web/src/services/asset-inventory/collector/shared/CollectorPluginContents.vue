@@ -91,19 +91,23 @@ const state = reactive({
         width: 100%;
 
         .plugin-name {
-            @apply text-label-md text-gray-900;
-            margin-bottom: 0.25rem;
+            @apply text-label-lg text-gray-900;
+            margin-bottom: 0.375rem;
             .beta {
                 @apply text-label-xs text-coral-500 font-normal;
             }
         }
         .plugin-description {
-            @apply inline-flex items-end gap-1;
-            margin-bottom: 0.5rem;
+            @apply inline-flex flex-col gap-1;
+            margin-bottom: 1rem;
             flex-wrap: wrap;
             .plugin-description-text {
-                @apply text-label-sm text-gray-500 truncate;
-                max-width: 18.75rem;
+                @apply text-paragraph-md text-gray-500;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                text-overflow: ellipsis;
                 flex-shrink: 1;
             }
         }

@@ -199,13 +199,13 @@ watch(() => state.selectedRepository, (repository) => {
         margin-bottom: 1.625rem;
 
         .provider-item {
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
     }
 
     .repository {
         .repository-item {
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
     }
     .dropdown-container {
