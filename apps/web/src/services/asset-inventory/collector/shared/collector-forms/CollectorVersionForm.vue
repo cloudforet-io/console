@@ -69,7 +69,7 @@ const initSelectedVersion = () => {
         const originVersion = collectorFormState.originCollector?.plugin_info?.version;
         collectorFormStore.$patch({
             version: originVersion ?? collectorFormState.versions[0] ?? '',
-            autoUpgrade: originAutoUpgrade ?? true,
+            autoUpgrade: props.getVersionsOnPluginIdChange ? true : (originAutoUpgrade ?? true),
         });
     }
 };
