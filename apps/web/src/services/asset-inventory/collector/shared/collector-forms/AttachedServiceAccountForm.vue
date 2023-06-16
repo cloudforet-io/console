@@ -4,7 +4,6 @@
                        :invalid="invalidState.selectedAttachedServiceAccount"
                        :invalid-text="invalidTexts.selectedAttachedServiceAccount"
                        :valid="state.isAttachedServiceAccountValid"
-                       :valid-text="$t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT_VALID')"
                        :required="true"
                        :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
         >
