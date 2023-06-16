@@ -92,6 +92,7 @@ interface FullData {
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
+const TABLE_COL_MIN_WIDTH = '5rem';
 
 const props = defineProps<WidgetProps>();
 
@@ -118,6 +119,7 @@ const state = reactive({
         const refinedFieldsWithLabel = refinedFields.map((field) => ({
             ...field,
             label: `${field.label}\nFailure count`,
+            width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
         }));
         const groupByLabel = ASSET_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
@@ -126,6 +128,7 @@ const state = reactive({
                 label: groupByLabel,
                 name: state.groupByKey,
                 textOptions: { type: 'reference', referenceType },
+                width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
             },
             ...refinedFieldsWithLabel,
         ];
