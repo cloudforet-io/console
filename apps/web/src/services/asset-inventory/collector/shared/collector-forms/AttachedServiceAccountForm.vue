@@ -66,6 +66,7 @@ import type {
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 
 
 
@@ -103,7 +104,7 @@ const state = reactive({
         return !invalidState.selectedAttachedServiceAccount;
     }),
     handlerParams: computed(() => {
-        queryHelper.setFilters([]); // init filters
+        queryHelper.setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '!=' }]); // init filters
         if (collectorFormStore.collectorProvider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
         }
