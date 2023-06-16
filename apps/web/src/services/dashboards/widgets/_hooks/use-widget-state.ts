@@ -116,6 +116,7 @@ const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFil
     const results: ConsoleFilter[] = [];
     Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
         if (!filterItems?.length) return;
+        // HACK: This is temporary code for cloud_service_type filter
         if ((filterKey === ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type)) {
             filterItems.forEach((d) => {
                 const key = 'cloud_service_type';
