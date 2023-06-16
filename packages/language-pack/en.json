@@ -2191,7 +2191,7 @@
 				"NO_DATA": "There’s no collector created yet.",
 				"NO_SCHEDULE": "No Scheduled",
 				"PLUGIN": "Plugin",
-				"RECENT_JOBS": "Recent Collector Jobs (Last 5 days)",
+				"RECENT_JOBS": "Recent data collection results within the past 5 days",
 				"SCHEDULED": "Scheduled",
 				"SCHEDULED_TIME": "in {hr} hr {m} mins",
 				"SET_SCHEDULE": "Set schedule",
