@@ -101,9 +101,8 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, QueryTag, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -118,6 +117,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import { peacock, green, red } from '@/styles/colors';
 
@@ -165,7 +165,6 @@ export default {
         PCollectorHistoryChart,
     },
     setup() {
-        const currentQuery = SpaceRouter.router.currentRoute.query;
         const storeState = reactive({
             timezone: computed(() => store.state.user.timezone),
             collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
@@ -188,7 +187,13 @@ export default {
             } as ValueHandlerMap,
         });
 
-        const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters);
+        const queryTagsHelper = useQueryTags({
+            keyItemSets: handlers.keyItemSets,
+            referenceStore: {
+                'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
+            },
+        });
+        const { queryTags, filters: searchFilters } = queryTagsHelper;
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             loading: true,
@@ -224,7 +229,6 @@ export default {
             pageSize: 15,
             thisPage: 1,
             totalCount: 0,
-            queryTags: [] as QueryTag[],
         });
 
         /* api */
@@ -234,7 +238,7 @@ export default {
         const getQuery = () => {
             apiQueryHelper
                 .setPageStart(state.pageStart).setPageLimit(state.pageSize)
-                .setFilters(searchQueryHelper.filters);
+                .setFilters(searchFilters.value);
 
             let statusValues: JOB_STATUS[] = [];
             if (state.selectedStatus === 'inProgress') {
@@ -279,9 +283,8 @@ export default {
         const handleChange = async (options: ToolboxOptions = {}) => {
             setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
             if (options.queryTags) {
-                state.queryTags = options.queryTags;
-                searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-                replaceUrlQuery('filters', apiQueryHelper.rawQueryStrings);
+                queryTagsHelper.setQueryTags(options.queryTags);
+                replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
             }
             if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
             if (options?.pageLimit !== undefined) {
@@ -297,13 +300,10 @@ export default {
         };
         const handleClickDate = async (data) => {
             state.selectedStatus = data.type;
-            state.queryTags = [
-                {
-                    key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
-                    value: { label: data.date, name: data.date },
-                    operator: '=',
-                },
-            ];
+            queryTagsHelper.setFilters([
+                ...searchFilters.value,
+                { k: 'created_at', v: data.date, o: '=' },
+            ]);
         };
 
         (async () => {
@@ -311,10 +311,10 @@ export default {
                 store.dispatch('reference/plugin/load'),
                 store.dispatch('reference/collector/load'),
             ]);
-            searchQueryHelper.setReference({
-                'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
-            });
-            state.queryTags = searchQueryHelper.queryTags;
+
+            const currentQuery = SpaceRouter.router.currentRoute.query;
+            queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
+
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
         })();
@@ -330,6 +330,7 @@ export default {
             ...toRefs(state),
             storeState,
             handlers,
+            queryTags,
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,
             ASSET_INVENTORY_ROUTE,
