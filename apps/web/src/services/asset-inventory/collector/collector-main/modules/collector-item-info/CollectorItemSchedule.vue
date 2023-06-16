@@ -93,6 +93,9 @@ const handleClickSchedule = () => {
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply flex flex-col items-start;
+    gap: 0.5rem;
+
     .info-label {
         @apply text-label-sm text-gray-500;
     }

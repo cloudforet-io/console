@@ -42,6 +42,10 @@ const state = reactive({
 
 <style scoped lang="postcss">
 .info-item {
+    @apply flex flex-col flex-wrap;
+    flex: 1;
+    gap: 0.5rem;
+
     .info-label {
         @apply text-label-sm text-gray-500;
     }
@@ -57,19 +61,17 @@ const state = reactive({
         }
 
         .plugin-info {
-            @apply absolute flex;
-            width: 100%;
-            bottom: 0.25rem;
-            left: 1.5rem;
+            @apply flex;
+            flex: 1;
 
             .plugin-name {
                 @apply truncate;
-                width: calc(75% - 0.125rem);
+                flex: 3;
             }
 
             .plugin-version {
                 @apply truncate text-label-sm text-gray-700;
-                width: calc(25% - 0.125rem);
+                flex: 1;
             }
         }
     }

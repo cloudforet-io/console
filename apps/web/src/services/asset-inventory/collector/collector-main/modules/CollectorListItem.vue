@@ -119,7 +119,7 @@ const handleClickCollectData = async (collectorId) => {
                 @apply text-label-xl font-bold;
             }
             .collector-info-wrapper {
-                @apply flex;
+                @apply flex flex-wrap;
                 gap: 1.5rem;
 
                 @screen tablet {
@@ -130,14 +130,7 @@ const handleClickCollectData = async (collectorId) => {
                 .collector-info-view {
                     @apply flex flex-col flex-wrap;
                     gap: 1.5rem;
-                    width: 50%;
-
-                    .info-item {
-                        @apply relative flex flex-col flex-wrap;
-                        width: 100%;
-                        min-height: 2.75rem;
-                        gap: 0.5rem;
-                    }
+                    flex: 1;
                 }
             }
         }
