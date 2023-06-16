@@ -223,6 +223,10 @@ const refineChartData = (data: ChartDataModel[]): XYChartData[] => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
+    xAxis.get('renderer').grid.template.setAll({
+        strokeOpacity: 1,
+        location: 0.5,
+    });
     yAxis.get('renderer').setAll({
         minGridDistance: 18,
     });
