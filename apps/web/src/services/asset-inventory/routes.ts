@@ -20,7 +20,7 @@ const ServerPage = () => import('@/services/asset-inventory/server/ServerPage.vu
 const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/CloudServicePage.vue');
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
-const CollectorPage = () => import('@/services/asset-inventory/collector/collector-main/CollectorPage.vue');
+const CollectorMainPage = () => import('@/services/asset-inventory/collector/collector-main/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/collector/collector-create/CollectorCreatePage.vue');
 
 const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
@@ -100,7 +100,7 @@ const assetInventoryRoute: RouteConfig = {
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
                     meta: { lnbVisible: true },
                     props: true,
-                    component: CollectorPage as any,
+                    component: CollectorMainPage as any,
                 },
                 {
                     path: 'create',
