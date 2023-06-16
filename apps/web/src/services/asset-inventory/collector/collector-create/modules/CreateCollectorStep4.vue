@@ -36,8 +36,8 @@
                         :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
                         :loading="state.collectLoading"
                         @confirm="handleConfirmCreateCollector"
-                        @cancel="handleRouteToCollectorList"
-                        @close="handleRouteToCollectorList"
+                        @cancel="goToCollectorDetailPage"
+                        @close="goToCollectorDetailPage"
         >
             <template #close-button>
                 {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
@@ -150,7 +150,7 @@ const handleConfirmCreateCollector = async () => {
             collector_id: state.createdCollectorId,
         });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-        handleRouteToCollectorList();
+        goToCollectorDetailPage();
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
     } finally {
@@ -158,9 +158,16 @@ const handleConfirmCreateCollector = async () => {
     }
 };
 
-const handleRouteToCollectorList = () => {
+const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+    if (state.createdCollectorId) {
+        SpaceRouter.router.push({
+            name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+            params: {
+                collectorId: state.createdCollectorId,
+            },
+        });
+    }
 };
 
 (() => {
