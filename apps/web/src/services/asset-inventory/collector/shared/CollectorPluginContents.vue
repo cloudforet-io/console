@@ -13,7 +13,9 @@
                 >{{ $t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
             </p>
             <div class="plugin-description">
-                <span class="plugin-description-text">
+                <span class="plugin-description-text"
+                      :class="{ 'sm': props.size === 'sm' }"
+                >
                     {{ state.description }}
                 </span>
                 <p-anchor v-if="state.pluginDetailLink"
@@ -121,11 +123,15 @@ const state = reactive({
             flex-wrap: wrap;
             .plugin-description-text {
                 @apply text-paragraph-md text-gray-500;
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-                -webkit-line-clamp: 2;
-                overflow: hidden;
-                text-overflow: ellipsis;
+
+                &.sm {
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
                 flex-shrink: 1;
             }
         }
