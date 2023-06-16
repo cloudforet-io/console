@@ -5,7 +5,7 @@
         </p>
         <div class="label-description">
             <div v-if="props.item.schedule">
-                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                <div v-if="state.status === JOB_STATE.SUCCESS && props.item.schedule.hours && props.item.schedule.hours.length > 0"
                      class="scheduled"
                 >
                     <p-i
@@ -22,7 +22,7 @@
                         </span>
                     </p>
                 </div>
-                <span v-else-if="state.isInProgress"
+                <span v-else-if="state.status === JOB_STATE.IN_PROGRESS"
                       class="current-status-progress"
                 >
                     {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} - <span class="remained-task">{{ state.remained_tasks }}%</span>
@@ -66,7 +66,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    isInProgress: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status === JOB_STATE.IN_PROGRESS),
+    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs().utc();
