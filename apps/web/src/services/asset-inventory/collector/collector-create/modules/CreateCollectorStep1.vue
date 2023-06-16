@@ -23,7 +23,9 @@
                         >
                             <template #content>
                                 <div class="plugin-card-content">
-                                    <collect-plugin-contents :plugin="item" />
+                                    <collect-plugin-contents :plugin="item"
+                                                             size="sm"
+                                    />
                                     <p-button style-type="secondary"
                                               class="select-button"
                                               @click="handleClickNextStep(item)"
