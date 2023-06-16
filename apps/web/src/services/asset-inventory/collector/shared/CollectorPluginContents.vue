@@ -2,8 +2,9 @@
     <div class="plugin-data-contents">
         <p-lazy-img :src="state.icon"
                     class="plugin-icon"
-                    width="2.5rem"
-                    height="2.5rem"
+                    :class="{ 'sm': props.size === 'sm' }"
+                    :width="state.iconSize"
+                    :height="state.iconSize"
         />
         <div class="contents">
             <p class="plugin-name">
@@ -35,6 +36,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useWindowSize } from '@vueuse/core';
 import {
     defineProps, reactive, computed,
 } from 'vue';
@@ -49,15 +51,27 @@ import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/re
 
 import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 
+type Size = 'sm' | 'lg';
+
 // TODO: Add plugin data type
 interface Props {
     plugin?: CollectorPluginModel|RepositoryPluginModel|null;
+    size?: Size;
 }
 
-const props = defineProps<Props>();
+const { width } = useWindowSize();
+
+const props = withDefaults(defineProps<Props>(), {
+    plugin: null,
+    size: 'lg',
+});
 
 const state = reactive({
     icon: computed<string>(() => state.pluginItem?.icon ?? ''),
+    iconSize: computed(() => {
+        if (props.size === 'sm' || width.value < 1024) return '2.5rem';
+        return '3rem';
+    }),
     name: computed<string>(() => state.pluginItem?.name ?? state.pluginItem?.key ?? ''),
     description: computed<string>(() => state.pluginItem?.description ?? ''),
     labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin
@@ -84,7 +98,11 @@ const state = reactive({
     width: 100%;
     .plugin-icon {
         flex-shrink: 0;
-        margin-right: 1.5rem;
+        margin-right: 1rem;
+
+        &.sm {
+            margin-right: 1.5rem;
+        }
     }
     .contents {
         @apply flex flex-col;
