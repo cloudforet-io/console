@@ -340,6 +340,7 @@ export default {
 
         const hiddenFilterHelper = new QueryHelper();
         const hiddenFilters = computed<ConsoleFilter[]>(() => {
+            hiddenFilterHelper.setFilters([]);
             if (props.isServerPage) {
                 hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
             } else {
