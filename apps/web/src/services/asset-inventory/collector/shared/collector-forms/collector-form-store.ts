@@ -27,7 +27,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         tags: {} as Tag,
         name: '',
         version: '' as string,
-        autoUpgrade: false,
+        autoUpgrade: true,
         scheduleHours: [] as number[],
         schedulePower: false,
         attachedServiceAccount: [] as AttachedServiceAccount,
