@@ -45,6 +45,7 @@ import {
 
 import {
     PAnchor, PLazyImg, PLabel,
+    screens,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -71,7 +72,7 @@ const props = withDefaults(defineProps<Props>(), {
 const state = reactive({
     icon: computed<string>(() => state.pluginItem?.icon ?? ''),
     iconSize: computed(() => {
-        if (props.size === 'sm' || width.value < 1024) return '2.5rem';
+        if (props.size === 'sm' || width.value <= screens.tablet.max) return '2.5rem';
         return '3rem';
     }),
     name: computed<string>(() => state.pluginItem?.name ?? state.pluginItem?.key ?? ''),
