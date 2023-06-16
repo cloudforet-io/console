@@ -29,13 +29,15 @@
                            :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
                            position="top"
                 >
-                    <p-i
-                        name="ic_settings-filled"
-                        class="icon progress"
-                        height="1.125rem"
-                        width="1.125rem"
-                        color="inherit"
-                    />
+                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
+                        <p-i
+                            name="ic_settings-filled"
+                            class="icon progress"
+                            height="1.125rem"
+                            width="1.125rem"
+                            color="inherit"
+                        />
+                    </router-link>
                 </p-tooltip>
                 <p-tooltip v-else-if="jobStatus.status === JOB_STATE.NONE"
                            class="icon-fill-wrapper none"
