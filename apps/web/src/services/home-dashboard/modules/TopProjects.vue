@@ -103,21 +103,20 @@
 
 <script lang="ts">
 
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import { range } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -143,7 +142,7 @@ interface ChartData {
 interface TableColumnData {
     label?: string;
     count?: number;
-    to: Location;
+    to: RouteLocation;
 }
 interface TableItem {
     [key: string]: TableColumnData;
@@ -273,10 +272,10 @@ export default {
         //
         const queryHelper = new QueryHelper();
         const getLocation = (type: string, projectId: string) => {
-            const query: Location['query'] = {};
+            const query: RouteLocation['query'] = {};
             query.service = arrayToQueryString([type]);
 
-            const location: Location = {
+            const location: RouteLocation = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.setFilters([

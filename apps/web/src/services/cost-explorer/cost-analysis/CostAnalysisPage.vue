@@ -9,12 +9,12 @@
 </template>
 
 <script lang="ts">
+import { isEqual } from 'lodash';
 import {
     onUnmounted, watch,
 } from 'vue';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
-import { isEqual } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -85,7 +85,7 @@ export default {
         /* Watchers */
         watch(() => costAnalysisPageState.selectedQueryId, (selectedQueryId) => {
             if (props.querySetId !== selectedQueryId) {
-                const location: Location = {
+                const location: RouteLocation = {
                     params: { querySetId: selectedQueryId as string },
                     query: {},
                 };

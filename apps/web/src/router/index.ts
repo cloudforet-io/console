@@ -1,8 +1,7 @@
-import Vue from 'vue';
-import type { RouteConfig } from 'vue-router';
-import VueRouter from 'vue-router';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Router, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 
@@ -19,18 +18,19 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
 export class SpaceRouter {
-    static router: VueRouter;
+    static router: Router;
 
-    static init(routes: RouteConfig[]) {
+    static init(routes: RouteRecordRaw[]) {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
-        Vue.use(VueRouter);
+        const store = useStore();
 
-        SpaceRouter.router = new VueRouter({
-            mode: 'history',
+        SpaceRouter.router = createRouter({
+            history: createWebHistory(),
             linkActiveClass: 'open active',
             routes,
         });
+
 
         let nextPath: string;
 
@@ -48,17 +48,17 @@ export class SpaceRouter {
             }
         });
 
-        SpaceRouter.router.onReady(() => {
+        SpaceRouter.router.isReady().then(() => {
             localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
+            const userPagePermissions = store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
-            const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
+            const userAccessLevel = getUserAccessLevel(to.name as string, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
+            const userNeedPwdReset = store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
             // When a user is authenticated
@@ -89,7 +89,6 @@ export class SpaceRouter {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
 
-            const store = SpaceRouter.router.app?.$store;
             if (!store) return;
 
             if (store.state.error.visibleAuthorizationError) { store.commit('error/setVisibleAuthorizationError', false); }

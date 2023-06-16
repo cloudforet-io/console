@@ -1,6 +1,6 @@
-import type { Route } from 'vue-router';
-
 import { clone } from 'lodash';
+import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, RouteRecordNormalized } from 'vue-router';
+
 
 import type { AccessLevel, PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
 import { ACCESS_LEVEL, PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
@@ -26,11 +26,11 @@ const getMenuIdByRouteName = (routeName?: string|null): MenuId|undefined => {
     return hasMenuId ? name as MenuId : undefined;
 };
 
-export const getRouteAccessLevel = (route: Route): AccessLevel => {
-    const reversedMatched = clone(route.matched).reverse();
+export const getRouteAccessLevel = (route: RouteLocationNormalized | RouteLocationNormalizedLoaded): AccessLevel => {
+    const reversedMatched = clone(route.matched).reverse() as RouteRecordNormalized[];
     const closestRoute = reversedMatched.find((d) => d.meta?.accessLevel !== undefined);
     if (!closestRoute) return ACCESS_LEVEL.AUTHENTICATED;
-    return closestRoute.meta.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
+    return (closestRoute.meta.accessLevel as AccessLevel) ?? ACCESS_LEVEL.AUTHENTICATED;
 };
 
 // extract higher permission from userPagePermissions that exist in referenceMenuIds.
@@ -66,8 +66,8 @@ export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePerm
     if (!permission) return false;
     return getAccessTypeFromPermission(permission) >= getMenuAccessLevel(menuId);
 };
-export const isUserAccessibleToRoute = (route: Route, pagePermissions: PagePermissionTuple[]): boolean => {
+export const isUserAccessibleToRoute = (route: RouteLocationNormalized, pagePermissions: PagePermissionTuple[]): boolean => {
     const routeAccessLevel = getRouteAccessLevel(route);
-    const userAccessLevel = getUserAccessLevel(route.name, pagePermissions);
+    const userAccessLevel = getUserAccessLevel(route.name as string, pagePermissions);
     return userAccessLevel >= routeAccessLevel;
 };

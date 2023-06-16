@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -21,7 +21,7 @@ const BudgetBulkCreatePage = () => import('@/services/cost-explorer/budget/budge
 const BudgetUpdatePage = () => import('@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
 
-const costExplorerRoutes: RouteConfig = {
+const costExplorerRoutes: RouteRecordRaw = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
     meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },

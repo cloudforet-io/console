@@ -2,8 +2,8 @@
     <fragment>
         <p class="toggle">
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ORIGINAL_DATA') }}
-            <p-collapsible-toggle :toggle-type="'switch'"
-                                  :is-collapsed.sync="showFormattedBudgetData"
+            <p-collapsible-toggle v-model:is-collapsed="showFormattedBudgetData"
+                                  :toggle-type="'switch'"
                                   class="collapsible-toggle"
             />
         </p>
@@ -43,12 +43,12 @@
 
 <script lang="ts">
 
-import { computed, reactive, toRefs } from 'vue';
-import type { Location } from 'vue-router';
 
 import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { computed, reactive, toRefs } from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -89,7 +89,7 @@ interface EnrichedBudgetUsageData {
     limit: number|string;
     usd_cost: number;
     ratio: number;
-    link?: Location | string;
+    link?: RouteLocation | string;
 }
 
 interface BudgetCostType {

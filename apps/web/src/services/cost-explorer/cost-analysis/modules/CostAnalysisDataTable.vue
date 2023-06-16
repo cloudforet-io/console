@@ -60,7 +60,7 @@
                 </span>
             </template>
         </p-toolbox-table>
-        <p-button-modal :visible.sync="visibleExcelNotiModal"
+        <p-button-modal v-model:visible="visibleExcelNotiModal"
                         hide-header
                         size="sm"
                         @confirm="handleExcelDownload"
@@ -78,11 +78,12 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
 
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PAnchor, PI, PToolboxTable, PDataTable, PButtonModal,
 } from '@spaceone/design-system';
@@ -92,12 +93,10 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import type { Table } from 'pdfmake/interfaces';
-
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -217,7 +216,7 @@ export default {
         /* util */
         const getLink = (item: CostAnalyzeModel, fieldName: string) => {
             const queryHelper = new QueryHelper();
-            const query: Location['query'] = {};
+            const query: RouteLocation['query'] = {};
             if (item.region_code) {
                 query.region = arrayToQueryString([item.region_code]);
             } else if (costAnalysisPageState.filters.region_code?.length) {

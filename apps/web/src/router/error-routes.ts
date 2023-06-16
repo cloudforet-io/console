@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
@@ -8,7 +8,7 @@ export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
 });
 
-export const errorRoutes: RouteConfig[] = [
+export const errorRoutes: RouteRecordRaw[] = [
     {
         path: '/error-page/:statusCode?',
         name: ERROR_ROUTE._NAME,

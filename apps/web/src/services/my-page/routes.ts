@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -18,7 +18,7 @@ const NotificationAddPage = () => import('@/services/notification/notification-a
 // eslint-disable-next-line max-len
 // const UserManageNotificationPage = () => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue');
 
-const myPageRoutes: RouteConfig = {
+const myPageRoutes: RouteRecordRaw = {
     path: 'my-page',
     name: MY_PAGE_ROUTE._NAME,
     meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },

@@ -1,6 +1,6 @@
-import type { RouteConfig } from 'vue-router';
-
 import { upperCase } from 'lodash';
+import type { RouteRecordRaw } from 'vue-router';
+
 
 import { store } from '@/store';
 
@@ -32,7 +32,7 @@ const ServiceAccountSearchPage = () => import('@/services/asset-inventory/servic
 const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
 const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
 
-const assetInventoryRoute: RouteConfig = {
+const assetInventoryRoute: RouteRecordRaw = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
     meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },

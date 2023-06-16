@@ -1,9 +1,9 @@
+import Hashids from 'hashids';
 import Vue from 'vue';
 import type { VueGtag as VueGtagType } from 'vue-gtag';
 import VueGtag from 'vue-gtag';
-import type { Route } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 
-import Hashids from 'hashids';
 
 import config from '@/lib/config';
 
@@ -51,7 +51,7 @@ export class GTag {
         }
     }
 
-    static setPageView(to: Route) {
+    static setPageView(to: RouteLocationNormalized) {
         if (GTag.gtag) {
             GTag.gtag.pageview({
                 // eslint-disable-next-line camelcase

@@ -68,19 +68,18 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch, onUnmounted,
-} from 'vue';
-import type { Location } from 'vue-router';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    computed, reactive, toRefs, watch, onUnmounted,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -199,7 +198,7 @@ export default {
             }
         };
 
-        const getLink = (data): Location => ({
+        const getLink = (data): RouteLocation => ({
             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
             query: {
                 provider: data.provider,

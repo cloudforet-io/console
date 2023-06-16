@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
@@ -11,4 +11,4 @@ export default {
     name: HOME_DASHBOARD_ROUTE._NAME,
     meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     component: HomeDashboard,
-} as RouteConfig;
+} as RouteRecordRaw;

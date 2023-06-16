@@ -50,17 +50,17 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
 
-import { PDataTable } from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataTable } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -89,7 +89,7 @@ interface TableColumnData {
     label?: string;
     count?: number;
     color?: string;
-    to: Location;
+    to: RouteLocation;
 }
 interface Item {
     [key: string]: TableColumnData;
@@ -130,7 +130,7 @@ export default {
                 { k: 'project_id', o: '=', v: props.projectId },
             ]);
 
-            const location: Location = {
+            const location: RouteLocation = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     provider: primitiveToQueryString(provider),

@@ -49,20 +49,19 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
-
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
@@ -85,7 +84,7 @@ interface ChartData {
     usage: number;
     limit: number;
     usdCost: number;
-    linkLocation: Location;
+    linkLocation: RouteLocation;
 }
 
 export default defineComponent<WidgetProps>({

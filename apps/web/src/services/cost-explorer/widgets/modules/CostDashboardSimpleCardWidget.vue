@@ -4,7 +4,7 @@
     >
         <p class="title-wrapper">
             <span class="title">{{ title }}</span>
-            <span v-if="$scopedSlots['title-extra']"
+            <span v-if="$slots['title-extra']"
                   class="title-extra"
             >
                 <slot name="title-extra" />
@@ -54,13 +54,13 @@
 </template>
 
 <script lang="ts">
+import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
-import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
 
 import type { CurrencySymbol } from '@/store/modules/display/config';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
@@ -80,7 +80,7 @@ interface Props {
     showDivider: boolean;
     description: string;
     noData: boolean;
-    widgetLink?: Location|string;
+    widgetLink?: RouteLocation|string;
 
 }
 
@@ -131,7 +131,7 @@ export default defineComponent<Props>({
             default: false,
         },
         widgetLink: {
-            type: [Object, String] as PropType<Location|string>,
+            type: [Object, String] as PropType<RouteLocation|string>,
             default: undefined,
         },
     },

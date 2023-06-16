@@ -95,13 +95,13 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router';
-
-import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+
 
 import { store } from '@/store';
 
@@ -164,7 +164,7 @@ export default {
             currencyRates: computed(() => store.state.display.currencyRates),
         });
         const state = reactive({
-            linkLocation: computed<Location>(() => ({
+            linkLocation: computed<RouteLocation>(() => ({
                 name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                 params: {
                     budgetId: props.budgetUsage.budget_id,

@@ -140,20 +140,19 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find, range } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -187,8 +186,8 @@ interface Item {
     totalCount: number;
     createdCount: number;
     deletedCount: number;
-    createdHref?: Location;
-    deletedHref?: Location;
+    createdHref?: RouteLocation;
+    deletedHref?: RouteLocation;
 }
 
 export default {

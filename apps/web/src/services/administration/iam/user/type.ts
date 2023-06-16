@@ -1,5 +1,5 @@
 import VueI18n from 'vue-i18n';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
 import type { Tags, TimeStamp } from '@/models';
 
@@ -106,7 +106,7 @@ export interface ProtocolItem {
 
 export interface EnrichedProtocolItem extends ProtocolItem {
 	label: TranslateResult;
-	link: Partial<Location>;
+	link: Partial<RouteLocation>;
 	protocolType: string;
 	tags: Tags;
 	icon: any;

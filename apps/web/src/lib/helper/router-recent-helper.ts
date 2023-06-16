@@ -1,4 +1,4 @@
-import type { Route } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 
 import type { RecentConfig } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
@@ -10,12 +10,12 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-export const getRecentConfig = (to: Route): RecentConfig | undefined => {
+export const getRecentConfig = (to: RouteLocationNormalized): RecentConfig | undefined => {
     /* DASHBOARD */
     if (to.name === DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME || to.name === DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
-        return { itemType: RECENT_TYPE.DASHBOARD, itemId: dashboardId };
+        return { itemType: RECENT_TYPE.DASHBOARD, itemId: dashboardId as string };
     }
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
@@ -38,7 +38,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     if (to.name === PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME) {
         const projectId = to?.params?.id;
         if (!projectId) return undefined;
-        return { itemType: RECENT_TYPE.PROJECT, itemId: projectId };
+        return { itemType: RECENT_TYPE.PROJECT, itemId: projectId as string };
     }
 
     /* MENU */

@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -15,7 +15,7 @@ const AlertPage = () => import('@/services/alert-manager/alert/AlertPage.vue');
 const EscalationPolicyPage = () => import('@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import('@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
 
-const alertManagerRoutes: RouteConfig = {
+const alertManagerRoutes: RouteRecordRaw = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
     meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },

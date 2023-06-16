@@ -123,27 +123,26 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
 } from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
-
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -170,7 +169,7 @@ interface SummaryData {
     provider: string;
     label: string | TranslateResult;
     count: number | string;
-    to: string | Location;
+    to: string | RouteLocation;
 }
 
 const DAY_COUNT = 14;
@@ -305,7 +304,7 @@ export default {
             chart.cursor.behavior = 'none';
         };
         const getLocation = (type: ServiceCategory) => {
-            const query: Location['query'] = {};
+            const query: RouteLocation['query'] = {};
             if (type !== SERVICE_CATEGORY.ALL) {
                 query.service = type;
             }
@@ -313,7 +312,7 @@ export default {
             // set filters
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
-            const location: Location = {
+            const location: RouteLocation = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,

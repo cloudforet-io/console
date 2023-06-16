@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 // Routes
 import { store } from '@/store';
@@ -22,7 +22,7 @@ export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',
 });
 
-export const serviceRoutes: RouteConfig[] = [
+export const serviceRoutes: RouteRecordRaw[] = [
     ...authRoutes,
     {
         path: '/',

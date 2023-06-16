@@ -1,7 +1,7 @@
-import type VueRouter from 'vue-router';
+import type { Router } from 'vue-router';
+import { useRouter } from 'vue-router';
 import type { Getter } from 'vuex';
 
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import {
@@ -53,7 +53,7 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
     return { styleType: 'primary', disableButton: false, size: 'md' };
 };
 
-const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
+const filterMenuByRoute = (menuList: DisplayMenu[], router: Router): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
@@ -98,10 +98,11 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
+    const router = useRouter();
     const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter((d) => d.id !== MENU_ID.COST_EXPLORER);
 
     let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
-    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
+    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };

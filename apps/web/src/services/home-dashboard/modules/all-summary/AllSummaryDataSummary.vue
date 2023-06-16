@@ -52,18 +52,17 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
-
-import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { range } from 'lodash';
 
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -84,7 +83,7 @@ interface SummaryData {
     type: string;
     provider: string;
     count: number | string;
-    to: string | Location;
+    to: string | RouteLocation;
 }
 
 export default {
@@ -158,7 +157,7 @@ export default {
             }
             return location;
         };
-        const getAllServiceLocation = (): Location => {
+        const getAllServiceLocation = (): RouteLocation => {
             if (props.activeTab === DATA_TYPE.BILLING) {
                 return getBillingServiceLocation(undefined, true);
             }
@@ -169,7 +168,7 @@ export default {
                 },
             };
         };
-        const getServiceLocation = (data): Location => {
+        const getServiceLocation = (data): RouteLocation => {
             if (props.activeTab === DATA_TYPE.BILLING) {
                 return getBillingServiceLocation(data.service_code, false);
             }
@@ -221,7 +220,7 @@ export default {
                 const summaryData: SummaryData[] = [];
 
                 results.forEach((d) => {
-                    const detailLocation: Location = {
+                    const detailLocation: RouteLocation = {
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,

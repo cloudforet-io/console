@@ -1,12 +1,10 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
 } from '@cloudforet/core-lib/space-connector/error';
-
-import { SpaceRouter } from '@/router';
+import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -35,11 +33,12 @@ export default class ErrorHandler {
     }
 
     static handleError(error: unknown, errorInfo?: ErrorInfo) {
+        const router = useRouter();
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ACCESS_LEVEL.AUTHENTICATED) {
+                && getRouteAccessLevel(router.currentRoute.value) >= ACCESS_LEVEL.AUTHENTICATED) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {
@@ -47,9 +46,9 @@ export default class ErrorHandler {
             console.error(error);
         } else if (isInstanceOfNoResourceError(error)) {
             showErrorMessage('No Resource', 'No Resource');
-            SpaceRouter.router.push(error.redirectUrl);
+            router.push(error.redirectUrl);
         } else if (isInstanceOfNoSearchResourceError(error)) {
-            SpaceRouter.router.push(error.redirectUrl);
+            router.push(error.redirectUrl);
         } else if (isInstanceOfAPIError(error)) {
             console.error('API Error', error);
         } else {

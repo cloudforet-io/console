@@ -1,6 +1,6 @@
-import { computed, getCurrentInstance } from 'vue';
-import type Vue from 'vue';
-import type { Location } from 'vue-router';
+import { computed } from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -9,36 +9,26 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 export const useBreadcrumbs = () => {
-    const vm = getCurrentInstance()?.proxy as Vue;
+    const route = useRoute();
     return {
         breadcrumbs: computed(() => {
-            const matched = vm.$route.matched;
+            const matched = route.matched;
 
             return matched.reduce((results, d) => {
                 if (d.name === 'root') return results;
 
-                const location: Location = { path: d.path };
-
-                // replace parameters in path with value from route
-                const currentRegexRes = d.regex.exec(d.path) ?? [];
-                if (currentRegexRes.length > 1) {
-                    let path = currentRegexRes[0];
-                    const routeRegexRes = matched[matched.length - 1].regex.exec(vm.$route.path) ?? [];
-                    currentRegexRes.forEach((param, i) => {
-                        if (i !== 0) {
-                            path = path.replace(param, routeRegexRes[i]);
-                        }
-                    });
-                    location.path = path;
-                }
+                const location = {
+                    path: d.path,
+                    params: route.params,
+                } as RouteLocation;
 
                 if (d.meta.breadcrumbs && typeof d.meta.breadcrumbs === 'function') {
-                    const breadcrumbsFunctionResults = d.meta.breadcrumbs(vm.$route);
+                    const breadcrumbsFunctionResults = d.meta.breadcrumbs(route);
                     results.push(...breadcrumbsFunctionResults);
                 } else if (d.meta.label) {
                     const label = d.meta.label;
                     if (typeof label === 'function') {
-                        const labelResult = label(vm.$route);
+                        const labelResult = label(route);
                         if (labelResult) results.push({ name: labelResult, to: location, copiable: d.meta.copiable });
                     } else {
                         results.push({ name: label, to: location, copiable: d.meta.copiable });
@@ -46,8 +36,9 @@ export const useBreadcrumbs = () => {
                 } else if (d.meta.translationId) {
                     const translationId = d.meta.translationId;
                     if (typeof translationId === 'function') {
-                        const translationIdResult = translationId(vm.$route);
-                        if (translationIdResult) results.push({ name: i18n.t(translationIdResult), to: location, copiable: d.meta.copiable });
+                        const translationIdResult = translationId(route);
+                        // TODO: translationId's result can be an array of translationId, this need to be refactored
+                        if (translationIdResult && !Array.isArray(translationIdResult)) results.push({ name: i18n.t(translationIdResult), to: location, copiable: d.meta.copiable });
                     } else {
                         results.push({ name: i18n.t(translationId), to: location, copiable: d.meta.copiable });
                     }

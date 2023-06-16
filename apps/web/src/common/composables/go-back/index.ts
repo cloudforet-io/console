@@ -1,10 +1,10 @@
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 
-export const useGoBack = (mainRoute: Location) => {
+export const useGoBack = (mainRoute: RouteLocation) => {
     let pathFrom;
-    const setPathFrom = (path: Location) => {
+    const setPathFrom = (path: RouteLocation) => {
         pathFrom = path;
     };
 

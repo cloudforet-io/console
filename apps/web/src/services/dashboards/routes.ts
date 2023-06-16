@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteLocation, RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -17,7 +17,7 @@ const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create
 const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
 
-const dashboardsRoute: RouteConfig = {
+const dashboardsRoute: RouteRecordRaw = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
     meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
@@ -74,7 +74,7 @@ const dashboardsRoute: RouteConfig = {
                                             name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                                            },
+                                            } as RouteLocation,
                                         },
                                     ];
                                     if (params.dashboardId) {
@@ -85,7 +85,7 @@ const dashboardsRoute: RouteConfig = {
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
-                                            },
+                                            } as unknown as RouteLocation,
                                             copiable: true,
                                         });
                                     }
@@ -123,7 +123,7 @@ const dashboardsRoute: RouteConfig = {
                                             name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                                            },
+                                            } as RouteLocation,
                                         },
                                     ];
                                     if (params.dashboardId) {
@@ -134,7 +134,7 @@ const dashboardsRoute: RouteConfig = {
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
-                                            },
+                                            } as unknown as RouteLocation,
                                             copiable: true,
                                         });
                                     }

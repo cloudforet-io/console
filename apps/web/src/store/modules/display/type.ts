@@ -1,5 +1,5 @@
 import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
 import type { SidebarType, Currency } from '@/store/modules/display/config';
 
@@ -11,7 +11,7 @@ export interface DisplayMenu extends Menu {
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;
-    to: Location;
+    to: RouteLocation;
     subMenuList?: DisplayMenu[];
 }
 

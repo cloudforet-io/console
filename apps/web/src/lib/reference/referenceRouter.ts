@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import type { Location } from 'vue-router';
-
-import { concat } from 'lodash';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { concat } from 'lodash';
+import type { RouteLocation } from 'vue-router';
+
+
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
@@ -11,13 +11,13 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 interface LinkFormatter {
-    (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
+    (baseUrl: string, data: string, reference: Reference, query: RouteLocation['query']): RouteLocation;
 }
 
 const queryHelper = new QueryHelper();
 
 const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query };
+    const location = { name, query } as RouteLocation;
     let filters: any[] = [];
     if (data) {
         queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
@@ -35,9 +35,9 @@ const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
         return {
             name,
             query,
-            params: data ? { id: data } : undefined,
-        };
-    } return {};
+            params: (data ? { id: data } : undefined) as RouteLocation['params'],
+        } as RouteLocation;
+    } return {} as RouteLocation;
 };
 
 const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
@@ -46,13 +46,13 @@ const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) 
         query: {
             ...query,
             select_pg: data,
-        },
-    };
+        } as RouteLocation['query'],
+    } as RouteLocation;
     return location;
 };
 
 const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query };
+    const location = { name, query } as RouteLocation;
     let filters: any[] = [];
     if (data) {
         queryHelper.setFilters([{ k: 'collector_id', v: data, o: '=' }]);
@@ -69,8 +69,8 @@ const serviceAccountLinkFormatter: LinkFormatter = (name, data, reference, query
     const location = {
         name,
         query,
-        params: { serviceAccountId: data },
-    };
+        params: { serviceAccountId: data } as RouteLocation['params'],
+    } as RouteLocation;
     return location;
 };
 
@@ -81,8 +81,8 @@ const cloudServiceLinkFormatter: LinkFormatter = (name, data, reference, query) 
         params: {
             searchKey: reference.reference_key || 'reference.resource_id',
             id: data,
-        },
-    };
+        } as RouteLocation['params'],
+    } as RouteLocation;
     return location;
 };
 
@@ -90,8 +90,8 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
     const location = {
         name,
         query,
-        params: { id: data },
-    };
+        params: { id: data } as RouteLocation['params'],
+    } as RouteLocation;
     return location;
 };
 
@@ -135,13 +135,13 @@ const routerMap: RouterMap = {
         },
 };
 
-export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {
+export const referenceRouter = (data: string, reference: Reference, query?: RouteLocation['query']): RouteLocation => {
     if (routerMap[reference.resource_type]) {
         const { name, formatter } = routerMap[reference.resource_type];
-        return formatter(name, data, reference, query);
+        return formatter(name, data, reference, query as RouteLocation['query']);
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
-    return {};
+    return {} as RouteLocation;
 };
 
 export default referenceRouter;

@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -15,7 +15,7 @@ const NoticeDetailPage = () => import('@/services/info/notice/notice-detail/Noti
 const NoticeCreatePage = () => import('@/services/info/notice/notice-create/NoticeCreatePage.vue');
 const NoticeUpdatePage = () => import('@/services/info/notice/notice-update/NoticeUpdatePage.vue');
 
-const infoRoute: RouteConfig = {
+const infoRoute: RouteRecordRaw = {
     path: 'info',
     name: INFO_ROUTE._NAME,
     meta: { menuId: MENU_ID.INFO },

@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { errorRoutes } from '@/router/error-routes';
 
@@ -17,7 +17,7 @@ const ROOT_DOMAIN_ROUTE = Object.freeze({
     },
 });
 
-export const adminDomainServiceRoutes: RouteConfig[] = [
+export const adminDomainServiceRoutes: RouteRecordRaw[] = [
     ...authRoutes,
     {
         path: '/',
@@ -31,7 +31,7 @@ export const adminDomainServiceRoutes: RouteConfig[] = [
                 component: TotalDashboardPage,
             },
             administrationRoute,
-        ] as RouteConfig[],
+        ] as RouteRecordRaw[],
     },
     ...errorRoutes,
 ];

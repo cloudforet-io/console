@@ -45,13 +45,13 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-import type { Location } from 'vue-router';
-
-import { PLazyImg, PDivider } from '@spaceone/design-system';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { PLazyImg, PDivider } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+import type { RouteLocation } from 'vue-router';
+
+
 
 import { store } from '@/store';
 
@@ -103,7 +103,7 @@ export default {
                 cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
             }
 
-            const res: Location = {
+            const res: RouteLocation = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,

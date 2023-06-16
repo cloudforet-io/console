@@ -1,6 +1,6 @@
-import type { Location } from 'vue-router';
-
 import { forEach } from 'lodash';
+import type { RouteLocation } from 'vue-router';
+
 
 import { SpaceRouter } from '@/router';
 
@@ -22,12 +22,12 @@ export const replaceUrlQuery = async (keyOrQuery?: string|Record<string, RouteQu
 
     if (typeof keyOrQuery === 'string') {
         const key = keyOrQuery;
-        query = { ...SpaceRouter.router.currentRoute.query };
+        query = { ...SpaceRouter.router.currentRoute.value.query };
         if ((value === null || value === undefined) && query[key]) delete query[key];
         else query[key] = value;
     } else if (typeof keyOrQuery === 'object') {
         const queryKeys = Object.keys(keyOrQuery);
-        query = { ...SpaceRouter.router.currentRoute.query };
+        query = { ...SpaceRouter.router.currentRoute.value.query };
         queryKeys.forEach((key) => {
             const queryValue = keyOrQuery[key] as RouteQueryString;
             if ((queryValue === null || queryValue === undefined) && query[key]) delete query[key];
@@ -170,7 +170,7 @@ export const arrayToQueryString = (value?: any[]): RouteQueryString => {
  * @param locationQuery
  * @description convert location query to search filters. will be DEPRECATED.
  */
-export const locationQueryToString = (locationQuery: Location['query']): string => {
+export const locationQueryToString = (locationQuery: RouteLocation['query']): string => {
     if (!locationQuery) return '';
     const queryStrings: string[] = [];
     forEach(locationQuery, (v, k) => {

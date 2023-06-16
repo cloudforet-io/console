@@ -42,14 +42,14 @@
 </template>
 
 <script lang="ts">
+import { PI, PTooltip } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Route } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 
-import { PI, PTooltip } from '@spaceone/design-system';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -57,7 +57,7 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 interface Props {
     show?: boolean;
     label: string|undefined|TranslateResult;
-    to?: Route;
+    to?: RouteLocationNormalized;
     href?: string;
     isBeta?: boolean;
     isNew?: boolean;

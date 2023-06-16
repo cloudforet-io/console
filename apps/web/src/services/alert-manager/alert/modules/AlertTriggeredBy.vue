@@ -12,15 +12,15 @@
 </template>
 
 <script lang="ts">
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { PAnchor } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
-import { PAnchor } from '@spaceone/design-system';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
 
@@ -60,7 +60,7 @@ export default {
             webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
             userLabel: computed<string|undefined>(() => props.userReference?.label),
             label: computed(() => state.webhookLabel || state.userLabel || props.value),
-            link: computed<Location|undefined>(() => {
+            link: computed<RouteLocation|undefined>(() => {
                 if (props.disableLink) return undefined;
                 if (props.webhookReference) {
                     return {

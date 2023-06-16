@@ -57,15 +57,15 @@
 
 <script lang="ts">
 
+import { PI } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { PropType, DirectiveFunction, SetupContext } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { RawLocation } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
-import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
@@ -86,11 +86,13 @@ interface SubMenu extends DisplayMenu {
     href?: string;
 }
 
+type RawRouteLocation = RouteLocation | string;
+
 interface Props {
     show: boolean;
     menuId: MenuId;
     label: TranslateResult;
-    to?: RawLocation;
+    to?: RawRouteLocation;
     href?: string;
     hasPermission: boolean;
     isOpened: boolean;

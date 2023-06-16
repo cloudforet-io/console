@@ -53,22 +53,21 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, watch, onUnmounted, computed,
-} from 'vue';
-import type { Location } from 'vue-router';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import Color from 'color';
 import { range, orderBy } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    reactive, toRefs, watch, onUnmounted, computed,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -194,7 +193,7 @@ export default {
         };
 
         const getLocation = (provider: string, region: string, projectId: string, label: string) => {
-            const query: Location['query'] = {
+            const query: RouteLocation['query'] = {
                 provider: primitiveToQueryString(provider),
                 region: arrayToQueryString([region]),
             };
@@ -203,7 +202,7 @@ export default {
             // set filters
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: projectId }]);
 
-            const location: Location = {
+            const location: RouteLocation = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,

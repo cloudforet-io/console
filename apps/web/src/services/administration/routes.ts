@@ -1,4 +1,4 @@
-import type { RouteConfig } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -21,7 +21,7 @@ const PolicyDetailPage = () => import('@/services/administration/iam/policy/poli
 // const ProviderPage = () => import('@/services/administration/additional-settings/provider/ProviderPage.vue');
 // const ProviderAddPage = () => import('@/services/administration/additional-settings/provider/provider-add/ProviderAddPage.vue');
 
-const administrationRoutes: RouteConfig = {
+const administrationRoutes: RouteRecordRaw = {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
     meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },

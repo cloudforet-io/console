@@ -35,7 +35,7 @@
                             {{ state.label }}
                         </p-select-button>
                         <p-text-pagination
-                            :this-page.sync="thisPage"
+                            v-model:this-page="thisPage"
                             :all-page="allPage"
                             :show-page-number="false"
                             @pageChange="listAlerts"
@@ -55,20 +55,20 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
 
-import {
-    PListCard, PSelectButton, PTextPagination,
-} from '@spaceone/design-system';
-import { find } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PListCard, PSelectButton, PTextPagination,
+} from '@spaceone/design-system';
+import { find } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -149,7 +149,7 @@ export default {
         });
 
         /* util */
-        const alertLinkFormatter = (alertState): Location => ({
+        const alertLinkFormatter = (alertState): RouteLocation => ({
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
             query: {
                 state: alertState,

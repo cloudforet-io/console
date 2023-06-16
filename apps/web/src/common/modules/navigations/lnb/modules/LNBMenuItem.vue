@@ -84,13 +84,13 @@
 </template>
 
 <script lang="ts">
+import { PDivider, PI } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router';
+import type { RouteLocation } from 'vue-router';
 
-import { PDivider, PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -146,7 +146,7 @@ export default defineComponent<Props>({
             state.isFolded = !state.isFolded;
         };
 
-        const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
+        const isSelectedMenu = (selectedMenuRoute: RouteLocation): boolean => {
             let currentPath = props.currentPath;
             if (!currentPath) return false;
 
