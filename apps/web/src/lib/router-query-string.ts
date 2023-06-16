@@ -1,8 +1,6 @@
 import { forEach } from 'lodash';
 import type { RouteLocation } from 'vue-router';
-
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 export interface ConvertValueToQueryString {
@@ -18,16 +16,17 @@ export interface ConvertQueryStringToValue<T = any> {
  * @description replace url query. if no key is given, it replace empty query.
  */
 export const replaceUrlQuery = async (keyOrQuery?: string|Record<string, RouteQueryString>, value?: RouteQueryString) => {
+    const router = useRouter();
     let query: Record<string, RouteQueryString> = {};
 
     if (typeof keyOrQuery === 'string') {
         const key = keyOrQuery;
-        query = { ...SpaceRouter.router.currentRoute.value.query };
+        query = { ...router.currentRoute.value.query };
         if ((value === null || value === undefined) && query[key]) delete query[key];
         else query[key] = value;
     } else if (typeof keyOrQuery === 'object') {
         const queryKeys = Object.keys(keyOrQuery);
-        query = { ...SpaceRouter.router.currentRoute.value.query };
+        query = { ...router.currentRoute.value.query };
         queryKeys.forEach((key) => {
             const queryValue = keyOrQuery[key] as RouteQueryString;
             if ((queryValue === null || queryValue === undefined) && query[key]) delete query[key];
@@ -36,7 +35,7 @@ export const replaceUrlQuery = async (keyOrQuery?: string|Record<string, RouteQu
     }
 
     try {
-        await SpaceRouter.router.replace({ query });
+        await router.replace({ query });
     } catch (e) {}
 };
 
