@@ -2181,7 +2181,7 @@
 				"CREATE_COLLECTOR": "コレクタ生成",
 				"CURRENT_STATUS": "進行状況",
 				"EDIT_MODAL_TITLE": "スケジュールの編集",
-				"EDIT_SCHEDULE": "スケジュールの編集",
+				"EDIT_SCHEDULE": "編集",
 				"HISTORY": "コレクターの履歴",
 				"IN_PROGRESS": "進行中",
 				"JOB_ERROR": "状態: {date}に収集失敗",
@@ -2194,7 +2194,7 @@
 				"RECENT_JOBS": "過去5日間の最新のデータ収集結果です",
 				"SCHEDULED": "予定された収集:",
 				"SCHEDULED_TIME": "{hr}時間{m}分後",
-				"SET_SCHEDULE": "スケジュールを設定する",
+				"SET_SCHEDULE": "設定",
 				"TITLE": "コレクタ",
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
 			},

@@ -6,9 +6,17 @@
         >
             <div class="collector-item-wrapper">
                 <span class="collector-item-name">{{ props.item.name }}</span>
+                <div class="collector-plugin">
+                    <p-lazy-img :src="props.item.plugin.icon"
+                                width="1.25rem"
+                                height="1.25rem"
+                                class="plugin-icon"
+                    />
+                    <span class="plugin-name">{{ state.plugin.name }}</span>
+                    <span class="plugin-version">v{{ state.plugin.version }}</span>
+                </div>
                 <div class="collector-info-wrapper">
                     <div class="collector-info-view">
-                        <collector-item-plugin :item="props.item" />
                         <collector-item-job-list :item="props.item" />
                     </div>
                     <div class="collector-info-view">
@@ -17,21 +25,29 @@
                     </div>
                 </div>
             </div>
-            <p-button class="collect-data-button"
-                      style-type="tertiary"
-                      :loading="state.collectLoading"
-                      @click.stop="handleClickCollectData(props.item.collectorId)"
-            >
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
-            </p-button>
+            <div class="collector-status-wrapper">
+                <p-spinner v-if="state.status === JOB_STATE.IN_PROGRESS"
+                           class="collector-in-process"
+                />
+                <p-button v-else
+                          style-type="tertiary"
+                          :loading="state.collectLoading"
+                          class="collector-data-button"
+                          @click.stop="handleClickCollectData(props.item.collectorId)"
+                >
+                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
+                </p-button>
+            </div>
         </p-card>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { PButton, PCard } from '@spaceone/design-system';
+import {
+    PButton, PCard, PLazyImg, PSpinner,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -42,11 +58,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
-import CollectorItemPlugin from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemPlugin.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
 
 interface Props {
     item?: CollectorItemInfo;
@@ -56,10 +72,15 @@ const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
 
-const emit = defineEmits(['refresh-collector-list']);
+const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
 const state = reactive({
     collectLoading: false,
+    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
+    plugin: computed(() => {
+        const plugin = props.item?.plugin;
+        return { name: plugin.name, version: plugin.info.version };
+    }),
 });
 
 /* API */
@@ -96,28 +117,57 @@ const handleClickCollectData = async (collectorId) => {
         &:hover {
             @apply cursor-pointer;
 
-            .collect-data-button {
-                @apply flex absolute;
-                opacity: 1;
-                top: 1.25rem;
-                right: 1.5rem;
-                gap: 0.25rem;
+            .collector-status-wrapper {
+                .collector-data-button {
+                    opacity: 1;
+                }
             }
         }
 
-        .collect-data-button {
-            @apply hidden;
-            opacity: 0;
+        .collector-status-wrapper {
+            @apply absolute;
+            top: 1.25rem;
+            right: 1.5rem;
+            gap: 0.25rem;
+
+            .collector-in-process {
+                @apply relative;
+
+                &::before {
+                    @apply absolute bg-gray-500;
+                    content: '';
+                    top: 50%;
+                    left: 50%;
+                    width: 0.375rem;
+                    height: 0.375rem;
+                    transform: translate(-50%, -50%);
+                    border-radius: 0.063rem;
+                }
+            }
+
+            .collector-data-button {
+                opacity: 0;
+            }
         }
 
         .collector-item-wrapper {
             @apply flex flex-col;
             gap: 1.25rem;
-            padding: 0.5rem 0.625rem;
+            padding: 0.75rem 0.625rem;
 
             .collector-item-name {
                 @apply text-label-xl font-bold;
             }
+
+            .collector-plugin {
+                @apply flex items-center;
+                gap: 0.5rem;
+
+                .plugin-version {
+                    @apply text-label-md text-gray-700;
+                }
+            }
+
             .collector-info-wrapper {
                 @apply flex;
                 gap: 1.5rem;

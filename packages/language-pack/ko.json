@@ -2181,7 +2181,7 @@
 				"CREATE_COLLECTOR": "컬렉터 생성",
 				"CURRENT_STATUS": "진행 상태",
 				"EDIT_MODAL_TITLE": "스케줄 수정",
-				"EDIT_SCHEDULE": "스케줄 수정",
+				"EDIT_SCHEDULE": "수정",
 				"HISTORY": "컬렉터 히스토리",
 				"IN_PROGRESS": "진행중",
 				"JOB_ERROR": "상태: {date}에 수집 실패",
@@ -2194,7 +2194,7 @@
 				"RECENT_JOBS": "최근 5일내 수집 결과",
 				"SCHEDULED": "수집 예정: ",
 				"SCHEDULED_TIME": "{hr}시간 {m}분 후 ",
-				"SET_SCHEDULE": "스케줄 설정",
+				"SET_SCHEDULE": "설정",
 				"TITLE": "컬렉터",
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
 			},

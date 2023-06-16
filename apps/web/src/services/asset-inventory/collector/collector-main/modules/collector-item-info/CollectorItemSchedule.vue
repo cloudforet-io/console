@@ -1,8 +1,29 @@
 <template>
     <div class="info-item">
-        <p class="info-label">
-            {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
-        </p>
+        <div class="info-label-wrapper">
+            <p class="info-label">
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
+            </p>
+            <button class="schedule-button"
+                    @click.stop="handleClickSchedule"
+            >
+                <p-i v-if="state.isScheduleActivated"
+                     name="ic_edit"
+                     height="0.75rem"
+                     width="0.75rem"
+                     color="inherit"
+                     class="icon-schedule"
+                />
+                <p-i v-else
+                     name="ic_settings-filled"
+                     height="0.75rem"
+                     width="0.75rem"
+                     color="inherit"
+                     class="icon-schedule"
+                />
+                {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+            </button>
+        </div>
         <div @click.stop="handleChangeToggle">
             <p-toggle-button
                 :value="state.isScheduleActivated"
@@ -11,25 +32,6 @@
                 @change-toggle="handleChangeToggle"
             />
         </div>
-        <button class="schedule-button"
-                @click.stop="handleClickSchedule"
-        >
-            <p-i v-if="state.isScheduleActivated"
-                 name="ic_edit"
-                 height="0.75rem"
-                 width="0.75rem"
-                 color="inherit"
-                 class="icon-schedule"
-            />
-            <p-i v-else
-                 name="ic_settings-filled"
-                 height="0.75rem"
-                 width="0.75rem"
-                 color="inherit"
-                 class="icon-schedule"
-            />
-            {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
-        </button>
     </div>
 </template>
 
@@ -93,8 +95,26 @@ const handleClickSchedule = () => {
 
 <style lang="postcss" scoped>
 .info-item {
-    .info-label {
-        @apply text-label-sm text-gray-500;
+    .info-label-wrapper {
+        @apply flex;
+        gap: 0.375rem;
+
+        .info-label {
+            @apply text-label-sm text-gray-500;
+        }
+
+        .schedule-button {
+            @apply flex items-center text-label-sm text-blue-600 font-normal;
+            gap: 0.125rem;
+
+            &:hover {
+                @apply underline;
+                background-color: initial;
+            }
+            .icon-schedule {
+                @apply text-blue-600;
+            }
+        }
     }
 
     /* custom design-system component - p-toggle-button */
@@ -106,18 +126,6 @@ const handleClickSchedule = () => {
             .label {
                 @apply text-blue-600;
             }
-        }
-    }
-
-    .schedule-button {
-        @apply flex items-center text-label-sm text-blue-600 font-normal;
-        gap: 0.25rem;
-
-        &:hover {
-            background-color: initial;
-        }
-        .icon-schedule {
-            @apply text-blue-600;
         }
     }
 }

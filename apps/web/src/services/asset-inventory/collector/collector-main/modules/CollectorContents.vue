@@ -87,7 +87,10 @@ const props = withDefaults(defineProps<Props>(), {
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
-const emit = defineEmits(['change-toolbox', 'export-excel', 'refresh-collector-list']);
+const emit = defineEmits<{(e: 'change-toolbox'): void,
+    (e: 'export-excel'): void,
+    (e: 'refresh-collector-list'): void
+}>();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
