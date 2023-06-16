@@ -1,11 +1,11 @@
-import VueI18n from 'vue-i18n';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import VueI18n from 'vue-i18n';
+import { useStore } from 'vuex';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 export interface Validation {
 	isValid: boolean;
@@ -38,6 +38,7 @@ export const checkDuplicateID = async (userID: string) => {
 };
 
 export const checkOauth = async (userID: string) => {
+    const store = useStore();
     const validation = {
         isValid: true,
         invalidText: '' as TranslateResult,

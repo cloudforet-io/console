@@ -1,8 +1,8 @@
-import type { ComputedRef } from 'vue';
-import { computed, getCurrentInstance } from 'vue';
-import type { Vue } from 'vue/types/vue';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -15,16 +15,17 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
  * @param routeName
  */
 export const useManagePermissionState = (routeName?: string): ComputedRef<boolean> => {
-    const vm = getCurrentInstance()?.proxy as Vue;
+    const store = useStore();
+    const route = useRoute();
     if (routeName) {
         return computed<boolean>(() => {
-            const userAccessLevel = getUserAccessLevel(routeName, vm.$store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(routeName, store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
             return userAccessLevel >= ACCESS_LEVEL.MANAGE_PERMISSION;
         });
     }
 
     return computed<boolean>(() => {
-        const userAccessLevel = getUserAccessLevel(vm.$route.name, vm.$store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
+        const userAccessLevel = getUserAccessLevel(route.name as string, store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
         return userAccessLevel >= ACCESS_LEVEL.MANAGE_PERMISSION;
     });
 };

@@ -1,5 +1,4 @@
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,6 +35,7 @@ class GoogleAuth extends Authenticator {
     }
 
     static async onSuccess(accessToken) {
+        const store = useStore();
         try {
             GoogleAuth.accessToken = accessToken;
             const credentials = {
@@ -50,6 +50,7 @@ class GoogleAuth extends Authenticator {
     }
 
     static signIn = async (onSignInCallback?) => {
+        const store = useStore();
         await GoogleAuth.loadGapi();
         const tokenClient = await google.accounts.oauth2.initTokenClient({
             client_id: store.state.domain.authOptions.client_id,

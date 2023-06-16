@@ -1,6 +1,5 @@
 import { computed, reactive } from 'vue';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -9,6 +8,7 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 export const useReferenceStore = () => {
+    const store = useStore();
     const referenceStoreState = reactive({
         loading: true,
         provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
