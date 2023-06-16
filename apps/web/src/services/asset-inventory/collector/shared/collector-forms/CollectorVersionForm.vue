@@ -106,7 +106,7 @@ watch(() => state.pluginId, async (pluginId) => {
         width: 100%;
 
         .auto-upgrade-wrapper {
-            @apply flex items-center gap-2;
+            @apply flex items-center gap-1;
             span {
                 @apply text-label-sm text-gray-600;
             }
