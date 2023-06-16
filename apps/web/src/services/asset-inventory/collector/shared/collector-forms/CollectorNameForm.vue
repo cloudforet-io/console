@@ -8,6 +8,7 @@
             <p-text-input :value="name"
                           class="block"
                           :invalid="invalid"
+                          :is-focused="state.isFocused"
                           @update:value="setForm('name', $event)"
             />
         </template>
@@ -15,7 +16,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, watch } from 'vue';
+import {
+    reactive, computed, watch, defineExpose,
+} from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -38,6 +41,7 @@ const collectorFormState = collectorFormStore.$state;
 const state = reactive({
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
+    isFocused: false,
 });
 
 const {
@@ -72,5 +76,8 @@ watch(isAllValid, (value) => {
 (async () => {
     await store.dispatch('reference/collector/load', { force: true });
 })();
+
+defineExpose({ focus: () => { state.isFocused = true; } });
+
 </script>
 

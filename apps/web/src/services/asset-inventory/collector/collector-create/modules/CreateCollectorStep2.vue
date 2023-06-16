@@ -2,7 +2,8 @@
     <div class="collector-page-2">
         <collect-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
         <div class="input-form">
-            <collector-name-form class="name-form"
+            <collector-name-form ref="nameInputRef"
+                                 class="name-form"
                                  @update:isValid="handleUpdateIsValid"
             />
             <multiple-provider-form v-if="state.supportedProviders.length"
@@ -49,7 +50,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, ref,
+} from 'vue';
 
 import {
     PButton, PTextButton,
@@ -91,6 +94,7 @@ const state = reactive({
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
     supportedProviders: computed<string[]>(() => collectorFormState.repositoryPlugin?.capability?.supported_providers ?? []),
 });
+const nameInputRef = ref<null|HTMLElement>(null);
 
 /* event */
 
@@ -116,6 +120,10 @@ const handleChangeIsVersionValid = (isValid: boolean) => {
 const handleChangeIsTagsValid = (isValid: boolean) => {
     state.isTagsValid = isValid;
 };
+
+onMounted(() => {
+    if (nameInputRef.value) nameInputRef.value.focus();
+});
 
 (async () => {
     await store.dispatch('reference/collector/load', { force: true });
