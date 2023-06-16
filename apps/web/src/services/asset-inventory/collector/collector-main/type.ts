@@ -1,3 +1,7 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
+import type { RouteQueryString } from '@/lib/router-query-string';
+
 import type {
     CollectorPluginModel, Schedule, JobStatus,
 } from '@/services/asset-inventory/collector/model';
@@ -59,4 +63,11 @@ export interface CollectorItemInfo {
     detailLink: CollectorLink;
     schedule: Schedule;
     recentJobAnalyze: JobStatus[];
+}
+
+export type CollectorMainPageQuery = Partial<Record<'filters'|'provider', RouteQueryString>>;
+
+export interface CollectorMainPageQueryValue {
+    provider?: string;
+    filters?: ConsoleFilter[];
 }

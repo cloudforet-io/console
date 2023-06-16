@@ -24,18 +24,15 @@
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div class="collector-contents-wrapper">
+            <div v-if="state.hasCollectorList"
+                 class="collector-contents-wrapper"
+            >
                 <provider-list
                     :provider-list="state.providerList"
                     :selected-provider="collectorPageState.selectedProvider"
                     @change-provider="handleSelectedProvider"
                 />
-                <collector-contents
-                    :key-item-sets="handlerState.keyItemSets"
-                    @change-toolbox="handleChangeToolbox"
-                    @export-excel="handleExportExcel"
-                    @refresh-collector-list="refreshCollectorList"
-                />
+                <collector-contents />
             </div>
             <template #no-data>
                 <collector-no-data />
@@ -45,12 +42,17 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { watchDebounced } from '@vueuse/core';
+import {
+    computed, reactive, onMounted,
+} from 'vue';
+
 
 import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
@@ -58,41 +60,25 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { replaceUrlQuery } from '@/lib/router-query-string';
+import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorContents from '@/services/asset-inventory/collector/collector-main/modules/CollectorContents.vue';
 import CollectorNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorNoData.vue';
-import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/collector-main/type';
+import type {
+    CollectorMainPageQuery,
+    CollectorMainPageQueryValue,
+} from '@/services/asset-inventory/collector/collector-main/type';
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
-const { query } = SpaceRouter.router.currentRoute;
-
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-});
-
-const handlerState = reactive({
-    keyItemSets: computed<KeyItemSet[]>(() => [{
-        title: 'Properties',
-        items: [
-            { name: 'collector_id', label: 'Collector Id' },
-            { name: 'name', label: 'Name' },
-            { name: 'state', label: 'State' },
-            { name: 'plugin_info.plugin_id', label: 'Plugin' },
-            { name: 'plugin_info.version', label: 'Version' },
-            { name: 'provider', label: 'Provider', valueSet: storeState.providers },
-            { name: 'created_at', label: 'Created' },
-            { name: 'last_collected_at', label: 'Last Collected' },
-        ],
-    }]),
 });
 
 const state = reactive({
@@ -101,87 +87,71 @@ const state = reactive({
     providerList: computed(() => ([{ key: 'all', name: 'All Providers' }, ...Object.values(storeState.providers)])),
 });
 
-/* Query Helper */
-const collectorApiQueryHelper = new ApiQueryHelper()
-    .setOnly(
-        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-        COLLECTOR_QUERY_HELPER_SET.NAME,
-        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
-        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
-        COLLECTOR_QUERY_HELPER_SET.TAGS,
-        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
-        COLLECTOR_QUERY_HELPER_SET.STATE,
-        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
-    )
-    .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
-    .setSort(collectorPageState.sortBy, true);
+/* Url Query String */
+const urlFilterConverter = new QueryHelper();
 
-/* Components */
+const setValuesFromUrlQueryString = () => {
+    const currentRoute = SpaceRouter.router.currentRoute;
+    const query: CollectorMainPageQuery = currentRoute.query;
+    // set provider
+    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    // set search filters
+    if (query.filters) {
+        const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
+        collectorPageStore.setSearchFilters(filters);
+    }
+};
+
+const collectorMainPageQueryValue = computed<Required<CollectorMainPageQueryValue>>(() => ({
+    provider: collectorPageState.selectedProvider,
+    filters: collectorPageState.searchFilters,
+}));
+
+watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
+    const newQuery: CollectorMainPageQuery = {
+        provider: primitiveToQueryString(queryValue.provider),
+        filters: urlFilterConverter.setFilters(queryValue.filters ?? []).rawQueryStrings,
+    };
+    console.debug('newQuery', queryValue.provider, newQuery);
+    SpaceRouter.router.replace({ query: newQuery }).catch((e) => {
+        if (e.name !== 'NavigationDuplicated') console.error(e);
+    });
+}, { debounce: 300 });
+
+
+/* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
     collectorPageStore.setSelectedProvider(providerName);
 };
-const handleChangeToolbox = (options) => {
-    setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
-    refreshCollectorList();
-};
-const handleExportExcel = async (excelFields) => {
-    await store.dispatch('file/downloadExcel', {
-        url: '/inventory/collector/list',
-        param: { query: collectorApiQueryHelper.data },
-        fields: excelFields,
-        file_name_prefix: FILE_NAME_PREFIX.collector,
-    });
-};
+
 
 /* API */
-const initCollectorList = async () => {
-    state.initLoading = true;
+const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
+const fetchCollectorCount = async (): Promise<number> => {
     try {
-        await collectorPageStore.getCollectorList();
-        if (collectorPageState.totalCount > 0) {
-            state.hasCollectorList = true;
-        }
-    } catch (e) {
-        await collectorPageStore.$reset();
-    } finally {
-        state.initLoading = false;
-    }
-};
-const refreshCollectorList = async () => {
-    state.initLoading = false;
-    state.hasCollectorList = true;
-    collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
-    try {
-        await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
+        const { total_count } = await SpaceConnector.client.inventory.collector.list({
+            query: collectorCountApiQueryHelper.data,
+        });
+        return total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
-        await collectorPageStore.$reset();
+        return 0;
     }
 };
 
-/* Watcher */
-watch(() => collectorPageState.selectedProvider, async (providerName) => {
-    await replaceUrlQuery('provider', providerName);
-    await refreshCollectorList();
-});
-
 /* INIT */
-(async () => {
+onMounted(async () => {
+    state.initLoading = true;
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
         store.dispatch('reference/provider/load'),
     ]);
     await collectorPageStore.$reset();
-    if (Object.keys(query).length > 0) {
-        const { provider } = query;
-        if (provider === 'all') {
-            await initCollectorList();
-        }
-        await handleSelectedProvider(provider as string);
-    } else {
-        await initCollectorList();
-    }
-})();
+    setValuesFromUrlQueryString();
+    const count = await fetchCollectorCount();
+    state.hasCollectorList = count > 0;
+    state.initLoading = false;
+});
 </script>
 
 <style lang="postcss" scoped>
