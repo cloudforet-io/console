@@ -110,7 +110,7 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);

@@ -214,7 +214,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({
                 k: 'key',

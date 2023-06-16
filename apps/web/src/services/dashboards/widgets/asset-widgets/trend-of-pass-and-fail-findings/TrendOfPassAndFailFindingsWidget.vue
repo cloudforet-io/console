@@ -148,7 +148,7 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
         return await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
@@ -177,7 +177,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
