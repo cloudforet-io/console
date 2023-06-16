@@ -114,6 +114,9 @@ const state = reactive({
                 limit: 10,
                 filter: queryHelper.apiQuery.filter,
             },
+            parameters: {
+                has_secret: true,
+            },
         };
     }),
 });
