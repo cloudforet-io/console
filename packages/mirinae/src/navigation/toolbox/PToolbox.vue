@@ -76,7 +76,7 @@
             </div>
             <div class="filters-wrapper">
                 <p-query-search-tags v-show="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
-                                     :tags.sync="proxyState.queryTags"
+                                     :tags="proxyState.queryTags"
                                      :timezone="timezone"
                                      :converter="queryTagConverter"
                                      @change="onQueryTagsChange"
