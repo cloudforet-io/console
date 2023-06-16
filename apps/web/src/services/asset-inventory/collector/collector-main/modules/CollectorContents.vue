@@ -43,6 +43,7 @@
         <collector-schedule-modal edit-mode
                                   @refresh-collector-list="refreshCollectorList"
         />
+        <collector-restart-modal />
     </div>
 </template>
 
@@ -74,6 +75,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorListItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorListItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
+import CollectorRestartModal
+    from '@/services/asset-inventory/collector/collector-main/modules/CollectorRestartModal.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
 import {

@@ -26,9 +26,12 @@
                 </div>
             </div>
             <div class="collector-status-wrapper">
-                <p-spinner v-if="state.status === JOB_STATE.IN_PROGRESS"
-                           class="collector-in-process"
-                />
+                <button v-if="state.status === JOB_STATE.IN_PROGRESS"
+                        class="collector-in-process"
+                        @click.stop="handleClickProgressStatus"
+                >
+                    <p-spinner />
+                </button>
                 <p-button v-else
                           style-type="tertiary"
                           :loading="state.collectLoading"
@@ -57,6 +60,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
@@ -74,6 +78,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
+const collectorPageStore = useCollectorPageStore();
+
 const state = reactive({
     collectLoading: false,
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
@@ -82,6 +88,13 @@ const state = reactive({
         return { name: plugin.name, version: plugin.info.version };
     }),
 });
+
+/* Components */
+const handleClickProgressStatus = () => {
+    collectorPageStore.$patch({
+        visibleRestartModal: true,
+    });
+};
 
 /* API */
 const handleClickCollectData = async (collectorId) => {

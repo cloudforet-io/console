@@ -23,6 +23,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         totalCount: 0,
         schedules: [] as Schedule[],
         visibleScheduleModal: false,
+        visibleRestartModal: false,
 
     }),
     getters: {

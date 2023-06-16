@@ -2191,6 +2191,7 @@
 				"NO_SCHEDULE": "スケジュールが設定されていません",
 				"PLUGIN": "プラグイン",
 				"RECENT_JOBS": "過去5日間の最新のデータ収集結果です",
+				"RESTART_COLLECT": "現在、データ収集は進行中です。再開しますか？",
 				"SCHEDULED": "予定された収集:",
 				"SCHEDULED_TIME": "{hr}時間{m}分後",
 				"SET_SCHEDULE": "設定",
