@@ -232,7 +232,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchTrendData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
@@ -263,7 +263,7 @@ const fetchTrendData = async (): Promise<Data[]> => {
 const fetchRealtimeData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);

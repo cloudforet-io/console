@@ -120,7 +120,7 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
 

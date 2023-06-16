@@ -92,6 +92,7 @@ interface FullData {
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
+const TABLE_COL_MIN_WIDTH = '5rem';
 
 const props = defineProps<WidgetProps>();
 
@@ -118,6 +119,7 @@ const state = reactive({
         const refinedFieldsWithLabel = refinedFields.map((field) => ({
             ...field,
             label: `${field.label}\nFailure count`,
+            width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
         }));
         const groupByLabel = ASSET_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
@@ -126,6 +128,7 @@ const state = reactive({
                 label: groupByLabel,
                 name: state.groupByKey,
                 textOptions: { type: 'reference', referenceType },
+                width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
             },
             ...refinedFieldsWithLabel,
         ];
@@ -148,7 +151,7 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
         return await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
@@ -177,7 +180,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
-            .setFilters(state.consoleFilters)
+            .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
@@ -223,6 +226,10 @@ const refineChartData = (data: ChartDataModel[]): XYChartData[] => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
+    xAxis.get('renderer').grid.template.setAll({
+        strokeOpacity: 1,
+        location: 0.5,
+    });
     yAxis.get('renderer').setAll({
         minGridDistance: 18,
     });

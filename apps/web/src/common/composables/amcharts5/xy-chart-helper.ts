@@ -54,11 +54,12 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
     const xRenderer = am5xy.AxisRendererX.new(root, {
         strokeOpacity: 1,
         strokeWidth: 1,
-        stroke: am5.color(gray[300]),
+        stroke: am5.color(gray[200]),
         minGridDistance: 20,
     });
     xRenderer.grid.template.setAll({
         strokeOpacity: 0,
+        stroke: am5.color(gray[200]),
     });
     xRenderer.labels.template.setAll({
         fontSize: 12,

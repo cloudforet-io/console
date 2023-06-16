@@ -199,6 +199,9 @@ const loadSearchResourceOptions = async () => {
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
             resource_type: state.variableProperty.options.resource_type ?? 'cost_analysis.Cost',
             distinct_key: state.variableProperty.options.resource_key,
+            options: {
+                ...apiQueryHelper.data,
+            },
         });
         state.searchResourceOptions = results.map((d) => ({ name: d.name, label: d.name }));
     }
