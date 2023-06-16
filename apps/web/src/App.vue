@@ -63,9 +63,9 @@
                           @clickButton="goToSignIn"
             />
             <notification-email-modal
+                v-model:visible="notificationEmailModalVisible"
                 :domain-id="domainId"
                 :user-id="userId"
-                :visible.sync="notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
@@ -85,14 +85,14 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
-
-import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
+import {
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
+
 
 import { store } from '@/store';
 
@@ -141,7 +141,7 @@ export default defineComponent({
             notificationEmailModalVisible: false,
         });
         const goToSignIn = () => {
-            const res: Location = {
+            const res: RouteLocation = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
                 query: { nextPath: vm.$route.fullPath },
             };

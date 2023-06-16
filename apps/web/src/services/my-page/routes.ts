@@ -50,7 +50,7 @@ const myPageRoutes: RouteRecordRaw = {
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: '/',
+                            path: '',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,
                             meta: { lnbVisible: true },
                             component: UserNotificationPage as any,

@@ -45,7 +45,7 @@ const assetInventoryRoute: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     meta: { lnbVisible: true },
                     component: CloudServicePage as any,
@@ -96,7 +96,7 @@ const assetInventoryRoute: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
                     meta: { lnbVisible: true },
                     props: true,
@@ -108,7 +108,7 @@ const assetInventoryRoute: RouteRecordRaw = {
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: '/',
+                            path: '',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
                             meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             component: CollectorPluginPage as any,
@@ -128,7 +128,7 @@ const assetInventoryRoute: RouteRecordRaw = {
                     component: { template: '<keep-alive><router-view /></keep-alive>' },
                     children: [
                         {
-                            path: '/',
+                            path: '',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                             meta: { lnbVisible: true },
                             component: CollectorHistoryPage as any,
@@ -150,7 +150,7 @@ const assetInventoryRoute: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                     meta: { lnbVisible: true },
                     props: true,

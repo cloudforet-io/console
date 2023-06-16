@@ -17,7 +17,7 @@ export const errorRoutes: RouteRecordRaw[] = [
         component: ErrorPage,
     },
     {
-        path: '*',
+        path: '/:pathMatch(.*)*',
         component: ErrorPage,
     },
 ];

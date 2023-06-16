@@ -29,7 +29,7 @@ export default {
     component: { template: '<router-view />' },
     children: [
         {
-            path: '/',
+            path: '',
             name: PROJECT_ROUTE._NAME,
             meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
             props: true,
@@ -39,12 +39,12 @@ export default {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
             meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-            redirect: ':id/summary',
+            redirect: (to) => `${to.params.id}/summary`,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
                     redirect: 'summary',
                     props: true,

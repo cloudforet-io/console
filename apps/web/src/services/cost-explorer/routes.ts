@@ -85,7 +85,7 @@ const costExplorerRoutes: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     meta: { lnbVisible: true },
                     component: BudgetPage as any,

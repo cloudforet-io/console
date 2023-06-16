@@ -30,7 +30,7 @@ export default [
         component: { template: '<router-view />' },
         children: [
             {
-                path: '/',
+                path: '',
                 name: AUTH_ROUTE.SIGN_IN._NAME,
                 meta: {
                     isSignInPage: true,

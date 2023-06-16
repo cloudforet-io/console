@@ -34,7 +34,7 @@ const alertManagerRoutes: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
                     meta: { lnbVisible: true },
                     component: AlertPage as any,

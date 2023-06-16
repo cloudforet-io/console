@@ -47,7 +47,7 @@ const administrationRoutes: RouteRecordRaw = {
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: '/',
+                            path: '',
                             name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
                             meta: { lnbVisible: true },
                             props: true,
@@ -74,7 +74,7 @@ const administrationRoutes: RouteRecordRaw = {
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: '/',
+                            path: '',
                             name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
                             meta: { lnbVisible: true },
                             props: true,

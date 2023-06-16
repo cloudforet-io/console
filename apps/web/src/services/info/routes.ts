@@ -31,7 +31,7 @@ const infoRoute: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: INFO_ROUTE.NOTICE._NAME,
                     meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
                     component: NoticePage as any,
