@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
 import type { Tags, TimeStamp } from '@/models';
@@ -36,7 +34,7 @@ export interface PageAccessMenuItem {
     subMenuList?: PageAccessMenuItem[];
 }
 export interface PageAccessDefinitionTableData {
-    label?: TranslateResult;
+    label?: string;
     data: Record<string, PagePermissionType | '--'>;
     fields: DefinitionField[];
 }

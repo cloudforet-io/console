@@ -1,11 +1,8 @@
-import VueI18n from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
 import type { Tags, TimeStamp } from '@/models';
 
 import type { RoleBindingType } from '@/services/administration/type';
-
-import TranslateResult = VueI18n.TranslateResult;
 
 export const USER_TYPE = Object.freeze({
     API_USER: 'API_USER',
@@ -105,7 +102,7 @@ export interface ProtocolItem {
 }
 
 export interface EnrichedProtocolItem extends ProtocolItem {
-	label: TranslateResult;
+	label: string;
 	link: Partial<RouteLocation>;
 	protocolType: string;
 	tags: Tags;

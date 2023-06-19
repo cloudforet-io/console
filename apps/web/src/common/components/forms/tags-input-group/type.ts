@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 export interface TagItem {
     key: string | number;
     value: string | number | boolean;
@@ -11,5 +9,5 @@ export interface Tag {
 
 export type ValidationData = {
     isValid: boolean;
-    message: string | TranslateResult;
+    message: string;
 };

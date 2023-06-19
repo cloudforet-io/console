@@ -1,19 +1,19 @@
 import { toRef } from 'vue';
-
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 
 export const useWidgetTitleInput = () => {
+    const { t } = useI18n();
     const widgetFormStore = useWidgetFormStore();
     const {
         forms: { title }, setForm, invalidState, invalidTexts, isAllValid: isTitleValid, resetAll: resetTitle,
     } = useFormValidator({
         title: '',
     }, {
-        title(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME'); },
+        title(value: string) { return value.trim().length ? '' : t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME'); },
     });
     const updateTitle = (val) => {
         setForm('title', val);

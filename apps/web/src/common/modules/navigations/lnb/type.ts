@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
 import type { FavoriteType } from '@/store/modules/favorite/type';
@@ -16,7 +15,7 @@ type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
 export interface LNBItem {
     type: MenuItemType;
-    label?: TranslateResult;
+    label?: string;
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: RouteLocation;
@@ -30,7 +29,7 @@ export interface LNBItem {
 export type LNBMenu = LNBItem[]|LNBItem;
 
 export interface BackLink {
-    label: TranslateResult;
+    label: string;
     to: RouteLocation;
 }
 

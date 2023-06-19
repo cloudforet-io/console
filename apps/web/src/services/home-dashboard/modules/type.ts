@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 export interface DashboardWidgetProps {
     extraParams?: Record<string, any>;
 }
@@ -8,7 +6,7 @@ export interface DashboardWidgetProps {
 export type DateType = 'DAILY' | 'MONTHLY';
 export interface DateItem {
     name: DateType;
-    label: TranslateResult;
+    label: string;
 }
 
 export const DATA_TYPE = {

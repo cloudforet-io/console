@@ -1,8 +1,6 @@
-import { reactive } from 'vue';
-
 import { cloneDeep } from 'lodash';
-
-import { i18n } from '@/translations';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -28,6 +26,7 @@ interface ParamType {
 }
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
+    const { t } = useI18n();
     const alertPageStore = useAlertPageStore();
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = (initialData) => {
@@ -50,9 +49,9 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
 
     const getMessage = (editMode: EditMode, isSuccessful: boolean) => {
         if (isSuccessful) {
-            return editMode === EDIT_MODE.DESCRIPTION ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_PROJECT');
+            return editMode === EDIT_MODE.DESCRIPTION ? t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION') : t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_PROJECT');
         }
-        return editMode === EDIT_MODE.PROJECT ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_PROJECT');
+        return editMode === EDIT_MODE.PROJECT ? t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION') : t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_PROJECT');
     };
 
     const getParams = (editMode: EditMode) => {

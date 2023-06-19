@@ -1,8 +1,6 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
 
 import type { PagePermissionMap, RawPagePermission } from '@/lib/access-control/config';
 import {
@@ -14,14 +12,15 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { PageAccessDefinitionTableData } from '@/services/administration/iam/role/type';
 
-const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, subMenuList: Menu[], labels: Array<string|TranslateResult> = []): PageAccessDefinitionTableData => {
+const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, subMenuList: Menu[], labels: Array<string> = []): PageAccessDefinitionTableData => {
+    const { t } = useI18n();
     let result: PageAccessDefinitionTableData = {
         data: {},
         fields: [],
     };
     subMenuList.forEach((subMenu) => {
         const menuInfo = MENU_INFO_MAP[subMenu.id];
-        const _labels = [...labels, i18n.t(menuInfo.translationId)];
+        const _labels = [...labels, t(menuInfo.translationId)];
         if (subMenu.subMenuList?.length) {
             result = {
                 ...flattenPageAccessDefinitionData(pagePermissionMap, subMenu.subMenuList, _labels),
@@ -38,6 +37,7 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
 };
 // eslint-disable-next-line max-len
 export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<RawPagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
+    const { t } = useI18n();
     const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value);
     const results: PageAccessDefinitionTableData[] = [];
     MENU_LIST.forEach((menu) => {
@@ -45,7 +45,7 @@ export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef
         if (!permissionRequiredMenuIdList.includes(menu.id)) return;
         const menuInfo = MENU_INFO_MAP[menu.id];
         results.push({
-            label: i18n.t(menuInfo.translationId),
+            label: t(menuInfo.translationId),
             ...flattenPageAccessDefinitionData(pagePermissionMap, [menu]),
         });
     });

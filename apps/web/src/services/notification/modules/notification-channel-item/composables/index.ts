@@ -1,11 +1,10 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { cloneDeep } from 'lodash';
 import { getCurrentInstance, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
-import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -16,6 +15,7 @@ import {
     PARAM_KEY_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
 
+
 interface NotificationItemState {
 	isEditMode: boolean;
 	dataForEdit?: any;
@@ -23,6 +23,7 @@ interface NotificationItemState {
 	projectChannelId?: string;
 }
 export const useNotificationItem = (obj: NotificationItemState) => {
+    const { t } = useI18n();
     const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive<NotificationItemState>(obj);
     const cancelEdit = (initialData) => {
@@ -53,11 +54,11 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
             else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
             await SpaceConnector.client.notification.userChannel.update(param);
-            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
+            showSuccessMessage(t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
+            ErrorHandler.handleRequestError(e, t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
         }
     };
 
@@ -72,11 +73,11 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             // eslint-disable-next-line camelcase
             else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
             await SpaceConnector.client.notification.projectChannel.update(param);
-            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '');
+            showSuccessMessage(t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '');
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'));
+            ErrorHandler.handleRequestError(e, t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'));
         }
     };
 
