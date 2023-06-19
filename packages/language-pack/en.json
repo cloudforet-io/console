@@ -2191,6 +2191,7 @@
 				"NO_SCHEDULE": "No Scheduled",
 				"PLUGIN": "Plugin",
 				"RECENT_JOBS": "Recent data collection results within the past 5 days",
+				"RESTART_COLLECT": "Collecting is still in progress. Do you want to re-start it?",
 				"SCHEDULED": "Scheduled",
 				"SCHEDULED_TIME": "in {hr} hr {m} mins",
 				"SET_SCHEDULE": "Set",

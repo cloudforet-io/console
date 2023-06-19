@@ -42,8 +42,6 @@ import { PToggleButton, PI } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -80,7 +78,6 @@ const handleChangeToggle = async (value) => {
         };
         const response = await collectorPageStore.updateCollectorSchedule(params);
         await collectorFormStore.setOriginCollector(response);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
@@ -104,7 +101,7 @@ const handleClickSchedule = () => {
         }
 
         .schedule-button {
-            @apply flex items-center text-label-sm text-blue-600 font-normal;
+            @apply flex items-center text-label-sm text-blue-700 font-normal;
             gap: 0.125rem;
 
             &:hover {
@@ -112,7 +109,7 @@ const handleClickSchedule = () => {
                 background-color: initial;
             }
             .icon-schedule {
-                @apply text-blue-600;
+                @apply text-blue-700;
             }
         }
     }

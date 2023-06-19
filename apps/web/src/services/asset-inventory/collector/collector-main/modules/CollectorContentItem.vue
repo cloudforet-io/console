@@ -1,5 +1,5 @@
 <template>
-    <div class="collector-list-item">
+    <div class="collector-content-item">
         <p-card :header="false"
                 style-type="white"
                 class="collector-item"
@@ -26,14 +26,17 @@
                 </div>
             </div>
             <div class="collector-status-wrapper">
-                <p-spinner v-if="state.status === JOB_STATE.IN_PROGRESS"
-                           class="collector-in-process"
-                />
+                <button v-if="state.status === JOB_STATE.IN_PROGRESS"
+                        class="collector-in-process"
+                        @click.stop="handleClickProgressStatus"
+                >
+                    <p-spinner />
+                </button>
                 <p-button v-else
                           style-type="tertiary"
-                          :loading="state.collectLoading"
+                          :loading="collectorPageState.collectorLoading"
                           class="collector-data-button"
-                          @click.stop="handleClickCollectData(props.item.collectorId)"
+                          @click.stop="handleClickCollectData"
                 >
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                 </p-button>
@@ -49,14 +52,7 @@ import {
     PButton, PCard, PLazyImg, PSpinner,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
@@ -74,8 +70,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
+const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
+
 const state = reactive({
-    collectLoading: false,
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
@@ -83,25 +81,27 @@ const state = reactive({
     }),
 });
 
+/* Components */
+const handleClickProgressStatus = () => {
+    const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
+    collectorPageStore.$patch({
+        visibleRestartModal: true,
+        selectedCollector: collectorCollector,
+    });
+};
+
 /* API */
-const handleClickCollectData = async (collectorId) => {
-    state.collectLoading = true;
-    try {
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: collectorId,
-        });
-        emit('refresh-collector-list');
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-    } finally {
-        state.collectLoading = false;
-    }
+const handleClickCollectData = async () => {
+    const collectorId = props.item.collectorId;
+    await collectorPageStore.restartCollector(collectorId);
+    emit('refresh-collector-list');
 };
 </script>
 
 <style lang="postcss" scoped>
-.collector-list-item {
+.collector-content-item {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
     /* custom design-system component - p-card */
     :deep(.p-card) {
         &:hover {
@@ -143,6 +143,12 @@ const handleClickCollectData = async (collectorId) => {
                     transform: translate(-50%, -50%);
                     border-radius: 0.063rem;
                 }
+
+                &:hover {
+                    &::before {
+                        @apply bg-gray-900;
+                    }
+                }
             }
 
             .collector-data-button {
@@ -152,7 +158,7 @@ const handleClickCollectData = async (collectorId) => {
 
         .collector-item-wrapper {
             @apply flex flex-col;
-            gap: 1.25rem;
+            gap: 1rem;
             padding: 0.75rem 0.625rem;
 
             .collector-item-name {
@@ -179,7 +185,7 @@ const handleClickCollectData = async (collectorId) => {
 
                 .collector-info-view {
                     @apply flex flex-col flex-wrap;
-                    gap: 1.5rem;
+                    gap: 1rem;
                     width: 50%;
 
                     .info-item {

@@ -31,8 +31,8 @@
                      :key="item.collectorId"
                      @click="handleClickListItem(item.detailLink)"
                 >
-                    <collector-list-item :item="item"
-                                         @refresh-collector-list="refreshCollectorList"
+                    <collector-content-item :item="item"
+                                            @refresh-collector-list="refreshCollectorList"
                     />
                 </div>
             </div>
@@ -43,6 +43,7 @@
         <collector-schedule-modal edit-mode
                                   @refresh-collector-list="refreshCollectorList"
         />
+        <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
     </div>
 </template>
 
@@ -72,16 +73,17 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import CollectorListItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorListItem.vue';
+import CollectorContentItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorContentItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
+import CollectorRestartModal
+    from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorRestartModal.vue';
 import CollectorScheduleModal
-    from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
+    from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorScheduleModal.vue';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const RECENT_COUNT = 5;
 
@@ -232,6 +234,11 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
 
     fetchCollectorList();
 };
+const handleClickListItem = (detailLink) => {
+    SpaceRouter.router.push(detailLink);
+};
+
+/* API */
 const handleExportExcel = async (excelFields) => {
     await store.dispatch('file/downloadExcel', {
         url: '/inventory/collector/list',
@@ -239,9 +246,6 @@ const handleExportExcel = async (excelFields) => {
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
     });
-};
-const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(detailLink);
 };
 
 /* Watcher */

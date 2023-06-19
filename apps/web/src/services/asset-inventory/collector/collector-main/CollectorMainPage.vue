@@ -154,8 +154,6 @@ onMounted(async () => {
 </script>
 
 <style lang="postcss" scoped>
-/* FIXME: Reducing dependencies on the design system */
-
 /* custom design-system component - p-heading */
 :deep(.p-heading) {
     @apply items-center;
