@@ -43,7 +43,7 @@
         <collector-schedule-modal edit-mode
                                   @refresh-collector-list="refreshCollectorList"
         />
-        <collector-restart-modal />
+        <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
     </div>
 </template>
 
@@ -84,7 +84,6 @@ import {
     COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const RECENT_COUNT = 5;
 
@@ -235,6 +234,11 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
 
     fetchCollectorList();
 };
+const handleClickListItem = (detailLink) => {
+    SpaceRouter.router.push(detailLink);
+};
+
+/* API */
 const handleExportExcel = async (excelFields) => {
     await store.dispatch('file/downloadExcel', {
         url: '/inventory/collector/list',
@@ -242,9 +246,6 @@ const handleExportExcel = async (excelFields) => {
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
     });
-};
-const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(detailLink);
 };
 
 /* Watcher */

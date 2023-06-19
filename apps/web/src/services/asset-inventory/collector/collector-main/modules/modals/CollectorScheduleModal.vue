@@ -22,8 +22,6 @@ import { PButtonModal } from '@spaceone/design-system';
 
 import { i18n as i18nTranslator } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -59,7 +57,6 @@ const handleConfirm = async () => {
         await fetchCollectorUpdate();
         handleCloseModal();
         emit('refresh-collector-list');
-        showSuccessMessage(i18nTranslator.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
     } catch (e) {
         collectorFormStore.resetSchedulePower();
         ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));

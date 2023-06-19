@@ -4,6 +4,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
@@ -93,7 +97,19 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 const response = await SpaceConnector.client.inventory.collector.update(params);
                 const updatedCollectorIndex = this.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
                 this.collectors[updatedCollectorIndex] = response;
+                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
                 return response;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+        async restartCollector(collectorId: string) {
+            try {
+                await SpaceConnector.client.inventory.collector.collect({
+                    collector_id: collectorId,
+                });
+                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

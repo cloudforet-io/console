@@ -42,8 +42,6 @@ import { PToggleButton, PI } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -80,7 +78,6 @@ const handleChangeToggle = async (value) => {
         };
         const response = await collectorPageStore.updateCollectorSchedule(params);
         await collectorFormStore.setOriginCollector(response);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }

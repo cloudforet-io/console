@@ -36,7 +36,7 @@
                           style-type="tertiary"
                           :loading="state.collectLoading"
                           class="collector-data-button"
-                          @click.stop="handleClickCollectData(props.item.collectorId)"
+                          @click.stop="handleClickCollectData"
                 >
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                 </p-button>
@@ -52,11 +52,7 @@ import {
     PButton, PCard, PLazyImg, PSpinner,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -91,20 +87,20 @@ const state = reactive({
 
 /* Components */
 const handleClickProgressStatus = () => {
+    const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
     collectorPageStore.$patch({
         visibleRestartModal: true,
+        selectedCollector: collectorCollector,
     });
 };
 
 /* API */
-const handleClickCollectData = async (collectorId) => {
+const handleClickCollectData = async () => {
+    const collectorId = props.item.collectorId;
     state.collectLoading = true;
     try {
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: collectorId,
-        });
+        await collectorPageStore.restartCollector(collectorId);
         emit('refresh-collector-list');
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
     } finally {
