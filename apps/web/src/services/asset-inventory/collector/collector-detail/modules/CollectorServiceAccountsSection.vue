@@ -29,6 +29,7 @@
                          searchable
                          use-cursor-loading
                          @change="handleToolboxTableChange"
+                         @refresh="handleToolboxTableRefresh"
         >
             <template #col-service_account_id-format="{value}">
                 {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
@@ -263,6 +264,9 @@ const handleToolboxTableChange = async (options: ToolboxTableOptions) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.queryTags !== undefined) queryTagHelper.setQueryTags(options.queryTags);
 
+    if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
+};
+const handleToolboxTableRefresh = async () => {
     if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
 };
 const handleClickCancel = () => {
