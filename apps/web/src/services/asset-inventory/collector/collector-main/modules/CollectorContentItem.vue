@@ -27,7 +27,7 @@
             </div>
             <div class="collector-status-wrapper">
                 <p-button style-type="tertiary"
-                          :loading="collectorPageState.collectorLoading"
+                          :loading="state.collectorLoading"
                           class="collector-data-button"
                           :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
@@ -73,9 +73,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
 
 const state = reactive({
+    loading: false,
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
@@ -85,6 +85,7 @@ const state = reactive({
 
 /* API */
 const handleClickCollectData = async () => {
+    state.loading = true;
     if (state.status === JOB_STATE.IN_PROGRESS) {
         const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
         collectorPageStore.$patch({
@@ -94,8 +95,9 @@ const handleClickCollectData = async () => {
     } else {
         const collectorId = props.item.collectorId;
         await collectorPageStore.restartCollector(collectorId);
-        emit('refresh-collector-list');
     }
+    state.loading = false;
+    emit('refresh-collector-list');
 };
 </script>
 
