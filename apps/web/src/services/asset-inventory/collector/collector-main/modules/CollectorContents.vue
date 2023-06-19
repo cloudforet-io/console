@@ -32,7 +32,7 @@
                      @click="handleClickListItem(item.detailLink)"
                 >
                     <collector-content-item :item="item"
-                                            @refresh-collector-list="$emit('refresh-collector-list');"
+                                            @refresh-collector-list="refreshCollectorList"
                     />
                 </div>
             </div>
