@@ -8,7 +8,11 @@
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
                     @confirm="handleConfirm"
-    />
+    >
+        <template #confirm-button>
+            {{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}
+        </template>
+    </p-button-modal>
 </template>
 
 <script setup lang="ts">
