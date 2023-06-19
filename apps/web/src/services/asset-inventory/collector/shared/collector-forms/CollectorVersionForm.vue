@@ -64,12 +64,17 @@ const state = reactive({
 });
 
 const initSelectedVersion = () => {
-    if (!collectorFormState.version.length) {
+    if (!collectorFormState.version.length && collectorFormState.originCollector) {
         const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
         const originVersion = collectorFormState.originCollector?.plugin_info?.version;
         collectorFormStore.$patch({
             version: originVersion ?? collectorFormState.versions[0] ?? '',
             autoUpgrade: originAutoUpgrade ?? true,
+        });
+    } else {
+        collectorFormStore.$patch({
+            version: collectorFormState.versions[0] ?? '',
+            autoUpgrade: true,
         });
     }
 };
