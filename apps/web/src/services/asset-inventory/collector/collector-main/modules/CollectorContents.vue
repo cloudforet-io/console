@@ -4,12 +4,12 @@
             exportable
             filters-visible
             search-type="query"
-            :key-item-sets="props.keyItemSets"
+            :key-item-sets="keyItemSets"
             :query-tags="state.searchTags"
-            :value-handler-map="state.valueHandlerMap"
+            :value-handler-map="valueHandlerMap"
             :total-count="collectorPageState.totalCount"
             @change="handleChangeToolbox"
-            @refresh="handleChangeToolbox"
+            @refresh="refreshCollectorList"
             @export="handleExportExcel"
         >
             <template #left-area>
@@ -32,7 +32,7 @@
                      @click="handleClickListItem(item.detailLink)"
                 >
                     <collector-list-item :item="item"
-                                         @refresh-collector-list="$emit('refresh-collector-list');"
+                                         @refresh-collector-list="refreshCollectorList"
                     />
                 </div>
             </div>
@@ -41,27 +41,35 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="$emit('refresh-collector-list');"
+                                  @refresh-collector-list="refreshCollectorList"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    onMounted, computed, reactive, watch,
+} from 'vue';
 
 import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ExcelDataField } from '@/store/modules/file/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
-import { replaceUrlQuery } from '@/lib/router-query-string';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorListItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorListItem.vue';
@@ -74,69 +82,66 @@ import {
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
 const RECENT_COUNT = 5;
-
-interface Props {
-    keyItemSets?: KeyItemSet[]
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    keyItemSets: undefined,
-});
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
-const emit = defineEmits<{(e: 'change-toolbox'): void,
-    (e: 'export-excel'): void,
-    (e: 'refresh-collector-list'): void
-}>();
+const keyItemSets: KeyItemSet[] = [{
+    title: 'Properties',
+    items: [
+        { name: 'collector_id', label: 'Collector Id' },
+        { name: 'name', label: 'Name' },
+        { name: 'state', label: 'State' },
+        { name: 'plugin_info.plugin_id', label: 'Plugin' },
+        { name: 'plugin_info.version', label: 'Version' },
+        { name: 'created_at', label: 'Created' },
+        { name: 'last_collected_at', label: 'Last Collected' },
+    ],
+}];
+const valueHandlerMap: ValueHandlerMap = {
+    collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
+    name: makeDistinctValueHandler('inventory.Collector', 'name'),
+    state: makeDistinctValueHandler('inventory.Collector', 'state'),
+    'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
+    'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
+    provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
+    supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
+    created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
+    last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
+};
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
+const historyLinkQueryHelper = new QueryHelper();
 const state = reactive({
-    infoItems: [
+    infoItems: computed(() => [
         { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
         { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
         { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
-    ],
-    valueHandlerMap: {
-        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
-        name: makeDistinctValueHandler('inventory.Collector', 'name'),
-        state: makeDistinctValueHandler('inventory.Collector', 'state'),
-        'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
-        'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
-        provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
-        supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
-        created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
-        last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
-    } as ValueHandlerMap,
+    ]),
     excelFields: [
         { key: 'name', name: 'Name' },
         { key: 'schedule.state', name: 'Schedule state' },
         { key: 'plugin_info.plugin_id', name: 'Plugin' },
         { key: 'plugin_info.version', name: 'Version' },
         { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
-    ],
+    ] as ExcelDataField[],
     searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
     items: computed(() => {
         const plugins = storeState.plugins;
         return collectorPageState.collectors?.map((d) => {
-            const linkData = {
-                params: { id: d.collector_id },
-                query: {
-                    filters: searchQueryHelper.setFilters([
-                        {
-                            k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-                            v: d.collector_id,
-                            o: '=',
-                        },
-                    ]).rawQueryStrings,
+            historyLinkQueryHelper.setFilters([
+                {
+                    k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+                    v: d.collector_id,
+                    o: '=',
                 },
-            };
+            ]);
 
             const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
             const recentJobAnalyze = matchedJob?.job_status.slice(-5) || [];
@@ -161,7 +166,10 @@ const state = reactive({
                     info: d.plugin_info,
                 },
                 historyLink: {
-                    ...linkData,
+                    params: { id: d.collector_id },
+                    query: {
+                        filters: historyLinkQueryHelper.rawQueryStrings,
+                    },
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
                 },
                 detailLink: {
@@ -177,22 +185,60 @@ const state = reactive({
     }),
 });
 
-const searchQueryHelper = new QueryHelper().setKeyItemSets(props.keyItemSets ?? []);
+const searchQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
+const collectorApiQueryHelper = new ApiQueryHelper()
+    .setOnly(
+        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+        COLLECTOR_QUERY_HELPER_SET.NAME,
+        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
+        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
+        COLLECTOR_QUERY_HELPER_SET.TAGS,
+        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
+        COLLECTOR_QUERY_HELPER_SET.STATE,
+        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
+    )
+    .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
+    .setSort(collectorPageState.sortBy, true);
+
+const fetchCollectorList = async () => {
+    collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
+    try {
+        await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        await collectorPageStore.$reset();
+    }
+};
 
 /* Components */
 const routeToCreatePage = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
-const handleExportExcel = async () => {
-    emit('export-excel', state.excelFields);
+const refreshCollectorList = async () => {
+    await fetchCollectorList();
 };
-const handleChangeToolbox = (options) => {
+const handleChangeToolbox = (options: ToolboxOptions) => {
+    if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) collectorApiQueryHelper.setPageLimit(options.pageLimit);
+
     if (options.queryTags !== undefined) {
+        // convert queryTags to filters
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-        collectorPageStore.setFilteredCollectorList(searchQueryHelper.filters);
-        replaceUrlQuery('filters', searchQueryHelper.rawQueryStrings);
+        // set filters to store
+        collectorPageStore.setSearchFilters(searchQueryHelper.filters);
+        // set filters to apiQueryHelper
+        collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     }
-    emit('change-toolbox', options);
+
+    fetchCollectorList();
+};
+const handleExportExcel = async (excelFields) => {
+    await store.dispatch('file/downloadExcel', {
+        url: '/inventory/collector/list',
+        param: { query: collectorApiQueryHelper.data },
+        fields: excelFields,
+        file_name_prefix: FILE_NAME_PREFIX.collector,
+    });
 };
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
@@ -204,6 +250,13 @@ watch(() => collectorPageState.collectors, async () => {
     if (ids.length > 0) {
         await collectorPageStore.setCollectorJobs(ids);
     }
+});
+watch(() => collectorPageState.selectedProvider, async () => {
+    await fetchCollectorList();
+});
+
+onMounted(async () => {
+    await fetchCollectorList();
 });
 
 </script>

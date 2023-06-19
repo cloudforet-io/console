@@ -35,7 +35,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
     },
     actions: {
-        async getCollectorList(queryData?: Query) {
+        async getCollectorList(queryData: Query) {
             this.loading = true;
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({
@@ -98,10 +98,10 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 throw e;
             }
         },
-        setSelectedProvider(provider) {
+        setSelectedProvider(provider: string) {
             this.selectedProvider = provider;
         },
-        setFilteredCollectorList(filters) {
+        setSearchFilters(filters: ConsoleFilter[]) {
             this.searchFilters = filters;
         },
         setSelectedCollector(id) {
