@@ -55,9 +55,12 @@
                 </p-tooltip>
             </div>
         </div>
-        <p-text-button style-type="highlight">
+        <p-text-button style-type="highlight"
+                       class="view-history-detail-wrapper"
+                       @click.stop
+        >
             <router-link :to="props.item.historyLink"
-                         class="to-history-detail"
+                         class="view-history-detail"
             >
                 <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
                 <p-i
@@ -186,10 +189,14 @@ const storeState = reactive({
         }
     }
 
-    .to-history-detail {
-        @apply flex items-center text-label-sm;
-        height: 1.875rem;
-        margin-top: -0.5rem;
+    .view-history-detail-wrapper {
+        padding: 0;
+
+        .view-history-detail {
+            @apply flex items-center text-label-sm;
+            height: 1.875rem;
+            margin-top: -0.5rem;
+        }
     }
 }
 </style>
