@@ -104,7 +104,7 @@ const handleClickSchedule = () => {
         }
 
         .schedule-button {
-            @apply flex items-center text-label-sm text-blue-600 font-normal;
+            @apply flex items-center text-label-sm text-blue-700 font-normal;
             gap: 0.125rem;
 
             &:hover {
@@ -112,7 +112,7 @@ const handleClickSchedule = () => {
                 background-color: initial;
             }
             .icon-schedule {
-                @apply text-blue-600;
+                @apply text-blue-700;
             }
         }
     }

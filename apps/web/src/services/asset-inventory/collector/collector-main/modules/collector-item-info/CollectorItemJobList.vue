@@ -55,24 +55,26 @@
                 </p-tooltip>
             </div>
         </div>
-        <router-link :to="props.item.historyLink"
-                     class="to-history-detail"
-        >
-            <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-            <p-i
-                name="ic_chevron-right"
-                width="0.75rem"
-                height="0.75rem"
-                color="inherit transparent"
-            />
-        </router-link>
+        <p-text-button style-type="highlight">
+            <router-link :to="props.item.historyLink"
+                         class="to-history-detail"
+            >
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+                <p-i
+                    name="ic_chevron-right"
+                    width="0.75rem"
+                    height="0.75rem"
+                    color="inherit transparent"
+                />
+            </router-link>
+        </p-text-button>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTooltip, PI } from '@spaceone/design-system';
+import { PTooltip, PI, PTextButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -185,13 +187,9 @@ const storeState = reactive({
     }
 
     .to-history-detail {
-        @apply flex items-center text-label-sm text-blue-700;
+        @apply flex items-center text-label-sm;
         height: 1.875rem;
         margin-top: -0.5rem;
-
-        &:hover {
-            @apply underline;
-        }
     }
 }
 </style>

@@ -102,6 +102,8 @@ const handleClickCollectData = async (collectorId) => {
 
 <style lang="postcss" scoped>
 .collector-list-item {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
     /* custom design-system component - p-card */
     :deep(.p-card) {
         &:hover {
@@ -143,6 +145,12 @@ const handleClickCollectData = async (collectorId) => {
                     transform: translate(-50%, -50%);
                     border-radius: 0.063rem;
                 }
+
+                &:hover {
+                    &::before {
+                        @apply bg-gray-900;
+                    }
+                }
             }
 
             .collector-data-button {
@@ -152,7 +160,7 @@ const handleClickCollectData = async (collectorId) => {
 
         .collector-item-wrapper {
             @apply flex flex-col;
-            gap: 1.25rem;
+            gap: 1rem;
             padding: 0.75rem 0.625rem;
 
             .collector-item-name {
@@ -179,7 +187,7 @@ const handleClickCollectData = async (collectorId) => {
 
                 .collector-info-view {
                     @apply flex flex-col flex-wrap;
-                    gap: 1.5rem;
+                    gap: 1rem;
                     width: 50%;
 
                     .info-item {
