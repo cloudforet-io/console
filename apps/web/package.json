@@ -38,6 +38,7 @@
     "@tiptap/extension-underline": "^2.0.0-beta.25",
     "@tiptap/starter-kit": "^2.0.0-beta.191",
     "@tiptap/vue-2": "^2.0.0-beta.84",
+    "@vue/compat": "^3.3.4",
     "@vueuse/components": "^9.0.2",
     "@vueuse/core": "^8.9.1",
     "@vvo/tzdb": "^6.4.1",
@@ -69,11 +70,10 @@
     "v-click-outside": "^3.0.1",
     "v-tooltip": "^2.0.3",
     "vue": "^3.3.4",
-    "@vue/compat": "^3.3.4",
     "vue-focus": "^2.1.0",
     "vue-fragment": "^1.5.1",
     "vue-gtag": "^1.16.1",
-    "vue-i18n": "^8.15.5",
+    "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.2",
     "vue-selecto": "^1.6.4",
     "vuedraggable": "^2.24.3",
@@ -95,6 +95,7 @@
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitest/coverage-c8": "^0.24.3",
     "@vitest/ui": "^0.26.3",
+    "@vue/compiler-sfc": "^3.3.4",
     "axios-mock-adapter": "^1.17.0",
     "dotenv": "^16.0.3",
     "eslint-config-custom": "*",
@@ -106,8 +107,7 @@
     "vite": "^4.3.9",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
-    "vitest": "^0.26.3",
-    "@vue/compiler-sfc": "^3.3.4"
+    "vitest": "^0.26.3"
   },
   "browserslist": [
     "> 1%",

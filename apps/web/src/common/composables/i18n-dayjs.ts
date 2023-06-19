@@ -1,8 +1,8 @@
+import dayjs from 'dayjs';
 import {
     computed,
 } from 'vue';
 
-import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
@@ -16,7 +16,7 @@ import { i18n } from '@/translations';
  */
 export const useI18nDayjs = () => ({
     i18nDayjs: computed<typeof dayjs>(() => {
-        dayjs.locale(i18n.locale);
+        dayjs.locale(i18n.global.locale.value);
         return dayjs;
     }),
 });
