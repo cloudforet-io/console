@@ -8,8 +8,8 @@
                 <span class="collector-item-name">{{ props.item.name }}</span>
                 <div class="collector-plugin">
                     <p-lazy-img :src="props.item.plugin.icon"
-                                width="1.25rem"
-                                height="1.25rem"
+                                width="1.5rem"
+                                height="1.5rem"
                                 class="plugin-icon"
                     />
                     <span class="plugin-name">{{ state.plugin.name }}</span>
@@ -168,6 +168,10 @@ const handleClickCollectData = async () => {
             .collector-plugin {
                 @apply flex items-center;
                 gap: 0.5rem;
+
+                .plugin-name {
+                    @apply truncate;
+                }
 
                 .plugin-version {
                     @apply text-label-md text-gray-700;
