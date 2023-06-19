@@ -116,7 +116,8 @@ const state = reactive({
                 @apply block font-bold text-gray-900 not-italic;
 
                 @screen tablet {
-                    @apply inline; }
+                    @apply inline;
+                }
             }
 
             .alarm-icon {
