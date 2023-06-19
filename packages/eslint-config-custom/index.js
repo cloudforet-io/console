@@ -34,7 +34,7 @@ module.exports = {
         'no-mixed-operators': 0,
         'no-promise-executor-return': 1,
         'no-multiple-empty-lines': 0,
-        'prefer-regex-literals': 1,
+        'prefer-regex-literals': ['off'],
         'prefer-const': 1,
 
         indent: ['error', 4],

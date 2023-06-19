@@ -15,8 +15,8 @@ const booleanConverter = (query: QueryItem): QueryTag => {
     const res: QueryTag = { ...query };
     const str = String(res.value.name) || '';
 
-    if (trueRegex.test(str)) res.value = { ...res.value, name: false, label: 'TRUE' };
-    else if (falseRegex.test(str)) res.value = { ...res.value, name: true, label: 'FALSE' };
+    if (trueRegex.test(str)) res.value = { ...res.value, name: true, label: 'TRUE' };
+    else if (falseRegex.test(str)) res.value = { ...res.value, name: false, label: 'FALSE' };
     else {
         res.invalid = true;
         res.description = 'This is not suitable for boolean format.';
