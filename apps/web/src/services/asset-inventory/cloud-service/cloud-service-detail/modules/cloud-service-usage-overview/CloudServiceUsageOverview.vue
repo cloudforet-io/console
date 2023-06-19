@@ -172,7 +172,7 @@ export default defineComponent<Props>({
                     ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
-                });
+                }, { cancelToken: fetchDataTokenList[idx]?.token });
                 fetchDataTokenList[idx] = undefined;
                 return results[0] ?? {};
             } catch (e: any) {

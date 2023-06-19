@@ -217,7 +217,7 @@ export default {
                             end: dayjs.utc(cloudServicePageState.period.end).add(1, 'day').format('YYYY-MM-DD'),
                         },
                     }),
-                });
+                }, { cancelToken: listCloudServiceRequest.token });
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
