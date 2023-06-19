@@ -26,18 +26,20 @@
                 </div>
             </div>
             <div class="collector-status-wrapper">
-                <button v-if="state.status === JOB_STATE.IN_PROGRESS"
-                        class="collector-in-process"
-                        @click.stop="handleClickProgressStatus"
-                >
-                    <p-spinner />
-                </button>
-                <p-button v-else
-                          style-type="tertiary"
+                <p-button style-type="tertiary"
                           :loading="collectorPageState.collectorLoading"
                           class="collector-data-button"
+                          :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
                 >
+                    <p-i v-if="state.status === JOB_STATE.IN_PROGRESS"
+                         name="ic_settings-filled"
+                         class="progress-icon"
+                         height="1rem"
+                         width="1rem"
+                         animation="spin"
+                         color="inherit"
+                    />
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                 </p-button>
             </div>
@@ -49,7 +51,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PCard, PLazyImg, PSpinner,
+    PButton, PCard, PLazyImg, PI,
 } from '@spaceone/design-system';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -81,20 +83,19 @@ const state = reactive({
     }),
 });
 
-/* Components */
-const handleClickProgressStatus = () => {
-    const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
-    collectorPageStore.$patch({
-        visibleRestartModal: true,
-        selectedCollector: collectorCollector,
-    });
-};
-
 /* API */
 const handleClickCollectData = async () => {
-    const collectorId = props.item.collectorId;
-    await collectorPageStore.restartCollector(collectorId);
-    emit('refresh-collector-list');
+    if (state.status === JOB_STATE.IN_PROGRESS) {
+        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
+        collectorPageStore.$patch({
+            visibleRestartModal: true,
+            selectedCollector: collectorCollector,
+        });
+    } else {
+        const collectorId = props.item.collectorId;
+        await collectorPageStore.restartCollector(collectorId);
+        emit('refresh-collector-list');
+    }
 };
 </script>
 
@@ -153,6 +154,18 @@ const handleClickCollectData = async () => {
 
             .collector-data-button {
                 opacity: 0;
+
+                &.in-process {
+                    @apply items-center;
+                    opacity: 1;
+                    padding-right: 0.75rem;
+                    padding-left: 0.75rem;
+                    gap: 0.25rem;
+
+                    .progress-icon {
+                        @apply text-gray-500;
+                    }
+                }
             }
         }
 
