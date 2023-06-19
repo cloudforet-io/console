@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { PToggleButton, PI } from '@spaceone/design-system';
 
@@ -88,6 +88,13 @@ const handleClickSchedule = () => {
         visibleScheduleModal: true,
     });
 };
+
+/* Watcher */
+watch(() => props.item, (item) => {
+    if (item) {
+        state.isScheduleActivated = item.schedule.state === 'ENABLED';
+    }
+}, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>
