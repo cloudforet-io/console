@@ -15,7 +15,6 @@ import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
         loading: true,
-        collectorLoading: false,
         isRefreshList: false,
         pageStart: 1,
         pageLimit: 15,
@@ -106,7 +105,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
             }
         },
         async restartCollector(collectorId: string) {
-            this.collectorLoading = true;
             try {
                 await SpaceConnector.client.inventory.collector.collect({
                     collector_id: collectorId,
@@ -115,8 +113,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
                 throw e;
-            } finally {
-                this.collectorLoading = false;
             }
         },
         setSelectedProvider(provider: string) {

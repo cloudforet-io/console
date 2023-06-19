@@ -8,8 +8,8 @@
                 <span class="collector-item-name">{{ props.item.name }}</span>
                 <div class="collector-plugin">
                     <p-lazy-img :src="props.item.plugin.icon"
-                                width="1.25rem"
-                                height="1.25rem"
+                                width="1.5rem"
+                                height="1.5rem"
                                 class="plugin-icon"
                     />
                     <span class="plugin-name">{{ state.plugin.name }}</span>
@@ -26,18 +26,20 @@
                 </div>
             </div>
             <div class="collector-status-wrapper">
-                <button v-if="state.status === JOB_STATE.IN_PROGRESS"
-                        class="collector-in-process"
-                        @click.stop="handleClickProgressStatus"
-                >
-                    <p-spinner />
-                </button>
-                <p-button v-else
-                          style-type="tertiary"
-                          :loading="collectorPageState.collectorLoading"
+                <p-button style-type="tertiary"
+                          :loading="state.loading"
                           class="collector-data-button"
+                          :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
                 >
+                    <p-i v-if="state.status === JOB_STATE.IN_PROGRESS"
+                         name="ic_settings-filled"
+                         class="progress-icon"
+                         height="1rem"
+                         width="1rem"
+                         animation="spin"
+                         color="inherit"
+                    />
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                 </p-button>
             </div>
@@ -49,7 +51,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PCard, PLazyImg, PSpinner,
+    PButton, PCard, PLazyImg, PI,
 } from '@spaceone/design-system';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -71,9 +73,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
 
 const state = reactive({
+    loading: false,
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
@@ -81,19 +83,20 @@ const state = reactive({
     }),
 });
 
-/* Components */
-const handleClickProgressStatus = () => {
-    const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
-    collectorPageStore.$patch({
-        visibleRestartModal: true,
-        selectedCollector: collectorCollector,
-    });
-};
-
 /* API */
 const handleClickCollectData = async () => {
-    const collectorId = props.item.collectorId;
-    await collectorPageStore.restartCollector(collectorId);
+    state.loading = true;
+    if (state.status === JOB_STATE.IN_PROGRESS) {
+        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
+        collectorPageStore.$patch({
+            visibleRestartModal: true,
+            selectedCollector: collectorCollector,
+        });
+    } else {
+        const collectorId = props.item.collectorId;
+        await collectorPageStore.restartCollector(collectorId);
+    }
+    state.loading = false;
     emit('refresh-collector-list');
 };
 </script>
@@ -130,29 +133,20 @@ const handleClickCollectData = async () => {
             right: 1.5rem;
             gap: 0.25rem;
 
-            .collector-in-process {
-                @apply relative;
-
-                &::before {
-                    @apply absolute bg-gray-500;
-                    content: '';
-                    top: 50%;
-                    left: 50%;
-                    width: 0.375rem;
-                    height: 0.375rem;
-                    transform: translate(-50%, -50%);
-                    border-radius: 0.063rem;
-                }
-
-                &:hover {
-                    &::before {
-                        @apply bg-gray-900;
-                    }
-                }
-            }
-
             .collector-data-button {
                 opacity: 0;
+
+                &.in-process {
+                    @apply items-center;
+                    opacity: 1;
+                    padding-right: 0.75rem;
+                    padding-left: 0.75rem;
+                    gap: 0.25rem;
+
+                    .progress-icon {
+                        @apply text-gray-500;
+                    }
+                }
             }
         }
 
@@ -169,8 +163,12 @@ const handleClickCollectData = async () => {
                 @apply flex items-center;
                 gap: 0.5rem;
 
+                .plugin-name {
+                    @apply truncate;
+                }
+
                 .plugin-version {
-                    @apply text-label-md text-gray-700;
+                    @apply text-label-sm text-gray-400;
                 }
             }
 

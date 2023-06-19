@@ -102,16 +102,18 @@ const state = reactive({
 
     .label-description {
         @apply text-label-md text-gray-700;
+        min-height: 2.25rem;
 
         .scheduled {
             @apply flex items-center;
             gap: 0.25rem;
 
             .emphasis {
-                @apply font-bold text-gray-900 not-italic;
+                @apply font-bold text-gray-900 not-italic block;
             }
 
             .alarm-icon {
+                margin-bottom: auto;
                 min-width: 1.25rem;
             }
 
