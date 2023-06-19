@@ -63,6 +63,7 @@ export interface CollectorItemInfo {
     detailLink: CollectorLink;
     schedule: Schedule;
     recentJobAnalyze: JobStatus[];
+    hasJobList?: boolean
 }
 
 export type CollectorMainPageQuery = Partial<Record<'filters'|'provider', RouteQueryString>>;

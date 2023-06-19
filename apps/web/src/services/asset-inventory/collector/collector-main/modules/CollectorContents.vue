@@ -182,6 +182,7 @@ const state = reactive({
                 },
                 schedule: d.schedule,
                 recentJobAnalyze,
+                hasJobList: !!matchedJob,
             };
         });
     }),

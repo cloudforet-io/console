@@ -55,7 +55,8 @@
                 </p-tooltip>
             </div>
         </div>
-        <p-text-button style-type="highlight"
+        <p-text-button v-if="props.item.hasJobList"
+                       style-type="highlight"
                        class="view-history-detail-wrapper"
                        @click.stop
         >
