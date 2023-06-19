@@ -241,6 +241,7 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     return state.data;
 };
 const refreshWidget = async (thisPage = 1): Promise<Data[]> => {
+    await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
@@ -257,7 +258,7 @@ const handleUpdateThisPage = (thisPage: number) => {
 };
 
 useWidgetLifecycle({
-    disposeWidget: undefined,
+    disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
     state,
