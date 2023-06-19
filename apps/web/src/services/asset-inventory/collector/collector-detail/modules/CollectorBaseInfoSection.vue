@@ -227,6 +227,7 @@ watch(() => collectorFormStore.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .p-definition-table {
     border-color: transparent;
+    margin-bottom: 2.5rem;
 }
 .collector-base-info-edit {
     padding: 1rem;
