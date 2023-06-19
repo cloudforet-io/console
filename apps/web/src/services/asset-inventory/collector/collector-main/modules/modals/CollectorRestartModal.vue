@@ -4,7 +4,7 @@
                     fade
                     backdrop
                     :visible="collectorPageState.visibleRestartModal"
-                    :loading="state.loading"
+                    :loading="collectorPageState.collectorLoading"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
                     @confirm="handleConfirm"
@@ -12,13 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import { PButtonModal } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 
@@ -26,10 +20,6 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
-
-const state = reactive({
-    loading: false,
-});
 
 /* Components */
 const handleCloseModal = () => {
@@ -41,15 +31,8 @@ const handleCloseModal = () => {
 /* API */
 const handleConfirm = async () => {
     const collectorId = collectorPageStore.selectedCollector.collector_id;
-    state.loading = true;
-    try {
-        await collectorPageStore.restartCollector(collectorId);
-        emit('refresh-collector-list');
-        handleCloseModal();
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-    } finally {
-        state.loading = false;
-    }
+    await collectorPageStore.restartCollector(collectorId);
+    emit('refresh-collector-list');
+    handleCloseModal();
 };
 </script>

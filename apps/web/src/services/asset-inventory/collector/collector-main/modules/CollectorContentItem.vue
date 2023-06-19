@@ -34,7 +34,7 @@
                 </button>
                 <p-button v-else
                           style-type="tertiary"
-                          :loading="state.collectLoading"
+                          :loading="collectorPageState.collectorLoading"
                           class="collector-data-button"
                           @click.stop="handleClickCollectData"
                 >
@@ -51,10 +51,6 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PCard, PLazyImg, PSpinner,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
@@ -75,9 +71,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
 const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
 
 const state = reactive({
-    collectLoading: false,
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
@@ -97,15 +93,8 @@ const handleClickProgressStatus = () => {
 /* API */
 const handleClickCollectData = async () => {
     const collectorId = props.item.collectorId;
-    state.collectLoading = true;
-    try {
-        await collectorPageStore.restartCollector(collectorId);
-        emit('refresh-collector-list');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-    } finally {
-        state.collectLoading = false;
-    }
+    await collectorPageStore.restartCollector(collectorId);
+    emit('refresh-collector-list');
 };
 </script>
 
