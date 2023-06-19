@@ -186,6 +186,10 @@ const handleClickCollectData = async () => {
                     gap: 1rem;
                     width: 50%;
 
+                    @screen tablet {
+                        width: 100%;
+                    }
+
                     .info-item {
                         @apply relative flex flex-col flex-wrap;
                         width: 100%;
