@@ -112,7 +112,6 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
         provider: primitiveToQueryString(queryValue.provider),
         filters: urlFilterConverter.setFilters(queryValue.filters ?? []).rawQueryStrings,
     };
-    console.debug('newQuery', queryValue.provider, newQuery);
     SpaceRouter.router.replace({ query: newQuery }).catch((e) => {
         if (e.name !== 'NavigationDuplicated') console.error(e);
     });
