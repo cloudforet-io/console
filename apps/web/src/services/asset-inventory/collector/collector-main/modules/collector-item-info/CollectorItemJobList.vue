@@ -57,6 +57,7 @@
         </div>
         <p-text-button style-type="highlight"
                        class="view-history-detail-wrapper"
+                       @click.stop
         >
             <router-link :to="props.item.historyLink"
                          class="view-history-detail"
