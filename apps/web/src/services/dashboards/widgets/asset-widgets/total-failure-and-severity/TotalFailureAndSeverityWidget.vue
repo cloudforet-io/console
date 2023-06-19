@@ -99,6 +99,8 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 
@@ -229,7 +231,14 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* API */
 const apiQueryHelper = new ApiQueryHelper();
+let trendAnalyzeRequest: CancelTokenSource | undefined;
+let realtimeAnalyzeRequest: CancelTokenSource | undefined;
 const fetchTrendData = async (): Promise<Data[]> => {
+    if (trendAnalyzeRequest) {
+        trendAnalyzeRequest.cancel('Next request has been called.');
+        trendAnalyzeRequest = undefined;
+    }
+    trendAnalyzeRequest = axios.CancelToken.source();
     try {
         apiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
@@ -253,7 +262,8 @@ const fetchTrendData = async (): Promise<Data[]> => {
                 }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: trendAnalyzeRequest.token });
+        trendAnalyzeRequest = undefined;
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -261,6 +271,11 @@ const fetchTrendData = async (): Promise<Data[]> => {
     }
 };
 const fetchRealtimeData = async (): Promise<Data[]> => {
+    if (realtimeAnalyzeRequest) {
+        realtimeAnalyzeRequest.cancel('Next request has been called.');
+        realtimeAnalyzeRequest = undefined;
+    }
+    realtimeAnalyzeRequest = axios.CancelToken.source();
     try {
         apiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
@@ -281,7 +296,8 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
                 },
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: realtimeAnalyzeRequest.token });
+        realtimeAnalyzeRequest = undefined;
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);

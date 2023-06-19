@@ -32,6 +32,8 @@ import type { Location } from 'vue-router/types/router';
 import {
     PProgressBar,
 } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -115,7 +117,13 @@ const targetTextFormatter = (value: string): string => {
 };
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
@@ -156,7 +164,8 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'budget_usage', desc: true }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);

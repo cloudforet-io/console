@@ -52,6 +52,8 @@ import type { Location } from 'vue-router/types/router';
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -176,7 +178,13 @@ const getRefinedCircleData = (results?: Data): CircleData[] => {
 };
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
@@ -206,7 +214,8 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: '_total_usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results: sortTableData(results, COST_GROUP_BY.TYPE), more };
     } catch (e) {
         ErrorHandler.handleError(e);

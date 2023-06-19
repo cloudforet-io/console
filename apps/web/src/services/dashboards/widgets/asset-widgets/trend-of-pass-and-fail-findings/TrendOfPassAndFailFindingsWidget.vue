@@ -40,6 +40,8 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -147,14 +149,21 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+let chartAnalyzeRequest: CancelTokenSource | undefined;
+let tableAnalyzeRequest: CancelTokenSource | undefined;
 const fetchChartData = async (): Promise<FullData['chartData']> => {
+    if (chartAnalyzeRequest) {
+        chartAnalyzeRequest.cancel('Next request has been called.');
+        chartAnalyzeRequest = undefined;
+    }
+    chartAnalyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
-        return await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -170,13 +179,20 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
                 sort: [{ key: DATE_FIELD_NAME, desc: false }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: chartAnalyzeRequest.token });
+        chartAnalyzeRequest = undefined;
+        return res;
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [] };
     }
 };
 const fetchTableData = async (): Promise<FullData['tableData']> => {
+    if (tableAnalyzeRequest) {
+        tableAnalyzeRequest.cancel('Next request has been called.');
+        tableAnalyzeRequest = undefined;
+    }
+    tableAnalyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
@@ -184,7 +200,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        return await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -203,7 +219,9 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                 ],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: tableAnalyzeRequest.token });
+        tableAnalyzeRequest = undefined;
+        return res;
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
@@ -277,7 +295,6 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = false;
     return state.data;
 };
-
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;

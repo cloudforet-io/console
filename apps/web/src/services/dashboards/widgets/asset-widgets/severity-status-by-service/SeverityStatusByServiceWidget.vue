@@ -47,6 +47,8 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { flattenDeep, min } from 'lodash';
 
@@ -106,7 +108,13 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<Data[]> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
@@ -141,7 +149,8 @@ const fetchData = async (): Promise<Data[]> => {
                 },
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);
