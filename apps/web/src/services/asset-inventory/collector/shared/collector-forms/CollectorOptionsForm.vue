@@ -96,7 +96,7 @@ const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnect
     plugin_id: state.pluginId,
     version: collectorFormState.version,
     options: {
-        provider: collectorFormState.provider,
+        provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
     },
 });
 
