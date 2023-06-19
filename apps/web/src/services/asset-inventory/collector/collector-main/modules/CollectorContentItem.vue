@@ -27,7 +27,7 @@
             </div>
             <div class="collector-status-wrapper">
                 <p-button style-type="tertiary"
-                          :loading="state.collectorLoading"
+                          :loading="state.loading"
                           class="collector-data-button"
                           :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
