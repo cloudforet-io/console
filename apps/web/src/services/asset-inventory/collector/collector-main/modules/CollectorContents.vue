@@ -95,7 +95,7 @@ const keyItemSets: KeyItemSet[] = [{
     items: [
         { name: 'collector_id', label: 'Collector Id' },
         { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
+        { name: 'schedule.state', label: 'Schedule' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
         { name: 'plugin_info.version', label: 'Version' },
         { name: 'created_at', label: 'Created' },
@@ -105,11 +105,9 @@ const keyItemSets: KeyItemSet[] = [{
 const valueHandlerMap: ValueHandlerMap = {
     collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
     name: makeDistinctValueHandler('inventory.Collector', 'name'),
-    state: makeDistinctValueHandler('inventory.Collector', 'state'),
+    'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
     'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
     'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
-    provider: makeDistinctValueHandler('inventory.Collector', 'provider'),
-    supported_resource_type: makeDistinctValueHandler('inventory.Collector', 'supported_resource_type'),
     created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
     last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
 };
