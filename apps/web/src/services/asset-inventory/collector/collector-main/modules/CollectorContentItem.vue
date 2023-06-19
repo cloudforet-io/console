@@ -133,27 +133,6 @@ const handleClickCollectData = async () => {
             right: 1.5rem;
             gap: 0.25rem;
 
-            .collector-in-process {
-                @apply relative;
-
-                &::before {
-                    @apply absolute bg-gray-500;
-                    content: '';
-                    top: 50%;
-                    left: 50%;
-                    width: 0.375rem;
-                    height: 0.375rem;
-                    transform: translate(-50%, -50%);
-                    border-radius: 0.063rem;
-                }
-
-                &:hover {
-                    &::before {
-                        @apply bg-gray-900;
-                    }
-                }
-            }
-
             .collector-data-button {
                 opacity: 0;
 
@@ -189,7 +168,7 @@ const handleClickCollectData = async () => {
                 }
 
                 .plugin-version {
-                    @apply text-label-md text-gray-700;
+                    @apply text-label-sm text-gray-400;
                 }
             }
 
