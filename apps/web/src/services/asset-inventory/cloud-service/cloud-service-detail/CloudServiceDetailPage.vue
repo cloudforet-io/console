@@ -65,7 +65,7 @@
                                   #toolbox-bottom
                         >
                             <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
-                                                          :filters="tableState.searchFilters"
+                                                          :filters="searchFilters"
                                                           :hidden-filters="hiddenFilters"
                                                           :period="overviewState.period"
                                                           :key-item-sets="keyItemSets"
@@ -201,6 +201,7 @@ import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
@@ -217,7 +218,6 @@ import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/m
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -268,15 +268,17 @@ export default {
         const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
-        const queryHelper = new QueryHelper();
 
         /* Main Table */
+        const queryTagsHelper = useQueryTags({});
+        queryTagsHelper.setURLQueryStringFilters(vm.$route.query.filters);
+        const { filters: searchFilters, urlQueryStringFilters } = queryTagsHelper;
         const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
+            queryTags: computed(() => queryTagsHelper.queryTags.value),
         });
 
         const typeOptionState = reactive({
@@ -309,7 +311,6 @@ export default {
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map((d) => d.cloud_service_id)),
             tableHeight: tableHeight > TABLE_MIN_HEIGHT ? tableHeight : TABLE_MIN_HEIGHT,
             visibleCustomFieldModal: false,
-            searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
 
         const schemaQueryHelper = new QueryHelper();
@@ -339,6 +340,7 @@ export default {
 
         const hiddenFilterHelper = new QueryHelper();
         const hiddenFilters = computed<ConsoleFilter[]>(() => {
+            hiddenFilterHelper.setFilters([]);
             if (props.isServerPage) {
                 hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
             } else {
@@ -408,7 +410,7 @@ export default {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
                 .setFilters(hiddenFilters.value)
-                .addFilter(...tableState.searchFilters);
+                .addFilter(...searchFilters.value);
 
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
@@ -460,7 +462,7 @@ export default {
                 fetchOptionState.pageStart = changed.pageStart;
             }
             if (changed.queryTags !== undefined) {
-                fetchOptionState.queryTags = changed.queryTags;
+                queryTagsHelper.setQueryTags(changed.queryTags);
             }
 
             const { items, totalCount } = await listCloudServiceTableData();
@@ -474,12 +476,10 @@ export default {
             fetchTableData(changed);
         };
 
-        const replaceQueryHelper = new QueryHelper();
-        watch(() => tableState.searchFilters, (searchFilters) => {
-            replaceQueryHelper.setFilters(searchFilters);
+        watch(urlQueryStringFilters, (queryStringFilters) => {
             const filterQueryString = vm.$route.query.filters ?? '';
-            if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
-                replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
+            if (queryStringFilters !== JSON.stringify(filterQueryString)) {
+                replaceUrlQuery('filters', queryStringFilters);
             }
         });
 
@@ -587,7 +587,7 @@ export default {
         /* Watchers */
         watch(() => keyItemSets.value, (after) => {
             // initiate queryTags with keyItemSets
-            fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
+            queryTagsHelper.setKeyItemSets(after);
         }, { immediate: true });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -603,6 +603,7 @@ export default {
             cloudServiceDetailPageState,
             /* Filter */
             hiddenFilters,
+            searchFilters,
             /* Main Table */
             tableState,
             fetchOptionState,

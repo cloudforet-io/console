@@ -8,16 +8,15 @@
                     @confirm="handleUpdateVisible(false)"
     >
         <template #body>
-            <div class="flex items-center">
-                <span class="text-sm text-gray-900 font-bold mb-3 mr-2">Filter: </span>
-                <span class="text-sm text-gray-500 mb-3">{{ period ? '' : 'Auto (Overall period)' }}</span>
+            <div class="filter-wrapper">
+                <span class="filter-label">Filter: </span>
+                <span class="period">{{ period ? '' : 'Auto (Overall period)' }}</span>
                 <cloud-service-period-filter class="period-filter"
                                              read-only
                                              :period="period"
                 />
                 <p-divider v-if="queryTags.length"
                            vertical
-                           class="!h-4 !ml-4 !mr-4 mb-3"
                 />
                 <p-query-search-tags :tags="queryTags"
                                      read-only
@@ -229,7 +228,7 @@ export default defineComponent<Props>({
         /* Watchers */
         watch(
             [() => state.proxyVisible, () => props.schemaList, () => props.filters, () => props.hiddenFilters],
-            async ([visible, schemaList, filters, hiddenFilters], [, prevSchemaList, prevFilters, prevHiddenFilters]) => {
+            async ([visible, schemaList, filters, hiddenFilters], [, prevSchemaList]) => {
                 if (!visible) {
                 // If the schema is the same, do not flush the data.
                 // We can reuse the data if the filters are the same.
@@ -239,9 +238,6 @@ export default defineComponent<Props>({
                     state.dataLoading = true;
                     return;
                 }
-
-                // Do not get data if filters are the same with the previous one.
-                if (filters === prevFilters && hiddenFilters === prevHiddenFilters) return;
 
                 // set filters and get data
                 if (!state.dataLoading) state.dataLoading = true;
@@ -278,6 +274,24 @@ export default defineComponent<Props>({
         display: flex;
         flex-direction: column;
         padding: 1rem 1.25rem;
+    }
+    .filter-wrapper {
+        @apply flex items-center mb-3;
+        .filter-label {
+            @apply text-sm text-gray-900 font-bold;
+            margin-right: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .period {
+            @apply text-sm text-gray-500;
+            margin-bottom: 0.75rem;
+        }
+        .p-divider {
+            height: 1rem;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            margin-bottom: 0.75rem;
+        }
     }
     .chart-widget-wrapper {
         @apply overflow-visible;

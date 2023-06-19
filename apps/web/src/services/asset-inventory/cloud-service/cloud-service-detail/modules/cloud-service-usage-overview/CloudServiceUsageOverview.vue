@@ -25,6 +25,7 @@
                                                    :cloud-service-type-info="cloudServiceTypeInfo"
                                                    :filters="filters"
                                                    :period="period"
+                                                   :key-item-sets="keyItemSets"
         />
     </fragment>
 </template>
