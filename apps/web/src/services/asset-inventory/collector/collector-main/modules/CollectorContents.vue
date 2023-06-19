@@ -31,8 +31,8 @@
                      :key="item.collectorId"
                      @click="handleClickListItem(item.detailLink)"
                 >
-                    <collector-list-item :item="item"
-                                         @refresh-collector-list="refreshCollectorList"
+                    <collector-content-item :item="item"
+                                            @refresh-collector-list="$emit('refresh-collector-list');"
                     />
                 </div>
             </div>
@@ -73,12 +73,12 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import CollectorListItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorListItem.vue';
+import CollectorContentItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorContentItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
 import CollectorRestartModal
-    from '@/services/asset-inventory/collector/collector-main/modules/CollectorRestartModal.vue';
+    from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorRestartModal.vue';
 import CollectorScheduleModal
-    from '@/services/asset-inventory/collector/collector-main/modules/CollectorScheduleModal.vue';
+    from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorScheduleModal.vue';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET, JOB_STATE,

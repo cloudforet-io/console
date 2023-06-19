@@ -1,5 +1,5 @@
 <template>
-    <div class="collector-list-item">
+    <div class="collector-content-item">
         <p-card :header="false"
                 style-type="white"
                 class="collector-item"
@@ -114,7 +114,7 @@ const handleClickCollectData = async (collectorId) => {
 </script>
 
 <style lang="postcss" scoped>
-.collector-list-item {
+.collector-content-item {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
     /* custom design-system component - p-card */
