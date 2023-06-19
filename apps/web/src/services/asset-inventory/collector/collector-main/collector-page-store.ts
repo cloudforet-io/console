@@ -17,7 +17,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         loading: true,
         isRefreshList: false,
         pageStart: 1,
-        pageLimit: 15,
+        pageLimit: 24,
         sortBy: '',
         selectedProvider: 'all',
         collectors: [] as CollectorModel[],
