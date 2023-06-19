@@ -104,13 +104,16 @@ const state = reactive({
     schema: null as null|JsonSchema|object,
 });
 
-const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
-    plugin_id: state.pluginId,
-    version: collectorFormState.version,
-    options: {
-        provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
-    },
-});
+const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => {
+    const options = collectorFormState.provider ? {
+        provider: collectorFormState.provider,
+    } : {};
+    return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
+        plugin_id: state.pluginId,
+        version: collectorFormState.version,
+        options,
+    });
+};
 
 const getPluginMetadata = async () => {
     try {
