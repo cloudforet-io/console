@@ -70,7 +70,7 @@
                                 {{ data.label }}
                             </p>
                             <p class="status-content">
-                                <span class="status-value">{{ data.value === undefined ? '--': data.value }}</span>
+                                <span class="status-value">{{ data.value }}</span>
                                 <span v-if="data.diff"
                                       class="status-rate"
                                 >
@@ -175,7 +175,7 @@ const state = reactive({
                 name: status.name,
                 label: status.label,
                 color: status.color,
-                value: currValue,
+                value: currValue ?? 0,
                 diff: (currValue && prevValue) ? currValue - prevValue : undefined,
                 rgb: getRGBFromHex(status.color),
             });

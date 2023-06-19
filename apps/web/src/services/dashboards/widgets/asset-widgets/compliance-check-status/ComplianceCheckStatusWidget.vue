@@ -165,6 +165,17 @@ const state = reactive({
         });
         return innerChartData;
     }),
+    innerChartTooltipText: computed<string>(() => {
+        if (!state.innerChartData?.length) return '';
+        let text = '';
+        const totalFailCheckCount = sum(state.innerChartData.map((d) => d.value));
+        state.innerChartData.forEach((d, idx) => {
+            const failRate = Math.round((d.value / totalFailCheckCount) * 100);
+            if (idx !== 0) text += '\n';
+            text += `[${d.pieSettings?.fill.toString()}; fontSize: 14px]●[/] Fail (${d.severity}): ${failRate}%`;
+        });
+        return text;
+    }),
     prevComplianceCount: computed<number|undefined>(() => {
         if (!state.data) return undefined;
         const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
@@ -297,8 +308,9 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
         templateField: 'pieSettings',
         strokeOpacity: 0,
     });
-    const innerTooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(innerSeries, innerTooltip);
+    const innerTooltip = chartHelper.createTooltip({
+        labelText: state.innerChartTooltipText,
+    });
     innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
 
