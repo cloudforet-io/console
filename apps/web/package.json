@@ -64,7 +64,7 @@
     "numeral": "^2.0.6",
     "pdfmake": "^0.2.4",
     "pinia": "^2.0.28",
-    "portal-vue": "^2.1.7",
+    "portal-vue": "^3.0.0-beta.0",
     "process": "^0.11.10",
     "prosemirror-state": "^1.4.3",
     "uuid": "^8.3.2",
