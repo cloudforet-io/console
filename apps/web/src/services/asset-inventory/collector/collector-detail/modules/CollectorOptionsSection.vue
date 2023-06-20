@@ -20,6 +20,9 @@
                             :data="state.collectorOptions"
                             style-type="white"
         >
+            <template #data="{value}">
+                {{ value ? value : '--' }}
+            </template>
             <template #no-data>
                 <div class="no-data-box">
                     <p-empty image-size="sm"
@@ -102,6 +105,7 @@ const state = reactive({
         return Object.entries<JsonSchema['properties']>(properties).map(([key, property]) => ({
             name: key,
             label: property.title ?? key,
+            disableCopy: !state.collectorOptions[key],
         }));
     }),
     isEditMode: false,
