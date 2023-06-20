@@ -175,7 +175,7 @@ export default {
             }
             .subtitle {
                 @apply text-paragraph-md text-gray-400;
-                padding-bottom: 1.75rem;
+                padding-bottom: 2.375rem;
                 margin-top: 0.5rem;
             }
             .error-msg-box {
