@@ -1,4 +1,4 @@
-import type { Editor } from '@tiptap/vue-2';
+import type { Editor } from '@tiptap/vue-3';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
@@ -6,7 +6,7 @@ import type { Attachment } from '@/common/components/editor/extensions/image/typ
 export const emptyHtmlRegExp = /<[^/>][^>]*><\/[^>]+>/;
 
 export const getAttachments = (editor: Editor): Attachment[] => {
-    const contentsEl = editor.contentComponent?.$el;
+    const contentsEl = editor.contentComponent?.ctx.$refs.content as HTMLElement;
     if (!contentsEl) return [];
     const imageElements = contentsEl.getElementsByTagName('img');
     return Array.from(imageElements)

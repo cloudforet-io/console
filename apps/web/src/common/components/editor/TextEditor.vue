@@ -10,12 +10,8 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 
-import {
-    defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
-} from 'vue';
-import type { PropType, SetupContext } from 'vue';
 
 import { Color } from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
@@ -23,7 +19,8 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
-import { Editor, EditorContent } from '@tiptap/vue-2';
+import { useEditor, EditorContent } from '@tiptap/vue-3';
+import { watch } from 'vue';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
@@ -36,91 +33,55 @@ interface Props {
     value: string;
     imageUploader: ImageUploader;
     attachments: Attachment[];
+    invalid: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'TextEditor',
-    components: {
-        MenuBar,
-        EditorContent,
-    },
-    model: {
-        prop: 'value',
-        event: 'update:value',
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        imageUploader: {
-            type: Function as PropType<ImageUploader>,
-            default: () => Promise.resolve(''),
-        },
-        attachments: {
-            type: Array as PropType<Attachment[]>,
-            default: () => [],
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        loadMonospaceFonts();
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    attachments: () => [],
+    invalid: false,
+});
+const emit = defineEmits(['update:value', 'update:attachments']);
 
-        const state = reactive({
-            editor: null as null|Editor,
-        });
+loadMonospaceFonts();
 
-        onMounted(() => {
-            state.editor = new Editor({
-                content: setAttachmentsToContents(props.value, props.attachments),
-                extensions: [
-                    StarterKit.configure({
-                        heading: {
-                            levels: [1, 2, 3],
-                        },
-                        code: {
-                            HTMLAttributes: {
-                                class: 'inline-code',
-                            },
-                        },
-                    }),
-                    Underline,
-                    Link,
-                    TextStyle,
-                    Color,
-                    TextAlign.configure({
-                        types: ['heading', 'paragraph'],
-                    }),
-                    createImageExtension(props.imageUploader),
-                ],
-                onUpdate: () => {
-                    emit('update:value', state.editor?.getHTML() ?? '');
-                    emit('update:attachments', state.editor ? getAttachments(state.editor as Editor) : []);
+const editor = useEditor({
+    content: setAttachmentsToContents(props.value, props.attachments),
+    extensions: [
+        StarterKit.configure({
+            heading: {
+                levels: [1, 2, 3],
+            },
+            code: {
+                HTMLAttributes: {
+                    class: 'inline-code',
                 },
-            });
-        });
-
-        onBeforeUnmount(() => {
-            if (state.editor) state.editor.destroy();
-        });
-
-        watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
-            if (!state.editor) return;
-            const isSame = state.editor.getHTML() === value;
-            if (isSame) return;
-            let newContents = value;
-            if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
-            state.editor.commands.setContent(newContents, false);
-        });
-
-        return {
-            ...toRefs(state),
-        };
+            },
+        }),
+        Underline,
+        Link,
+        TextStyle,
+        Color,
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }),
+        createImageExtension(props.imageUploader),
+    ],
+    onUpdate: (update) => {
+        emit('update:value', update.editor.getHTML() ?? '');
+        emit('update:attachments', update.editor ? getAttachments(update.editor) : []);
     },
 });
+
+watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
+    if (!editor.value) return;
+    const isSame = editor.value.getHTML() === value;
+    if (isSame) return;
+    let newContents = value;
+    if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
+    editor.value.commands.setContent(newContents, false);
+});
+
 </script>
 
 <style lang="postcss">

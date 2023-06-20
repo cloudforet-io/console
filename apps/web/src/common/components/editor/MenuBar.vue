@@ -17,10 +17,10 @@
                    vertical
         />
 
-        <p-select-dropdown :selected="selectedTextStyle"
+        <p-select-dropdown :selected="state.selectedTextStyle"
                            class="menu-dropdown text-style"
                            style-type="transparent"
-                           :items="textStyleItems"
+                           :items="state.textStyleItems"
                            @select="handleTextStyleSelect"
         >
             <template #menu-item--format="{item}">
@@ -36,14 +36,14 @@
                    vertical
         />
 
-        <p-select-dropdown :selected="selectedTextAlign"
+        <p-select-dropdown :selected="state.selectedTextAlign"
                            class="menu-dropdown"
                            style-type="transparent"
-                           :items="textAlignItems"
+                           :items="state.textAlignItems"
                            @select="handleTextAlignSelect"
         >
             <template #default>
-                <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
+                <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
                      color="inherit"
                 />
             </template>
@@ -125,18 +125,18 @@
                        :class="{ 'selected': editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <p-popover v-model="imagePopoverVisible"
+        <p-popover v-model="state.imagePopoverVisible"
                    position="bottom"
         >
             <p-icon-button class="menu-button"
                            style-type="transparent"
                            name="ic_image"
-                           :class="{selected: imagePopoverVisible}"
+                           :class="{selected: state.imagePopoverVisible}"
             />
             <template #content>
                 <div class="image-popover">
                     <p>
-                        {{ $t('COMMON.EDITOR.COPY_PASTE_DRAG_DROP') }}
+                        {{ t('COMMON.EDITOR.COPY_PASTE_DRAG_DROP') }}
                     </p>
                     <img src="@/assets/images/illust_insert-image.svg">
                 </div>
@@ -166,19 +166,16 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from 'vue';
-
+<script lang="ts" setup>
 import {
     PDivider, PI, PIconButton, PPopover, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { Editor } from '@tiptap/vue-2';
-
-import { i18n } from '@/translations';
+import type { Editor } from '@tiptap/vue-3';
+import {
+    computed,
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ColorPicker from '@/common/components/editor/ColorPicker.vue';
 
@@ -200,109 +197,85 @@ const TEXT_STYLE_TAGS = {
     heading3: 'h3',
 };
 
-export default defineComponent<Props>({
-    name: 'MenuBar',
-    components: {
-        ColorPicker,
-        PIconButton,
-        PDivider,
-        PSelectDropdown,
-        PI,
-        PPopover,
-    },
-    props: {
-        editor: {
-            type: Object as PropType<Editor>,
-            required: true,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            textStyleItems: computed(() => [
-                { name: 'normal', label: i18n.t('COMMON.EDITOR.NORMAL_TEXT') },
-                { name: 'heading1', label: i18n.t('COMMON.EDITOR.HEADING1') },
-                { name: 'heading2', label: i18n.t('COMMON.EDITOR.HEADING2') },
-                { name: 'heading3', label: i18n.t('COMMON.EDITOR.HEADING3') },
-            ]),
-            textAlignItems: computed(() => [
-                { name: 'left', label: i18n.t('COMMON.EDITOR.ALIGN_LEFT') },
-                { name: 'center', label: i18n.t('COMMON.EDITOR.ALIGN_CENTER') },
-                { name: 'right', label: i18n.t('COMMON.EDITOR.ALIGN_RIGHT') },
-                { name: 'justify', label: i18n.t('COMMON.EDITOR.ALIGN_JUSTIFY') },
-            ]),
-            selectedTextStyle: computed(() => {
-                if (props.editor.isActive('paragraph')) return 'normal';
-                if (props.editor.isActive('heading', { level: 1 })) return 'heading1';
-                if (props.editor.isActive('heading', { level: 2 })) return 'heading2';
-                if (props.editor.isActive('heading', { level: 3 })) return 'heading3';
-                return 'normal';
-            }),
-            selectedTextAlign: computed(() => {
-                if (props.editor.isActive({ textAlign: 'left' })) return 'left';
-                if (props.editor.isActive({ textAlign: 'center' })) return 'center';
-                if (props.editor.isActive({ textAlign: 'right' })) return 'right';
-                if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
-                return 'left';
-            }),
-            imagePopoverVisible: false,
-        });
+const props = defineProps<Props>();
+const { t } = useI18n();
 
-        /* Event Handlers */
-        const handleTextStyleSelect = (style: string) => {
-            switch (style) {
-            case 'normal': props.editor.chain().focus().setParagraph().run(); break;
-            case 'heading1': props.editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
-            case 'heading2': props.editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
-            case 'heading3': props.editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
-            default: props.editor.chain().focus().setParagraph().run(); break;
-            }
-        };
-        const handleTextAlignSelect = (align: string) => {
-            props.editor.chain().focus().setTextAlign(align).run();
-        };
-        const handleLinkClick = () => {
-            if (props.editor.isActive('link')) {
-                props.editor.chain().focus().unsetLink().run();
-            } else {
-                const previousUrl = props.editor.getAttributes('link').href;
-                // eslint-disable-next-line no-alert
-                const url = window.prompt('URL', previousUrl);
-
-                // cancelled
-                if (url === null) return;
-
-                // empty
-                if (url === '') {
-                    props.editor
-                        .chain()
-                        .focus()
-                        .extendMarkRange('link')
-                        .unsetLink()
-                        .run();
-
-                    return;
-                }
-
-                // update link
-                props.editor
-                    .chain()
-                    .focus()
-                    .extendMarkRange('link')
-                    .setLink({ href: url })
-                    .run();
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            handleTextStyleSelect,
-            handleTextAlignSelect,
-            handleLinkClick,
-            TEXT_ALIGN_ICONS,
-            TEXT_STYLE_TAGS,
-        };
-    },
+const state = reactive({
+    textStyleItems: computed(() => [
+        { name: 'normal', label: t('COMMON.EDITOR.NORMAL_TEXT') },
+        { name: 'heading1', label: t('COMMON.EDITOR.HEADING1') },
+        { name: 'heading2', label: t('COMMON.EDITOR.HEADING2') },
+        { name: 'heading3', label: t('COMMON.EDITOR.HEADING3') },
+    ]),
+    textAlignItems: computed(() => [
+        { name: 'left', label: t('COMMON.EDITOR.ALIGN_LEFT') },
+        { name: 'center', label: t('COMMON.EDITOR.ALIGN_CENTER') },
+        { name: 'right', label: t('COMMON.EDITOR.ALIGN_RIGHT') },
+        { name: 'justify', label: t('COMMON.EDITOR.ALIGN_JUSTIFY') },
+    ]),
+    selectedTextStyle: computed(() => {
+        if (props.editor.isActive('paragraph')) return 'normal';
+        if (props.editor.isActive('heading', { level: 1 })) return 'heading1';
+        if (props.editor.isActive('heading', { level: 2 })) return 'heading2';
+        if (props.editor.isActive('heading', { level: 3 })) return 'heading3';
+        return 'normal';
+    }),
+    selectedTextAlign: computed(() => {
+        if (props.editor.isActive({ textAlign: 'left' })) return 'left';
+        if (props.editor.isActive({ textAlign: 'center' })) return 'center';
+        if (props.editor.isActive({ textAlign: 'right' })) return 'right';
+        if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
+        return 'left';
+    }),
+    imagePopoverVisible: false,
 });
+
+/* Event Handlers */
+const handleTextStyleSelect = (style: string) => {
+    switch (style) {
+    case 'normal': props.editor.chain().focus().setParagraph().run(); break;
+    case 'heading1': props.editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
+    case 'heading2': props.editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+    case 'heading3': props.editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+    default: props.editor.chain().focus().setParagraph().run(); break;
+    }
+};
+const handleTextAlignSelect = (align: string) => {
+    props.editor.chain().focus().setTextAlign(align).run();
+};
+const handleLinkClick = () => {
+    if (props.editor.isActive('link')) {
+        props.editor.chain().focus().unsetLink().run();
+    } else {
+        const previousUrl = props.editor.getAttributes('link').href;
+        // eslint-disable-next-line no-alert
+        const url = window.prompt('URL', previousUrl);
+
+        // cancelled
+        if (url === null) return;
+
+        // empty
+        if (url === '') {
+            props.editor
+                .chain()
+                .focus()
+                .extendMarkRange('link')
+                .unsetLink()
+                .run();
+
+            return;
+        }
+
+        // update link
+        props.editor
+            .chain()
+            .focus()
+            .extendMarkRange('link')
+            .setLink({ href: url })
+            .run();
+    }
+};
+
 </script>
 
 <style lang="postcss" scoped>
