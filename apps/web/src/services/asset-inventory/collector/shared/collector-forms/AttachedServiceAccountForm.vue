@@ -107,6 +107,10 @@ const state = reactive({
         queryHelper.setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '!=' }]); // init filters
         if (collectorFormStore.collectorProvider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
+        } else if (collectorFormState.provider) {
+            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.provider, o: '=' });
+        } else if (collectorFormState.repositoryPlugin?.provider) {
+            queryHelper.addFilter({ k: 'provider', v: collectorFormState.repositoryPlugin.provider, o: '=' });
         }
         return {
             resource_type: 'identity.ServiceAccount',
@@ -183,6 +187,13 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
 }, { immediate: true });
+
+watch(() => collectorFormState.provider, () => {
+    setForm('selectedAttachedServiceAccount', []);
+    collectorFormStore.$patch({
+        attachedServiceAccount: [],
+    });
+});
 
 </script>
 
