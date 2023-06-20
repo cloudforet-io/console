@@ -269,7 +269,6 @@ const drawChart = (chartData: XYChartData[]) => {
         };
         const series = chartHelper.createXYLineSeries(chart, seriesSettings);
         chart.series.push(series);
-        series.bullets.clear();
         series.fills.template.setAll({
             opacity: 0.2,
             visible: true,
