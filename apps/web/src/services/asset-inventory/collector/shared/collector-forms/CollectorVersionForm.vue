@@ -64,7 +64,7 @@ const state = reactive({
 });
 
 const initSelectedVersion = () => {
-    if (!collectorFormState.version.length && collectorFormState.originCollector) {
+    if (collectorFormState.originCollector) {
         const originAutoUpgrade = collectorFormState.originCollector?.plugin_info?.upgrade_mode === 'AUTO';
         const originVersion = collectorFormState.originCollector?.plugin_info?.version;
         collectorFormStore.$patch({
