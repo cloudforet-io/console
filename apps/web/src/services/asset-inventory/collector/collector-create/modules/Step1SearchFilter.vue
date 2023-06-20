@@ -208,6 +208,11 @@ watch(() => state.selectedRepository, (repository) => {
             margin-bottom: 0.5rem;
         }
     }
+    .radio-container {
+        height: calc(100vh - 17rem);
+        overflow-y: auto;
+    }
+
     .dropdown-container {
         width: 100%;
         display: none;
