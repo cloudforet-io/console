@@ -13,7 +13,7 @@
                          :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"
         />
-        <div v-if="!props.enableHoursEdit && !props.disableFirstLoading"
+        <div v-if="!props.enableHoursEdit && collectorFormState.schedulePower"
              class="collect-data-desc"
         >
             <i18n v-if="state.timezoneAppliedHours.length > 0"
@@ -34,7 +34,7 @@
                 </p-button>
             </template>
         </div>
-        <p-field-group v-else
+        <p-field-group v-if="props.enableHoursEdit"
                        class="hourly-schedule-field-group"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
         >
@@ -86,7 +86,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 const props = defineProps<{
     enableHoursEdit?: boolean;
-    disableFirstLoading?: boolean;
+    disableLoading?: boolean;
     disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
     callApiOnPowerChange?: boolean;
@@ -112,7 +112,7 @@ const state = reactive({
     }),
     timezoneAppliedHoursDisplayText: computed(() => state.timezoneAppliedHours.map((hour) => `${hour}:00`).join(', ')),
     loading: computed<boolean>(() => {
-        if (props.disableFirstLoading) return false;
+        if (props.disableLoading) return false;
         return collectorFormState.originCollector === null;
     }),
 });

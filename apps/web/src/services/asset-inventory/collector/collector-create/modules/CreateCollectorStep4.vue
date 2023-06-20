@@ -1,6 +1,8 @@
 <template>
     <div class="collector-page-4">
-        <collector-schedule-form disable-first-loading />
+        <collector-schedule-form enable-hours-edit
+                                 disable-loading
+        />
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
                            style-type="highlight"
