@@ -71,7 +71,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
-                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
+                                            name: i18n.global.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
                                             } as RouteLocation,
@@ -120,7 +120,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
-                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
+                                            name: i18n.global.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
                                             } as RouteLocation,

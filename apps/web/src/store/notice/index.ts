@@ -1,10 +1,10 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ComputedRef } from 'vue';
 import {
     computed, ref,
 } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -75,7 +75,7 @@ export const useNoticeStore = ({ userId }: {
         try {
             if (!boardId.value) boardId.value = await getNoticeBoardId();
             const result = await SpaceConnector.client.config.userConfig.set({
-                user_id: store.state.user.userId,
+                user_id: store.state['user/userId'],
                 name: `console:board:${boardId.value}:${postId}`,
                 data: { is_read: true, show_popup: showPopup },
             });
@@ -99,7 +99,7 @@ export const useNoticeStore = ({ userId }: {
             totalNoticeIdList.value = results.map((post) => post.post_id);
             totalNoticeCount.value = total_count;
         } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            ErrorHandler.handleRequestError(e, i18n.global.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
         }
     };
 

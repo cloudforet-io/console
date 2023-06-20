@@ -1,8 +1,8 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import axios from 'axios';
 import type { Action } from 'vuex';
 
-import axios from 'axios';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
@@ -34,7 +34,7 @@ const getFileName = (contentDisposition) => {
     return fileName[0];
 };
 export const downloadExcel: Action<FileState, any> = async ({ commit, rootState, dispatch }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
-    dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') }, { root: true });
+    dispatch('display/startLoading', { loadingMessage: i18n.global.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') }, { root: true });
     try {
         let params;
         if (Array.isArray(payload)) {
@@ -87,7 +87,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                 Because this error is not from the SpaceConnector(it's from axios), so the ErrorHandler does not pop up the error message in the catch below.
                 */
                 setTimeout(() => {
-                    showErrorMessage(i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'), e);
+                    showErrorMessage(i18n.global.t('COMMON.EXCEL.ALT_E_DOWNLOAD'), e);
                 }, 500);
                 throw e;
             });
@@ -104,9 +104,9 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
             link.remove();
         }
 
-        dispatch('display/finishLoading', { successMessage: i18n.t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS') }, { root: true });
+        dispatch('display/finishLoading', { successMessage: i18n.global.t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS') }, { root: true });
     } catch (error) {
-        ErrorHandler.handleRequestError(error, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
+        ErrorHandler.handleRequestError(error, i18n.global.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
         dispatch('display/finishLoading', {}, { root: true });
     }
 };

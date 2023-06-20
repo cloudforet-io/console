@@ -1,10 +1,10 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
 import { reverse } from 'lodash';
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
@@ -251,7 +251,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 const res = await SpaceConnector.client.identity.project.create({
                     ...projectInfo,
                 });
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
+                showSuccessMessage(i18n.global.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
                 this.shouldUpdateProjectList = true;
 
                 if (this.treeEditMode) {
@@ -271,7 +271,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 }
                 return res;
             } catch (e: any) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
+                ErrorHandler.handleRequestError(e, i18n.global.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
                 throw new Error(e);
             }
         },

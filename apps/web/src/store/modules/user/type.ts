@@ -1,3 +1,5 @@
+import type { SupportLanguage } from '@/translations/type';
+
 import type { RawPagePermission } from '@/lib/access-control/config';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
@@ -20,7 +22,7 @@ export interface UserState {
     backend?: UserBackend;
     name?: string;
     email?: string;
-    language?: string;
+    language?: SupportLanguage;
     timezone?: string;
     roles?: Array<UserRole>;
     requiredActions?: string[];

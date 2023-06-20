@@ -12,7 +12,7 @@ export const blankPreview: DefaultDashboardPreviewConfig = reactive({
     description: {
         icon: 'ic_dashboard-template_blank',
         preview_image: '',
-        text: computed(() => i18n.t('DASHBOARDS.CREATE.BLANK_DESC')),
+        text: computed(() => i18n.global.t('DASHBOARDS.CREATE.BLANK_DESC')),
     },
 });
 
