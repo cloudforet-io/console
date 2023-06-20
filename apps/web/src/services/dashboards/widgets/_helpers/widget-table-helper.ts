@@ -7,7 +7,7 @@ import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
-import type { CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeDataModel, AnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 /**
  * @name getWidgetTableDateFields
@@ -52,13 +52,13 @@ export const getWidgetTableDateFields = (
  * @name getRefinedDateTableData
  * @description set data of empty date. This is necessary for index-oriented fields, like `usd_cost_sum.0.value`
  * @example (before) [{ date: '2023-01', provider: 'aws' }]
- * @example (after) [{ date: '2023-01', provider: 'aws' }, { date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }]
+ * @example (after) [{ date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }, { date: '2023-01', provider: 'aws' }]
  */
 export const getRefinedDateTableData = (
-    results: CostAnalyzeDataModel['results'],
+    results: AnalyzeDataModel['results'],
     dateRange: DateRange,
     fieldsKey = 'usd_cost_sum',
-): CostAnalyzeDataModel['results'] => {
+): AnalyzeDataModel['results'] => {
     if (!results?.length) return [];
     const _results = cloneDeep(results);
     results.forEach((result, idx) => {
@@ -71,7 +71,7 @@ export const getRefinedDateTableData = (
             }
             now = now.add(1, 'month');
         }
-        _results[idx][fieldsKey] = _fieldsData;
+        _results[idx][fieldsKey] = sortBy(_fieldsData, 'date');
     });
     return _results;
 };
