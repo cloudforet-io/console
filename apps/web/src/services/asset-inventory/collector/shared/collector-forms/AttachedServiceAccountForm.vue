@@ -107,7 +107,7 @@ const state = reactive({
         queryHelper.setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '!=' }]); // init filters
         if (collectorFormStore.collectorProvider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
-        } else if (collectorFormStore.provider) {
+        } else if (collectorFormState.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormStore.provider, o: '=' });
         } else if (collectorFormState.repositoryPlugin?.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormState.repositoryPlugin.provider, o: '=' });
