@@ -24,13 +24,13 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'service_account', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetFilterOptionsSchema(
                     'project',
-                    'service_account',
+                    // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
                     'asset_compliance_type',
@@ -39,7 +39,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
             },
             order: getWidgetFilterSchemaPropertyNames(
                 'project',
-                'service_account',
+                // 'service_account',
                 'provider',
                 'region',
                 'asset_compliance_type',

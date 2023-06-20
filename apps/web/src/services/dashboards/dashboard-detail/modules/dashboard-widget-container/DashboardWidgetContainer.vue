@@ -143,6 +143,7 @@ export default defineComponent<Props>({
         /* refresh widgets */
         let dashboardChangedTime;
         watch(() => dashboardDetailState.dashboardId, () => {
+            state.initiatedWidgetMap = {};
             dashboardChangedTime = new Date().getTime();
         });
         watch(() => dashboardDetailState.settings, (dashboardSettings, prevSettings) => {

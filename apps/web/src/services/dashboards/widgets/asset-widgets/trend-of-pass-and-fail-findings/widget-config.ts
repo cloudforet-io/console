@@ -29,7 +29,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'provider', 'asset_compliance_type', 'region', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'asset_compliance_type', 'region', 'asset_account')],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
@@ -37,7 +37,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                 ...getWidgetOptionsSchema('asset_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
-                    'service_account',
+                    // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'asset_compliance_type',
                     'region',
@@ -46,7 +46,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
             },
             order: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'project',
-                'service_account',
+                // 'service_account',
                 'provider',
                 'asset_compliance_type',
                 'region',
