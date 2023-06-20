@@ -39,7 +39,7 @@ export const useWidgetReformer = ({
     const getWidgetThemes = (widgetInfoList: DashboardLayoutWidgetInfo[], widgetConfigMap: Record<string, WidgetConfig>): Array<WidgetTheme|undefined> => {
         const widgetThemeOptions: Array<WidgetConfig['theme']> = [];
         widgetInfoList.forEach((widgetInfo) => {
-            widgetThemeOptions.push(widgetConfigMap[widgetInfo.widget_key].theme);
+            widgetThemeOptions.push(widgetConfigMap[widgetInfo.widget_key]?.theme);
         });
         return widgetThemeAssigner(widgetThemeOptions);
     };
