@@ -2,7 +2,7 @@
     <div v-cloak
          id="app"
     >
-        <template v-if="$store.state.display.isInitialized">
+        <template v-if="store.state.display.isInitialized">
             <p-notice-alert group="noticeTopLeft" />
             <p-notice-alert group="noticeTopRight" />
             <p-notice-alert group="noticeBottomLeft" />
@@ -12,13 +12,13 @@
             <template v-if="showGNB">
                 <g-n-b class="gnb" />
                 <div class="app-body">
-                    <p-sidebar :visible="$store.state.display.visibleSidebar"
-                               :style-type="$store.getters['display/sidebarProps'].styleType"
-                               :size="$store.getters['display/sidebarProps'].size"
-                               :is-fixed-size="$store.getters['display/sidebarProps'].isFixedSize"
-                               :hide-close-button="$store.getters['display/sidebarProps'].disableButton"
-                               :disable-scroll="$store.getters['display/sidebarProps'].disableScroll"
-                               @close="$store.dispatch('display/hideSidebar')"
+                    <p-sidebar :visible="store.state.display.visibleSidebar"
+                               :style-type="store.getters['display/sidebarProps'].styleType"
+                               :size="store.getters['display/sidebarProps'].size"
+                               :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
+                               :hide-close-button="store.getters['display/sidebarProps'].disableButton"
+                               :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
+                               @close="store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
                             <portal-target name="top-notification"
@@ -27,10 +27,10 @@
                             <router-view />
                         </main>
                         <template #title>
-                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
                                            name="info-title"
                             />
-                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
                                            name="widget-title"
                             />
                             <portal-target v-else
@@ -38,10 +38,10 @@
                             />
                         </template>
                         <template #sidebar>
-                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
                                            name="info-contents"
                             />
-                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
                                            name="widget-contents"
                             />
                             <portal-target v-else
@@ -57,10 +57,10 @@
             <router-view v-else />
             <p-icon-modal :visible="isExpired"
                           emoji="👋"
-                          :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
-                          :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
+                          :header-title="t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
+                          :button-text="t('COMMON.SESSION_MODAL.SIGNIN')"
                           button-type="primary"
-                          @clickButton="goToSignIn"
+                          @click-button="goToSignIn"
             />
             <notification-email-modal
                 v-model:visible="notificationEmailModalVisible"
@@ -68,18 +68,18 @@
                 :user-id="userId"
                 :modal-type="MODAL_TYPE.SEND"
             />
-            <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
+            <notice-popup v-if="!store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
         </template>
         <!-- Iframe for file download -->
         <iframe class="hidden"
-                :src="$store.state.file.downloadSource"
+                :src="store.state.file.downloadSource"
                 width="1"
                 height="1"
         />
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
-        <mobile-guide-modal v-if="$store.state.display.visibleMobileGuideModal" />
+        <mobile-guide-modal v-if="store.state.display.visibleMobileGuideModal" />
     </div>
 </template>
 
@@ -88,13 +88,12 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
-
-
-import { store } from '@/store';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -129,11 +128,14 @@ export default defineComponent({
         PSidebar,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const route = useRoute();
+        const router = useRouter();
+        const store = useStore();
+        const { t } = useI18n();
 
         const state = reactive({
-            showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+            showGNB: computed(() => route.matched[0]?.name === 'root'),
+            isExpired: computed(() => store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
             isEmailVerified: computed(() => store.state.user.emailVerified),
             userId: computed(() => store.state.user.userId),
             email: computed(() => store.state.user.email),
@@ -141,19 +143,19 @@ export default defineComponent({
             notificationEmailModalVisible: false,
         });
         const goToSignIn = () => {
-            const res: RouteLocation = {
+            const res = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
-                query: { nextPath: vm.$route.fullPath },
-            };
+                query: { nextPath: route.fullPath } as RouteLocation['query'],
+            } as RouteLocation;
             store.commit('error/setVisibleSessionExpiredError', false);
-            vm.$router.push(res);
+            router.push(res);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
         const updateUser = async () => {
             await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
         };
 
-        watch(() => vm.$route, (value) => {
+        watch(() => route, (value) => {
             state.notificationEmailModalVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
         });
 
@@ -164,6 +166,8 @@ export default defineComponent({
             MODAL_TYPE,
             showsBrowserRecommendation,
             updateUser,
+            store,
+            t,
         };
     },
 
