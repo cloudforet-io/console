@@ -26,13 +26,13 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetFilterOptionsSchema(
                     'project',
-                    'service_account',
+                    // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
                     'asset_compliance_type',
@@ -41,7 +41,7 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
             },
             order: getWidgetFilterSchemaPropertyNames(
                 'project',
-                'service_account',
+                // 'service_account',
                 'provider',
                 'region',
                 'asset_compliance_type',

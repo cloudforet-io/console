@@ -29,13 +29,13 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetFilterOptionsSchema(
                     'project',
-                    'service_account',
+                    // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
                     'asset_compliance_type',
@@ -44,7 +44,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
             },
             order: getWidgetFilterSchemaPropertyNames(
                 'project',
-                'service_account',
+                // 'service_account',
                 'provider',
                 'region',
                 'asset_compliance_type',

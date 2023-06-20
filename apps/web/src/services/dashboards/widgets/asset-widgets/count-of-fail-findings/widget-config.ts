@@ -27,7 +27,7 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'service_account', 'asset_compliance_type', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account')],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
@@ -35,7 +35,7 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
                 ...getWidgetOptionsSchema('asset_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
-                    'service_account',
+                    // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
                     'asset_compliance_type',
@@ -44,7 +44,7 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
             },
             order: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'project',
-                'service_account',
+                // 'service_account',
                 'provider',
                 'region',
                 'asset_compliance_type',
