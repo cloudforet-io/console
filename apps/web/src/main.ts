@@ -1,5 +1,5 @@
 
-import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
+// import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import SpaceDesignSystem from '@spaceone/design-system';
 import FloatingVue from 'floating-vue';
 import { createPinia } from 'pinia';
@@ -22,9 +22,6 @@ import '@spaceone/design-system/dist/css/style.css';
 
 /** ********** CREATE VUE APP INSTANCE ************** */
 const app = createApp(App);
-/* This is global injection for site-initializing */
-app.provide('app', app);
-app.provide('store', store);
 
 const pinia = createPinia();
 pinia.use(resetStore);
@@ -37,7 +34,7 @@ app.use(router);
 app.use(i18n);
 app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
-app.use(LottieVuePlayer);
+// app.use(LottieVuePlayer);
 app.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** INITIALIZE ************** */

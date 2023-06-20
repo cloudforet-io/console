@@ -8,7 +8,6 @@ declare module '@vue/runtime-core' {
     interface App {
         $store: Store<State>
     }
-
     interface ComponentCustomProperties {
         $store: Store<State>
     }
