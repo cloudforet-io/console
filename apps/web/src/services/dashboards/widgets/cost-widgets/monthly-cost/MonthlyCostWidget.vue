@@ -106,6 +106,8 @@ import {
 import {
     PDivider, PDataLoader, PBadge, PI, PSkeleton,
 } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -129,6 +131,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { XYChartData, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -174,7 +177,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<Data> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -192,7 +201,8 @@ const fetchData = async (): Promise<Data> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);

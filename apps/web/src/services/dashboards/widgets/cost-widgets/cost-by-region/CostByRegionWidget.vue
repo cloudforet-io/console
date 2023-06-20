@@ -49,6 +49,8 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import {
     groupBy, isEqual, sum, uniqWith,
 } from 'lodash';
@@ -202,7 +204,13 @@ const getRefinedMapChartData = (results?: Data): MapChartData[] => {
 };
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -222,7 +230,8 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);

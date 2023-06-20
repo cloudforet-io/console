@@ -54,6 +54,8 @@ import type { Location } from 'vue-router/types/router';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -155,7 +157,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -176,7 +184,8 @@ const fetchData = async (): Promise<FullData> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results: sortTableData(getRefinedDateTableData(results, state.dateRange)), more };
     } catch (e) {
         ErrorHandler.handleError(e);

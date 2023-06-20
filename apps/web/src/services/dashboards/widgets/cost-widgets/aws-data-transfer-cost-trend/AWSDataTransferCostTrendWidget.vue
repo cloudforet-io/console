@@ -51,6 +51,8 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -152,7 +154,13 @@ const getRefinedTableData = (results: Data): Data => results.map((result) => ({
 }));
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<Data> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
@@ -181,7 +189,8 @@ const fetchData = async (): Promise<Data> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         const _refinedData = getRefinedTableData(results);
         return sortTableData(getRefinedDateTableData(_refinedData, state.dateRange));
     } catch (e) {

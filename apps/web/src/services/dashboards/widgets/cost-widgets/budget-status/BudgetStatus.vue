@@ -52,6 +52,8 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -129,7 +131,13 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 };
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<Data> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
@@ -169,7 +177,8 @@ const fetchData = async (): Promise<Data> => {
                 page: { limit: 200 },
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);
