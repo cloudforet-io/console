@@ -170,9 +170,10 @@ const state = reactive({
         if (!state.data?.realtimeData) return [];
         const results: SeverityData[] = [];
         const prevMonth = dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
+        const failFindingCountDataList = state.data.realtimeData.filter((d) => d.key === 'fail_finding_count');
         SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((status) => {
-            const currValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === state.dateRange.end)?.value;
-            const prevValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === prevMonth)?.value;
+            const currValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === state.dateRange.end)?.value;
+            const prevValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === prevMonth)?.value;
             results.push({
                 name: status.name,
                 label: status.label,
