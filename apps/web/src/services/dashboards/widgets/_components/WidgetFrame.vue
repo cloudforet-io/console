@@ -104,7 +104,7 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -155,7 +155,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
-    currency: CURRENCY.USD,
+    currency: undefined,
     overflowY: undefined,
 });
 
@@ -167,13 +167,16 @@ const state = reactive({
     dateLabel: computed<TranslateResult|undefined>(() => {
         const start = props.dateRange?.start;
         const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
-        if (start && endDayjs) {
+        if (endDayjs) {
             let endText;
             const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
             if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
             else endText = endDayjs.endOf('month').format('YY-MM-DD');
-            const startText = dayjs.utc(start).format('YY-MM-DD');
-            return `${startText} ~ ${endText}`;
+            if (start) {
+                const startText = dayjs.utc(start).format('YY-MM-DD');
+                return `${startText} ~ ${endText}`;
+            }
+            return endText;
         }
         if (start && !endDayjs) {
             const today = dayjs();

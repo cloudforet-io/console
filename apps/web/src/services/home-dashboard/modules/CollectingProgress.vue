@@ -94,8 +94,14 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { COLLECT_MODE, CollectorModel } from '@/services/asset-inventory/collector/type';
+import type { CollectorModel } from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+enum COLLECT_MODE {
+    all = 'ALL',
+    create = 'CREATE',
+    update = 'UPDATE'
+}
 
 enum JOB_STATE {
     created = 'CREATED',

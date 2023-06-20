@@ -1,6 +1,6 @@
 {
   "name": "cloudforet-console",
-  "version": "1.12.0-dev21",
+  "version": "1.12.0-dev24",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -13,7 +13,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint --parallel",
     "format": "turbo run format",
-    "test": "turbo run test --parallel",
+    "test": "NODE_OPTIONS=--max_old_space_size=8192 turbo run test --parallel",
     "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install"
   },
   "devDependencies": {

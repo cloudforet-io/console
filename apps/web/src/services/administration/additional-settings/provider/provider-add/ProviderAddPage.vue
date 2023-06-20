@@ -1,6 +1,6 @@
 <template>
     <section class="provider-add-page">
-        <!--song-lang-->
+        <!--TODO: translation-->
         <p-heading
             show-back-button
             :title="$t('Add Provider')"
@@ -21,14 +21,14 @@
                 <!--                />-->
             </div>
         </p-data-loader>
-        <!--song-lang-->
+        <!--TODO: translation-->
         <p-button-modal
             :header-title="$t('Would you like to install', {provider: selectedProvider})"
             :visible.sync="visibleInstallModal"
             size="sm"
             @confirm="handleConfirmInstallProvider"
         />
-        <!--song-lang-->
+        <!--TODO: translation-->
         <p-icon-modal
             :visible.sync="visibleResultModal"
             icon-name="ic_check-circle"

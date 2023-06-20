@@ -30,7 +30,7 @@ export default {
                 if (result.url === DEFAULT_URL) {
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
-                    queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '=' }]);
+                    queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '' }]);
                     link = `${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);

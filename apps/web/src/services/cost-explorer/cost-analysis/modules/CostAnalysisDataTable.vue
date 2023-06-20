@@ -354,7 +354,7 @@ export default {
                     start: dayjs.utc(period.start).format(dateFormat),
                     end: dayjs.utc(period.end).format(dateFormat),
                     ...query,
-                });
+                }, { cancelToken: listCostAnalysisRequest.token });
                 let items = results;
                 if (granularity !== GRANULARITY.ACCUMULATED && stack) items = _getStackedTableData(results, granularity, period);
                 tableState.items = items;

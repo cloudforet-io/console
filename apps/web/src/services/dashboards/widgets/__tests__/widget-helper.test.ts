@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import basePieWidgetConfig from '@/services/dashboards/widgets/_base/base-pie/widget-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import costMapWidgetConfig from '@/services/dashboards/widgets/cost-map/widget-config';
-import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
-import costTrendWidgetConfig from '@/services/dashboards/widgets/cost-trend/widget-config';
-import monthlyCostWidgetConfig from '@/services/dashboards/widgets/monthly-cost/widget-config';
+import costMapWidgetConfig from '@/services/dashboards/widgets/cost-widgets/cost-map/widget-config';
+import costPieWidgetConfig from '@/services/dashboards/widgets/cost-widgets/cost-pie/widget-config';
+import costTrendWidgetConfig from '@/services/dashboards/widgets/cost-widgets/cost-trend/widget-config';
+import monthlyCostWidgetConfig from '@/services/dashboards/widgets/cost-widgets/monthly-cost/widget-config';
 
 const costPieConfigId = costPieWidgetConfig.widget_config_id;
 const basePieConfigId = basePieWidgetConfig.widget_config_id;
@@ -47,7 +47,7 @@ describe('[Widget Helper] getWidgetConfig', () => {
     it('test CostMapWidget', () => {
         const mergedCostMapWidgetConfig = getWidgetConfig(costMapWidgetConfigId);
         expect(mergedCostMapWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'group_by', 'filters.provider', 'filters.project', 'filters.service_account',
+            'cost_group_by', 'filters.provider', 'filters.project', 'filters.service_account', 'filters.region', 'filters.cost_product', 'filters.cost_account',
         ]));
     });
 });

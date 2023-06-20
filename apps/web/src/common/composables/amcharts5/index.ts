@@ -14,17 +14,17 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
 import {
-    createBullet, createCircle, createDataProcessor, createLegend, createTooltip, toggleSeries,
+    createBullet, createCircle, createDataProcessor, createLabel, createLegend, createTooltip, toggleSeries,
 } from '@/common/composables/amcharts5/concepts-helper';
 import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
-    createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
+    createDonutChart, createPieChart, createPieSeries, setPieLabelText, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
 import { createTreeMapSeries, setTreemapTooltipText, setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    setXYSharedTooltipText, setXYSingleTooltipText, createXYHorizontalChart, setXYSharedTooltipTextByUsage,
+    setXYSharedTooltipText, setXYSingleTooltipText, createXYHorizontalChart, setXYSharedTooltipTextByUsage, setXYSharedTooltipTextWithRate,
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
@@ -115,7 +115,7 @@ export const useAmcharts5 = (
             return createMapChart(state.root as Root, settings);
         },
         //
-        createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.XYSeries => {
+        createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.LineSeries => {
             if (!state.root) throw new Error('No root');
             return createXYLineSeries(state.root as Root, chart, settings);
         },
@@ -152,6 +152,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createBullet(state.root as Root, settings);
         },
+        createLabel: (settings: am5.ILabelSettings): am5.Label => {
+            if (!state.root) throw new Error('No root');
+            return createLabel(state.root as Root, settings);
+        },
         createCircle: (settings: am5.ICircleSettings, circleTemplate: am5.Template<am5.Circle>): am5.Circle => {
             if (!state.root) throw new Error('No root');
             return createCircle(state.root as Root, settings, circleTemplate);
@@ -162,8 +166,10 @@ export const useAmcharts5 = (
         },
         setXYSharedTooltipText,
         setXYSharedTooltipTextByUsage,
+        setXYSharedTooltipTextWithRate,
         setXYSingleTooltipText,
         setPieTooltipText,
+        setPieLabelText,
         setTreemapTooltipText,
         setTreemapLabelText,
         setChartColors,

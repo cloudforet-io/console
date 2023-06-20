@@ -51,6 +51,8 @@ import type { Location } from 'vue-router/types/router';
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -72,7 +74,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
@@ -111,7 +113,7 @@ const state = reactive({
     }),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
-        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             {
@@ -147,7 +149,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -167,7 +175,8 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);

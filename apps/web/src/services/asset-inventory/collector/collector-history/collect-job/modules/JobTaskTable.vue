@@ -148,7 +148,7 @@ export default {
                 { label: 'Updated Count', name: 'updated_count' },
                 { label: 'Disconnected Count', name: 'disconnected_count' },
                 { label: 'Deleted Count', name: 'deleted_count' },
-                { label: 'Started', name: 'created_at' },
+                { label: 'Started', name: 'started_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ],
             statusList: computed(() => ([
@@ -240,8 +240,8 @@ export default {
                 state.totalCount = res.total_count;
                 state.items = res.results.map((jobTask) => ({
                     ...jobTask,
-                    created_at: iso8601Formatter(jobTask.created_at, state.timezone),
-                    duration: durationFormatter(jobTask.created_at, jobTask.finished_at, state.timezone),
+                    started_at: iso8601Formatter(jobTask.started_at, state.timezone),
+                    duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone),
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);

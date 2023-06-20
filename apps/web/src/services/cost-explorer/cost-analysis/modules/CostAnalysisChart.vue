@@ -136,7 +136,7 @@ export default {
                     end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
-                });
+                }, { cancelToken: listCostAnalysisRequest.token });
                 listCostAnalysisRequest = undefined;
                 return results;
             } catch (e) {

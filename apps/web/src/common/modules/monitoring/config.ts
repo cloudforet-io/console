@@ -2,16 +2,18 @@ import {
     blue, coral, green, indigo, peacock, violet, yellow,
 } from '@/styles/colors';
 
-export const MONITORING_TYPE = Object.freeze({
+export const MONITORING_TYPE = {
     METRIC: 'METRIC',
     LOG: 'LOG',
-});
+} as const;
+export type MonitoringType = typeof MONITORING_TYPE[keyof typeof MONITORING_TYPE];
 
-export const STATISTICS_TYPE = Object.freeze({
+export const STATISTICS_TYPE = {
     AVERAGE: 'AVERAGE',
     MAXIMUM: 'MAXIMUM',
     MINIMUM: 'MINIMUM',
-});
+} as const;
+export type StatisticsType = typeof STATISTICS_TYPE[keyof typeof STATISTICS_TYPE];
 
 export const COLORS = [
     coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[500], coral[600],

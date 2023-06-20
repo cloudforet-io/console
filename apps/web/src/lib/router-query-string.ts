@@ -144,6 +144,7 @@ export const queryStringToString = (queryString: RouteQueryString): string|undef
  */
 export const primitiveToQueryString = (value?: string|boolean|number): RouteQueryString => {
     if (value === undefined) return undefined;
+    if (typeof value === 'string') return value;
     return JSON.stringify(value);
 };
 
