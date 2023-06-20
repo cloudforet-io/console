@@ -59,6 +59,9 @@ export default defineComponent({
 </script>
 
 <style lang="postcss">
+pre code.hljs {
+    padding: 0;
+}
 .hljs {
     @apply text-gray-700;
     overflow: visible;
