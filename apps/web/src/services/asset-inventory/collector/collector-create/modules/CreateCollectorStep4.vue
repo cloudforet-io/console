@@ -111,12 +111,12 @@ const handleClickCreateButton = async () => {
             plugin_info: {
                 plugin_id: collectorFormState.repositoryPlugin?.plugin_id,
                 version: collectorFormState.version,
-                secret_filter: {
-                    state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
-                    service_accounts: collectorFormStore.serviceAccounts,
-                },
                 options: collectorFormState.options,
                 upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
+            },
+            secret_filter: {
+                state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
+                service_accounts: collectorFormStore.serviceAccounts,
             },
             schedule: {
                 state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
