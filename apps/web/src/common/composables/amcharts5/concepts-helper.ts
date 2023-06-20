@@ -65,6 +65,10 @@ export const createBullet = (root: Root, settings: IBulletSettings): am5.Bullet 
     ...settings,
 });
 
+export const createLabel = (root: Root, settings?: am5.ILabelSettings): am5.Label => am5.Label.new(root, {
+    ...settings,
+});
+
 export const createCircle = (root: Root, settings: ICircleSettings, circleTemplate: am5.Template<Circle>): am5.Circle => am5.Circle.new(root, {
     ...settings,
 }, circleTemplate);

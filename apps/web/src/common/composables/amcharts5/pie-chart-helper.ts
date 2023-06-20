@@ -58,3 +58,14 @@ export const setPieTooltipText = (series: am5percent.PieSeries, tooltip: am5.Too
         return `[${colorHex}; fontSize: 10px]●[/] {${categoryFieldName}}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
 };
+
+export const setPieLabelText = (chart: am5percent.PieChart, settings?: am5.Template<am5.Label>['_settings']): void => {
+    chart.seriesContainer.children.push(
+        am5.Label.new(chart.root, {
+            textAlign: 'center',
+            centerY: am5.p50,
+            centerX: am5.p50,
+            ...settings,
+        }),
+    );
+};

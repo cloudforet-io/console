@@ -128,12 +128,13 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
     COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
 import type {
     AvailableResource,
-    Metric, MetricChartData, StatisticsType, StatItem,
+    Metric, MetricChartData, StatItem,
 } from '@/common/modules/monitoring/type';
 
 interface DataToolType {

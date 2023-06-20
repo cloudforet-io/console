@@ -87,6 +87,7 @@ export default {
         /* Event */
         const handleChangeTab = (selectedTab) => {
             tabState.activeTab = selectedTab;
+            state.selectedWidgetConfigId = undefined;
         };
         const selectWidget = (widgetConfigId: string) => {
             state.selectedWidgetConfigId = widgetConfigId;

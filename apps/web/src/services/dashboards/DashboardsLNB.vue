@@ -162,7 +162,9 @@ export default defineComponent({
             const result = [] as LNBMenu[];
             menuItems.forEach((d) => {
                 if (Array.isArray(d)) {
-                    result.push(d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM));
+                    const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+                    const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
+                    if (hasProject) result.push(filtered);
                 } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
             });
             return result;

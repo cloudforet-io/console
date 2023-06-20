@@ -12,6 +12,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
+import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
@@ -111,12 +112,35 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
     return results;
 };
 
+const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): ConsoleFilter[] => {
+    const results: ConsoleFilter[] = [];
+    Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
+        if (!filterItems?.length) return;
+        // HACK: This is temporary code for cloud_service_type filter
+        if ((filterKey === ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type)) {
+            filterItems.forEach((d) => {
+                const key = 'cloud_service_type';
+                results.push({
+                    k: key,
+                    v: d.v,
+                    o: d.o,
+                });
+            });
+        } else {
+            filterItems.forEach((d) => {
+                results.push(d);
+            });
+        }
+    });
+    return results;
+};
+
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
     widgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     title: ComputedRef<string|undefined>;
     options: ComputedRef<WidgetOptions>;
-    currency: ComputedRef<Currency>;
+    currency: ComputedRef<Currency|undefined>;
     groupBy: ComputedRef<GroupBy | string | undefined>;
     granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
@@ -129,6 +153,7 @@ export interface WidgetState<Data = any> {
     pageSize: ComputedRef<number|undefined>;
     consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
+    cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
     optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
 }
 export function useWidgetState<Data = any>(
@@ -145,8 +170,15 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
             state.optionsErrorMap,
         )),
-        currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
-        groupBy: computed(() => state.options?.group_by),
+        currency: computed(() => {
+            if (state.widgetConfig.labels?.includes('Cost')) return state.settings?.currency?.value ?? CURRENCY.USD;
+            return undefined;
+        }),
+        groupBy: computed(() => {
+            if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_group_by;
+            if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_group_by;
+            return undefined;
+        }),
         granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         size: computed(() => {
@@ -194,6 +226,10 @@ export function useWidgetState<Data = any>(
         budgetConsoleFilters: computed(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return getConvertedBudgetConsoleFilters(state.options.filters);
+        }),
+        cloudServiceStatsConsoleFilters: computed(() => {
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return getConvertedCloudServiceStatsConsoleFilters(state.options.filters);
         }),
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
             props.inheritOptions,

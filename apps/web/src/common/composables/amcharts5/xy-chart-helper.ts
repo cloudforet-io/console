@@ -5,7 +5,7 @@ import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@am
 import * as am5xy from '@amcharts/amcharts5/xy';
 import bytes from 'bytes';
 
-import { byteFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
@@ -38,7 +38,7 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
         cursor,
         pinchZoomX: false,
         paddingLeft: 0,
-        paddingRight: 0,
+        paddingRight: 20,
         paddingBottom: 0,
         ...settings,
     }));
@@ -54,11 +54,12 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
     const xRenderer = am5xy.AxisRendererX.new(root, {
         strokeOpacity: 1,
         strokeWidth: 1,
-        stroke: am5.color(gray[300]),
+        stroke: am5.color(gray[200]),
         minGridDistance: 20,
     });
     xRenderer.grid.template.setAll({
         strokeOpacity: 0,
+        stroke: am5.color(gray[200]),
     });
     xRenderer.labels.template.setAll({
         fontSize: 12,
@@ -99,6 +100,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
     });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
+        min: 0,
     }));
     return { chart, xAxis, yAxis };
 };
@@ -187,7 +189,7 @@ export const createXYLineSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.XYSeries => {
+): am5xy.LineSeries => {
     const series = am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
@@ -250,6 +252,28 @@ export const setXYSharedTooltipTextByUsage = (chart: am5xy.XYChart, tooltip: am5
             value = bytes.parse(`${value}${sourceUnit}`);
             value = byteFormatter(value);
             _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+        });
+        return _text;
+    });
+};
+export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am5.Tooltip): void => {
+    tooltip.label.adapters.add('text', (text, target) => {
+        let totalValue = 0;
+        const seriesList: any[] = []; // { color: string, name: string, value: number }[]
+        chart.series.each((s) => {
+            const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+            const value = target.dataItem?.dataContext?.[fieldName];
+            totalValue += value;
+            seriesList.push({
+                color: s.get('stroke')?.toString() ?? '',
+                name: s.get('name') ?? '',
+                value: value ?? 0,
+            });
+        });
+        let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
+        seriesList.forEach((s) => {
+            const rate = Math.round((s.value / totalValue) * 100);
+            _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
         });
         return _text;
     });

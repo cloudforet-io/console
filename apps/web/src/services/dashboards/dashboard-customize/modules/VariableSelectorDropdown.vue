@@ -74,8 +74,11 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
+
+import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -184,11 +187,21 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 
-const loadSearchResourceOptionsByCostAnalysis = async () => {
+const loadSearchResourceOptions = async () => {
     if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+        // NOTE: Some variables(asset) require specific API filters.
+        const apiQueryHelper = new ApiQueryHelper();
+        if (state.variableProperty.name === ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name) {
+            apiQueryHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
+        } else if (state.variableProperty.name === ASSET_REFERENCE_TYPE_INFO.asset_account.name) {
+            apiQueryHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
+        }
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
-            resource_type: 'cost_analysis.Cost',
+            resource_type: state.variableProperty.options.resource_type ?? 'cost_analysis.Cost',
             distinct_key: state.variableProperty.options.resource_key,
+            options: {
+                ...apiQueryHelper.data,
+            },
         });
         state.searchResourceOptions = results.map((d) => ({ name: d.name, label: d.name }));
     }
@@ -201,7 +214,7 @@ watch(visibleMenu, (_visibleMenu) => {
 }, { immediate: true });
 
 onMounted(() => {
-    loadSearchResourceOptionsByCostAnalysis();
+    loadSearchResourceOptions();
 });
 
 const {
