@@ -7,6 +7,7 @@
         <p-data-loader class="collector-options-form-contents"
                        :loading="state.loading"
                        :data="state.schema"
+                       loader-backdrop-color="0"
         >
             <p-json-schema-form :schema="state.schema"
                                 :form-data="collectorFormState.options"
@@ -49,6 +50,17 @@
                     </p-empty>
                 </div>
             </template>
+            <template #loader>
+                <div class="loading-box">
+                    <div class="loading-spinner">
+                        <p-spinner size="xl" />
+                    </div>
+                    <div class="loading-description">
+                        <p>{{ $t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC1') }}</p>
+                        <p>{{ $t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC2') }}</p>
+                    </div>
+                </div>
+            </template>
         </p-data-loader>
     </div>
 </template>
@@ -59,7 +71,7 @@ import {
 } from 'vue';
 
 import {
-    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty,
+    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty, PSpinner,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { isEmpty } from 'lodash';
@@ -92,13 +104,16 @@ const state = reactive({
     schema: null as null|JsonSchema|object,
 });
 
-const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
-    plugin_id: state.pluginId,
-    version: collectorFormState.version,
-    options: {
+const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => {
+    const options = collectorFormState.provider ? {
         provider: collectorFormState.provider,
-    },
-});
+    } : {};
+    return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
+        plugin_id: state.pluginId,
+        version: collectorFormState.version,
+        options,
+    });
+};
 
 const getPluginMetadata = async () => {
     try {
@@ -149,7 +164,7 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
     }
 
     .collector-options-form-contents {
-        min-height: 6rem;
+        min-height: 10.625rem;
 
         .error-box {
             @apply flex flex-col items-center justify-center w-full;
@@ -167,6 +182,20 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
 
             .empty-options-image {
                 height: 100%;
+            }
+        }
+
+        .loading-box {
+            height: 8.625rem;
+            .loading-spinner {
+                height: 6rem;
+
+                @apply flex flex-col justify-center items-center w-full;
+            }
+
+            .loading-description {
+                @apply text-paragraph-md text-gray-500;
+                text-align: center;
             }
         }
     }

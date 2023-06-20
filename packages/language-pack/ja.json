@@ -2116,6 +2116,8 @@
 				"CREATE_NEW_COLLECTOR": "新しいコレクターを作成",
 				"FORM_LOAD_FAILED": "追加オプションの読み込みに失敗しました。",
 				"LEARN_MORE": "詳細を見る",
+				"LOADING_DESC1": "加オプションを読み込んでいます...",
+				"LOADING_DESC2": "(お待ちください、約1〜2分かかる場合があります)",
 				"NAME": "名前",
 				"NAME_INVALID_DUPLICATED": "名前が重複しています",
 				"NAME_INVALID_MIN": "2文字以上を入力してください",
