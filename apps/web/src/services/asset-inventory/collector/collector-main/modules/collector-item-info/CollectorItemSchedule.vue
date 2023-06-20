@@ -21,7 +21,7 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
