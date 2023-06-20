@@ -238,11 +238,11 @@ const handleClickListItem = (detailLink) => {
 };
 
 /* API */
-const handleExportExcel = async (excelFields) => {
+const handleExportExcel = async () => {
     await store.dispatch('file/downloadExcel', {
         url: '/inventory/collector/list',
         param: { query: collectorApiQueryHelper.data },
-        fields: excelFields,
+        fields: state.excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
     });
 };
