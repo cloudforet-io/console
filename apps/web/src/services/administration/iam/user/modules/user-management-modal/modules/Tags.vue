@@ -1,28 +1,7 @@
-<template>
-    <div class="tags-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
-                       class="title"
-        >
-            <div class="tag-help-msg">
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
-            </div>
-        </p-field-group>
-
-        <tags-input-group :tags="formState.tags"
-                          show-validation
-                          :is-valid.sync="validationState.isTagsValid"
-                          is-administration
-                          class="utils-wrapper"
-                          @update-tags="handleUpdateTags"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import { PFieldGroup } from '@spaceone/design-system';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -42,6 +21,7 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const { t } = useI18n();
 
 const formState = reactive({
     tags: {},
@@ -52,7 +32,7 @@ const validationState = reactive({
 
 /* Components */
 const setForm = () => {
-    formState.tags = props.item.tags || {};
+    formState.tags = props.item?.tags || {};
 };
 const handleUpdateTags = (tags: Tag) => {
     formState.tags = tags;
@@ -66,6 +46,27 @@ const handleUpdateTags = (tags: Tag) => {
     }
 })();
 </script>
+
+<template>
+    <div class="tags-wrapper">
+        <p-field-group :label="t('IDENTITY.USER.FORM.TAGS')"
+                       class="title"
+        >
+            <div class="tag-help-msg">
+                {{ t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                {{ t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
+            </div>
+        </p-field-group>
+
+        <tags-input-group v-model:is-valid="validationState.isTagsValid"
+                          :tags="formState.tags"
+                          show-validation
+                          is-administration
+                          class="utils-wrapper"
+                          @update-tags="handleUpdateTags"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .tags-wrapper {

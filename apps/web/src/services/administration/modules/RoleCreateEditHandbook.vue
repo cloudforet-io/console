@@ -1,84 +1,75 @@
+<script lang="ts" setup>
+import { PAnchor, PDivider } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
+const { t } = useI18n();
+
+</script>
+
 <template>
     <section>
         <article class="desc-wrapper">
             <h2 class="header2">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE') }}
             </h2>
             <p class="desc2">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN_DESC') }}
             </p>
         </article>
         <p-divider class="divider" />
         <article class="desc-wrapper">
             <h2 class="header2">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS') }}
             </h2>
             <p class="desc2">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE_DESC') }}
+                {{ t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE_DESC') }}
             </p>
         </article>
         <p-divider class="divider" />
         <h2 class="header2">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY') }}
+            {{ t('IAM.ROLE.HANDBOOK.API_POLICY') }}
         </h2>
         <p class="desc2">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_DESC') }}
+            {{ t('IAM.ROLE.HANDBOOK.API_POLICY_DESC') }}
         </p>
         <p class="desc4">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
+            {{ t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
             <p-anchor :highlight="true"
                       :to="{
                           name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
                       }"
             >
-                {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_LINK') }}
+                {{ t('IAM.ROLE.HANDBOOK.API_POLICY_LINK') }}
             </p-anchor>
         </p>
     </section>
 </template>
-
-<script lang="ts">
-import { PAnchor, PDivider } from '@spaceone/design-system';
-
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
-export default {
-    name: 'RoleCreateEditHandbook',
-    components: {
-        PAnchor,
-        PDivider,
-    },
-    setup() {
-        return {
-            ADMINISTRATION_ROUTE,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .header2 {

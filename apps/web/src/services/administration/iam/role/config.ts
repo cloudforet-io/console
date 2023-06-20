@@ -28,6 +28,7 @@ export const FORM_TYPE = Object.freeze({
     UPDATE: 'UPDATE',
     CREATE: 'CREATE',
 } as const);
+export type FormType = typeof FORM_TYPE[keyof typeof FORM_TYPE];
 
 export const MANAGE_FEATURE_MAP = {
     [MENU_ID.DASHBOARDS_WORKSPACE]: {

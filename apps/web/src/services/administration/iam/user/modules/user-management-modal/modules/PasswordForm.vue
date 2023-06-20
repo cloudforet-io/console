@@ -1,86 +1,9 @@
-<template>
-    <div>
-        <p-field-group :label="userPageState.visibleUpdateModal ? $t('COMMON.PROFILE.PASSWORD') : ''"
-                       required
-                       class="password-form-wrapper"
-        >
-            <div class="password-form-view">
-                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
-                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
-                             :key="type.name"
-                             v-model="state.passwordStatus"
-                             :value="idx"
-                             :disabled="type.disabled"
-                             @change="handleClickRadio(idx)"
-                    >
-                        {{ type.label }}
-                    </p-radio>
-                </p-radio-group>
-                <p-divider />
-                <form class="form">
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :required="true"
-                        :invalid="invalidState.password"
-                        :invalid-text="invalidTexts.password"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="password"
-                                          type="password"
-                                          autocomplete="current-password"
-                                          appearance-type="masking"
-                                          class="text-input password"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('password', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :required="true"
-                        :invalid="invalidState.passwordCheck"
-                        :invalid-text="invalidTexts.passwordCheck"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="passwordCheck"
-                                          type="password"
-                                          class="text-input password-check"
-                                          autocomplete="new-password"
-                                          appearance-type="masking"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('passwordCheck', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                </form>
-            </div>
-        </p-field-group>
-        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
-             class="help-text-wrapper"
-        >
-            <p-i name="ic_info-circle"
-                 height="0.875rem"
-                 width="0.875rem"
-                 class="info-icon"
-                 color="inherit"
-            />
-            <span class="help-text">{{ $t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import {
     oneLowerCaseValidator,
@@ -109,6 +32,7 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const { t } = useI18n();
 
 const state = reactive({
     passwordStatus: 0,
@@ -117,27 +41,27 @@ const state = reactive({
             return [
                 {
                     name: PASSWORD_TYPE.KEEP,
-                    label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
+                    label: t('COMMON.PROFILE.KEEP_PASSWORD'),
                 },
                 {
                     name: PASSWORD_TYPE.RESET,
-                    label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                    label: t('COMMON.PROFILE.SEND_LINK'),
                     disabled: !props.isValidEmail,
                 },
                 {
                     name: PASSWORD_TYPE.MANUALLY,
-                    label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
+                    label: t('COMMON.PROFILE.SET_MANUALLY'),
                 },
             ];
         }
         return [
             {
                 name: PASSWORD_TYPE.RESET,
-                label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                label: t('COMMON.PROFILE.SEND_LINK'),
             },
             {
                 name: PASSWORD_TYPE.MANUALLY,
-                label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
+                label: t('COMMON.PROFILE.SET_MANUALLY'),
             },
         ];
     }),
@@ -157,14 +81,14 @@ const {
 }, {
     password(value: string) {
         if (value === '') return '';
-        if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-        if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-        if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+        if (!oneLowerCaseValidator(value)) return t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+        if (!oneUpperCaseValidator(value)) return t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+        if (!oneNumberValidator(value)) return t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
         return '';
     },
     passwordCheck(value: string) {
         if (value === '') return '';
-        if (!samePasswordValidator(password.value, value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        if (!samePasswordValidator(password.value, value)) return t('AUTH.PASSWORD.RESET.NOT_MATCHING');
         return '';
     },
 });
@@ -202,6 +126,81 @@ const resetForm = () => {
 })();
 
 </script>
+
+<template>
+    <div>
+        <p-field-group :label="userPageState.visibleUpdateModal ? t('COMMON.PROFILE.PASSWORD') : ''"
+                       required
+                       class="password-form-wrapper"
+        >
+            <div class="password-form-view">
+                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
+                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
+                             :key="type.name"
+                             v-model="state.passwordStatus"
+                             :value="idx"
+                             :disabled="type.disabled"
+                             @change="handleClickRadio(idx)"
+                    >
+                        {{ type.label }}
+                    </p-radio>
+                </p-radio-group>
+                <p-divider />
+                <form class="form">
+                    <p-field-group
+                        :label="t('COMMON.PROFILE.PASSWORD')"
+                        :required="true"
+                        :invalid="invalidState.password"
+                        :invalid-text="invalidTexts.password"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="password"
+                                          type="password"
+                                          autocomplete="current-password"
+                                          appearance-type="masking"
+                                          class="text-input password"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                          :invalid="invalid"
+                                          @update:value="handleChangeInput('password', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-field-group
+                        :label="t('COMMON.PROFILE.PASSWORD_CHECK')"
+                        :required="true"
+                        :invalid="invalidState.passwordCheck"
+                        :invalid-text="invalidTexts.passwordCheck"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="passwordCheck"
+                                          type="password"
+                                          class="text-input password-check"
+                                          autocomplete="new-password"
+                                          appearance-type="masking"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                          :invalid="invalid"
+                                          @update:value="handleChangeInput('passwordCheck', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </form>
+            </div>
+        </p-field-group>
+        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
+             class="help-text-wrapper"
+        >
+            <p-i name="ic_info-circle"
+                 height="0.875rem"
+                 width="0.875rem"
+                 class="info-icon"
+                 color="inherit"
+            />
+            <span class="help-text">{{ t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .password-form-wrapper {

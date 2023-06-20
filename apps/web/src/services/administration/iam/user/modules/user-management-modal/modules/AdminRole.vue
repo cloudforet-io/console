@@ -1,34 +1,9 @@
-<template>
-    <div class="admin-role-wrapper">
-        <div class="admin-role-headline">
-            <p-toggle-button
-                :value="state.isToggled"
-                @change-toggle="handleUpdateToggle"
-            />
-            <span class="title">{{ $t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
-        </div>
-        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
-        <p-select-dropdown v-if="state.isToggled"
-                           :key="`admin-role-${props.activeTab}`"
-                           :items="formState.domainRoleList"
-                           :disabled="formState.domainRoleList.length < 2 || state.isSameId"
-                           use-fixed-menu-style
-                           :selected="state.selectedMenuIndex"
-                           index-mode
-                           class="dropdown"
-                           @select="handleSelectedMenuIndex"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import { reactive } from 'vue';
-
-import { PToggleButton, PSelectDropdown } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
+import { PToggleButton, PSelectDropdown } from '@spaceone/design-system';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -43,6 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
     item: undefined,
 });
+const store = useStore();
+const { t } = useI18n();
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
@@ -81,7 +58,7 @@ const handleSelectedMenuIndex = (selectedIndex: number) => {
 };
 const setForm = async () => {
     if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings && userPageStore.selectedUsers[0].role_bindings.length > 0) {
-        state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
+        state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item?.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
         if (state.selectedMenuIndex === -1) return;
         state.isToggled = true;
         formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
@@ -120,6 +97,29 @@ const getRoleList = async () => {
     }
 })();
 </script>
+
+<template>
+    <div class="admin-role-wrapper">
+        <div class="admin-role-headline">
+            <p-toggle-button
+                :value="state.isToggled"
+                @change-toggle="handleUpdateToggle"
+            />
+            <span class="title">{{ t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
+        </div>
+        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
+        <p-select-dropdown v-if="state.isToggled"
+                           :key="`admin-role-${props.activeTab}`"
+                           :items="formState.domainRoleList"
+                           :disabled="formState.domainRoleList.length < 2 || state.isSameId"
+                           use-fixed-menu-style
+                           :selected="state.selectedMenuIndex"
+                           index-mode
+                           class="dropdown"
+                           @select="handleSelectedMenuIndex"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .admin-role-wrapper {

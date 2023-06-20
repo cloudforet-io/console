@@ -1,89 +1,12 @@
-<template>
-    <div class="notification-email-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
-                       :invalid="invalidState.email"
-                       :invalid-text="invalidTexts.email"
-                       class="input-form-view"
-        >
-            <template #default="{invalid}">
-                <div class="input-form">
-                    <p-text-input :value="email"
-                                  :invalid="invalid"
-                                  :placeholder="store.state.user.userId"
-                                  :disabled="userPageState.visibleUpdateModal && !state.isEdit"
-                                  class="text-input"
-                                  @update:value="handleChangeInput($event)"
-                    >
-                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
-                             class="email-status-badge"
-                             @click="handleClickBadge"
-                        >
-                            <span>{{ email }}</span>
-                            <p-badge class="selected-text"
-                                     badge-type="subtle"
-                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
-                            >
-                                {{ isValidEmail
-                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
-                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
-                                }}
-                            </p-badge>
-                        </div>
-                    </p-text-input>
-                    <div v-if="userPageState.visibleUpdateModal">
-                        <p-button v-if="!state.isEdit"
-                                  style-type="tertiary"
-                                  @click="handleClickChange"
-                        >
-                            <p-i name="ic_edit"
-                                 height="1rem"
-                                 width="1rem"
-                                 class="edit-icon"
-                                 color="inherit transparent"
-                            />
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
-                        </p-button>
-                        <p-button v-else
-                                  style-type="tertiary"
-                                  class="send-mail-button"
-                                  :disabled="!email || invalidTexts.email !== ''"
-                                  :loading="state.loading"
-                                  @click="handleClickSend"
-                        >
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
-                        </p-button>
-                    </div>
-                </div>
-            </template>
-            <template #label-extra>
-                <p-tooltip
-                    position="bottom"
-                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
-                    class="tooltip"
-                >
-                    <p-i name="ic_question-mark-circle-filled"
-                         height="0.875rem"
-                         width="0.875rem"
-                         color="inherit transparent"
-                         class="tooltip-icon"
-                    />
-                </p-tooltip>
-            </template>
-        </p-field-group>
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
-
 import {
     PFieldGroup, PTextInput, PTooltip, PI, PButton, PBadge,
 } from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -93,6 +16,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
 
 interface Props {
     item?: User;
@@ -109,6 +33,8 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const emit = defineEmits(['change-input', 'change-verify']);
+const store = useStore();
+const { t } = useI18n();
 
 const state = reactive({
     loading: false,
@@ -125,7 +51,7 @@ const {
 } = useFormValidator({
     email: '' || props.email,
 }, {
-    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    email(value: string) { return !emailValidator(value) ? '' : t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
 const { email } = forms;
 
@@ -149,14 +75,14 @@ const handleClickBadge = () => {
     }
 };
 const initForm = () => {
-    setForm('email', props.item.email || '');
+    setForm('email', props.item?.email || '');
 };
 /* API */
 const handleClickSend = async () => {
     state.loading = true;
     try {
         await postValidationEmail({
-            user_id: props.item.user_id,
+            user_id: props.item?.user_id,
             email: email.value,
             force: true,
         });
@@ -164,7 +90,7 @@ const handleClickSend = async () => {
         emit('change-input', { ...forms, email: email.value });
         emit('change-verify', true);
 
-        if (state.loginUserId === props.item.user_id) {
+        if (state.loginUserId === props.item?.user_id) {
             await store.dispatch('user/setUser', { email: email.value, email_verified: true });
         }
     } catch (e) {
@@ -189,6 +115,81 @@ watch(() => props.isValidEmail, (value) => {
     }
 })();
 </script>
+
+<template>
+    <div class="notification-email-form-wrapper">
+        <p-field-group :label="t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
+                       :invalid="invalidState.email"
+                       :invalid-text="invalidTexts.email"
+                       class="input-form-view"
+        >
+            <template #default="{invalid}">
+                <div class="input-form">
+                    <p-text-input :value="email"
+                                  :invalid="invalid"
+                                  :placeholder="store.state.user.userId"
+                                  :disabled="userPageState.visibleUpdateModal && !state.isEdit"
+                                  class="text-input"
+                                  @update:value="handleChangeInput($event)"
+                    >
+                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
+                             class="email-status-badge"
+                             @click="handleClickBadge"
+                        >
+                            <span>{{ email }}</span>
+                            <p-badge class="selected-text"
+                                     badge-type="subtle"
+                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
+                            >
+                                {{ isValidEmail
+                                    ? t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
+                                    : t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
+                                }}
+                            </p-badge>
+                        </div>
+                    </p-text-input>
+                    <div v-if="userPageState.visibleUpdateModal">
+                        <p-button v-if="!state.isEdit"
+                                  style-type="tertiary"
+                                  @click="handleClickChange"
+                        >
+                            <p-i name="ic_edit"
+                                 height="1rem"
+                                 width="1rem"
+                                 class="edit-icon"
+                                 color="inherit transparent"
+                            />
+                            <span>{{ t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
+                        </p-button>
+                        <p-button v-else
+                                  style-type="tertiary"
+                                  class="send-mail-button"
+                                  :disabled="!email || invalidTexts.email !== ''"
+                                  :loading="state.loading"
+                                  @click="handleClickSend"
+                        >
+                            <span>{{ t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
+                        </p-button>
+                    </div>
+                </div>
+            </template>
+            <template #label-extra>
+                <p-tooltip
+                    position="bottom"
+                    :contents="t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
+                    class="tooltip"
+                >
+                    <p-i name="ic_question-mark-circle-filled"
+                         height="0.875rem"
+                         width="0.875rem"
+                         color="inherit transparent"
+                         class="tooltip-icon"
+                    />
+                </p-tooltip>
+            </template>
+        </p-field-group>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .notification-email-form-wrapper {

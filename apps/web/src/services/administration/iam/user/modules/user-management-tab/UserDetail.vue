@@ -1,13 +1,99 @@
+<script setup lang="ts">
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDefinitionTable, PHeading, PI, PStatus,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, useAttrs, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+
+import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+import type { UserDetailData } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+interface Props {
+    userId: string
+    timezone: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    userId: '',
+    timezone: '',
+});
+const { t } = useI18n();
+const attrs = useAttrs();
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    fields: computed(() => [
+        { name: 'user_id', label: t('IDENTITY.USER.MAIN.USER_ID') },
+        { name: 'name', label: t('IDENTITY.USER.MAIN.NAME') },
+        { name: 'state', label: t('IDENTITY.USER.MAIN.STATE') },
+        { name: 'user_type', label: t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
+        {
+            name: 'email',
+            label: t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
+            block: true,
+            disableCopy: state.data.user_type === 'API_USER',
+        },
+        { name: 'last_accessed_at', label: t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
+        { name: 'domain_id', label: t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+        { name: 'language', label: t('IDENTITY.USER.MAIN.LANGUAGE') },
+        { name: 'timezone', label: t('IDENTITY.USER.MAIN.TIMEZONE') },
+        { name: 'created_at', label: t('IDENTITY.USER.MAIN.CREATED_AT') },
+    ]),
+    data: {} as UserDetailData,
+});
+
+/* API */
+const getUserDetailData = async (userId) => {
+    state.loading = true;
+    try {
+        const response = await SpaceConnector.client.identity.user.get({
+            user_id: userId || props.userId,
+        });
+        state.data = response;
+        state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
+        state.data.email = response.email;
+        state.data.email_verified = response.email_verified;
+        state.loading = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const listeners = { ...attrs };
+
+/* Watcher */
+watch(() => props.userId, (value) => {
+    getUserDetailData(value);
+}, { immediate: true });
+watch(() => userPageState.visibleUpdateModal, (value) => {
+    if (!value) {
+        getUserDetailData(props.userId);
+    }
+});
+
+</script>
+
 <template>
     <div>
         <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+                   :title="t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
         />
         <p-definition-table :fields="state.fields"
                             :data="state.data"
                             :loading="state.loading"
                             :skeleton-rows="7"
-                            v-on="$listeners"
+                            v-on="listeners"
         >
             <template #data-state="{data}">
                 <p-status v-bind="userStateFormatter(data)"
@@ -32,7 +118,7 @@
                     <span v-else
                           class="not-verified"
                     >
-                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                        {{ t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
                     </span>
                 </span>
                 <span v-else>
@@ -44,13 +130,13 @@
                     No Activity
                 </span>
                 <span v-else-if="data === 0">
-                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                    {{ t('IDENTITY.USER.MAIN.TODAY') }}
                 </span>
                 <span v-else-if="data === 1">
-                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                    {{ t('IDENTITY.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                    {{ data }} {{ t('IDENTITY.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #data-created_at="{data}">
@@ -58,7 +144,7 @@
             </template>
             <template #extra="{label}">
                 <verify-button
-                    v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
+                    v-if="label === t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
                     :email="state.data.email"
                     :user-id="state.data.user_id"
                     :domain-id="state.data.domain_id"
@@ -70,91 +156,6 @@
         </p-definition-table>
     </div>
 </template>
-
-<script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
-
-import {
-    PDefinitionTable, PHeading, PI, PStatus,
-} from '@spaceone/design-system';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-
-import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import type { UserDetailData } from '@/services/administration/iam/user/type';
-import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-interface Props {
-    userId: string
-    timezone: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    userId: '',
-    timezone: '',
-});
-
-const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
-
-const state = reactive({
-    loading: true,
-    fields: computed(() => [
-        { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
-        { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
-        { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
-        { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
-        {
-            name: 'email',
-            label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
-            block: true,
-            disableCopy: state.data.user_type === 'API_USER',
-        },
-        { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
-        { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-        { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
-        { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
-        { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
-    ]),
-    data: {} as UserDetailData,
-});
-
-/* API */
-const getUserDetailData = async (userId) => {
-    state.loading = true;
-    try {
-        const response = await SpaceConnector.client.identity.user.get({
-            user_id: userId || props.userId,
-        });
-        state.data = response;
-        state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
-        state.data.email = response.email;
-        state.data.email_verified = response.email_verified;
-        state.loading = false;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-/* Watcher */
-watch(() => props.userId, (value) => {
-    getUserDetailData(value);
-}, { immediate: true });
-watch(() => userPageState.visibleUpdateModal, (value) => {
-    if (!value) {
-        getUserDetailData(props.userId);
-    }
-});
-
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-definition */

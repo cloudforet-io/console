@@ -1,6 +1,37 @@
+<script lang="ts" setup>
+import {
+    PHorizontalLayout, PHeading,
+} from '@spaceone/design-system';
+import {
+    onUnmounted, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
+import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';
+import RoleManagementTable from '@/services/administration/iam/role/modules/role-managemnet-table/RoleManagementTable.vue';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
+const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
+
+const { t } = useI18n();
+
+const state = reactive({
+    hasManagePermission: useManagePermissionState(),
+});
+
+onUnmounted(() => {
+    rolePageStore.$dispose();
+    rolePageStore.$reset();
+});
+
+</script>
+
 <template>
     <section class="role-page">
-        <p-heading :title="$t('IAM.ROLE.ROLE')"
+        <p-heading :title="t('IAM.ROLE.ROLE')"
                    use-selected-count
                    use-total-count
                    :total-count="rolePageState.totalCount"
@@ -9,59 +40,13 @@
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
-                                       :manage-disabled="!hasManagePermission"
+                                       :manage-disabled="!state.hasManagePermission"
                 />
             </template>
         </p-horizontal-layout>
         <role-management-tab />
     </section>
 </template>
-
-<script lang="ts">
-import {
-    defineComponent, onUnmounted, reactive, toRefs,
-} from 'vue';
-
-import {
-    PHorizontalLayout, PHeading,
-} from '@spaceone/design-system';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
-import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';
-import RoleManagementTable from '@/services/administration/iam/role/modules/role-managemnet-table/RoleManagementTable.vue';
-import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
-
-export default defineComponent({
-    name: 'RolePage',
-    components: {
-        RoleManagementTab,
-        PHorizontalLayout,
-        PHeading,
-        RoleManagementTable,
-    },
-    setup() {
-        const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.$state;
-
-        const state = reactive({
-            hasManagePermission: useManagePermissionState(),
-        });
-
-        onUnmounted(() => {
-            rolePageStore.$dispose();
-            rolePageStore.$reset();
-        });
-
-        return {
-            ...toRefs(state),
-            rolePageState,
-        };
-    },
-
-});
-</script>
 
 <style lang="postcss" scoped>
 .role-page {

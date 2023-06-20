@@ -1,6 +1,6 @@
 <template>
     <div class="user-info-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+        <p-field-group :label="t('IDENTITY.USER.FORM.USER_ID')"
                        :required="true"
                        :invalid="validationState.isUserIdValid === false"
                        :invalid-text="validationState.userIdInvalidText"
@@ -13,17 +13,17 @@
                       #help
             >
                 <div class="external-items-help-text">
-                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                    <span>{{ t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
                 </div>
             </template>
             <template #default="{invalid}">
                 <div v-if="props.activeTab === 'external' && state.supportFind">
                     <p-filterable-dropdown
-                        :search-text.sync="state.searchText"
+                        v-model:search-text="state.searchText"
+                        v-model:selected="state.selectedItems"
                         :class="{invalid}"
                         show-select-marker
                         :menu="state.externalItems"
-                        :selected.sync="state.selectedItems"
                         :loading="state.loading"
                         disable-handler
                         :exact-mode="false"
@@ -35,8 +35,8 @@
                 <div v-else
                      class="id-input-form"
                 >
-                    <p-text-input v-model="formState.userId"
-                                  v-focus
+                    <p-text-input ref="inputRef"
+                                  v-model="formState.userId"
                                   :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
                                   :invalid="invalid"
                                   :disabled="userPageState.visibleUpdateModal"
@@ -47,12 +47,12 @@
                               class="user-id-check-button"
                               @click="handleClickCheckId"
                     >
-                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                        {{ t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
                     </p-button>
                 </div>
             </template>
         </p-field-group>
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+        <p-field-group :label="t('IDENTITY.USER.FORM.NAME')"
                        class="input-form"
         >
             <p-text-input v-model="formState.name"
@@ -64,20 +64,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
-
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch, ref,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
@@ -109,6 +107,11 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const store = useStore();
+const { t } = useI18n();
+
+const inputRef = ref(null as null|HTMLInputElement);
+useFocus(inputRef, { initialValue: true });
 
 const state = reactive({
     loading: false,
@@ -124,8 +127,8 @@ const formState = reactive({
 });
 const validationState = reactive({
     isUserIdValid: undefined as undefined | boolean,
-    userIdInvalidText: '' as TranslateResult,
-    userIdValidText: '' as TranslateResult,
+    userIdInvalidText: '' as string,
+    userIdValidText: '' as string,
 });
 
 /* Components */
@@ -138,7 +141,7 @@ const setExternalMenuItems = (users) => {
             disabled: false,
         };
         if (state.users[user.userId]) {
-            singleItem.label = `(${i18n.t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
+            singleItem.label = `(${t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
             singleItem.disabled = true;
         }
         _externalItems.push(singleItem);
@@ -159,8 +162,8 @@ const handleChangeInput = () => {
     emit('change-input', { ...formState, name: formState.name });
 };
 const setForm = () => {
-    formState.userId = props.item.user_id;
-    formState.name = props.item.name || '';
+    formState.userId = props.item?.user_id || '';
+    formState.name = props.item?.name || '';
 };
 
 /* API */

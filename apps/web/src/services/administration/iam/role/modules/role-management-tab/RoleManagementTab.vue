@@ -1,19 +1,72 @@
+<script lang="ts" setup>
+
+import {
+    PEmpty, PTab, PDataTable, PBadge, PButton,
+} from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import RoleDetail from '@/services/administration/iam/role/modules/role-management-tab/RoleDetail.vue';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
+const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
+
+const { t } = useI18n();
+const router = useRouter();
+
+const state = reactive({
+    fields: computed<DataTableField[]>(() => ([
+        { name: 'name', label: 'Name' },
+        { name: 'tags.description', label: 'Description', sortable: false },
+        { name: 'role_type', label: 'Role Type' },
+        { name: 'created_at', label: 'Created', sortable: false },
+        { name: 'edit_button', label: ' ', sortable: false },
+    ])),
+    selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
+});
+
+const singleItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { label: t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
+    ])),
+    activeTab: 'detail',
+});
+
+const multiItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { name: 'data', label: t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
+    ])),
+    activeTab: 'data',
+});
+
+const handleEditRole = (id: string) => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
+
+</script>
+
 <template>
     <section>
         <p-tab v-if="rolePageState.selectedIndices.length === 1"
+               v-model:active-tab="singleItemTabState.activeTab"
                :tabs="singleItemTabState.tabs"
-               :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <role-detail :role-id="selectedRoleId" />
+                <role-detail :role-id="state.selectedRoleId" />
             </template>
         </p-tab>
         <p-tab v-else-if="rolePageState.selectedIndices.length > 1"
+               v-model:active-tab="multiItemTabState.activeTab"
                :tabs="multiItemTabState.tabs"
-               :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="fields"
+                <p-data-table :fields="state.fields"
                               :sortable="false"
                               :selectable="false"
                               :items="rolePageStore.selectedRoles"
@@ -40,7 +93,7 @@
                                   icon-left="ic_edit"
                                   @click="handleEditRole(item.role_id)"
                         >
-                            {{ $t('IAM.ROLE.EDIT') }}
+                            {{ t('IAM.ROLE.EDIT') }}
                         </p-button>
                     </template>
                 </p-data-table>
@@ -49,85 +102,10 @@
         <div v-else
              id="empty-space"
         >
-            <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PEmpty, PTab, PDataTable, PBadge, PButton,
-} from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
-
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import RoleDetail from '@/services/administration/iam/role/modules/role-management-tab/RoleDetail.vue';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
-
-export default {
-    name: 'RoleManagementTab',
-    components: {
-        PEmpty,
-        PTab,
-        PDataTable,
-        PBadge,
-        PButton,
-        RoleDetail,
-    },
-    setup() {
-        const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.$state;
-
-        const state = reactive({
-            fields: computed<DataTableField[]>(() => ([
-                { name: 'name', label: 'Name' },
-                { name: 'tags.description', label: 'Description', sortable: false },
-                { name: 'role_type', label: 'Role Type' },
-                { name: 'created_at', label: 'Created', sortable: false },
-                { name: 'edit_button', label: ' ', sortable: false },
-            ])),
-            selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
-        });
-
-        const singleItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
-            ])),
-            activeTab: 'detail',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
-            ])),
-            activeTab: 'data',
-        });
-
-        const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
-
-        return {
-            ...toRefs(state),
-            singleItemTabState,
-            multiItemTabState,
-            rolePageStore,
-            rolePageState,
-            handleEditRole,
-            ROLE_TYPE_BADGE_OPTION,
-        };
-    },
-
-};
-</script>
 
 <style lang="postcss" scoped>
 #empty-space {

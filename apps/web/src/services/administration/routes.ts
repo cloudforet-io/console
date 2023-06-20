@@ -17,9 +17,6 @@ const RoleUpdatePage = () => import('@/services/administration/iam/role/role-upd
 const PolicyPage = () => import('@/services/administration/iam/policy/PolicyPage.vue');
 const PolicyCreatePage = () => import('@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
 const PolicyDetailPage = () => import('@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
-// TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-// const ProviderPage = () => import('@/services/administration/additional-settings/provider/ProviderPage.vue');
-// const ProviderAddPage = () => import('@/services/administration/additional-settings/provider/provider-add/ProviderAddPage.vue');
 
 const administrationRoutes: RouteRecordRaw = {
     path: 'administration',
@@ -98,40 +95,6 @@ const administrationRoutes: RouteRecordRaw = {
                 },
             ],
         },
-        // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-        // {
-        //     path: 'settings',
-        //     name: ADMINISTRATION_ROUTE.SETTINGS._NAME,
-        //     meta: { menuId: MENU_ID.ADMINISTRATION_SETTINGS },
-        //     redirect: () => getRedirectRouteByPagePermission(MENU_ID.ADMINISTRATION_SETTINGS, store.getters['user/pagePermissionMap']),
-        //     component: { template: '<router-view />' },
-        //     children: [
-        //         {
-        //             path: 'provider',
-        //             name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME,
-        //             meta: { lnbVisible: true, menuId: MENU_ID.ADMINISTRATION_PROVIDER },
-        //             component: { template: '<router-view/>' },
-        //             children: [
-        //                 {
-        //                     path: '/',
-        //                     name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME,
-        //                     meta: { lnbVisible: true },
-        //                     props: true,
-        //                     component: ProviderPage,
-        //                 },
-        //                 {
-        //                     path: 'add',
-        //                     name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER.ADD._NAME,
-        //                     // song-lang  => Add Provider
-        //                     meta: { lnbVisible: false, translationId: 'Add Provider' }, // TODO: access level 확인 필요
-        //                     props: true,
-        //                     component: ProviderAddPage,
-        //                 },
-        //             ],
-        //         },
-        //
-        //     ],
-        // },
     ],
 };
 export default administrationRoutes;

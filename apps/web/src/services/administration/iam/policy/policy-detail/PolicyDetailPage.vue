@@ -1,124 +1,13 @@
-<template>
-    <section>
-        <p-heading
-            show-back-button
-            :title="state.policyName"
-            @click-back-button="$router.go(-1)"
-        >
-            <template #title-right-extra>
-                <span v-if="state.policyType === POLICY_TYPE.MANAGED"
-                      class="policy-managed-badge"
-                >
-                    <p-badge badge-type="subtle"
-                             style-type="gray200"
-                    >{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
-                </span>
-                <span v-if="state.policyType === POLICY_TYPE.CUSTOM"
-                      class="policy-edit-buttons"
-                >
-                    <p-icon-button name="ic_delete"
-                                   :disabled="!state.hasManagePermission"
-                                   class="w-full delete-btn"
-                                   @click="handleVisibleDeleteModal"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   :disabled="!state.hasManagePermission"
-                                   class="edit-btn"
-                                   @click="handleVisibleTitleEditModal"
-                    />
-                </span>
-                <div v-if="state.policyType === POLICY_TYPE.CUSTOM"
-                     class="policy-modify-buttons"
-                >
-                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
-                              style-type="tertiary"
-                              @click="$router.back()"
-                    >
-                        {{ $t('IAM.POLICY.FORM.CANCEL') }}
-                    </p-button>
-                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
-                              style-type="primary"
-                              @click="handleSaveChanges"
-                    >
-                        {{ $t('IAM.POLICY.FORM.SAVE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-heading>
-        <p-pane-layout class="policy-detail-info-wrapper">
-            <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
-                <br>
-                <div class="policy-detail-type-badge">
-                    <p-badge v-if="state.policyType === POLICY_TYPE.MANAGED"
-                             badge-type="solid-outline"
-                             style-type="gray500"
-                    >
-                        {{ $t('IAM.POLICY.FORM.MANAGED_POLICY') }}
-                    </p-badge>
-                    <p-badge v-else
-                             badge-type="solid-outline"
-                             style-type="primary1"
-                    >
-                        {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
-                    </p-badge>
-                </div>
-            </div>
-            <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.ID') }}</p-field-title>
-                <p>{{ policyState.policyData ? policyState.policyData?.policy_id : '' }}</p>
-            </div>
-            <div class="policy-detail-contents">
-                <div v-if="state.policyType === POLICY_TYPE.MANAGED">
-                    <p-field-title>
-                        {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
-                    </p-field-title>
-                    <br>
-                    <p>{{ policyState.policyData ? policyState.policyData?.tags?.description : '' }}</p>
-                </div>
-                <p-field-group
-                    v-else
-                    :label="$t('IAM.POLICY.FORM.DESCRIPTION')"
-                >
-                    <p-text-input
-                        v-model="state.description"
-                        :disabled="!state.hasManagePermission"
-                        @update:value="handleDescriptionUpdate"
-                    />
-                </p-field-group>
-            </div>
-            <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
-                <p-text-editor
-                    :read-only="(state.policyType === POLICY_TYPE.MANAGED || !state.hasManagePermission)"
-                    :code="state.code"
-                    @update:code="handleCodeUpdate"
-                />
-            </div>
-        </p-pane-layout>
-        <policy-delete-modal :visible.sync="state.visibleDeleteModal"
-                             :policy-id="id"
-        />
-        <policy-name-edit-modal :visible.sync="state.visibleTitleEditModal"
-                                :policy-id="id"
-                                :policy-name="state.policyName"
-        />
-    </section>
-</template>
-
 <script setup lang="ts">
-import {
-    computed, reactive, defineProps,
-} from 'vue';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PIconButton, PBadge, PPaneLayout, PFieldTitle, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
+import {
+    computed, reactive, defineProps,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -129,6 +18,7 @@ import type { PolicyDetailPageProps } from '@/services/administration/iam/policy
 import PolicyDeleteModal from '@/services/administration/iam/policy/policy-detail/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/policy-detail/modules/PolicyNameEditModal.vue';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
+import type { PolicyType } from '@/services/administration/store/type';
 import { POLICY_TYPE } from '@/services/administration/store/type';
 
 
@@ -144,10 +34,14 @@ interface PolicyDetailPageProps {
 const props = withDefaults(defineProps<PolicyDetailPageProps>(), {
     id: '',
 });
+
+const router = useRouter();
+const { t } = useI18n();
+
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     policyName: computed(() => policyState.policyData?.name || ''),
-    policyType: computed(() => SpaceRouter.router.currentRoute.query.type),
+    policyType: computed(() => router.currentRoute.value.query.type as PolicyType),
     code: '',
     isCodeModified: false,
     description: '',
@@ -178,9 +72,9 @@ const handleSaveChanges = () => {
                 description: state.description,
             },
         });
-        showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
+        showSuccessMessage(t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
+        ErrorHandler.handleRequestError(e, t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
     }
 };
 
@@ -194,6 +88,114 @@ const getPolicyData = async () => {
     await getPolicyData();
 })();
 </script>
+
+<template>
+    <section>
+        <p-heading
+            show-back-button
+            :title="state.policyName"
+            @click-back-button="router.go(-1)"
+        >
+            <template #title-right-extra>
+                <span v-if="state.policyType === POLICY_TYPE.MANAGED"
+                      class="policy-managed-badge"
+                >
+                    <p-badge badge-type="subtle"
+                             style-type="gray200"
+                    >{{ t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
+                </span>
+                <span v-if="state.policyType === POLICY_TYPE.CUSTOM"
+                      class="policy-edit-buttons"
+                >
+                    <p-icon-button name="ic_delete"
+                                   :disabled="!state.hasManagePermission"
+                                   class="w-full delete-btn"
+                                   @click="handleVisibleDeleteModal"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   :disabled="!state.hasManagePermission"
+                                   class="edit-btn"
+                                   @click="handleVisibleTitleEditModal"
+                    />
+                </span>
+                <div v-if="state.policyType === POLICY_TYPE.CUSTOM"
+                     class="policy-modify-buttons"
+                >
+                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
+                              style-type="tertiary"
+                              @click="router.back()"
+                    >
+                        {{ t('IAM.POLICY.FORM.CANCEL') }}
+                    </p-button>
+                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
+                              style-type="primary"
+                              @click="handleSaveChanges"
+                    >
+                        {{ t('IAM.POLICY.FORM.SAVE') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading>
+        <p-pane-layout class="policy-detail-info-wrapper">
+            <div class="policy-detail-contents">
+                <p-field-title>{{ t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
+                <br>
+                <div class="policy-detail-type-badge">
+                    <p-badge v-if="state.policyType === POLICY_TYPE.MANAGED"
+                             badge-type="solid-outline"
+                             style-type="gray500"
+                    >
+                        {{ t('IAM.POLICY.FORM.MANAGED_POLICY') }}
+                    </p-badge>
+                    <p-badge v-else
+                             badge-type="solid-outline"
+                             style-type="primary1"
+                    >
+                        {{ t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
+                    </p-badge>
+                </div>
+            </div>
+            <div class="policy-detail-contents">
+                <p-field-title>{{ t('IAM.POLICY.FORM.ID') }}</p-field-title>
+                <p>{{ policyState.policyData ? policyState.policyData?.policy_id : '' }}</p>
+            </div>
+            <div class="policy-detail-contents">
+                <div v-if="state.policyType === POLICY_TYPE.MANAGED">
+                    <p-field-title>
+                        {{ t('IAM.POLICY.FORM.DESCRIPTION') }}
+                    </p-field-title>
+                    <br>
+                    <p>{{ policyState.policyData ? policyState.policyData?.tags?.description : '' }}</p>
+                </div>
+                <p-field-group
+                    v-else
+                    :label="t('IAM.POLICY.FORM.DESCRIPTION')"
+                >
+                    <p-text-input
+                        v-model="state.description"
+                        :disabled="!state.hasManagePermission"
+                        @update:value="handleDescriptionUpdate"
+                    />
+                </p-field-group>
+            </div>
+            <div class="policy-detail-contents">
+                <p-field-title>{{ t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
+                <p-text-editor
+                    :read-only="(state.policyType === POLICY_TYPE.MANAGED || !state.hasManagePermission)"
+                    :code="state.code"
+                    @update:code="handleCodeUpdate"
+                />
+            </div>
+        </p-pane-layout>
+        <policy-delete-modal v-model:visible="state.visibleDeleteModal"
+                             :policy-id="id"
+        />
+        <policy-name-edit-modal v-model:visible="state.visibleTitleEditModal"
+                                :policy-id="id"
+                                :policy-name="state.policyName"
+        />
+    </section>
+</template>
 
 <style lang="postcss" scoped>
 .policy-edit-buttons {

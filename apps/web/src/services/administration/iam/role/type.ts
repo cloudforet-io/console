@@ -23,6 +23,12 @@ export interface RoleData {
     tags?: Tags; // [ description: string ]
 }
 
+export interface BaseInfoFormData {
+    roleName: string;
+    roleDescription?: string;
+    roleType: RoleType;
+}
+
 // Page Access
 export interface PageAccessMenuItem {
     id: string;

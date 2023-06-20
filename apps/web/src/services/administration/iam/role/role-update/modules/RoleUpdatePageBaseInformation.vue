@@ -1,11 +1,84 @@
+<script lang="ts" setup>
+import {
+    PPaneLayout, PHeading, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import type { RoleType } from '@/services/administration/iam/role/config';
+import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
+import type { BaseInfoFormData } from '@/services/administration/iam/role/type';
+
+interface RoleTypeForm {label: string; key: string; description: string}
+
+interface Props {
+    initialFormData: BaseInfoFormData;
+    roleTypeInputDisabled: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    initialFormData: () => ({}) as BaseInfoFormData,
+    roleTypeInputDisabled: false,
+});
+const emit = defineEmits(['update-validation', 'update-form']);
+const { t } = useI18n();
+
+const {
+    forms: {
+        roleName,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+    isAllValid,
+} = useFormValidator({
+    roleName: undefined,
+}, {
+    roleName(value?: string) {
+        if (value === undefined) return '';
+        return value.trim().length > 2 ? '' : t('IAM.ROLE.FORM.VALIDATION_ROLE_NAME');
+    },
+});
+
+const state = reactive({
+    roleDescription: undefined as undefined | string,
+    roleTypes: computed<RoleTypeForm[]>(() => [
+        { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
+        { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
+    ]),
+    selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
+    savedRoleType: computed<RoleTypeForm|undefined>(() => {
+        const roleType = props.initialFormData?.roleType;
+        return state.roleTypes.find((type) => type.key === roleType);
+    }),
+});
+watch(() => isAllValid.value, (after) => {
+    emit('update-validation', after);
+}, { immediate: true });
+watch([() => state.selectedRoleType, () => state.roleDescription, () => roleName.value], ([selectedRoleType, roleDescription, roleNameValue]) => {
+    emit('update-form', { roleName: roleNameValue, roleDescription, roleType: selectedRoleType });
+}, { immediate: true });
+watch(() => props.initialFormData, (initialFormData) => {
+    // TODO: refactor any type
+    setForm('roleName', initialFormData.roleName as any);
+    state.roleDescription = initialFormData.roleDescription;
+    state.selectedRoleType = initialFormData.roleType;
+});
+
+</script>
+
 <template>
     <p-pane-layout class="role-update-page-base-information">
         <p-heading heading-type="sub"
-                   :title="$t('IAM.ROLE.DETAIL.BASE_INFORMATION')"
+                   :title="t('IAM.ROLE.DETAIL.BASE_INFORMATION')"
         />
         <div class="input-wrapper">
             <p-field-group
-                :label="$t('IAM.ROLE.DETAIL.NAME')"
+                :label="t('IAM.ROLE.DETAIL.NAME')"
                 :invalid="invalidState.roleName"
                 :invalid-text="invalidTexts.roleName"
                 required
@@ -19,22 +92,22 @@
                 </template>
             </p-field-group>
             <p-field-group
-                :label="$t('IAM.ROLE.DETAIL.DESCRIPTION')"
+                :label="t('IAM.ROLE.DETAIL.DESCRIPTION')"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="roleDescription"
+                    <p-text-input v-model="state.roleDescription"
                                   class="role-description-input input"
                                   :invalid="invalid"
                     />
                 </template>
             </p-field-group>
-            <p-field-title :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
+            <p-field-title :label="t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
             <div v-if="!roleTypeInputDisabled"
                  class="select-card-wrapper"
             >
-                <p-select-card v-for="(roleType, index) in roleTypes"
+                <p-select-card v-for="(roleType, index) in state.roleTypes"
                                :key="roleType.key"
-                               v-model="selectedRoleType"
+                               v-model="state.selectedRoleType"
                                :tab-index="index"
                                class="card"
                                :value="roleType.key"
@@ -48,106 +121,12 @@
                     </p>
                 </p-select-card>
             </div>
-            <span v-else-if="savedRoleType"
+            <span v-else-if="state.savedRoleType"
                   class="role-type-saved-text"
-            >{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
+            >{{ `${state.savedRoleType.label} (${state.savedRoleType.description})` }}</span>
         </div>
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import {
-    PPaneLayout, PHeading, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
-} from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { useFormValidator } from '@/common/composables/form-validator';
-
-import type { RoleType } from '@/services/administration/iam/role/config';
-import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import type { BaseInfoFormData } from '@/services/administration/iam/role/role-update/modules/RoleUpdateForm.vue';
-
-interface RoleTypeForm {label: string; key: string; description: TranslateResult}
-
-export default {
-    name: 'RoleUpdatePageBaseInformation',
-    components: {
-        PPaneLayout,
-        PHeading,
-        PFieldGroup,
-        PTextInput,
-        PFieldTitle,
-        PSelectCard,
-    },
-    props: {
-        initialFormData: {
-            type: Object as PropType<BaseInfoFormData>,
-            default: () => ({}),
-        },
-        roleTypeInputDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const {
-            forms: {
-                roleName,
-            },
-            setForm,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-        } = useFormValidator({
-            roleName: undefined,
-        }, {
-            roleName(value?: string) {
-                if (value === undefined) return '';
-                return value.trim().length > 2 ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_ROLE_NAME');
-            },
-        });
-
-        const state = reactive({
-            roleDescription: undefined as undefined | string,
-            roleTypes: computed<RoleTypeForm[]>(() => [
-                { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
-                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
-            ]),
-            selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
-            savedRoleType: computed<RoleTypeForm|undefined>(() => {
-                const roleType = props.initialFormData?.roleType;
-                return state.roleTypes.find((type) => type.key === roleType);
-            }),
-        });
-        watch(() => isAllValid.value, (after) => {
-            emit('update-validation', after);
-        }, { immediate: true });
-        watch([() => state.selectedRoleType, () => state.roleDescription, () => roleName.value], ([selectedRoleType, roleDescription, roleNameValue]) => {
-            emit('update-form', { roleName: roleNameValue, roleDescription, roleType: selectedRoleType });
-        }, { immediate: true });
-        watch(() => props.initialFormData, (initialFormData) => {
-            setForm('roleName', initialFormData.roleName);
-            state.roleDescription = initialFormData.roleDescription;
-            state.selectedRoleType = initialFormData.roleType;
-        });
-        return {
-            ...toRefs(state),
-            roleName,
-            setForm,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .role-update-page-base-information {

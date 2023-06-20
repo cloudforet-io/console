@@ -1,3 +1,55 @@
+<script lang="ts" setup>
+import {
+    PCheckbox, PIconButton, PI, PTooltip,
+} from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { MANAGE_FEATURE_MAP } from '@/services/administration/iam/role/config';
+import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
+
+interface Props {
+    menu: PageAccessMenuItem;
+    isSubMenu: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    menu: () => ({}) as PageAccessMenuItem,
+    isSubMenu: false,
+});
+const emit = defineEmits<{(e: 'update', id: string, key: string, val: boolean): void }>();
+const { t } = useI18n();
+
+const state = reactive({
+    tooltipText: computed(() => {
+        const { title, features } = MANAGE_FEATURE_MAP[props.menu?.id] ?? {};
+        if (!title) return null;
+        return `<b>${t(title)}</b></br><ul>${features.map((d) => `<li>&#8729; ${t(d)}</li>`).join('')}</ul>`;
+    }),
+    isDisabled: computed(() => ((props.menu?.id === 'all') ? false : !props.menu?.subMenuList?.length)),
+});
+
+/* Event */
+const handleToggleMenuVisible = () => {
+    const key = 'hideMenu';
+    const val = !props.menu.hideMenu;
+    emit('update', props.menu.id, key, val);
+};
+const handleChangeView = () => {
+    const key = 'isViewed';
+    const val = !props.menu.isViewed;
+    emit('update', props.menu.id, key, val);
+};
+const handleChangeManage = () => {
+    const key = 'isManaged';
+    const val = !props.menu.isManaged;
+    emit('update', props.menu.id, key, val);
+};
+
+</script>
+
 <template>
     <div class="role-create-page-access-menu-item"
          :class="[menu.isParent ? 'parent' : '', menu.id]"
@@ -6,11 +58,11 @@
             <p-icon-button v-if="!isSubMenu"
                            :name="menu.hideMenu ? 'ic_caret-right' : 'ic_caret-down-filled-alt'"
                            size="sm"
-                           :disabled="isDisabled"
+                           :disabled="state.isDisabled"
                            @click="handleToggleMenuVisible"
             />
             <template v-for="(translationId, lIdx) in menu.translationIds">
-                {{ $t(translationId) }}
+                {{ t(translationId) }}
                 <p-i v-if="lIdx < menu.translationIds.length - 1"
                      :key="`label-${menu.translationIds.join('.')}-${lIdx}`"
                      name="ic_chevron-left-thin"
@@ -27,16 +79,16 @@
                         class="pr-6"
                         @change="handleChangeView"
             >
-                <span>{{ $t('IAM.ROLE.FORM.VIEW') }}</span>
+                <span>{{ t('IAM.ROLE.FORM.VIEW') }}</span>
             </p-checkbox>
             <p-checkbox :selected="menu.isManaged"
                         @change="handleChangeManage"
             >
                 <span>Manage</span>
             </p-checkbox>
-            <p-tooltip v-if="tooltipText"
+            <p-tooltip v-if="state.tooltipText"
                        class="help-icon"
-                       :contents="tooltipText"
+                       :contents="state.tooltipText"
                        :position="'bottom'"
             >
                 <p-i name="ic_question-mark-circle"
@@ -48,76 +100,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PCheckbox, PIconButton, PI, PTooltip,
-} from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { MANAGE_FEATURE_MAP } from '@/services/administration/iam/role/config';
-import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
-
-export default {
-    name: 'RoleUpdatePageAccessMenuItem',
-    components: {
-        PCheckbox,
-        PIconButton,
-        PI,
-        PTooltip,
-    },
-    props: {
-        menu: {
-            type: Object,
-            default: () => ({}) as PropType<PageAccessMenuItem>,
-        },
-        isSubMenu: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            tooltipText: computed(() => {
-                const { title, features } = MANAGE_FEATURE_MAP[props.menu?.id] ?? {};
-                if (!title) return null;
-                return `<b>${i18n.t(title)}</b></br><ul>${features.map((d) => `<li>&#8729; ${i18n.t(d)}</li>`).join('')}</ul>`;
-            }),
-            isDisabled: computed(() => ((props.menu?.id === 'all') ? false : !props.menu?.subMenuList?.length)),
-        });
-
-        /* Event */
-        const handleToggleMenuVisible = () => {
-            const key = 'hideMenu';
-            const val = !props.menu.hideMenu;
-            emit('update', props.menu.id, key, val);
-        };
-        const handleChangeView = () => {
-            const key = 'isViewed';
-            const val = !props.menu.isViewed;
-            emit('update', props.menu.id, key, val);
-        };
-        const handleChangeManage = () => {
-            const key = 'isManaged';
-            const val = !props.menu.isManaged;
-            emit('update', props.menu.id, key, val);
-        };
-
-        return {
-            ...toRefs(state),
-            handleToggleMenuVisible,
-            handleChangeView,
-            handleChangeManage,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .role-create-page-access-menu-item {
