@@ -1,3 +1,4 @@
+import type { Store as StoreType } from 'vuex';
 import { createStore } from 'vuex';
 
 // eslint-disable-next-line import/no-cycle
@@ -14,7 +15,9 @@ import settings from './modules/settings';
 import user from './modules/user';
 import plugins from './plugins';
 
-const store = createStore({
+export type Store = StoreType<any>;
+
+const store = createStore<Store>({
     modules: {
         user,
         dashboard,

@@ -1,6 +1,6 @@
-import { computed } from 'vue';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { App } from 'vue';
+import { computed } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -25,19 +25,19 @@ const initConfig = async () => {
 };
 
 const initQueryHelper = () => {
-    QueryHelper.init(computed(() => store.state.user.timezone));
+    QueryHelper.init(computed(() => store.state['user/timezone']));
 };
 
-const initRouter = (domainName?: string) => {
+const initRouter = (app: App, domainName?: string) => {
     if (!domainName) {
-        SpaceRouter.init(errorRoutes);
+        SpaceRouter.init(app, errorRoutes);
     } else {
-        SpaceRouter.init(serviceRoutes);
+        SpaceRouter.init(app, serviceRoutes);
     }
 };
 
 const initI18n = () => {
-    setI18nLocale(store.state.user.language);
+    setI18nLocale(store.state['user/language']);
 };
 
 const removeInitializer = () => {
@@ -45,7 +45,7 @@ const removeInitializer = () => {
     if (el?.parentElement) el.parentElement.removeChild(el);
 };
 
-const init = async () => {
+const init = async (app: App) => {
     /* Init SpaceONE Console */
     await initConfig();
     await initApiClient(store, config);
@@ -55,25 +55,25 @@ const init = async () => {
         initI18n();
         initDayjs();
         initQueryHelper();
-        initGtag(store, config);
-        initGtm(config);
+        initGtag(app, store, config);
+        initGtm(app, config);
         initAmcharts(config);
         initAmcharts5(config);
-        initRouter(domainName);
-        initErrorHandler(store);
+        initRouter(app, domainName);
+        initErrorHandler(app, store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);
     } else {
-        initRouter();
+        initRouter(app);
         throw new Error('Site initialization failed: No matched domain');
     }
 };
 
 const MIN_LOADING_TIME = 1000;
-export const siteInit = async () => {
+export const siteInit = async (app: App) => {
     store.dispatch('display/startInitializing');
 
-    store.watch((state) => state.display.isInitialized, (isInitialized) => {
+    store.watch((_store) => _store.state.display.isInitialized, (isInitialized) => {
         if (isInitialized) {
             const el = document.getElementById('site-loader-wrapper');
             if (el?.parentElement) el.parentElement.removeChild(el);
@@ -92,7 +92,7 @@ export const siteInit = async () => {
     }, MIN_LOADING_TIME);
 
     try {
-        await init();
+        await init(app);
     } catch (e) {
         console.error(e);
         store.dispatch('display/finishInitializing');

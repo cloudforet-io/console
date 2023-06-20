@@ -1,5 +1,6 @@
 import Keycloak from 'keycloak-js';
-import { useStore } from 'vuex';
+
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -11,7 +12,6 @@ class KeycloakAuth extends Authenticator {
     private static keycloak: Keycloak.KeycloakInstance;
 
     private static init() {
-        const store = useStore();
         /* keycloak init options */
         const authOptions = store.state.domain.authOptions;
         const issuer = authOptions.issuer;

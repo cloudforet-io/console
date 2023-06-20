@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -9,7 +10,6 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 class KbAuth extends Authenticator {
     static async signIn(onSignInCallback, query) {
-        const store = useStore();
         try {
             const clientIP = await SpaceConnector.client.identity.user.getIp();
             const credentials = {
@@ -37,8 +37,7 @@ class KbAuth extends Authenticator {
     }
 
     private static async onSignInFail() {
-        const router = useRouter();
-        await router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME, query: { error: 'error' } });
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME, query: { error: 'error' } });
     }
 }
 

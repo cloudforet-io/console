@@ -4,7 +4,8 @@ import {
     isInstanceOfBadRequestError,
 } from '@cloudforet/core-lib/space-connector/error';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+
+import { SpaceRouter } from '@/router';
 
 import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -33,12 +34,11 @@ export default class ErrorHandler {
     }
 
     static handleError(error: unknown, errorInfo?: ErrorInfo) {
-        const router = useRouter();
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && getRouteAccessLevel(router.currentRoute.value) >= ACCESS_LEVEL.AUTHENTICATED) {
+                && getRouteAccessLevel(SpaceRouter.router.currentRoute.value) >= ACCESS_LEVEL.AUTHENTICATED) {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {
@@ -46,9 +46,9 @@ export default class ErrorHandler {
             console.error(error);
         } else if (isInstanceOfNoResourceError(error)) {
             showErrorMessage('No Resource', 'No Resource');
-            router.push(error.redirectUrl);
+            SpaceRouter.router.push(error.redirectUrl);
         } else if (isInstanceOfNoSearchResourceError(error)) {
-            router.push(error.redirectUrl);
+            SpaceRouter.router.push(error.redirectUrl);
         } else if (isInstanceOfAPIError(error)) {
             console.error('API Error', error);
         } else {

@@ -1,7 +1,7 @@
 import type { Router } from 'vue-router';
-import { useRouter } from 'vue-router';
 import type { Getter } from 'vuex';
 
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import {
@@ -89,7 +89,7 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     return {
         ...d,
-        label: i18n.t(menuInfo.translationId),
+        label: i18n.global.t(menuInfo.translationId),
         icon: menuInfo.icon,
         isNew: menuInfo.isNew,
         isBeta: menuInfo.isBeta,
@@ -98,11 +98,10 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    const router = useRouter();
     const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter((d) => d.id !== MENU_ID.COST_EXPLORER);
 
     let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
-    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, router);
+    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };

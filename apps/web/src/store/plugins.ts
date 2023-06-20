@@ -1,4 +1,4 @@
-import createLogger from 'vuex/dist/logger';
+import { createLogger } from 'vuex';
 
 import displayPlugins from '@/store/modules/display/plugins';
 import settingsPlugins from '@/store/modules/settings/plugins';

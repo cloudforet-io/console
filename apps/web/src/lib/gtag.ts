@@ -1,5 +1,5 @@
 import Hashids from 'hashids';
-import Vue from 'vue';
+import type { App } from 'vue';
 import type { VueGtag as VueGtagType } from 'vue-gtag';
 import VueGtag from 'vue-gtag';
 import type { RouteLocationNormalized } from 'vue-router';
@@ -7,10 +7,11 @@ import type { RouteLocationNormalized } from 'vue-router';
 
 import config from '@/lib/config';
 
+
 export class GTag {
     private static _gtag: VueGtagType|null;
 
-    constructor() {
+    constructor(app: App) {
         const gtagId: string = config.get('GTAG_ID');
         if (!gtagId || gtagId === 'DISABLED') {
             console.log('GTG ID is not given.');
@@ -18,14 +19,14 @@ export class GTag {
             return;
         }
 
-        Vue.use(VueGtag, {
+        app.use(VueGtag, {
             config: { id: gtagId },
         });
-        GTag._gtag = Vue.prototype.$gtag;
+        GTag._gtag = app.config.globalProperties.gtag;
     }
 
-    static init() {
-        new GTag();
+    static init(app: App) {
+        new GTag(app);
     }
 
     static get gtag(): VueGtagType|null {

@@ -24,14 +24,15 @@ import '@spaceone/design-system/dist/css/style.css';
 const app = createApp(App);
 /* This is global injection for site-initializing */
 app.provide('app', app);
+app.provide('store', store);
 
 const pinia = createPinia();
 pinia.use(resetStore);
 
 /** ********** SET VUE PLUGINS ************** */
+const router = SpaceRouter.router;
 app.use(pinia);
 app.use(store);
-const router = SpaceRouter.router;
 app.use(router);
 app.use(i18n);
 app.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
@@ -41,7 +42,7 @@ app.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** INITIALIZE ************** */
 (async () => {
-    await siteInit();
+    await siteInit(app);
 
     app.mount('#app');
 })();

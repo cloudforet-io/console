@@ -1,9 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { App } from 'vue';
-import { inject } from 'vue';
 import type { Router, RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
-import { useStore } from 'vuex';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 
@@ -17,17 +15,13 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
-const app = inject('app') as App;
-
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
 export class SpaceRouter {
     static router: Router;
 
-    static init(routes: RouteRecordRaw[]) {
+    static init(app: App, routes: RouteRecordRaw[]) {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
-
-        const store = useStore();
 
         SpaceRouter.router = createRouter({
             history: createWebHistory(),
@@ -36,6 +30,7 @@ export class SpaceRouter {
         });
 
         app.use(SpaceRouter.router);
+        const store = app.$store;
 
         let nextPath: string;
 
@@ -96,7 +91,7 @@ export class SpaceRouter {
 
             if (!store) return;
 
-            if (store.state.error.visibleAuthorizationError) { store.commit('error/setVisibleAuthorizationError', false); }
+            if (store.state['error/visibleAuthorizationError']) { store.commit('error/setVisibleAuthorizationError', false); }
             const isDomainOwner = store.getters['user/isDomainOwner'];
             if (!isDomainOwner) {
                 const recent = getRecentConfig(to);
