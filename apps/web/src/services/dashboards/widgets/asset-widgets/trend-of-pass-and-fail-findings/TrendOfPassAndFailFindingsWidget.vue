@@ -70,7 +70,7 @@ import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
-    getReferenceTypeOfGroupBy, getWidgetTableDateFields,
+    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -135,7 +135,11 @@ const state = reactive({
             ...refinedFieldsWithLabel,
         ];
     }),
-    tableData: computed<FullData['tableData']>(() => state.data?.tableData ?? { more: false, results: [] }),
+    tableData: computed<FullData['tableData']>(() => {
+        if (!state.data?.tableData) return { more: false, results: [] };
+        const refinedData = getRefinedDateTableData(state.data?.tableData?.results ?? [], state.dateRange, 'value');
+        return { ...state.data?.tableData, results: refinedData };
+    }),
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
