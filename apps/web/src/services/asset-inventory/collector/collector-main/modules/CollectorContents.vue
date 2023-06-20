@@ -191,12 +191,10 @@ const collectorApiQueryHelper = new ApiQueryHelper()
     .setOnly(
         COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
         COLLECTOR_QUERY_HELPER_SET.NAME,
+        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
+        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
         COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
         COLLECTOR_QUERY_HELPER_SET.PROVIDER,
-        COLLECTOR_QUERY_HELPER_SET.TAGS,
-        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
-        COLLECTOR_QUERY_HELPER_SET.STATE,
-        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
     )
     .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
     .setSort(collectorPageState.sortBy, true);

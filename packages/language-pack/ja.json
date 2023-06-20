@@ -2198,6 +2198,7 @@
 				"SCHEDULED": "予定された収集:",
 				"SCHEDULED_TIME": "{hr}時間{m}分後",
 				"SET_SCHEDULE": "設定",
+				"TIMEZONE": "タイムゾーン",
 				"TITLE": "コレクタ",
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
 			},

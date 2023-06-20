@@ -21,7 +21,7 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ state.isScheduleActivated ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
@@ -91,7 +91,7 @@ const handleClickSchedule = () => {
 
 /* Watcher */
 watch(() => props.item, (item) => {
-    if (item) {
+    if (item && item.schedule) {
         state.isScheduleActivated = item.schedule.state === 'ENABLED';
     }
 }, { immediate: true });
