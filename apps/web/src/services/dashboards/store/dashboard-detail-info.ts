@@ -12,6 +12,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
@@ -93,6 +94,8 @@ const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema, l
                     _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
                 }
             });
+            // HACK: remove below code after backend is ready
+            _managedDashboardVariablesSchema.properties[REFERENCE_TYPE_INFO.service_account.type].use = false;
         } else if (labels?.includes('Cost')) {
             managedVariablesPropertiesMap.forEach((value, key) => {
                 if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
