@@ -23,23 +23,25 @@
                                      @update:enableHoursEdit="handleUpdateEditMode"
             />
 
-            <p-button v-if="state.isEditMode"
-                      style-type="tertiary"
-                      size="lg"
-                      :disabled="state.updateLoading"
-                      @click="handleClickCancel"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-            </p-button>
-            <p-button v-if="state.isEditMode"
-                      style-type="primary"
-                      size="lg"
-                      :loading="state.updateLoading"
-                      class="save-changes-button"
-                      @click="handleClickSave"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-            </p-button>
+            <div class="button-group">
+                <p-button v-if="state.isEditMode"
+                          style-type="tertiary"
+                          size="lg"
+                          :disabled="state.updateLoading"
+                          @click="handleClickCancel"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button v-if="state.isEditMode"
+                          style-type="primary"
+                          size="lg"
+                          :loading="state.updateLoading"
+                          class="save-changes-button"
+                          @click="handleClickSave"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -119,8 +121,11 @@ const handleClickSave = async () => {
 <style lang="postcss" scoped>
 .schedule-wrapper {
     padding: 1rem;
-    .save-changes-button {
-        margin-left: 1rem;
+    .button-group {
+        margin-bottom: 1.5rem;
+        .save-changes-button {
+            margin-left: 1rem;
+        }
     }
 }
 </style>

@@ -51,22 +51,24 @@
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
                                 @update:isTagsValid="handleUpdateIsTagsValid"
             />
-            <p-button style-type="tertiary"
-                      size="lg"
-                      :disabled="state.updateLoading"
-                      @click="handleClickCancel"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-            </p-button>
-            <p-button style-type="primary"
-                      size="lg"
-                      class="save-changes-button"
-                      :disabled="!state.isAllValid"
-                      :loading="state.updateLoading"
-                      @click="handleClickSave"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-            </p-button>
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          size="lg"
+                          :disabled="state.updateLoading"
+                          @click="handleClickCancel"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          class="save-changes-button"
+                          :disabled="!state.isAllValid"
+                          :loading="state.updateLoading"
+                          @click="handleClickSave"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -225,11 +227,15 @@ watch(() => collectorFormStore.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .p-definition-table {
     border-color: transparent;
+    margin-bottom: 2.5rem;
 }
 .collector-base-info-edit {
     padding: 1rem;
-    .save-changes-button {
-        margin-left: 1rem;
+    .button-group {
+        margin-bottom: 1.5rem;
+        .save-changes-button {
+            margin-left: 1rem;
+        }
     }
 }
 </style>

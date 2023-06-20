@@ -132,7 +132,7 @@ const assetInventoryRoute: RouteConfig = {
                     path: ':collectorId',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId },
+                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
                     component: CollectorDetailPage as any,
                 },
             ],

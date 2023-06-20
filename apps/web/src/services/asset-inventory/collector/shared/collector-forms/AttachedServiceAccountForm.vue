@@ -113,9 +113,9 @@ const state = reactive({
             options: {
                 limit: 10,
                 filter: queryHelper.apiQuery.filter,
-            },
-            parameters: {
-                has_secret: true,
+                parameters: {
+                    has_secret: true,
+                },
             },
         };
     }),

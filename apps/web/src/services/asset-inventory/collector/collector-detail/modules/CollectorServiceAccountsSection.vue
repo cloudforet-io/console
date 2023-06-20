@@ -67,20 +67,22 @@
                                            reset-on-collector-id-change
                                            @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
             />
-            <p-button style-type="tertiary"
-                      size="lg"
-                      @click="handleClickCancel"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-            </p-button>
-            <p-button style-type="primary"
-                      size="lg"
-                      class="save-changes-button"
-                      :disalbed="state.updateLoading"
-                      @click="handleClickSave"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-            </p-button>
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          size="lg"
+                          @click="handleClickCancel"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          class="save-changes-button"
+                          :disalbed="state.updateLoading"
+                          @click="handleClickSave"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -312,9 +314,13 @@ onMounted(async () => {
     border-color: transparent;
 }
 .edit-form {
-    padding: 0 1rem 2.5rem 1rem;
-    .save-changes-button {
-        margin-left: 1rem;
+    padding: 0 1rem;
+    .button-group {
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+        .save-changes-button {
+            margin-left: 1rem;
+        }
     }
 }
 </style>
