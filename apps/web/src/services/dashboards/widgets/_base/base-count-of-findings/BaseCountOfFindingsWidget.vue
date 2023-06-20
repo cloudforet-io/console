@@ -281,7 +281,7 @@ defineExpose<WidgetExpose<Data[]>>({
 <style lang="postcss" scoped>
 .count-of-findings-widget {
     &.full {
-        height: 23.5rem;
+        height: 29rem;
     }
     .data-container {
         display: flex;
