@@ -163,8 +163,9 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .collector-page-1 {
+    @apply flex flex-col;
     min-width: 59.5625rem;
-    max-height: 100vh;
+    height: calc(100vh - 11.75rem);
     width: 100%;
     .contents-container {
         @apply flex justify-between;
@@ -180,8 +181,8 @@ onMounted(() => {
             .right-area-contents {
                 .plugin-card-list {
                     @apply flex flex-col gap-2;
+                    height: calc(100vh - 17rem);
                     overflow-y: auto;
-                    height: 41.0625rem;
                     :deep(.p-board-item) {
                         .content-area .content {
                             flex-grow: unset;
@@ -221,11 +222,13 @@ onMounted(() => {
 @screen tablet {
     .collector-page-1 {
         min-width: 43rem;
+        height: calc(100vh - 15.375rem);
         .contents-container {
             @apply flex-col;
             .right-area {
                 .right-area-contents {
                     .plugin-card-list {
+                        height: calc(100vh - 20.625rem);
                         .plugin-card-item {
                             .plugin-card-content {
                                 @apply flex items-center;

@@ -17,6 +17,26 @@ export interface CostAnalyzeDataModel {
     }>;
 }
 
+export interface AnalyzeDataModel {
+    more?: boolean;
+    results: Array<{
+        [groupBy: string]: string | any; // product: 'AmazonCloudFront'
+        // cost-analysis/analyze
+        usd_cost_sum?: Array<{
+            [field_group: string]: any;
+            value: number
+        }> | number;
+        usage_quantity_sum?: Array<{
+            [field_group: string]: any;
+            value: number
+        }> | number;
+        _total_usd_cost_sum?: number;
+        _total_usage_quantity_sum?: number;
+        // cloud-service/stats
+        value?: Array<{ date: string; value: number }>;
+    }>;
+}
+
 export interface BudgetDataModel {
     more?: boolean;
     results: Array<{
