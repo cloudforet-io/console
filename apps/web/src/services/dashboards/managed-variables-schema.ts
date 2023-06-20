@@ -93,9 +93,9 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         [COST_VARIABLES_INFO.group_by.key]: {
             name: COST_VARIABLES_INFO.group_by.name,
             variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'SINGLE',
-            description: i18n.global.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_GROUP_BY'),
+            use: false,
+            selection_type: 'MULTI',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_TYPE'),
             options: {
                 type: 'ENUM',
                 values: Object.values(GROUP_BY_ITEM_MAP).map((d) => ({ key: d.name, label: d.label })),
