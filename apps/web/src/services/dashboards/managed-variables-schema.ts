@@ -84,7 +84,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
-            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_TYPE'),
+            description: i18n.global.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_TYPE'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudServiceType',
@@ -96,7 +96,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
-            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT'),
+            description: i18n.global.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudService',
