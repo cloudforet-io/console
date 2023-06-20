@@ -104,9 +104,9 @@ const state = reactive({
     schema: null as null|JsonSchema|object,
 });
 
-const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => {
-    const options = collectorFormState.provider ? {
-        provider: collectorFormState.provider,
+const fetchGetPluginMetadata = (provider: string|null): Promise<CollectorPluginModel> => {
+    const options = provider ? {
+        provider,
     } : {};
     return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
         plugin_id: state.pluginId,
@@ -115,12 +115,12 @@ const fetchGetPluginMetadata = (): Promise<CollectorPluginModel> => {
     });
 };
 
-const getPluginMetadata = async () => {
+const getPluginMetadata = async (provider: string|null) => {
     try {
         state.loading = true;
         state.isLoadFailed = false;
         if (!props.hasMetadata) {
-            const res = await fetchGetPluginMetadata();
+            const res = await fetchGetPluginMetadata(provider);
             state.schema = res.metadata?.options_schema ?? {};
             if (state.isSchemaEmpty) {
                 emit('update:isValid', true);
@@ -144,15 +144,21 @@ const handleUpdateSchemaForm = (isValid:boolean, value) => {
 };
 
 const handleClickReloadButton = () => {
-    getPluginMetadata();
+    getPluginMetadata(collectorFormState.provider);
 };
 
 
-watch(() => collectorFormStore.collectorId, (collectorId) => {
+watch(() => collectorFormStore.collectorId, async (collectorId) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetAttachedServiceAccount();
-    getPluginMetadata();
+    await getPluginMetadata(collectorFormState.provider);
 }, { immediate: true });
+
+watch(() => collectorFormState.provider, async (provider) => {
+    // CAUTION: Do not change the order of the following two lines. The form data(options) must be reset after the schema has been updated.
+    await getPluginMetadata(provider);
+    collectorFormStore.resetOptions();
+});
 
 </script>
 
