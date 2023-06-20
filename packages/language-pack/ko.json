@@ -2198,6 +2198,7 @@
 				"SCHEDULED": "수집 예정: ",
 				"SCHEDULED_TIME": "{hr}시간 {m}분 후 ",
 				"SET_SCHEDULE": "설정",
+				"TIMEZONE": "타임존",
 				"TITLE": "컬렉터",
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
 			},

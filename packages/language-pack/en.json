@@ -2198,6 +2198,7 @@
 				"SCHEDULED": "Scheduled",
 				"SCHEDULED_TIME": "in {hr} hr {m} mins",
 				"SET_SCHEDULE": "Set",
+				"TIMEZONE": "Time Zone",
 				"TITLE": "Collector",
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},

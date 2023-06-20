@@ -37,6 +37,7 @@
         <p-field-group v-if="props.enableHoursEdit"
                        class="hourly-schedule-field-group"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
+                       :help-text="$t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
             <div class="hourly-schedule-wrapper">
                 <span v-for="(hour) in hoursMatrix"
