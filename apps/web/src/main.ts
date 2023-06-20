@@ -1,9 +1,9 @@
 
 import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import SpaceDesignSystem from '@spaceone/design-system';
+import FloatingVue from 'floating-vue';
 import { createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
-import VTooltip from 'v-tooltip';
 import { createApp } from 'vue';
 
 import { SpaceRouter } from '@/router';
@@ -35,7 +35,7 @@ app.use(pinia);
 app.use(store);
 app.use(router);
 app.use(i18n);
-app.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
 app.use(LottieVuePlayer);
 app.use(SpaceDesignSystem, { vueI18n: i18n });
