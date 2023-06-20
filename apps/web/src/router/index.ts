@@ -1,4 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { App } from 'vue';
+import { inject } from 'vue';
 import type { Router, RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useStore } from 'vuex';
@@ -14,6 +16,8 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
+
+const app = inject('app') as App;
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
@@ -31,6 +35,7 @@ export class SpaceRouter {
             routes,
         });
 
+        app.use(SpaceRouter.router);
 
         let nextPath: string;
 
