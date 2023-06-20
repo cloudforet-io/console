@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { defineStore } from 'pinia';
 
 import { store } from '@/store';
 
@@ -30,7 +30,7 @@ export const useUserPageStore = defineStore('user-page', {
         visibleUpdateModal: false,
     }),
     getters: {
-        timezone: () => store.state.user.timezone || 'UTC',
+        timezone: () => store.state['user/timezone'] || 'UTC',
         selectedUsers: (state) => {
             const users = [] as User[];
             state.selectedIndices.map((d) => users.push(state.users[d]));
