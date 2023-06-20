@@ -91,7 +91,7 @@ const handleClickSchedule = () => {
 
 /* Watcher */
 watch(() => props.item, (item) => {
-    if (item) {
+    if (item && item.schedule) {
         state.isScheduleActivated = item.schedule.state === 'ENABLED';
     }
 }, { immediate: true });
