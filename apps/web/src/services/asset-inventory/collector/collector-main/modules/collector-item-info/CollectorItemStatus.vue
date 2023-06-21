@@ -77,9 +77,7 @@ const state = reactive({
             }
 
             const timeDiff = nextScheduledTime.diff(current, 'minute');
-            return {
-                diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60, nextScheduledHour, current, nextScheduledTime,
-            };
+            return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
         return { diffHour: 0, diffMin: 0 };
     }),
