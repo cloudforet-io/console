@@ -5,7 +5,7 @@
         </p>
         <div class="label-description">
             <div v-if="props.item.schedule">
-                <div v-if="state.status === JOB_STATE.SUCCESS && props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
                      class="scheduled"
                 >
                     <p-i
