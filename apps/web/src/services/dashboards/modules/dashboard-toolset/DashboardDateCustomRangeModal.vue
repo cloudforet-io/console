@@ -5,9 +5,11 @@
         size="sm"
         fade
         backdrop
-        :visible.sync="proxyVisible"
+        :visible="proxyVisible"
         :disabled="invalid"
         @confirm="handleConfirm"
+        @cancel="handleClose"
+        @close="handleClose"
     >
         <template #body>
             <p-field-group class="period-select"
@@ -168,6 +170,9 @@ export default {
             }
             emit('confirm', period);
         };
+        const handleClose = () => {
+            state.proxyVisible = false;
+        };
 
         watch(() => props.selectedMonth, (d) => {
             if (d !== 'custom') {
@@ -179,6 +184,7 @@ export default {
         return {
             ...toRefs(state),
             handleConfirm,
+            handleClose,
         };
     },
 };
