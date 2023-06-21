@@ -58,6 +58,9 @@
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
                 </p-button>
             </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, state.timezone) }}
+            </template>
         </p-toolbox-table>
         <div v-else
              class="edit-form"
@@ -93,12 +96,14 @@ import {
     reactive, watch, onMounted, computed,
 } from 'vue';
 
+
 import {
     PHeading, PButton, PPaneLayout, PToolboxTable, PBadge, PAnchor,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
 
+import { iso8601Formatter } from '@cloudforet/core-lib';
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -140,6 +145,7 @@ const fields: DefinitionField[] = [
     { name: 'collect', label: ' ' },
 ];
 const state = reactive({
+    timezone: computed(() => store.state.user.timezone),
     isEditMode: false,
     // table data
     loading: true,
