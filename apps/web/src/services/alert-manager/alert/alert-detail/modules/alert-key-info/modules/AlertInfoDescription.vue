@@ -1,5 +1,38 @@
+<script lang="ts" setup>
+import { PTextarea, PButton, PTextBeautifier } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
+import { EDIT_MODE } from '@/services/alert-manager/lib/config';
+import type { AlertDataModel } from '@/services/alert-manager/type';
+
+interface Props {
+    id: string;
+    alertData: AlertDataModel;
+    manageDisabled: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    alertData: () => ({}) as AlertDataModel,
+    manageDisabled: false,
+});
+const { t } = useI18n();
+
+const {
+    state: alertDetailItemState,
+    cancelEdit,
+    startEdit,
+    onClickSave,
+} = useAlertInfoItem({
+    alertId: props.id,
+    isEditMode: false,
+    dataForUpdate: props.alertData?.description,
+});
+
+</script>
+
 <template>
-    <p v-if="!isEditMode"
+    <p v-if="!alertDetailItemState.isEditMode"
        class="content-wrapper"
     >
         <p-text-beautifier class="description"
@@ -9,13 +42,13 @@
                 :class="{'disabled': manageDisabled}"
                 @click="startEdit(alertData.description)"
         >
-            {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+            {{ t('IDENTITY.USER.NOTIFICATION.EDIT') }}
         </button>
     </p>
     <div v-else
          class="content-wrapper"
     >
-        <p-textarea v-model="dataForUpdate"
+        <p-textarea v-model="alertDetailItemState.dataForUpdate"
                     class="textarea"
         />
         <div class="button-group">
@@ -24,7 +57,7 @@
                       size="sm"
                       @click="cancelEdit(alertData.description)"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
+                {{ t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
             </p-button>
             <p-button
                 style-type="primary"
@@ -32,62 +65,11 @@
                 class="text-button"
                 @click="onClickSave(EDIT_MODE.DESCRIPTION)"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
+                {{ t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
             </p-button>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import { toRefs } from 'vue';
-
-import { PTextarea, PButton, PTextBeautifier } from '@spaceone/design-system';
-
-import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
-import { EDIT_MODE } from '@/services/alert-manager/lib/config';
-
-export default {
-    name: 'AlertInfoDescription',
-    components: {
-        PTextarea,
-        PButton,
-        PTextBeautifier,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const {
-            state: alertDetailItemState,
-            cancelEdit,
-            startEdit,
-            onClickSave,
-        } = useAlertInfoItem({
-            alertId: props.id,
-            isEditMode: false,
-            dataForUpdate: props.alertData?.description,
-        });
-        return {
-            EDIT_MODE,
-            ...toRefs(alertDetailItemState),
-            cancelEdit,
-            startEdit,
-            onClickSave,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 @import '../styles/alertInfoItem.pcss';

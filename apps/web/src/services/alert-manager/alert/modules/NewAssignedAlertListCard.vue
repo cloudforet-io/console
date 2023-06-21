@@ -1,10 +1,109 @@
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PListCard, PI,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { get } from 'lodash';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+
+
+const store = useStore();
+const { t } = useI18n();
+const router = useRouter();
+
+const storeState = reactive({
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+});
+const state = reactive({
+    loading: false,
+    items: [],
+    totalCount: 0,
+    assignedVisible: true,
+    lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', ALERT_MANAGER_ROUTE.ALERT._NAME)),
+    isVisible: computed(() => {
+        if (state.totalCount && state.assignedVisible) return true;
+        return false;
+    }),
+});
+
+const assignedAlertApiQuery = new ApiQueryHelper()
+    .setSort('created_at', true)
+    .setFilters([
+        { k: 'assignee', v: store.state.user.userId, o: '=' },
+        { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
+    ]);
+
+const getAssignedAlerts = async () => {
+    if (state.loading) return;
+    if (state.lastCheckedTime) assignedAlertApiQuery.setOrFilters([{ k: 'created_at', v: state.lastCheckedTime, o: '>=t' }, { k: 'acknowledged_at', v: state.lastCheckedTime, o: '>=t' }]);
+    state.loading = true;
+    try {
+        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+            query: assignedAlertApiQuery.data,
+        });
+
+        state.items = results;
+        state.totalCount = total_count;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* event */
+const onHideAlerts = () => {
+    state.assignedVisible = false;
+    const lastCheckedTime = dayjs.utc().toISOString();
+    store.dispatch('settings/setItem', {
+        key: 'last_checked_time',
+        value: lastCheckedTime,
+        path: ALERT_MANAGER_ROUTE.ALERT._NAME,
+    });
+};
+
+const onClickListItem = (idx) => {
+    const alertId = get(state.items[idx], 'alert_id');
+    if (alertId) router.push({ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: alertId } });
+};
+
+/* init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/user/load'),
+        getAssignedAlerts(),
+    ]);
+})();
+
+</script>
+
 <template>
     <p-list-card
-        v-if="isVisible"
+        v-if="state.isVisible"
         style-type="indigo400"
         class="assigned-alert-list"
-        :loading="loading"
-        :items="items"
+        :loading="state.loading"
+        :items="state.items"
         :hoverable="true"
         @click="onClickListItem"
     >
@@ -15,7 +114,7 @@
                  class="ic_notification"
                  color="white"
             />
-            {{ $t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
+            {{ t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
             <p-i name="ic_close"
                  width="1.25rem"
                  height="1.25rem"
@@ -33,119 +132,7 @@
         </template>
     </p-list-card>
 </template>
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
 
-import {
-    PListCard, PI,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { get } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-
-export default {
-    name: 'NewAssignedAlertListCard',
-    components: {
-        AlertListItem,
-        PListCard,
-        PI,
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const storeState = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-        });
-        const state = reactive({
-            loading: false,
-            items: [],
-            totalCount: 0,
-            assignedVisible: true,
-            lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', ALERT_MANAGER_ROUTE.ALERT._NAME)),
-            isVisible: computed(() => {
-                if (state.totalCount && state.assignedVisible) return true;
-                return false;
-            }),
-        });
-
-        const assignedAlertApiQuery = new ApiQueryHelper()
-            .setSort('created_at', true)
-            .setFilters([
-                { k: 'assignee', v: store.state.user.userId, o: '=' },
-                { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
-            ]);
-
-        const getAssignedAlerts = async () => {
-            if (state.loading) return;
-            if (state.lastCheckedTime) assignedAlertApiQuery.setOrFilters([{ k: 'created_at', v: state.lastCheckedTime, o: '>=t' }, { k: 'acknowledged_at', v: state.lastCheckedTime, o: '>=t' }]);
-            state.loading = true;
-            try {
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
-                    query: assignedAlertApiQuery.data,
-                });
-
-                state.items = results;
-                state.totalCount = total_count;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* event */
-        const onHideAlerts = () => {
-            state.assignedVisible = false;
-            const lastCheckedTime = dayjs.utc().toISOString();
-            store.dispatch('settings/setItem', {
-                key: 'last_checked_time',
-                value: lastCheckedTime,
-                path: ALERT_MANAGER_ROUTE.ALERT._NAME,
-            });
-        };
-
-        const onClickListItem = (idx) => {
-            const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: alertId } });
-        };
-
-        /* init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/user/load'),
-                getAssignedAlerts(),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            storeState,
-            getAssignedAlerts,
-            onHideAlerts,
-            onClickListItem,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 /* custom design-system component - p-list-card */
 :deep(.assigned-alert-list) {

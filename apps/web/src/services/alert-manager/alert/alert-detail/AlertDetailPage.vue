@@ -1,90 +1,14 @@
-<template>
-    <div v-if="!loading"
-         class="alert-detail-page"
-    >
-        <p-heading :title="alertPageState.alertData?.title"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
-        >
-            <template #title-right-extra>
-                <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
-                <span class="title-btn">
-                    <p-icon-button name="ic_delete"
-                                   class="w-full delete-btn"
-                                   :disabled="!hasManagePermission"
-                                   @click="openAlertDeleteForm"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   class="edit-btn"
-                                   :disabled="!hasManagePermission"
-                                   @click="openAlertEditForm"
-                    />
-                </span>
-            </template>
-        </p-heading>
-        <section class="detail-contents-wrapper">
-            <div class="left-wrapper">
-                <alert-summary :id="id"
-                               class="header"
-                               :manage-disabled="!hasManagePermission"
-                />
-
-                <alert-key-info :id="id"
-                                class="info"
-                                :manage-disabled="!hasManagePermission"
-                />
-                <alert-status-update :id="id"
-                                     :manage-disabled="!hasManagePermission"
-                                     class="status-update"
-                />
-                <alert-timeline-and-event :id="id"
-                                          class="timeline-and-event"
-                />
-            </div>
-            <div class="right-wrapper">
-                <alert-responder :id="id"
-                                 class="responder"
-                                 :alert-data="alertPageState.alertData"
-                                 :manage-disabled="!hasManagePermission"
-                />
-                <alert-note :id="id"
-                            :manage-disabled="!hasManagePermission"
-                            class="note"
-                />
-                <alert-project-dependency :id="id"
-                                          class="project-dependency"
-                />
-            </div>
-        </section>
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
-                      :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
-                      @confirm="alertDeleteConfirm"
-        />
-        <alert-title-edit-modal v-if="alertTitleEditFormVisible"
-                                :visible.sync="alertTitleEditFormVisible"
-                                :alert-id="id"
-                                @confirm="alertTitleEditConfirm"
-        />
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
-                      :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
-                      @confirm="alertDeleteConfirm"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PIconButton, PHeading } from '@spaceone/design-system';
-
+<script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PIconButton, PHeading } from '@spaceone/design-system';
+import {
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocation } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-import { i18n } from '@/translations';
+
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -106,94 +30,144 @@ import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/mod
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
-export default {
-    name: 'AlertDetailPage',
-    components: {
-        AlertStatusUpdate,
-        AlertProjectDependency,
-        AlertTitleEditModal,
-        AlertNote,
-        AlertTimelineAndEvent,
-        AlertResponder,
-        AlertKeyInfo,
-        AlertSummary,
-        DeleteModal,
-        PHeading,
-        PIconButton,
-    },
-    props: {
-        id: {
-            type: String,
-            default: null,
-        },
-    },
-    setup(props) {
-        const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.$state;
 
-        const vm = getCurrentInstance()?.proxy as Vue;
+interface Props {
+    id: string;
+}
 
-        const state = reactive({
-            hasManagePermission: useManagePermissionState(),
-            loading: true,
-            alertTitleEditFormVisible: false,
-        });
+const props = defineProps<Props>();
+const { t } = useI18n();
+const router = useRouter();
 
-        const checkDeleteState = reactive({
-            visible: false,
-            headerTitle: i18n.t('MONITORING.ALERT.DETAIL.DELETE_MODAL_TITLE'),
-        });
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.$state;
 
-        const openAlertDeleteForm = () => {
-            checkDeleteState.visible = true;
-        };
+const state = reactive({
+    hasManagePermission: useManagePermissionState(),
+    loading: true,
+    alertTitleEditFormVisible: false,
+});
 
-        const alertDeleteConfirm = async () => {
-            try {
-                await SpaceConnector.client.monitoring.alert.delete({
-                    alerts: [props.id],
-                });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '');
-                await vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));
-            } finally {
-                checkDeleteState.visible = false;
-            }
-        };
+const checkDeleteState = reactive({
+    visible: false,
+    headerTitle: t('MONITORING.ALERT.DETAIL.DELETE_MODAL_TITLE'),
+});
 
-        const openAlertEditForm = () => {
-            state.alertTitleEditFormVisible = true;
-        };
-
-        const alertTitleEditConfirm = async () => {
-            state.alertTitleEditFormVisible = false;
-        };
-
-        /* init */
-        (async () => {
-            state.loading = true;
-            try {
-                await alertPageStore.getAlertData(props.id);
-            } catch (e) {
-                ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
-            } finally {
-                state.loading = false;
-            }
-        })();
-
-        return {
-            ...toRefs(state),
-            checkDeleteState,
-            alertPageState,
-            openAlertDeleteForm,
-            alertDeleteConfirm,
-            openAlertEditForm,
-            alertTitleEditConfirm,
-        };
-    },
+const openAlertDeleteForm = () => {
+    checkDeleteState.visible = true;
 };
+
+const alertDeleteConfirm = async () => {
+    try {
+        await SpaceConnector.client.monitoring.alert.delete({
+            alerts: [props.id],
+        });
+        showSuccessMessage(t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '');
+        await router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));
+    } finally {
+        checkDeleteState.visible = false;
+    }
+};
+
+const openAlertEditForm = () => {
+    state.alertTitleEditFormVisible = true;
+};
+
+const alertTitleEditConfirm = async () => {
+    state.alertTitleEditFormVisible = false;
+};
+
+/* init */
+(async () => {
+    state.loading = true;
+    try {
+        await alertPageStore.getAlertData(props.id);
+    } catch (e) {
+        ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME } as RouteLocation));
+    } finally {
+        state.loading = false;
+    }
+})();
+
 </script>
+
+<template>
+    <div v-if="!state.loading"
+         class="alert-detail-page"
+    >
+        <p-heading :title="alertPageState.alertData?.title"
+                   show-back-button
+                   @click-back-button="router.go(-1)"
+        >
+            <template #title-right-extra>
+                <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
+                <span class="title-btn">
+                    <p-icon-button name="ic_delete"
+                                   class="w-full delete-btn"
+                                   :disabled="!state.hasManagePermission"
+                                   @click="openAlertDeleteForm"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   class="edit-btn"
+                                   :disabled="!state.hasManagePermission"
+                                   @click="openAlertEditForm"
+                    />
+                </span>
+            </template>
+        </p-heading>
+        <section class="detail-contents-wrapper">
+            <div class="left-wrapper">
+                <alert-summary :id="id"
+                               class="header"
+                               :manage-disabled="!state.hasManagePermission"
+                />
+
+                <alert-key-info :id="id"
+                                class="info"
+                                :manage-disabled="!state.hasManagePermission"
+                />
+                <alert-status-update :id="id"
+                                     :manage-disabled="!state.hasManagePermission"
+                                     class="status-update"
+                />
+                <alert-timeline-and-event :id="id"
+                                          class="timeline-and-event"
+                />
+            </div>
+            <div class="right-wrapper">
+                <alert-responder :id="id"
+                                 class="responder"
+                                 :alert-data="alertPageState.alertData"
+                                 :manage-disabled="!state.hasManagePermission"
+                />
+                <alert-note :id="id"
+                            :manage-disabled="!state.hasManagePermission"
+                            class="note"
+                />
+                <alert-project-dependency :id="id"
+                                          class="project-dependency"
+                />
+            </div>
+        </section>
+        <delete-modal v-model:visible="checkDeleteState.visible"
+                      :header-title="checkDeleteState.headerTitle"
+                      :contents="t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
+                      @confirm="alertDeleteConfirm"
+        />
+        <alert-title-edit-modal v-if="state.alertTitleEditFormVisible"
+                                v-model:visible="state.alertTitleEditFormVisible"
+                                :alert-id="id"
+                                @confirm="alertTitleEditConfirm"
+        />
+        <delete-modal v-model:visible="checkDeleteState.visible"
+                      :header-title="checkDeleteState.headerTitle"
+                      :contents="t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
+                      @confirm="alertDeleteConfirm"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .alert-detail-page {

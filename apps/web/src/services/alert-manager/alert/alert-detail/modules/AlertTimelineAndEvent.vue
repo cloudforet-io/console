@@ -1,11 +1,40 @@
+<script lang="ts" setup>
+
+import { PHeading, PTab } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import AlertPushedEvent from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/AlertPushedEvent.vue';
+import AlertDetails from '@/services/alert-manager/alert/alert-detail/modules/AlertDetails.vue';
+
+interface Props {
+    id: string;
+}
+
+defineProps<Props>();
+const { t } = useI18n();
+
+const tabState = reactive({
+    tabs: computed(() => ([
+        { name: 'pushed-event', label: t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
+        { name: 'details', label: t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') },
+    ] as TabItem[])),
+    activeTab: 'pushed-event',
+});
+
+</script>
+
 <template>
-    <p-tab :tabs="tabState.tabs"
-           :active-tab.sync="tabState.activeTab"
+    <p-tab v-model:active-tab="tabState.activeTab"
+           :tabs="tabState.tabs"
            class="alert-detail-timeline"
     >
         <template #pushed-event>
             <p-heading heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT')"
+                       :title="t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT')"
             />
             <alert-pushed-event :id="id" />
         </template>
@@ -14,46 +43,3 @@
         </template>
     </p-tab>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive,
-} from 'vue';
-
-import { PHeading, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { i18n } from '@/translations';
-
-import AlertPushedEvent from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/AlertPushedEvent.vue';
-import AlertDetails from '@/services/alert-manager/alert/alert-detail/modules/AlertDetails.vue';
-
-export default {
-    name: 'AlertTimelineAndEvent',
-    components: {
-        AlertPushedEvent,
-        AlertDetails,
-        PTab,
-        PHeading,
-    },
-    props: {
-        id: {
-            type: String,
-            default: '',
-        },
-    },
-    setup() {
-        const tabState = reactive({
-            tabs: computed(() => ([
-                { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
-                { name: 'details', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') },
-            ] as TabItem[])),
-            activeTab: 'pushed-event',
-        });
-        return {
-            tabState,
-        };
-    },
-};
-
-</script>

@@ -1,20 +1,96 @@
+<script lang="ts" setup>
+import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import type {
+    AlertStateFilter, AlertUrgency, AssignedState,
+} from '@/services/alert-manager/lib/config';
+import {
+    ALERT_STATE_FILTER,
+    ALERT_URGENCY,
+    ASSIGNED_STATE,
+} from '@/services/alert-manager/lib/config';
+import type {
+    AlertBottomFilters,
+} from '@/services/alert-manager/type';
+
+interface Props {
+    alertState: AlertStateFilter;
+    urgency: AlertUrgency;
+    assigned: AssignedState;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    alertState: ALERT_STATE_FILTER.OPEN,
+    urgency: ALERT_URGENCY.ALL,
+    assigned: ASSIGNED_STATE.ALL,
+});
+const emit = defineEmits<{(e: 'update', value: AlertBottomFilters): void;}>();
+const { t } = useI18n();
+
+const state = reactive({
+    selectedAlertState: props.alertState,
+    selectedUrgency: props.urgency,
+    selectedAssigned: props.assigned,
+    statusList: computed(() => [
+        { name: ALERT_STATE_FILTER.OPEN, label: t('MONITORING.ALERT.ALERT_LIST.OPEN') },
+        { name: ALERT_STATE_FILTER.ACKNOWLEDGED, label: t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED') },
+        { name: ALERT_STATE_FILTER.TRIGGERED, label: t('MONITORING.ALERT.ALERT_LIST.TRIGGERED') },
+        { name: ALERT_STATE_FILTER.RESOLVED, label: t('MONITORING.ALERT.ALERT_LIST.RESOLVED') },
+        { name: ALERT_STATE_FILTER.ERROR, label: t('MONITORING.ALERT.ALERT_LIST.ERROR') },
+        { name: ALERT_STATE_FILTER.ALL, label: t('MONITORING.ALERT.ALERT_LIST.ALL') },
+    ]),
+    urgencyList: computed(() => [
+        { name: ALERT_URGENCY.ALL, label: t('MONITORING.ALERT.ALERT_LIST.ALL') },
+        { name: ALERT_URGENCY.HIGH, label: t('MONITORING.ALERT.ALERT_LIST.HIGH') },
+        { name: ALERT_URGENCY.LOW, label: t('MONITORING.ALERT.ALERT_LIST.LOW') },
+    ]),
+    assignedStateList: computed(() => [
+        { name: ASSIGNED_STATE.ALL, label: t('MONITORING.ALERT.ALERT_LIST.ALL') },
+        { name: ASSIGNED_STATE.ASSIGNED_TO_ME, label: t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME') },
+    ]),
+});
+
+const onSelectAssignedCheckbox = (value) => {
+    state.selectedAssigned = value || ASSIGNED_STATE.ALL;
+};
+
+watch([() => props.alertState, () => props.urgency, () => props.assigned], () => {
+    state.selectedAlertState = props.alertState;
+    state.selectedUrgency = props.urgency;
+    state.selectedAssigned = props.assigned;
+});
+
+watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.selectedAssigned], () => {
+    emit('update', {
+        state: state.selectedAlertState,
+        urgency: state.selectedUrgency,
+        assigned: state.selectedAssigned,
+    } as AlertBottomFilters);
+});
+
+</script>
+
 <template>
     <div class="alert-table-bottom-filters">
         <div class="filter filter-state">
-            <span class="filter-label">{{ $t('MONITORING.ALERT.ALERT_LIST.STATE') }}</span>
-            <p-select-status v-for="(status, idx) in statusList"
+            <span class="filter-label">{{ t('MONITORING.ALERT.ALERT_LIST.STATE') }}</span>
+            <p-select-status v-for="(status, idx) in state.statusList"
                              :key="idx"
-                             v-model="selectedAlertState"
+                             v-model="state.selectedAlertState"
                              :value="status.name"
             >
                 {{ status.label }}
             </p-select-status>
         </div>
         <div class="filter filter-urgency">
-            <span class="filter-label">{{ $t('MONITORING.ALERT.ALERT_LIST.URGENCY') }}</span>
-            <p-select-status v-for="(urgencyItem, idx) in urgencyList"
+            <span class="filter-label">{{ t('MONITORING.ALERT.ALERT_LIST.URGENCY') }}</span>
+            <p-select-status v-for="(urgencyItem, idx) in state.urgencyList"
                              :key="idx"
-                             v-model="selectedUrgency"
+                             v-model="state.selectedUrgency"
                              :value="urgencyItem.name"
                              class="mr-2"
             >
@@ -22,9 +98,9 @@
             </p-select-status>
         </div>
         <div class="filter filter-assigned">
-            <p-select-button v-for="(item, idx) in assignedStateList"
+            <p-select-button v-for="(item, idx) in state.assignedStateList"
                              :key="`assigned-${idx}`"
-                             v-model="selectedAssigned"
+                             v-model="state.selectedAssigned"
                              :value="item.name"
                              size="sm"
                              style-type="gray"
@@ -33,102 +109,15 @@
                 {{ item.label }}
             </p-select-button>
             <p-checkbox :value="ASSIGNED_STATE.ASSIGNED_TO_ME"
-                        :selected="selectedAssigned"
+                        :selected="state.selectedAssigned"
                         class="only-mobile"
                         @change="onSelectAssignedCheckbox"
             >
-                <span>{{ $t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
+                <span>{{ t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
             </p-checkbox>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
-import type {
-    AlertBottomFilters,
-} from '@/services/alert-manager/type';
-
-export default {
-    name: 'AlertTableBottomFilters',
-    components: {
-        PSelectStatus,
-        PSelectButton,
-        PCheckbox,
-
-    },
-    props: {
-        alertState: {
-            type: String,
-            default: ALERT_STATE_FILTER.OPEN,
-        },
-        urgency: {
-            type: String,
-            default: ALERT_URGENCY.ALL,
-        },
-        assigned: {
-            type: String,
-            default: ASSIGNED_STATE.ALL,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            selectedAlertState: props.alertState,
-            selectedUrgency: props.urgency,
-            selectedAssigned: props.assigned,
-            statusList: computed(() => [
-                { name: ALERT_STATE_FILTER.OPEN, label: i18n.t('MONITORING.ALERT.ALERT_LIST.OPEN') },
-                { name: ALERT_STATE_FILTER.ACKNOWLEDGED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED') },
-                { name: ALERT_STATE_FILTER.TRIGGERED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED') },
-                { name: ALERT_STATE_FILTER.RESOLVED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVED') },
-                { name: ALERT_STATE_FILTER.ERROR, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ERROR') },
-                { name: ALERT_STATE_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-            ]),
-            urgencyList: computed(() => [
-                { name: ALERT_URGENCY.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-                { name: ALERT_URGENCY.HIGH, label: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH') },
-                { name: ALERT_URGENCY.LOW, label: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW') },
-            ]),
-            assignedStateList: computed(() => [
-                { name: ASSIGNED_STATE.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-                { name: ASSIGNED_STATE.ASSIGNED_TO_ME, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME') },
-            ]),
-        });
-
-        const onSelectAssignedCheckbox = (value) => {
-            state.selectedAssigned = value || ASSIGNED_STATE.ALL;
-        };
-
-        watch([() => props.alertState, () => props.urgency, () => props.assigned], () => {
-            state.selectedAlertState = props.alertState;
-            state.selectedUrgency = props.urgency;
-            state.selectedAssigned = props.assigned;
-        });
-
-        watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.selectedAssigned], () => {
-            emit('update', {
-                state: state.selectedAlertState,
-                urgency: state.selectedUrgency,
-                assigned: state.selectedAssigned,
-            } as AlertBottomFilters);
-        });
-
-        return {
-            ...toRefs(state),
-            ASSIGNED_STATE,
-            onSelectAssignedCheckbox,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .alert-table-bottom-filters {

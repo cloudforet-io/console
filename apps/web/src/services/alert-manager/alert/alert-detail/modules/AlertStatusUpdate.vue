@@ -1,32 +1,98 @@
+<script lang="ts" setup>
+import {
+    PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
+} from '@spaceone/design-system';
+import {
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+
+interface Props {
+    id: string;
+    manageDisabled: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    manageDisabled: false,
+});
+const { t } = useI18n();
+
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.$state;
+
+const state = reactive({
+    modalVisible: false,
+    statusInput: '',
+    loading: true,
+});
+const openStatusUpdateModal = () => {
+    state.modalVisible = true;
+};
+const updateStatus = async () => {
+    const isEmptyInput = state.statusInput.trim().length === 0;
+    try {
+        state.loading = true;
+        await alertPageStore.updateAlertData({
+            updateParams: {
+                status_message: state.statusInput,
+                reset_status_message: isEmptyInput,
+            },
+            alertId: props.id,
+        });
+        showSuccessMessage(t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'));
+    } finally {
+        state.loading = false;
+    }
+};
+
+const onClickConfirm = async () => {
+    await updateStatus();
+    state.modalVisible = false;
+};
+
+(() => {
+    state.statusInput = alertPageState.alertData?.status_message ?? '';
+})();
+
+</script>
+
 <template>
     <p-pane-layout class="alert-detail-status-update">
-        <span class="content-title">{{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.STATUS_UPDATE') }}</span>
+        <span class="content-title">{{ t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.STATUS_UPDATE') }}</span>
         <p class="content-wrapper">
             <span v-if="alertPageState.alertData?.status_message"
                   class="description"
             >{{ alertPageState.alertData?.status_message }}</span>
             <p-empty v-else>
-                {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
+                {{ t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
             </p-empty>
             <button class="new-button"
                     :class="{'disabled': manageDisabled}"
                     @click="openStatusUpdateModal"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE') }}
+                {{ t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE') }}
             </button>
         </p>
         <p-button-modal
-            :header-title="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.UPDATE_NEW_STATUS')"
+            v-model:visible="state.modalVisible"
+            :header-title="t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.UPDATE_NEW_STATUS')"
             size="sm"
-            :visible.sync="modalVisible"
             @confirm="onClickConfirm"
         >
             <template #body>
-                <p-field-group :label="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_STATUS')"
+                <p-field-group :label="t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_STATUS')"
                                required
                 >
                     <template #default>
-                        <p-textarea v-model="statusInput"
+                        <p-textarea v-model="state.statusInput"
                                     class="block w-full"
                         />
                     </template>
@@ -35,93 +101,6 @@
         </p-button-modal>
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import {
-    reactive, toRefs,
-} from 'vue';
-
-import {
-    PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
-} from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
-
-
-export default {
-    name: 'AlertStatusUpdate',
-    components: {
-        PPaneLayout,
-        PButtonModal,
-        PTextarea,
-        PFieldGroup,
-        PEmpty,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.$state;
-
-        const state = reactive({
-            modalVisible: false,
-            statusInput: '',
-            loading: true,
-        });
-        const openStatusUpdateModal = () => {
-            state.modalVisible = true;
-        };
-        const updateStatus = async () => {
-            const isEmptyInput = state.statusInput.trim().length === 0;
-            try {
-                state.loading = true;
-                await alertPageStore.updateAlertData({
-                    updateParams: {
-                        status_message: state.statusInput,
-                        reset_status_message: isEmptyInput,
-                    },
-                    alertId: props.id,
-                });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'));
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const onClickConfirm = async () => {
-            await updateStatus();
-            state.modalVisible = false;
-        };
-
-        (() => {
-            state.statusInput = alertPageState.alertData?.status_message ?? '';
-        })();
-
-        return {
-            ...toRefs(state),
-            alertPageState,
-            openStatusUpdateModal,
-            onClickConfirm,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .alert-detail-status-update {

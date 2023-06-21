@@ -1,3 +1,22 @@
+<script lang="ts" setup>
+import { iso8601Formatter } from '@cloudforet/core-lib';
+
+import type { Event } from '@/services/alert-manager/type';
+
+interface Props {
+    item: Event;
+    timezone: string;
+    eventType: string;
+    isLastItem: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    item: () => ({}) as Event,
+    isLastItem: false,
+});
+
+</script>
+
 <template>
     <div class="timeline-wrapper">
         <ul class="timeline-list">
@@ -14,41 +33,6 @@
         </ul>
     </div>
 </template>
-
-<script lang="ts">
-import { iso8601Formatter } from '@cloudforet/core-lib';
-
-export default {
-    name: 'AlertVerticalTimeline',
-    components: {
-
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => ({}),
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        eventType: {
-            type: String,
-            default: undefined,
-        },
-        isLastItem: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        return {
-            iso8601Formatter,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 @define-mixin circle-style {

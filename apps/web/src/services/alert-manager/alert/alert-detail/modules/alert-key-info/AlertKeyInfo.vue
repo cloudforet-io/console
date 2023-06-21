@@ -1,7 +1,103 @@
+<script lang="ts" setup>
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
+} from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
+
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AlertInfoDescription
+    from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
+import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
+import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
+import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+
+
+interface Props {
+    id: string;
+    manageDisabled: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    manageDisabled: false,
+});
+const emit = defineEmits(['update']);
+const store = useStore();
+const { t } = useI18n();
+
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.$state;
+
+const state = reactive({
+    fields: computed(() => [
+        { name: 'description', label: t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
+        { name: 'rule', label: t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
+        { name: 'severity', label: t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
+        {
+            name: 'escalation_policy_id',
+            label: t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'),
+            copyValueFormatter: () => state.data.escalation_policy_id,
+        },
+        { name: 'project_id', label: t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
+        {
+            name: 'triggered_by',
+            label: t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
+            copyValueFormatter: () => state.data.triggered_by,
+        },
+        { name: 'account', label: t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
+        { name: 'resource.name', label: t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
+    ]),
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+    data: computed(() => alertPageState.alertData ?? {}),
+    escalationPolicyName: '',
+    loading: true,
+    timezone: computed(() => store.state.user.timezone),
+});
+
+const getEscalationPolicy = async () => {
+    try {
+        const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
+            escalation_policy_id: state.data.escalation_policy_id,
+        });
+        state.escalationPolicyName = res.name;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.escalationPolicyName = '';
+    }
+};
+
+const handleUpdate = (e) => {
+    emit('update', e);
+};
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        getEscalationPolicy(),
+        store.dispatch('reference/webhook/load'),
+        store.dispatch('reference/user/load'),
+    ]);
+})();
+
+</script>
+
 <template>
     <p-pane-layout class="alert-detail-info border-none">
-        <p-definition-table :fields="fields"
-                            :data="data"
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
                             :skeleton-rows="10"
                             style-type="white"
                             block
@@ -9,9 +105,9 @@
             <template #data-description>
                 <alert-info-description
                     :id="id"
-                    :alert-data="data"
+                    :alert-data="state.data"
                     :manage-disabled="manageDisabled"
-                    @update="$emit('update')"
+                    @update="handleUpdate"
                 />
             </template>
             <template #data-rule="{value}">
@@ -31,21 +127,21 @@
                 <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
                           highlight
                 >
-                    {{ escalationPolicyName }}
+                    {{ state.escalationPolicyName }}
                 </p-anchor>
             </template>
             <template #data-project_id>
                 <alert-info-project :id="id"
-                                    :alert-data="data"
+                                    :alert-data="state.data"
                                     :manage-disabled="manageDisabled"
-                                    @update="$emit('update')"
+                                    @update="handleUpdate"
                 />
             </template>
             <template #data-triggered_by="{ value }">
                 <alert-triggered-by :value="value"
-                                    :project-id="data.project_id"
-                                    :webhook-reference="webhooks[value]"
-                                    :user-reference="users[value]"
+                                    :project-id="state.data.project_id"
+                                    :webhook-reference="state.webhooks[value]"
+                                    :user-reference="state.users[value]"
                                     disable-link
                 />
             </template>
@@ -53,14 +149,14 @@
                 {{ value }}
             </template>
             <template #data-created_at>
-                {{ iso8601Formatter(data.created_at, timezone) }}
+                {{ iso8601Formatter(state.data.created_at, state.timezone) }}
             </template>
             <template #data-acknowledged_at>
-                <span v-if="data.acknowledged_at"> {{ iso8601Formatter(data.acknowledged_at, timezone) }}</span>
+                <span v-if="state.data.acknowledged_at"> {{ iso8601Formatter(state.data.acknowledged_at, state.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-resolved_at>
-                <span v-if="data.resolved_at"> {{ iso8601Formatter(data.resolved_at, timezone) }}</span>
+                <span v-if="state.data.resolved_at"> {{ iso8601Formatter(state.data.resolved_at, state.timezone) }}</span>
                 <span v-else>--</span>
             </template>
             <template #data-additional_info="{value}">
@@ -79,123 +175,6 @@
         </p-definition-table>
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
-} from '@spaceone/design-system';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
-import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import AlertInfoDescription
-    from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
-import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
-import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
-import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
-
-
-export default {
-    name: 'AlertKeyInfo',
-    components: {
-        AlertTriggeredBy,
-        AlertInfoDescription,
-        AlertInfoProject,
-        PPaneLayout,
-        PDefinitionTable,
-        PAnchor,
-        PBadge,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.$state;
-
-        const state = reactive({
-            fields: computed(() => [
-                { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
-                { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
-                { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
-                {
-                    name: 'escalation_policy_id',
-                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'),
-                    copyValueFormatter: () => state.data.escalation_policy_id,
-                },
-                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
-                {
-                    name: 'triggered_by',
-                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
-                    copyValueFormatter: () => state.data.triggered_by,
-                },
-                { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
-                { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
-            ]),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            data: computed(() => alertPageState.alertData ?? {}),
-            escalationPolicyName: '',
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
-        });
-
-        const getEscalationPolicy = async () => {
-            try {
-                const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
-                    escalation_policy_id: state.data.escalation_policy_id,
-                });
-                state.escalationPolicyName = res.name;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.escalationPolicyName = '';
-            }
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                getEscalationPolicy(),
-                store.dispatch('reference/webhook/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            iso8601Formatter,
-            referenceRouter,
-            ALERT_MANAGER_ROUTE,
-            ALERT_SEVERITY,
-            ALERT_SEVERITY_COLORS,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 .additional-info {
