@@ -32,7 +32,7 @@
                 </div>
             </template>
         </p-select-dropdown>
-        <dashboard-date-custom-range-modal :visible="customRangeModalVisible"
+        <dashboard-date-custom-range-modal :visible.sync="customRangeModalVisible"
                                            granularity="MONTHLY"
                                            :selected-month="selectedMonthName"
                                            @confirm="handleCustomRangeModalConfirm"
@@ -159,7 +159,8 @@ export default defineComponent({
                 && _start.isSame(_start.startOf('month'), 'day')
                 && _end.isSame(_end.endOf('month'), 'day')
             ) {
-                return state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
+                const itemIndex = state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
+                if (itemIndex > -1) return itemIndex;
             }
 
             // 3. custom => else cases.
