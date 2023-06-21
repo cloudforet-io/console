@@ -1,92 +1,18 @@
-<template>
-    <div class="top-project-activity-widget">
-        <div class="title-wrapper">
-            <div class="left-part">
-                <span class="title">
-                    {{ $t('MONITORING.ALERT.DASHBOARD.TOP_5_PROJECT_ACTIVITY') }}
-                </span>
-                <div class="legend-wrapper">
-                    <p-status v-for="(activityLabel, activity, idx) in alertActivity"
-                              :key="`status-${idx}`"
-                              :icon-color="ACTIVITY_COLOR[activity]"
-                              :text="activityLabel"
-                    />
-                </div>
-            </div>
-            <div class="period-wrapper">
-                <p-select-status v-for="(period, idx) in periods"
-                                 :key="`period-${idx}`"
-                                 v-model="selectedPeriod"
-                                 :value="period.name"
-                                 :disable-check-icon="true"
-                >
-                    {{ period.label }}
-                </p-select-status>
-            </div>
-        </div>
-        <div class="content-wrapper">
-            <p-skeleton v-if="loading"
-                        width="100%"
-                        height="100%"
-            />
-            <template v-else>
-                <div v-for="(projectId, idx) in top5Projects"
-                     :key="`table-row-${idx}`"
-                     class="table-row"
-                >
-                    <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                              hide-icon
-                              size="sm"
-                              class="col-name"
-                    >
-                        <span v-tooltip.bottom="projectNameFormatter(projectId, projects)"
-                              class="tablet:hidden"
-                        >{{ projectNameFormatter(projectId, projects) }}</span>
-                        <span class="tablet-text">{{ projectNameFormatter(projectId, projects) }}</span>
-                    </p-anchor>
-                    <div class="col-activity">
-                        <div v-for="(activity, aIdx) in activity[projectId]"
-                             :key="`activity-${aIdx}`"
-                             class="box-wrapper"
-                             :class="activity.status ? activity.status : 'empty'"
-                        >
-                            <div class="box"
-                                 :class="activity.status ? activity.status : 'empty'"
-                                 @click="onClickBox(projectId, activity.date)"
-                            >
-                                <top5-project-activity-tooltip
-                                    :project-id="projectId"
-                                    :status="activity.status"
-                                    :date="activity.date"
-                                    :period="selectedPeriod"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        </div>
-    </div>
-</template>
+<script lang="ts" setup>
 
-<script lang="ts">
-
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PAnchor, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
@@ -100,12 +26,12 @@ import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard
 import { ALERT_STATE_FILTER } from '@/services/alert-manager/lib/config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
-const ACTIVITY = {
-    HIGH: 'HIGH',
-    LOW: 'LOW',
-    // MAINTENANCE: 'MAINTENANCE',
-} as const;
-export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY];
+// const ACTIVITY = {
+//     HIGH: 'HIGH',
+//     LOW: 'LOW',
+//     // MAINTENANCE: 'MAINTENANCE',
+// } as const;
+// export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY];
 const ACTIVITY_COLOR = Object.freeze({
     HIGH: red[400],
     LOW: red[200],
@@ -127,155 +53,203 @@ interface Activity {
     status?: string;
 }
 
-export default {
-    name: 'Top5ProjectActivityWidget',
-    components: {
-        PAnchor,
-        PStatus,
-        PSelectStatus,
-        PSkeleton,
-        Top5ProjectActivityTooltip,
-    },
-    props: {
-        projectsWithAlert: {
-            type: Array,
-            default: () => ([]),
+interface Props {
+    projectsWithAlert: string[];
+}
+
+withDefaults(defineProps<Props>(), {
+    projectsWithAlert: () => ([]),
+});
+
+const store = useStore();
+const { t } = useI18n();
+const router = useRouter();
+
+const state = reactive({
+    loading: true,
+    projects: computed(() => store.getters['reference/projectItems']),
+    top5Projects: [] as string[],
+    activity: {},
+    periods: [
+        {
+            name: PERIOD['14D'],
+            label: '14d',
         },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            loading: true,
-            projects: computed(() => store.getters['reference/projectItems']),
-            top5Projects: [] as string[],
-            activity: {},
-            periods: [
-                {
-                    name: PERIOD['14D'],
-                    label: '14d',
-                },
-                {
-                    name: PERIOD['7D'],
-                    label: '7d',
-                },
-                {
-                    name: PERIOD['24H'],
-                    label: '24h',
-                },
-                {
-                    name: PERIOD['12H'],
-                    label: '12h',
-                },
-            ],
-            selectedPeriod: PERIOD['14D'],
-            showTooltip: false,
-            alertActivity: computed(() => ({
-                HIGH: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
-                LOW: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
-            })),
+        {
+            name: PERIOD['7D'],
+            label: '7d',
+        },
+        {
+            name: PERIOD['24H'],
+            label: '24h',
+        },
+        {
+            name: PERIOD['12H'],
+            label: '12h',
+        },
+    ],
+    selectedPeriod: PERIOD['14D'],
+    showTooltip: false,
+    alertActivity: computed(() => ({
+        HIGH: t('MONITORING.ALERT.DASHBOARD.HIGH'),
+        LOW: t('MONITORING.ALERT.DASHBOARD.LOW'),
+    })),
+});
+
+/* util */
+const activityFormatter = (results, unit, start, end) => {
+    const dateFormat = unit === 'day' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH';
+    let now = start.clone();
+    const activities: Activity[] = [];
+
+    while (now.isBefore(end, unit)) {
+        const isHigh = find(results, { urgency: 'HIGH', date: now.format(dateFormat) });
+        const isLow = find(results, { urgency: 'LOW', date: now.format(dateFormat) });
+        let status;
+        if (isLow) status = 'LOW';
+        if (isHigh) status = 'HIGH';
+        activities.push({
+            date: now.format(dateFormat),
+            status,
         });
-
-        /* util */
-        const activityFormatter = (results, unit, start, end) => {
-            const dateFormat = unit === 'day' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH';
-            let now = start.clone();
-            const activities: Activity[] = [];
-
-            while (now.isBefore(end, unit)) {
-                const isHigh = find(results, { urgency: 'HIGH', date: now.format(dateFormat) });
-                const isLow = find(results, { urgency: 'LOW', date: now.format(dateFormat) });
-                let status;
-                if (isLow) status = 'LOW';
-                if (isHigh) status = 'HIGH';
-                activities.push({
-                    date: now.format(dateFormat),
-                    status,
-                });
-                now = now.add(1, unit);
-            }
-            return activities;
-        };
-        const periodNumberFormatter = (period) => parseInt(period.match(/\d+/)[0]);
-        const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
-
-        /* api */
-        const getTop5ProjectList = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityList({
-                    period: state.selectedPeriod,
-                });
-                state.top5Projects = results.map((d) => d.project_id);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.top5Projects = [];
-            }
-        };
-        const getActivities = async (projectId) => {
-            try {
-                const unit = state.selectedPeriod.includes('d') ? 'day' : 'hour';
-                const end = dayjs.utc().add(1, unit).startOf(unit);
-                const start = end.subtract(periodNumberFormatter(state.selectedPeriod), unit);
-
-                const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityAlertDetails({
-                    project_id: projectId,
-                    granularity: state.selectedPeriod.includes('d') ? DATE_TYPE.DAILY : DATE_TYPE.HOURLY,
-                    start: start.toISOString(),
-                    end: end.toISOString(),
-                });
-                state.activity[projectId] = activityFormatter(results, unit, start, end);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.activity[projectId] = [];
-            }
-        };
-
-        /* event */
-        const onMouseOver = (status) => {
-            if (status) state.showTooltip = true;
-        };
-        const onMouseLeave = () => {
-            state.showTooltip = false;
-        };
-        const urlQueryHelper = new QueryHelper();
-        const onClickBox = (projectId, date) => {
-            urlQueryHelper.setFilters([
-                { k: 'project_id', v: projectId, o: '=' },
-                { k: 'created_at', v: date.split(' ')[0], o: '=t' },
-            ]);
-            vm.$router.replace({
-                name: ALERT_MANAGER_ROUTE.ALERT._NAME,
-                query: {
-                    filters: urlQueryHelper.rawQueryStrings,
-                    state: ALERT_STATE_FILTER.ALL,
-                },
-            });
-        };
-
-        watch(() => state.selectedPeriod, async () => {
-            state.loading = true;
-            await getTop5ProjectList();
-            await Promise.all(state.top5Projects.map((d) => getActivities(d)));
-            state.loading = false;
-        }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
-
-        return {
-            ...toRefs(state),
-            ACTIVITY,
-            ACTIVITY_COLOR,
-            referenceRouter,
-            projectNameFormatter,
-            onMouseOver,
-            onMouseLeave,
-            onClickBox,
-        };
-    },
+        now = now.add(1, unit);
+    }
+    return activities;
 };
+const periodNumberFormatter = (period) => parseInt(period.match(/\d+/)[0]);
+const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
+
+/* api */
+const getTop5ProjectList = async () => {
+    try {
+        const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityList({
+            period: state.selectedPeriod,
+        });
+        state.top5Projects = results.map((d) => d.project_id);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.top5Projects = [];
+    }
+};
+const getActivities = async (projectId) => {
+    try {
+        const unit = state.selectedPeriod.includes('d') ? 'day' : 'hour';
+        const end = dayjs.utc().add(1, unit).startOf(unit);
+        const start = end.subtract(periodNumberFormatter(state.selectedPeriod), unit);
+
+        const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityAlertDetails({
+            project_id: projectId,
+            granularity: state.selectedPeriod.includes('d') ? DATE_TYPE.DAILY : DATE_TYPE.HOURLY,
+            start: start.toISOString(),
+            end: end.toISOString(),
+        });
+        state.activity[projectId] = activityFormatter(results, unit, start, end);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.activity[projectId] = [];
+    }
+};
+
+/* event */
+const urlQueryHelper = new QueryHelper();
+const onClickBox = (projectId, date) => {
+    urlQueryHelper.setFilters([
+        { k: 'project_id', v: projectId, o: '=' },
+        { k: 'created_at', v: date.split(' ')[0], o: '=t' },
+    ]);
+    router.replace({
+        name: ALERT_MANAGER_ROUTE.ALERT._NAME,
+        query: {
+            filters: urlQueryHelper.rawQueryStrings,
+            state: ALERT_STATE_FILTER.ALL,
+        },
+    });
+};
+
+watch(() => state.selectedPeriod, async () => {
+    state.loading = true;
+    await getTop5ProjectList();
+    await Promise.all(state.top5Projects.map((d) => getActivities(d)));
+    state.loading = false;
+}, { immediate: true });
+
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/project/load');
+})();
+
 </script>
+
+<template>
+    <div class="top-project-activity-widget">
+        <div class="title-wrapper">
+            <div class="left-part">
+                <span class="title">
+                    {{ t('MONITORING.ALERT.DASHBOARD.TOP_5_PROJECT_ACTIVITY') }}
+                </span>
+                <div class="legend-wrapper">
+                    <p-status v-for="(activityLabel, activity, idx) in state.alertActivity"
+                              :key="`status-${idx}`"
+                              :icon-color="ACTIVITY_COLOR[activity]"
+                              :text="activityLabel"
+                    />
+                </div>
+            </div>
+            <div class="period-wrapper">
+                <p-select-status v-for="(period, idx) in state.periods"
+                                 :key="`period-${idx}`"
+                                 v-model="state.selectedPeriod"
+                                 :value="period.name"
+                                 :disable-check-icon="true"
+                >
+                    {{ period.label }}
+                </p-select-status>
+            </div>
+        </div>
+        <div class="content-wrapper">
+            <p-skeleton v-if="state.loading"
+                        width="100%"
+                        height="100%"
+            />
+            <template v-else>
+                <div v-for="(projectId, idx) in state.top5Projects"
+                     :key="`table-row-${idx}`"
+                     class="table-row"
+                >
+                    <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
+                              hide-icon
+                              size="sm"
+                              class="col-name"
+                    >
+                        <span v-tooltip.bottom="projectNameFormatter(projectId, state.projects)"
+                              class="tablet:hidden"
+                        >{{ projectNameFormatter(projectId, state.projects) }}</span>
+                        <span class="tablet-text">{{ projectNameFormatter(projectId, state.projects) }}</span>
+                    </p-anchor>
+                    <div class="col-activity">
+                        <div v-for="(activity, aIdx) in activity[projectId]"
+                             :key="`activity-${aIdx}`"
+                             class="box-wrapper"
+                             :class="activity.status ? activity.status : 'empty'"
+                        >
+                            <div class="box"
+                                 :class="activity.status ? activity.status : 'empty'"
+                                 @click="onClickBox(projectId, activity.date)"
+                            >
+                                <top5-project-activity-tooltip
+                                    :project-id="projectId"
+                                    :status="activity.status"
+                                    :date="activity.date"
+                                    :period="state.selectedPeriod"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .top-project-activity-widget {

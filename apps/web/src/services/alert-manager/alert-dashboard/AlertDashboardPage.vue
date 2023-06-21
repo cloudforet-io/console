@@ -1,34 +1,11 @@
-<template>
-    <div class="alert-dashboard-page">
-        <p-heading :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
-        <div class="widget-wrapper">
-            <alert-state-widget :activated-projects="activatedProjects"
-                                class="alert-state-widget"
-            />
-            <alert-history-widget :activated-projects="activatedProjects"
-                                  class="alert-history-widget"
-            />
-            <h2 class="widget-title">
-                {{ $t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
-            </h2>
-            <current-project-status-widget class="current-project-status-widget" />
-            <top5-project-activity-widget class="top5-project-activity-widget" />
-            <project-search-widget :activated-projects="activatedProjects"
-                                   class="col-span-12"
-            />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-
-import {
-    reactive, toRefs,
-} from 'vue';
-
-import { PHeading } from '@spaceone/design-system';
+<script lang="ts" setup>
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PHeading } from '@spaceone/design-system';
+import {
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import AlertHistoryWidget from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryWidget.vue';
 import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';
@@ -36,41 +13,49 @@ import CurrentProjectStatusWidget from '@/services/alert-manager/alert-dashboard
 import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
 import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityWidget.vue';
 
-export default {
-    name: 'AlertDashboardPage',
-    components: {
-        ProjectSearchWidget,
-        Top5ProjectActivityWidget,
-        CurrentProjectStatusWidget,
-        AlertHistoryWidget,
-        AlertStateWidget,
-        PHeading,
-    },
-    setup() {
-        const state = reactive({
-            activatedProjects: [] as string[],
-        });
+const { t } = useI18n();
 
-        /* api */
-        const listProjectAlertConfig = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list();
-                state.activatedProjects = results.map((d) => d.project_id);
-            } catch (e) {
-            }
-        };
+const state = reactive({
+    activatedProjects: [] as string[],
+});
 
-        /* init */
-        (async () => {
-            await listProjectAlertConfig();
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
+/* api */
+const listProjectAlertConfig = async () => {
+    try {
+        const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list();
+        state.activatedProjects = results.map((d) => d.project_id);
+    } catch (e) {
+    }
 };
+
+/* init */
+(async () => {
+    await listProjectAlertConfig();
+})();
+
 </script>
+
+<template>
+    <div class="alert-dashboard-page">
+        <p-heading :title="t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
+        <div class="widget-wrapper">
+            <alert-state-widget :activated-projects="state.activatedProjects"
+                                class="alert-state-widget"
+            />
+            <alert-history-widget :activated-projects="state.activatedProjects"
+                                  class="alert-history-widget"
+            />
+            <h2 class="widget-title">
+                {{ t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
+            </h2>
+            <current-project-status-widget class="current-project-status-widget" />
+            <top5-project-activity-widget class="top5-project-activity-widget" />
+            <project-search-widget :activated-projects="state.activatedProjects"
+                                   class="col-span-12"
+            />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .alert-dashboard-page {
