@@ -2177,12 +2177,12 @@
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "Failed to edit schedule.",
 				"ALT_S_EDIT_SCHEDULE": "Schedule successfully edited",
+				"COLLECTOR_SCHEDULE": "Collector Schedule",
 				"COLLECT_DATA": "Collect Data",
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
 				"CURRENT_STATUS": "Current Status",
 				"EDIT_MODAL_TITLE": "Edit Schedule",
-				"EDIT_SCHEDULE": "Edit",
 				"HISTORY": "Collector History",
 				"IN_PROGRESS": "In-Progress",
 				"JOB_ERROR": "Status: Failed,\nCollected: {date}",
