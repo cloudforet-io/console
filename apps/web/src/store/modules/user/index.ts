@@ -14,7 +14,7 @@ let storedUserState: Partial<UserState> = {};
 try {
     storedUserState = LocalStorageAccessor.getItem(STORAGE_KEY) ?? {};
 } catch (e) {
-    window.localStorage.removeItem(STORAGE_KEY);
+    LocalStorageAccessor.removeItem(STORAGE_KEY);
 }
 
 const state: UserState = {
