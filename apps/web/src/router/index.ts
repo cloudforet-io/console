@@ -2,6 +2,7 @@ import Vue from 'vue';
 import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
@@ -38,9 +39,9 @@ export class SpaceRouter {
             console.error(error);
 
             if (error.name === 'ChunkLoadError') {
-                const lastCheckedTime = localStorage.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
+                const lastCheckedTime = LocalStorageAccessor.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
                 if (!lastCheckedTime) {
-                    localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
+                    LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
                     window.location.href = nextPath ?? '/';
                 } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
                     window.location.href = nextPath ?? '/';
@@ -49,7 +50,7 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.onReady(() => {
-            localStorage.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
+            LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
