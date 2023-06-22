@@ -2177,12 +2177,12 @@
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "スケジュールの編集に失敗しました",
 				"ALT_S_EDIT_SCHEDULE": "スケジュールの編集が正常に完了しました",
+				"COLLECTOR_SCHEDULE": "コレクタースケジュール",
 				"COLLECT_DATA": "データ収集",
 				"CREATE": "作成",
 				"CREATE_COLLECTOR": "コレクタ生成",
 				"CURRENT_STATUS": "進行状況",
 				"EDIT_MODAL_TITLE": "スケジュールの編集",
-				"EDIT_SCHEDULE": "編集",
 				"HISTORY": "コレクターの履歴",
 				"IN_PROGRESS": "進行中",
 				"JOB_ERROR": "状態: {date}に収集失敗",

@@ -40,9 +40,7 @@
                 <collector-list-no-data class="collector-no-data" />
             </template>
         </p-data-loader>
-        <collector-schedule-modal edit-mode
-                                  @refresh-collector-list="refreshCollectorList"
-        />
+        <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
         <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
     </div>
 </template>

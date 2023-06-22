@@ -2177,12 +2177,12 @@
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "스케줄 수정 실패",
 				"ALT_S_EDIT_SCHEDULE": "스케줄 수정 완료",
+				"COLLECTOR_SCHEDULE": "컬렉터 스케줄",
 				"COLLECT_DATA": "데이터 수집",
 				"CREATE": "생성",
 				"CREATE_COLLECTOR": "컬렉터 생성",
 				"CURRENT_STATUS": "진행 상태",
 				"EDIT_MODAL_TITLE": "스케줄 수정",
-				"EDIT_SCHEDULE": "수정",
 				"HISTORY": "컬렉터 히스토리",
 				"IN_PROGRESS": "진행중",
 				"JOB_ERROR": "상태: {date}에 수집 실패",

@@ -8,14 +8,14 @@
             @select="handleSelectMonthMenuItem"
         >
             <div>
-                <span>{{ monthMenuItems[selectedMonthMenuIndex].label }}</span>
+                <span>{{ selectedMonthLabel }}</span>
                 <p-badge
-                    v-if="monthMenuItems[selectedMonthMenuIndex].badge"
+                    v-if="selectedMonthBadge"
                     style-type="indigo100"
                     badge-type="subtle"
                     class="ml-1"
                 >
-                    {{ monthMenuItems[selectedMonthMenuIndex].badge }}
+                    {{ selectedMonthBadge }}
                 </p-badge>
             </div>
             <template #menu-item--format="{ item }">
@@ -34,7 +34,7 @@
         </p-select-dropdown>
         <dashboard-date-custom-range-modal :visible.sync="customRangeModalVisible"
                                            granularity="MONTHLY"
-                                           :selected-month="monthMenuItems[selectedMonthMenuIndex].name"
+                                           :selected-month="selectedMonthName"
                                            @confirm="handleCustomRangeModalConfirm"
         />
     </div>
@@ -101,6 +101,9 @@ export default defineComponent({
                     label: i18n.t('DASHBOARDS.DETAIL.CUSTOM'),
                 },
             ])),
+            selectedMonthLabel: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.label),
+            selectedMonthBadge: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.badge),
+            selectedMonthName: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.name),
             selectedDateRange: {},
             selectedMonthMenuIndex: 0,
             customRangeModalVisible: false,
@@ -156,7 +159,8 @@ export default defineComponent({
                 && _start.isSame(_start.startOf('month'), 'day')
                 && _end.isSame(_end.endOf('month'), 'day')
             ) {
-                return state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
+                const itemIndex = state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
+                if (itemIndex > -1) return itemIndex;
             }
 
             // 3. custom => else cases.

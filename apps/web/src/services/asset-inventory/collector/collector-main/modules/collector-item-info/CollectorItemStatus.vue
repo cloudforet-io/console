@@ -5,7 +5,7 @@
         </p>
         <div class="label-description">
             <div v-if="props.item.schedule">
-                <div v-if="state.status === JOB_STATE.SUCCESS && props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
                      class="scheduled"
                 >
                     <p-i
@@ -46,8 +46,6 @@ import dayjs from 'dayjs';
 
 import { numberFormatter } from '@cloudforet/core-lib';
 
-import { store } from '@/store';
-
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
 
@@ -61,20 +59,15 @@ const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
 
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-});
-
 const state = reactive({
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
-            const current = dayjs().utc();
+            const current = dayjs.utc();
 
-            const userCurrentTime = dayjs.tz(current, storeState.timezone);
             const hours = props.item.schedule.hours ?? [];
             const sortedHours = hours.sort((a, b) => a - b);
-            const nextScheduledHour = sortedHours.find((num) => num > userCurrentTime.hour());
+            const nextScheduledHour = sortedHours.find((num) => num > current.hour());
 
             let nextScheduledTime;
             if (nextScheduledHour) {
@@ -82,7 +75,8 @@ const state = reactive({
             } else {
                 nextScheduledTime = current.add(1, 'day').set('h', sortedHours[0]).set('m', 0);
             }
-            const timeDiff = nextScheduledTime.diff(current, 'm');
+
+            const timeDiff = nextScheduledTime.diff(current, 'minute');
             return { diffHour: Math.floor(timeDiff / 60), diffMin: timeDiff % 60 };
         }
         return { diffHour: 0, diffMin: 0 };
