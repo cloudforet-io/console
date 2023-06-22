@@ -1,5 +1,5 @@
 import type { OperatorType } from '@/component-util/query-search/type';
-import type { ConsoleFilterOperator } from '@/query/type';
+import type { ConsoleFilterOperator, DatetimeOperator } from '@/query/type';
 import type { ApiFilterOperator } from '@/space-connector/type';
 
 export const rawQueryOperatorToApiQueryOperatorMap: Record<ConsoleFilterOperator, ApiFilterOperator> = {
@@ -19,9 +19,14 @@ export const rawQueryOperatorToApiQueryOperatorMap: Record<ConsoleFilterOperator
     '<t': 'datetime_lt',
     '<=t': 'datetime_lte',
     '=t': 'datetime_gt',
+    /* time diff only */
+    '>td': 'timediff_gt',
+    '>=td': 'timediff_gte',
+    '<td': 'timediff_lt',
+    '<=td': 'timediff_lte',
 };
 
-export const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<ConsoleFilterOperator, OperatorType>> = {
+export const datetimeRawQueryOperatorToQueryTagOperatorMap: Record<DatetimeOperator, OperatorType> = {
     '>t': '>',
     '>=t': '>=',
     '<t': '<',
