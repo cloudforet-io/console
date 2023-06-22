@@ -73,6 +73,12 @@ export interface DashboardConfig {
     }
 }
 
+export const DASHBOARD_LABEL = {
+    COST: 'Cost',
+    ASSET: 'Asset',
+} as const;
+export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
+
 // variables
 export type DashboardVariables = SingleSelectDashboardVariables | MultiSelectDashboardVariables;
 interface SingleSelectDashboardVariables {

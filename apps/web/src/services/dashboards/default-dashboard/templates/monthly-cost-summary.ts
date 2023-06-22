@@ -1,6 +1,7 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
+import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
-import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
+import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/default-dashboard/helper';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
@@ -26,7 +27,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig = {
     name: 'Monthly Cost Summary',
-    labels: ['Cost'],
+    labels: [DASHBOARD_LABEL.COST],
     version: '1',
     description: {
         icon: 'ic_dashboard-template_monthly-cost-summary',
@@ -45,10 +46,7 @@ export const monthlyCostSummaryDashboard: DashboardConfig = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: {
-        properties: {},
-        order: [],
-    },
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST),
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
