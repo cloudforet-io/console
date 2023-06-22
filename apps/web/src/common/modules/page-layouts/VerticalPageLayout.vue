@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 
@@ -67,7 +67,14 @@ export default {
         },
     },
     setup(props) {
-        const containerRef = ref(undefined);
+        const containerRef = ref<HTMLElement|null>(null);
+
+        watch(() => props.breadcrumbs, () => {
+            const container = containerRef.value;
+            if (container) {
+                container.scrollTo(0, 0);
+            }
+        });
 
         return {
             containerRef,

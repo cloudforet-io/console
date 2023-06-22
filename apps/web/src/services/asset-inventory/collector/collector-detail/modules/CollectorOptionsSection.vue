@@ -102,11 +102,19 @@ const state = reactive({
     isCollectorOptionsSchemaEmpty: computed<boolean>(() => Object.keys(state.collectorOptionsSchema?.properties ?? {}).length === 0),
     fields: computed<DefinitionField[]>(() => {
         const properties = state.collectorOptionsSchema?.properties ?? {};
+        const order: string[] = state.collectorOptionsSchema?.order ?? [];
         return Object.entries<JsonSchema['properties']>(properties).map(([key, property]) => ({
             name: key,
             label: property.title ?? key,
             disableCopy: !state.collectorOptions[key],
-        }));
+        })).sort((a, b) => {
+            const aIndex = order.indexOf(a.name);
+            const bIndex = order.indexOf(b.name);
+            if (aIndex === -1 && bIndex === -1) return a.name.localeCompare(b.name);
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+            return aIndex - bIndex;
+        });
     }),
     isEditMode: false,
     isOptionsValid: false,
