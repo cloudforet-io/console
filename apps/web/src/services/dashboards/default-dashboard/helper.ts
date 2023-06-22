@@ -1,10 +1,18 @@
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
+import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
+import type { DashboardVariablesSchema, DashboardLabel } from '@/services/dashboards/config';
+import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/default-dashboard/config';
+import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getWidgetDefaultInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+
 
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<DashboardLayoutWidgetInfo>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
@@ -40,3 +48,23 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
         }
     },
 );
+
+export const getDashboardVariablesSchema = (label: DashboardLabel): DashboardVariablesSchema => {
+    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
+    if (label === DASHBOARD_LABEL.ASSET) {
+        managedVariablesPropertiesMap.forEach((value, key) => {
+            if (Object.keys(ASSET_REFERENCE_TYPE_INFO).includes(key)) {
+                _managedVariablesSchema.properties[key] = { ...value, use: true }; // set Asset variables to use
+            }
+        });
+        // HACK: remove below code after backend is ready
+        _managedVariablesSchema.properties[REFERENCE_TYPE_INFO.service_account.type].use = false;
+    } else if (label === DASHBOARD_LABEL.COST) {
+        managedVariablesPropertiesMap.forEach((value, key) => {
+            if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
+                _managedVariablesSchema.properties[key] = { ...value, use: true }; // set Cost variables to use
+            }
+        });
+    }
+    return _managedVariablesSchema;
+};
