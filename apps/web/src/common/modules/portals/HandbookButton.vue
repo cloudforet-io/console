@@ -56,6 +56,8 @@ import {
     PI, PCheckbox, PTab,
 } from '@spaceone/design-system';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -87,11 +89,11 @@ export default defineComponent({
         });
 
         watch(() => state.storageKey, () => {
-            state.noMore = !!JSON.parse(localStorage.getItem(state.storageKey) ?? 'false');
+            state.noMore = !!LocalStorageAccessor.getItem(state.storageKey);
         }, { immediate: true });
 
         const onChangeNoMore = (val) => {
-            localStorage.setItem(state.storageKey, val);
+            LocalStorageAccessor.setItem(state.storageKey, val);
             if (val) store.dispatch('display/hideSidebar');
         };
 

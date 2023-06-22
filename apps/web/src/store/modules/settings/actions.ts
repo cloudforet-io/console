@@ -17,11 +17,12 @@ export const initSettings: Action<SettingsState, any> = ({ commit, rootState, di
         const settings = LocalStorageAccessor.getItem(userId);
 
         if (settings) {
-            const settingsObj = JSON.parse(settings);
-            commit('initUserSettings', settingsObj.global);
+            commit('initUserSettings', settings.global);
         }
         dispatch('loadCurrencyRates');
     } catch (e) {
+        console.log('hihi?');
+        console.error(e);
         LocalStorageAccessor.removeItem(userId);
     }
 };
