@@ -103,7 +103,7 @@
     "postcss-config-custom": "*",
     "rollup-plugin-visualizer": "^5.9.0",
     "tsconfig": "*",
-    "vite": "^4.3.3",
+    "vite": "^4.3.9",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
     "vitest": "^0.26.3",
