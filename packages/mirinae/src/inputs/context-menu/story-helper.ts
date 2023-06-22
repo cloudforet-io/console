@@ -278,6 +278,24 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        resetSelectedOnUnmounted: {
+            name: 'resetSelectedOnUnmounted',
+            type: { name: 'boolean' },
+            description: 'Whether to reset selected items when unmounted or not.',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: true,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         ...getArgTypes('slots', contextMenuSlots),
         ...getArgTypes('events', contextMenuEvents),
     };

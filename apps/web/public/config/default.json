@@ -14,8 +14,10 @@
   },
   "MOCK": {
     "ALL": false,
-    "ENDPOINT": "",
-    "REFLECTION": false
+    "ENDPOINT_V1": "",
+    "ENDPOINT_V2": "",
+    "REFLECTION": false,
+    "SKIP_TOKEN_CHECK": false
   },
   "ASSET_PATH": {
   },
@@ -23,7 +25,7 @@
   },
   "DOCS": [
     { "label": "User Guide", "link": "https://cloudforet.io/<%if (lang !== 'en') { %><%- lang -%>/<% } %>docs/guides/" },
-    { "label": "API Guide", "link": "https://cloudforet.gitbook.io/cloudforet-apis" },
+    { "label": "API Guide", "link": "https://cloudforet-io.github.io/api-doc/" },
     { "label": "GitHub", "link": "https://github.com/cloudforet-io" }
   ],
   "CONTACT_LINK": "",

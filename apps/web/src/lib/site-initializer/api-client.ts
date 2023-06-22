@@ -46,9 +46,10 @@ const getApiEndpoints = (config) => {
     } else throw new Error('ApiClient init failed: There are no endpoint v2.');
 };
 const getMockInfo = (config): MockInfo => ({
-    endpoints: [config.get('MOCK.ENDPOINT')],
+    endpoints: [config.get('MOCK.ENDPOINT_V1'), config.get('MOCK.ENDPOINT_V2')],
     all: config.get('MOCK.ALL'),
     reflection: config.get('MOCK.REFLECTION'),
+    skipTokenCheck: config.get('MOCK.SKIP_TOKEN_CHECK'),
 });
 
 export const initApiClient = async (store, config) => {

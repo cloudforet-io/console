@@ -38,9 +38,12 @@ import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import type { DashboardScope } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
+
+const PRIVATE_ICON = 'ic_lock-filled';
 
 export default defineComponent({
     name: 'DashboardsLNB',
@@ -63,7 +66,7 @@ export default defineComponent({
                 }
                 return result;
             }),
-            workSpaceMenuSet: computed<LNBItem[]>(() => store.state.dashboard.domainItems.map((d) => ({
+            workspaceMenuSet: computed<LNBItem[]>(() => store.state.dashboard.domainItems.map((d) => ({
                 type: 'item',
                 id: d.domain_dashboard_id,
                 label: d.name,
@@ -74,6 +77,7 @@ export default defineComponent({
                     },
                 },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
+                icon: d.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
             }))),
             projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
             projectItems: computed(() => store.getters['reference/projectItems']),
@@ -89,7 +93,7 @@ export default defineComponent({
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.DOMAIN, filterFavoriteItems(state.workSpaceMenuSet)),
+                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.DOMAIN, filterFavoriteItems(state.workspaceMenuSet)),
                 ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.PROJECT, filterFavoriteItems(state.projectMenuSet)),
             ]),
         });
@@ -144,6 +148,7 @@ export default defineComponent({
                             },
                         },
                         favoriteType: FAVORITE_TYPE.DASHBOARD,
+                        icon: board.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
                     })),
                 ]);
             });
@@ -157,7 +162,9 @@ export default defineComponent({
             const result = [] as LNBMenu[];
             menuItems.forEach((d) => {
                 if (Array.isArray(d)) {
-                    result.push(d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM));
+                    const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+                    const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
+                    if (hasProject) result.push(filtered);
                 } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
             });
             return result;

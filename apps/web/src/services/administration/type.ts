@@ -15,3 +15,9 @@ export interface RoleBindingType {
     role_info: RoleData;
     tags: { description: string };
 }
+
+export interface ExternalMenuType {
+    name: string;
+    label: string;
+    disabled: boolean;
+}

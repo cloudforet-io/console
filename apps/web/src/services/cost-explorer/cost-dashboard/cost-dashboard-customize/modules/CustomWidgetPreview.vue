@@ -96,7 +96,7 @@ export default {
             }),
             groupByLabel: computed(() => {
                 const groupBy = state.groupBy;
-                if (groupBy) return GROUP_BY_ITEM_MAP[groupBy].label;
+                if (groupBy) return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
                 return i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
             }),
         });

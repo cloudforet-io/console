@@ -370,7 +370,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     sortBy: {
         name: 'sortBy',
         type: { name: 'string' },
-        defaultValue: '',
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
@@ -387,7 +387,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     sortDesc: {
         name: 'sortDesc',
         type: { name: 'boolean' },
-        defaultValue: true,
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'boolean',
@@ -404,7 +404,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     pageStart: {
         name: 'pageStart',
         type: { name: 'number' },
-        defaultValue: 1,
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'number',
@@ -421,7 +421,7 @@ export const getDynamicLayoutArgTypes = (): ArgTypes => ({
     pageLimit: {
         name: 'pageLimit',
         type: { name: 'number' },
-        defaultValue: 15,
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'number',

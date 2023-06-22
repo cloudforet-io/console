@@ -27,17 +27,18 @@
                                 :custom-error-map="inheritOptionsErrorMap"
                                 :validation-mode="widgetKey ? 'all' : 'input'"
                                 use-fixed-menu-style
+                                uniform-width
                                 :reference-handler="referenceHandler"
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
             >
                 <template #label-extra="{ propertyName }">
-                    <div class="inherit-toggle-button">
+                    <div class="inherit-toggle-button-wrapper">
                         <span class="text"
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
-                                         :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled"
+                                         :disabled="isInheritDisabled(propertyName)"
                                          @change-toggle="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
@@ -52,8 +53,10 @@
                     />
                 </template>
                 <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)">
-                        <span>{{ selectedItem.label }}</span>
+                    <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)"
+                         class="dropdown-inner"
+                    >
+                        <span class="item-label">{{ selectedItem.label }}</span>
                         <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
                     </div>
                 </template>
@@ -62,7 +65,7 @@
         <dashboard-widget-more-options class="more-option-container"
                                        :widget-config-id="widgetConfigId"
                                        :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleUpdateSchemaProperties"
+                                       @update:selected-properties="handleSelectWidgetOptions"
         />
     </div>
 </template>
@@ -77,7 +80,9 @@ import {
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { cloneDeep, isEmpty, union } from 'lodash';
+import {
+    cloneDeep, isEmpty, union, xor,
+} from 'lodash';
 
 import {
     useReferenceStore,
@@ -175,7 +180,23 @@ export default defineComponent<Props>({
         const { referenceStoreState } = useReferenceStore();
 
         /* more options */
-        const handleUpdateSchemaProperties = (properties: string[]) => {
+        const updateSchemaFormDataBySchemaProperties = (oldSchemaProperties: string[], newSchemaProperties: string[]) => {
+            if (oldSchemaProperties.length > newSchemaProperties.length) { // delete case
+                const deletedProperties = xor(oldSchemaProperties, newSchemaProperties);
+                deletedProperties.forEach((propertyName) => {
+                    delete state.schemaFormData[propertyName];
+                });
+            } else if (oldSchemaProperties.length < newSchemaProperties.length) { // add case
+                const addedProperties = xor(oldSchemaProperties, newSchemaProperties);
+                addedProperties.forEach((propertyName) => {
+                    state.schemaFormData[propertyName] = undefined;
+                });
+            }
+            state.schemaFormData = { ...state.schemaFormData };
+        };
+        const updateSchemaProperties = (properties: string[]) => {
+            updateSchemaFormDataBySchemaProperties(widgetFormState.schemaProperties ?? [], properties);
+
             widgetFormStore.$patch((_state) => {
                 _state.schemaProperties = properties;
             });
@@ -201,9 +222,12 @@ export default defineComponent<Props>({
                 dashboardDetailState.projectId,
             );
         };
+        const handleSelectWidgetOptions = (selectedProperties: string[]) => {
+            updateSchemaProperties(selectedProperties);
+        };
         const handleDeleteProperty = (property: string) => {
             const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
-            handleUpdateSchemaProperties(_properties);
+            updateSchemaProperties(_properties);
         };
 
         /* utils */
@@ -211,6 +235,7 @@ export default defineComponent<Props>({
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
         };
+        const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || state.fixedProperties.includes(propertyName);
 
         const getFormDataFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
             const { widget_options, inherit_options } = widgetInfo;
@@ -318,6 +343,11 @@ export default defineComponent<Props>({
             });
             if (!props.widgetKey) {
                 let _inheritOptions = widgetFormState.inheritOptions;
+                // set default value to fixed properties
+                widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
+                    state.schemaFormData[propertyName] = state.widgetConfig?.options?.[propertyName];
+                });
+                // set default value to default properties
                 widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
                     state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
                     _inheritOptions = {
@@ -408,11 +438,12 @@ export default defineComponent<Props>({
             title,
             updateTitle,
             isTitleInvalid,
+            isInheritDisabled,
             titleInvalidText,
             /* reference store */
             referenceStoreState,
             /* more options */
-            handleUpdateSchemaProperties,
+            handleSelectWidgetOptions,
             handleDeleteProperty,
             /* inherit */
             handleChangeInheritToggle,
@@ -451,27 +482,54 @@ export default defineComponent<Props>({
         }
     }
 
-    /* custom design-system component - p-field-group */
+    .widget-options-form {
+        width: 100%;
+    }
+
+    /* custom design-system component - p-json-schema-form */
     :deep(.widget-options-form) {
-        .field-title-box {
-            pointer-events: none;
+        /* custom design-system component - p-field-group */
+        .p-field-group {
+            .form-label {
+                width: 100%;
+                > .title {
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+
+            /* HACK: remove this when p-select-dropdown is fixed */
+            .input-wrapper {
+                width: calc(100% - 2.5rem);
+            }
         }
-        .form-label {
-            display: -webkit-box;
-            width: 100%;
-            justify-content: space-between;
-            align-content: center;
-        }
-        .input-form {
-            width: 100%;
+
+        /*
+        custom design-system component - p-select-dropdown
+        HACK: remove this when p-select-dropdown is fixed
+         */
+        .p-select-dropdown .dropdown-button {
+            > .text {
+                @apply truncate;
+                max-width: calc(100% - 1.5rem);
+            }
         }
     }
-    .suffix-text {
-        @apply text-gray-500;
-        padding-left: 0.25rem;
+    .dropdown-inner {
+        display: flex;
+        .item-label {
+            @apply truncate;
+            flex-shrink: 0;
+        }
+        .suffix-text {
+            @apply truncate text-gray-500;
+            padding-left: 0.25rem;
+        }
     }
-    .inherit-toggle-button {
-        @apply flex bg-gray-100 rounded;
+    .inherit-toggle-button-wrapper {
+        @apply inline-flex bg-gray-100 rounded;
         line-height: 1.25;
         padding: 0.25rem 0.5rem;
         pointer-events: initial;

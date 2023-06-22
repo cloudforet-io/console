@@ -95,6 +95,7 @@ export interface EnumOptions {
 }
 export interface SearchResourceOptions {
     type: 'SEARCH_RESOURCE';
+    resource_type: string;
     resource_key: string;
 }
 export interface ReferenceResourceOptions {

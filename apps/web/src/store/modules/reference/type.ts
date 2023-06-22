@@ -14,6 +14,8 @@ export interface ReferenceItem<Data = Record<string, any>> {
     latitude?: string;
     longitude?: string;
     data?: Data;
+    description?: string;
+    link?: string;
 }
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;

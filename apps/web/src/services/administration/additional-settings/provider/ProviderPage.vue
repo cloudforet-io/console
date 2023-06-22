@@ -1,6 +1,6 @@
 <template>
     <section class="provider-page">
-        <!--song-lang-->
+        <!--TODO: translation-->
         <p-heading :title="$t('Provider')" />
         <p-divider />
         <p>Hi Provider</p>

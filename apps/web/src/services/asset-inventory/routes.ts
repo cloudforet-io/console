@@ -20,9 +20,8 @@ const ServerPage = () => import('@/services/asset-inventory/server/ServerPage.vu
 const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/CloudServicePage.vue');
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
-const CollectorPage = () => import('@/services/asset-inventory/collector/CollectorPage.vue');
-const CollectorPluginPage = () => import('@/services/asset-inventory/collector/collector-plugins/CollectorPluginsPage.vue');
-const CreateCollectorPage = () => import('@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
+const CollectorMainPage = () => import('@/services/asset-inventory/collector/collector-main/CollectorMainPage.vue');
+const CreateCollectorPage = () => import('@/services/asset-inventory/collector/collector-create/CollectorCreatePage.vue');
 
 const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
 const ServiceAccountDetailPage = () => import('@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');
@@ -31,6 +30,7 @@ const ServiceAccountSearchPage = () => import('@/services/asset-inventory/servic
 
 const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
 const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
+const CollectorDetailPage = () => import('@/services/asset-inventory/collector/collector-detail/CollectorDetailPage.vue');
 
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
@@ -100,27 +100,13 @@ const assetInventoryRoute: RouteConfig = {
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
                     meta: { lnbVisible: true },
                     props: true,
-                    component: CollectorPage as any,
+                    component: CollectorMainPage as any,
                 },
                 {
                     path: 'create',
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE' },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                            meta: { lnbVisible: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            component: CollectorPluginPage as any,
-                        },
-                        {
-                            path: ':pluginId',
-                            name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE.STEPS._NAME,
-                            meta: { label: ({ params }) => params.pluginId, copiable: true, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            props: true,
-                            component: CreateCollectorPage as any,
-                        },
-                    ],
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION, centeredLayout: true },
+                    component: CreateCollectorPage as any,
                 },
                 {
                     path: 'history',
@@ -141,6 +127,13 @@ const assetInventoryRoute: RouteConfig = {
                             component: CollectJobPage as any,
                         },
                     ],
+                },
+                {
+                    path: ':collectorId',
+                    name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                    props: true,
+                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
+                    component: CollectorDetailPage as any,
                 },
             ],
         },

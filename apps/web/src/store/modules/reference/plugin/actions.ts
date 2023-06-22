@@ -10,6 +10,8 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+
 let lastLoadedTime = 0;
 
 export const load: Action<PluginReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
@@ -20,7 +22,6 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const repoResponse = await SpaceConnector.client.repository.repository.list({
@@ -39,12 +40,14 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
                 repository_id: repoInfo.repository_id,
             }, { timeout: 3000 });
 
-            pluginResponse.results.forEach((pluginInfo: any): void => {
+            pluginResponse.results.forEach((pluginInfo: RepositoryPluginModel): void => {
                 plugins[pluginInfo.plugin_id] = {
                     key: pluginInfo.plugin_id,
-                    label: pluginInfo.tags.description || pluginInfo.name,
+                    label: pluginInfo.name,
                     name: pluginInfo.name,
-                    icon: assetUrlConverter(pluginInfo.tags.icon),
+                    icon: pluginInfo.tags.icon ? assetUrlConverter(pluginInfo.tags.icon) : '',
+                    description: pluginInfo.tags.description ?? '',
+                    link: pluginInfo.tags.link ?? '',
                 };
             });
         });
@@ -52,6 +55,7 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
         await Promise.all(promises);
 
         commit('setPlugins', plugins);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

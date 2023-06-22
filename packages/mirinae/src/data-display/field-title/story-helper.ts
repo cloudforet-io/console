@@ -19,6 +19,24 @@ export const getLabelArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    description: {
+        name: 'description',
+        type: { name: 'string' },
+        description: 'description for the title.',
+        defaultValue: 'description for the title!',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',

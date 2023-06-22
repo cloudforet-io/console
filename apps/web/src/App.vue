@@ -62,6 +62,12 @@
                           button-type="primary"
                           @clickButton="goToSignIn"
             />
+            <notification-email-modal
+                :domain-id="domainId"
+                :user-id="userId"
+                :visible.sync="notificationEmailModalVisible"
+                :modal-type="MODAL_TYPE.SEND"
+            />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
         </template>
@@ -79,8 +85,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
@@ -97,18 +102,21 @@ import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
+import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
-import MobileGuideModal from '@/services/auth/reset-password/MobileGuideModal.vue';
+import MobileGuideModal from '@/services/auth/password/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 // import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
 
 export default defineComponent({
     name: 'App',
     components: {
+        NotificationEmailModal,
         NoticePopup,
         MobileGuideModal,
         // SurveyModal,
@@ -126,8 +134,12 @@ export default defineComponent({
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
             isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+            isEmailVerified: computed(() => store.state.user.emailVerified),
+            userId: computed(() => store.state.user.userId),
+            email: computed(() => store.state.user.email),
+            domainId: computed(() => store.state.domain.domainId),
+            notificationEmailModalVisible: false,
         });
-
         const goToSignIn = () => {
             const res: Location = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
@@ -137,14 +149,24 @@ export default defineComponent({
             vm.$router.push(res);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
+        const updateUser = async () => {
+            await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
+        };
+
+        watch(() => vm.$route, (value) => {
+            state.notificationEmailModalVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
+        });
 
         return {
             ...toRefs(state),
             goToSignIn,
             SIDEBAR_TYPE,
+            MODAL_TYPE,
             showsBrowserRecommendation,
+            updateUser,
         };
     },
+
 });
 
 </script>

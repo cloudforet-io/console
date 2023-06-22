@@ -38,7 +38,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
-import { i18n } from '@/translations';
+import { I18nConnector } from '@/translations';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
@@ -123,8 +123,7 @@ export default {
                 }),
             ] : [])),
             localeFile: computed(() => {
-                // TODO:: use I18nConnector
-                const localeFile = getLocaleFile(i18n.locale);
+                const localeFile = getLocaleFile(I18nConnector.i18n.locale);
                 if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
                 return { rangeSeparator: ' ~ ' };
             }),

@@ -1,8 +1,11 @@
-name: "Make Helm Chart"
+name: "[Dispatch] Make Helm Chart"
 on:
   workflow_dispatch:
   repository_dispatch:
     types: [make_helm_chart]
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   helm_cloudforet:
@@ -10,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ env.BRANCH }}
           
       - name: Install Helm
         uses: azure/setup-helm@v1
@@ -70,7 +71,7 @@ jobs:
     steps:
       - name: Slack
         if: always()
-        uses: 8398a7/action-slack@3.15.0
+        uses: 8398a7/action-slack@v3.15.0
         with:
           status: ${{job.status}}
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took

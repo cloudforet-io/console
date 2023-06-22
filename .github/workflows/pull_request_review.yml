@@ -10,12 +10,13 @@ on:
       - '**/Dockerfile'
       - '**/*.dockerfile'
       - '**/*.dockerignore'
-      - '**/README.md'
       - '**/LICENSE'
       - '**/AUTHORS'
       - '**/.husky/**'
       - '**/commitlint.config.js'
       - '**/.lintstagedrc.js'
+      - '**/*.md'
+      - '**/*.env'
     branches:
       - master
       - feature-*
@@ -25,17 +26,11 @@ jobs:
   review:
     runs-on: ubuntu-latest
 
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-      TURBO_API: ${{ secrets.TURBO_API }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           submodules: true
-          ref: ${{ github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -55,8 +50,20 @@ jobs:
         if: steps.restore-node-cache.outputs.cache-hit != 'true'
         run: npm ci
 
+      - name: Make turbo cache directory
+        run: mkdir -p node_modules/.cache/turbo
+
+      - name: Download turbo artifact
+        uses: actions/download-artifact@v3
+        with:
+          path: node_modules/.cache/turbo
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: node_modules/.cache/turbo
+
       - name: Build Packages
-        run: npm run build -- --filter="./packages/*" --parallel
+        run: npm run build -- --filter="./packages/*" --parallel --output-logs=new-only
 
       - name: Lint
         run: npm run lint
@@ -65,4 +72,9 @@ jobs:
         run: npm run test
 
       - name: Build Apps
-        run: npm run build -- --filter="./apps/*" --parallel
+        run: npm run build -- --filter="./apps/*" --parallel --output-logs=new-only
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: node_modules/.cache/turbo/

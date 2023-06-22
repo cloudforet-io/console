@@ -108,7 +108,7 @@ export default {
                 const id = state.job.collector_info?.plugin_info?.plugin_id || '';
                 return {
                     id,
-                    label: state.plugins[id]?.name || id,
+                    label: state.plugins[id]?.label || id,
                     icon: state.plugins[id]?.icon,
                 };
             }),

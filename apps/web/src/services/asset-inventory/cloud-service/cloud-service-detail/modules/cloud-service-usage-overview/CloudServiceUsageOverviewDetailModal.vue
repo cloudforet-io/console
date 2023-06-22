@@ -8,16 +8,15 @@
                     @confirm="handleUpdateVisible(false)"
     >
         <template #body>
-            <div class="flex items-center">
-                <span class="text-sm text-gray-900 font-bold mb-3 mr-2">Filter: </span>
-                <span class="text-sm text-gray-500 mb-3">{{ period ? '' : 'Auto (Overall period)' }}</span>
+            <div class="filter-wrapper">
+                <span class="filter-label">Filter: </span>
+                <span class="period">{{ period ? '' : 'Auto (Overall period)' }}</span>
                 <cloud-service-period-filter class="period-filter"
                                              read-only
                                              :period="period"
                 />
                 <p-divider v-if="queryTags.length"
                            vertical
-                           class="!h-4 !ml-4 !mr-4 mb-3"
                 />
                 <p-query-search-tags :tags="queryTags"
                                      read-only
@@ -65,7 +64,7 @@ import type {
     DynamicWidgetFieldHandler,
     DynamicWidgetSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
-import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
@@ -81,6 +80,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
@@ -100,6 +100,8 @@ interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
     filters: ConsoleFilter[];
     period?: Period;
+    hiddenFilters: ConsoleFilter[];
+    keyItemSets: KeyItemSet[];
 }
 
 export default defineComponent<Props>({
@@ -141,6 +143,14 @@ export default defineComponent<Props>({
             type: Object as () => Period|undefined,
             default: undefined,
         },
+        hiddenFilters: {
+            type: Array as () => ConsoleFilter[],
+            default: () => [],
+        },
+        keyItemSets: {
+            type: Array as () => KeyItemSet[],
+            default: () => [],
+        },
     },
     setup(props, { emit }) {
         const queryHelper = new QueryHelper();
@@ -153,7 +163,6 @@ export default defineComponent<Props>({
             chartDataList: [] as Data[][],
             dataLoading: true,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
-            queryTags: [] as QueryTag[],
             apiQuery: { filter: [] as ApiFilter[], keyword: '' },
             dateRange: computed<Period|undefined>(() => {
                 if (isEmpty(props.period)) return undefined;
@@ -188,12 +197,18 @@ export default defineComponent<Props>({
             });
         };
 
-        const setFilters = (filters: ConsoleFilter[]) => {
-            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
+        const queryTagsHelper = useQueryTags({});
+        const { queryTags } = queryTagsHelper;
+        watch(() => props.keyItemSets, (keyItemSets) => {
+            queryTagsHelper.setKeyItemSets(keyItemSets);
+        }, { immediate: true });
 
+        const setFilters = (filters: ConsoleFilter[], hiddenFilters: ConsoleFilter[]) => {
+            queryTagsHelper.setFilters(filters);
+
+            const { filter, keyword } = queryHelper.setFilters(filters).addFilter(...hiddenFilters).apiQuery;
             state.apiQuery.filter = filter;
             state.apiQuery.keyword = keyword;
-            state.queryTags = queryHelper.queryTags;
         };
 
         /* Component Props */
@@ -211,26 +226,27 @@ export default defineComponent<Props>({
         };
 
         /* Watchers */
-        watch([() => state.proxyVisible, () => props.schemaList, () => props.filters], async ([visible, schemaList, filters], [, prevSchemaList, prevFilters]) => {
-            if (!visible) {
+        watch(
+            [() => state.proxyVisible, () => props.schemaList, () => props.filters, () => props.hiddenFilters],
+            async ([visible, schemaList, filters, hiddenFilters], [, prevSchemaList]) => {
+                if (!visible) {
                 // If the schema is the same, do not flush the data.
                 // We can reuse the data if the filters are the same.
-                if (schemaList !== prevSchemaList) state.chartDataList = [];
+                    if (schemaList !== prevSchemaList) state.chartDataList = [];
 
-                // Show users loading UI at the first time.
-                state.dataLoading = true;
-                return;
-            }
+                    // Show users loading UI at the first time.
+                    state.dataLoading = true;
+                    return;
+                }
 
-            // Do not get data if filters are the same with the previous one.
-            if (filters === prevFilters) return;
-
-            // set filters and get data
-            if (!state.dataLoading) state.dataLoading = true;
-            setFilters(filters);
-            await getDataListWithSchema();
-            state.dataLoading = false;
-        }, { immediate: true });
+                // set filters and get data
+                if (!state.dataLoading) state.dataLoading = true;
+                setFilters(filters, hiddenFilters);
+                await getDataListWithSchema();
+                state.dataLoading = false;
+            },
+            { immediate: true },
+        );
 
         let initiated = false;
         watch(() => props.visible, async (visible) => {
@@ -243,6 +259,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            queryTags,
             handleUpdateVisible,
             fieldHandler,
         };
@@ -257,6 +274,24 @@ export default defineComponent<Props>({
         display: flex;
         flex-direction: column;
         padding: 1rem 1.25rem;
+    }
+    .filter-wrapper {
+        @apply flex items-center mb-3;
+        .filter-label {
+            @apply text-sm text-gray-900 font-bold;
+            margin-right: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .period {
+            @apply text-sm text-gray-500;
+            margin-bottom: 0.75rem;
+        }
+        .p-divider {
+            height: 1rem;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            margin-bottom: 0.75rem;
+        }
     }
     .chart-widget-wrapper {
         @apply overflow-visible;

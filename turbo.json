@@ -1,18 +1,22 @@
 {
+  "globalDependencies": [
+    "turbo.json", "package.json", "package-lock.json"
+  ],
   "pipeline": {
     "@cloudforet/core-lib#build": {
       "outputs": ["./dist/**"],
       "inputs": [
-        "src/**", "package.json", "package-lock.json", "tsconfig.json"
+        "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
     "@spaceone/design-system#build": {
       "outputs": ["./dist/**", "./css/**", "./types/**"],
         "inputs": [
-            "src/**", "postcss.config.cjs", "tailwind.config.cjs",
+          "src/**", "postcss.config.cjs", "tailwind.config.cjs",
           "package.json", "tsconfig.build.json", "vite.config.js",
-          "!./**/*.stories.mdx", "!./**/story-helper.ts", "!./**/*.mock.ts"
+          "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
         ],
       "cache": true
     },
@@ -21,9 +25,11 @@
       "outputs": ["./dist/**"],
       "inputs": [
         "public/**", "!public/config/development.json",
-        "src/**", "!src/assets/.github", "!src/assets/.gitignore", "!src/assets/Dockerfile", "!src/assets/public/**",
+        "src/**", "!src/assets/**", "src/assets/images/**",
         "package.json", "package-lock.json", "tsconfig.json",
-        "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs"
+        "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs",
+        "../../packages/language-pack/*.json", "!../../packages/language-pack/package.json",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },
@@ -31,7 +37,8 @@
       "outputs": ["./.out/**"],
       "inputs": [
         "../../packages/mirinae/src/**", "../../packages/mirinae/postcss.config.js", "../../packages/mirinae/tailwind.config.js",  "../../packages/mirinae/package.json",
-        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*"
+        "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
       "cache": true
     },

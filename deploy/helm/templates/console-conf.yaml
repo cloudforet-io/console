@@ -1,0 +1,10 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-conf
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+data:
+  production.json: |-
+    {{ toJson .Values.production_json| indent 4 }}
+{{- end }}

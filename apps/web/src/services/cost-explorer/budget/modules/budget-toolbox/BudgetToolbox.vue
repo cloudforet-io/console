@@ -61,7 +61,6 @@ import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
@@ -70,7 +69,6 @@ import {
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -79,6 +77,7 @@ import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
+import { useQueryTags } from '@/common/composables/query-tags';
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import BudgetToolboxUsageRange
@@ -150,7 +149,10 @@ export default {
             } as ValueHandlerMap,
         });
 
-        const filtersHelper = new QueryHelper().setKeyItemSets(handlerState.keyItemSets);
+        const queryTagsHelper = useQueryTags({
+            referenceStore: {},
+            keyItemSets: handlerState.keyItemSets,
+        });
 
         const state = reactive({
             selectedPeriod: ['total'] as string[],
@@ -160,7 +162,6 @@ export default {
             ]),
             pageStart: 1,
             pageLimit: 24,
-            queryTags: filtersHelper.setFilters(props.filters).queryTags as QueryTag[],
             // query
             range: {} as BudgetUsageRange,
             pagination: computed<Pagination>(() => ({
@@ -177,7 +178,6 @@ export default {
 
                 return period;
             }),
-            _filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
             sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
                 { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
                 { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'usd_cost' },
@@ -201,7 +201,7 @@ export default {
         };
 
         const handleChangeToolbox = async (options: ToolboxOptions) => {
-            if (options.queryTags !== undefined) state.queryTags = options.queryTags;
+            if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
             if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
             if (options.pageStart !== undefined) state.pageStart = options.pageStart;
         };
@@ -220,12 +220,12 @@ export default {
         watch(() => state.period, (period) => {
             emit('update-period', period);
         });
-        watch(() => state._filters, (filters) => {
+        watch(queryTagsHelper.filters, (filters) => {
             emit('update-filters', filters);
         });
         watch(() => props.filters, (filters) => {
-            if (filters !== state._filters) {
-                state.queryTags = filtersHelper.setFilters(filters).queryTags;
+            if (filters !== queryTagsHelper.filters.value) {
+                queryTagsHelper.setFilters(filters);
             }
         });
         watch(() => state.sort, (sort) => { emit('update-sort', sort); });
@@ -240,6 +240,7 @@ export default {
         })();
 
         return {
+            queryTags: computed(() => queryTagsHelper.queryTags.value),
             ...toRefs(state),
             pageSizeOptions,
             handlerState,

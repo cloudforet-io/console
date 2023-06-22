@@ -37,7 +37,6 @@
                                :color-set="colorSet"
                                :this-page="state.thisPage"
                                :show-next-page="state.data?.more"
-                               disable-ellipsis
                                show-legend
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"
@@ -55,6 +54,8 @@ import type { Location } from 'vue-router/types/router';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -79,7 +80,7 @@ import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
     getXYChartLegends,
@@ -122,7 +123,7 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, { type: 'cost' });
-        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             {
@@ -156,7 +157,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
+let analyzeRequest: CancelTokenSource | undefined;
 const fetchData = async (): Promise<FullData> => {
+    if (analyzeRequest) {
+        analyzeRequest.cancel('Next request has been called.');
+        analyzeRequest = undefined;
+    }
+    analyzeRequest = axios.CancelToken.source();
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
@@ -177,7 +184,8 @@ const fetchData = async (): Promise<FullData> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        });
+        }, { cancelToken: analyzeRequest.token });
+        analyzeRequest = undefined;
         return { results: sortTableData(getRefinedDateTableData(results, state.dateRange)), more };
     } catch (e) {
         ErrorHandler.handleError(e);

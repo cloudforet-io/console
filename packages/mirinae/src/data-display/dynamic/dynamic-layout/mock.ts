@@ -351,7 +351,7 @@ export default {
             server_id: 'server-cb8ebd06742f',
             name: '',
             state: 'INSERVICE',
-            primary_ip_address: '172.16.16.58',
+            primary_ip_address: faker.internet.ip(),
             ip_addresses: [],
             server_type: 'VM',
             os_type: 'LINUX',
@@ -367,20 +367,20 @@ export default {
             },
             metadata: {},
             reference: {
-                resource_id: 'arn:aws:ec2:ap-northeast-2:257706363616:instance/i-094985f71d3bc30a7',
+                resource_id: `arn:aws:ec2:ap-northeast-2:${faker.random.numeric(15)}:instance/i-${faker.random.alphaNumeric(17)}`,
                 external_link: '',
             },
             tags: {},
             collection_info: {
-                service_accounts: ['sa-ebc86e9cea28'],
+                service_accounts: [`sa-${faker.random.numeric(10)}`],
                 state: 'ACTIVE',
-                collectors: ['collector-6746d641c98b'],
+                collectors: [`collector-${faker.random.numeric(10)}`],
                 pinned_keys: [],
                 collected_at: null,
                 change_history: [],
-                secrets: ['secret-5545c9db0a42'],
+                secrets: [`secret-${faker.random.numeric(10)}`],
             },
-            project_id: 'project-18655561c535',
+            project_id: `project-${faker.random.numeric(10)}`,
             domain_id: '',
             created_at: { seconds: '1595497991', nanos: 452000000 },
             updated_at: { seconds: '1596773009', nanos: 956000000 },
@@ -389,98 +389,102 @@ export default {
     },
     item: {
         options: {
-            fields: [{
-                name: 'Instance ID',
-                key: 'data.compute.instance_name',
-                options: {
-                    disable_copy: true,
-                },
-            }, {
-                name: 'Region',
-                key: 'data.compute.region',
-            }, {
-                name: 'Instance State',
-                key: 'data.compute.instance_state',
-                type: 'enum',
-                options: {
-                    ACTIVE: {
-                        type: 'state',
-                        options: {
-                            icon: {
-                                image: 'ic_check',
-                                color: 'green.500',
+            fields: [
+                {
+                    name: 'Instance ID',
+                    key: 'data.compute.instance_name',
+                    options: {
+                        disable_copy: true,
+                    },
+                }, {
+                    name: 'Region',
+                    key: 'data.compute.region',
+                }, {
+                    name: 'Instance State',
+                    key: 'data.compute.instance_state',
+                    type: 'enum',
+                    options: {
+                        ACTIVE: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_check',
+                                    color: 'green.500',
+                                },
+                            },
+                        },
+                        DUPLICATED: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_warning-filled',
+                                },
+                            },
+                        },
+                        DISCONNECTED: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_plug-filled',
+                                },
+                            },
+                        },
+                        MANUAL: {
+                            type: 'state',
+                            options: {
+                                icon: {
+                                    image: 'ic_spanner',
+                                },
                             },
                         },
                     },
-                    DUPLICATED: {
-                        type: 'state',
-                        options: {
-                            icon: {
-                                image: 'ic_warning-filled',
+                }, {
+                    name: 'Instance Type',
+                    key: 'data.compute.instance_type',
+                }, {
+                    name: 'Region',
+                    key: 'data.compute.region',
+                }, {
+                    name: 'Core',
+                    key: 'data.hardware.core',
+                }, {
+                    name: 'AZ',
+                    key: 'data.compute.az',
+                }, {
+                    name: 'Compute (object)',
+                    key: 'data.compute',
+                }, {
+                    name: 'OS',
+                    key: 'data.os.os_distro',
+                }, {
+                    name: 'Changed Jobs',
+                    key: 'collection_info.change_history.job_id',
+                    options: {
+                        delimiter: '  ',
+                        link: 'https://www.google.com',
+                    },
+                }, {
+                    name: 'Collection Information',
+                    key: 'collection_info.state',
+                    type: 'more',
+                    options: {
+                        sub_key: 'collection_info.change_history',
+                        layout: {
+                            name: 'Change History Details',
+                            type: 'popup',
+                            options: {
+                                layout: {
+                                    type: 'raw',
+                                    options: {},
+                                },
                             },
                         },
                     },
-                    DISCONNECTED: {
-                        type: 'state',
-                        options: {
-                            icon: {
-                                image: 'ic_plug-filled',
-                            },
-                        },
-                    },
-                    MANUAL: {
-                        type: 'state',
-                        options: {
-                            icon: {
-                                image: 'ic_spanner',
-                            },
-                        },
-                    },
-                },
-            }, {
-                name: 'Instance Type',
-                key: 'data.compute.instance_type',
-            }, {
-                name: 'Region',
-                key: 'data.compute.region',
-            }, {
-                name: 'Core',
-                key: 'data.hardware.core',
-            }, {
-                name: 'AZ',
-                key: 'data.compute.az',
-            }, {
-                name: 'OS',
-                key: 'data.os.os_distro',
-            }, {
-                name: 'Changed Jobs',
-                key: 'collection_info.change_history.job_id',
-                options: {
-                    delimiter: '  ',
-                    link: 'https://www.google.com',
-                },
-            }, {
-                name: 'Collection Information',
-                key: 'collection_info.state',
-                type: 'more',
-                options: {
-                    sub_key: 'collection_info.change_history',
-                    layout: {
-                        name: 'Change History Details',
-                        type: 'popup',
-                        options: {
-                            layout: {
-                                type: 'raw',
-                                options: {},
-                            },
-                        },
-                    },
-                },
-            }],
+                }],
         },
         data: {
             name: 'cloudone-dev-eks-cluster-adm-worker',
-            primary_ip_address: '172.16.16.100',
+            primary_ip_address: faker.internet.ip(),
             server_type: 'VM',
             os_type: 'LINUX',
             data: {
@@ -492,7 +496,7 @@ export default {
                     image: 'amazon-eks-node-1.14-v20190927',
                     region: 'ap-northeast-2',
                     launched_at: '2020-04-13',
-                    account_id: '072548720675',
+                    account_id: faker.random.numeric(15),
                     keypair: '...',
                     instance_name: 'cloudone-dev-eks-cluster-adm-worker',
                 },
@@ -501,14 +505,17 @@ export default {
                     ebs_oprimized: false,
                     iam_instance_profile: {
                         name: 'cloudone-dev-EKSAdminWorkerRole',
-                        arn: 'arn:aws:iam::072548720675:instance-profile/cloudone-dev-EKSAdminWorkerRole',
-                        id: 'AIPARBZB5UARS3CO3KSQF',
+                        arn: `arn:aws:iam::${faker.random.numeric(10)}:instance-profile/cloudone-dev-EKSAdminWorkerRole`,
+                        id: faker.random.alpha({
+                            count: 21,
+                            casing: 'upper',
+                        }),
                     },
                 },
                 auto_scaling_group: {
                     name: 'cloudone-dev-eks-cluster-adm-worker',
                     arn: '...',
-                    launch_configuration_name: 'cloudone-dev-eks-cluster_woker0120200115104205194400000001',
+                    launch_configuration_name: `cloudone-dev-eks-cluster_woker${faker.random.numeric(15)}`,
                     launch_configuration_arn: '...',
                 },
                 os: {
@@ -534,41 +541,41 @@ export default {
                 ],
             },
             reference: {
-                resource_id: 'arn:aws:ec2:ap-northeast-2:072548720675:instance/i-0745c928020bed89f',
-                external_link: 'https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Instances:instanceId=i-0745c928020bed89f',
+                resource_id: `arn:aws:ec2:ap-northeast-2:${faker.random.numeric(15)}:instance/i-${faker.random.alphaNumeric(17)}`,
+                external_link: `https://ap-northeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#Instances:instanceId=i-${faker.random.alphaNumeric(17)}`,
             },
             collection_info: {
                 secrets: [
-                    'secret-dc17a188d214',
-                    'secret-fe25ca834a20',
+                    `secret-${faker.random.alphaNumeric(12)}`,
+                    `secret-${faker.random.alphaNumeric(12)}`,
                 ],
                 state: 'ACTIVE',
                 collectors: [
-                    'collector-005363ecb28d',
-                    'collector-15a0703b5dc6',
-                    'collector-2bee95327fa2',
+                    `collector-${faker.random.alphaNumeric(12)}`,
+                    `collector-${faker.random.alphaNumeric(12)}`,
+                    `collector-${faker.random.alphaNumeric(12)}`,
                 ],
                 service_accounts: [
-                    'sa-5e186fcc7c91',
-                    'sa-6b677520656a',
+                    `sa-${faker.random.alphaNumeric(12)}`,
+                    `sa-${faker.random.alphaNumeric(12)}`,
                 ],
                 change_history: [
                     {
                         updated_at: '2021-03-16T07:00:20.890000Z',
-                        job_id: 'job-fed98e922800',
+                        job_id: `job-${faker.random.alphaNumeric(12)}`,
                         key: 'state',
                         diff: {},
-                        updated_by: 'collector-2bee95327fa2',
+                        updated_by: `collector-${faker.random.alphaNumeric(12)}`,
                     },
                     {
                         diff: {},
                         key: 'project_id',
-                        job_id: 'job-fed98e922800',
+                        job_id: `job-${faker.random.alphaNumeric(12)}`,
                         updated_at: '2021-03-16T07:00:20.890000Z',
-                        updated_by: 'collector-2bee95327fa2',
+                        updated_by: `collector-${faker.random.alphaNumeric(12)}`,
                     },
                     {
-                        job_id: 'job-36ec104500f2',
+                        job_id: `job-${faker.random.alphaNumeric(12)}`,
                         diff: {
                             delete: {
                                 status: 'IN_PROGRESS',
@@ -577,16 +584,16 @@ export default {
                                 status: 'RUNNING',
                             },
                         },
-                        updated_by: 'collector-15a0703b5dc6',
+                        updated_by: `collector-${faker.random.alphaNumeric(12)}`,
                         key: 'data.power_state',
                         updated_at: '2021-03-16T09:53:54.280000Z',
                     },
                     {
                         updated_at: '2021-03-16T07:12:14.603000Z',
                         diff: {},
-                        key: 'metadata.plugin-4969e01314b4',
-                        job_id: 'job-2ecb802f026f',
-                        updated_by: 'collector-005363ecb28d',
+                        key: `metadata.plugin-${faker.random.alphaNumeric(12)}`,
+                        job_id: `job-${faker.random.alphaNumeric(12)}`,
+                        updated_by: `collector-${faker.random.alphaNumeric(12)}`,
                     },
                     {
                         diff: {
@@ -679,9 +686,9 @@ export default {
                                 },
                             },
                         },
-                        job_id: 'job-5f808281f536',
+                        job_id: `job-${faker.random.alphaNumeric(12)}`,
                         key: 'data.monitoring',
-                        updated_by: 'collector-005363ecb28d',
+                        updated_by: `collector-${faker.random.alphaNumeric(12)}`,
                         updated_at: '2021-03-18T08:00:13.541000Z',
                     },
                 ],
@@ -720,6 +727,16 @@ export default {
     table: {
         options: {
             fields: makeTableFields(),
+            default_sort: {
+                key: 'name',
+                desc: false,
+            },
+        },
+        data: makeTableData(),
+    },
+    simpleTable: {
+        options: {
+            fields: makeTableFields(),
         },
         data: makeTableData(),
     },
@@ -733,6 +750,10 @@ export default {
     querySearchTable: {
         options: {
             fields: makeTableFields(),
+            default_sort: {
+                key: 'name',
+                desc: false,
+            },
         },
         data: makeTableData(),
     },

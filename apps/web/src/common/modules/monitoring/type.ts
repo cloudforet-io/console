@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-import type { STATISTICS_TYPE } from '@/common/modules/monitoring/config';
-
 export interface Metric {
     key: string;
     name: string;
@@ -25,7 +22,6 @@ export interface MonitoringProps {
     responsive?: boolean;
 }
 
-export type StatisticsType = typeof STATISTICS_TYPE[keyof typeof STATISTICS_TYPE];
 
 export interface MetricChartData {
     loading: boolean;

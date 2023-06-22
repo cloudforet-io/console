@@ -1,11 +1,11 @@
 <template>
     <div>
         <p-heading heading-type="sub"
-                   :title="title"
+                   :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
         />
-        <p-definition-table :fields="fields"
-                            :data="data"
-                            :loading="loading"
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
+                            :loading="state.loading"
                             :skeleton-rows="7"
                             v-on="$listeners"
         >
@@ -17,6 +17,27 @@
             <template #data-user_type="{data}">
                 <span v-if="data === 'API_USER'">API Only</span>
                 <span v-else>Console, API</span>
+            </template>
+            <template #data-email="{data}">
+                <span v-if="state.data.user_type !== 'API_USER'">
+                    <span :class="state.data.email_verified && 'verified-text'">{{ data }}</span>
+                    <span v-if="state.data.email_verified">
+                        <p-i name="ic_verified"
+                             height="1rem"
+                             width="1rem"
+                             class="verified-icon"
+                             color="#60B731"
+                        />
+                    </span>
+                    <span v-else
+                          class="not-verified"
+                    >
+                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                    </span>
+                </span>
+                <span v-else>
+                    <span>N/A</span>
+                </span>
             </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === -1">
@@ -35,115 +56,139 @@
             <template #data-created_at="{data}">
                 {{ iso8601Formatter(data, timezone) }}
             </template>
+            <template #extra="{label}">
+                <verify-button
+                    v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
+                    :email="state.data.email"
+                    :user-id="state.data.user_id"
+                    :domain-id="state.data.domain_id"
+                    :verified="state.data.email_verified"
+                    is-administration
+                    @refresh-user="getUserDetailData"
+                />
+            </template>
         </p-definition-table>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PHeading, PDefinitionTable, PStatus } from '@spaceone/design-system';
+    PDefinitionTable, PHeading, PI, PStatus,
+} from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { Tags } from '@/models';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 
 import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-// const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
+import type { UserDetailData } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
-interface Timestamp {
-    seconds: string;
-    nanos?: number;
+interface Props {
+    userId: string
+    timezone: string
 }
 
-interface UserDetailData {
-    roles?: unknown;
-    tags?: Tags;
-    user_id: string;
-    name: string;
-    state: string;
-    email?: string;
-    // eslint-disable-next-line camelcase
-    user_type: string;
-    backend: string;
-    language: string;
-    timezone: string;
-    // eslint-disable-next-line camelcase
-    last_accessed_at: number;
-    created_at?: Timestamp;
-    domain_id: string;
-}
+const props = withDefaults(defineProps<Props>(), {
+    userId: '',
+    timezone: '',
+});
 
-export default {
-    name: 'UserDetail',
-    components: {
-        PStatus,
-        PDefinitionTable,
-        PHeading,
-    },
-    props: {
-        userId: {
-            type: String,
-            required: true,
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    fields: computed(() => [
+        { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
+        { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
+        { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
+        { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
+        {
+            name: 'email',
+            label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
+            block: true,
+            disableCopy: state.data.user_type === 'API_USER',
         },
-        timezone: {
-            type: String,
-            required: true,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const baseState = reactive({
-            title: computed(() => vm.$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
-            loading: true,
-            fields: computed(() => [
-                { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
-                { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
-                { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
-                { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
-                { name: 'email', label: i18n.t('IDENTITY.USER.MAIN.EMAIL') },
-                { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
-                { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-                { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
-                { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
-                { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
-            ]),
-            data: {} as UserDetailData,
+        { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
+        { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+        { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
+        { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
+        { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
+    ]),
+    data: {} as UserDetailData,
+});
+
+/* API */
+const getUserDetailData = async (userId) => {
+    state.loading = true;
+    try {
+        const response = await SpaceConnector.client.identity.user.get({
+            user_id: userId || props.userId,
         });
-
-        const getUserDetailData = async (userId) => {
-            baseState.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.user.get({
-                    user_id: userId,
-                });
-                baseState.data = res;
-                // eslint-disable-next-line camelcase
-                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, props.timezone as string) || 0;
-                baseState.loading = false;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        watch(() => props.userId, () => {
-            const userId = props.userId;
-            getUserDetailData(userId);
-        }, { immediate: true });
-
-        return {
-            ...toRefs(baseState),
-            userStateFormatter,
-            iso8601Formatter,
-        };
-    },
+        state.data = response;
+        state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
+        state.data.email = response.email;
+        state.data.email_verified = response.email_verified;
+        state.loading = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
+
+/* Watcher */
+watch(() => props.userId, (value) => {
+    getUserDetailData(value);
+}, { immediate: true });
+watch(() => userPageState.visibleUpdateModal, (value) => {
+    if (!value) {
+        getUserDetailData(props.userId);
+    }
+});
+
 </script>
+
+<style lang="postcss" scoped>
+/* custom design-system component - p-definition */
+:deep(.p-definition) {
+    .value-wrapper {
+        @apply relative;
+        .copy-text {
+            @apply relative;
+            .not-verified {
+                @apply absolute bg-yellow-200 text-label-sm;
+                right: -7rem;
+                padding: 0.15rem 0.5rem;
+                border-radius: 6.25rem;
+            }
+            .verified-text {
+                padding-left: 1.25rem;
+            }
+            .verified-icon {
+                @apply absolute;
+                bottom: -0.1rem;
+                left: 0;
+            }
+        }
+    }
+    &.block {
+        .extra {
+            width: 11.375rem;
+            height: 1.5rem;
+            margin-top: -0.125rem;
+            margin-left: 0;
+            .verify-button-wrapper {
+                @apply flex justify-end;
+            }
+        }
+    }
+}
+</style>

@@ -18,7 +18,6 @@ export const load: Action<ProtocolReferenceState, any> = async ({ state, commit 
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.notification.protocol.list({
@@ -37,6 +36,7 @@ export const load: Action<ProtocolReferenceState, any> = async ({ state, commit 
         });
 
         commit('setProtocols', protocols);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

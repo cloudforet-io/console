@@ -3,17 +3,21 @@ name: "[Dispatch] Release"
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'enter branch (only master and release-x.y.z are allowed)'
-        required: true
-        default: 'master'
       version:
         description: 'enter version(x.y.z)'
         required: true
         default: '1.0.0'
+      container_arch:
+        type: choice
+        description: 'choose container architecture'
+        default: linux/amd64
+        options:
+          - "linux/amd64"
+          - "linux/amd64,linux/arm64"
+
 
 env:
-  BRANCH: ${{ github.event.inputs.branch }}
+  ARCH: ${{ github.event.inputs.container_arch }}
   VERSION: ${{ github.event.inputs.version }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -29,12 +33,11 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_versioning.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: true
           propagate_failure: true
           wait_interval: 5
+          ref: ${{ github.ref_name }}
           client_payload: '{
-              "branch": "${{ env.BRANCH }}",
               "version": "${{ env.VERSION }}"
             }'
 
@@ -50,14 +53,10 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_mirinae_release.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: true
           propagate_failure: true
           wait_interval: 5
-          client_payload: '{
-              "branch": "${{ env.BRANCH }}",
-              "version": "${{ env.VERSION }}"
-            }'
+          ref: ${{ github.ref_name }}
 
   storybook:
     runs-on: ubuntu-latest
@@ -70,21 +69,40 @@ jobs:
           repo: ${{ github.event.repository.name }}
           github_token: ${{ secrets.PAT_TOKEN }}
           workflow_file_name: dispatch_storybook_release.yaml
-          ref: ${{ env.BRANCH }}
           wait_workflow: false
           propagate_failure: false
-          client_payload: '{
-              "branch": "${{ env.BRANCH }}"
-            }'
+          ref: ${{ github.ref_name }}
 
   docker:
     runs-on: ubuntu-latest
     needs: mirinae
+
+    services:
+      turbo_cache:
+        image: wanzargen/turbo-cache-server:1.0.0
+        env:
+          PORT: 3000
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          STORAGE_PROVIDER: git-repository
+          STORAGE_PATH: console-artifacts
+          GIT_REPOSITORY: ${{ vars.TURBO_CACHE_SERVER_GIT_REPOSITORY }}
+          GIT_BRANCH: ${{ vars.TURBO_CACHE_SERVER_GIT_BRANCH }}
+          GIT_USER_NAME: ${{ vars.GIT_USERNAME }}
+          GIT_USER_EMAIL: ${{ vars.GIT_EMAIL }}
+          GIT_USER_PASSWORD: ${{ secrets.PAT_TOKEN }}
+        ports:
+          - 3000:3000
+        options: >-
+          --health-cmd "curl -f -X GET 'http://localhost:3000/v8/artifacts/status' -H 'Authorization: Bearer $TURBO_TOKEN'"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+          --health-start-period 30s
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.BRANCH }}
           submodules: true
 
       - name: Set up QEMU
@@ -119,12 +137,13 @@ jobs:
           build-args: |
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
             TURBO_TEAM=${{ secrets.TURBO_TEAM }}
-            TURBO_API=${{ secrets.TURBO_API }}
-          platforms: linux/amd64, linux/arm64
+            TURBO_API=http://172.17.0.1:3000
+          platforms: ${{ env.ARCH }}
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:latest
+          cache-to: type=inline
           tags: |
+            ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:latest
             ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:${{ env.VERSION }}
             ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:latest
             ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:${{ env.VERSION }}
@@ -143,8 +162,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: ${{ env.BRANCH }}
 
       - name: Configure git
         run: |

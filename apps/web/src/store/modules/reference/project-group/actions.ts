@@ -18,7 +18,6 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
         || (options?.lazyLoad && state.items)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.identity.projectGroup.list({
@@ -45,6 +44,7 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
         });
 
         commit('setProjectGroups', projectGroups);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

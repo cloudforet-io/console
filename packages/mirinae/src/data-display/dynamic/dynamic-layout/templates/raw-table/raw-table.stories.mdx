@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-import {i18n} from '@/translations'
+import { I18nConnector } from '@/translations'
 import { getDynamicLayoutRawTableArgTypes } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/story-helper';
 import mock from '@/data-display/dynamic/dynamic-layout/mock';
 
@@ -11,7 +11,7 @@ import mock from '@/data-display/dynamic/dynamic-layout/mock';
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PDynamicLayout },
-    i18n,
+    i18n: I18nConnector.i18n,
     template: `
       <p-dynamic-layout :name="name" type="raw-table"
                           :options="options"
@@ -50,64 +50,6 @@ export const Template = (args, { argTypes }) => ({
 
 
 # Raw Table Type
-<br/>
-<br/>
-
-## Supported Options
-
-| Name | Supported |
-| ---- | ----------- |
-| root_path | O |
-| translation_id | O |
-| fields | X |
-| markdown | X |
-| search | X |
-| disable_search | O |
-| headers | O |
-| layout | X |
-
-
-## Supported Fetch Options
-
-| Name | Supported |
-| ---- | ---- |
-| sortBy | O |
-| sortDesc | O |
-| pageStart | O |
-| pageLimit | O |
-| searchText | O |
-| queryTags | X |
-
-
-## Supported Type Options
-
-| Type Option Name | Supported |
-| ---- | ---- |
-| loading | O |
-| totalCount | O |
-| timezone | O |
-| selectIndex | O |
-| selectable | O |
-| multiSelect | O |
-| invalid | O |
-| colCopy | O |
-| excelVisible | O |
-| settingsVisible | O |
-| keyItemSets | X |
-| valueHandlerMap | X |
-| language | X |
-| popupVisible | X |
-
-
-## Supported Events
-| Event Name | Supported |
-| ---------- | ----------- |
-| fetch | O |
-| select | O |
-| export | O |
-| click-settings | X |
-| update-popup-visible | X |
-
 <br/>
 <br/>
 

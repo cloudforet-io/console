@@ -1,0 +1,26 @@
+name: "[Dispatch] Sync CI"
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO: cloudforet-io/actions
+  WORKFLOW_NAME: dispatch_apply_workflows.yaml
+
+jobs:
+  owner_check:
+    if: github.repository_owner == 'cloudforet-io'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ github.repository_owner }}
+  pull_workflows:
+    runs-on: ubuntu-latest
+    needs: owner_check
+    steps:
+      - name: request workflows
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repo: ${{ env.REPO }}
+          workflow: ${{ env.WORKFLOW_NAME }}
+          inputs: '{"dest" : "${{ github.event.repository.name }}"}'

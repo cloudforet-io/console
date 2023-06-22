@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import {
     toRefs, reactive, watch,
 } from 'vue';
-import {i18n} from "@/translations";
+import { I18nConnector } from "@/translations";
 import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import PButton from "@/inputs/buttons/button/PButton";
@@ -32,7 +32,7 @@ import {
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    i18n,
+    i18n: I18nConnector.i18n,
     components: { PJsonSchemaForm },
     template: `
         <p-json-schema-form
@@ -43,6 +43,8 @@ export const Template = (args, { argTypes }) => ({
             :reset-on-schema-change="resetOnSchemaChange"
             :custom-error-map="customErrorMap"
             :reference-handler="simpleHandler"
+            :use-fixed-menu-style="useFixedMenuStyle"
+            :uniform-width="uniformWidth"
         />
     `,
     setup(props) {
@@ -119,6 +121,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
 |reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
 |order|custom|-|order of properties. string[]|
+|disabled|custom|all|If the input event of the form is disabled, it will still be reflected in the formData if there is a default value.|
 
 
 
@@ -139,7 +142,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Basic" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">
@@ -231,7 +234,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Reset on Schema Change" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PButton },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid grid-cols-12">
     <p-json-schema-form
@@ -283,7 +286,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Validation Mode" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid grid-cols-12">
     <p-json-schema-form
@@ -334,7 +337,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
     <Story name="Json Input Mode" >
         {{
             components: { PJsonSchemaForm, PTextEditor, PHeading },
-            i18n,
+            i18n: I18nConnector.i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">
@@ -375,6 +378,44 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <br/>
 <br/>
 
+
+## Uniform Width
+
+<Canvas>
+    <Story name="Uniform Width" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
+            i18n: I18nConnector.i18n,
+            template: `
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-heading>Json Schema Form</p-heading>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+                            :reference-handler="handler"
+                            uniform-width
+                            style="width: 100%"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getDefaultSchema(),
+                    formData: {},
+                    handler: getReferenceHandler()
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 

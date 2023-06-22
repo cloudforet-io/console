@@ -73,22 +73,22 @@
                 </template>
             </template>
         </p-toolbox-table>
-        <user-management-modal v-if="modalState.visible"
-                               :header-title="modalState.title"
-                               :sub-title="modalState.subTitle"
-                               :theme-color="modalState.themeColor"
-                               :mode="modalState.mode"
-                               @confirm="handleUserManagementModalConfirm()"
+        <user-status-modal v-if="modalState.visible"
+                           :header-title="modalState.title"
+                           :sub-title="modalState.subTitle"
+                           :theme-color="modalState.themeColor"
+                           :mode="modalState.mode"
+                           @confirm="handleUserStatusModalConfirm()"
         />
-        <user-create-modal v-if="userPageState.visibleCreateModal"
-                           :header-title="userFormState.headerTitle"
-                           :item="userFormState.item"
-                           @confirm="handleUserFormConfirm"
+        <user-management-modal v-if="userPageState.visibleCreateModal"
+                               :header-title="userFormState.headerTitle"
+                               :item="userFormState.item"
+                               @confirm="handleUserFormConfirm"
         />
-        <user-update-modal v-if="userPageState.visibleUpdateModal"
-                           :header-title="userFormState.headerTitle"
-                           :item="userFormState.item"
-                           @confirm="handleUserFormConfirm"
+        <user-management-modal v-if="userPageState.visibleUpdateModal"
+                               :header-title="userFormState.headerTitle"
+                               :item="userFormState.item"
+                               @confirm="handleUserFormConfirm"
         />
     </section>
 </template>
@@ -113,17 +113,16 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userSearchHandlers } from '@/services/administration/iam/user/lib/config';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import UserCreateModal from '@/services/administration/iam/user/modules/user-management-modal/UserCreateModal.vue';
-import UserManagementModal
-    from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
-import UserUpdateModal from '@/services/administration/iam/user/modules/user-management-modal/UserUpdateModal.vue';
+import UserManagementModal from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
+import UserStatusModal
+    from '@/services/administration/iam/user/modules/user-management-modal/UserStatusModal.vue';
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -131,11 +130,10 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 export default {
     name: 'UserManagementTable',
     components: {
-        UserManagementModal,
+        UserStatusModal,
         PToolboxTable,
         PButton,
-        UserCreateModal,
-        UserUpdateModal,
+        UserManagementModal,
         PStatus,
         PSelectDropdown,
         PBadge,
@@ -215,7 +213,7 @@ export default {
             title: '',
             subTitle: '',
             themeColor: undefined as string | undefined,
-            visible: computed(() => userPageState.visibleManagementModal),
+            visible: computed(() => userPageState.visibleStatusModal),
         });
         const userFormState = reactive({
             visible: computed(() => userPageState.visibleCreateModal || userPageState.visibleUpdateModal),
@@ -277,21 +275,21 @@ export default {
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'safe';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
 
         const handleSelectDropdown = (name) => {
@@ -309,19 +307,19 @@ export default {
                 resource_type: 'identity.User',
                 resource_id: userId,
                 role_id: roleId,
+                domain_id: store.state.domain.domainId,
             });
         };
-        const unbindRole = async (userId, roleId) => {
+        const unbindRole = async (userId) => {
             const res = await SpaceConnector.client.identity.roleBinding.list({
-                resource_type: 'identity.User',
                 resource_id: userId,
-                role_id: roleId,
-                role_type: 'DOMAIN',
+                domain_id: store.state.domain.domainId,
             });
             const roleBindingId = res.results[0].role_binding_id;
             if (res.total_count > 0) {
                 await SpaceConnector.client.identity.roleBinding.delete({
                     role_binding_id: roleBindingId,
+                    domain_id: store.state.domain.domainId,
                 });
             }
         };
@@ -330,10 +328,10 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
                 if (roleId.length > 0 || roleId !== '') {
                     await bindRole(item.user_id, roleId);
                 }
-                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
@@ -342,20 +340,25 @@ export default {
         };
         const updateUser = async (item, roleId) => {
             try {
-                await SpaceConnector.client.identity.user.update({
+                await SpaceConnector.clientV2.identity.user.update({
                     ...item,
                 });
                 if (roleId && roleId !== userFormState.roleOfSelectedUser) {
                     await bindRole(item.user_id, roleId);
                     userFormState.roleOfSelectedUser = roleId;
                 }
-                if (roleId === '' && userFormState.roleOfSelectedUser !== '') {
-                    await unbindRole(item.user_id, roleId);
+                if (!roleId && userFormState.roleOfSelectedUser !== '') {
+                    await unbindRole(item.user_id);
                     userFormState.roleOfSelectedUser = roleId;
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+            } catch (e: any) {
+                const errorDetail = e.axiosError.response.data.detail;
+                if (errorDetail.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
+                    showErrorMessage(errorDetail.message, '');
+                } else {
+                    ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+                }
             } finally {
                 await userPageStore.listUsers(userListApiQuery);
                 userPageStore.$patch({ selectedIndices: [] });
@@ -370,7 +373,7 @@ export default {
             }
             await userPageStore.listUsers(userListApiQuery);
         };
-        const handleUserManagementModalConfirm = () => {
+        const handleUserStatusModalConfirm = () => {
             userPageStore.listUsers(userListApiQuery);
         };
 
@@ -385,7 +388,7 @@ export default {
             userStateFormatter,
             modalState,
             clickAdd,
-            handleUserManagementModalConfirm,
+            handleUserStatusModalConfirm,
             handleSelectDropdown,
             handleUserFormConfirm,
             handleSelect,

@@ -7,7 +7,7 @@ export const getDynamicLayoutSimpleTableArgTypes = (): ArgTypes => {
     const argTypes = getDynamicLayoutArgTypes();
 
     argTypes.data.defaultValue = mock.table.data;
-    argTypes.options.defaultValue = mock.table.options;
+    argTypes.options.defaultValue = mock.simpleTable.options;
 
     return {
         name: argTypes.name,

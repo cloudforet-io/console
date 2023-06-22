@@ -210,6 +210,9 @@ export default {
         @apply col-span-12;
         font-size: 1rem;
         line-height: 1.6;
+        .text {
+            @apply font-bold;
+        }
     }
     .chart-wrapper {
         @apply col-span-12;

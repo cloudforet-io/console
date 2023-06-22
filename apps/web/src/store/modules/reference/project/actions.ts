@@ -18,7 +18,6 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
         || (options?.lazyLoad && state.items)
         ) && !options?.force
     ) return;
-    lastLoadedTime = currentTime;
 
     try {
         const response = await SpaceConnector.client.identity.project.list({
@@ -44,6 +43,7 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
         });
 
         commit('setProjects', projects);
+        lastLoadedTime = currentTime;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

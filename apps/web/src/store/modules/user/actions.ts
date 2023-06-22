@@ -21,6 +21,8 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         email: response.email,
         language: languages[response.language] ? response.language : 'en',
         timezone: response.timezone,
+        // email_verified : There is data only when the value is true.
+        emailVerified: !!response.email_verified,
     };
 };
 
@@ -35,6 +37,8 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         language: response.language,
         timezone: response.timezone,
         requiredActions: response.required_actions,
+        // email_verified : There is data only when the value is true.
+        emailVerified: !!response.email_verified,
     };
 };
 
@@ -57,7 +61,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userType === 'DOMAIN_OWNER') {
         await SpaceConnector.client.identity.domainOwner.update(request);
     } else {
-        await SpaceConnector.client.identity.user.update(request);
+        await SpaceConnector.clientV2.identity.user.update(request);
     }
 };
 
@@ -125,6 +129,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
 export const signOut = (): void => {
     SpaceConnector.flushToken();
+    window.localStorage.removeItem('hideNotificationEmailModal');
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
@@ -133,7 +138,17 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
     await updateUser(state.userId, state.userType, userRequest);
-    commit('setUser', { ...state, ...userRequest });
+
+    const convertRequestType = (): UserState => ({
+        userId: userRequest.user_id || state.userId,
+        name: userRequest.name || state.name,
+        email: userRequest.email || state.email,
+        language: userRequest.language || state.language,
+        timezone: userRequest.timezone || state.timezone,
+        emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
+    });
+
+    commit('setUser', { ...state, ...convertRequestType() });
     commit('setTimezone', userRequest.timezone);
     if (userRequest.language) {
         commit('setLanguage', userRequest.language);

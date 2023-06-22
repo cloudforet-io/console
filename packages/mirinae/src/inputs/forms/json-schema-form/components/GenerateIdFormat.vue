@@ -9,6 +9,7 @@
         </p-button>
         <p-text-input :value="value"
                       :invalid="invalid"
+                      :style="{ width: fullWidth ? '100%' : undefined }"
                       @update:value="handleUpdateValue"
         >
             <template #right-edge>
@@ -52,6 +53,10 @@ export default defineComponent<Props>({
             default: false,
         },
         invalid: {
+            type: Boolean,
+            default: false,
+        },
+        fullWidth: {
             type: Boolean,
             default: false,
         },

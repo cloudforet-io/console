@@ -28,17 +28,58 @@
 		}
 	},
 	"AUTH": {
-		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
-			"GO_TO_LOGIN_PAGE": "ログインページへ移動",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "パスワードを変更せずにログインに戻る",
-			"HELP_TEXT": "アカウントの新しいパスワード入力:",
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "ログインする",
+				"FORGOT_PASSWORD": "パスワードをお忘れですか？",
+				"HELP_TEXT": "ユーザーIDを入力すると、パスワードリセットリンクがメールで送信されます。",
+				"INVALID_EMAIL_FORMAT": "無効なメール形式またはSingle Sign-Onアカウントです。",
+				"SEND": "パスワードリセットメール送信",
+				"TITLE": "パスワードをお忘れですか？",
+				"USER_ID": "ユーザーID"
+			},
 			"INVALID_LINK": "無効なリンクです",
-			"MOBILE_GUIDE_MODAL_DESC_1": "初期ログインの時に",
-			"MOBILE_GUIDE_MODAL_DESC_2": "PC環境でまずパスワードを再設定した後、",
-			"MOBILE_GUIDE_MODAL_DESC_3": "ご利用いただけます。",
-			"MOBILE_GUIDE_MODAL_TITLE": "モバイル環境では利用不可",
-			"RESET_PASSWORD": "パスワード再設定"
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "デスクトップまたはノートパソコン環境で",
+				"MOBILE_GUIDE_MODAL_DESC_2": "初期パスワードを再設定した後",
+				"MOBILE_GUIDE_MODAL_DESC_3": "ログインできます。",
+				"MOBILE_GUIDE_MODAL_TITLE": "モバイル環境には対応していません"
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "パスワード確認",
+				"DESC": "{min}文字以上で入力してください。",
+				"DONE": "パスワードのリセットが完了しました!",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "こちら",
+						"COLLAPSED": "メールが届かない場合は、",
+						"DESC_1": "メール送信完了",
+						"DESC_2": "送信されたガイドに従ってパスワードを変更してください。",
+						"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
+						"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
+						"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
+						"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
+						"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
+						"EXTENSION_TITLE_1": "メールが届かない場合は、",
+						"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？",
+						"GO_BACK_TO_CONSOLE": "コンソールログイン",
+						"TITLE": "パスワードリセットメールを送信する"
+					},
+					"FAIL": {
+						"DESC_1": "リクエストされたアカウントには、",
+						"DESC_2": "パスワードリセットリンクを送信するための通知メールが認証されていません。",
+						"DESC_3": "ドメイン管理者に連絡して、",
+						"DESC_4": "パスワードリセットをリクエストしてください。",
+						"GO_BACK": "戻る",
+						"TITLE": "パスワードリセットができません"
+					}
+				},
+				"GO_TO_SIGN_IN": "ログインする",
+				"HELP_TEXT": "アカウントの新しいパスワード入力:",
+				"NOT_MATCHING": "一致しません。",
+				"RESET_PASSWORD": "パスワード再設定",
+				"TITLE": "パスワード再設定"
+			}
 		}
 	},
 	"AUTOMATION": {
@@ -887,6 +928,20 @@
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
+			"COLLAPSE_TITLE": "認証コードが届きませんか？",
+			"ENTER_EMAIL": "通知メールを入力してください。",
+			"INVALID_CODE": "無効なコードです。もう一度メールを確認してください。",
+			"NOTIFICATION_EMAIL": "お知らせメール",
+			"SEND_CODE": "認証コードを送信",
+			"SEND_NEW_CODE": "再送信",
+			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
+			"SUCCESS": "確認コードが通知メールに送信されました。",
+			"TITLE": "通知メールを確認する",
+			"VERIFICATION_CODE": "認証コード",
+			"VERIFY_NOW": "認証"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "閉じる",
@@ -896,20 +951,26 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "個人情報編集に失敗",
 			"ALT_S_UPDATE": "個人情報編集完了",
+			"CURRENT_PASSWORD": "現在のパスワード",
 			"EMAIL": "メールアドレス",
 			"EMAIL_REQUIRED": "メールアドレスを入力してください",
 			"GROUP": "グループ/会社",
 			"ID": "ID",
+			"KEEP_PASSWORD": "現在のパスワードを維持する",
 			"LANGUAGE": "言語",
 			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
 			"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
 			"MOBILE": "電話番号",
 			"NAME": "お名前",
 			"NAME_REQUIRED": "お名前を入力してください。",
+			"NEW_PASSWORD": "新しいパスワード",
 			"PASSWORD": "パスワード",
 			"PASSWORD_CHECK": "パスワードの確認",
 			"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください",
+			"PASSWORD_HELP_TEXT": "認証済みの通知専用メールアドレスがあるアカウントの場合に限り、パスワードリセットリンクの受信が可能です。",
 			"ROLE": "権限",
+			"SEND_LINK": "パスワードリセットメール送信",
+			"SET_MANUALLY": "管理者がパスワードを設定する",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
@@ -944,6 +1005,7 @@
 			"VERSION": "バージョン"
 		},
 		"TAGS": {
+			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
 			"ADD_TAG_DESC": "タグを追加して、リソースを管理します",
 			"ALT_E_UPDATE": "タグの編集に失敗",
@@ -1223,6 +1285,8 @@
 				"DELETE": "削除",
 				"DELETE_TITLE": "この変数を削除しますか？",
 				"DESCRIPTION_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
+				"DESCRIPTION_ASSET_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
+				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "クラウドセキュリティと規制コンプライアンスのためのコンプライアンスフレームワークのリスト",
 				"DESCRIPTION_GROUP_BY": "特定のオプションに基づいてデータをグループ化し、そのグループのトレンドやパターンを把握することができます。",
 				"DESCRIPTION_PRODUCT": "各クラウドプロバイダーが提供するクラウドコンピューティング製品やサービス",
 				"DESCRIPTION_PROJECT": "プロジェクトにグループ化されたクラウドリソースやサービスの集合体",
@@ -1349,6 +1413,14 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
+			"COMPLIANCE_CHECK_STATUS": {
+				"CHECKED_SERVICE_ACCOUNT": "確認されたサービスアカウント",
+				"COMPLIANCE_SCORE": "コンプライアンススコア",
+				"DESC": "選択した期間中のコンプライアンスのPass/Failの全体的な状態を表示するウィジェット",
+				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
+				"MORE_THAN_PREV_MONTH": "前月よりも多い",
+				"TOTAL_COMPLIANCE_NUMBER": "総コンプライアンス数"
+			},
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
@@ -1366,6 +1438,12 @@
 			},
 			"COST_TREND_STACKED": {
 				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+			},
+			"COUNT_OF_FAIL_FINDINGS": {
+				"DESC": "選択した期間中のコンプライアンスのFail findingsの数を'Group By'オプションで集計して表示するウィジェット"
+			},
+			"COUNT_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsの数を'Group By'オプションで集計して表示するウィジェット"
 			},
 			"DAILY_UPDATES": {
 				"DESC": "当日の作成または削除されたクラウドリソースの一覧が表示されます。"
@@ -1390,8 +1468,22 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
+			"SEVERITY_STATUS_BY_SERVICE": {
+				"DESC": "選択した期間中に確認された各サービスのコンプライアンスFailureをヒートマップを使用して表示するウィジェット"
+			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
+			},
+			"TOTAL_FAILURE_AND_SEVERITY": {
+				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット",
+				"FAILURE_RATE": "Failure率",
+				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
+				"MORE_THAN_PREV_MONTH": "前月よりも多い",
+				"SEVERITY": "重要度",
+				"TOTAL_FAILURE_COUNT": "合計の failure 数"
+			},
+			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
+				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
 			},
 			"UPDATE_TITLE": "ウィジェットの更新",
 			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
@@ -1604,6 +1696,16 @@
 				"ACCOUNT_N_PROFILE": "アカウント＆情報",
 				"BASE_INFORMATION": "基本情報",
 				"CHANGE_PASSWORD": "パスワード変更",
+				"NOTIFICATION_EMAIL": {
+					"CHANGE": "変更",
+					"HELP_TEXT": "アカウントやシステムに関する重要な情報を受け取るためのメールアドレスを入力してください。",
+					"NOT_VERIFIED": "認証されていません",
+					"SEND_MAIL": "認証コード送信",
+					"SUCCESS": "通知専用メールの認証が完了しました",
+					"TITLE": "お知らせメール",
+					"VERIFIED": "認証済みです",
+					"VERIFY": "認証"
+				},
 				"SAVE_CHANGES": "変更事項を保存"
 			},
 			"API_KEY": {
@@ -1619,7 +1721,7 @@
 				"ENABLE_MODAL_TITLE": "API Key有効化",
 				"HIDE": "非表示",
 				"ID": "API Key ID",
-				"MODAL_TITLE": "API Keyが作成されました！",
+				"MODAL_TITLE": "API Keyが作成されました",
 				"SHOW": "もっと見る",
 				"SPACECTL": "Spacectl (CLI)",
 				"SPACECTL_CONFIG": "spacectl設定",
@@ -1633,7 +1735,6 @@
 				"ASSIGN_DOMAIN_ROLE": "ドメイン·ロールの割り当てる",
 				"CHECK_USER_ID": "ユーザ名を確認",
 				"DOMAIN_ADMIN": "ドメイン管理者",
-				"EMAIL": "メールアドレス",
 				"EMAIL_INVALID": "無効なメール形式です",
 				"EMPTY_SPACE_INVALID": "空白を取り除いてください",
 				"GROUP": "グループ/会社",
@@ -1644,6 +1745,8 @@
 				"NAME": "お名前",
 				"NAME_PLACEHOLDER": "ユーザ名を入力",
 				"NAME_VALID": "使用可能なIDです",
+				"NOTIFICATION_EMAIL": "お知らせメール",
+				"NOTIFICATION_TOOLTIP": "アカウントやシステムに関する重要な情報を受け取るためのメールアドレスを入力してください。",
 				"NOT_SELECT_ROLE": "ロールが選択されていません",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
@@ -1654,7 +1757,7 @@
 				"PASSWORD_CHECK": "パスワード確認",
 				"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください。",
 				"PASSWORD_HELP_TEXT": "パスワードは、5〜12文字で入力してください。",
-				"PASSWORD_INVALID": "パスワードは、5〜12文字で入力してください。",
+				"PASSWORD_INVALID": "8文字以上で入力してください。",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"TAGS": "タグ",
 				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
@@ -1663,8 +1766,8 @@
 				"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"UPDATE_TITLE": "ユーザー編集",
-				"USER_ID": "ID",
-				"USER_ID_DUPLICATED": "同じIDが存在します。",
+				"USER_ID": "User ID",
+				"USER_ID_DUPLICATED": "すでに存在しています",
 				"USER_ID_INVALID": "同じIDが存在します。",
 				"USER_ID_NOT_EXIST": "IDがありません"
 			},
@@ -1722,7 +1825,6 @@
 				"DISABLE_MODAL_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 				"DISABLE_MODAL_TITLE": "ユーザ無効化",
 				"DOMAIN_ID": "ドメイン名",
-				"EMAIL": "メールアドレス",
 				"ENABLE": "有効化",
 				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
 				"ENABLE_MODAL_TITLE": "ユーザー有効化",
@@ -1734,6 +1836,7 @@
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",
+				"NOTIFICATION_EMAIL": "お知らせメール",
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 				"ROOT_ACCOUNT": "Root account",
 				"SELECTED_DATA": "選択したデータ",
@@ -1975,6 +2078,132 @@
 				"TAG_MANAGED": "Managed",
 				"TYPE": "種類"
 			}
+		},
+		"COLLECTOR": {
+			"ADDITIONAL_OPTIONS": "追加オプション",
+			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
+			"ALT_E_COLLECT_DATA": "データ収集に失敗",
+			"ALT_E_DELETE_COLLECTOR": "コレクター削除に失敗",
+			"ALT_E_GET_COLLECTOR": "コレクター取得に失敗",
+			"ALT_E_GET_VERSION": "バージョン取得に失敗",
+			"ALT_E_UPDATE_COLLECTOR": "コレクタ変更に失敗",
+			"ALT_E_UPDATE_COLLECTOR_OPTIONS": "コレクターオプションの更新に失敗しました",
+			"ALT_E_UPDATE_SCHEDULE": "スケジュール変更に失敗",
+			"ALT_E_UPDATE_SERVICE_ACCOUNTS": "関連サービスアカウントの更新に失敗しました",
+			"ALT_S_CHANGE_COLLECTOR_NAME": "レクター名の変更に成功しました",
+			"ALT_S_COLLECT_START": "データ収集開始",
+			"ALT_S_DELETE_COLLECTOR": "コレクタが削除されました",
+			"ALT_S_UPDATE_COLLECTOR": "コレクタ変更完了",
+			"ALT_S_UPDATE_COLLECTOR_OPTIONS": "コレクターオプションの更新に成功しました",
+			"ALT_S_UPDATE_SCHEDULE": "スケジュールの変更完了",
+			"ALT_S_UPDATE_SERVICE_ACCOUNTS": "サービスアカウントの更新に成功しました",
+			"CREATE": {
+				"ALL": "全体",
+				"ALT_E_COLLECT_EXECUTION": "データ収集は開始に失敗しました",
+				"ALT_E_CREATE_COLLECTOR": "コレクターの作成に失敗しました",
+				"ALT_E_GET_VERSION_TITLE": "バージョン取得に失敗",
+				"ALT_S_COLLECT_EXECUTION": "データ収集は現在進行中です",
+				"ALT_S_CREATE_COLLECTOR": "コレクターの作成に成功しました",
+				"ATTACHED_SERVICE_ACCOUNT": "関連するサービスアカウント",
+				"AUTO_UPGRADE_LABEL": "自動アップグレード",
+				"BETA": "ベータ版",
+				"CONTINUE": "次へ",
+				"CREATE_COMPLETE_MODAL_COLLECT": "今すぐ収集",
+				"CREATE_COMPLETE_MODAL_SKIP": "後で収集",
+				"CREATE_COMPLETE_MODAL_TITLE": "今すぐデータを収集しますか？",
+				"CREATE_EXIT_MODAL_CONTENT": "この操作は取り消すことができません。",
+				"CREATE_EXIT_MODAL_TITLE": "中止してもよろしいですか？",
+				"CREATE_NEW_COLLECTOR": "新しいコレクターを作成",
+				"FORM_LOAD_FAILED": "追加オプションの読み込みに失敗しました。",
+				"LEARN_MORE": "詳細を見る",
+				"LOADING_DESC1": "加オプションを読み込んでいます...",
+				"LOADING_DESC2": "(お待ちください、約1〜2分かかる場合があります)",
+				"NAME": "名前",
+				"NAME_INVALID_DUPLICATED": "名前が重複しています",
+				"NAME_INVALID_MIN": "2文字以上を入力してください",
+				"PAGE_TITLE": "新しいコレクターを作成する",
+				"PREVIOUS": "前へ",
+				"PREV_MODAL_CONTENT": "この操作は取り消すことができません。",
+				"PREV_MODAL_TITLE": "プラグインの選択から再開してもよろしいですか？",
+				"PROVIDER": "プロバイダー",
+				"RELOAD": "リロード",
+				"REQUIRED_FIELD": "必須入力項目です。",
+				"SELECT": "選択",
+				"SELECT_OTHER_PLUGIN": "他のプラグインを選択する",
+				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
+				"STEP_DESC1": "先にプラグインを選択してください",
+				"STEP_DESC2": "基本情報を入力してください",
+				"STEP_DESC3": "高度なオプションを設定してください",
+				"STEP_DESC4": "データ収集ジョブの自動化のためのスケジュールを設定します",
+				"TAG": "タグ",
+				"TAG_FORM_DESC1": "{service}のタグを設定する",
+				"TAG_FORM_DESC2": "各タグはキーとオプションの値で構成されています。{service}サービスでは、タグを使用してより正確な検索やフィルタリングが可能です。",
+				"VERSION_INVALID_REQUIRED": "バージョンを選択してください",
+				"VERSION_LABEL": "バージョン"
+			},
+			"DETAIL": {
+				"ALL": "全体",
+				"ATTACHED_SERVICE_ACCOUNTS": "接続されたサービスアカウント",
+				"AUTO_UPGRADE": "自動アップグレード",
+				"A_PROVIDER": "クラウドプロバイダ",
+				"BASE_INFO": "基本情報",
+				"CANCEL": "キャンセル",
+				"COLLECTOR_HISTORY": "コレクターの履歴",
+				"COLLECTOR_OPTIONS": "コレクターオプション",
+				"COLLECT_DATA": "データ収集",
+				"CREATED": "作成日",
+				"DELETE_COLLECTOR": "コレクター削除",
+				"EDIT": "編集",
+				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
+				"LAST_COLLECTED": "最後に収集した時間",
+				"NAME": "名前",
+				"PLUGIN": "プラグイン",
+				"PLUGIN_ID": "プラグイン ID",
+				"REGION": "Region",
+				"SAVE_CHANGES": "変更を保存",
+				"SCHEDULE": "スケジュール",
+				"SCHEDULE_COLLECT_DESC": "毎日、{times}にデータを収集します。",
+				"SCHEDULE_HOURLY": "時間の間隔 ",
+				"SCHEDULE_NOT_SELECTED_YET": "スケジュールの頻度がまだ選択されていません。",
+				"SCHEDULE_ON_OFF": "自動収集スケジュールのオン/オフ",
+				"SCHEDULE_TURN_ON_DESC": "データを自動的に収集するように設定できます。",
+				"SELECT": "選択する",
+				"SELECT_SERVICE_ACCOUNT": "関連するサービスアカウントを選択してください。",
+				"SERVICE_CODE": "Service Code",
+				"SPECIFIC_SERVICE_ACCOUNT": "特定のサービスアカウント",
+				"TAG": "タグ",
+				"VERSION": "バージョン"
+			},
+			"MAIN": {
+				"ALT_E_EDIT_SCHEDULE": "スケジュールの編集に失敗しました",
+				"ALT_S_EDIT_SCHEDULE": "スケジュールの編集が正常に完了しました",
+				"COLLECT_DATA": "データ収集",
+				"CREATE": "作成",
+				"CREATE_COLLECTOR": "コレクタ生成",
+				"CURRENT_STATUS": "進行状況",
+				"EDIT_MODAL_TITLE": "スケジュールの編集",
+				"EDIT_SCHEDULE": "編集",
+				"HISTORY": "コレクターの履歴",
+				"IN_PROGRESS": "進行中",
+				"JOB_ERROR": "状態: {date}に収集失敗",
+				"JOB_NONE": "収集記録なし",
+				"JOB_PROGRESS": "進捗率: 進行中",
+				"JOB_SUCCESS": "状態：{date}に収集完了",
+				"NO_DATA": "作成されたコレクターはありません。",
+				"NO_SCHEDULE": "スケジュールが設定されていません",
+				"PLUGIN": "プラグイン",
+				"RECENT_JOBS": "過去5日間の最新のデータ収集結果です",
+				"RESTART": "再開",
+				"RESTART_COLLECT": "現在、データ収集は進行中です。再開しますか？",
+				"SCHEDULED": "予定された収集:",
+				"SCHEDULED_TIME": "{hr}時間{m}分後",
+				"SET_SCHEDULE": "設定",
+				"TIMEZONE": "タイムゾーン",
+				"TITLE": "コレクタ",
+				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
+			},
+			"NO_DATA": "データがありません",
+			"NO_OPTIONS": "オプションなし"
 		},
 		"SERVER": {
 			"MAIN": {
@@ -2455,11 +2684,7 @@
 			"CREATE": {
 				"ALT_E_CREATE_TITLE": "コレクター作成に失敗",
 				"ALT_E_GET_PLUGIN_TITLE": "プラグイン読み込みに失敗",
-				"ALT_E_GET_VERSION_TITLE": "バージョン取得に失敗",
 				"ALT_S_CREATE_TITLE": "コレクタ作成完了",
-				"AUTO_UPGRADE_LABEL": "自動アップグレード",
-				"NAME_INVALID_DUPLICATED": "名前が重複しています",
-				"NAME_INVALID_MIN": "2文字以上を入力してください",
 				"NAME_LABEL": "名前",
 				"PRIORITY_INVALID_MAX": "10以内で設定してください",
 				"PRIORITY_INVALID_MIN": "1以上で設定してください",
@@ -2474,9 +2699,7 @@
 				},
 				"TAB_ADD_TAG": "タグ追加",
 				"TAB_SET_COLLECTOR": "コレクター設定",
-				"TITLE": "コレクター作成",
-				"VERSION_INVALID_REQUIRED": "バージョンを選択してください",
-				"VERSION_LABEL": "バージョン"
+				"TITLE": "コレクター作成"
 			},
 			"MAIN": {
 				"ACTION": "作業",
@@ -2533,6 +2756,7 @@
 				"DETAILS_FILTER_TITLE": "フィルタ情報",
 				"DISABLE": "無効化",
 				"ENABLE": "有効化",
+				"NO_COLLECTOR_DATA": "作成されたコレクターはありません。",
 				"NO_SELECTED_COLLECTOR": "コレクターを選択したら詳しい情報が確認できます。",
 				"SCHEDULE_ACTION": "作業",
 				"SCHEDULE_ADD": "追加",

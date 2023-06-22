@@ -43,6 +43,7 @@ export const Template = (args, { argTypes }) => ({
             :disable-handler="disableHandler"
             :appearance-type="appearanceType"
             :page-size="pageSize"
+            :reset-selected-on-unmounted="resetSelectedOnUnmounted"
             @update:visible-menu="onUpdateVisibleMenu"
             @update:search-text="onUpdateSearchText"
             @update:selected="onUpdateSelected"

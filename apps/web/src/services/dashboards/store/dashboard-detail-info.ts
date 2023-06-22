@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {
-    cloneDeep, isEmpty, isEqual, union,
+    cloneDeep, isEmpty, isEqual,
 } from 'lodash';
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
@@ -10,11 +10,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
 
+import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -81,12 +85,36 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     },
 });
 
-const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema): DashboardVariablesSchema => ({
-    properties: { ...managedDashboardVariablesSchema.properties, ...variablesSchemaInfo?.properties ?? {} },
-    order: union(managedDashboardVariablesSchema.order, variablesSchemaInfo?.order ?? []),
-});
-const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema): DashboardVariablesSchema => {
-    const projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
+    if (isEmpty(variablesSchemaInfo?.properties)) { // create dashboard case
+        const _managedDashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
+        if (labels?.includes('Asset')) {
+            managedVariablesPropertiesMap.forEach((value, key) => {
+                if (Object.keys(ASSET_REFERENCE_TYPE_INFO).includes(key)) {
+                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
+                }
+            });
+            // HACK: remove below code after backend is ready
+            _managedDashboardVariablesSchema.properties[REFERENCE_TYPE_INFO.service_account.type].use = false;
+        } else if (labels?.includes('Cost')) {
+            managedVariablesPropertiesMap.forEach((value, key) => {
+                if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
+                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
+                }
+            });
+        }
+        return _managedDashboardVariablesSchema;
+    }
+    return {
+        properties: { ...variablesSchemaInfo?.properties ?? {} },
+        order: variablesSchemaInfo?.order ?? [],
+    };
+};
+const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
+    let projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+    if (labels?.includes('Asset')) {
+        projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+    }
     const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
 
     const order = [...variablesSchemaInfo.order];
@@ -180,10 +208,10 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
             };
 
-            let _variablesSchema = refineVariablesSchema(_dashboardInfo.variables_schema);
+            let _variablesSchema = refineVariablesSchema(_dashboardInfo.variables_schema, _dashboardInfo.labels);
             let _variables = _dashboardInfo.variables ?? {};
             if (this.projectId) {
-                _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
+                _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
                 _variables = refineProjectDashboardVariables(_variables, this.projectId);
             }
             this.variablesSchema = _variablesSchema;
@@ -210,7 +238,6 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 }
                 const resultWithConvertedVariableSchema = this.convertDashboardInfoByChangedVariableSchema(result);
                 this.setDashboardInfo(resultWithConvertedVariableSchema);
-                this.setDashboardInfo(result);
             } catch (e) {
                 this.resetDashboardData();
                 throw e;
@@ -252,7 +279,7 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             const {
                 properties: originProperties,
                 order: originOrder,
-            } = refineVariablesSchema(this.dashboardInfo?.variables_schema);
+            } = refineVariablesSchema(this.dashboardInfo?.variables_schema, this.dashboardInfo?.labels);
             const originVariables = this.dashboardInfo?.variables ?? {};
 
             // reset variables schema
@@ -261,7 +288,7 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 if (!originProperties[property]) return;
                 _variableSchema.properties[property].use = originProperties[property].use;
             });
-            if (this.projectId) _variableSchema = refineProjectDashboardVariablesSchema(_variableSchema);
+            if (this.projectId) _variableSchema = refineProjectDashboardVariablesSchema(_variableSchema, this.labels);
             this.variablesSchema = _variableSchema;
 
             // reset variables
@@ -279,7 +306,7 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
         updateWidgetValidation(isValid: boolean, widgetKey: string) {
             this.widgetValidMap[widgetKey] = isValid;
         },
-        // This action is for handling dashbaord data that does not reflect schema changes.
+        // This action is for handling dashboard data that does not reflect schema changes.
         convertDashboardInfoByChangedVariableSchema(dashboardInfo: DashboardModel) {
             const _dashboardInfo = cloneDeep(dashboardInfo);
             Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, v]) => {

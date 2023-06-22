@@ -16,6 +16,7 @@
                                                   :data-list="summaryDataList"
                                                   :widget-schema-list="summaryWidgetSchemaList"
                                                   :cloud-service-type-id="cloudServiceTypeId"
+                                                  :filters="hiddenFilters"
             />
         </div>
         <cloud-service-usage-overview-detail-modal v-model="usageOverviewDetailModalVisible"
@@ -24,6 +25,7 @@
                                                    :cloud-service-type-info="cloudServiceTypeInfo"
                                                    :filters="filters"
                                                    :period="period"
+                                                   :key-item-sets="keyItemSets"
         />
     </fragment>
 </template>
@@ -42,6 +44,7 @@ import {
 import type {
     DynamicWidgetSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -67,6 +70,8 @@ interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
     filters?: ConsoleFilter[];
     period?: Period;
+    hiddenFilters?: ConsoleFilter[];
+    keyItemSets: KeyItemSet[];
 }
 
 interface Data {
@@ -94,6 +99,14 @@ export default defineComponent<Props>({
             type: Object as () => Period|undefined,
             default: undefined,
         },
+        hiddenFilters: {
+            type: Array as () => ConsoleFilter[]|undefined,
+            default: undefined,
+        },
+        keyItemSets: {
+            type: Array as () => KeyItemSet[],
+            default: () => [],
+        },
     },
     setup(props) {
         const queryHelper = new QueryHelper();
@@ -107,12 +120,16 @@ export default defineComponent<Props>({
             summaryDataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
-            apiQuery: computed<{filter?: ApiFilter[]; keyword?: string}>(() => {
+            apiQuery: computed<{filter: ApiFilter[]; keyword: string}>(() => {
+                queryHelper.setFilters([]);
                 if (props.filters) {
-                    const { filter, keyword } = queryHelper.setFilters(props.filters).apiQuery;
-                    return { filter, keyword };
+                    queryHelper.addFilter(...props.filters);
                 }
-                return {};
+                if (props.hiddenFilters) {
+                    queryHelper.addFilter(...props.hiddenFilters);
+                }
+                const { filter, keyword } = queryHelper.apiQuery;
+                return { filter, keyword };
             }),
             dateRange: computed<Period|undefined>(() => {
                 if (isEmpty(props.period)) return undefined;
@@ -155,7 +172,7 @@ export default defineComponent<Props>({
                     ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
-                });
+                }, { cancelToken: fetchDataTokenList[idx]?.token });
                 fetchDataTokenList[idx] = undefined;
                 return results[0] ?? {};
             } catch (e: any) {
@@ -199,7 +216,7 @@ export default defineComponent<Props>({
         };
 
         /* Watchers */
-        watch([() => props.filters, () => state.dateRange], () => {
+        watch([() => state.apiQuery, () => state.dateRange], () => {
             if (state.cloudServiceTypeId) {
                 getDataListWithSchema();
             }

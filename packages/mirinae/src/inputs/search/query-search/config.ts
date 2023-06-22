@@ -62,7 +62,8 @@ const datetimeItems: ValueItem[] = [
 ];
 
 export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
-    boolean: (inputText: string) => {
+    boolean: (inputText: string|number) => {
+        if (typeof inputText === 'number') return { results: booleanItems };
         const regex = RegExp(inputText || '', 'i');
         return {
             results: booleanItems.reduce((res, d) => {
@@ -71,7 +72,8 @@ export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
             }, [] as ValueItem[]),
         };
     },
-    datetime: (inputText: string) => {
+    datetime: (inputText: string|number) => {
+        if (typeof inputText === 'number') return { results: datetimeItems };
         const regex = RegExp(inputText || '', 'i');
         return {
             results: datetimeItems.filter((d) => regex.test(d.name)) as ValueItem[],
