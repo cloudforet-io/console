@@ -10,15 +10,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
+import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -85,31 +81,6 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     },
 });
 
-const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    if (isEmpty(variablesSchemaInfo?.properties)) { // create dashboard case
-        const _managedDashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
-        if (labels?.includes('Asset')) {
-            managedVariablesPropertiesMap.forEach((value, key) => {
-                if (Object.keys(ASSET_REFERENCE_TYPE_INFO).includes(key)) {
-                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
-                }
-            });
-            // HACK: remove below code after backend is ready
-            _managedDashboardVariablesSchema.properties[REFERENCE_TYPE_INFO.service_account.type].use = false;
-        } else if (labels?.includes('Cost')) {
-            managedVariablesPropertiesMap.forEach((value, key) => {
-                if (Object.keys(COST_REFERENCE_TYPE_INFO).includes(key)) {
-                    _managedDashboardVariablesSchema.properties[key] = { ...value, use: true };
-                }
-            });
-        }
-        return _managedDashboardVariablesSchema;
-    }
-    return {
-        properties: { ...variablesSchemaInfo?.properties ?? {} },
-        order: variablesSchemaInfo?.order ?? [],
-    };
-};
 const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
     let projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
     if (labels?.includes('Asset')) {
@@ -208,7 +179,10 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
                 refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
             };
 
-            let _variablesSchema = refineVariablesSchema(_dashboardInfo.variables_schema, _dashboardInfo.labels);
+            let _variablesSchema = {
+                properties: _dashboardInfo.variables_schema?.properties ?? {},
+                order: _dashboardInfo.variables_schema?.order ?? [],
+            };
             let _variables = _dashboardInfo.variables ?? {};
             if (this.projectId) {
                 _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
@@ -276,10 +250,8 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             this.widgetValidMap = _widgetValidMap;
         },
         resetVariables() {
-            const {
-                properties: originProperties,
-                order: originOrder,
-            } = refineVariablesSchema(this.dashboardInfo?.variables_schema, this.dashboardInfo?.labels);
+            const originProperties = this.dashboardInfo?.variables_schema?.properties ?? {};
+            const originOrder = this.dashboardInfo?.variables_schema?.order ?? [];
             const originVariables = this.dashboardInfo?.variables ?? {};
 
             // reset variables schema

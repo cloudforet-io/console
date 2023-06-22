@@ -1,6 +1,7 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
+import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
-import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
+import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/default-dashboard/helper';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['awsDataTransferCostTrend'],
@@ -10,7 +11,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
     name: 'CDN & Traffic Cost',
-    labels: ['Cost'],
+    labels: [DASHBOARD_LABEL.COST],
     version: '1',
     description: {
         icon: 'ic_dashboard-template_cdn-traffic-cost',
@@ -29,10 +30,7 @@ export const cdnAndTrafficCostDashboard: DashboardConfig = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: {
-        properties: {},
-        order: [],
-    },
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST),
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
