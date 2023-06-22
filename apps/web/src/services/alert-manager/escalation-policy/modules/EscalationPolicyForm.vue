@@ -1,7 +1,125 @@
+<script lang="ts" setup>
+
+import {
+    PAnchor, PFieldGroup, PRadio, PTextInput,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
+import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
+
+interface Props {
+    mode: ACTION;
+    showScope: boolean;
+    escalationPolicyData: EscalationPolicyDataModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    mode: ACTION.create,
+    showScope: true,
+    escalationPolicyData: () => ({}) as EscalationPolicyDataModel,
+});
+const { t } = useI18n();
+const store = useStore();
+
+const escalationPolicyFormStore = useEscalationPolicyFormStore();
+const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const state = reactive({
+    projects: computed(() => store.getters['reference/projectItems']),
+    //
+    scopeLabels: computed(() => ({
+        [SCOPE.DOMAIN]: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
+        [SCOPE.PROJECT]: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
+    })),
+    scopes: computed(() => [
+        { label: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN },
+        { label: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT },
+    ]),
+    finishConditions: computed(() => [
+        { label: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged },
+        { label: t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved },
+    ]),
+});
+
+const {
+    forms: {
+        name,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+    isAllValid,
+} = useFormValidator({
+    name: undefined as string|undefined,
+    projectId: undefined as string|undefined,
+}, {
+    name(value) {
+        if (!value) return t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+        if (value.length > 40) return t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+        return true;
+    },
+    projectId(value) {
+        if (escalationPolicyFormState.scope === SCOPE.DOMAIN) return true;
+        if (!value) return t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
+        return true;
+    },
+});
+
+/* event */
+const handleChangeScope = (value) => {
+    escalationPolicyFormStore.$patch({ scope: value });
+    if (value === SCOPE.DOMAIN) {
+        escalationPolicyFormStore.$patch({ projectId: undefined });
+    }
+};
+const handleChangeFinishCondition = (value) => {
+    escalationPolicyFormStore.$patch({ finishCondition: value });
+};
+const handleUpdateName = (_name) => {
+    setForm('name', _name);
+    escalationPolicyFormStore.$patch({ name: _name });
+};
+const handleSelectProject = (selected) => {
+    setForm('projectId', selected[0]?.id);
+    escalationPolicyFormStore.$patch({ projectId: selected[0]?.id });
+};
+
+watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
+    if (mode === ACTION.create) {
+        escalationPolicyFormStore.$reset();
+    } else if (props.escalationPolicyData?.escalation_policy_id) {
+        escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
+        setForm('name', escalationPolicyFormState.name);
+        setForm('projectId', escalationPolicyFormState.projectId);
+    }
+}, { immediate: true });
+watch(() => isAllValid.value, (_isAllValid) => {
+    escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
+}, { immediate: true });
+
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/project/load');
+})();
+
+</script>
+
 <template>
     <div class="escalation-policy-form">
         <p-field-group required
-                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
+                       :label="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
         >
@@ -14,12 +132,12 @@
             </template>
         </p-field-group>
         <p-field-group v-if="showScope"
-                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
+                       :label="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
                        required
         >
             <template #default>
                 <div v-if="mode === ACTION.create">
-                    <p-radio v-for="(item, idx) in scopes"
+                    <p-radio v-for="(item, idx) in state.scopes"
                              :key="idx"
                              :selected="item.value"
                              :value="escalationPolicyFormState.scope"
@@ -33,10 +151,10 @@
                 <span v-if="mode === ACTION.update"
                       class="scope-text"
                 >
-                    <span>{{ scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
+                    <span>{{ state.scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
                     <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
                         (<p-anchor :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
-                                   :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                   :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                    highlight
                         />)
                     </span>
@@ -50,10 +168,10 @@
                        :invalid-text="invalidTexts.projectId"
         >
             <template #label>
-                <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
+                <span>{{ t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
                 <p-anchor class="link-text"
                           :to="{ name: PROJECT_ROUTE._NAME }"
-                          :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
+                          :text="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
                           highlight
                 />
             </template>
@@ -65,10 +183,10 @@
             </template>
         </p-field-group>
         <p-field-group
-            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
+            :label="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
             required
         >
-            <p-radio v-for="(item, idx) in finishConditions"
+            <p-radio v-for="(item, idx) in state.finishConditions"
                      :key="idx"
                      :selected="item.value"
                      :value="escalationPolicyFormState.finishCondition"
@@ -78,173 +196,18 @@
             </p-radio>
         </p-field-group>
         <p-field-group
-            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_LABEL')"
+            :label="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_LABEL')"
             required
         >
             <template #help>
                 <span class="help-text">
-                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_HELP_TEXT') }}
+                    {{ t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_HELP_TEXT') }}
                 </span>
             </template>
             <escalation-rules-input-form />
         </p-field-group>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { PropType } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PAnchor, PFieldGroup, PRadio, PTextInput,
-} from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import { useFormValidator } from '@/common/composables/form-validator';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
-import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-
-
-export default {
-    name: 'EscalationPolicyForm',
-    components: {
-        EscalationRulesInputForm,
-        ProjectSelectDropdown,
-        PFieldGroup,
-        PTextInput,
-        PRadio,
-        PAnchor,
-    },
-    props: {
-        mode: {
-            type: String,
-            default: ACTION.create,
-        },
-        showScope: {
-            type: Boolean,
-            default: true,
-        },
-        escalationPolicyData: {
-            type: Object as PropType<EscalationPolicyDataModel>,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.$state;
-        const state = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            //
-            scopeLabels: computed(() => ({
-                [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
-                [SCOPE.PROJECT]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
-            })),
-            scopes: computed(() => [
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN },
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT },
-            ]),
-            finishConditions: computed(() => [
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged },
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved },
-            ]),
-        });
-
-        const {
-            forms: {
-                name,
-                projectId,
-            },
-            setForm,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-        } = useFormValidator({
-            name: undefined as string|undefined,
-            projectId: undefined as string|undefined,
-        }, {
-            name(value) {
-                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
-                if (value.length > 40) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                return true;
-            },
-            projectId(value) {
-                if (escalationPolicyFormState.scope === SCOPE.DOMAIN) return true;
-                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
-                return true;
-            },
-        });
-
-        /* event */
-        const handleChangeScope = (value) => {
-            escalationPolicyFormStore.$patch({ scope: value });
-            if (value === SCOPE.DOMAIN) {
-                escalationPolicyFormStore.$patch({ projectId: undefined });
-            }
-        };
-        const handleChangeFinishCondition = (value) => {
-            escalationPolicyFormStore.$patch({ finishCondition: value });
-        };
-        const handleUpdateName = (_name) => {
-            setForm('name', _name);
-            escalationPolicyFormStore.$patch({ name: _name });
-        };
-        const handleSelectProject = (selected) => {
-            setForm('projectId', selected[0]?.id);
-            escalationPolicyFormStore.$patch({ projectId: selected[0]?.id });
-        };
-
-        watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
-            if (mode === ACTION.create) {
-                escalationPolicyFormStore.$reset();
-            } else if (props.escalationPolicyData?.escalation_policy_id) {
-                escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
-                setForm('name', escalationPolicyFormState.name);
-                setForm('projectId', escalationPolicyFormState.projectId);
-            }
-        }, { immediate: true });
-        watch(() => isAllValid.value, (_isAllValid) => {
-            escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
-        }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
-
-        return {
-            ...toRefs(state),
-            escalationPolicyFormState,
-            referenceRouter,
-            SCOPE,
-            ACTION,
-            PROJECT_ROUTE,
-            handleChangeScope,
-            handleChangeFinishCondition,
-            handleUpdateName,
-            handleSelectProject,
-            //
-            name,
-            projectId,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-            setForm,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .escalation-policy-form {

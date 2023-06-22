@@ -1,6 +1,20 @@
+<script lang="ts" setup>
+import { useRoute } from 'vue-router';
+
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
+
+const { breadcrumbs } = useBreadcrumbs();
+const route = useRoute();
+
+</script>
+
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
+        <vertical-page-layout v-if="route.meta.lnbVisible"
                               :breadcrumbs="breadcrumbs"
         >
             <template #sidebar>
@@ -17,26 +31,3 @@
         </general-page-layout>
     </fragment>
 </template>
-
-<script lang="ts">
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-
-import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
-
-export default {
-    name: 'AlertManagerContainer',
-    components: {
-        AlertManagerLNB,
-        VerticalPageLayout,
-        GeneralPageLayout,
-    },
-    setup() {
-        const { breadcrumbs } = useBreadcrumbs();
-        return {
-            breadcrumbs,
-        };
-    },
-};
-</script>

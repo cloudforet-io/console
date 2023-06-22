@@ -1,3 +1,77 @@
+<script lang="ts" setup>
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PTree, PI, PRadio,
+} from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+
+
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
+
+interface Props {
+    selectedProjectId: string|undefined;
+}
+
+defineProps<Props>();
+const emit = defineEmits<{(e: 'update:selected-project-id', value: string|undefined): void}>();
+
+const state = reactive({
+    root: null as ProjectTreeRoot|null,
+    selectedItem: {} as ProjectGroupTreeItem,
+    selectedNode: computed(() => state.selectedItem.node),
+});
+
+const toggleOptions = {
+    validator: (node) => node.data.has_child || node.children.length > 0,
+    removeChildrenOnFold: true,
+};
+const selectOptions = {
+    validator({ data }) {
+        return data.item_type === 'PROJECT';
+    },
+};
+const dataSetter = (text, node) => {
+    node.data.name = text;
+};
+const dataGetter = (node) => node.data.name;
+const dataFetcher = async (node): Promise<ProjectGroup[]> => {
+    try {
+        const params: any = {
+            sort: { key: 'name', desc: false },
+            item_type: 'ROOT',
+            check_child: true,
+        };
+
+        if (node.data?.id && node.data?.item_type) {
+            params.item_id = node.data.id;
+            params.item_type = node.data.item_type;
+        }
+
+        const { items } = await SpaceConnector.client.identity.project.tree(params);
+        return items;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+const onTreeInit = async (root) => {
+    state.root = root;
+};
+const onChangeSelect = (selected) => {
+    state.selectedItem = selected.length > 0 ? selected[0] : {};
+    emit('update:selected-project-id', selected.length > 0 ? selected[0].node.data.id : undefined);
+};
+const changeSelectState = (node, path) => {
+    state.root.changeSelectState(node, path);
+};
+
+</script>
+
 <template>
     <p-tree class="escalation-policy-project-tree"
             :edit-options="{disabled: true}"
@@ -32,100 +106,6 @@
         </template>
     </p-tree>
 </template>
-
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PTree, PI, PRadio,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
-
-export default {
-    name: 'EscalationPolicyProjectTree',
-    components: {
-        PTree,
-        PI,
-        PRadio,
-    },
-    props: {
-        selectedProjectId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            root: null as ProjectTreeRoot|null,
-            selectedItem: {} as ProjectGroupTreeItem,
-            selectedNode: computed(() => state.selectedItem.node),
-        });
-
-        const toggleOptions = {
-            validator: (node) => node.data.has_child || node.children.length > 0,
-            removeChildrenOnFold: true,
-        };
-        const selectOptions = {
-            validator({ data }) {
-                return data.item_type === 'PROJECT';
-            },
-        };
-        const dataSetter = (text, node) => {
-            node.data.name = text;
-        };
-        const dataGetter = (node) => node.data.name;
-        const dataFetcher = async (node): Promise<ProjectGroup[]> => {
-            try {
-                const params: any = {
-                    sort: { key: 'name', desc: false },
-                    item_type: 'ROOT',
-                    check_child: true,
-                };
-
-                if (node.data?.id && node.data?.item_type) {
-                    params.item_id = node.data.id;
-                    params.item_type = node.data.item_type;
-                }
-
-                const { items } = await SpaceConnector.client.identity.project.tree(params);
-                return items;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        };
-        const onTreeInit = async (root) => {
-            state.root = root;
-        };
-        const onChangeSelect = (selected) => {
-            state.selectedItem = selected.length > 0 ? selected[0] : {};
-            emit('update:selected-project-id', selected.length > 0 ? selected[0].node.data.id : undefined);
-        };
-        const changeSelectState = (node, path) => {
-            state.root.changeSelectState(node, path);
-        };
-
-        return {
-            ...toRefs(state),
-            toggleOptions,
-            selectOptions,
-            dataSetter,
-            dataGetter,
-            dataFetcher,
-            onTreeInit,
-            onChangeSelect,
-            changeSelectState,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .escalation-policy-project-tree {

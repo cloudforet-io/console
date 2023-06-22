@@ -1,3 +1,68 @@
+<script lang="ts" setup>
+
+import {
+    PI, PBadge, PAnchor,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import {
+    computed, reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+import type { ReferenceItem } from '@/store/modules/reference/type';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import type { AlertDataModel } from '@/services/alert-manager/type';
+
+import { ALERT_STATE } from '../lib/config';
+
+const ALERT_URGENCY = Object.freeze({
+    HIGH: 'HIGH',
+    LOW: 'LOW',
+});
+
+interface Props {
+    item: AlertDataModel;
+    showProjectLink: boolean;
+    showMemberName: boolean;
+    showStatusMessage: boolean;
+    projectReference: ReferenceItem;
+    userReference: ReferenceItem;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    item: () => ({}) as AlertDataModel,
+    showProjectLink: false,
+    showMemberName: false,
+    showStatusMessage: false,
+    projectReference: () => ({}) as ReferenceItem,
+    userReference: () => ({}) as ReferenceItem,
+});
+const store = useStore();
+
+const state = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    alertStateI18n: useAlertStateI18n(),
+});
+
+/* util */
+const badgeStyleTypeFormatter = (alertState) => {
+    if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
+    if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
+    return 'gray200';
+};
+const dateFormatter = (date) => {
+    const offset = (dayjs().tz(state.timezone).utcOffset());
+    const timezoneDate = dayjs(date).utcOffset(offset);
+    return timezoneDate.format('MM/DD HH:mm');
+};
+const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
+
+</script>
+
 <template>
     <div class="alert-list-item">
         <div class="content-wrapper">
@@ -33,7 +98,7 @@
                          badge-type="subtle"
                          class="badge"
                 >
-                    {{ alertStateI18n[item.state] }}
+                    {{ state.alertStateI18n[item.state] }}
                 </p-badge>
                 <span class="date">{{ dateFormatter(item.created_at) }}</span>
             </div>
@@ -49,99 +114,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { PropType } from 'vue';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PI, PBadge, PAnchor,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { store } from '@/store';
-
-import type { ReferenceItem } from '@/store/modules/reference/type';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-
-import { ALERT_STATE } from '../lib/config';
-
-const ALERT_URGENCY = Object.freeze({
-    HIGH: 'HIGH',
-    LOW: 'LOW',
-});
-
-export default {
-    name: 'AlertListItem',
-    components: {
-        PI,
-        PBadge,
-        PAnchor,
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => ({}),
-        },
-        showProjectLink: {
-            type: Boolean,
-            default: false,
-        },
-        showMemberName: {
-            type: Boolean,
-            default: false,
-        },
-        showStatusMessage: {
-            type: Boolean,
-            default: false,
-        },
-        projectReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: () => ({}),
-        },
-        userReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            alertStateI18n: useAlertStateI18n(),
-        });
-
-        /* util */
-        const badgeStyleTypeFormatter = (alertState) => {
-            if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
-            if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
-            return 'gray200';
-        };
-        const dateFormatter = (date) => {
-            const offset = (dayjs().tz(state.timezone).utcOffset());
-            const timezoneDate = dayjs(date).utcOffset(offset);
-            return timezoneDate.format('MM/DD HH:mm');
-        };
-        const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
-
-        return {
-            ...toRefs(state),
-            ALERT_URGENCY,
-            ALERT_MANAGER_ROUTE,
-            referenceRouter,
-            badgeStyleTypeFormatter,
-            dateFormatter,
-            projectNameFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .alert-list-item {

@@ -12,6 +12,7 @@ declare module 'vue-router' {
         // RouteRecord
         RouteRecordNormalized as OriginRouteRecordNormalized,
         RouteLocationMatched as OriginRouteLocationMatched,
+        RouteLocationNormalizedLoaded as OriginRouteLocationNormalizedLoaded,
     } from 'vue-router';
     import {
         Router,
@@ -52,6 +53,10 @@ declare module 'vue-router' {
     export interface RouteRecordMultipleViews extends OriginRouteRecordMultipleViews {
         meta?: RouteMeta;
         children?: RouteRecordRaw[];
+    }
+
+    export interface RouteLocationNormalizedLoaded extends OriginRouteLocationNormalizedLoaded {
+        meta?: RouteMeta;
     }
 
     // export
