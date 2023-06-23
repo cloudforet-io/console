@@ -132,6 +132,10 @@ const handleChangeToggle = () => {
         }
     }
 
+    .state-text {
+        @apply font-bold text-label-md;
+    }
+
     &.disabled {
         @apply cursor-not-allowed;
         .slider {

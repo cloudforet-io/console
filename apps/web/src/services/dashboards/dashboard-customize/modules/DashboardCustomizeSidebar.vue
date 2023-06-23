@@ -7,15 +7,19 @@
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableDateRange"
+                                     :state-text="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE')"
+                                     show-state-text
+                                     spacing="md"
                                      @change-toggle="handleChangeDateRangeToggle"
                     />
-                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
                 </div>
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableCurrency"
+                                     :state-text="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
+                                     show-state-text
+                                     spacing="md"
                                      @change-toggle="handleChangeCurrencyToggle"
                     />
-                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
                 </div>
                 <p-divider class="divider" />
                 <p-button style-type="tertiary"
@@ -163,10 +167,15 @@ onUnmounted(() => {
     line-height: 125%;
 
     .selector-wrapper {
-        display: flex;
-        gap: 0.5rem;
         &:first-child {
             padding-bottom: 0.5rem;
+        }
+
+        /* custom design-system component -p-toggle-button */
+        :deep(.p-toggle-button) {
+            .state-text {
+                @apply font-normal;
+            }
         }
     }
     .divider {
