@@ -22,7 +22,7 @@
     "eslint-config-custom": "*",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
-    "turbo": "^1.9.4"
+    "turbo": "^1.10.5"
   },
   "engines": {
     "npm": ">=8.0.0",
