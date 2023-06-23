@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
@@ -43,6 +43,7 @@ export default {
         const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
         const alertManagerSettings = useAlertManagerSettingsStore();
+        alertManagerSettings.initState();
         alertManagerSettings.$onAction((action) => {
             action.after(() => {
                 if (window) {
@@ -53,6 +54,11 @@ export default {
                     }
                 }
             });
+        });
+
+        onUnmounted(() => {
+            alertManagerSettings.$reset();
+            alertManagerSettings.$dispose();
         });
         return {
             breadcrumbs,

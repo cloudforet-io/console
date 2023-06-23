@@ -28,6 +28,7 @@ interface CostAnalysisPageState {
 }
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
+costExplorerSettingsStore.initState();
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {

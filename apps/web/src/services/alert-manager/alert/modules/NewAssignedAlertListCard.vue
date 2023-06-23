@@ -74,6 +74,7 @@ export default {
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
         const alertManagerSettingsStore = useAlertManagerSettingsStore();
+        alertManagerSettingsStore.initState();
 
 
         const state = reactive({

@@ -13,6 +13,7 @@ import type {
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
+costExplorerSettingsStore.initState();
 
 export const useCostExplorerDashboardStore = defineStore('cost-explorer-dashboard', {
     state: () => ({

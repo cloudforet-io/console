@@ -9,18 +9,19 @@ interface AlertManagerSettingsStore {
 
 
 export const useAlertManagerSettingsStore = defineStore('alert-manager-settings', {
-    state: (): AlertManagerSettingsStore => {
-        const localStorageItem = initServiceSettingsStore<AlertManagerSettingsStore>('alertManager');
-        return ({
-            alertLastCheckTime: localStorageItem?.alertLastCheckTime ?? '',
-        });
-    },
+    state: (): AlertManagerSettingsStore => ({
+        alertLastCheckTime: '',
+    }),
     getters: {
         getAlertLastCheckTime: (state): string => state.alertLastCheckTime,
     },
     actions: {
         setAlertLastCheckTime(time: string) {
             this.alertLastCheckTime = time;
+        },
+        initState() {
+            const localStorageItem = initServiceSettingsStore<AlertManagerSettingsStore>('alertManager');
+            this.alertLastCheckTime = localStorageItem?.alertLastCheckTime ?? '';
         },
     },
 });
