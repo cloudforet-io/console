@@ -1,15 +1,13 @@
 <template>
     <p-pane-layout class="channel-card-wrapper">
         <div class="card-header">
-            <div class="left-section">
-                <p-toggle-button :value="isActivated"
-                                 :disabled="manageDisabled"
-                                 @change-toggle="onToggleChange"
-                />
-                <span class="card-title"
-                      :class="{ inactivated: !isActivated }"
-                >{{ channelData.protocol_name }}</span>
-            </div>
+            <p-toggle-button :value="isActivated"
+                             :disabled="manageDisabled"
+                             :state-text="channelData.protocol_name"
+                             show-state-text
+                             spacing="lg"
+                             @change-toggle="onToggleChange"
+            />
             <p-icon-button name="ic_delete"
                            width="1.5rem"
                            height="1.5rem"
@@ -276,24 +274,12 @@ export default {
     min-height: 13.375rem;
     padding: 1rem 1rem 2.531rem;
 }
+
 .card-header {
     display: flex;
     justify-content: space-between;
-    .left-section {
-        display: flex;
-        align-items: center;
-    }
-    .card-title {
-        @apply font-bold;
-        font-size: 1rem;
-        line-height: 160%;
-        margin-left: 1rem;
-        margin-right: 0.5rem;
-        &.inactivated {
-            @apply text-gray-900;
-        }
-    }
 }
+
 .card-body {
     display: flex;
     flex-direction: column;
