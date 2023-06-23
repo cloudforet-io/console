@@ -1,12 +1,12 @@
 <template>
     <div class="admin-role-wrapper">
-        <div class="admin-role-headline">
-            <p-toggle-button
-                :value="state.isToggled"
-                @change-toggle="handleUpdateToggle"
-            />
-            <span class="title">{{ $t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
-        </div>
+        <p-toggle-button
+            :value="state.isToggled"
+            :state-text="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
+            show-state-text
+            spacing="md"
+            @change-toggle="handleUpdateToggle"
+        />
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
                            :key="`admin-role-${props.activeTab}`"
@@ -126,12 +126,5 @@ const getRoleList = async () => {
     @apply flex flex-col bg-white rounded-lg;
     padding: 0.75rem;
     gap: 0.875rem;
-    .admin-role-headline {
-        @apply flex items-center;
-        gap: 0.5rem;
-        .title {
-            @apply text-label-md font-bold;
-        }
-    }
 }
 </style>
