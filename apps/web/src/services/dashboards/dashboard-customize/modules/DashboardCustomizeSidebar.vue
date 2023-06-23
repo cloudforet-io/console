@@ -174,7 +174,8 @@ onUnmounted(() => {
         /* custom design-system component -p-toggle-button */
         :deep(.p-toggle-button) {
             .state-text {
-                @apply font-normal; }
+                @apply font-normal;
+            }
         }
     }
     .divider {
