@@ -14,7 +14,13 @@ export default defineConfig(async ({ command, mode }) => {
 
     return {
         optimizeDeps: {
-            include: ['@spaceone/design-system/tailwind.config.cjs'],
+            include: [
+                '@spaceone/design-system/tailwind.config.cjs',
+                'prosemirror-state',
+                'prosemirror-transform',
+                'prosemirror-model',
+                'prosemirror-view',
+            ],
         },
         plugins: [
             vuePlugin(),
