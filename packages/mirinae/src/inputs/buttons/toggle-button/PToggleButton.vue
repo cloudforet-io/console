@@ -10,10 +10,11 @@
                :checked="state.proxyValue"
                @change="handleChangeToggle"
         >
-        <span v-if="!!props.label"
+        <span v-if="!!props.stateText"
               class="label"
+              :class="props.position"
         >
-            {{ props.label }}
+            {{ props.stateText }}
         </span>
     </label>
 </template>
@@ -26,15 +27,19 @@ import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 
 interface ToggleButtonProps {
     value: boolean,
-    label?: string,
     styleType?: TOGGLE_BUTTON_THEME,
     disabled?: boolean,
+    stateText?: string,
+    position?: 'left' | 'right' | 'top',
+    spacing?: 'sm' | 'md' | 'lg' | 'space-between',
 }
 const props = withDefaults(defineProps<ToggleButtonProps>(), {
     value: false,
-    label: '',
     styleType: TOGGLE_BUTTON_THEME.secondary,
     disabled: false,
+    stateText: '',
+    position: 'right',
+    spacing: 'sm',
 });
 const emit = defineEmits<{(e: 'change-toggle', value: boolean): void;}>();
 const state = reactive({

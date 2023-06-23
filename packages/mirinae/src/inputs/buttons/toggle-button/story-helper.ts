@@ -22,10 +22,10 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    label: {
-        name: 'label',
+    stateText: {
+        name: 'stateText',
         type: { name: 'string' },
-        description: 'Toggle Label',
+        description: 'Toggle State Text',
         defaultValue: '',
         table: {
             type: {
