@@ -19,9 +19,12 @@
                 >
                     <template v-if="!printMode">
                         <span class="v-divider" />
-                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
                         <p-toggle-button class="ml-2"
                                          :value="costAnalysisPageState.stack"
+                                         :state-text="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')"
+                                         show-state-text
+                                         position="left"
+                                         spacing="md"
                                          @change-toggle="handleToggleStack"
                         />
                     </template>
