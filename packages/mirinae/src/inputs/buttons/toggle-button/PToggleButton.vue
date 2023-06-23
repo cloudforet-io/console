@@ -1,6 +1,6 @@
 <template>
     <label class="p-toggle-button"
-           :class="{'disabled': props.disabled}"
+           :class="{[props.position]: true, [props.spacing]: true, 'disabled': props.disabled}"
     >
         <input role="switch"
                type="checkbox"
@@ -10,17 +10,19 @@
                :checked="state.proxyValue"
                @change="handleChangeToggle"
         >
-        <span v-if="!!props.stateText"
-              class="label"
-              :class="props.position"
+        <slot v-if="props.showStateText"
+              name="state-text"
         >
-            {{ props.stateText }}
-        </span>
+            <span class="state-text">
+                {{ state.proxyStateText }}
+            </span>
+        </slot>
+
     </label>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { useProxyValue } from '@/hooks';
 import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
@@ -29,21 +31,24 @@ interface ToggleButtonProps {
     value: boolean,
     styleType?: TOGGLE_BUTTON_THEME,
     disabled?: boolean,
+    showStateText?: boolean,
     stateText?: string,
+    spacing?: 'sm' | 'md' | 'lg' | 'space-between' | 'none',
     position?: 'left' | 'right' | 'top',
-    spacing?: 'sm' | 'md' | 'lg' | 'space-between',
 }
 const props = withDefaults(defineProps<ToggleButtonProps>(), {
     value: false,
     styleType: TOGGLE_BUTTON_THEME.secondary,
     disabled: false,
-    stateText: '',
+    showStateText: false,
+    stateText: undefined,
     position: 'right',
     spacing: 'sm',
 });
 const emit = defineEmits<{(e: 'change-toggle', value: boolean): void;}>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
+    proxyStateText: computed(() => props.stateText || (state.proxyValue ? 'ON' : 'OFF')),
 });
 const handleChangeToggle = () => {
     state.proxyValue = !state.proxyValue;
@@ -54,6 +59,39 @@ const handleChangeToggle = () => {
 <style lang="postcss">
 .p-toggle-button {
     @apply inline-flex items-center cursor-pointer;
+
+    &.none {
+        gap: 0;
+    }
+
+    &.sm {
+        gap: 0.25rem;
+    }
+
+    &.md {
+        gap: 0.5rem;
+    }
+
+    &.lg {
+        gap: 1rem;
+    }
+
+    &.space-between {
+        justify-content: space-between;
+    }
+
+    &.right {
+        flex-direction: row;
+    }
+
+    &.left {
+        flex-direction: row-reverse;
+    }
+
+    &.top {
+        flex-direction: column-reverse;
+    }
+
     .slider {
         @apply relative bg-gray-300 cursor-pointer appearance-none;
         width: 2rem;
@@ -88,17 +126,16 @@ const handleChangeToggle = () => {
                 }
             }
         }
+
+        &:focus {
+            box-shadow: 0 0 0 2px rgba(73, 167, 247, 0.2);
+        }
     }
-    .label {
-        margin-left: 0.875rem;
-    }
+
     &.disabled {
         @apply cursor-not-allowed;
         .slider {
             @apply bg-gray-200 cursor-not-allowed;
-        }
-        .label {
-            @apply text-gray-300;
         }
     }
 }

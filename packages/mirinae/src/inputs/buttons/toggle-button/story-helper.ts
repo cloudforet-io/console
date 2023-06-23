@@ -1,6 +1,10 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
+import {
+    TOGGLE_BUTTON_POSITION,
+    TOGGLE_BUTTON_SPACING,
+    TOGGLE_BUTTON_THEME,
+} from '@/inputs/buttons/toggle-button/config';
 
 
 export const getToggleButtonArgTypes = (): ArgTypes => ({
@@ -16,6 +20,24 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             category: 'props',
             defaultValue: {
                 summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showStateText: {
+        name: 'showStateText',
+        type: { name: 'boolean' },
+        description: 'Determine whether the toggle button state text is checked.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
             },
         },
         control: {
@@ -38,6 +60,44 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'text',
+        },
+    },
+    position: {
+        name: 'position',
+        type: { name: 'string' },
+        description: 'StateText position',
+        defaultValue: 'right',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'right',
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.keys(TOGGLE_BUTTON_POSITION),
+        },
+    },
+    spacing: {
+        name: 'spacing',
+        type: { name: 'string' },
+        description: 'The spacing between toggle and stateText',
+        defaultValue: 'sm',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.keys(TOGGLE_BUTTON_SPACING),
         },
     },
     styleType: {
