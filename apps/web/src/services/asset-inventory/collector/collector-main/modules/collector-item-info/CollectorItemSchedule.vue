@@ -27,8 +27,8 @@
         <div @click.stop="handleChangeToggle">
             <p-toggle-button
                 :value="state.isScheduleActivated"
-                :label="state.isScheduleActivated ? 'ON' : 'OFF'"
                 :class="state.isScheduleActivated ? 'toggle-active' : ''"
+                show-state-text
                 @change-toggle="handleChangeToggle"
             />
         </div>
@@ -123,11 +123,11 @@ watch(() => props.item, (item) => {
 
     /* custom design-system component - p-toggle-button */
     :deep(.p-toggle-button) {
-        .label {
-            @apply text-gray-400;
+        .state-text {
+            @apply text-gray-400 font-normal;
         }
         &.toggle-active {
-            .label {
+            .state-text {
                 @apply text-blue-600;
             }
         }

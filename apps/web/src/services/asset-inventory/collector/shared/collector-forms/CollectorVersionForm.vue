@@ -2,12 +2,12 @@
     <div class="collector-version-form">
         <div class="label-row">
             <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
-            <div class="auto-upgrade-wrapper">
-                <span>{{ $t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
-                <p-toggle-button :value="collectorFormState.autoUpgrade"
-                                 @change-toggle="handleClickAutoUpgrade"
-                />
-            </div>
+            <p-toggle-button :value="collectorFormState.autoUpgrade"
+                             :state-text="$t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
+                             show-state-text
+                             position="left"
+                             @change-toggle="handleClickAutoUpgrade"
+            />
         </div>
         <p-select-dropdown :selected="collectorFormState.version"
                            :items="state.versionItems"
@@ -110,9 +110,9 @@ watch(() => state.pluginId, async (pluginId) => {
         @apply flex justify-between;
         width: 100%;
 
-        .auto-upgrade-wrapper {
-            @apply flex items-center gap-1;
-            span {
+        /* custom design-system component - p-toggle-button */
+        :deep(.p-toggle-button) {
+            .state-text {
                 @apply text-label-sm text-gray-600;
             }
         }
