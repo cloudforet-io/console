@@ -21,9 +21,12 @@ export const Template = (args, { argTypes }) => ({
         <div class="flex items-center justify-center">
             <p-toggle-button
                 :value="value"
-                :label="label"
                 :style-type="styleType"
                 :disabled="disabled"
+                :show-state-text="showStateText"
+                :state-text="stateText"
+                :spacing="spacing"
+                :position="position"
             />
         </div>
     `,
@@ -59,17 +62,94 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Label
+## Show State Text
 <Canvas>
-    <Story name="toggle button label">
+    <Story name="Show Text Next to Toggle Button">
         {{
             components: { PToggleButton },
             template: `
-                <div class="flex items-center justify-center">
+            <div class="flex items-center justify-center">
+                <p-toggle-button
+                    :value="true"
+                    showStateText="true"
+                    class="mr-8"
+                />
+            </div>
+        `
+        }}
+    </Story>
+</Canvas>
+
+## Position
+<Canvas>
+    <Story name="toggle button state text position">
+        {{
+            components: { PToggleButton },
+            template: `
+            <div class="flex flex-col gap-4 items-center justify-center">
+                <p-toggle-button
+                    :value="true"
+                    showStateText="true"
+                    class="mr-8"
+                />
+                <p-toggle-button
+                    :value="true"
+                    showStateText="true"
+                    position="left"
+                    class="mr-8"
+                />
+                <p-toggle-button
+                    :value="true"
+                    showStateText="true"
+                    position="top"
+                />
+            </div>
+        `
+        }}
+    </Story>
+</Canvas>
+
+## Spacing
+<Canvas>
+    <Story name="toggle button spacing">
+        {{
+            components: { PToggleButton },
+            template: `
+                <div class="flex flex-col gap-4 items-center justify-center">
                     <p-toggle-button
                         :value="true"
-                        label="label"
+                        showStateText="true"
+                        stateText="spacing : none"
+                        spacing="none"
                         class="mr-8"
+                    />
+                    <p-toggle-button
+                        :value="true"
+                        showStateText="true"
+                        stateText="spacing : sm"
+                        spacing="sm"
+                        class="mr-8"
+                    />
+                    <p-toggle-button
+                        :value="true"
+                        showStateText="true"
+                        stateText="spacing : md"
+                        spacing="md"
+                        class="mr-8"
+                    />
+                    <p-toggle-button
+                        :value="true"
+                        showStateText="true"
+                        stateText="spacing : lg"
+                        spacing="lg"
+                        class="mr-8"
+                    />
+                    <p-toggle-button
+                        :value="true"
+                        showStateText="true"
+                        stateText="spacing : space-between"
+                        spacing="space-between"
+                        class="w-2/4"
                     />
                 </div>
             `
@@ -91,7 +171,7 @@ export const Template = (args, { argTypes }) => ({
                             :disabled="true"
                         />
                         <p-toggle-button
-                            label="label"
+                            stateText="stateText"
                             :value="false"
                             :disabled="true"
                         />
@@ -103,7 +183,7 @@ export const Template = (args, { argTypes }) => ({
                             :disabled="true"
                         />
                         <p-toggle-button
-                            label="label"
+                            stateText="stateText"
                             :value="true"
                             :disabled="true"
                         />
@@ -117,7 +197,7 @@ export const Template = (args, { argTypes }) => ({
                         />
                         <p-toggle-button
                             style-type="peacock500"
-                            label="label"
+                            stateText="stateText"
                             :value="true"
                             :disabled="true"
                         />
