@@ -94,11 +94,11 @@ import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
 import {
     getReferenceHandler,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/reference-handler-helpers';
+} from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/reference-handler-helper';
 import {
     getRefinedWidgetInheritOptions,
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/schema-helpers';
+} from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
