@@ -73,9 +73,9 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
 import type { DashboardVariablesSchema, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
-import DashboardManageVariableForm from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableForm.vue';
+import DashboardManageVariableForm from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableForm.vue';
 import DashboardManageVariableTable
-    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableTable.vue';
+    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableTable.vue';
 import type {
     OverlayStatus,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';

@@ -53,8 +53,8 @@
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
-            <dashboard-variables-selector class="variable-selector-wrapper"
-                                          :is-manageable="state.hasManagePermission"
+            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
+                                                 :is-manageable="state.hasManagePermission"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"
@@ -105,16 +105,16 @@ import { gray } from '@/styles/colors';
 
 import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/DashboardWidgetContainer.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
-import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
-import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
-import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
-import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
-import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
+import DashboardVariablesSelectDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardWidgetContainer from '@/services/dashboards/shared/dashboard-widget-container/DashboardWidgetContainer.vue';
+import DashboardCloneModal from '@/services/dashboards/shared/DashboardCloneModal.vue';
+import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/shared/DashboardRefreshDropdown.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 const PUBLIC_ICON_COLOR = gray[500];
