@@ -46,11 +46,9 @@ export default {
         costExplorerSettings.$onAction((action) => {
             action.after(() => {
                 if (window) {
-                    const settings = LocalStorageAccessor.getItem(userId.value);
-                    if (settings) {
-                        settings.costExplorer = action.store.$state;
-                        LocalStorageAccessor.setItem(userId.value, settings);
-                    }
+                    const settings = LocalStorageAccessor.getItem(userId.value) ?? {};
+                    settings.costExplorer = action.store.$state;
+                    LocalStorageAccessor.setItem(userId.value, settings);
                 }
             });
         });
