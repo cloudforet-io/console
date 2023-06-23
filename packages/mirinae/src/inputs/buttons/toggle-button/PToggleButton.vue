@@ -1,6 +1,6 @@
 <template>
     <label class="p-toggle-button"
-           :class="{[props.position]: true, [props.spacing]: true, 'disabled': props.disabled}"
+           :class="[props.position, props.spacing, {'disabled': props.disabled}]"
     >
         <input role="switch"
                type="checkbox"
