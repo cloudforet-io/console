@@ -71,7 +71,7 @@
                 </p-button>
             </div>
         </portal>
-        <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible"
+        <dashboard-widget-add-modal :visible.sync="state.addWidgetModalVisible"
                                     @add-widget="handleAddWidget"
         />
     </div>
@@ -92,7 +92,7 @@ import {
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
