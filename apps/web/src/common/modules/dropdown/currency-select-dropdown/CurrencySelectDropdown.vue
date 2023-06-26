@@ -75,8 +75,9 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const DEFAULT_CURRENCY = CURRENCY.USD;
         const state = reactive({
-            currency: computed(() => props.currency || store.state.settings.currency),
+            currency: computed(() => props.currency || store.state.settings.currency || DEFAULT_CURRENCY),
             currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
@@ -84,7 +85,6 @@ export default {
                 badge: currency === DEFAULT_CURRENCY ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
             }))),
         });
-        const DEFAULT_CURRENCY = CURRENCY.USD;
 
         const handleSelectCurrency = (currency: Currency) => {
             store.commit('settings/setCurrency', currency);

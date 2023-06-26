@@ -11,19 +11,21 @@ interface CostExplorerSettingsState {
 
 
 export const useCostExplorerSettingsStore = defineStore('cost-explorer-settings', {
-    state: (): CostExplorerSettingsState => {
-        const localStorageItem = initServiceSettingsStore<CostExplorerSettingsState>('costExplorer');
-        return ({
-            homeDashboardId: localStorageItem?.homeDashboardId || '',
-            costAnalysisMoreGroupBy: localStorageItem?.costAnalysisMoreGroupBy || [],
-        });
-    },
+    state: (): CostExplorerSettingsState => ({
+        homeDashboardId: '',
+        costAnalysisMoreGroupBy: [],
+    }),
     actions: {
         setHomeDashboardId(id: string) {
             this.homeDashboardId = id;
         },
         setCostAnalysisMoreGroupBy(moreGroupBy: MoreGroupByItem[]) {
             this.costAnalysisMoreGroupBy = moreGroupBy;
+        },
+        initState() {
+            const localStorageItem = initServiceSettingsStore<CostExplorerSettingsState>('costExplorer');
+            this.homeDashboardId = localStorageItem?.homeDashboardId || '';
+            this.costAnalysisMoreGroupBy = localStorageItem?.costAnalysisMoreGroupBy || [];
         },
     },
 });

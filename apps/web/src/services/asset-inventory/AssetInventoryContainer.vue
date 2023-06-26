@@ -59,6 +59,7 @@ export default defineComponent({
         const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
         const assetInventorySettings = useAssetInventorySettingsStore();
+        assetInventorySettings.initState();
         assetInventorySettings.$onAction((action) => {
             action.after(() => {
                 if (window) {

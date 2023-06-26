@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
@@ -30,6 +30,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 
 export default {
@@ -42,8 +43,10 @@ export default {
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
-        const costExplorerSettings = useCostExplorerSettingsStore();
-        costExplorerSettings.$onAction((action) => {
+        const costExplorerSettingsStore = useCostExplorerSettingsStore();
+        costExplorerSettingsStore.initState();
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
+        costExplorerSettingsStore.$onAction((action) => {
             action.after(() => {
                 if (window) {
                     const settings = LocalStorageAccessor.getItem(userId.value);
@@ -59,6 +62,13 @@ export default {
         (async () => {
             await store.dispatch('settings/initSettings');
         })();
+
+        onUnmounted(() => {
+            costExplorerSettingsStore.$dispose();
+            costExplorerSettingsStore.$reset();
+            costExplorerDashboardStore.$dispose();
+            costExplorerDashboardStore.$reset();
+        });
 
         return {
             breadcrumbs,

@@ -264,6 +264,7 @@ export default {
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
         const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
         const assetInventorySettingsStore = useAssetInventorySettingsStore();
+        assetInventorySettingsStore.initState();
 
         const vm = getCurrentInstance()?.proxy as Vue;
 
