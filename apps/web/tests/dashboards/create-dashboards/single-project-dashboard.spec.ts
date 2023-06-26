@@ -46,5 +46,11 @@ test.describe('Single Project Dashboard', () => {
             // Todo: to be added
             // await expect(locatorName).toContainText('public');
         });
+
+        await test.step('6. Delete dashboard', async () => {
+            const deleteButton = await page.locator('.dashboard-title-icon-buttons-wrapper .delete-button');
+            await deleteButton.click();
+            await page.getByRole('button', { name: 'Confirm' }).click();
+        });
     });
 });
