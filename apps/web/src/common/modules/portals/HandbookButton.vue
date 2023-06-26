@@ -36,7 +36,7 @@
                 <div class="no-more">
                     <p-checkbox v-model="noMore"
                                 :value="true"
-                                @change="onChangeNoMore"
+                                @change="handleNoMore"
                     >
                         {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
                     </p-checkbox>
@@ -84,16 +84,23 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyActiveTab: useProxyValue('activeTab', props, emit),
-            storageKey: computed<string>(() => `handbook:${store.state.user.userId}:${props.type}`),
+            userId: computed<string>(() => store.state.user.userId),
             noMore: false,
         });
 
-        watch(() => state.storageKey, () => {
-            state.noMore = !!LocalStorageAccessor.getItem(state.storageKey);
+        watch([() => state.userId, () => props.type], ([userId, type]) => {
+            state.noMore = !!((LocalStorageAccessor.getItem(userId) ?? {}).handbook?.[type]);
         }, { immediate: true });
 
-        const onChangeNoMore = (val) => {
-            LocalStorageAccessor.setItem(state.storageKey, val);
+        const handleNoMore = (val: string) => {
+            const storageValue = LocalStorageAccessor.getItem(state.userId) || {};
+            LocalStorageAccessor.setItem(state.userId, {
+                ...storageValue,
+                handbook: {
+                    ...(storageValue.handbook && storageValue.handbook),
+                    [props.type]: val,
+                },
+            });
             if (val) store.dispatch('display/hideSidebar');
         };
 
@@ -114,7 +121,7 @@ export default defineComponent({
         });
         return {
             ...toRefs(state),
-            onChangeNoMore,
+            handleNoMore,
             handleHandbookButton,
         };
     },
