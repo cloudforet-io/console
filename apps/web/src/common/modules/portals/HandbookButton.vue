@@ -36,7 +36,7 @@
                 <div class="no-more">
                     <p-checkbox v-model="noMore"
                                 :value="true"
-                                @change="onChangeNoMore"
+                                @change="handleNoMore"
                     >
                         {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
                     </p-checkbox>
@@ -88,11 +88,11 @@ export default defineComponent({
             noMore: false,
         });
 
-        watch([() => state.userId, () => props.type], () => {
-            state.noMore = !!((LocalStorageAccessor.getItem(state.userId) ?? {}).handbook?.[props.type]);
+        watch([() => state.userId, () => props.type], ([userId, type]) => {
+            state.noMore = !!((LocalStorageAccessor.getItem(userId) ?? {}).handbook?.[type]);
         }, { immediate: true });
 
-        const onChangeNoMore = (val) => {
+        const handleNoMore = (val: string) => {
             const storageValue = LocalStorageAccessor.getItem(state.userId) || {};
             LocalStorageAccessor.setItem(state.userId, {
                 ...storageValue,
@@ -121,7 +121,7 @@ export default defineComponent({
         });
         return {
             ...toRefs(state),
-            onChangeNoMore,
+            handleNoMore,
             handleHandbookButton,
         };
     },
