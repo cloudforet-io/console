@@ -84,16 +84,23 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyActiveTab: useProxyValue('activeTab', props, emit),
-            storageKey: computed<string>(() => `handbook:${store.state.user.userId}:${props.type}`),
+            userId: computed<string>(() => store.state.user.userId),
             noMore: false,
         });
 
-        watch(() => state.storageKey, () => {
-            state.noMore = !!LocalStorageAccessor.getItem(state.storageKey);
+        watch([() => state.userId, () => props.type], () => {
+            state.noMore = !!((LocalStorageAccessor.getItem(state.userId) ?? {}).handbook?.[props.type]);
         }, { immediate: true });
 
         const onChangeNoMore = (val) => {
-            LocalStorageAccessor.setItem(state.storageKey, val);
+            const storageValue = LocalStorageAccessor.getItem(state.userId) || {};
+            LocalStorageAccessor.setItem(state.userId, {
+                ...storageValue,
+                handbook: {
+                    ...(storageValue.handbook && storageValue.handbook),
+                    [props.type]: val,
+                },
+            });
             if (val) store.dispatch('display/hideSidebar');
         };
 
