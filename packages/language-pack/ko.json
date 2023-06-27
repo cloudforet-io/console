@@ -2950,7 +2950,7 @@
 				"NO_RESULTS_FOUND_HELP_TEXT": "검색결과가 없습니다.",
 				"ROLE": "역할(Role)",
 				"ROLE_HELP_TEXT": "선택한 멤버에 역할(Role)을 할당 해주세요",
-				"ROLE_TOOLTIP": "계정에 부여된 역할(Role)타입에 따라 선택가능한 리스트는 상이합니다.",
+				"ROLE_TOOLTIP": "'Project' 타입의 역할(Role)만 선택할 수 있습니다.",
 				"ROLE_WARNING": "'나 자신'을 프로젝트에 초대하여 역할을 할당시킬 경우, 할당된 역할에 의해 해당 프로젝트의 권한이 제한될 수 있습니다.",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다. 다른 검색어로 검색해보세요.",
 				"USER_ID": "사용자 아이디"
