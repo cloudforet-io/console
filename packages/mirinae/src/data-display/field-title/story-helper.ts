@@ -146,9 +146,9 @@ export const getLabelArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
-    buttonSlot: {
-        name: 'button',
-        description: 'Button side slot for field-title.',
+    bottomSlot: {
+        name: 'bottom',
+        description: 'Bottom side slot for field-title.',
         defaultValue: '',
         table: {
             type: {
