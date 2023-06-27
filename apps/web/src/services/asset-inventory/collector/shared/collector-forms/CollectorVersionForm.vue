@@ -2,12 +2,17 @@
     <div class="collector-version-form">
         <div class="label-row">
             <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
-            <p-toggle-button :value="collectorFormState.autoUpgrade"
-                             :state-text="$t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
-                             show-state-text
-                             position="left"
-                             @change-toggle="handleClickAutoUpgrade"
-            />
+            <div class="toggle-button-wrapper">
+                <p-field-title font-weight="regular"
+                               size="sm"
+                               color="gray"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}
+                </p-field-title>
+                <p-toggle-button :value="collectorFormState.autoUpgrade"
+                                 @change-toggle="handleClickAutoUpgrade"
+                />
+            </div>
         </div>
         <p-select-dropdown :selected="collectorFormState.version"
                            :items="state.versionItems"
@@ -106,15 +111,15 @@ watch(() => state.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .collector-version-form {
     margin: 1.5rem 0;
+
     .label-row {
         @apply flex justify-between;
         width: 100%;
+        margin-bottom: 0.125rem;
 
-        /* custom design-system component - p-toggle-button */
-        :deep(.p-toggle-button) {
-            .state-text {
-                @apply text-label-sm text-gray-600;
-            }
+        .toggle-button-wrapper {
+            @apply flex items-center;
+            gap: 0.25rem;
         }
     }
 
