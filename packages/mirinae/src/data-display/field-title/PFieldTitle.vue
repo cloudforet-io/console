@@ -1,18 +1,29 @@
 <template>
-    <span class="p-field-title"
-          v-on="$listeners"
+    <div class="p-field-title"
+         v-on="$listeners"
     >
-        <span class="title">
-            <slot>
-                {{ props.label }}
-            </slot>
-        </span>
-        <span v-if="props.description"
-              class="description"
-        >
-            {{ props.description }}
-        </span>
-    </span>
+        <div class="title-wrapper">
+            <slot name="left"
+                  class="left-slot"
+            />
+            <span class="title"
+                  :class="[size, fontWeight, color]"
+            >
+                <slot>
+                    {{ props.label }}
+                </slot>
+            </span>
+            <slot name="right"
+                  class="right-slot"
+            />
+        </div>
+        <div v-if="props.description">
+            <span class="description">
+                {{ props.description }}
+            </span>
+        </div>
+        <slot name="button" />
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -21,27 +32,54 @@ import { defineProps } from 'vue';
 interface FieldTitleProps {
     label?: string;
     description?: string;
+    size?: 'sm' | 'md' | 'lg';
+    fontWeight?: 'regular' | 'bold';
+    color?: 'dark' | 'gray';
 }
 
 const props = withDefaults(defineProps<FieldTitleProps>(), {
     label: '',
     description: undefined,
+    size: 'md',
+    fontWeight: 'bold',
+    color: 'dark',
 });
 
 </script>
 
 <style lang="postcss">
 .p-field-title {
-    @apply text-gray-900;
-    display: inline-block;
+    @apply flex flex-col text-gray-900;
     letter-spacing: 0;
     margin-bottom: 0.25rem;
-    > .title {
-        @apply text-label-md font-bold;
-        display: block;
+
+    .title-wrapper {
+        @apply flex;
+        gap: 0.25rem;
+
+        .left-slot, .right-slot {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .title {
+            @apply block text-label-md font-bold;
+            &.sm {
+                @apply text-label-sm;
+            }
+            &.lg {
+                @apply text-label-lg;
+            }
+            &.regular {
+                @apply font-normal;
+            }
+            &.gray {
+                @apply text-gray-600;
+            }
+        }
     }
-    > .description {
-        @apply text-paragraph-md font-normal;
+    .description {
+        @apply block text-paragraph-sm font-normal;
     }
 }
 </style>
