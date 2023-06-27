@@ -1,54 +1,45 @@
 <template>
     <label class="p-toggle-button"
-           :class="[props.position, props.spacing, {'disabled': props.disabled}]"
+           :class="[props.position, props.spacing, {'disabled': props.disabled, 'is-active': state.proxyValue}]"
     >
         <input role="switch"
                type="checkbox"
                class="slider"
-               :class="[props.styleType]"
                :disabled="props.disabled"
                :checked="state.proxyValue"
                @change="handleChangeToggle"
         >
-        <slot v-if="props.showStateText"
-              name="state-text"
+        <span v-if="props.showStateText"
+              class="state-text"
         >
-            <span class="state-text">
-                {{ state.proxyStateText }}
-            </span>
-        </slot>
+            {{ state.proxyValue ? 'ON' : 'OFF' }}
+        </span>
 
     </label>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { useProxyValue } from '@/hooks';
-import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 
 interface ToggleButtonProps {
     value: boolean,
-    styleType?: TOGGLE_BUTTON_THEME,
     disabled?: boolean,
     showStateText?: boolean,
-    stateText?: string,
-    spacing?: 'sm' | 'md' | 'lg' | 'space-between' | 'none',
-    position?: 'left' | 'right' | 'top',
+    spacing?: 'sm' | 'md' | 'space-between',
+    position?: 'left' | 'right',
 }
 const props = withDefaults(defineProps<ToggleButtonProps>(), {
     value: false,
-    styleType: TOGGLE_BUTTON_THEME.secondary,
     disabled: false,
     showStateText: false,
-    stateText: undefined,
     position: 'right',
     spacing: 'sm',
 });
 const emit = defineEmits<{(e: 'change-toggle', value: boolean): void;}>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    proxyStateText: computed(() => props.stateText || (state.proxyValue ? 'ON' : 'OFF')),
 });
 const handleChangeToggle = () => {
     state.proxyValue = !state.proxyValue;
@@ -110,20 +101,12 @@ const handleChangeToggle = () => {
             -moz-transition: left 300ms ease-in-out;
         }
         &:checked {
+            @apply bg-blue-600;
+            &:disabled {
+                @apply bg-blue-600 opacity-50;
+            }
             &::before {
                 left: 1.125rem;
-            }
-            &.secondary {
-                @apply bg-blue-600;
-                &:disabled {
-                    @apply bg-blue-300;
-                }
-            }
-            &.peacock500 {
-                @apply bg-peacock-500;
-                &:disabled {
-                    @apply bg-peacock-200;
-                }
             }
         }
 
@@ -132,14 +115,24 @@ const handleChangeToggle = () => {
         }
     }
 
+    &.is-active {
+        .state-text {
+            @apply text-blue-600;
+        }
+    }
     .state-text {
-        @apply font-bold text-label-md;
+        @apply text-label-md text-gray-300;
     }
 
     &.disabled {
         @apply cursor-not-allowed;
+
         .slider {
             @apply bg-gray-200 cursor-not-allowed;
+        }
+
+        .state-text {
+            @apply opacity-50;
         }
     }
 }

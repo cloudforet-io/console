@@ -3,7 +3,6 @@ import type { ArgTypes } from '@storybook/addons';
 import {
     TOGGLE_BUTTON_POSITION,
     TOGGLE_BUTTON_SPACING,
-    TOGGLE_BUTTON_THEME,
 } from '@/inputs/buttons/toggle-button/config';
 
 
@@ -44,24 +43,6 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    stateText: {
-        name: 'stateText',
-        type: { name: 'string' },
-        description: 'Toggle State Text',
-        defaultValue: '',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: undefined,
-            },
-        },
-        control: {
-            type: 'text',
-        },
-    },
     position: {
         name: 'position',
         type: { name: 'string' },
@@ -98,25 +79,6 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.keys(TOGGLE_BUTTON_SPACING),
-        },
-    },
-    styleType: {
-        name: 'styleType',
-        type: { name: 'string' },
-        description: 'Style theme of toggle button.',
-        defaultValue: TOGGLE_BUTTON_THEME.secondary,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: TOGGLE_BUTTON_THEME.secondary,
-            },
-        },
-        control: {
-            type: 'select',
-            options: Object.keys(TOGGLE_BUTTON_THEME),
         },
     },
     disabled: {
