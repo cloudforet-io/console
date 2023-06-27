@@ -56,11 +56,6 @@ export default {
             });
         });
 
-        /* Init */
-        (async () => {
-            await store.dispatch('settings/initSettings');
-        })();
-
         onUnmounted(() => {
             costExplorerSettingsStore.$dispose();
             costExplorerSettingsStore.$reset();

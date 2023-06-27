@@ -193,9 +193,6 @@ export default defineComponent<Props>({
             // for PDF export
             // emit('rendered', state.widgetRef);
         });
-        (async () => {
-            await store.dispatch('settings/initSettings');
-        })();
 
         return {
             dashboardDetailState,

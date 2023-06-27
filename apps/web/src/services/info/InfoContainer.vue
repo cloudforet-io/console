@@ -23,8 +23,6 @@ import {
     defineComponent,
 } from 'vue';
 
-import { store } from '@/store';
-
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -41,11 +39,6 @@ export default defineComponent({
     },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
-
-        /* Init */
-        (async () => {
-            await store.dispatch('settings/initSettings');
-        })();
 
         return {
             breadcrumbs,

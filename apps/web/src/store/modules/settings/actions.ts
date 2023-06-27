@@ -21,7 +21,6 @@ export const initSettings: Action<SettingsState, any> = ({ commit, rootState, di
         }
         dispatch('loadCurrencyRates');
     } catch (e) {
-        console.log('hihi?');
         console.error(e);
         LocalStorageAccessor.removeItem(userId);
     }

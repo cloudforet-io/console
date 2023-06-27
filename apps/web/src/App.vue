@@ -159,6 +159,12 @@ export default defineComponent({
             state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
         });
 
+        watch(() => state.userId, (userId) => {
+            if (userId) {
+                store.dispatch('settings/initSettings');
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             goToSignIn,
