@@ -22,7 +22,7 @@
                 {{ props.description }}
             </span>
         </div>
-        <slot name="button" />
+        <slot name="bottom" />
     </div>
 </template>
 
