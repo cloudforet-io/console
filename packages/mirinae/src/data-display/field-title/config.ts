@@ -1,4 +1,4 @@
-export const FIELD_TITLE_TEXT_SIZE = {
+export const FIELD_TITLE_SIZE = {
     sm: 'sm',
     md: 'md',
     lg: 'lg',

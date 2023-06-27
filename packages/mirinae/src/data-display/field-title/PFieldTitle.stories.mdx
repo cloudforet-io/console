@@ -21,7 +21,7 @@ export const Template = (args, { argTypes }) => ({
         <p-field-title
             :label="label"
             :description="description"
-            :font-size="fontSize"
+            :size="size"
             :font-weight="fontWeight"
             :color="color"
         >
@@ -74,16 +74,16 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Font Size
+## Size
 <Canvas>
-    <Story name="Font Size">
+    <Story name="Size">
         {{
             components: { PFieldTitle },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-field-title font-size="sm">Field Title</p-field-title>
+        <p-field-title size="sm">Field Title</p-field-title>
         <p-field-title>Field Title</p-field-title>
-        <p-field-title font-size="lg">Field Title</p-field-title>
+        <p-field-title size="lg">Field Title</p-field-title>
     </div>
     `,
             setup() {

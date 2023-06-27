@@ -1,6 +1,10 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { FIELD_TITLE_COLOR, FIELD_TITLE_TEXT_SIZE, FIELD_TITLE_TEXT_WEIGHT } from '@/data-display/field-title/config';
+import {
+    FIELD_TITLE_COLOR,
+    FIELD_TITLE_SIZE,
+    FIELD_TITLE_TEXT_WEIGHT,
+} from '@/data-display/field-title/config';
 
 export const getLabelArgTypes = (): ArgTypes => ({
     label: {
@@ -39,23 +43,23 @@ export const getLabelArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    fontSize: {
-        name: 'fontSize',
+    size: {
+        name: 'size',
         type: { name: 'string' },
-        description: 'font size of field title label.',
-        defaultValue: FIELD_TITLE_TEXT_SIZE.md,
+        description: 'size of field title label.',
+        defaultValue: FIELD_TITLE_SIZE.md,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: FIELD_TITLE_TEXT_SIZE.md,
+                summary: FIELD_TITLE_SIZE.md,
             },
         },
         control: {
             type: 'select',
-            options: Object.keys(FIELD_TITLE_TEXT_SIZE),
+            options: Object.keys(FIELD_TITLE_SIZE),
         },
     },
     fontWeight: {

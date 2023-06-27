@@ -7,7 +7,7 @@
                   class="left-slot"
             />
             <span class="title"
-                  :class="[fontSize, fontWeight, color]"
+                  :class="[size, fontWeight, color]"
             >
                 <slot>
                     {{ props.label }}
@@ -32,7 +32,7 @@ import { defineProps } from 'vue';
 interface FieldTitleProps {
     label?: string;
     description?: string;
-    fontSize?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg';
     fontWeight?: 'regular' | 'bold';
     color?: 'dark' | 'gray';
 }
@@ -40,7 +40,7 @@ interface FieldTitleProps {
 const props = withDefaults(defineProps<FieldTitleProps>(), {
     label: '',
     description: undefined,
-    fontSize: 'md',
+    size: 'md',
     fontWeight: 'bold',
     color: 'dark',
 });
