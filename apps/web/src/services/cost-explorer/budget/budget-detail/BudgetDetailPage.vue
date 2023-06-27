@@ -84,8 +84,8 @@ export default {
 
         const state = reactive({
             loading: true,
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currency: computed(() => store.state.settings.currency),
+            currencyRates: computed(() => store.state.settings.currencyRates),
             hasManagePermission: useManagePermissionState(),
         });
 

@@ -87,8 +87,8 @@ export default {
             loading: true,
             layout: [] as any[],
             periodType: '',
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currency: computed(() => store.state.settings.currency),
+            currencyRates: computed(() => store.state.settings.currencyRates),
             isPageMounted: false,
             // dashboard layout widget
             widgetList: undefined as HTMLElement[]|undefined,

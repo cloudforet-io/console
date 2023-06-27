@@ -6,8 +6,8 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
-import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import type { CurrencyRates } from '@/store/modules/settings/type';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';

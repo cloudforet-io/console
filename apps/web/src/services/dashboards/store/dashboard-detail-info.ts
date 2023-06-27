@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';

@@ -1,11 +1,50 @@
 import type { Store } from 'vuex';
 
-import { STORAGE_KEY } from '@/store/modules/settings';
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 const localStoragePlugin = (store: Store<any>) => {
     store.subscribe((mutation, state) => {
-        if (mutation.type === 'settings/setItem') {
-            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings));
+        const settings = LocalStorageAccessor.getItem(state.user.userId) ?? {};
+        const global = settings.global || {};
+        switch (mutation.type) {
+        case 'settings/setCurrencyRates':
+            LocalStorageAccessor.setItem(state.user.userId, {
+                ...settings,
+                global: {
+                    ...global,
+                    currencyRates: mutation.payload,
+                },
+            });
+            break;
+        case 'settings/setCurrency':
+            LocalStorageAccessor.setItem(state.user.userId, {
+                ...settings,
+                global: {
+                    ...global,
+                    currency: mutation.payload,
+                },
+            });
+            break;
+        case 'settings/setCurrencyUpdateTime':
+            LocalStorageAccessor.setItem(state.user.userId, {
+                ...settings,
+                global: {
+                    ...global,
+                    currencyUpdateTime: mutation.payload,
+                },
+            });
+            break;
+        case 'settings/setGnbNotificationLastReadTime':
+            LocalStorageAccessor.setItem(state.user.userId, {
+                ...settings,
+                global: {
+                    ...global,
+                    gnbNotificationLastReadTime: mutation.payload,
+                },
+            });
+            break;
+        default:
+            break;
         }
     });
 };

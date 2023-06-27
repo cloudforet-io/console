@@ -18,7 +18,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
