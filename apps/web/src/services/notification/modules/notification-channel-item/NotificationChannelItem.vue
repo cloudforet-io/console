@@ -1,13 +1,15 @@
 <template>
     <p-pane-layout class="channel-card-wrapper">
         <div class="card-header">
-            <p-toggle-button :value="isActivated"
-                             :disabled="manageDisabled"
-                             :state-text="channelData.protocol_name"
-                             show-state-text
-                             spacing="lg"
-                             @change-toggle="onToggleChange"
-            />
+            <p-field-title :label="channelData.protocol_name">
+                <template #left>
+                    <p-toggle-button :value="isActivated"
+                                     :disabled="manageDisabled"
+                                     class="toggle-button"
+                                     @change-toggle="onToggleChange"
+                    />
+                </template>
+            </p-field-title>
             <p-icon-button name="ic_delete"
                            width="1.5rem"
                            height="1.5rem"
@@ -68,7 +70,7 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PIconButton, PPaneLayout, PToggleButton,
+    PDivider, PIconButton, PPaneLayout, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -119,6 +121,7 @@ export default {
         PToggleButton,
         PIconButton,
         PDivider,
+        PFieldTitle,
     },
     props: {
         channelData: {
@@ -276,8 +279,10 @@ export default {
 }
 
 .card-header {
-    display: flex;
-    justify-content: space-between;
+    @apply flex items-center justify-between;
+    .toggle-button {
+        margin-right: 0.75rem;
+    }
 }
 
 .card-body {
