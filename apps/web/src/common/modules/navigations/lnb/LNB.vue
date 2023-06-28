@@ -49,7 +49,11 @@
                      :key="`${idx}-${getUUID()}`"
                      class="favorite-only-wrapper"
                 >
-                    <span>{{ $t('DASHBOARDS.LNB.ONLY_FAVORITE') }}</span>
+                    <p-field-title :label="$t('DASHBOARDS.LNB.ONLY_FAVORITE')"
+                                   color="gray"
+                                   font-weight="regular"
+                                   size="sm"
+                    />
                     <p-toggle-button :value="proxyShowFavoriteOnly"
                                      @change-toggle="handleFavoriteToggle"
                     />
@@ -81,7 +85,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PDivider, PI, PLazyImg, PToggleButton,
+    PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -97,7 +101,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 export default {
     name: 'LNB',
     components: {
-        LNBMenuItem, PDivider, PI, PLazyImg, PToggleButton,
+        LNBMenuItem, PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
     },
     props: {
         header: {

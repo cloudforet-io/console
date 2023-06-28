@@ -6,20 +6,28 @@
         <portal to="widget-contents">
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="state.enableDateRange"
-                                     :state-text="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE')"
-                                     show-state-text
-                                     spacing="md"
-                                     @change-toggle="handleChangeDateRangeToggle"
-                    />
+                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE')"
+                                   font-weight="regular"
+                    >
+                        <template #left>
+                            <p-toggle-button :value="state.enableDateRange"
+                                             class="toggle-button"
+                                             @change-toggle="handleChangeDateRangeToggle"
+                            />
+                        </template>
+                    </p-field-title>
                 </div>
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="state.enableCurrency"
-                                     :state-text="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
-                                     show-state-text
-                                     spacing="md"
-                                     @change-toggle="handleChangeCurrencyToggle"
-                    />
+                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
+                                   font-weight="regular"
+                    >
+                        <template #left>
+                            <p-toggle-button :value="state.enableCurrency"
+                                             class="toggle-button"
+                                             @change-toggle="handleChangeCurrencyToggle"
+                            />
+                        </template>
+                    </p-field-title>
                 </div>
                 <p-divider class="divider" />
                 <p-button style-type="tertiary"
@@ -90,7 +98,7 @@ import {
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PDivider, PI, PToggleButton,
+    PButton, PDivider, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -170,12 +178,8 @@ onUnmounted(() => {
         &:first-child {
             padding-bottom: 0.5rem;
         }
-
-        /* custom design-system component -p-toggle-button */
-        :deep(.p-toggle-button) {
-            .state-text {
-                @apply font-normal;
-            }
+        .toggle-button {
+            margin-right: 0.25rem;
         }
     }
     .divider {
@@ -225,5 +229,9 @@ onUnmounted(() => {
 $footer-height: 57px;
 .p-sidebar .sidebar-wrapper {
     padding-bottom: $footer-height;
+    .title {
+        @apply text-label-md;
+        min-height: initial;
+    }
 }
 </style>

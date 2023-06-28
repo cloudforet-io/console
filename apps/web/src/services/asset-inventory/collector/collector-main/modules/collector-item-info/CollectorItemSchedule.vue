@@ -120,17 +120,5 @@ watch(() => props.item, (item) => {
             }
         }
     }
-
-    /* custom design-system component - p-toggle-button */
-    :deep(.p-toggle-button) {
-        .state-text {
-            @apply text-gray-400 font-normal;
-        }
-        &.toggle-active {
-            .state-text {
-                @apply text-blue-600;
-            }
-        }
-    }
 }
 </style>
