@@ -2,19 +2,17 @@
     <div class="collector-version-form">
         <div class="label-row">
             <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
-            <div class="toggle-button-wrapper">
-                <p-field-title font-weight="regular"
-                               size="sm"
-                               color="gray"
-                               :label="$t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
-                >
-                    <template #right>
-                        <p-toggle-button :value="collectorFormState.autoUpgrade"
-                                         @change-toggle="handleClickAutoUpgrade"
-                        />
-                    </template>
-                </p-field-title>
-            </div>
+            <p-field-title font-weight="regular"
+                           size="sm"
+                           color="gray"
+                           :label="$t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
+            >
+                <template #right>
+                    <p-toggle-button :value="collectorFormState.autoUpgrade"
+                                     @change-toggle="handleClickAutoUpgrade"
+                    />
+                </template>
+            </p-field-title>
         </div>
         <p-select-dropdown :selected="collectorFormState.version"
                            :items="state.versionItems"
@@ -118,11 +116,6 @@ watch(() => state.pluginId, async (pluginId) => {
         @apply flex justify-between;
         width: 100%;
         margin-bottom: 0.25rem;
-
-        .toggle-button-wrapper {
-            @apply flex items-center;
-            gap: 0.25rem;
-        }
     }
 
     .invalid-feedback {
