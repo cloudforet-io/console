@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 
 import { PButtonModal, PI } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
-const props = defineProps<{
+interface Props {
     visible?: boolean;
     manageDisabled?: boolean;
-}>();
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
+
+const { t } = useI18n();
 
 const handleVisibleUpdate = (value: boolean) => {
     emit('update:visible', value);
@@ -26,7 +30,7 @@ const handleConfirm = () => {
 <template>
     <p-button-modal
         class="no-collector-modal"
-        :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
+        :header-title="t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
         size="md"
         :fade="true"
         :backdrop="true"
@@ -37,8 +41,8 @@ const handleConfirm = () => {
     >
         <template #body>
             <p class="modal-content">
-                <b>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_1') }}</b><br>
-                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_2') }}
+                <b>{{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_1') }}</b><br>
+                {{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_2') }}
             </p>
         </template>
         <template #confirm-button>
@@ -47,7 +51,7 @@ const handleConfirm = () => {
                  height="1.25rem"
                  name="ic_plus_bold"
                  color="inherit"
-            />{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
+            />{{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
         </template>
     </p-button-modal>
 </template>

@@ -1,7 +1,49 @@
+<script lang="ts" setup>
+import {
+    PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
+} from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
+
+const { t } = useI18n();
+const store = useStore();
+
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providerList: computed(() => {
+        const supportedProviderList = collectorFormState.repositoryPlugin?.capability?.supported_providers ?? [];
+        return supportedProviderList.map((providerName) => ({
+            label: state.providers[providerName]?.name,
+            name: providerName,
+        }));
+    }),
+    selectedProvider: computed(() => collectorFormState.provider),
+});
+
+const handleChangeProvider = (provider) => {
+    collectorFormStore.setProvider(provider);
+};
+
+(() => {
+    collectorFormStore.setProvider(state.providerList[0]?.name);
+})();
+
+</script>
+
 <template>
     <div class="multiple-provider-form">
         <p-field-title class="title">
-            {{ $t('INVENTORY.COLLECTOR.CREATE.PROVIDER') }}
+            {{ t('INVENTORY.COLLECTOR.CREATE.PROVIDER') }}
         </p-field-title>
         <div class="radio-container">
             <p-radio-group>
@@ -34,49 +76,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts" setup>
-import { computed, reactive } from 'vue';
-
-import {
-    PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
-} from '@spaceone/design-system';
-
-
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import {
-    useCollectorFormStore,
-} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-
-const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
-
-
-const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    providerList: computed(() => {
-        const supportedProviderList = collectorFormState.repositoryPlugin?.capability?.supported_providers ?? [];
-        return supportedProviderList.map((providerName) => ({
-            label: state.providers[providerName]?.name,
-            name: providerName,
-        }));
-    }),
-    selectedProvider: computed(() => collectorFormState.provider),
-});
-
-const handleChangeProvider = (provider) => {
-    collectorFormStore.setProvider(provider);
-};
-
-
-(() => {
-    collectorFormStore.setProvider(state.providerList[0]?.name);
-})();
-
-</script>
 
 <style lang="postcss" scoped>
 .multiple-provider-form {

@@ -1,8 +1,44 @@
+<script lang="ts" setup>
+import {
+    PHorizontalLayout, PHeading,
+} from '@spaceone/design-system';
+import {
+    reactive, onActivated,
+} from 'vue';
+import { useRouter } from 'vue-router';
+
+import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
+import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
+import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
+import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
+import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+
+interface Props {
+    jobId: string;
+}
+
+defineProps<Props>();
+const router = useRouter();
+
+const state = reactive({
+    selectedItem: null as null|JobTaskData,
+});
+
+const handleSelect = (item: JobTaskData) => {
+    state.selectedItem = item;
+};
+
+onActivated(() => {
+    state.selectedItem = null;
+});
+
+</script>
+
 <template>
     <div>
         <p-heading :title="jobId"
                    show-back-button
-                   @click-back-button="$router.go(-1)"
+                   @click-back-button="router.go(-1)"
         />
         <div class="top-wrapper">
             <job-status-chart :job-id="jobId" />
@@ -14,62 +50,15 @@
             <template #container="{ height }">
                 <job-table :style="{height: `${height}px`}"
                            :job-id="jobId"
-                           @select="selectedItem = $event"
+                           @select="handleSelect"
                 />
             </template>
         </p-horizontal-layout>
-        <job-task-details v-if="selectedItem"
-                          :selected-item="selectedItem"
+        <job-task-details v-if="state.selectedItem"
+                          :selected-item="state.selectedItem"
         />
     </div>
 </template>
-
-<script lang="ts">
-import {
-    reactive, toRefs, onActivated,
-} from 'vue';
-
-import {
-    PHorizontalLayout, PHeading,
-} from '@spaceone/design-system';
-
-import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
-import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
-import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
-import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
-import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
-export default {
-    name: 'CollectorJobPage',
-    components: {
-        JobTaskDetails,
-        JobTable,
-        JobBasicInformation,
-        JobStatusChart,
-        PHeading,
-        PHorizontalLayout,
-    },
-    props: {
-        jobId: {
-            type: String,
-            required: true,
-        },
-    },
-    setup() {
-        const state = reactive({
-            selectedItem: null as null|JobTaskData,
-        });
-
-        onActivated(() => {
-            state.selectedItem = null;
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-horizontal-layout */

@@ -1,67 +1,11 @@
-<template>
-    <div class="collector-page-4">
-        <collector-schedule-form enable-hours-edit
-                                 disable-loading
-        />
-        <div class="step-footer">
-            <p-text-button icon-left="ic_chevron-left"
-                           style-type="highlight"
-                           class="step-left-text-button"
-                           @click="handleClickOtherPluginButton"
-            >
-                {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
-            </p-text-button>
-            <div class="right-area">
-                <p-button icon-left="ic_arrow-left"
-                          style-type="transparent"
-                          size="lg"
-                          @click="handleClickPrevButton"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
-                </p-button>
-                <p-button :disabled="!state.isAbleToCreateCollector"
-                          size="lg"
-                          :loading="state.createLoading"
-                          @click="handleClickCreateButton"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
-                </p-button>
-            </div>
-        </div>
-        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
-                      :visible.sync="state.deleteModalVisible"
-                      :contents="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
-                      size="sm"
-                      @confirm="handleClose"
-        />
-        <p-button-modal :visible.sync="state.visibleCreateCompleteModal"
-                        :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
-                        :loading="state.collectLoading"
-                        @confirm="handleConfirmCreateCollector"
-                        @cancel="goToCollectorDetailPage"
-                        @close="goToCollectorDetailPage"
-        >
-            <template #close-button>
-                {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
-            </template>
-            <template #confirm-button>
-                {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_COLLECT') }}
-            </template>
-        </p-button-modal>
-    </div>
-</template>
-
 <script lang="ts" setup>
-import { reactive } from 'vue';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PTextButton, PButtonModal,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -78,9 +22,9 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const emit = defineEmits([
-    'update:currentStep',
-]);
+const emit = defineEmits<{(e: 'update:current-step', value: number): void}>();
+const { t } = useI18n();
+const router = useRouter();
 
 const state = reactive<{
     deleteModalVisible: boolean;
@@ -99,7 +43,7 @@ const state = reactive<{
 });
 
 const handleClickPrevButton = () => {
-    emit('update:currentStep', 3);
+    emit('update:current-step', 3);
 };
 
 const handleClickCreateButton = async () => {
@@ -127,9 +71,9 @@ const handleClickCreateButton = async () => {
         const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.CREATE.ALT_E_CREATE_COLLECTOR'));
     } finally {
         state.createLoading = false;
     }
@@ -140,7 +84,7 @@ const handleClickOtherPluginButton = () => {
 };
 
 const handleClose = () => {
-    emit('update:currentStep', 1);
+    emit('update:current-step', 1);
     state.deleteModalVisible = false;
 };
 
@@ -151,10 +95,10 @@ const handleConfirmCreateCollector = async () => {
         await SpaceConnector.client.inventory.collector.collect({
             collector_id: state.createdCollectorId,
         });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         goToCollectorDetailPage();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
     } finally {
         state.collectLoading = false;
     }
@@ -163,7 +107,7 @@ const handleConfirmCreateCollector = async () => {
 const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
     if (state.createdCollectorId) {
-        SpaceRouter.router.push({
+        router.push({
             name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
             params: {
                 collectorId: state.createdCollectorId,
@@ -175,6 +119,59 @@ const goToCollectorDetailPage = () => {
 (() => {
 })();
 </script>
+
+<template>
+    <div class="collector-page-4">
+        <collector-schedule-form enable-hours-edit
+                                 disable-loading
+        />
+        <div class="step-footer">
+            <p-text-button icon-left="ic_chevron-left"
+                           style-type="highlight"
+                           class="step-left-text-button"
+                           @click="handleClickOtherPluginButton"
+            >
+                {{ t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
+            </p-text-button>
+            <div class="right-area">
+                <p-button icon-left="ic_arrow-left"
+                          style-type="transparent"
+                          size="lg"
+                          @click="handleClickPrevButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
+                </p-button>
+                <p-button :disabled="!state.isAbleToCreateCollector"
+                          size="lg"
+                          :loading="state.createLoading"
+                          @click="handleClickCreateButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
+                </p-button>
+            </div>
+        </div>
+        <delete-modal v-model:visible="state.deleteModalVisible"
+                      :header-title="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
+                      :contents="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
+                      size="sm"
+                      @confirm="handleClose"
+        />
+        <p-button-modal v-model:visible="state.visibleCreateCompleteModal"
+                        :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
+                        :loading="state.collectLoading"
+                        @confirm="handleConfirmCreateCollector"
+                        @cancel="goToCollectorDetailPage"
+                        @close="goToCollectorDetailPage"
+        >
+            <template #close-button>
+                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
+            </template>
+            <template #confirm-button>
+                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_COLLECT') }}
+            </template>
+        </p-button-modal>
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .collector-page-4 {

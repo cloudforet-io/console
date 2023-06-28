@@ -1,93 +1,15 @@
-<template>
-    <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
-
-        <p-definition-table v-if="!state.isEditMode"
-                            :fields="fields"
-                            :loading="state.loading"
-                            :data="collectorFormState.originCollector"
-                            style-type="white"
-        >
-            <template #data-pluginName>
-                <p-lazy-img :src="state.pluginIcon"
-                            :loading="state.loading"
-                            width="1rem"
-                            height="1rem"
-                />
-                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
-            </template>
-            <template #data-plugin_info.version="{ value }">
-                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
-            </template>
-            <template #data-plugin_info.upgrade_mode="{ value }">
-                {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
-            </template>
-            <template #data-created_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-            <template #data-last_collected_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-        </p-definition-table>
-
-        <div v-if="state.isEditMode"
-             class="collector-base-info-edit"
-        >
-            <collector-plugin-contents :plugin="state.pluginInfo" />
-            <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
-            <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
-                                @update:isTagsValid="handleUpdateIsTagsValid"
-            />
-            <div class="button-group">
-                <p-button style-type="tertiary"
-                          size="lg"
-                          :disabled="state.updateLoading"
-                          @click="handleClickCancel"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="lg"
-                          class="save-changes-button"
-                          :disabled="!state.isAllValid"
-                          :loading="state.updateLoading"
-                          @click="handleClickSave"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
-
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
-
+import { iso8601Formatter } from '@cloudforet/core-lib/index';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PPaneLayout, PDefinitionTable, PLazyImg,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
-
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
@@ -107,15 +29,18 @@ import CollectorPluginContents from '@/services/asset-inventory/collector/shared
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const store = useStore();
+const { t } = useI18n();
+
 const timezone = computed<string>(() => store.state.user.timezone);
 const fields = computed<DefinitionField[]>(() => [
-    { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-    { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
-    { name: 'plugin_info.version', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.VERSION') },
-    { name: 'tags', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.TAG') },
-    { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
-    { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
-    { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
+    { name: 'pluginName', label: t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
+    { name: 'plugin_info.plugin_id', label: t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
+    { name: 'plugin_info.version', label: t('INVENTORY.COLLECTOR.DETAIL.VERSION') },
+    { name: 'tags', label: t('INVENTORY.COLLECTOR.DETAIL.TAG') },
+    { name: 'plugin_info.upgrade_mode', label: t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
+    { name: 'last_collected_at', label: t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
+    { name: 'created_at', label: t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
 ]);
 
 const state = reactive({
@@ -202,12 +127,12 @@ const handleClickSave = async () => {
         }
         if (!collector) throw new Error('collector is undefined'); // collector must be defined if all valid
         collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.ALT_S_UPDATE_COLLECTOR'), '');
     } catch (e) {
         collectorFormStore.resetVersion();
         collectorFormStore.resetAutoUpgrade();
         collectorFormStore.resetTags();
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.ALT_E_UPDATE_COLLECTOR'));
     } finally {
         state.updateLoading = false;
         state.isEditMode = false;
@@ -223,6 +148,81 @@ watch(() => collectorFormStore.pluginId, async (pluginId) => {
     await store.dispatch('reference/plugin/load');
 })();
 </script>
+
+<template>
+    <p-pane-layout>
+        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <p-button v-if="!state.isEditMode"
+                          size="md"
+                          icon-left="ic_edit"
+                          style-type="secondary"
+                          @click="handleClickEdit"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                </p-button>
+            </template>
+        </p-heading>
+
+        <p-definition-table v-if="!state.isEditMode"
+                            :fields="fields"
+                            :loading="state.loading"
+                            :data="collectorFormState.originCollector"
+                            style-type="white"
+        >
+            <template #data-pluginName>
+                <p-lazy-img :src="state.pluginIcon"
+                            :loading="state.loading"
+                            width="1rem"
+                            height="1rem"
+                />
+                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
+            </template>
+            <template #data-plugin_info.version="{ value }">
+                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
+            </template>
+            <template #data-plugin_info.upgrade_mode="{ value }">
+                {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
+            </template>
+            <template #data-created_at="{ value }">
+                {{ value ? iso8601Formatter(value, timezone) : '' }}
+            </template>
+            <template #data-last_collected_at="{ value }">
+                {{ value ? iso8601Formatter(value, timezone) : '' }}
+            </template>
+        </p-definition-table>
+
+        <div v-if="state.isEditMode"
+             class="collector-base-info-edit"
+        >
+            <collector-plugin-contents :plugin="state.pluginInfo" />
+            <collector-version-form @update:is-version-valid="handleUpdateIsVersionValid" />
+            <collector-tag-form :service-name="t('MENU.ASSET_INVENTORY_COLLECTOR')"
+                                @update:is-tags-valid="handleUpdateIsTagsValid"
+            />
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          size="lg"
+                          :disabled="state.updateLoading"
+                          @click="handleClickCancel"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          class="save-changes-button"
+                          :disabled="!state.isAllValid"
+                          :loading="state.updateLoading"
+                          @click="handleClickSave"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .p-definition-table {

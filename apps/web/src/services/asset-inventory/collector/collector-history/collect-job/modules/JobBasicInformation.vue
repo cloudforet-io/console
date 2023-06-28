@@ -1,64 +1,14 @@
-<template>
-    <p-pane-layout class="job-basic-information">
-        <header>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
-        <section class="items-container">
-            <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="collector.linkLocation"
-                          class="contents"
-                          size="sm"
-                >
-                    {{ collector.label }}
-                </p-anchor>
-            </div>
-            <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
-                <span class="contents">
-                    {{ iso8601Formatter(job.created_at, timezone) }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
-                <span class="contents align-middle">
-                    <p-lazy-img :src="plugin.icon"
-                                error-icon="ic_cloud-filled"
-                                :loading="!plugin.id"
-                                :alt="plugin.label"
-                                width="1rem"
-                                height="1rem"
-                                class="mr-1"
-                    />
-                    {{ plugin.label }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}</label>
-                <span class="contents">
-                    {{ iso8601Formatter(job.finished_at, timezone) }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
-                <span class="contents">
-                    {{ provider.label }}
-                </span>
-            </div>
-        </section>
-    </p-pane-layout>
-</template>
-
-<script lang="ts">
-import {
-    computed, onActivated, reactive, toRefs,
-} from 'vue';
-
-import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+<script lang="ts" setup>
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
+import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import {
+    computed, onActivated, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -72,87 +22,124 @@ interface Props {
     jobId: string;
 }
 
-export default {
-    name: 'JobBasicInformation',
-    components: { PPaneLayout, PAnchor, PLazyImg },
-    props: {
-        jobId: {
-            type: String,
-            required: true,
-        },
-    },
-    setup(props: Props) {
-        const state = reactive({
-            loading: true,
-            job: {} as any,
-            collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-            timezone: computed(() => store.state.user.timezone),
-            collector: computed(() => {
-                const id = state.job.collector_info?.collector_id || '';
-                return {
-                    id,
-                    label: state.collectors[id]?.label || id,
-                    linkLocation: referenceRouter(id, { resource_type: 'inventory.Collector' }),
-                };
-            }),
-            provider: computed(() => {
-                const id = state.job.collector_info?.provider || '';
-                return {
-                    id,
-                    label: state.providers[id]?.name || id,
-                };
-            }),
-            plugin: computed(() => {
-                const id = state.job.collector_info?.plugin_info?.plugin_id || '';
-                return {
-                    id,
-                    label: state.plugins[id]?.label || id,
-                    icon: state.plugins[id]?.icon,
-                };
-            }),
+const props = defineProps<Props>();
+const store = useStore();
+const { t } = useI18n();
 
-        });
-
-        const apiQuery = new ApiQueryHelper();
-        const getJob = async () => {
-            state.loading = true;
-            state.job = {};
-            try {
-                apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
-                const { results } = await SpaceConnector.client.inventory.job.list({
-                    query: apiQuery.data,
-                });
-                state.job = results[0] || {};
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* Init */
-        onActivated(() => {
-            getJob();
-        });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/collector/load'),
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/plugin/load'),
-            ]);
-        })();
-
+const state = reactive({
+    loading: true,
+    job: {} as any,
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    timezone: computed(() => store.state.user.timezone),
+    collector: computed(() => {
+        const id = state.job.collector_info?.collector_id || '';
         return {
-            ...toRefs(state),
-            iso8601Formatter,
+            id,
+            label: state.collectors[id]?.label || id,
+            linkLocation: referenceRouter(id, { resource_type: 'inventory.Collector' }),
         };
-    },
+    }),
+    provider: computed(() => {
+        const id = state.job.collector_info?.provider || '';
+        return {
+            id,
+            label: state.providers[id]?.name || id,
+        };
+    }),
+    plugin: computed(() => {
+        const id = state.job.collector_info?.plugin_info?.plugin_id || '';
+        return {
+            id,
+            label: state.plugins[id]?.label || id,
+            icon: state.plugins[id]?.icon,
+        };
+    }),
+
+});
+
+const apiQuery = new ApiQueryHelper();
+const getJob = async () => {
+    state.loading = true;
+    state.job = {};
+    try {
+        apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
+        const { results } = await SpaceConnector.client.inventory.job.list({
+            query: apiQuery.data,
+        });
+        state.job = results[0] || {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
 };
+
+/* Init */
+onActivated(() => {
+    getJob();
+});
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/collector/load'),
+        store.dispatch('reference/provider/load'),
+        store.dispatch('reference/plugin/load'),
+    ]);
+})();
+
 </script>
+
+<template>
+    <p-pane-layout class="job-basic-information">
+        <header>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
+        <section class="items-container">
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
+                <p-anchor :to="state.collector.linkLocation"
+                          class="contents"
+                          size="sm"
+                >
+                    {{ state.collector.label }}
+                </p-anchor>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(state.job.created_at, state.timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
+                <span class="contents align-middle">
+                    <p-lazy-img :src="state.plugin.icon"
+                                error-icon="ic_cloud-filled"
+                                :loading="!state.plugin.id"
+                                :alt="state.plugin.label"
+                                width="1rem"
+                                height="1rem"
+                                class="mr-1"
+                    />
+                    {{ state.plugin.label }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(state.job.finished_at, state.timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
+                <span class="contents">
+                    {{ state.provider.label }}
+                </span>
+            </div>
+        </section>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .job-basic-information {

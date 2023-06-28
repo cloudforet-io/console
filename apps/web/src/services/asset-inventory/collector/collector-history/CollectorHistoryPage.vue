@@ -1,101 +1,4 @@
-<template>
-    <div class="collector-history-page">
-        <p-heading :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
-        />
-        <p-collector-history-chart @click-date="handleClickDate" />
-        <div class="collector-history-table">
-            <div class="status-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group class="select-button-group"
-                                       :buttons="statusList"
-                                       :selected.sync="selectedStatus"
-                                       theme="text"
-                />
-            </div>
-            <p-toolbox-table search-type="query"
-                             :fields="fields"
-                             :items="items"
-                             :query-tags="queryTags"
-                             :key-item-sets="handlers.keyItemSets"
-                             :value-handler-map="handlers.valueHandlerMap"
-                             :loading="loading"
-                             :total-count="totalCount"
-                             :this-page.sync="thisPage"
-                             :page-size.sync="pageSize"
-                             row-cursor-pointer
-                             sortable
-                             :selectable="false"
-                             :exportable="false"
-                             :class="items.length === 0 ? 'no-data' : ''"
-                             :style="{height: '100%', border: 'none'}"
-                             @change="handleChange"
-                             @refresh="handleChange()"
-                             @rowLeftClick="onSelect"
-            >
-                <template #th-task-format="{ field }">
-                    <span>{{ field.label }}</span>
-                    <span class="th-additional-info-text"> (completed / total)</span>
-                </template>
-                <template #[`col-collector_info.plugin_info-format`]="{ value }">
-                    <template v-if="value">
-                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
-                                    width="1rem"
-                                    height="1rem"
-                                    class="mr-2"
-                        />
-                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
-                    </template>
-                </template>
-                <template #col-status-format="{ value }">
-                    <p-status
-                        :text="statusTextFormatter(value)"
-                        :text-color="statusTextColorFormatter(value)"
-                        :icon="statusIconFormatter(value)"
-                        :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
-                    />
-                </template>
-                <template #col-remained_tasks-format="{value}">
-                    <div class="col-remained_tasks-format">
-                        <p-progress-bar
-                            :percentage="value"
-                            :color="PROGRESS_BAR_COLOR"
-                        />
-                        <span class="text">{{ value }}%</span>
-                    </div>
-                </template>
-            </p-toolbox-table>
-            <div v-if="items.length > 0"
-                 class="pagination"
-            >
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @change="handleChangePagination"
-                />
-            </div>
-        </div>
-        <no-collector-modal :visible.sync="modalVisible"
-                            :manage-disabled="!hasManagePermission"
-                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PHeading, PPagination, PLazyImg,
-    PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
-} from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import { capitalize } from 'lodash';
-
+<script lang="ts" setup>
 import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
@@ -105,10 +8,18 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    PHeading, PPagination, PLazyImg,
+    PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+} from '@spaceone/design-system';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import { capitalize } from 'lodash';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -125,6 +36,7 @@ import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-histo
 import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 import NoCollectorModal from '@/services/asset-inventory/collector/collector-history/modules/NoCollectorModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 
 const PROGRESS_BAR_COLOR = peacock[500];
 const COMPLETED_ICON_COLOR = green[500];
@@ -150,203 +62,258 @@ const statusIconColorFormatter = (status) => {
     return FAILED_ICON_COLOR;
 };
 
-export default {
-    name: 'CollectorHistoryPage',
-    components: {
-        NoCollectorModal,
-        // HandbookButton,
-        PLazyImg,
-        PPagination,
-        PToolboxTable,
-        PHeading,
-        PSelectButtonGroup,
-        PProgressBar,
-        PStatus,
-        PCollectorHistoryChart,
+const store = useStore();
+const { t } = useI18n();
+const router = useRouter();
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+const handlers = reactive({
+    keyItemSets: computed<KeyItemSet[]>(() => [{
+        title: 'Properties',
+        items: [
+            { name: 'job_id', label: 'Job ID' },
+            { name: 'status', label: 'Status' },
+            { name: 'collector_id', label: 'Collector', valueSet: storeState.collectors },
+            { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
+        ],
+    }]),
+    valueHandlerMap: {
+        job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+        status: makeEnumValueHandler(JOB_STATUS),
+        collector_id: makeReferenceValueHandler('inventory.Collector'),
+    } as ValueHandlerMap,
+});
+
+const queryTagsHelper = useQueryTags({
+    keyItemSets: handlers.keyItemSets,
+    referenceStore: {
+        'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
     },
-    setup() {
-        const storeState = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-        });
-        const handlers = reactive({
-            keyItemSets: computed<KeyItemSet[]>(() => [{
-                title: 'Properties',
-                items: [
-                    { name: 'job_id', label: 'Job ID' },
-                    { name: 'status', label: 'Status' },
-                    { name: 'collector_id', label: 'Collector', valueSet: storeState.collectors },
-                    { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
-                ],
-            }]),
-            valueHandlerMap: {
-                job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-                status: makeEnumValueHandler(JOB_STATUS),
-                collector_id: makeReferenceValueHandler('inventory.Collector'),
-            } as ValueHandlerMap,
-        });
+});
+const { queryTags, filters: searchFilters } = queryTagsHelper;
+const state = reactive({
+    hasManagePermission: useManagePermissionState(),
+    loading: true,
+    modalVisible: false,
+    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
+    fields: computed(() => [
+        { label: 'Job ID', name: 'job_id' },
+        { label: 'Collector', name: 'collector_info.name', sortable: false },
+        { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
+        { label: 'Status', name: 'status', sortable: false },
+        { label: 'Job Progress', name: 'remained_tasks' },
+        { label: 'Created', name: 'created_at' },
+        { label: 'Duration', name: 'duration', sortable: false },
+    ]),
+    statusList: computed(() => ([
+        {
+            name: 'all', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
+        },
+        {
+            name: 'inProgress', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
+        },
+        {
+            name: 'completed', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
+        },
+        {
+            name: 'failed', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
+        },
+    ])),
+    selectedStatus: 'all',
+    items: [] as any[],
+    //
+    pageStart: 1,
+    pageSize: 15,
+    thisPage: 1,
+    totalCount: 0,
+});
 
-        const queryTagsHelper = useQueryTags({
-            keyItemSets: handlers.keyItemSets,
-            referenceStore: {
-                'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
-            },
-        });
-        const { queryTags, filters: searchFilters } = queryTagsHelper;
-        const state = reactive({
-            hasManagePermission: useManagePermissionState(),
-            loading: true,
-            modalVisible: false,
-            isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-            fields: computed(() => [
-                { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector', name: 'collector_info.name', sortable: false },
-                { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
-                { label: 'Status', name: 'status', sortable: false },
-                { label: 'Job Progress', name: 'remained_tasks' },
-                { label: 'Created', name: 'created_at' },
-                { label: 'Duration', name: 'duration', sortable: false },
-            ]),
-            statusList: computed(() => ([
-                {
-                    name: 'all', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
-                },
-                {
-                    name: 'inProgress', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
-                },
-                {
-                    name: 'completed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
-                },
-                {
-                    name: 'failed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
-                },
-            ])),
-            selectedStatus: 'all',
-            items: [] as any[],
-            //
-            pageStart: 1,
-            pageSize: 15,
-            thisPage: 1,
-            totalCount: 0,
-        });
+/* api */
+const apiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('created_at', true);
+const getQuery = () => {
+    apiQueryHelper
+        .setPageStart(state.pageStart).setPageLimit(state.pageSize)
+        .setFilters(searchFilters.value);
 
-        /* api */
-        const apiQueryHelper = new ApiQueryHelper()
-            .setPageStart(1).setPageLimit(15)
-            .setSort('created_at', true);
-        const getQuery = () => {
-            apiQueryHelper
-                .setPageStart(state.pageStart).setPageLimit(state.pageSize)
-                .setFilters(searchFilters.value);
+    let statusValues: JOB_STATUS[] = [];
+    if (state.selectedStatus === 'inProgress') {
+        statusValues = [JOB_STATUS.progress];
+    } else if (state.selectedStatus === 'completed') {
+        statusValues = [JOB_STATUS.created, JOB_STATUS.success];
+    } else if (state.selectedStatus === 'failed') {
+        statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
+    }
 
-            let statusValues: JOB_STATUS[] = [];
-            if (state.selectedStatus === 'inProgress') {
-                statusValues = [JOB_STATUS.progress];
-            } else if (state.selectedStatus === 'completed') {
-                statusValues = [JOB_STATUS.created, JOB_STATUS.success];
-            } else if (state.selectedStatus === 'failed') {
-                statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
-            }
+    if (statusValues.length > 0) {
+        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
+    }
 
-            if (statusValues.length > 0) {
-                apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
-            }
-
-            return apiQueryHelper.data;
-        };
-        const getJobs = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
-                state.totalCount = res.total_count;
-                state.items = res.results.map((job) => ({
-                    ...job,
-                    remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
-                    created_at: iso8601Formatter(job.created_at, storeState.timezone),
-                    duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* event */
-        const onSelect = (item) => {
-            SpaceRouter.router.push({
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-                params: { jobId: item.job_id },
-            }).catch(() => {});
-        };
-        const handleChange = async (options: ToolboxOptions = {}) => {
-            setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
-            if (options.queryTags) {
-                queryTagsHelper.setQueryTags(options.queryTags);
-                replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
-            }
-            if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
-            if (options?.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-                state.thisPage = 1;
-                state.pageStart = getPageStart(state.thisPage, state.pageSize);
-            }
-            await getJobs();
-        };
-        const handleChangePagination = () => {
-            state.pageStart = getPageStart(state.thisPage, state.pageSize);
-            getJobs();
-        };
-        const handleClickDate = async (data) => {
-            state.selectedStatus = data.type;
-            queryTagsHelper.setFilters([
-                ...searchFilters.value,
-                { k: 'created_at', v: data.date, o: '=' },
-            ]);
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/plugin/load'),
-                store.dispatch('reference/collector/load'),
-            ]);
-
-            const currentQuery = SpaceRouter.router.currentRoute.query;
-            queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-
-            await getJobs();
-            if (state.totalCount === 0) state.modalVisible = true;
-        })();
-
-        watch(() => state.selectedStatus, (selectedStatus) => {
-            state.selectedStatus = selectedStatus;
-            state.thisPage = 1;
-            state.pageStart = 1;
-            getJobs();
-        });
-
-        return {
-            ...toRefs(state),
-            storeState,
-            handlers,
-            queryTags,
-            PROGRESS_BAR_COLOR,
-            COMPLETED_ICON_COLOR,
-            ASSET_INVENTORY_ROUTE,
-            JOB_STATUS,
-            onSelect,
-            handleChange,
-            handleChangePagination,
-            handleClickDate,
-            statusTextFormatter,
-            statusTextColorFormatter,
-            statusIconFormatter,
-            statusIconColorFormatter,
-        };
-    },
+    return apiQueryHelper.data;
 };
+const getJobs = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
+        state.totalCount = res.total_count;
+        state.items = res.results.map((job) => ({
+            ...job,
+            remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
+            created_at: iso8601Formatter(job.created_at, storeState.timezone),
+            duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* event */
+const onSelect = (item) => {
+    router.push({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        params: { jobId: item.job_id },
+    }).catch(() => {});
+};
+const handleChange = async (options: ToolboxOptions = {}) => {
+    setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
+    if (options.queryTags) {
+        queryTagsHelper.setQueryTags(options.queryTags);
+        replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
+    }
+    if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options?.pageLimit !== undefined) {
+        state.pageSize = options.pageLimit;
+        state.thisPage = 1;
+        state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    }
+    await getJobs();
+};
+const handleChangePagination = () => {
+    state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    getJobs();
+};
+const handleClickDate = async (data) => {
+    state.selectedStatus = data.type;
+    queryTagsHelper.setFilters([
+        ...searchFilters.value,
+        { k: 'created_at', v: data.date, o: '=' },
+    ]);
+};
+
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/plugin/load'),
+        store.dispatch('reference/collector/load'),
+    ]);
+
+    const currentQuery = router.currentRoute.value.query;
+    // TODO: need to implement about type assertion
+    queryTagsHelper.setURLQueryStringFilters(currentQuery.filters as undefined|string|(string|null)[]);
+
+    await getJobs();
+    if (state.totalCount === 0) state.modalVisible = true;
+})();
+
+watch(() => state.selectedStatus, (selectedStatus) => {
+    state.selectedStatus = selectedStatus;
+    state.thisPage = 1;
+    state.pageStart = 1;
+    getJobs();
+});
+
 </script>
+
+<template>
+    <div class="collector-history-page">
+        <p-heading :title="t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
+                   show-back-button
+                   @click-back-button="router.go(-1)"
+        />
+        <p-collector-history-chart @click-date="handleClickDate" />
+        <div class="collector-history-table">
+            <div class="status-wrapper">
+                <span class="label">{{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <p-select-button-group v-model:selected="state.selectedStatus"
+                                       class="select-button-group"
+                                       :buttons="state.statusList"
+                                       theme="text"
+                />
+            </div>
+            <p-toolbox-table v-model:this-page="state.thisPage"
+                             v-model:page-size="state.pageSize"
+                             search-type="query"
+                             :fields="state.fields"
+                             :items="state.items"
+                             :query-tags="queryTags"
+                             :key-item-sets="handlers.keyItemSets"
+                             :value-handler-map="handlers.valueHandlerMap"
+                             :loading="state.loading"
+                             :total-count="state.totalCount"
+                             row-cursor-pointer
+                             sortable
+                             :selectable="false"
+                             :exportable="false"
+                             :class="state.items.length === 0 ? 'no-data' : ''"
+                             :style="{height: '100%', border: 'none'}"
+                             @change="handleChange"
+                             @refresh="handleChange()"
+                             @row-left-click="onSelect"
+            >
+                <template #th-task-format="{ field }">
+                    <span>{{ field.label }}</span>
+                    <span class="th-additional-info-text"> (completed / total)</span>
+                </template>
+                <template #[`col-collector_info.plugin_info-format`]="{ value }">
+                    <template v-if="value">
+                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
+                                    width="1rem"
+                                    height="1rem"
+                                    class="mr-2"
+                        />
+                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
+                    </template>
+                </template>
+                <template #col-status-format="{ value }">
+                    <p-status :text="statusTextFormatter(value)"
+                              :text-color="statusTextColorFormatter(value)"
+                              :icon="statusIconFormatter(value)"
+                              :icon-color="statusIconColorFormatter(value)"
+                              :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
+                    />
+                </template>
+                <template #col-remained_tasks-format="{value}">
+                    <div class="col-remained_tasks-format">
+                        <p-progress-bar
+                            :percentage="value"
+                            :color="PROGRESS_BAR_COLOR"
+                        />
+                        <span class="text">{{ value }}%</span>
+                    </div>
+                </template>
+            </p-toolbox-table>
+            <div v-if="state.items.length > 0"
+                 class="pagination"
+            >
+                <p-pagination v-model:this-page="state.thisPage"
+                              v-model:page-size="state.pageSize"
+                              :total-count="state.totalCount"
+                              @change="handleChangePagination"
+                />
+            </div>
+        </div>
+        <no-collector-modal v-model:visible="state.modalVisible"
+                            :manage-disabled="!state.hasManagePermission"
+                            @confirm="router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .collector-history-page {

@@ -1,59 +1,13 @@
-<template>
-    <p-pane-layout class="job-status-chart">
-        <div class="status-wrapper">
-            <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span v-if="status"
-                  class="value"
-            >
-                <p-i
-                    :name="statusIconFormatter(status)"
-                    width="1rem"
-                    height="1rem"
-                    :animation="status === JOB_STATUS.progress ? 'spin' : undefined"
-                    :color="status === JOB_STATUS.success ? SUCCEEDED_COLOR : undefined"
-                />
-                {{ statusText }}
-            </span>
-        </div>
-        <div class="chart-wrapper">
-            <div class="label-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
-                <template v-if="succeededCount > 0">
-                    <p-status :icon-color="SUCCEEDED_COLOR" />
-                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ succeededCount }}</strong></span>
-                </template>
-                <template v-if="failedCount > 0">
-                    <p-status :icon-color="FAILED_COLOR" />
-                    <span :style="{'color': FAILED_COLOR}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ failedCount }}</strong></span>
-                </template>
-                <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ totalCount }}</strong></span>
-            </div>
-            <div class="progress-bar">
-                <span class="succeeded-bar"
-                      :style="{ width: `${succeededPercentage}%` }"
-                />
-                <span class="failed-bar"
-                      :style="{ width: `${failedPercentage}%` }"
-                />
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 import {
     computed,
-    getCurrentInstance,
     onActivated,
     onDeactivated,
     reactive,
-    toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -64,97 +18,122 @@ import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-histo
 const SUCCEEDED_COLOR = green[400];
 const FAILED_COLOR = coral[400];
 
-export default {
-    name: 'JobStatusChart',
-    components: {
-        PPaneLayout,
-        PStatus,
-        PI,
-    },
-    props: {
-        jobId: {
-            type: String,
-            required: true,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            job: {},
-            status: computed(() => state.job.job_status),
-            statusText: computed(() => {
-                if (state.status === JOB_STATUS.progress) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
-                if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
-                return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
-            }),
-            succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
-            failedCount: computed(() => state.job.job_task_status?.failed || 0),
-            totalCount: computed(() => state.job.job_task_status?.total),
-            succeededPercentage: computed(() => {
-                if (state.totalCount > 0) {
-                    return (state.succeededCount / state.totalCount) * 100;
-                }
-                return 0;
-            }),
-            failedPercentage: computed(() => {
-                if (state.totalCount > 0) {
-                    if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) {
-                        return 100 - state.succeededPercentage;
-                    }
-                    return (state.failedCount / state.totalCount) * 100;
-                }
-                return 0;
-            }),
-        });
+interface Props {
+    jobId: string;
+}
 
-        /* util */
-        const statusIconFormatter = (status) => {
-            if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_check';
-            if (status === JOB_STATUS.progress) return 'ic_gear-filled';
-            return 'ic_error-filled';
-        };
+const props = defineProps<Props>();
+const { t } = useI18n();
 
-        /* api */
-        let interval;
-        const getJob = async () => {
-            try {
-                state.job = await SpaceConnector.client.inventory.job.getJobProgress({
-                    job_id: props.jobId,
-                });
-                if (state.status !== JOB_STATUS.progress && interval) {
-                    clearInterval(interval);
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.job = {};
+const state = reactive({
+    job: {},
+    status: computed(() => state.job.job_status),
+    statusText: computed(() => {
+        if (state.status === JOB_STATUS.progress) return t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
+        if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) return t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
+        return t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
+    }),
+    succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
+    failedCount: computed(() => state.job.job_task_status?.failed || 0),
+    totalCount: computed(() => state.job.job_task_status?.total),
+    succeededPercentage: computed(() => {
+        if (state.totalCount > 0) {
+            return (state.succeededCount / state.totalCount) * 100;
+        }
+        return 0;
+    }),
+    failedPercentage: computed(() => {
+        if (state.totalCount > 0) {
+            if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) {
+                return 100 - state.succeededPercentage;
             }
-        };
+            return (state.failedCount / state.totalCount) * 100;
+        }
+        return 0;
+    }),
+});
 
-        /* Init */
-        onActivated(async () => {
-            await getJob();
-
-            if (state.status === JOB_STATUS.progress) {
-                interval = setInterval(() => {
-                    getJob();
-                }, 5000);
-            }
-        });
-
-        onDeactivated(() => {
-            if (interval) clearInterval(interval);
-        });
-
-        return {
-            ...toRefs(state),
-            statusIconFormatter,
-            JOB_STATUS,
-            SUCCEEDED_COLOR,
-            FAILED_COLOR,
-        };
-    },
+/* util */
+const statusIconFormatter = (status) => {
+    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_check';
+    if (status === JOB_STATUS.progress) return 'ic_gear-filled';
+    return 'ic_error-filled';
 };
+
+/* api */
+let interval;
+const getJob = async () => {
+    try {
+        state.job = await SpaceConnector.client.inventory.job.getJobProgress({
+            job_id: props.jobId,
+        });
+        if (state.status !== JOB_STATUS.progress && interval) {
+            clearInterval(interval);
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.job = {};
+    }
+};
+
+/* Init */
+onActivated(async () => {
+    await getJob();
+
+    if (state.status === JOB_STATUS.progress) {
+        interval = setInterval(() => {
+            getJob();
+        }, 5000);
+    }
+});
+
+onDeactivated(() => {
+    if (interval) clearInterval(interval);
+});
+
 </script>
+
+<template>
+    <p-pane-layout class="job-status-chart">
+        <div class="status-wrapper">
+            <span class="label">{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
+            <span v-if="state.status"
+                  class="value"
+            >
+                <p-i
+                    :name="statusIconFormatter(status)"
+                    width="1rem"
+                    height="1rem"
+                    :animation="state.status === JOB_STATUS.progress ? 'spin' : undefined"
+                    :color="state.status === JOB_STATUS.success ? SUCCEEDED_COLOR : undefined"
+                />
+                {{ statusText }}
+            </span>
+        </div>
+        <div class="chart-wrapper">
+            <div class="label-wrapper">
+                <span class="label">{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
+                <template v-if="state.succeededCount > 0">
+                    <p-status :icon-color="SUCCEEDED_COLOR" />
+                    <span>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ state.succeededCount }}</strong></span>
+                </template>
+                <template v-if="state.failedCount > 0">
+                    <p-status :icon-color="FAILED_COLOR" />
+                    <span :style="{'color': FAILED_COLOR}">{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ state.failedCount }}</strong></span>
+                </template>
+                <span class="total-text">{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ state.totalCount }}</strong></span>
+            </div>
+            <div class="progress-bar">
+                <span class="succeeded-bar"
+                      :style="{ width: `${state.succeededPercentage}%` }"
+                />
+                <span class="failed-bar"
+                      :style="{ width: `${state.failedPercentage}%` }"
+                />
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .job-status-chart {

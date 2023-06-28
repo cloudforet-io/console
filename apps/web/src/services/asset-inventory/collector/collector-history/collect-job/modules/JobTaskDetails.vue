@@ -1,57 +1,45 @@
+<script lang="ts" setup>
+import { PTab } from '@spaceone/design-system';
+import {
+    computed, onActivated, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
+import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+
+interface Props {
+    selectedItem: JobTaskData;
+}
+
+withDefaults(defineProps<Props>(), {
+    selectedItem: () => ({}) as JobTaskData,
+});
+const { t } = useI18n();
+
+const state = reactive({
+    tabs: computed(() => [
+        { name: 'error-list', label: t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },
+    ]),
+    activeTab: 'error-list',
+});
+
+onActivated(() => {
+    state.activeTab = 'error-list';
+});
+
+</script>
+
 <template>
-    <p-tab class="job-task-details"
-           :tabs="tabs"
-           :active-tab.sync="activeTab"
+    <p-tab v-model:active-tab="state.activeTab"
+           class="job-task-details"
+           :tabs="state.tabs"
     >
         <template #error-list>
             <job-task-error-list :selected-item="selectedItem" />
         </template>
     </p-tab>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PTab } from '@spaceone/design-system';
-
-import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
-import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
-export default {
-    name: 'JobTaskDetails',
-    components: {
-        PTab,
-        JobTaskErrorList,
-    },
-    props: {
-        selectedItem: {
-            type: Object as () => JobTaskData,
-            default: () => ({}),
-            required: true,
-        },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            tabs: computed(() => [
-                { name: 'error-list', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },
-            ]),
-            activeTab: 'error-list',
-        });
-
-        onActivated(() => {
-            state.activeTab = 'error-list';
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .job-task-details {

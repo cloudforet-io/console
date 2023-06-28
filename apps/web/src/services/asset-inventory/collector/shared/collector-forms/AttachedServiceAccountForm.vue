@@ -43,16 +43,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
@@ -77,7 +76,7 @@ interface Props {
 }
 
 
-const emit = defineEmits<{(e: 'update:isAttachedServiceAccountValid', value: boolean): void;
+const emit = defineEmits<{(e: 'update:is-attached-service-account-valid', value: boolean): void;
 }>();
 
 const props = defineProps<Props>();
@@ -180,7 +179,7 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
 };
 
 watch(() => isAllValid.value, (value) => {
-    emit('update:isAttachedServiceAccountValid', value);
+    emit('update:is-attached-service-account-valid', value);
 }, { immediate: true });
 
 watch(() => collectorFormStore.collectorId, (collectorId) => {

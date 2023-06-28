@@ -1,3 +1,78 @@
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown,
+} from '@spaceone/design-system';
+import { computed, reactive, watch } from 'vue';
+import { useStore } from 'vuex';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    useCollectorFormStore,
+} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
+
+const emit = defineEmits<{(e:'select-repository', repository: string):void}>();
+const store = useStore();
+
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providerList: computed(() => [
+        { name: 'all', label: 'All Providers', img: undefined },
+        ...Object.keys(state.providers).map((k) => ({
+            label: state.providers[k].name,
+            name: k,
+            img: state.providers[k]?.icon,
+        })),
+        { name: 'etc', label: 'ETC', img: undefined },
+    ]),
+    selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
+    repositories: [],
+    repositoryList: computed(() => ([
+        { name: 'all', label: 'All Repository' },
+        ...state.repositories.map((repo) => ({
+            label: repo.name,
+            name: repo.repository_id,
+        })),
+    ])),
+    selectedRepository: 'all',
+});
+
+const repoApiQuery = new ApiQueryHelper();
+const getRepositories = async () => {
+    try {
+        repoApiQuery.setSort('repository_type', true);
+        const res = await SpaceConnector.client.repository.repository.list({
+            query: repoApiQuery.data,
+        });
+        state.repositories = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.repositories = [];
+    }
+};
+
+const handleChangeProvider = (provider) => {
+    const providerValue = provider === 'all' ? null : provider;
+    collectorFormStore.setProvider(providerValue);
+};
+
+watch(() => state.selectedRepository, (repository) => {
+    emit('select-repository', repository);
+});
+
+(async () => {
+    await getRepositories();
+})();
+
+</script>
+
 <template>
     <div class="left-area">
         <div class="radio-container">
@@ -94,83 +169,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
-
-import {
-    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    useCollectorFormStore,
-} from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-
-const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
-
-const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
-
-const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    providerList: computed(() => [
-        { name: 'all', label: 'All Providers', img: undefined },
-        ...Object.keys(state.providers).map((k) => ({
-            label: state.providers[k].name,
-            name: k,
-            img: state.providers[k]?.icon,
-        })),
-        { name: 'etc', label: 'ETC', img: undefined },
-    ]),
-    selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
-    repositories: [],
-    repositoryList: computed(() => ([
-        { name: 'all', label: 'All Repository' },
-        ...state.repositories.map((repo) => ({
-            label: repo.name,
-            name: repo.repository_id,
-        })),
-    ])),
-    selectedRepository: 'all',
-});
-
-const repoApiQuery = new ApiQueryHelper();
-const getRepositories = async () => {
-    try {
-        repoApiQuery.setSort('repository_type', true);
-        const res = await SpaceConnector.client.repository.repository.list({
-            query: repoApiQuery.data,
-        });
-        state.repositories = res.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.repositories = [];
-    }
-};
-
-const handleChangeProvider = (provider) => {
-    const providerValue = provider === 'all' ? null : provider;
-    collectorFormStore.setProvider(providerValue);
-};
-
-watch(() => state.selectedRepository, (repository) => {
-    emit('selectRepository', repository);
-});
-
-(async () => {
-    await getRepositories();
-})();
-
-</script>
 
 <style lang="postcss" scoped>
 .left-area {

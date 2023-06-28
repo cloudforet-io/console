@@ -1,61 +1,10 @@
-<template>
-    <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
-
-        <div class="schedule-wrapper">
-            <collector-schedule-form :enable-hours-edit="state.isEditMode"
-                                     :disabled="state.updateLoading"
-                                     reset-on-collector-id-change
-                                     call-api-on-power-change
-                                     @update:enableHoursEdit="handleUpdateEditMode"
-            />
-
-            <div class="button-group">
-                <p-button v-if="state.isEditMode"
-                          style-type="tertiary"
-                          size="lg"
-                          :disabled="state.updateLoading"
-                          @click="handleClickCancel"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-                </p-button>
-                <p-button v-if="state.isEditMode"
-                          style-type="primary"
-                          size="lg"
-                          :loading="state.updateLoading"
-                          class="save-changes-button"
-                          @click="handleClickSave"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
-
 <script lang="ts" setup>
-import { reactive } from 'vue';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PHeading, PButton, PPaneLayout,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -70,6 +19,8 @@ import CollectorScheduleForm
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+
+const { t } = useI18n();
 
 const state = reactive({
     isEditMode: false,
@@ -106,17 +57,65 @@ const handleClickSave = async () => {
         state.updateLoading = true;
         const collector = await fetchCollectorUpdate();
         collectorFormStore.setOriginCollector(collector);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
         state.isEditMode = false;
     } catch (error) {
         collectorFormStore.resetSchedule();
-        ErrorHandler.handleRequestError(error, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        ErrorHandler.handleRequestError(error, t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     } finally {
         state.updateLoading = false;
     }
 };
 
 </script>
+
+<template>
+    <p-pane-layout>
+        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <p-button v-if="!state.isEditMode"
+                          size="md"
+                          icon-left="ic_edit"
+                          style-type="secondary"
+                          @click="handleClickEdit"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                </p-button>
+            </template>
+        </p-heading>
+
+        <div class="schedule-wrapper">
+            <collector-schedule-form :enable-hours-edit="state.isEditMode"
+                                     :disabled="state.updateLoading"
+                                     reset-on-collector-id-change
+                                     call-api-on-power-change
+                                     @update:enable-hours-edit="handleUpdateEditMode"
+            />
+
+            <div class="button-group">
+                <p-button v-if="state.isEditMode"
+                          style-type="tertiary"
+                          size="lg"
+                          :disabled="state.updateLoading"
+                          @click="handleClickCancel"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button v-if="state.isEditMode"
+                          style-type="primary"
+                          size="lg"
+                          :loading="state.updateLoading"
+                          class="save-changes-button"
+                          @click="handleClickSave"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .schedule-wrapper {

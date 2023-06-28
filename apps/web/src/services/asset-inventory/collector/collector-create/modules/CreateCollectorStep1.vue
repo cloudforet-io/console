@@ -1,81 +1,16 @@
-<template>
-    <div class="collector-page-1">
-        <p-search v-model="state.searchValue"
-                  @search="handleSearch"
-        />
-        <div class="contents-container">
-            <step1-search-filter @selectRepository="handleChangeRepository" />
-            <div class="right-area">
-                <p-field-title class="contents-title">
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') }}
-                </p-field-title>
-                <p-data-loader class="right-area-contents"
-                               :data="state.pluginList"
-                               :loading="state.loading"
-                               :loader-backdrop-color="BACKGROUND_COLOR"
-                >
-                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
-                         class="plugin-card-list"
-                    >
-                        <p-board-item v-for="item in state.pluginList"
-                                      :key="item.name"
-                                      class="plugin-card-item"
-                        >
-                            <template #content>
-                                <div class="plugin-card-content">
-                                    <collect-plugin-contents :plugin="item"
-                                                             size="sm"
-                                    />
-                                    <p-button style-type="secondary"
-                                              class="select-button"
-                                              @click="handleClickNextStep(item)"
-                                    >
-                                        {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT') }}
-                                    </p-button>
-                                    <p-i class="select-icon"
-                                         name="ic_chevron-right"
-                                         :color="gray[300]"
-                                         width="1.5rem"
-                                         height="1.5rem"
-                                         @click="handleClickNextStep(item)"
-                                    />
-                                </div>
-                            </template>
-                        </p-board-item>
-                    </div>
-                    <template #no-data>
-                        <div class="no-data-box">
-                            <p-empty image-size="md"
-                                     show-image
-                            >
-                                <template #image>
-                                    <img src="@/assets/images/illust_microscope.svg"
-                                         alt="empty-options"
-                                    >
-                                </template>
-                                {{ $t('INVENTORY.COLLECTOR.NO_DATA') }}
-                            </p-empty>
-                        </div>
-                    </template>
-                </p-data-loader>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script lang="ts" setup>
-import { vInfiniteScroll } from '@vueuse/components';
-import {
-    onMounted, reactive, watch,
-} from 'vue';
-
-import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
-} from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
+} from '@spaceone/design-system';
+import { vInfiniteScroll } from '@vueuse/components';
+import {
+    onMounted, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -88,9 +23,8 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 
-const emit = defineEmits([
-    'update:currentStep',
-]);
+const emit = defineEmits<{(e: 'update:current-step', value: number): void}>();
+const { t } = useI18n();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -144,7 +78,7 @@ const handleSearch = async (value) => {
     state.pluginList = await getPlugins();
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
-    emit('update:currentStep', 2);
+    emit('update:current-step', 2);
     collectorFormStore.setRepositoryPlugin(item);
 };
 const handleChangeRepository = (value:string) => {
@@ -160,6 +94,71 @@ onMounted(() => {
     collectorFormStore.$reset();
 });
 </script>
+
+<template>
+    <div class="collector-page-1">
+        <p-search v-model="state.searchValue"
+                  @search="handleSearch"
+        />
+        <div class="contents-container">
+            <step1-search-filter @select-repository="handleChangeRepository" />
+            <div class="right-area">
+                <p-field-title class="contents-title">
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') }}
+                </p-field-title>
+                <p-data-loader class="right-area-contents"
+                               :data="state.pluginList"
+                               :loading="state.loading"
+                               :loader-backdrop-color="BACKGROUND_COLOR"
+                >
+                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
+                         class="plugin-card-list"
+                    >
+                        <p-board-item v-for="item in state.pluginList"
+                                      :key="item.name"
+                                      class="plugin-card-item"
+                        >
+                            <template #content>
+                                <div class="plugin-card-content">
+                                    <collect-plugin-contents :plugin="item"
+                                                             size="sm"
+                                    />
+                                    <p-button style-type="secondary"
+                                              class="select-button"
+                                              @click="handleClickNextStep(item)"
+                                    >
+                                        {{ t('INVENTORY.COLLECTOR.CREATE.SELECT') }}
+                                    </p-button>
+                                    <p-i class="select-icon"
+                                         name="ic_chevron-right"
+                                         :color="gray[300]"
+                                         width="1.5rem"
+                                         height="1.5rem"
+                                         @click="handleClickNextStep(item)"
+                                    />
+                                </div>
+                            </template>
+                        </p-board-item>
+                    </div>
+                    <template #no-data>
+                        <div class="no-data-box">
+                            <p-empty image-size="md"
+                                     show-image
+                            >
+                                <template #image>
+                                    <img src="@/assets/images/illust_microscope.svg"
+                                         alt="empty-options"
+                                    >
+                                </template>
+                                {{ t('INVENTORY.COLLECTOR.NO_DATA') }}
+                            </p-empty>
+                        </div>
+                    </template>
+                </p-data-loader>
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .collector-page-1 {

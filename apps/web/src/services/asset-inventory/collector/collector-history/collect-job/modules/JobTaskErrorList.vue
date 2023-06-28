@@ -1,12 +1,77 @@
+<script lang="ts" setup>
+import { PDataTable, PHeading, PCollapsibleToggle } from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { resourceTypeLabels } from '@/lib/reference/type';
+
+import type { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+
+interface Props {
+    selectedItem: JobTaskData;
+}
+
+const detailErrorLocationList = ['inventory.CloudService', 'inventory.Server'];
+
+const errorMessageFormatter = (message) => {
+    let result = message
+        .replace(/'/g, '')
+        .replace(/(\\r\\n|\\n|\\r)/gm, '\n')
+        .replace(/(\\t)/gm, '');
+    if (result.startsWith('\n')) result = result.replace('\n', '');
+    return result;
+};
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedItem: () => ({}) as JobTaskData,
+});
+const { t } = useI18n();
+
+const initErrorItemsToggleList = (): boolean[] => props.selectedItem?.errors.map(() => true);
+
+const state = reactive({
+    errorItemsToggleList: initErrorItemsToggleList(),
+    errorItems: computed<JobTaskError[]>(() => {
+        if (Array.isArray(props?.selectedItem?.errors)) {
+            return props.selectedItem.errors.map((d, idx) => ({
+                ...d,
+                sequence: idx + 1,
+                message: errorMessageFormatter(d.message),
+            }));
+        }
+        return [];
+    }),
+    errorFields: [
+        { label: 'No.', name: 'sequence' },
+        { label: 'Error Location', name: 'additional' },
+        { label: 'Error Message', name: 'message' },
+        { label: 'Resource ID', name: 'additional.resource_id' },
+        { label: 'Error Code', name: 'error_code' },
+    ],
+});
+
+const handleUpdateErrorItemCollapsedState = (idx, isCollapsed) => {
+    state.errorItemsToggleList[idx] = isCollapsed;
+    state.errorItemsToggleList = [...state.errorItemsToggleList];
+};
+
+watch(() => props.selectedItem, () => {
+    state.errorItemsToggleList = initErrorItemsToggleList();
+});
+
+</script>
+
 <template>
     <div class="job-task-error-list">
         <p-heading heading-type="sub"
                    :use-total-count="true"
-                   :total-count="errorItems.length"
-                   :title="$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST')"
+                   :total-count="state.errorItems.length"
+                   :title="t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST')"
         />
-        <p-data-table :fields="errorFields"
-                      :items="errorItems"
+        <p-data-table :fields="state.errorFields"
+                      :items="state.errorItems"
                       :sortable="false"
                       :selectable="false"
                       :row-height-fixed="false"
@@ -19,14 +84,14 @@
                          class="error-message"
                     >
                         <pre class="content"
-                             :class="{ 'text-overflow': errorItemsToggleList[item.sequence - 1] }"
+                             :class="{ 'text-overflow': state.errorItemsToggleList[item.sequence - 1] }"
                         >{{ value }}</pre>
                         <div class="toggle-box">
                             <p-collapsible-toggle v-if="value.length >= 80"
-                                                  :is-collapsed="errorItemsToggleList[item.sequence - 1]"
-                                                  @update:isCollapsed="handleUpdateErrorItemCollapsedState(item.sequence - 1, $event)"
+                                                  :is-collapsed="state.errorItemsToggleList[item.sequence - 1]"
+                                                  @update:is-collapsed="handleUpdateErrorItemCollapsedState(item.sequence - 1, $event)"
                             >
-                                {{ errorItemsToggleList[item.sequence - 1] ? $t('COMMON.MONITORING.MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
+                                {{ state.errorItemsToggleList[item.sequence - 1] ? t('COMMON.MONITORING.MORE') : t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
                             </p-collapsible-toggle>
                         </div>
                     </div>
@@ -53,94 +118,11 @@
                 </template>
             </template>
             <template #no-data-format>
-                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_ERROR') }}
+                {{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_ERROR') }}
             </template>
         </p-data-table>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import { PDataTable, PHeading, PCollapsibleToggle } from '@spaceone/design-system';
-
-import { resourceTypeLabels } from '@/lib/reference/type';
-
-import type { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
-interface Props {
-    selectedItem: JobTaskData;
-}
-
-const detailErrorLocationList = ['inventory.CloudService', 'inventory.Server'];
-
-const errorMessageFormatter = (message) => {
-    let result = message
-        .replace(/'/g, '')
-        .replace(/(\\r\\n|\\n|\\r)/gm, '\n')
-        .replace(/(\\t)/gm, '');
-    if (result.startsWith('\n')) result = result.replace('\n', '');
-    return result;
-};
-
-export default {
-    name: 'JobTaskErrorList',
-    components: {
-        PDataTable,
-        PHeading,
-        PCollapsibleToggle,
-    },
-    props: {
-        selectedItem: {
-            type: Object as () => JobTaskData,
-            default: () => ({}),
-            required: true,
-        },
-    },
-    setup(props: Props) {
-        const initErrorItemsToggleList = (): boolean[] => props.selectedItem?.errors.map(() => true);
-
-        const state = reactive({
-            errorItemsToggleList: initErrorItemsToggleList(),
-            errorItems: computed<JobTaskError[]>(() => {
-                if (Array.isArray(props?.selectedItem?.errors)) {
-                    return props.selectedItem.errors.map((d, idx) => ({
-                        ...d,
-                        sequence: idx + 1,
-                        message: errorMessageFormatter(d.message),
-                    }));
-                }
-                return [];
-            }),
-            errorFields: [
-                { label: 'No.', name: 'sequence' },
-                { label: 'Error Location', name: 'additional' },
-                { label: 'Error Message', name: 'message' },
-                { label: 'Resource ID', name: 'additional.resource_id' },
-                { label: 'Error Code', name: 'error_code' },
-            ],
-        });
-
-        const handleUpdateErrorItemCollapsedState = (idx, isCollapsed) => {
-            state.errorItemsToggleList[idx] = isCollapsed;
-            state.errorItemsToggleList = [...state.errorItemsToggleList];
-        };
-
-        watch(() => props.selectedItem, () => {
-            state.errorItemsToggleList = initErrorItemsToggleList();
-        });
-
-        return {
-            ...toRefs(state),
-            detailErrorLocationList,
-            resourceTypeLabels,
-            handleUpdateErrorItemCollapsedState,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 $maxText:    79ch;

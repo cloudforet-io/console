@@ -1,50 +1,9 @@
-<template>
-    <div class="collector-page-3">
-        <div class="input-form">
-            <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
-            <collector-options-form class="collector-options-form"
-                                    show-title-on-empty-schema
-                                    @update:isValid="handleChangeIsSchemaFormValid"
-            />
-        </div>
-        <div class="step-footer">
-            <p-text-button icon-left="ic_chevron-left"
-                           style-type="highlight"
-                           class="step-left-text-button"
-                           @click="handleClickOtherPluginButton"
-            >
-                {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
-            </p-text-button>
-            <div class="right-area">
-                <p-button icon-left="ic_arrow-left"
-                          style-type="transparent"
-                          size="lg"
-                          @click="handleClickPrevButton"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
-                </p-button>
-                <p-button :disabled="!state.isAllFormValid"
-                          size="lg"
-                          @click="handleClickNextButton"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </div>
-        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
-                      :visible.sync="state.deleteModalVisible"
-                      :contents="$t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
-                      @confirm="handleClose"
-        />
-    </div>
-</template>
-
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
-
 import {
     PButton, PTextButton,
 } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -54,9 +13,8 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorOptionsForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorOptionsForm.vue';
 
 
-const emit = defineEmits([
-    'update:currentStep',
-]);
+const emit = defineEmits<{(e: 'update:current-step', value: number): void}>();
+const { t } = useI18n();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -85,18 +43,59 @@ const handleClickOtherPluginButton = () => {
     state.deleteModalVisible = true;
 };
 const handleClickNextButton = () => {
-    emit('update:currentStep', 4);
+    emit('update:current-step', 4);
 };
 const handleClickPrevButton = () => {
-    emit('update:currentStep', 2);
+    emit('update:current-step', 2);
 };
 
 const handleClose = () => {
-    emit('update:currentStep', 1);
+    emit('update:current-step', 1);
 };
 
-
 </script>
+
+<template>
+    <div class="collector-page-3">
+        <div class="input-form">
+            <attached-service-account-form @update:is-attached-service-account-valid="handleChangeIsAttachedServiceAccountValid" />
+            <collector-options-form class="collector-options-form"
+                                    show-title-on-empty-schema
+                                    @update:is-valid="handleChangeIsSchemaFormValid"
+            />
+        </div>
+        <div class="step-footer">
+            <p-text-button icon-left="ic_chevron-left"
+                           style-type="highlight"
+                           class="step-left-text-button"
+                           @click="handleClickOtherPluginButton"
+            >
+                {{ t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
+            </p-text-button>
+            <div class="right-area">
+                <p-button icon-left="ic_arrow-left"
+                          style-type="transparent"
+                          size="lg"
+                          @click="handleClickPrevButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
+                </p-button>
+                <p-button :disabled="!state.isAllFormValid"
+                          size="lg"
+                          @click="handleClickNextButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.CONTINUE') }}
+                </p-button>
+            </div>
+        </div>
+        <delete-modal v-model:visible="state.deleteModalVisible"
+                      :header-title="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
+                      :contents="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
+                      @confirm="handleClose"
+        />
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .collector-page-3 {
     min-width: 40rem;

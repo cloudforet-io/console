@@ -1,26 +1,8 @@
-<template>
-    <p-button-modal :visible="props.visible"
-                    :header-title="$t('INVENTORY.COLLECTOR.DETAIL.EDIT_COLLECTOR_NAME')"
-                    :disabled="!state.isAllValid"
-                    size="sm"
-                    :loading="state.loading"
-                    @confirm="handleConfirm"
-                    @update:visible="handleUpdateVisible"
-    >
-        <template #body>
-            <collector-name-form @update:isValid="handleUpdateIsValid" />
-        </template>
-    </p-button-modal>
-</template>
-
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive } from 'vue';
-
-import { PButtonModal } from '@spaceone/design-system';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
+import { PButtonModal } from '@spaceone/design-system';
+import { defineProps, defineEmits, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -30,14 +12,13 @@ import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
 
-
-
 const props = defineProps<{
     visible: boolean;
 }>();
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
+const { t } = useI18n();
 
 const state = reactive({
     isAllValid: false,
@@ -65,10 +46,10 @@ const handleConfirm = async () => {
         const collector = await fetchUpdateCollectorName();
         collectorFormStore.setOriginCollector(collector);
         emits('update:visible', false);
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_CHANGE_COLLECTOR_NAME'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.ALT_S_CHANGE_COLLECTOR_NAME'), '');
     } catch (e) {
         collectorFormStore.resetName();
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_CHANGE_COLLECTOR_NAME'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.ALT_E_CHANGE_COLLECTOR_NAME'));
     } finally {
         state.loading = false;
     }
@@ -79,3 +60,18 @@ const handleUpdateVisible = (visible: boolean) => {
 
 
 </script>
+
+<template>
+    <p-button-modal :visible="props.visible"
+                    :header-title="t('INVENTORY.COLLECTOR.DETAIL.EDIT_COLLECTOR_NAME')"
+                    :disabled="!state.isAllValid"
+                    size="sm"
+                    :loading="state.loading"
+                    @confirm="handleConfirm"
+                    @update:visible="handleUpdateVisible"
+    >
+        <template #body>
+            <collector-name-form @update:is-valid="handleUpdateIsValid" />
+        </template>
+    </p-button-modal>
+</template>
