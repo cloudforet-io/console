@@ -10,6 +10,7 @@ export interface CommonOptions {
     link?: string;
     sortable?: boolean;
     sort_key?: string;
+    key_depth?: number;
     width?: string;
     translation_id?: string;
     default?: any;
