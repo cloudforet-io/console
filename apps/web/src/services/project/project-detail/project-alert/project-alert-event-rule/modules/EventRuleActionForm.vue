@@ -311,13 +311,6 @@ export default {
             }
         }
 
-        /* custom design-system component - .p-toggle-button */
-        :deep(.p-toggle-button) {
-            .state-text {
-                @apply font-normal text-blue-600;
-            }
-        }
-
         .project-select-dropdown, .user-search-dropdown {
             width: 60%;
         }
