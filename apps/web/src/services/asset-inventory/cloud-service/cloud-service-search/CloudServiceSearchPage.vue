@@ -1,11 +1,8 @@
-<template>
-    <div />
-</template>
 <script lang="ts">
-import { isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { isEmpty } from 'lodash';
 
 import { locationQueryToString } from '@/lib/router-query-string';
 
@@ -15,6 +12,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 const DEFAULT_URL = '/asset-inventory/cloud-service';
 const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 
+
+/* TODO: need to find solution of Augmenting Custom Options 'beforeRouteEnter' in script setup
+*   ComponentCustomOptions is declared in shims-vue.d.ts */
 export default {
     name: 'CloudServiceSearch',
     beforeRouteEnter(to, from, next) {
@@ -55,3 +55,7 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div />
+</template>

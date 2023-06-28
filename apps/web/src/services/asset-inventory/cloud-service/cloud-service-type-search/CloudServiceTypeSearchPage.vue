@@ -1,11 +1,7 @@
-<template>
-    <div />
-</template>
-
 <script lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { locationQueryToString } from '@/lib/router-query-string';
 
@@ -47,3 +43,7 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div />
+</template>

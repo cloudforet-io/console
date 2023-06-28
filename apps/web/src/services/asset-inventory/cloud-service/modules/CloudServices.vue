@@ -1,3 +1,159 @@
+<script lang="ts" setup>
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSkeleton, PI, PLazyImg, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
+import { range } from 'lodash';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+interface Value {
+    provider: string;
+    group: string;
+    icon: string;
+    name: string;
+    count: number;
+    href: [string, object];
+}
+const DATA_LENGTH = 8;
+
+interface Props {
+    providers: Record<string, any>;
+    moreInfo: boolean;
+    projectId?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    providers: () => ({}),
+    moreInfo: false,
+    projectId: undefined,
+});
+const { t } = useI18n();
+
+const queryHelper = new QueryHelper();
+
+const state = reactive({
+    loading: true,
+    skeletons: range(8),
+    data: [] as Array<{
+                count: number;
+                group: string;
+                icon: string;
+                name: string;
+                provider: string;
+                href: string;
+            }>,
+    cloudServiceTypeLink: computed(() => {
+        const filters: ConsoleFilter[] = [];
+        if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
+        return {
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+            query: {
+                filters: queryHelper.setFilters(filters).rawQueryStrings,
+            },
+        };
+    }),
+});
+
+const getLink = (data, projectId?) => {
+    let link;
+    if (!projectId) {
+        link = {
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: data.provider,
+                group: data.cloud_service_group,
+                name: data.cloud_service_type,
+            },
+        };
+    }
+    if (projectId) {
+        link = {
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: data.provider,
+                group: data.cloud_service_group,
+                name: data.cloud_service_type,
+            },
+            query: {
+                filters: queryHelper.setFilters([
+                    { k: 'project_id', v: projectId, o: '=' },
+                ]).rawQueryStrings,
+            },
+        };
+    }
+    return link;
+};
+const iconUrl = (item: Value): string => assetUrlConverter(item.icon) || props.providers[item.provider]?.icon || '';
+const projectApiQuery = new ApiQueryHelper();
+const getDataInProject = async () => {
+    projectApiQuery.setSort('count', true)
+        .setFilters([{ k: 'project_id', v: props.projectId as string, o: '=' }]);
+    const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+        query: projectApiQuery.data,
+        is_primary: true,
+    });
+
+    state.data = [
+        ...res.results.map((d) => ({
+            count: d.count,
+            group: d.cloud_service_group,
+            icon: d.icon,
+            name: d.cloud_service_type,
+            type: d.resource_type,
+            provider: d.provider,
+            href: getLink(d, props.projectId),
+        })),
+    ];
+};
+
+const apiQuery = new ApiQueryHelper();
+const getData = async (): Promise<void> => {
+    state.loading = true;
+    apiQuery.setSort('count', true)
+        .setPage(1, 9);
+    try {
+        if (props.projectId) {
+            await getDataInProject();
+        } else {
+            const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+                query: apiQuery.data,
+                is_primary: true,
+            });
+            state.data = [
+                ...res.results.splice(0, DATA_LENGTH).map((d) => ({
+                    count: d.count,
+                    group: d.cloud_service_group,
+                    icon: d.icon,
+                    name: d.cloud_service_type,
+                    provider: d.provider,
+                    href: getLink(d),
+                })),
+            ];
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.data = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+getData();
+
+</script>
+
 <template>
     <widget-layout class="cloud-services-widget"
                    overflow="auto"
@@ -5,11 +161,11 @@
         <template #title>
             <div class="top">
                 <p class="title">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE.TITLE') }}
+                    {{ t('COMMON.WIDGETS.CLOUD_SERVICE.TITLE') }}
                 </p>
                 <div class="help">
                     <p-i v-if="projectId"
-                         v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE.HELP')"
+                         v-tooltip.top="t('COMMON.WIDGETS.CLOUD_SERVICE.HELP')"
                          name="ic_question-mark-circle-filled"
                          width="1rem"
                          height="1rem"
@@ -18,10 +174,10 @@
                     />
                 </div>
                 <router-link v-if="moreInfo"
-                             :to="cloudServiceTypeLink"
+                             :to="state.cloudServiceTypeLink"
                              class="more"
                 >
-                    <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
+                    <span class="text-xs">{{ t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
                     <p-i name="ic_chevron-right"
                          width="1rem"
                          height="1rem"
@@ -32,12 +188,12 @@
         </template>
         <template #default>
             <p-data-loader
-                :loading="loading"
-                :data="data"
+                :loading="state.loading"
+                :data="state.data"
             >
                 <template #loader>
                     <div class="card-wrapper">
-                        <div v-for="v in skeletons"
+                        <div v-for="v in state.skeletons"
                              :key="v"
                              class="flex items-center p-4"
                         >
@@ -57,7 +213,7 @@
                     </div>
                 </template>
                 <div class="card-wrapper">
-                    <router-link v-for="(item, index) in data"
+                    <router-link v-for="(item, index) in state.data"
                                  :key="index"
                                  :to="item.href"
                     >
@@ -87,7 +243,7 @@
                     <div class="no-data-wrapper">
                         <p-empty
                             show-image
-                            :title="$t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')"
+                            :title="t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')"
                         >
                             <template #image>
                                 <img src="@/assets/images/illust_circle_boy.svg"
@@ -101,179 +257,6 @@
         </template>
     </widget-layout>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PSkeleton, PI, PLazyImg, PEmpty, PDataLoader,
-} from '@spaceone/design-system';
-import { range } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-interface Value {
-    provider: string;
-    group: string;
-    icon: string;
-    name: string;
-    count: number;
-    href: [string, object];
-}
-const DATA_LENGTH = 8;
-
-export default {
-    name: 'CloudServices',
-    components: {
-        WidgetLayout,
-        PSkeleton,
-        PI,
-        PLazyImg,
-        PEmpty,
-        PDataLoader,
-    },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
-        moreInfo: {
-            type: Boolean,
-            default: false,
-        },
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const queryHelper = new QueryHelper();
-
-        const state = reactive({
-            loading: true,
-            skeletons: range(8),
-            data: [] as Array<{
-                count: number;
-                group: string;
-                icon: string;
-                name: string;
-                provider: string;
-                href: string;
-            }>,
-            cloudServiceTypeLink: computed(() => {
-                const filters: ConsoleFilter[] = [];
-                if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
-                return {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                    query: {
-                        filters: queryHelper.setFilters(filters).rawQueryStrings,
-                    },
-                };
-            }),
-        });
-
-        const getLink = (data, projectId?) => {
-            let link;
-            if (!projectId) {
-                link = {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: {
-                        provider: data.provider,
-                        group: data.cloud_service_group,
-                        name: data.cloud_service_type,
-                    },
-                };
-            }
-            if (projectId) {
-                link = {
-                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                    params: {
-                        provider: data.provider,
-                        group: data.cloud_service_group,
-                        name: data.cloud_service_type,
-                    },
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'project_id', v: projectId, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
-            }
-            return link;
-        };
-        const projectApiQuery = new ApiQueryHelper();
-        const getDataInProject = async () => {
-            projectApiQuery.setSort('count', true)
-                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
-            const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                query: projectApiQuery.data,
-                is_primary: true,
-            });
-
-            state.data = [
-                ...res.results.map((d) => ({
-                    count: d.count,
-                    group: d.cloud_service_group,
-                    icon: d.icon,
-                    name: d.cloud_service_type,
-                    type: d.resource_type,
-                    provider: d.provider,
-                    href: getLink(d, props.projectId),
-                })),
-            ];
-        };
-
-        const apiQuery = new ApiQueryHelper();
-        const getData = async (): Promise<void> => {
-            state.loading = true;
-            apiQuery.setSort('count', true)
-                .setPage(1, 9);
-            try {
-                if (props.projectId) {
-                    await getDataInProject();
-                } else {
-                    const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                        query: apiQuery.data,
-                        is_primary: true,
-                    });
-                    state.data = [
-                        ...res.results.splice(0, DATA_LENGTH).map((d) => ({
-                            count: d.count,
-                            group: d.cloud_service_group,
-                            icon: d.icon,
-                            name: d.cloud_service_type,
-                            provider: d.provider,
-                            href: getLink(d),
-                        })),
-                    ];
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.data = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        getData();
-
-        return {
-            ...toRefs(state),
-            iconUrl: (item: Value): string => assetUrlConverter(item.icon) || props.providers[item.provider]?.icon || '',
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .card-wrapper {

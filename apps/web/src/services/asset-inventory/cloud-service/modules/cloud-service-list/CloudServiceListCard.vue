@@ -1,59 +1,10 @@
-<template>
-    <div class="cloud-service-type-item">
-        <router-link :to="getCloudServiceDetailLink(item)"
-                     class="item-wrapper"
-        >
-            <div class="card-title-wrapper">
-                <div class="provider-title-wrapper">
-                    <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
-                </div>
-                <div class="service-group-wrapper">
-                    <p-lazy-img width="1.25rem"
-                                height="1.25rem"
-                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                error-icon="ic_cloud-filled"
-                                :alt="item.name"
-                                class="icon"
-                    />
-                    <span class="service-group">{{ item.cloud_service_group }}</span>
-                </div>
-            </div>
-            <p-divider />
-            <div class="service-type-list">
-                <template
-                    v-for="(cloudServiceType, idx) in slicedResources"
-                >
-                    <router-link
-                        :key="`${cloudServiceType}-${idx}`"
-                        :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
-                        class="service-type-item"
-                        :style="{ width: `${90 / slicedResources.length}%` }"
-                    >
-                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }}</span>
-                        <span class="service-type-count">{{ cloudServiceType.count }}</span>
-                    </router-link>
-                    <p-divider
-                        v-if="item.resources.length > 1 && idx === 0"
-                        :key="idx"
-                        class="service-type-divider"
-                        :vertical="true"
-                    />
-                </template>
-            </div>
-        </router-link>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from 'vue';
+import { computed, reactive } from 'vue';
 import type { RouteLocation } from 'vue-router';
-
-
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -71,66 +22,99 @@ interface Props {
     period?: Period;
 }
 
-export default {
-    name: 'CloudServiceListCard',
-    components: {
-        PLazyImg,
-        PDivider,
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => {},
-        },
-    },
-    setup(props: Props) {
-        const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.$state;
+const props = withDefaults(defineProps<Props>(), {
+    item: () => ({}),
+});
+const store = useStore();
 
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            slicedResources: computed(() => props.item?.resources.slice(0, 2)),
-        });
-        const cloudServiceDetailQueryHelper = new QueryHelper();
-        const getCloudServiceDetailLink = (item) => {
-            cloudServiceDetailQueryHelper.setFilters(cloudServicePageState.searchFilters.filter((f: any) => f.k && ![
-                'cloud_service_type',
-                'cloud_service_group',
-                'service_code',
-            ].includes(f.k)));
+const cloudServicePageStore = useCloudServicePageStore();
+const cloudServicePageState = cloudServicePageStore.$state;
 
-            if (cloudServicePageStore.selectedRegions.length) {
-                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
-            }
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    slicedResources: computed(() => props.item?.resources.slice(0, 2)),
+});
+const cloudServiceDetailQueryHelper = new QueryHelper();
+const getCloudServiceDetailLink = (item) => {
+    cloudServiceDetailQueryHelper.setFilters(cloudServicePageState.searchFilters.filter((f: any) => f.k && ![
+        'cloud_service_type',
+        'cloud_service_group',
+        'service_code',
+    ].includes(f.k)));
 
-            const res: RouteLocation = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: item.provider,
-                    group: item.cloud_service_group,
-                    name: item.cloudServiceTypeName ?? item.resources[0].cloud_service_type,
-                },
-                query: {
-                    filters: cloudServiceDetailQueryHelper.rawQueryStrings,
-                    period: objectToQueryString(cloudServicePageState.period),
-                },
-            };
-            return res;
-        };
+    if (cloudServicePageStore.selectedRegions.length) {
+        cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
+    }
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/provider/load');
-        })();
-
-        return {
-            ...toRefs(state),
-            assetUrlConverter,
-            getCloudServiceDetailLink,
-        };
-    },
+    // TODO: need to edit type assertion
+    const res: RouteLocation = {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        params: {
+            provider: item.provider,
+            group: item.cloud_service_group,
+            name: item.cloudServiceTypeName ?? item.resources[0].cloud_service_type,
+        } as RouteLocation['params'],
+        query: {
+            filters: cloudServiceDetailQueryHelper.rawQueryStrings,
+            // TODO: need to edit type assertion, RouteQueryString type should be refactored
+            period: objectToQueryString(cloudServicePageState.period) as string | null,
+        } as RouteLocation['query'],
+    } as RouteLocation;
+    return res;
 };
+
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/provider/load');
+})();
+
 </script>
+
+<template>
+    <div class="cloud-service-type-item">
+        <router-link :to="getCloudServiceDetailLink(item)"
+                     class="item-wrapper"
+        >
+            <div class="card-title-wrapper">
+                <div class="provider-title-wrapper">
+                    <span class="provider">{{ state.providers[item.provider] ? state.providers[item.provider].label : item.provider }}</span>
+                </div>
+                <div class="service-group-wrapper">
+                    <p-lazy-img width="1.25rem"
+                                height="1.25rem"
+                                :src="assetUrlConverter(item.icon) || (state.providers[item.provider] ? state.providers[item.provider].icon : '')"
+                                error-icon="ic_cloud-filled"
+                                :alt="item.name"
+                                class="icon"
+                    />
+                    <span class="service-group">{{ item.cloud_service_group }}</span>
+                </div>
+            </div>
+            <p-divider />
+            <div class="service-type-list">
+                <template v-for="(cloudServiceType, idx) in state.slicedResources"
+                          :key="`${cloudServiceType}-${idx}`"
+                >
+                    <router-link
+
+                        :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
+                        class="service-type-item"
+                        :style="{ width: `${90 / state.slicedResources.length}%` }"
+                    >
+                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }}</span>
+                        <span class="service-type-count">{{ cloudServiceType.count }}</span>
+                    </router-link>
+                    <p-divider
+                        v-if="item.resources.length > 1 && idx === 0"
+                        :key="idx"
+                        class="service-type-divider"
+                        :vertical="true"
+                    />
+                </template>
+            </div>
+        </router-link>
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .cloud-service-type-item {
