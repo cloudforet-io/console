@@ -205,7 +205,7 @@ export default {
         };
 
         const onToggleChange = async (value) => {
-            if (!value.value) await disableChannel();
+            if (!value) await disableChannel();
             else await enableChannel();
         };
 
