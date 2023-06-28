@@ -51,7 +51,6 @@ const props = withDefaults(defineProps<FieldTitleProps>(), {
 .p-field-title {
     @apply flex flex-col text-gray-900;
     letter-spacing: 0;
-    margin-bottom: 0.25rem;
 
     .title-wrapper {
         @apply flex;
@@ -80,6 +79,7 @@ const props = withDefaults(defineProps<FieldTitleProps>(), {
     }
     .description {
         @apply block text-paragraph-sm font-normal;
+        margin-top: 0.25rem;
     }
 }
 </style>
