@@ -1,6 +1,6 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Mutation } from 'vuex';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { DashboardState } from './type';
 

@@ -41,7 +41,7 @@ export interface UpdateUserRequest {
     name?: string;
     password?: string;
     email?: string;
-    language?: string;
+    language?: SupportLanguage;
     timezone?: string;
     tags?: Record<string, any>;
     domain_id?: string

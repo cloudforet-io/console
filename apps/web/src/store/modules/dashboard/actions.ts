@@ -1,8 +1,8 @@
-import type { Action } from 'vuex';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { Action } from 'vuex';
 
 // eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
@@ -13,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const getApiQuery = () => new ApiQueryHelper().setFilters([{
     k: 'user_id',
-    v: [null, store.state.user.userId || ''],
+    v: [null, store.state['user/userId'] || ''],
     o: '=',
 }]).data;
 

@@ -1,6 +1,6 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Action } from 'vuex';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { FavoriteConfig, FavoriteState, FavoriteType } from '@/store/modules/favorite/type';
 import {

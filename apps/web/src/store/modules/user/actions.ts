@@ -1,11 +1,13 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { setI18nLocale } from '@/translations';
 
 import { languages } from '@/store/modules/user/config';
+
+import type { SupportLanguage } from '@/translations/type';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
@@ -161,7 +163,7 @@ export const setTimezone = async ({ commit, state }, timezone: string): Promise<
     commit('setTimezone', timezone);
 };
 
-export const setLanguage = async ({ commit, state }, language: string): Promise<void> => {
+export const setLanguage = async ({ commit, state }, language: SupportLanguage): Promise<void> => {
     await updateUser(state.userId, state.userType, { language });
     commit('setLanguage', language);
     await setI18nLocale(language);
