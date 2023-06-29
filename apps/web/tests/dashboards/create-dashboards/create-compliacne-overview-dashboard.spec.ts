@@ -28,7 +28,6 @@ test.describe('Create Compliance Overview Dashboard', () => {
         });
 
         const dashboardName = `playwright-${Date()}`;
-        // const selectedTemplateName = await page.locator('.default-dashboard-board .p-board-item').nth(3).locator('.dashboard-name').innerText();
 
         await test.step('3. Select Template (Compliance Overview)', async () => {
             // choose template "Compliance Overview"
@@ -43,14 +42,43 @@ test.describe('Create Compliance Overview Dashboard', () => {
             await expect(page).toHaveURL('/dashboards/workspace/customize');
         });
 
-        await test.step('4. Enter and create a dashboard name', async () => {
+        await test.step('4. Check default variables', async () => {
+            const variables = await page.locator('.dashboard-variables-select-dropdown .dashboard-variable-dropdown');
+            const labelList: string[] = [];
+            for (const widgetElement of await variables.all()) {
+                const variableName = await widgetElement.locator('.variable-label').innerText();
+                labelList.push(variableName);
+            }
+            expect(labelList).toEqual([
+                'Project', 'Provider', 'Region', 'Compliance Type', 'AWS Account ID (Asset)',
+            ]);
+        });
+
+        await test.step('5. Check default widget list', async () => {
+            const widgetList = await page.locator('.draggable-wrapper .draggable-item');
+            const widgetNameList: string[] = [];
+            for (const widgetElement of await widgetList.all()) {
+                const widgetName = await widgetElement.locator('.text').innerText();
+                widgetNameList.push(widgetName);
+            }
+            expect(widgetNameList).toEqual([
+                'Compliance Check Status',
+                'Total Failure and Severity',
+                'Count of Pass and Fail Findings by Region',
+                'Count of Fail Findings by Service',
+                'Trend of Pass and Fail Findings by Service',
+                'Severity Status by Service',
+            ]);
+        });
+
+        await test.step('6. Enter and create a dashboard name', async () => {
             await page.getByPlaceholder('Compliance Overview').click();
             await page.getByPlaceholder('Compliance Overview').fill(`${'Compliance Overview'}-${dashboardName}`);
             await page.getByRole('button', { name: 'Save' }).click();
             await expect(page).toHaveURL(/dashboards\/workspace\/detail/);
         });
 
-        await test.step('5. Check the created dashboard', async () => {
+        await test.step('7. Check the created dashboard', async () => {
             const locatorScope = await page.locator('.p-breadcrumbs > span:nth-child(2) .link');
             const locatorName = await page.locator('.lnb-menu-item .selected .text');
 
@@ -58,7 +86,7 @@ test.describe('Create Compliance Overview Dashboard', () => {
             await expect(locatorName).toContainText(dashboardName);
         });
 
-        await test.step('6. Delete dashboard', async () => {
+        await test.step('8. Delete dashboard', async () => {
             const deleteButton = await page.locator('.dashboard-title-icon-buttons-wrapper .delete-button');
             await deleteButton.click();
             await page.getByRole('button', { name: 'Confirm' }).click();
