@@ -1,6 +1,6 @@
 <template>
     <div ref="containerRef"
-         class="variable-more-button-dropdown"
+         class="dashboard-variables-more-button"
          :class="{'open-menu': visibleMenu}"
     >
         <p-button ref="targetRef"
@@ -274,7 +274,7 @@ const {
 </script>
 
 <style lang="postcss" scoped>
-.variable-more-button-dropdown {
+.dashboard-variables-more-button {
     @apply inline-block;
 
     &.open-menu {
