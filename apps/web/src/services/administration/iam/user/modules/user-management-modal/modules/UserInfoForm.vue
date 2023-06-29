@@ -39,8 +39,8 @@
                                   v-focus
                                   :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
                                   :invalid="invalid"
+                                  :valid="validationState.isUserIdValid"
                                   :disabled="userPageState.visibleUpdateModal"
-                                  class="text-input"
                     />
                     <p-button v-if="!userPageState.visibleUpdateModal"
                               style-type="secondary"
@@ -219,6 +219,7 @@ const handleClickCheckId = async () => {
     const invalidObj = validation.find((item) => item.invalidText.length > 0);
     if (!invalidObj) {
         validationState.isUserIdValid = true;
+        validationState.userIdValidText = i18n.t('IDENTITY.USER.FORM.NAME_VALID');
         emit('change-input', { ...formState, userId: formState.userId });
     } else {
         validationState.isUserIdValid = invalidObj.isValid;
