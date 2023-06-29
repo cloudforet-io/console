@@ -1,74 +1,9 @@
-<template>
-    <div class="password-form">
-        <div class="form">
-            <div v-if="props.status !== PASSWORD_STATUS.RESET">
-                <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
-                               :invalid="validationState.isIdValid"
-                               :invalid-text="validationState.idInvalidText"
-                               required
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :value="userIdInput"
-                                      :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
-                                      :invalid="invalid"
-                                      block
-                                      @update:value="handleChangeInput('userId', $event)"
-                                      @keyup.enter="handleClickUtil('userId')"
-                        />
-                    </template>
-                </p-field-group>
-            </div>
-            <div v-else>
-                <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
-                               :invalid="invalidState.passwordInput"
-                               :invalid-text="invalidTexts.passwordInput"
-                               :help-text="$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 })"
-                               required
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :value="passwordInput"
-                                      type="password"
-                                      placeholder="Password"
-                                      :invalid="invalid"
-                                      block
-                                      appearance-type="masking"
-                                      @update:value="handleChangeInput('password', $event)"
-                                      @keyup.enter="handleClickUtil('password')"
-                        />
-                    </template>
-                </p-field-group>
-                <p-field-group :label="$t('AUTH.PASSWORD.RESET.CONFIRM_PASSWORD')"
-                               :invalid="invalidState.confirmPasswordInput"
-                               :invalid-text="invalidTexts.confirmPasswordInput"
-                               required
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :value="confirmPasswordInput"
-                                      type="password"
-                                      placeholder="Confirm Password"
-                                      :invalid="invalid"
-                                      block
-                                      appearance-type="masking"
-                                      @update:value="handleChangeInput('passwordConfirm', $event)"
-                                      @keyup.enter="handleClickUtil('passwordConfirm')"
-                        />
-                    </template>
-                </p-field-group>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { reactive } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
 import {
     PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import {
@@ -91,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits(['change-input', 'click-button']);
+const { t } = useI18n();
 
 const {
     forms: {
@@ -108,20 +44,20 @@ const {
 }, {
     passwordInput(value: string) {
         if (value === '') return '';
-        if (!oneLowerCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-        if (!oneUpperCaseValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-        if (!oneNumberValidator(value)) return i18n.t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
+        if (!oneLowerCaseValidator(value)) return t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
+        if (!oneUpperCaseValidator(value)) return t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
+        if (!oneNumberValidator(value)) return t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
         return '';
     },
     confirmPasswordInput(value: string) {
         if (value === '') return '';
-        if (!samePasswordValidator(passwordInput.value, value)) return i18n.t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+        if (!samePasswordValidator(passwordInput.value, value)) return t('AUTH.PASSWORD.RESET.NOT_MATCHING');
         return '';
     },
 });
 const validationState = reactive({
     isIdValid: undefined as undefined | boolean,
-    idInvalidText: '' as TranslateResult,
+    idInvalidText: '',
 });
 
 /* Components */
@@ -151,6 +87,67 @@ defineExpose<PasswordFormExpose>({
     validationState,
 });
 </script>
+
+<template>
+    <div class="password-form">
+        <div class="form">
+            <div v-if="props.status !== PASSWORD_STATUS.RESET">
+                <p-field-group :label="t('AUTH.PASSWORD.FIND.USER_ID')"
+                               :invalid="validationState.isIdValid"
+                               :invalid-text="validationState.idInvalidText"
+                               required
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="userIdInput"
+                                      :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                      :invalid="invalid"
+                                      block
+                                      @update:value="handleChangeInput('userId', $event)"
+                                      @keyup.enter="handleClickUtil('userId')"
+                        />
+                    </template>
+                </p-field-group>
+            </div>
+            <div v-else>
+                <p-field-group :label="t('COMMON.SIGN_IN.PASSWORD')"
+                               :invalid="invalidState.passwordInput"
+                               :invalid-text="invalidTexts.passwordInput"
+                               :help-text="t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 })"
+                               required
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="passwordInput"
+                                      type="password"
+                                      placeholder="Password"
+                                      :invalid="invalid"
+                                      block
+                                      appearance-type="masking"
+                                      @update:value="handleChangeInput('password', $event)"
+                                      @keyup.enter="handleClickUtil('password')"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group :label="t('AUTH.PASSWORD.RESET.CONFIRM_PASSWORD')"
+                               :invalid="invalidState.confirmPasswordInput"
+                               :invalid-text="invalidTexts.confirmPasswordInput"
+                               required
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="confirmPasswordInput"
+                                      type="password"
+                                      placeholder="Confirm Password"
+                                      :invalid="invalid"
+                                      block
+                                      appearance-type="masking"
+                                      @update:value="handleChangeInput('passwordConfirm', $event)"
+                                      @keyup.enter="handleClickUtil('passwordConfirm')"
+                        />
+                    </template>
+                </p-field-group>
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .password-form {

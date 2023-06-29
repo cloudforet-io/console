@@ -1,3 +1,126 @@
+<script lang="ts">
+import { isEmpty } from 'lodash';
+import {
+    toRefs, reactive, computed, watch,
+} from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import { SpaceRouter } from '@/router';
+
+import { isUserAccessibleToRoute } from '@/lib/access-control';
+import config from '@/lib/config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
+import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
+import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
+import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
+
+const router = useRouter();
+const route = useRoute();
+const store = useStore();
+
+export default {
+    name: 'SignInPage',
+    components: {
+        SignInRightContainer,
+        SignInLeftContainer,
+        IDPWSignIn,
+    },
+    beforeRouteEnter(to, from, next) {
+        if (from?.meta.isSignInPage) {
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
+    },
+    props: {
+        admin: {
+            type: Boolean,
+            default: false,
+        },
+        nextPath: {
+            type: String,
+            default: undefined,
+        },
+        error: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props) {
+        const state = reactive({
+            userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
+            authType: computed(() => store.state.domain.extendedAuthType),
+            beforeUser: store.state.user.userId,
+            component: computed(() => {
+                let component;
+                const auth = state.authType;
+                if (auth) {
+                    try {
+                        component = () => import(`./external/${auth}/template/${auth}.vue`);
+                    } catch (e) {
+                        ErrorHandler.handleError(e);
+                    }
+                }
+                return component;
+            }),
+            images: computed(() => {
+                const domainImage = config.get('DOMAIN_IMAGE');
+                if (!isEmpty(domainImage)) {
+                    return {
+                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
+                        ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
+                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
+                    };
+                }
+                return undefined;
+            }),
+            showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
+        });
+        const onSignIn = async (userId:string) => {
+            try {
+                const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+
+                if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
+                    await router.push(defaultRoute);
+                    return;
+                }
+
+                const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+                const isAccessible = isUserAccessibleToRoute(resolvedRoute, store.getters['user/pagePermissionList']);
+                if (isAccessible) {
+                    await router.push(resolvedRoute);
+                } else {
+                    await router.push(defaultRoute);
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        /* Watcher */
+        watch(() => route.query.error, (value) => {
+            state.showErrorMessage = !!value;
+        });
+
+        watch(() => route.name, () => {
+            store.dispatch('display/hideSignInErrorMessage');
+        }, { immediate: true });
+
+        return {
+            ...toRefs(state),
+            onSignIn,
+        };
+    },
+};
+</script>
+
 <template>
     <div class="wrapper">
         <div class="ci-wrapper">
@@ -44,127 +167,6 @@
         </sign-in-right-container>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    toRefs, reactive, computed, getCurrentInstance, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { isEmpty } from 'lodash';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-
-import { isUserAccessibleToRoute } from '@/lib/access-control';
-import config from '@/lib/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
-import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
-import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
-import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
-
-export default {
-    name: 'SignInPage',
-    components: {
-        SignInRightContainer,
-        SignInLeftContainer,
-        IDPWSignIn,
-    },
-    beforeRouteEnter(to, from, next) {
-        if (from?.meta.isSignInPage) {
-            next((vm) => {
-                vm.$router.replace({
-                    query: { ...to.query, nextPath: from.query.nextPath },
-                }).catch(() => {});
-            });
-        } else next();
-    },
-    props: {
-        admin: {
-            type: Boolean,
-            default: false,
-        },
-        nextPath: {
-            type: String,
-            default: undefined,
-        },
-        error: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
-            authType: computed(() => store.state.domain.extendedAuthType),
-            beforeUser: store.state.user.userId,
-            component: computed(() => {
-                let component;
-                const auth = state.authType;
-                if (auth) {
-                    try {
-                        component = () => import(`./external/${auth}/template/${auth}.vue`);
-                    } catch (e) {
-                        ErrorHandler.handleError(e);
-                    }
-                }
-                return component;
-            }),
-            images: computed(() => {
-                const domainImage = config.get('DOMAIN_IMAGE');
-                if (!isEmpty(domainImage)) {
-                    return {
-                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                        ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
-                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-                    };
-                }
-                return undefined;
-            }),
-            showErrorMessage: vm.$route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
-        });
-        const onSignIn = async (userId:string) => {
-            try {
-                const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
-                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
-
-                if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
-                    await vm.$router.push(defaultRoute);
-                    return;
-                }
-
-                const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
-                if (isAccessible) {
-                    await vm.$router.push(resolvedRoute.location);
-                } else {
-                    await vm.$router.push(defaultRoute);
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        /* Watcher */
-        watch(() => vm.$route.query.error, (value) => {
-            state.showErrorMessage = !!value;
-        });
-
-        watch(() => vm.$route.name, () => {
-            store.dispatch('display/hideSignInErrorMessage');
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            onSignIn,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .wrapper {

@@ -13,7 +13,7 @@ class KeycloakAuth extends Authenticator {
 
     private static init() {
         /* keycloak init options */
-        const authOptions = store.state.domain.authOptions;
+        const authOptions = store.state['domain/authOptions'] as Record<string, any>;
         const issuer = authOptions.issuer;
         const parsedIssuer = issuer.split('/');
         const authIndex = parsedIssuer.indexOf('auth');

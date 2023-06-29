@@ -1,3 +1,17 @@
+<script lang="ts" setup>
+import { PButton } from '@spaceone/design-system';
+import { useRouter } from 'vue-router';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+const router = useRouter();
+
+const openKeycloakSignIn = () => {
+    router.push({ name: AUTH_ROUTE.SIGN_IN.KEYCLOAK._NAME });
+};
+
+</script>
+
 <template>
     <div class="keycloak-wrapper">
         <p-button style-type="secondary"
@@ -9,38 +23,6 @@
         </p-button>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PButton } from '@spaceone/design-system';
-
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-
-export default defineComponent({
-    name: 'KEYCLOAK',
-    components: {
-        PButton,
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            keycloakVisible: false,
-        });
-
-        const openKeycloakSignIn = () => {
-            vm.$router.push({ name: AUTH_ROUTE.SIGN_IN.KEYCLOAK._NAME });
-        };
-        return {
-            openKeycloakSignIn,
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .keycloak-btn {

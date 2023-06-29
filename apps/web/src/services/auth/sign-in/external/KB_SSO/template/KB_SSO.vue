@@ -1,13 +1,28 @@
+<script lang="ts" setup>
+import { PButton } from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
+const state = reactive({
+    authOptions: computed<Record<string, any>>(() => store.state.domain.authOptions),
+});
+
+</script>
+
 <template>
     <div class="kbSSO-wrapper">
-        <form :action="authOptions.authorization_endpoint"
+        <form :action="state.authOptions.authorization_endpoint"
               method="post"
         >
             <input
                 id="agentId"
                 type="hidden"
                 name="agentId"
-                :value="authOptions.agent_id"
+                :value="state.authOptions.agent_id"
             >
             <p-button style-type="secondary"
                       size="lg"
@@ -18,32 +33,6 @@
         </form>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    defineComponent, getCurrentInstance, computed, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PButton } from '@spaceone/design-system';
-
-export default defineComponent({
-    name: 'KBSignIn',
-    components: {
-        PButton,
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            authOptions: computed(() => vm.$store.state.domain.authOptions),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .kbSSO-btn {

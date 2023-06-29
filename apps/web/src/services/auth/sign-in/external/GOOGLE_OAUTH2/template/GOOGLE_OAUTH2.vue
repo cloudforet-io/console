@@ -1,33 +1,19 @@
-<template>
-    <div class="google-oauth-wrapper">
-        <button class="google-signin-button"
-                @click="handleLogin"
-        >
-            <p-i name="logo_google"
-                 width="18px"
-                 height="18px"
-                 class="mr-2"
-            />
-            <span class="google-signin-button-label">Sign in with Google</span>
-        </button>
-    </div>
-</template>
-
 <script setup lang="ts">
+import { PI } from '@spaceone/design-system';
 import {
     computed,
     reactive,
 } from 'vue';
-
-import { PI } from '@spaceone/design-system';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
-const emit = defineEmits(['sign-in', 'go-to-admin-sign-in']);
+const emit = defineEmits<{(e: 'sign-in', value: string): void;
+    (e: 'go-to-admin-sign-in'): void;
+}>();
+const store = useStore();
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
@@ -46,6 +32,21 @@ const handleLogin = async () => {
 };
 
 </script>
+
+<template>
+    <div class="google-oauth-wrapper">
+        <button class="google-signin-button"
+                @click="handleLogin"
+        >
+            <p-i name="logo_google"
+                 width="18px"
+                 height="18px"
+                 class="mr-2"
+            />
+            <span class="google-signin-button-label">Sign in with Google</span>
+        </button>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .google-signin-button {

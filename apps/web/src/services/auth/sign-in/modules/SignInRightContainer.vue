@@ -1,3 +1,52 @@
+<script lang="ts" setup>
+import {
+    PI,
+} from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import config from '@/lib/config';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+interface Props {
+    isDomainOwner: boolean;
+    showErrorMessage: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    isDomainOwner: false,
+    showErrorMessage: false,
+});
+const router = useRouter();
+const route = useRoute();
+const { t } = useI18n();
+const store = useStore();
+
+const state = reactive({
+    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+});
+
+/* event */
+const hideErrorMessage = () => {
+    if (route.query.error) router.replace({ query: { error: null } });
+    store.dispatch('display/hideSignInErrorMessage');
+};
+const goToAdminSignIn = () => {
+    hideErrorMessage();
+    router.replace({ name: AUTH_ROUTE.ADMIN_SIGN_IN._NAME });
+};
+const goToUserSignIn = () => {
+    hideErrorMessage();
+    router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
+};
+
+</script>
+
 <template>
     <div class="sign-in-right-container"
          :class="{ admin: isDomainOwner }"
@@ -6,17 +55,17 @@
             <div class="headline-wrapper">
                 <div class="block mobile:hidden">
                     <p class="title">
-                        {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+                        {{ t('COMMON.SIGN_IN.SIGN_IN') }}
                     </p>
                     <p class="subtitle">
-                        {{ isDomainOwner ? $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
+                        {{ isDomainOwner ? t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') : t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
                     </p>
                 </div>
 
                 <div class="hidden mobile:flex">
-                    <img v-if="ciLogoImage"
+                    <img v-if="state.ciLogoImage"
                          class="logo-character"
-                         :src="ciLogoImage"
+                         :src="state.ciLogoImage"
                     >
                     <img v-else
                          class="logo-character"
@@ -27,7 +76,7 @@
                 <div v-if="showErrorMessage"
                      class="error-msg-box"
                 >
-                    <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
+                    <span class="error-msg">{{ t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_close"
                          width="1.5rem"
                          height="1.5rem"
@@ -50,7 +99,7 @@
                          color="inherit"
                          class="user-icon"
                     />
-                    {{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}
+                    {{ t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}
                 </span>
             </template>
             <template v-else>
@@ -62,73 +111,12 @@
                          height="1.5rem"
                          class="admin-icon"
                     />
-                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}</span>
+                    <span class="admin-sign-in-text">{{ t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}</span>
                 </span>
             </template>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PI,
-} from '@spaceone/design-system';
-
-import { store } from '@/store';
-
-import config from '@/lib/config';
-
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-
-export default {
-    name: 'SignInRightContainer',
-    components: {
-        PI,
-    },
-    props: {
-        isDomainOwner: {
-            type: Boolean,
-            default: false,
-        },
-        showErrorMessage: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-        });
-
-        /* event */
-        const hideErrorMessage = () => {
-            if (vm.$route.query.error) vm.$router.replace({ query: { error: null } });
-            store.dispatch('display/hideSignInErrorMessage');
-        };
-        const goToAdminSignIn = () => {
-            hideErrorMessage();
-            vm.$router.replace({ name: AUTH_ROUTE.ADMIN_SIGN_IN._NAME });
-        };
-        const goToUserSignIn = () => {
-            hideErrorMessage();
-            vm.$router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
-        };
-
-        return {
-            ...toRefs(state),
-            hideErrorMessage,
-            goToAdminSignIn,
-            goToUserSignIn,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .sign-in-right-container {

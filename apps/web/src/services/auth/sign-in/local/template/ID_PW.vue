@@ -1,14 +1,114 @@
+<script lang="ts" setup>
+/* eslint-disable camelcase */
+import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+import {
+    reactive, computed,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { loadAuth } from '@/services/auth/authenticator/loader';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+
+interface Props {
+    isDomainOwner: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isDomainOwner: false,
+});
+const emit = defineEmits<{(e:'sign-in', value: string): void}>();
+const router = useRouter();
+const store = useStore();
+const { t } = useI18n();
+
+const state = reactive({
+    userId: '' as string,
+    password: '',
+    loading: false,
+});
+
+const validationState = reactive({
+    isIdValid: undefined as undefined | boolean,
+    idInvalidText: '',
+    isPasswordValid: undefined as undefined | boolean,
+    passwordInvalidText: '',
+    isPasswordCheckValid: undefined as undefined | boolean,
+    passwordCheckInvalidText: '',
+});
+
+const checkUserId = () => {
+    if (!state.userId) {
+        validationState.isIdValid = false;
+        validationState.idInvalidText = t('COMMON.SIGN_IN.USER_ID_REQUIRED');
+    } else {
+        validationState.isIdValid = true;
+        validationState.idInvalidText = '';
+    }
+};
+
+const checkPassword = async () => {
+    if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
+    if ((state.password.replace(/ /g, '').length !== state.password.length)
+                || !state.password) {
+        validationState.isPasswordValid = false;
+        validationState.passwordInvalidText = t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
+    } else {
+        validationState.isPasswordValid = true;
+        validationState.passwordInvalidText = '';
+    }
+};
+
+const signIn = async () => {
+    state.loading = true;
+    checkUserId();
+    await checkPassword();
+    if (!validationState.isIdValid || !validationState.isPasswordValid) {
+        state.loading = false;
+        return;
+    }
+    const credentials = {
+        password: state.password.trim(),
+    };
+    try {
+        await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
+        await store.dispatch('display/hideSignInErrorMessage');
+        if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
+            await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
+        } else {
+            emit('sign-in', state.userId);
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.password = '';
+        await store.dispatch('display/showSignInErrorMessage');
+    } finally {
+        state.loading = false;
+    }
+};
+
+const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'substitutive'));
+
+</script>
+
 <template>
     <div class="local-wrapper">
         <form class="form"
               onsubmit="return false"
         >
-            <p-field-group :label="isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
-                           :invalid="isIdValid === false"
+            <p-field-group :label="isDomainOwner ? t('COMMON.SIGN_IN.ADMIN_ID') : t('COMMON.SIGN_IN.USER_ID')"
+                           :invalid="validationState.isIdValid === false"
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="userId"
+                    <p-text-input v-model="state.userId"
                                   :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
@@ -16,12 +116,12 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
+            <p-field-group :label="t('COMMON.SIGN_IN.PASSWORD')"
                            required
-                           :invalid="isPasswordValid === false"
+                           :invalid="validationState.isPasswordValid === false"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="password"
+                    <p-text-input v-model="state.password"
                                   type="password"
                                   placeholder="Password"
                                   :invalid="invalid"
@@ -37,142 +137,21 @@
                 <router-link id="reset-pw-button"
                              :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
                 >
-                    {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
+                    {{ t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
                 </router-link>
             </p>
             <p-button :style-type="buttonStyleType"
                       type="submit"
                       size="lg"
                       class="sign-in-btn"
-                      :loading="loading"
+                      :loading="state.loading"
                       @click="signIn"
             >
-                {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+                {{ t('COMMON.SIGN_IN.SIGN_IN') }}
             </p-button>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-/* eslint-disable camelcase */
-import type { SetupContext } from 'vue';
-import {
-    getCurrentInstance,
-    reactive,
-    toRefs,
-    defineComponent, computed,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
-
-import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { loadAuth } from '@/services/auth/authenticator/loader';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-
-export default defineComponent({
-    name: 'IDPWSignIn',
-    components: {
-        PButton,
-        PTextInput,
-        PFieldGroup,
-    },
-    props: {
-        isDomainOwner: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, context: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            userId: '' as string | undefined,
-            password: '',
-            loading: false,
-        });
-
-        const validationState = reactive({
-            isIdValid: undefined as undefined | boolean,
-            idInvalidText: '' as TranslateResult,
-            isPasswordValid: undefined as undefined | boolean,
-            passwordInvalidText: '' as TranslateResult,
-            isPasswordCheckValid: undefined as undefined | boolean,
-            passwordCheckInvalidText: '' as TranslateResult,
-        });
-
-        const checkUserId = () => {
-            if (!state.userId) {
-                validationState.isIdValid = false;
-                validationState.idInvalidText = i18n.t('COMMON.SIGN_IN.USER_ID_REQUIRED');
-            } else {
-                validationState.isIdValid = true;
-                validationState.idInvalidText = '';
-            }
-        };
-
-        const checkPassword = async () => {
-            if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
-            if ((state.password.replace(/ /g, '').length !== state.password.length)
-                || !state.password) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = i18n.t('COMMON.SIGN_IN.PASSWORD_REQUIRED');
-            } else {
-                validationState.isPasswordValid = true;
-                validationState.passwordInvalidText = '';
-            }
-        };
-
-        const signIn = async () => {
-            state.loading = true;
-            checkUserId();
-            await checkPassword();
-            if (!validationState.isIdValid || !validationState.isPasswordValid) {
-                state.loading = false;
-                return;
-            }
-            const credentials = {
-                password: state.password.trim(),
-            };
-            try {
-                await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
-                await store.dispatch('display/hideSignInErrorMessage');
-                if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-                    await vm.$router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
-                } else {
-                    context.emit('sign-in', state.userId);
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.password = '';
-                await store.dispatch('display/showSignInErrorMessage');
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'substitutive'));
-
-        return {
-            ...toRefs(state),
-            ...toRefs(validationState),
-            AUTH_ROUTE,
-            isMobile,
-            signIn,
-            checkUserId,
-            checkPassword,
-            buttonStyleType,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-text-input */

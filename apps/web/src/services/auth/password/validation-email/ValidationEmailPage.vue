@@ -1,3 +1,30 @@
+<script setup lang="ts">
+import {
+    PButton, PCollapsibleToggle, PI, PIconButton,
+} from '@spaceone/design-system';
+import { reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
+
+import CollapsibleContents from '@/services/auth/password/validation-email/modules/CollapsibleContents.vue';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+const { t } = useI18n();
+const route = useRoute();
+
+const { status, userId } = route.query;
+
+const state = reactive({
+    isCollapsed: false,
+    status: status as string,
+    userId: userId as string,
+});
+
+watch(() => route.query.status, (res) => {
+    state.status = res as string;
+});
+</script>
+
 <template>
     <div class="validation-email-page">
         <div class="status-wrapper">
@@ -21,19 +48,19 @@
                 <h1 v-if="!state.userId"
                     class="status-title"
                 >
-                    {{ $t('AUTH.PASSWORD.RESET.DONE') }}
+                    {{ t('AUTH.PASSWORD.RESET.DONE') }}
                 </h1>
                 <div v-else>
                     <h1 class="status-title">
-                        {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.TITLE') }}
+                        {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.TITLE') }}
                     </h1>
                     <div class="desc_wrapper">
                         <p>
-                            {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.DESC_1') }}
+                            {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.DESC_1') }}
                             <span class="emphasis">{{ state.userId }}</span>
                         </p>
                         <p>
-                            {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.DESC_2') }}
+                            {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.DESC_2') }}
                         </p>
                     </div>
                 </div>
@@ -42,17 +69,17 @@
                  class="failed"
             >
                 <p class="status-title">
-                    {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.TITLE') }}
+                    {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.TITLE') }}
                 </p>
                 <p class="desc_wrapper">
                     <span class="emphasis font-bold">
-                        {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_1') }}
+                        {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_1') }}
                     </span>
-                    {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_2') }}
+                    {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_2') }}
                     <span class="emphasis">
-                        {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_3') }}
+                        {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_3') }}
                     </span>
-                    {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_4') }}
+                    {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_4') }}
                 </p>
             </div>
         </div>
@@ -61,8 +88,8 @@
                 <router-link :to="{ name: AUTH_ROUTE.SIGN_OUT._NAME }">
                     <p-button class="go-back-console-button">
                         {{ state.userId
-                            ? $t('AUTH.PASSWORD.RESET.EMAIL.DONE.GO_BACK_TO_CONSOLE')
-                            : $t('AUTH.PASSWORD.RESET.GO_TO_SIGN_IN')
+                            ? t('AUTH.PASSWORD.RESET.EMAIL.DONE.GO_BACK_TO_CONSOLE')
+                            : t('AUTH.PASSWORD.RESET.GO_TO_SIGN_IN')
                         }}
                     </p-button>
                 </router-link>
@@ -72,7 +99,7 @@
                     <p-collapsible-toggle v-if="!state.isCollapsed"
                                           v-model="state.isCollapsed"
                     >
-                        {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
+                        {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
                     </p-collapsible-toggle>
                     <collapsible-contents v-if="state.isCollapsed" />
                 </div>
@@ -86,38 +113,13 @@
                 />
                 <p class="go-back-button">
                     <router-link :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: {status: 'find'}}">
-                        {{ $t('AUTH.PASSWORD.RESET.EMAIL.FAIL.GO_BACK') }}
+                        {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.GO_BACK') }}
                     </router-link>
                 </p>
             </div>
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { getCurrentInstance, reactive, watch } from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PButton, PCollapsibleToggle, PI, PIconButton,
-} from '@spaceone/design-system';
-
-import CollapsibleContents from '@/services/auth/password/validation-email/modules/CollapsibleContents.vue';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-
-const vm = getCurrentInstance()?.proxy as Vue;
-const { status, userId } = vm.$route.query;
-
-const state = reactive({
-    isCollapsed: false,
-    status: status as string,
-    userId: userId as string,
-});
-
-watch(() => vm.$route.query.status, (res) => {
-    state.status = res as string;
-});
-</script>
 
 <style lang="postcss" scoped>
 .validation-email-page {

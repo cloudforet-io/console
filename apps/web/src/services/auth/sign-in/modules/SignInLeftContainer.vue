@@ -1,3 +1,28 @@
+<script lang="ts" setup>
+import { PBadge } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import config from '@/lib/config';
+
+interface Props {
+    isDomainOwner: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    isDomainOwner: false,
+});
+const { t } = useI18n();
+
+const state = reactive({
+    // eslint-disable-next-line no-undef
+    version: VITE_APP_VER,
+    signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
+    contactLink: computed(() => config.get('CONTACT_LINK')),
+});
+
+</script>
+
 <template>
     <div
         class="sign-in-left-container"
@@ -5,8 +30,8 @@
     >
         <div class="lottie-wrapper">
             <img
-                v-if="signInImage"
-                :src="signInImage"
+                v-if="state.signInImage"
+                :src="state.signInImage"
             >
             <lottie-vue-player v-else
                                autoplay
@@ -20,51 +45,18 @@
                      badge-type="solid-outline"
                      shape="square"
             >
-                {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
+                {{ t('COMMON.SIGN_IN.VERSION') }} {{ state.version }}
             </p-badge>
-            <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
-                <a :href="contactLink ? contactLink : 'mailto:support@cloudforet.io'"
+            <span class="help-msg">{{ t('COMMON.SIGN_IN.NEED_HELP') }}
+                <a :href="state.contactLink ? state.contactLink : 'mailto:support@cloudforet.io'"
                    target="_blank"
                 >
-                    <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
+                    <span class="text-blue-700 ml-2">{{ t('COMMON.SIGN_IN.CONTACT') }}</span>
                 </a>
             </span>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import { PBadge } from '@spaceone/design-system';
-
-import config from '@/lib/config';
-
-export default {
-    name: 'SignInLeftContainer',
-    components: {
-        PBadge,
-    },
-    props: {
-        isDomainOwner: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const state = reactive({
-            // eslint-disable-next-line no-undef
-            version: VITE_APP_VER,
-            signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
-            contactLink: computed(() => config.get('CONTACT_LINK')),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .sign-in-left-container {
