@@ -1,82 +1,14 @@
-<template>
-    <div class="collector-options-form">
-        <p-field-title v-if="state.isVisibleTitle"
-                       class="additional-options-label"
-                       :label="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
-        />
-        <p-data-loader class="collector-options-form-contents"
-                       :loading="state.loading"
-                       :data="state.schema"
-                       loader-backdrop-color="0"
-        >
-            <p-json-schema-form :schema="state.schema"
-                                :form-data="collectorFormState.options"
-                                :language="$store.state.user.language"
-                                use-fixed-menu-style
-                                reset-on-schema-change
-                                uniform-width
-                                @change="handleUpdateSchemaForm"
-            />
-            <template #no-data>
-                <div v-if="state.isLoadFailed"
-                     class="error-box"
-                >
-                    <div class="error-message">
-                        <p-i width="1.25rem"
-                             height="1.25rem"
-                             name="ic_error-filled"
-                        /><span>{{ $t('INVENTORY.COLLECTOR.CREATE.FORM_LOAD_FAILED') }}</span>
-                    </div>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_refresh"
-                              @click="handleClickReloadButton"
-                    >
-                        {{ $t('INVENTORY.COLLECTOR.CREATE.RELOAD') }}
-                    </p-button>
-                </div>
-                <div v-else
-                     class="no-data-box"
-                >
-                    <p-empty image-size="sm"
-                             show-image
-                    >
-                        <template #image>
-                            <img src="@/assets/images/illust_circle_boy.svg"
-                                 alt="empty-options"
-                                 class="empty-options-image"
-                            >
-                        </template>
-                        {{ $t('INVENTORY.COLLECTOR.NO_OPTIONS') }}
-                    </p-empty>
-                </div>
-            </template>
-            <template #loader>
-                <div class="loading-box">
-                    <div class="loading-spinner">
-                        <p-spinner size="xl" />
-                    </div>
-                    <div class="loading-description">
-                        <p>{{ $t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC1') }}</p>
-                        <p>{{ $t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC2') }}</p>
-                    </div>
-                </div>
-            </template>
-        </p-data-loader>
-    </div>
-</template>
-
 <script lang="ts" setup>
-import {
-    defineProps, computed, reactive, watch,
-} from 'vue';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty, PSpinner,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { isEmpty } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    defineProps, computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -93,7 +25,8 @@ const props = defineProps<{
     showTitleOnEmptySchema?: boolean;
     resetOnCollectorIdChange?: boolean;
 }>();
-const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
+const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;}>();
+const { t } = useI18n();
 
 const state = reactive({
     isSchemaEmpty: computed<boolean>(() => isEmpty(state.schema)),
@@ -123,7 +56,7 @@ const getPluginMetadata = async (provider: string|null) => {
             const res = await fetchGetPluginMetadata(provider);
             state.schema = res.metadata?.options_schema ?? {};
             if (state.isSchemaEmpty) {
-                emit('update:isValid', true);
+                emit('update:is-valid', true);
             }
         } else {
             state.schema = collectorFormState.originCollector?.plugin_info?.metadata?.options_schema ?? {};
@@ -132,14 +65,14 @@ const getPluginMetadata = async (provider: string|null) => {
         ErrorHandler.handleError(e);
         state.schema = {};
         state.isLoadFailed = true;
-        emit('update:isValid', false);
+        emit('update:is-valid', false);
     } finally {
         state.loading = false;
     }
 };
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    emit('update:isValid', isValid);
+    emit('update:is-valid', isValid);
     collectorFormStore.setOptions(value);
 };
 
@@ -161,6 +94,73 @@ watch(() => collectorFormState.provider, async (provider) => {
 });
 
 </script>
+
+<template>
+    <div class="collector-options-form">
+        <p-field-title v-if="state.isVisibleTitle"
+                       class="additional-options-label"
+                       :label="t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
+        />
+        <p-data-loader class="collector-options-form-contents"
+                       :loading="state.loading"
+                       :data="state.schema"
+                       loader-backdrop-color="0"
+        >
+            <p-json-schema-form :schema="state.schema"
+                                :form-data="collectorFormState.options"
+                                :language="$store.state.user.language"
+                                use-fixed-menu-style
+                                reset-on-schema-change
+                                uniform-width
+                                @change="handleUpdateSchemaForm"
+            />
+            <template #no-data>
+                <div v-if="state.isLoadFailed"
+                     class="error-box"
+                >
+                    <div class="error-message">
+                        <p-i width="1.25rem"
+                             height="1.25rem"
+                             name="ic_error-filled"
+                        /><span>{{ t('INVENTORY.COLLECTOR.CREATE.FORM_LOAD_FAILED') }}</span>
+                    </div>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_refresh"
+                              @click="handleClickReloadButton"
+                    >
+                        {{ t('INVENTORY.COLLECTOR.CREATE.RELOAD') }}
+                    </p-button>
+                </div>
+                <div v-else
+                     class="no-data-box"
+                >
+                    <p-empty image-size="sm"
+                             show-image
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_circle_boy.svg"
+                                 alt="empty-options"
+                                 class="empty-options-image"
+                            >
+                        </template>
+                        {{ t('INVENTORY.COLLECTOR.NO_OPTIONS') }}
+                    </p-empty>
+                </div>
+            </template>
+            <template #loader>
+                <div class="loading-box">
+                    <div class="loading-spinner">
+                        <p-spinner size="xl" />
+                    </div>
+                    <div class="loading-description">
+                        <p>{{ t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC1') }}</p>
+                        <p>{{ t('INVENTORY.COLLECTOR.CREATE.LOADING_DESC2') }}</p>
+                    </div>
+                </div>
+            </template>
+        </p-data-loader>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 

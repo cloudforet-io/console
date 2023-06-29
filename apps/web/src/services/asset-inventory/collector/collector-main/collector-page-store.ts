@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { defineStore } from 'pinia';
 
 import { i18n } from '@/translations';
 
@@ -97,7 +97,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 const response = await SpaceConnector.client.inventory.collector.update(params);
                 const updatedCollectorIndex = this.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
                 this.collectors[updatedCollectorIndex] = response;
-                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
+                showSuccessMessage(i18n.global.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
                 return response;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -109,9 +109,9 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 await SpaceConnector.client.inventory.collector.collect({
                     collector_id: collectorId,
                 });
-                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+                showSuccessMessage(i18n.global.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+                ErrorHandler.handleRequestError(e, i18n.global.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
                 throw e;
             }
         },

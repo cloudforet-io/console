@@ -1,13 +1,64 @@
+<script lang="ts" setup>
+import {
+    PRadio,
+    // PCheckbox, PDivider
+} from '@spaceone/design-system';
+import {
+    reactive,
+    // computed,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import type { RepositoryModel } from '@/services/asset-inventory/collector/collector-plugins-old/type';
+
+interface Props {
+    repositories: RepositoryModel[];
+    selectedRepoId?: string;
+    resourceTypeSearchTags: string[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    repositories: () => [],
+    selectedRepoId: undefined,
+    resourceTypeSearchTags: () => [],
+});
+const emit = defineEmits<{(e: 'update:selected-repo-id', value: string): void}>();
+const { t } = useI18n();
+
+const state = reactive({
+    proxySelectedRepoId: useProxyValue('selectedRepoId', props, emit),
+    // resourceOptions: computed(() => ({
+    //     Server: props.resourceTypeSearchTags.includes('Server'),
+    //     'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),
+    // })),
+});
+
+const handleClickRepoText = (val) => {
+    state.proxySelectedRepoId = val;
+};
+// const handleClickResourceText = (val) => {
+//     const idx = props.resourceTypeSearchTags.indexOf(val);
+//     if (idx > -1) {
+//         props.resourceTypeSearchTags.splice(idx, 1);
+//     } else {
+//         props.resourceTypeSearchTags.push(val);
+//     }
+// };
+
+</script>
+
 <template>
     <div class="plugin-filter-container">
         <div class="cols">
-            <span class="header">{{ $t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</span>
+            <span class="header">{{ t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</span>
             <span v-for="repo in repositories"
                   :key="repo.repository_id"
                   class="filter"
-                  :class="{selected: proxySelectedRepoId === repo.repository_id}"
+                  :class="{selected: state.proxySelectedRepoId === repo.repository_id}"
                   @click.stop="handleClickRepoText(repo.repository_id)"
-            ><p-radio v-model="proxySelectedRepoId"
+            ><p-radio v-model="state.proxySelectedRepoId"
                       :value="repo.repository_id"
             />{{ repo.name }}</span>
         </div>
@@ -24,71 +75,6 @@
         <!--        </div>-->
     </div>
 </template>
-
-<script lang="ts">
-import {
-    toRefs, reactive,
-    // computed,
-} from 'vue';
-
-import {
-    PRadio,
-    // PCheckbox, PDivider
-} from '@spaceone/design-system';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-export default {
-    name: 'PluginFilter',
-    components: {
-        PRadio,
-        // PCheckbox,
-        // PDivider,
-    },
-    props: {
-        repositories: {
-            type: Array,
-            default: () => [],
-        },
-        /** sync */
-        selectedRepoId: {
-            type: String,
-            default: undefined,
-        },
-        resourceTypeSearchTags: {
-            type: Array,
-            default: () => [],
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxySelectedRepoId: useProxyValue('selectedRepoId', props, emit),
-            // resourceOptions: computed(() => ({
-            //     Server: props.resourceTypeSearchTags.includes('Server'),
-            //     'Cloud Service': props.resourceTypeSearchTags.includes('Cloud Service'),
-            // })),
-        });
-
-        const handleClickRepoText = (val) => {
-            state.proxySelectedRepoId = val;
-        };
-        // const handleClickResourceText = (val) => {
-        //     const idx = props.resourceTypeSearchTags.indexOf(val);
-        //     if (idx > -1) {
-        //         props.resourceTypeSearchTags.splice(idx, 1);
-        //     } else {
-        //         props.resourceTypeSearchTags.push(val);
-        //     }
-        // };
-
-        return {
-            ...toRefs(state),
-            handleClickRepoText,
-            // handleClickResourceText,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .plugin-filter-container {

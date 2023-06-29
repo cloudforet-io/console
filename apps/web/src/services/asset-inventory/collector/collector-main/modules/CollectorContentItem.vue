@@ -1,3 +1,56 @@
+<script setup lang="ts">
+import {
+    PButton, PCard, PLazyImg, PI,
+} from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
+import CollectorItemSchedule
+    from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
+import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+
+interface Props {
+    item?: CollectorItemInfo;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const { t } = useI18n();
+
+const collectorPageStore = useCollectorPageStore();
+
+const state = reactive({
+    loading: false,
+    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
+    plugin: computed(() => {
+        const plugin = props.item?.plugin;
+        return { name: plugin?.name, version: plugin?.info.version };
+    }),
+});
+
+/* API */
+const handleClickCollectData = async () => {
+    state.loading = true;
+    if (state.status === JOB_STATE.IN_PROGRESS) {
+        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item?.collectorId);
+        collectorPageStore.$patch({
+            visibleRestartModal: true,
+            selectedCollector: collectorCollector,
+        });
+    } else {
+        const collectorId = props.item?.collectorId ?? '';
+        await collectorPageStore.restartCollector(collectorId);
+    }
+    state.loading = false;
+    emit('refresh-collector-list');
+};
+</script>
+
 <template>
     <div class="collector-content-item">
         <p-card :header="false"
@@ -40,66 +93,12 @@
                          animation="spin"
                          color="inherit"
                     />
-                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
+                    <span>{{ t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
                 </p-button>
             </div>
         </p-card>
     </div>
 </template>
-
-<script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import {
-    PButton, PCard, PLazyImg, PI,
-} from '@spaceone/design-system';
-
-import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
-import CollectorItemSchedule
-    from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
-import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
-
-interface Props {
-    item?: CollectorItemInfo;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
-
-const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
-
-const collectorPageStore = useCollectorPageStore();
-
-const state = reactive({
-    loading: false,
-    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
-    plugin: computed(() => {
-        const plugin = props.item?.plugin;
-        return { name: plugin.name, version: plugin.info.version };
-    }),
-});
-
-/* API */
-const handleClickCollectData = async () => {
-    state.loading = true;
-    if (state.status === JOB_STATE.IN_PROGRESS) {
-        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
-        collectorPageStore.$patch({
-            visibleRestartModal: true,
-            selectedCollector: collectorCollector,
-        });
-    } else {
-        const collectorId = props.item.collectorId;
-        await collectorPageStore.restartCollector(collectorId);
-    }
-    state.loading = false;
-    emit('refresh-collector-list');
-};
-</script>
 
 <style lang="postcss" scoped>
 .collector-content-item {

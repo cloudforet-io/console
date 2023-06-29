@@ -1,3 +1,17 @@
+<script setup lang="ts">
+import { PEmpty, PButton } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+import { SpaceRouter } from '@/router';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+const { t } = useI18n();
+const handleCreate = () => {
+    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+};
+</script>
+
 <template>
     <p-empty
         show-image
@@ -14,24 +28,12 @@
                 icon-left="ic_plus_bold"
                 @click="handleCreate"
             >
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.CREATE_COLLECTOR') }}</span>
+                <span>{{ t('INVENTORY.COLLECTOR.MAIN.CREATE_COLLECTOR') }}</span>
             </p-button>
         </template>
-        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_DATA') }}
+        {{ t('INVENTORY.COLLECTOR.MAIN.NO_DATA') }}
     </p-empty>
 </template>
-
-<script setup lang="ts">
-import { PEmpty, PButton } from '@spaceone/design-system';
-
-import { SpaceRouter } from '@/router';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-const handleCreate = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
-};
-</script>
 
 <style scoped lang="postcss">
 .p-empty {

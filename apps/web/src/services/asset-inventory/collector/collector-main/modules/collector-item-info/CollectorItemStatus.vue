@@ -1,53 +1,13 @@
-<template>
-    <div class="info-item">
-        <p class="info-label">
-            {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
-        </p>
-        <div class="label-description">
-            <div v-if="props.item.schedule">
-                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
-                     class="scheduled"
-                >
-                    <p-i
-                        name="ic_alarm-clock"
-                        class="alarm-icon"
-                        height="1.25rem"
-                        width="1.25rem"
-                        color="inherit"
-                    />
-                    <p class="description">
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
-                        <span class="emphasis">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
-                        </span>
-                    </p>
-                </div>
-                <span v-else-if="state.status === JOB_STATE.IN_PROGRESS"
-                      class="current-status-progress"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} - <span class="remained-task">{{ state.remained_tasks }}%</span>
-                </span>
-                <span v-else>
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-                </span>
-            </div>
-            <span v-else>
-                {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-            </span>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
+import { numberFormatter } from '@cloudforet/core-lib';
 import { PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-
-import { numberFormatter } from '@cloudforet/core-lib';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobStatus } from '@/services/asset-inventory/collector/model';
 
 const RECENT_COUNT = 5;
 
@@ -58,11 +18,12 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
+const { t } = useI18n();
 
 const state = reactive({
     status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
     diffSchedule: computed(() => {
-        if (props.item.schedule) {
+        if (props.item?.schedule) {
             const current = dayjs.utc();
 
             const hours = props.item.schedule.hours ?? [];
@@ -82,11 +43,51 @@ const state = reactive({
         return { diffHour: 0, diffMin: 0 };
     }),
     remained_tasks: computed(() => {
-        const recentJob = props.item.recentJobAnalyze[RECENT_COUNT - 1];
+        const recentJob = props.item?.recentJobAnalyze[RECENT_COUNT - 1] as JobStatus;
         return recentJob.total_tasks > 0 ? numberFormatter(((recentJob.total_tasks - recentJob.remained_tasks) / recentJob.total_tasks) * 100) : 100;
     }),
 });
 </script>
+
+<template>
+    <div class="info-item">
+        <p class="info-label">
+            {{ t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
+        </p>
+        <div class="label-description">
+            <div v-if="props.item.schedule">
+                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                     class="scheduled"
+                >
+                    <p-i
+                        name="ic_alarm-clock"
+                        class="alarm-icon"
+                        height="1.25rem"
+                        width="1.25rem"
+                        color="inherit"
+                    />
+                    <p class="description">
+                        {{ t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
+                        <span class="emphasis">
+                            {{ t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                        </span>
+                    </p>
+                </div>
+                <span v-else-if="state.status === JOB_STATE.IN_PROGRESS"
+                      class="current-status-progress"
+                >
+                    {{ t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} - <span class="remained-task">{{ state.remained_tasks }}%</span>
+                </span>
+                <span v-else>
+                    {{ t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                </span>
+            </div>
+            <span v-else>
+                {{ t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+            </span>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .info-item {

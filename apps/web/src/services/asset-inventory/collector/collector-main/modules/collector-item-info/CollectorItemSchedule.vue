@@ -1,8 +1,70 @@
+<script setup lang="ts">
+import { PToggleButton, PI } from '@spaceone/design-system';
+import { reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+
+interface Props {
+    item?: CollectorItemInfo;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    item: undefined,
+});
+
+const { t } = useI18n();
+
+const collectorPageStore = useCollectorPageStore();
+const collectorFormStore = useCollectorFormStore();
+
+const state = reactive({
+    isScheduleActivated: false,
+});
+
+/* Components */
+const handleChangeToggle = async (value) => {
+    if (Object.keys(value).length > 0) return;
+    try {
+        state.isScheduleActivated = !state.isScheduleActivated;
+        const params: CollectorUpdateParameter = {
+            collector_id: props.item?.collectorId ?? '',
+            schedule: {
+                ...props.item?.schedule,
+                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
+            },
+        };
+        const response = await collectorPageStore.updateCollectorSchedule(params);
+        await collectorFormStore.setOriginCollector(response);
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+    }
+};
+const handleClickSchedule = () => {
+    collectorPageStore.setSelectedCollector(props.item?.collectorId);
+    collectorPageStore.$patch({
+        visibleScheduleModal: true,
+    });
+};
+
+/* Watcher */
+watch(() => props.item, (item) => {
+    if (item && item.schedule) {
+        state.isScheduleActivated = item.schedule.state === 'ENABLED';
+    }
+}, { immediate: true });
+</script>
+
 <template>
     <div class="info-item">
         <div class="info-label-wrapper">
             <p class="info-label">
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
+                {{ t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
             </p>
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
@@ -21,7 +83,7 @@
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
@@ -34,68 +96,6 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { reactive, watch } from 'vue';
-
-import { PToggleButton, PI } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-
-interface Props {
-    item?: CollectorItemInfo;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
-
-const collectorPageStore = useCollectorPageStore();
-const collectorFormStore = useCollectorFormStore();
-
-const state = reactive({
-    isScheduleActivated: false,
-});
-
-/* Components */
-const handleChangeToggle = async (value) => {
-    if (Object.keys(value).length > 0) return;
-    try {
-        state.isScheduleActivated = !state.isScheduleActivated;
-        const params: CollectorUpdateParameter = {
-            collector_id: props.item.collectorId,
-            schedule: {
-                ...props.item.schedule,
-                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
-            },
-        };
-        const response = await collectorPageStore.updateCollectorSchedule(params);
-        await collectorFormStore.setOriginCollector(response);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
-    }
-};
-const handleClickSchedule = () => {
-    collectorPageStore.setSelectedCollector(props.item.collectorId);
-    collectorPageStore.$patch({
-        visibleScheduleModal: true,
-    });
-};
-
-/* Watcher */
-watch(() => props.item, (item) => {
-    if (item && item.schedule) {
-        state.isScheduleActivated = item.schedule.state === 'ENABLED';
-    }
-}, { immediate: true });
-</script>
 
 <style lang="postcss" scoped>
 .info-item {

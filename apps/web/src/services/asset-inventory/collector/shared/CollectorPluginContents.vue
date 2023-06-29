@@ -1,58 +1,19 @@
-<template>
-    <div class="plugin-data-contents">
-        <p-lazy-img :src="state.icon"
-                    class="plugin-icon"
-                    :class="{ 'sm': props.size === 'sm' }"
-                    :width="state.iconSize"
-                    :height="state.iconSize"
-        />
-        <div class="contents">
-            <p class="plugin-name">
-                {{ state.name }} <span v-if="state.isBeta"
-                                       class="beta"
-                >{{ $t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
-            </p>
-            <div class="plugin-description">
-                <span class="plugin-description-text"
-                      :class="{ 'sm': props.size === 'sm' }"
-                >
-                    {{ state.description }}
-                </span>
-                <p-anchor v-if="state.pluginDetailLink"
-                          :href="state.pluginDetailLink"
-                          size="sm"
-                          :highlight="true"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-                </p-anchor>
-            </div>
-            <div class="label-container">
-                <p-label v-for="(label, idx) in state.labels"
-                         :key="`${label}-${idx}`"
-                         class="mb-1"
-                         :text="label"
-                />
-            </div>
-        </div>
-    </div>
-</template>
-
 <script lang="ts" setup>
-import { useWindowSize } from '@vueuse/core';
-import {
-    defineProps, reactive, computed,
-} from 'vue';
-
 import {
     PAnchor, PLazyImg, PLabel,
     screens,
 } from '@spaceone/design-system';
-
-import { store } from '@/store';
+import { useWindowSize } from '@vueuse/core';
+import {
+    defineProps, reactive, computed,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+
 
 type Size = 'sm' | 'lg';
 
@@ -68,6 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
     plugin: null,
     size: 'lg',
 });
+const store = useStore();
+const { t } = useI18n();
 
 const state = reactive({
     icon: computed<string>(() => state.pluginItem?.icon ?? ''),
@@ -92,8 +55,46 @@ const state = reactive({
     await store.dispatch('reference/plugin/load');
 })();
 
-
 </script>
+
+<template>
+    <div class="plugin-data-contents">
+        <p-lazy-img :src="state.icon"
+                    class="plugin-icon"
+                    :class="{ 'sm': props.size === 'sm' }"
+                    :width="state.iconSize"
+                    :height="state.iconSize"
+        />
+        <div class="contents">
+            <p class="plugin-name">
+                {{ state.name }} <span v-if="state.isBeta"
+                                       class="beta"
+                >{{ t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
+            </p>
+            <div class="plugin-description">
+                <span class="plugin-description-text"
+                      :class="{ 'sm': props.size === 'sm' }"
+                >
+                    {{ state.description }}
+                </span>
+                <p-anchor v-if="state.pluginDetailLink"
+                          :href="state.pluginDetailLink"
+                          size="sm"
+                          :highlight="true"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
+                </p-anchor>
+            </div>
+            <div class="label-container">
+                <p-label v-for="(label, idx) in state.labels"
+                         :key="`${label}-${idx}`"
+                         class="mb-1"
+                         :text="label"
+                />
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .plugin-data-contents {

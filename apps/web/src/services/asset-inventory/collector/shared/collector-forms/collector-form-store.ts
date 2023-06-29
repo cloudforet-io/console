@@ -1,7 +1,7 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -123,7 +123,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
                 this.versions = res.results;
             } catch (e) {
                 this.versions = [];
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.global.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));
             }
         },
     },

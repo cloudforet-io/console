@@ -1,62 +1,16 @@
-<template>
-    <div class="collector-page">
-        <p-heading
-            use-total-count
-            use-selected-count
-            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.totalCount"
-        >
-            <template #extra>
-                <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
-                >
-                    <p-button style-type="tertiary"
-                              class="history-button"
-                    >
-                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
-                    </p-button>
-                </router-link>
-            </template>
-        </p-heading>
-        <p-data-loader
-            :data="state.hasCollectorList"
-            :loading="state.initLoading"
-            loader-backdrop-color="gray.100"
-            class="collector-loader-wrapper"
-        >
-            <div v-if="state.hasCollectorList"
-                 class="collector-contents-wrapper"
-            >
-                <provider-list
-                    :provider-list="state.providerList"
-                    :selected-provider="collectorPageState.selectedProvider"
-                    @change-provider="handleSelectedProvider"
-                />
-                <collector-contents />
-            </div>
-            <template #no-data>
-                <collector-no-data />
-            </template>
-        </p-data-loader>
-    </div>
-</template>
-
 <script lang="ts" setup>
-import { watchDebounced } from '@vueuse/core';
-import {
-    computed, reactive, onMounted,
-} from 'vue';
-
-
-import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
+import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
+import { watchDebounced } from '@vueuse/core';
+import {
+    computed, reactive, onMounted,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -74,8 +28,13 @@ import type {
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+
+const store = useStore();
+const router = useRouter();
+const { t } = useI18n();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -91,8 +50,8 @@ const state = reactive({
 const urlFilterConverter = new QueryHelper();
 
 const setValuesFromUrlQueryString = () => {
-    const currentRoute = SpaceRouter.router.currentRoute;
-    const query: CollectorMainPageQuery = currentRoute.query;
+    const currentRoute = router.currentRoute;
+    const query: CollectorMainPageQuery = currentRoute.value.query;
     // set provider
     collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
     // set search filters
@@ -109,10 +68,10 @@ const collectorMainPageQueryValue = computed<Required<CollectorMainPageQueryValu
 
 watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
     const newQuery: CollectorMainPageQuery = {
-        provider: primitiveToQueryString(queryValue.provider),
-        filters: urlFilterConverter.setFilters(queryValue.filters ?? []).rawQueryStrings,
+        provider: primitiveToQueryString(queryValue.value.provider),
+        filters: urlFilterConverter.setFilters(queryValue.value.filters ?? []).rawQueryStrings,
     };
-    SpaceRouter.router.replace({ query: newQuery }).catch((e) => {
+    router.replace({ query: newQuery }).catch((e) => {
         if (e.name !== 'NavigationDuplicated') console.error(e);
     });
 }, { debounce: 300 });
@@ -152,6 +111,49 @@ onMounted(async () => {
     state.initLoading = false;
 });
 </script>
+
+<template>
+    <div class="collector-page">
+        <p-heading
+            use-total-count
+            use-selected-count
+            :title="t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+            :total-count="collectorPageState.totalCount"
+        >
+            <template #extra>
+                <router-link
+                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                >
+                    <p-button style-type="tertiary"
+                              class="history-button"
+                    >
+                        {{ t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
+                    </p-button>
+                </router-link>
+            </template>
+        </p-heading>
+        <p-data-loader
+            :data="state.hasCollectorList"
+            :loading="state.initLoading"
+            loader-backdrop-color="gray.100"
+            class="collector-loader-wrapper"
+        >
+            <div v-if="state.hasCollectorList"
+                 class="collector-contents-wrapper"
+            >
+                <provider-list
+                    :provider-list="state.providerList"
+                    :selected-provider="collectorPageState.selectedProvider"
+                    @change-provider="handleSelectedProvider"
+                />
+                <collector-contents />
+            </div>
+            <template #no-data>
+                <collector-no-data />
+            </template>
+        </p-data-loader>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-heading */

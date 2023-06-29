@@ -1,9 +1,24 @@
+<script lang="ts" setup>
+import {
+    PHeading, PCard,
+} from '@spaceone/design-system';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const state = reactive({
+    totalCount: 0,
+});
+
+</script>
+
 <template>
     <div class="collection-rule">
         <p-heading heading-type="sub"
                    use-total-count
-                   :total-count="totalCount"
-                   :title="$t('PLUGIN.COLLECTOR.MAIN.COLLECTION_RULE')"
+                   :total-count="state.totalCount"
+                   :title="t('PLUGIN.COLLECTOR.MAIN.COLLECTION_RULE')"
         />
         <div class="content-wrapper">
             <p-card>
@@ -20,32 +35,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import { reactive, toRefs } from 'vue';
-
-import {
-    PHeading, PCard,
-} from '@spaceone/design-system';
-
-export default {
-    name: 'CollectionRule',
-    components: {
-        PHeading,
-        PCard,
-    },
-    props: {},
-    setup() {
-        const state = reactive({
-            totalCount: 0,
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .collection-rule {

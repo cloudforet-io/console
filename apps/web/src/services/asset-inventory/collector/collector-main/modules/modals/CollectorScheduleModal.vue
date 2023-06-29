@@ -1,26 +1,7 @@
-<template>
-    <p-button-modal class="collector-schedule-modal"
-                    :header-title="$t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
-                    size="md"
-                    fade
-                    backdrop
-                    :visible="collectorPageState.visibleScheduleModal"
-                    @close="handleCloseModal"
-                    @cancel="handleCloseModal"
-                    @confirm="handleConfirm"
-    >
-        <template #body>
-            <collector-schedule-form enable-hours-edit />
-        </template>
-    </p-button-modal>
-</template>
-
 <script setup lang="ts">
-import { watch } from 'vue';
-
 import { PButtonModal } from '@spaceone/design-system';
-
-import { i18n as i18nTranslator } from '@/translations';
+import { watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -37,6 +18,7 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const { t } = useI18n();
 
 /* Components */
 const handleCloseModal = () => {
@@ -51,7 +33,7 @@ const handleConfirm = async () => {
         emit('refresh-collector-list');
     } catch (e) {
         collectorFormStore.resetSchedulePower();
-        ErrorHandler.handleRequestError(e, i18nTranslator.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
 
@@ -73,3 +55,20 @@ watch(() => collectorPageState.selectedCollector, async (value) => {
     await collectorFormStore.setOriginCollector(value);
 }, { immediate: true });
 </script>
+
+<template>
+    <p-button-modal class="collector-schedule-modal"
+                    :header-title="t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
+                    size="md"
+                    fade
+                    backdrop
+                    :visible="collectorPageState.visibleScheduleModal"
+                    @close="handleCloseModal"
+                    @cancel="handleCloseModal"
+                    @confirm="handleConfirm"
+    >
+        <template #body>
+            <collector-schedule-form enable-hours-edit />
+        </template>
+    </p-button-modal>
+</template>

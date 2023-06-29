@@ -1,30 +1,8 @@
-<template>
-    <p-field-group class="collector-tag-form"
-                   :label="$t('INVENTORY.COLLECTOR.CREATE.TAG')"
-    >
-        <template #label-extra>
-            <div class="mt-1">
-                <p class="tag-description">
-                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC1", {service: props.serviceName}) }}
-                </p>
-                <p class="tag-description">
-                    {{ $t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC2", {service: props.serviceName}) }}
-                </p>
-            </div>
-        </template>
-        <tags-input-group :tags="collectorFormState.tags"
-                          show-validation
-                          :is-valid.sync="state.isTagsValid"
-                          @update-tags="handleUpdateTags"
-        />
-    </p-field-group>
-</template>
-
 <script lang="ts" setup>
 
-import { reactive, watch } from 'vue';
-
 import { PFieldGroup } from '@spaceone/design-system';
+import { reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -33,6 +11,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 
 const emit = defineEmits<{(event: 'update:isTagsValid', value: boolean): void; }>();
+const { t } = useI18n();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -56,6 +35,28 @@ watch(() => state.isTagsValid, (isTagsValid) => {
 
 
 </script>
+
+<template>
+    <p-field-group class="collector-tag-form"
+                   :label="t('INVENTORY.COLLECTOR.CREATE.TAG')"
+    >
+        <template #label-extra>
+            <div class="mt-1">
+                <p class="tag-description">
+                    {{ t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC1", {service: props.serviceName}) }}
+                </p>
+                <p class="tag-description">
+                    {{ t("INVENTORY.COLLECTOR.CREATE.TAG_FORM_DESC2", {service: props.serviceName}) }}
+                </p>
+            </div>
+        </template>
+        <tags-input-group v-model:is-valid="state.isTagsValid"
+                          :tags="collectorFormState.tags"
+                          show-validation
+                          @update-tags="handleUpdateTags"
+        />
+    </p-field-group>
+</template>
 
 <style lang="postcss" scoped>
 .collector-tag-form {

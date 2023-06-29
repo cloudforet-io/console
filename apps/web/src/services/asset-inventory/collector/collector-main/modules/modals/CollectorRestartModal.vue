@@ -1,24 +1,7 @@
-<template>
-    <p-button-modal :header-title="$t('INVENTORY.COLLECTOR.MAIN.RESTART_COLLECT')"
-                    size="sm"
-                    fade
-                    backdrop
-                    :visible="collectorPageState.visibleRestartModal"
-                    :loading="state.loading"
-                    @close="handleCloseModal"
-                    @cancel="handleCloseModal"
-                    @confirm="handleConfirm"
-    >
-        <template #confirm-button>
-            {{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}
-        </template>
-    </p-button-modal>
-</template>
-
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import { PButtonModal } from '@spaceone/design-system';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 
@@ -26,6 +9,7 @@ const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const { t } = useI18n();
 
 const state = reactive({
     loading: false,
@@ -51,3 +35,20 @@ const handleConfirm = async () => {
     }
 };
 </script>
+
+<template>
+    <p-button-modal :header-title="t('INVENTORY.COLLECTOR.MAIN.RESTART_COLLECT')"
+                    size="sm"
+                    fade
+                    backdrop
+                    :visible="collectorPageState.visibleRestartModal"
+                    :loading="state.loading"
+                    @close="handleCloseModal"
+                    @cancel="handleCloseModal"
+                    @confirm="handleConfirm"
+    >
+        <template #confirm-button>
+            {{ t('INVENTORY.COLLECTOR.MAIN.RESTART') }}
+        </template>
+    </p-button-modal>
+</template>

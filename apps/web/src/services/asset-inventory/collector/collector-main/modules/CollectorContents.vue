@@ -1,67 +1,18 @@
-<template>
-    <div class="collector-contents">
-        <p-toolbox
-            exportable
-            filters-visible
-            search-type="query"
-            :key-item-sets="keyItemSets"
-            :query-tags="state.searchTags"
-            :value-handler-map="valueHandlerMap"
-            :total-count="collectorPageState.totalCount"
-            @change="handleChangeToolbox"
-            @refresh="refreshCollectorList"
-            @export="handleExportExcel"
-        >
-            <template #left-area>
-                <p-button
-                    icon-left="ic_plus_bold"
-                    class="create-button"
-                    @click="routeToCreatePage"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
-                </p-button>
-            </template>
-        </p-toolbox>
-        <p-data-loader :data="state.items"
-                       :loading="collectorPageState.loading"
-                       class="collector-list-wrapper"
-        >
-            <div class="collector-lists">
-                <div v-for="item in state.items"
-                     :key="item.collectorId"
-                     @click="handleClickListItem(item.detailLink)"
-                >
-                    <collector-content-item :item="item"
-                                            @refresh-collector-list="refreshCollectorList"
-                    />
-                </div>
-            </div>
-            <template #no-data>
-                <collector-list-no-data class="collector-no-data" />
-            </template>
-        </p-data-loader>
-        <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
-        <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    onMounted, computed, reactive, watch,
-} from 'vue';
-
-import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import {
+    onMounted, computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -83,10 +34,15 @@ import {
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
 const RECENT_COUNT = 5;
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+
+const store = useStore();
+const router = useRouter();
+const { t } = useI18n();
 
 const keyItemSets: KeyItemSet[] = [{
     title: 'Properties',
@@ -117,10 +73,10 @@ const storeState = reactive({
 const historyLinkQueryHelper = new QueryHelper();
 const state = reactive({
     infoItems: computed(() => [
-        { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
-        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: i18n.t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
-        { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: i18n.t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.PLUGIN, label: t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.JOBS, label: t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.STATUS, label: t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') },
+        { key: COLLECTOR_ITEM_INFO_TYPE.SCHEDULE, label: t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') },
     ]),
     excelFields: [
         { key: 'name', name: 'Name' },
@@ -209,7 +165,7 @@ const fetchCollectorList = async () => {
 
 /* Components */
 const routeToCreatePage = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+    router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
 const refreshCollectorList = async () => {
     await fetchCollectorList();
@@ -230,7 +186,7 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
     fetchCollectorList();
 };
 const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(detailLink);
+    router.push(detailLink);
 };
 
 /* API */
@@ -259,6 +215,53 @@ onMounted(async () => {
 });
 
 </script>
+
+<template>
+    <div class="collector-contents">
+        <p-toolbox
+            exportable
+            filters-visible
+            search-type="query"
+            :key-item-sets="keyItemSets"
+            :query-tags="state.searchTags"
+            :value-handler-map="valueHandlerMap"
+            :total-count="collectorPageState.totalCount"
+            @change="handleChangeToolbox"
+            @refresh="refreshCollectorList"
+            @export="handleExportExcel"
+        >
+            <template #left-area>
+                <p-button
+                    icon-left="ic_plus_bold"
+                    class="create-button"
+                    @click="routeToCreatePage"
+                >
+                    {{ t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
+                </p-button>
+            </template>
+        </p-toolbox>
+        <p-data-loader :data="state.items"
+                       :loading="collectorPageState.loading"
+                       class="collector-list-wrapper"
+        >
+            <div class="collector-lists">
+                <div v-for="item in state.items"
+                     :key="item.collectorId"
+                     @click="handleClickListItem(item.detailLink)"
+                >
+                    <collector-content-item :item="item"
+                                            @refresh-collector-list="refreshCollectorList"
+                    />
+                </div>
+            </div>
+            <template #no-data>
+                <collector-list-no-data class="collector-no-data" />
+            </template>
+        </p-data-loader>
+        <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
+        <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .collector-contents {

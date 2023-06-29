@@ -1,39 +1,12 @@
-<template>
-    <div class="collector-version-form">
-        <div class="label-row">
-            <p-field-title>{{ $t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
-            <div class="auto-upgrade-wrapper">
-                <span>{{ $t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
-                <p-toggle-button :value="collectorFormState.autoUpgrade"
-                                 @change-toggle="handleClickAutoUpgrade"
-                />
-            </div>
-        </div>
-        <p-select-dropdown :selected="collectorFormState.version"
-                           :items="state.versionItems"
-                           :disabled="collectorFormState.autoUpgrade"
-                           class="w-full"
-                           @update:selected="handleChangeVersion"
-        />
-        <div v-show="state.isVersionValid && !collectorFormState.autoUpgrade"
-             class="invalid-feedback"
-        >
-            {{ state.versionInvalidText }}
-        </div>
-    </div>
-</template>
-
 <script lang="ts" setup>
-
-import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldTitle, PToggleButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-
-import { i18n } from '@/translations';
+import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
@@ -46,6 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
 }>();
+const { t } = useI18n();
 
 const state = reactive({
     pluginId: computed<string|undefined>(() => collectorFormStore.pluginId),
@@ -56,7 +30,7 @@ const state = reactive({
     versionInvalidText: computed<TranslateResult>(() => {
         const value = collectorFormState.version;
         if (!value?.length) {
-            return i18n.t('INVENTORY.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
+            return t('INVENTORY.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');
         }
         return '';
     }),
@@ -102,6 +76,31 @@ watch(() => state.pluginId, async (pluginId) => {
     initSelectedVersion();
 }, { immediate: true });
 </script>
+
+<template>
+    <div class="collector-version-form">
+        <div class="label-row">
+            <p-field-title>{{ t('INVENTORY.COLLECTOR.CREATE.VERSION_LABEL') }}</p-field-title>
+            <div class="auto-upgrade-wrapper">
+                <span>{{ t('INVENTORY.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL') }}</span>
+                <p-toggle-button :value="collectorFormState.autoUpgrade"
+                                 @change-toggle="handleClickAutoUpgrade"
+                />
+            </div>
+        </div>
+        <p-select-dropdown :selected="collectorFormState.version"
+                           :items="state.versionItems"
+                           :disabled="collectorFormState.autoUpgrade"
+                           class="w-full"
+                           @update:selected="handleChangeVersion"
+        />
+        <div v-show="state.isVersionValid && !collectorFormState.autoUpgrade"
+             class="invalid-feedback"
+        >
+            {{ state.versionInvalidText }}
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .collector-version-form {

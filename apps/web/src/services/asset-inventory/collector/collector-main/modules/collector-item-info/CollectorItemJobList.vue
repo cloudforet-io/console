@@ -1,7 +1,36 @@
+<script setup lang="ts">
+
+import { PTooltip, PI, PTextButton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+
+interface Props {
+    item?: CollectorItemInfo;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    item: undefined,
+});
+
+const store = useStore();
+const { t } = useI18n();
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
+</script>
+
 <template>
     <div class="info-item">
         <p class="info-label">
-            {{ $t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
+            {{ t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
         </p>
         <div class="jobs-wrapper">
             <div v-for="(jobStatus, index) in props.item.recentJobAnalyze"
@@ -11,7 +40,7 @@
             >
                 <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
                            class="icon-fill-wrapper success"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                           :contents="t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                            position="top"
                 >
                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
@@ -26,7 +55,7 @@
                 </p-tooltip>
                 <p-tooltip v-else-if="jobStatus.status === JOB_STATE.IN_PROGRESS"
                            class="icon-fill-wrapper progress"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
+                           :contents="t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
                            position="top"
                 >
                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
@@ -41,14 +70,14 @@
                 </p-tooltip>
                 <p-tooltip v-else-if="jobStatus.status === JOB_STATE.NONE"
                            class="icon-fill-wrapper none"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
+                           :contents="t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
                            position="top"
                 />
                 <router-link v-else
                              :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
                 >
                     <p-tooltip class="icon-fill-wrapper error"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                               :contents="t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                position="top"
                     >
                         <span class="exclamation-mark">!</span>
@@ -64,7 +93,7 @@
             <router-link :to="props.item.historyLink"
                          class="view-history-detail"
             >
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
+                <span>{{ t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
                 <p-i
                     name="ic_chevron-right"
                     width="0.75rem"
@@ -75,31 +104,6 @@
         </p-text-button>
     </div>
 </template>
-
-<script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import { PTooltip, PI, PTextButton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { store } from '@/store';
-
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-interface Props {
-    item?: CollectorItemInfo;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
-
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-});
-</script>
 
 <style lang="postcss" scoped>
 .info-item {

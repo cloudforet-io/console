@@ -1,117 +1,11 @@
-<template>
-    <p-pane-layout class="collector-progress-wizard">
-        <slot name="top">
-            <slot name="progress">
-                <div class="progress-tab-nav">
-                    <div v-for="(tab, idx) in tabs"
-                         :key="tab.name"
-                         class="tab-nav-item"
-                         :class="{
-                             active: idx === proxyActiveIdx,
-                             invalid: invalidState[tab.name],
-                         }"
-                         :style="{width: tabWidth}"
-                         @click="onChangeTab(idx)"
-                    >
-                        <span class="triangle-bg" />
-                        <span class="triangle" />
-                        <slot :name="`progress-${tab.name}`"
-                              :tab="tab"
-                        >
-                            <span>{{ Number(idx) + 1 }}.
-                                {{ tab.label || tab.name }} {{ tab.optional ? `(${$t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.OPTIONAL')})`: '' }}
-                            </span>
-                        </slot>
-                    </div>
-                </div>
-            </slot>
-            <template v-if="activeTab">
-                <aside v-if="activeTab.alert"
-                       class="caution"
-                >
-                    <p-i name="ic_error-filled"
-                         height="1rem"
-                         width="1rem"
-                    />
-                    {{ activeTab.alert }}
-                </aside>
-                <aside v-if="activeTab.warning"
-                       class="caution warning"
-                >
-                    <p-i name="ic_error-filled"
-                         height="1rem"
-                         width="1rem"
-                         color="inherit"
-                    />
-                    {{ activeTab.warning }}
-                </aside>
-            </template>
-        </slot>
-
-        <template v-if="activeTab">
-            <div class="contents">
-                <keep-alive>
-                    <slot :name="`contents-${activeTab.name}`"
-                          :tab="activeTab"
-                    />
-                </keep-alive>
-            </div>
-        </template>
-
-        <slot name="bottom">
-            <div class="bottom">
-                <p-button style-type="tertiary"
-                          :disabled="loading"
-                          size="lg"
-                          class="txt-btn"
-                          @click="$emit('cancel', $event)"
-                >
-                    {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.CANCEL') }}
-                </p-button>
-                <div class="nav-btn-box">
-                    <p-button v-if="!isFirstTab"
-                              :disabled="loading"
-                              style-type="highlight"
-                              size="lg"
-                              icon-left="ic_arrow-left"
-                              @click="onClickPrev"
-                    >
-                        {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.PREV') }}
-                    </p-button>
-                    <p-button v-if="!isLastTab"
-                              :disabled="loading"
-                              style-type="highlight"
-                              size="lg"
-                              @click="onClickNext"
-                    >
-                        {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.NEXT') }}
-                        <p-i name="ic_arrow-left"
-                             color="inherit"
-                             dir="down"
-                        />
-                    </p-button>
-                    <p-button :loading="loading"
-                              :disabled="disabled"
-                              class="txt-btn"
-                              style-type="highlight"
-                              size="lg"
-                              @click="$emit('confirm', tabs, $event)"
-                    >
-                        {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.CONFIRM') }}
-                    </p-button>
-                </div>
-            </div>
-        </slot>
-    </p-pane-layout>
-</template>
-
-<script lang="ts">
-import {
-    toRefs, reactive, computed,
-} from 'vue';
+<script lang="ts" setup>
 
 import { PI, PButton, PPaneLayout } from '@spaceone/design-system';
 import { size } from 'lodash';
+import {
+    reactive, computed,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -132,72 +26,162 @@ interface ProgressWizardProps {
     disabled: boolean;
 }
 
-export default {
-    name: 'CollectorProgressWizard',
-    components: {
-        PPaneLayout,
-        PI,
-        PButton,
-    },
-    props: {
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        /** sync */
-        activeIdx: {
-            type: Number,
-            default: 0,
-        },
-        invalidState: {
-            type: Object,
-            default: () => ({}),
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: ProgressWizardProps, { emit }) {
-        const state = reactive({
-            tabWidth: computed(() => `${100 / size(props.tabs)}%`),
-            proxyActiveIdx: useProxyValue('activeIdx', props, emit),
-            activeTab: computed(() => props.tabs[state.proxyActiveIdx]),
-            isFirstTab: computed(() => state.proxyActiveIdx - 1 < 0),
-            isLastTab: computed(() => state.proxyActiveIdx + 1 >= props.tabs.length),
-        });
+const props = withDefaults(defineProps<ProgressWizardProps>(), {
+    tabs: () => [],
+    activeIdx: 0,
+    invalidState: () => ({}),
+    loading: false,
+    disabled: false,
+});
+const emit = defineEmits<{(e: 'update:active-idx', value: number): void;
+    (e: 'change-step', oldIdx: number, newIdx: number): void;
+    (e: 'cancel'): void;
+    (e: 'confirm', value: ProgressTab[]): void;
+}>();
+const { t } = useI18n();
 
-        const onClickPrev = () => {
-            if (state.isFirstTab) return;
-            emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx - 1);
-            state.proxyActiveIdx -= 1;
-        };
-        const onClickNext = () => {
-            if (state.isLastTab) return;
-            emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx + 1);
-            state.proxyActiveIdx += 1;
-        };
+const state = reactive({
+    tabWidth: computed(() => `${100 / size(props.tabs)}%`),
+    proxyActiveIdx: useProxyValue('activeIdx', props, emit),
+    activeTab: computed(() => props.tabs[state.proxyActiveIdx]),
+    isFirstTab: computed(() => state.proxyActiveIdx - 1 < 0),
+    isLastTab: computed(() => state.proxyActiveIdx + 1 >= props.tabs.length),
+});
 
-        const onChangeTab = (idx) => {
-            if (props.activeIdx !== idx) {
-                emit('changeStep', props.activeIdx, idx);
-                state.proxyActiveIdx = idx;
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            onClickPrev,
-            onClickNext,
-            onChangeTab,
-        };
-    },
+const onClickPrev = () => {
+    if (state.isFirstTab) return;
+    emit('change-step', state.proxyActiveIdx, state.proxyActiveIdx - 1);
+    state.proxyActiveIdx -= 1;
 };
+const onClickNext = () => {
+    if (state.isLastTab) return;
+    emit('change-step', state.proxyActiveIdx, state.proxyActiveIdx + 1);
+    state.proxyActiveIdx += 1;
+};
+
+const onChangeTab = (idx) => {
+    if (props.activeIdx !== idx) {
+        emit('change-step', props.activeIdx, idx);
+        state.proxyActiveIdx = idx;
+    }
+};
+
+const handleCancel = () => {
+    emit('cancel');
+};
+
+const handleConfirm = () => {
+    emit('confirm', props.tabs);
+};
+
 </script>
+
+<template>
+    <p-pane-layout class="collector-progress-wizard">
+        <slot name="top">
+            <slot name="progress">
+                <div class="progress-tab-nav">
+                    <div v-for="(tab, idx) in tabs"
+                         :key="tab.name"
+                         class="tab-nav-item"
+                         :class="{
+                             active: idx === state.proxyActiveIdx,
+                             invalid: invalidState[tab.name],
+                         }"
+                         :style="{width: state.tabWidth}"
+                         @click="onChangeTab(idx)"
+                    >
+                        <span class="triangle-bg" />
+                        <span class="triangle" />
+                        <slot :name="`progress-${tab.name}`"
+                              :tab="tab"
+                        >
+                            <span>{{ Number(idx) + 1 }}.
+                                {{ tab.label || tab.name }} {{ tab.optional ? `(${t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.OPTIONAL')})`: '' }}
+                            </span>
+                        </slot>
+                    </div>
+                </div>
+            </slot>
+            <template v-if="state.activeTab">
+                <aside v-if="state.activeTab.alert"
+                       class="caution"
+                >
+                    <p-i name="ic_error-filled"
+                         height="1rem"
+                         width="1rem"
+                    />
+                    {{ state.activeTab.alert }}
+                </aside>
+                <aside v-if="state.activeTab.warning"
+                       class="caution warning"
+                >
+                    <p-i name="ic_error-filled"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                    {{ state.activeTab.warning }}
+                </aside>
+            </template>
+        </slot>
+
+        <template v-if="state.activeTab">
+            <div class="contents">
+                <keep-alive>
+                    <slot :name="`contents-${state.activeTab.name}`"
+                          :tab="state.activeTab"
+                    />
+                </keep-alive>
+            </div>
+        </template>
+
+        <slot name="bottom">
+            <div class="bottom">
+                <p-button style-type="tertiary"
+                          :disabled="loading"
+                          size="lg"
+                          class="txt-btn"
+                          @click="handleCancel"
+                >
+                    {{ t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.CANCEL') }}
+                </p-button>
+                <div class="nav-btn-box">
+                    <p-button v-if="!state.isFirstTab"
+                              :disabled="loading"
+                              style-type="highlight"
+                              size="lg"
+                              icon-left="ic_arrow-left"
+                              @click="onClickPrev"
+                    >
+                        {{ t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.PREV') }}
+                    </p-button>
+                    <p-button v-if="!state.isLastTab"
+                              :disabled="loading"
+                              style-type="highlight"
+                              size="lg"
+                              @click="onClickNext"
+                    >
+                        {{ t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.NEXT') }}
+                        <p-i name="ic_arrow-left"
+                             color="inherit"
+                             dir="down"
+                        />
+                    </p-button>
+                    <p-button :loading="loading"
+                              :disabled="disabled"
+                              class="txt-btn"
+                              style-type="highlight"
+                              size="lg"
+                              @click="handleConfirm"
+                    >
+                        {{ t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.CONFIRM') }}
+                    </p-button>
+                </div>
+            </div>
+        </slot>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .collector-progress-wizard {
