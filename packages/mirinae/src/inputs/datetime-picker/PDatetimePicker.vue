@@ -216,11 +216,6 @@ export default {
                 createDatePicker(datePickerRef);
             }
         });
-        watch(() => props.selectedDates, (selectedDates) => {
-            if (selectedDates !== state.proxySelectedDates) {
-                state.datePicker?.setDate(selectedDates);
-            }
-        }, { immediate: false });
         watch([() => props.minDate, () => props.maxDate], () => {
             if (state.datePickerRef) {
                 state.datePicker?.clear();
