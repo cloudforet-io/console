@@ -38,11 +38,11 @@
                            :read-only="printMode"
                            @select="handleSelectMonthMenuItem"
         />
-        <cost-management-custom-range-modal v-if="customRangeModalVisible"
-                                            :visible.sync="customRangeModalVisible"
-                                            datetime-picker-data-type="yearToMonth"
-                                            :granularity="GRANULARITY.MONTHLY"
-                                            @confirm="handleCustomRangeModalConfirm"
+        <custom-date-range-modal v-if="customRangeModalVisible"
+                                 :visible.sync="customRangeModalVisible"
+                                 datetime-picker-data-type="yearToMonth"
+                                 :granularity="GRANULARITY.MONTHLY"
+                                 @confirm="handleCustomRangeModalConfirm"
         />
         <currency-select-dropdown :class="{ 'left-divider': printMode }"
                                   :print-mode="printMode"
@@ -73,9 +73,8 @@ import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dr
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import CostManagementCustomRangeModal
-    from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import type { Period } from '@/services/cost-explorer/type';
+import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
 const initialPeriodEnd = dayjs.utc().endOf('month').format('YYYY-MM-DD');
@@ -84,7 +83,7 @@ const initialSelectedMonth = initialPeriodStart.substr(0, 7);
 export default {
     name: 'CostDashboardPeriodSelectDropdown',
     components: {
-        CostManagementCustomRangeModal,
+        CustomDateRangeModal,
         CurrencySelectDropdown,
         PSelectDropdown,
         PBadge,
