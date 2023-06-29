@@ -17,10 +17,9 @@
             >
                 <p-datetime-picker class="datetime-picker"
                                    :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType"
-                                   :selected-dates.sync="startDate"
-                                   :invalid="!!startDate.length && !!endDate.length && invalid"
-                                   :min-date="fromDate.minDate"
-                                   :max-date="fromDate.maxDate"
+                                   :selected-dates="startDates"
+                                   :invalid="!!startDates.length && !!endDates.length && invalid"
+                                   @update:selected-dates="handleUpdateStartDates"
                 />
             </p-field-group>
             <p-field-group class="period-select"
@@ -30,10 +29,11 @@
             >
                 <p-datetime-picker class="datetime-picker"
                                    :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType"
-                                   :selected-dates.sync="endDate"
-                                   :invalid="!!startDate.length && !!endDate.length && invalid"
-                                   :min-date="toDate.minDate"
-                                   :max-date="toDate.maxDate"
+                                   :selected-dates="endDates"
+                                   :invalid="!!startDates.length && !!endDates.length && invalid"
+                                   :min-date="endDateSetting.minDate"
+                                   :max-date="endDateSetting.maxDate"
+                                   @update:selected-dates="handleUpdateEndDates"
                 />
             </p-field-group>
         </template>
@@ -42,7 +42,9 @@
 
 <script lang="ts">
 
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
@@ -93,35 +95,20 @@ export default {
                 set(val) { emit('update:visible', val); },
             }),
             invalid: computed(() => {
-                if (!state.startDate.length || !state.endDate.length) return true;
+                if (!state.startDates.length || !state.endDates.length) return true;
                 const timeUnit = props.datetimePickerDataType === 'yearToDate' ? 'day' : 'month';
-                const startDate = dayjs.utc(state.startDate[0]);
-                const endDate = dayjs.utc(state.endDate[0]);
+                const startDate = dayjs.utc(state.startDates[0]);
+                const endDate = dayjs.utc(state.endDates[0]);
                 return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, 'year') >= 1;
             }),
-            startDate: [],
-            endDate: [],
-            fromDate: computed<DateOption>(() => {
+            startDates: [] as string[],
+            endDates: [] as string[],
+            endDateSetting: computed<DateOption>(() => {
                 let minDate;
                 let maxDate;
-                if (!state.endDate.length) return { minDate, maxDate };
+                if (!state.startDates.length) return { minDate, maxDate };
 
-                const endDate = dayjs.utc(state.endDate[0]);
-                if (props.granularity === GRANULARITY.DAILY) {
-                    minDate = endDate.subtract(1, 'month').format('YYYY-MM-DD');
-                    maxDate = endDate.format('YYYY-MM-DD');
-                } else {
-                    minDate = endDate.subtract(11, 'month').format('YYYY-MM');
-                    maxDate = endDate.format('YYYY-MM');
-                }
-                return { minDate, maxDate };
-            }),
-            toDate: computed<DateOption>(() => {
-                let minDate;
-                let maxDate;
-                if (!state.startDate.length) return { minDate, maxDate };
-
-                const startDate = dayjs.utc(state.startDate[0]);
+                const startDate = dayjs.utc(state.startDates[0]);
                 if (props.granularity === GRANULARITY.DAILY) {
                     minDate = startDate.format('YYYY-MM-DD');
                     maxDate = startDate.add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
@@ -150,21 +137,44 @@ export default {
                 return customRangeModalSettingsByGranularity[props.granularity];
             }),
         });
+
+        /* Event */
         const handleConfirm = () => {
             state.proxyVisible = false;
             const period: Period = {};
             if (props.granularity === GRANULARITY.DAILY) {
-                period.start = state.startDate[0];
-                period.end = state.endDate[0];
+                period.start = state.startDates[0];
+                period.end = state.endDates[0];
             } else {
-                period.start = dayjs.utc(state.startDate[0]).format('YYYY-MM-01');
-                period.end = dayjs.utc(state.endDate[0]).endOf('month').format('YYYY-MM-DD');
+                period.start = dayjs.utc(state.startDates[0]).format('YYYY-MM-01');
+                period.end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM-DD');
             }
             emit('confirm', period);
         };
+        const handleUpdateStartDates = (selectedDates: string[]) => {
+            if (selectedDates.length && state.startDates[0] !== selectedDates[0]) {
+                state.startDates = selectedDates;
+                state.endDates = [];
+            }
+        };
+        const handleUpdateEndDates = (selectedDates: string[]) => {
+            if (selectedDates.length && state.endDates[0] !== selectedDates[0]) {
+                state.endDates = selectedDates;
+            }
+        };
+
+        watch(() => props.visible, (visible) => {
+            if (visible) {
+                state.startDates = [];
+                state.endDates = [];
+            }
+        });
+
         return {
             ...toRefs(state),
             handleConfirm,
+            handleUpdateStartDates,
+            handleUpdateEndDates,
         };
     },
 };

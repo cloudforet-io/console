@@ -5,6 +5,7 @@
             :items="monthMenuItems"
             :selected="selectedMonthMenuIndex"
             index-mode
+            menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
             <div>
@@ -32,10 +33,9 @@
                 </div>
             </template>
         </p-select-dropdown>
-        <dashboard-date-custom-range-modal :visible.sync="customRangeModalVisible"
-                                           granularity="MONTHLY"
-                                           :selected-month="selectedMonthName"
-                                           @confirm="handleCustomRangeModalConfirm"
+        <custom-date-range-modal :visible.sync="customRangeModalVisible"
+                                 granularity="MONTHLY"
+                                 @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
@@ -56,13 +56,12 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import DashboardDateCustomRangeModal
-    from '@/services/dashboards/shared/dashboard-toolset/DashboardDateCustomRangeModal.vue';
+import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
 
 export default defineComponent({
     name: 'DashboardDateDropdown',
     components: {
-        DashboardDateCustomRangeModal,
+        CustomDateRangeModal,
         PBadge,
         PSelectDropdown,
     },
