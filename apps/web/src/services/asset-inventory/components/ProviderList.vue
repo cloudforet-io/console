@@ -1,3 +1,55 @@
+<script setup lang="ts">
+import { PLazyImg, PButton } from '@spaceone/design-system';
+import type { MaybeElementRef } from '@vueuse/core';
+import { useElementSize } from '@vueuse/core';
+import { cloneDeep } from 'lodash';
+import { computed, reactive, ref } from 'vue';
+
+
+import type { ReferenceItem } from '@/store/modules/reference/type';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+const PROVIDER_BUTTON_SIZE = 182;
+const GAP_SIZE = 8;
+const containerRef = ref<HTMLElement|null>(null);
+
+const { width } = useElementSize(containerRef as unknown as MaybeElementRef);
+
+interface Props {
+    providerList?: ReferenceItem[];
+    selectedProvider: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    providerList: undefined,
+    selectedProvider: 'all',
+});
+
+const emit = defineEmits<{(e: 'change-provider', providerName: string): void}>();
+
+const state = reactive({
+    proxySelectedProvider: useProxyValue('selectedProvider', props, emit),
+    // states for design
+    providerCount: computed(() => props.providerList?.length ?? 0),
+    refinedProviderList: computed<ReferenceItem[][]>(() => {
+        const originProviderList = cloneDeep(props.providerList ?? []);
+        if (state.providerCount * (PROVIDER_BUTTON_SIZE + GAP_SIZE) < width.value) {
+            return [originProviderList];
+        } if (state.providerCount * (PROVIDER_BUTTON_SIZE + GAP_SIZE) < width.value * 2) {
+            const firstRowCount = Math.floor(width.value / (PROVIDER_BUTTON_SIZE + GAP_SIZE));
+            return [originProviderList.slice(0, firstRowCount), originProviderList.slice(firstRowCount)];
+        }
+        const halfCount = Math.ceil(state.providerCount / 2);
+        return [originProviderList.slice(0, halfCount), originProviderList.slice(halfCount)];
+    }),
+});
+const handleSelectProvider = (providerName) => {
+    state.proxySelectedProvider = providerName;
+    emit('change-provider', providerName);
+};
+</script>
+
 <template>
     <div ref="containerRef"
          class="provider-list-container"
@@ -25,57 +77,6 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { useElementSize } from '@vueuse/core';
-import { computed, reactive, ref } from 'vue';
-
-import { PLazyImg, PButton } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
-
-import type { ReferenceItem } from '@/store/modules/reference/type';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-const PROVIDER_BUTTON_SIZE = 182;
-const GAP_SIZE = 8;
-const containerRef = ref<HTMLElement|null>(null);
-
-const { width } = useElementSize(containerRef);
-
-interface Props {
-    providerList?: ReferenceItem[];
-    selectedProvider: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    providerList: undefined,
-    selectedProvider: 'all',
-});
-
-const emit = defineEmits<{(e: 'change-provider', providerName: string): void}>();
-
-const state = reactive({
-    proxySelectedProvider: useProxyValue('selectedProvider', props, emit),
-    // states for design
-    providerCount: computed(() => props.providerList.length),
-    refinedProviderList: computed<ReferenceItem[][]>(() => {
-        const originProviderList = cloneDeep(props.providerList);
-        if (state.providerCount * (PROVIDER_BUTTON_SIZE + GAP_SIZE) < width.value) {
-            return [originProviderList];
-        } if (state.providerCount * (PROVIDER_BUTTON_SIZE + GAP_SIZE) < width.value * 2) {
-            const firstRowCount = Math.floor(width.value / (PROVIDER_BUTTON_SIZE + GAP_SIZE));
-            return [originProviderList.slice(0, firstRowCount), originProviderList.slice(firstRowCount)];
-        }
-        const halfCount = Math.ceil(state.providerCount / 2);
-        return [originProviderList.slice(0, halfCount), originProviderList.slice(halfCount)];
-    }),
-});
-const handleSelectProvider = (providerName) => {
-    state.proxySelectedProvider = providerName;
-    emit('change-provider', providerName);
-};
-</script>
 
 <style lang="postcss" scoped>
 .provider-list-container {

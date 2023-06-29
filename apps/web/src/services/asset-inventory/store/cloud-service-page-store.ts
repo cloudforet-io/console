@@ -1,7 +1,7 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
@@ -51,7 +51,6 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
                 this.selectedProvider = 'all';
                 return;
             }
-
             this.selectedProvider = provider;
         },
         setSelectedCategoriesToFilters(categories: CloudServiceCategory[] = []) {

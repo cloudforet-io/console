@@ -1,53 +1,13 @@
-<template>
-    <div class="service-account-base-information-form">
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
-                       :invalid="invalidState.serviceAccountName"
-                       :invalid-text="invalidTexts.serviceAccountName"
-                       :required="true"
-        >
-            <template #default="{invalid}">
-                <p-text-input :value="serviceAccountName"
-                              class="account-name-input block"
-                              :invalid="invalid"
-                              :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
-                              @update:value="setForm('serviceAccountName', $event)"
-                />
-            </template>
-        </p-field-group>
-        <p-json-schema-form v-if="schema"
-                            class="p-json-schema-form"
-                            :form-data.sync="customSchemaForm"
-                            :schema="schema"
-                            :language="$store.state.user.language"
-                            @validate="handleAccountValidate"
-        />
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
-                       :help-text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.BASE_INFO_HELP_TEXT')"
-                       class="account-tags"
-        >
-            <tags-input-group :tags="tags"
-                              show-validation
-                              :is-valid.sync="isTagsValid"
-                              @update-tags="handleUpdateTags"
-            />
-        </p-field-group>
-    </div>
-</template>
-
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
-
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PJsonSchemaForm, PTextInput,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -62,120 +22,130 @@ interface Props {
     originForm: BaseInformationForm;
 }
 
-export default defineComponent<Props>({
-    name: 'ServiceAccountBaseInformationForm',
-    components: {
-        TagsInputGroup,
-        PJsonSchemaForm,
-        PFieldGroup,
-        PTextInput,
-    },
-    props: {
-        editMode: {
-            type: String as PropType<PageMode>,
-            default: 'CREATE',
-        },
-        schema: {
-            type: Object,
-            default: () => ({}),
-        },
-        isValid: {
-            type: Boolean,
-            default: false,
-        },
-        originForm: {
-            type: Object as PropType<BaseInformationForm>,
-            default: () => ({}),
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const {
-            forms: { serviceAccountName },
-            invalidState,
-            invalidTexts,
-            setForm,
-        } = useFormValidator({
-            serviceAccountName: '',
-        }, {
-            serviceAccountName: (val: string) => {
-                if (val.length < 2) {
-                    return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
-                } if (state.serviceAccountNames.includes(val)) {
-                    if (props.originForm?.accountName === val) return true;
-                    return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
-                }
-                return true;
-            },
-        });
-        const state = reactive({
-            serviceAccountNames: [] as string[],
-            customSchemaForm: {},
-            isCustomSchemaFormValid: undefined,
-            tags: {},
-            isTagsValid: true,
-            formData: computed<BaseInformationForm>(() => ({
-                accountName: serviceAccountName.value,
-                customSchemaForm: state.customSchemaForm,
-                tags: state.tags,
-            })),
-            isAllValid: computed(() => !invalidState.serviceAccountName
-                && state.isTagsValid
-                && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid)),
-        });
+const props = withDefaults(defineProps<Props>(), {
+    editMode: 'CREATE',
+    schema: () => ({}),
+    isValid: false,
+    originForm: () => ({}) as BaseInformationForm,
+});
+const emit = defineEmits<{(e: 'update:isValid', value: boolean): void;
+    (e: 'change', value: BaseInformationForm): void;
+}>();
+const { t } = useI18n();
 
-        /* Util */
-        const initFormData = (originForm: BaseInformationForm) => {
-            setForm('serviceAccountName', originForm?.accountName ?? '');
-            state.customSchemaForm = originForm?.customSchemaForm ?? {};
-            state.tags = originForm?.tags ?? {};
-            // init validation
-            state.isCustomSchemaFormValid = true;
-        };
-
-        /* Api */
-        const listServiceAccounts = async () => {
-            const { results } = await SpaceConnector.client.identity.serviceAccount.list({
-                only: 'name',
-            });
-            state.serviceAccountNames = results.map((v) => v.name);
-        };
-
-        /* Event */
-        const handleUpdateTags = (tags: Tag) => {
-            state.tags = tags;
-        };
-        const handleAccountValidate = (isValid) => {
-            state.isCustomSchemaFormValid = isValid;
-        };
-
-        /* Init */
-        (async () => {
-            await listServiceAccounts();
-        })();
-
-        /* Watcher */
-        watch(() => state.isAllValid, (isAllValid) => {
-            emit('update:isValid', isAllValid);
-        });
-        watch(() => state.formData, (formData) => {
-            emit('change', formData);
-        });
-        watch(() => props.originForm, (originForm) => {
-            if (!isEmpty(originForm)) initFormData(originForm);
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            serviceAccountName,
-            invalidState,
-            invalidTexts,
-            setForm,
-            handleUpdateTags,
-            handleAccountValidate,
-        };
+const {
+    forms: { serviceAccountName },
+    invalidState,
+    invalidTexts,
+    setForm,
+} = useFormValidator({
+    serviceAccountName: '',
+}, {
+    serviceAccountName: (val: string) => {
+        if (val.length < 2) {
+            return t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
+        } if (state.serviceAccountNames.includes(val)) {
+            if (props.originForm?.accountName === val) return true;
+            return t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
+        }
+        return true;
     },
 });
+const state = reactive({
+    serviceAccountNames: [] as string[],
+    customSchemaForm: {},
+    isCustomSchemaFormValid: undefined,
+    tags: {},
+    isTagsValid: true,
+    formData: computed<BaseInformationForm>(() => ({
+        accountName: serviceAccountName.value,
+        customSchemaForm: state.customSchemaForm,
+        tags: state.tags,
+    })),
+    isAllValid: computed(() => !invalidState.serviceAccountName
+                && state.isTagsValid
+                && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid)),
+});
+
+/* Util */
+const initFormData = (originForm: BaseInformationForm) => {
+    setForm('serviceAccountName', originForm?.accountName ?? '');
+    state.customSchemaForm = originForm?.customSchemaForm ?? {};
+    state.tags = originForm?.tags ?? {};
+    // init validation
+    state.isCustomSchemaFormValid = true;
+};
+
+/* Api */
+const listServiceAccounts = async () => {
+    const { results } = await SpaceConnector.client.identity.serviceAccount.list({
+        only: 'name',
+    });
+    state.serviceAccountNames = results.map((v) => v.name);
+};
+
+/* Event */
+const handleUpdateTags = (tags: Tag) => {
+    state.tags = tags;
+};
+const handleAccountValidate = (isValid) => {
+    state.isCustomSchemaFormValid = isValid;
+};
+
+/* Init */
+(async () => {
+    await listServiceAccounts();
+})();
+
+/* Watcher */
+watch(() => state.isAllValid, (isAllValid) => {
+    emit('update:isValid', isAllValid);
+});
+watch(() => state.formData, (formData) => {
+    emit('change', formData);
+});
+watch(() => props.originForm, (originForm) => {
+    if (!isEmpty(originForm)) initFormData(originForm);
+}, { immediate: true });
+
 </script>
+
+<template>
+    <div class="service-account-base-information-form">
+        <p-field-group :label="t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
+                       :invalid="invalidState.serviceAccountName"
+                       :invalid-text="invalidTexts.serviceAccountName"
+                       :required="true"
+        >
+            <template #default="{invalid}">
+                <p-text-input :value="serviceAccountName"
+                              class="account-name-input block"
+                              :invalid="invalid"
+                              :placeholder="t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
+                              @update:value="setForm('serviceAccountName', $event)"
+                />
+            </template>
+        </p-field-group>
+        <p-json-schema-form v-if="schema"
+                            v-model:form-data="state.customSchemaForm"
+                            class="p-json-schema-form"
+                            :schema="schema"
+                            :language="$store.state.user.language"
+                            @validate="handleAccountValidate"
+        />
+        <p-field-group :label="t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
+                       :help-text="t('INVENTORY.SERVICE_ACCOUNT.DETAIL.BASE_INFO_HELP_TEXT')"
+                       class="account-tags"
+        >
+            <tags-input-group v-model:is-valid="state.isTagsValid"
+                              :tags="state.tags"
+                              show-validation
+                              @update-tags="handleUpdateTags"
+            />
+        </p-field-group>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .service-account-base-information-form {
     /* custom design-system component - p-text-input */

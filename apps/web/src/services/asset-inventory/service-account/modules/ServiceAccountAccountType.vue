@@ -1,13 +1,53 @@
+<script lang="ts" setup>
+import {
+    PPaneLayout, PHeading, PSelectCard, PI,
+} from '@spaceone/design-system';
+import {
+    reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import type { AccountType } from '@/services/asset-inventory/service-account/type';
+
+interface Props {
+    accountType?: AccountType;
+    provider?: string;
+    showTrustedAccount?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    accountType: 'GENERAL',
+    provider: undefined,
+    showTrustedAccount: false,
+});
+const emit = defineEmits<{(e: 'change', value: AccountType): void}>();
+const { t } = useI18n();
+
+const state = reactive({
+    selectedType: 'GENERAL' as AccountType,
+});
+
+const handleSelectAccountType = (accountType: AccountType) => {
+    state.selectedType = accountType;
+    emit('change', accountType);
+};
+
+watch(() => props.accountType, (accountType: AccountType) => {
+    state.selectedType = accountType;
+});
+
+</script>
+
 <template>
     <p-pane-layout class="service-account-account-type">
         <p-heading heading-type="sub"
-                   :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ACCOUNT_TYPE_TITLE')"
+                   :title="t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ACCOUNT_TYPE_TITLE')"
         />
         <div class="content-wrapper">
             <div class="create-mode-wrapper">
                 <div class="card-wrapper">
                     <p-select-card
-                        v-model="selectedType"
+                        v-model:selected="state.selectedType"
                         :tab-index="0"
                         value="GENERAL"
                         label="General Account"
@@ -15,7 +55,7 @@
                     />
                     <p-select-card
                         v-if="showTrustedAccount"
-                        v-model="selectedType"
+                        v-model:selected="state.selectedType"
                         :tab-index="1"
                         value="TRUSTED"
                         label="Trusted Account"
@@ -32,7 +72,7 @@
                          class="external-icon"
                     />
                     <div class="help-wrapper">
-                        <span>{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.TRUST_ACCOUNT_HELP_TEXT') }}</span>
+                        <span>{{ t('INVENTORY.SERVICE_ACCOUNT.DETAIL.TRUST_ACCOUNT_HELP_TEXT') }}</span>
                     </div>
                 </div>
             </div>
@@ -40,61 +80,6 @@
     </p-pane-layout>
 </template>
 
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    reactive, toRefs, defineComponent, watch,
-} from 'vue';
-
-import {
-    PPaneLayout, PHeading, PSelectCard, PI,
-} from '@spaceone/design-system';
-
-import type { AccountType } from '@/services/asset-inventory/service-account/type';
-
-export default defineComponent({
-    name: 'ServiceAccountAccountType',
-    components: {
-        PPaneLayout,
-        PHeading,
-        PSelectCard,
-        PI,
-    },
-    props: {
-        accountType: {
-            type: String as PropType<AccountType>,
-            default: 'GENERAL',
-        },
-        provider: {
-            type: String,
-            default: undefined,
-        },
-        showTrustedAccount: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            selectedType: 'GENERAL' as AccountType,
-        });
-
-        const handleSelectAccountType = (accountType: AccountType) => {
-            state.selectedType = accountType;
-            emit('change', accountType);
-        };
-
-        watch(() => props.accountType, (accountType: AccountType) => {
-            state.selectedType = accountType;
-        });
-
-        return {
-            ...toRefs(state),
-            handleSelectAccountType,
-        };
-    },
-});
-</script>
 <style lang="postcss" scoped>
 .service-account-account-type {
     .content-wrapper {

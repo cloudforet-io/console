@@ -1,25 +1,14 @@
-<template>
-    <l-n-b :header="header"
-           :back-link="backLink"
-           :top-title="topTitle"
-           :menu-set="menuSet"
-    />
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
+import { get } from 'lodash';
 import {
     computed,
-    defineComponent,
-    getCurrentInstance,
-    reactive, toRefs,
+    reactive,
     watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { get } from 'lodash';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocation } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -38,107 +27,108 @@ import type {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
 
+const router = useRouter();
+const route = useRoute();
+const store = useStore();
+const { t } = useI18n();
 
-export default defineComponent({
-    name: 'AssetInventoryLNB',
-    components: { LNB },
-    setup() {
-        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-        const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
-            detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
-                if (state.isCloudServiceDetailPage) return vm.$route.params as unknown as CloudServiceDetailPageParams;
-                return undefined;
-            }),
-            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId)),
-            backLink: computed<BackLink|undefined>(() => {
-                if (!state.isCloudServiceDetailPage) return undefined;
-                return { label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
-            }),
-            topTitle: computed<TopTitle|undefined>(() => {
-                if (!state.detailPageParams) return undefined;
-                return { label: state.detailPageParams.group, icon: get(cloudServiceDetailPageState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
-            }),
-            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
-                const results: LNBItem[] = [];
-                cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
-                    results.push({
-                        type: 'item',
-                        label: d.name,
-                        id: d.cloud_service_type_key,
-                        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                        favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
-                    });
-                });
-                results.push({ type: 'divider' });
-                return results;
-            }),
-            menuSet: computed<LNBMenu[]>(() => {
-                const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
-                    type: 'item',
-                    id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
-                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
-                }]);
-                return [
-                    (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
-                    ...filterLNBMenuByPermission(menu.concat([
-                        {
-                            type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_SERVER,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
-                        },
-                        {
-                            type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
-                        },
-                        {
-                            type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                        },
-                    ]), store.getters['user/pagePermissionList']),
-                ];
-            }),
-        });
-
-        const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
-            cloudServiceDetailPageStore.setProviderGroupName(params);
-            cloudServiceDetailPageStore.listCloudServiceTypeData();
-        };
-
-        const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
-            await vm.$router.replace({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: params.provider,
-                    group: params.group,
-                    name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
-                },
-                query: vm.$route.query,
+const state = reactive({
+    isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
+    detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
+        if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
+        return undefined;
+    }),
+    header: computed(() => t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId)),
+    backLink: computed<BackLink|undefined>(() => {
+        if (!state.isCloudServiceDetailPage) return undefined;
+        return { label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } as RouteLocation };
+    }),
+    topTitle: computed<TopTitle|undefined>(() => {
+        if (!state.detailPageParams) return undefined;
+        return { label: state.detailPageParams.group, icon: get(cloudServiceDetailPageState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
+    }),
+    cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
+        const results: LNBItem[] = [];
+        cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
+            results.push({
+                type: 'item',
+                label: d.name,
+                id: d.cloud_service_type_key,
+                to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } } as RouteLocation,
+                favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
             });
-            await cloudServiceDetailPageStore.setSelectedCloudServiceType();
-        };
-
-        /* Watchers */
-        watch(() => state.detailPageParams, async (params) => {
-            if (!params) return;
-            await initCloudServiceDetailLNB(params);
-            if (!params.name) await routeToFirstCloudServiceType(params);
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            FAVORITE_TYPE,
-        };
-    },
+        });
+        results.push({ type: 'divider' });
+        return results;
+    }),
+    menuSet: computed<LNBMenu[]>(() => {
+        const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
+            type: 'item',
+            id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
+            label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
+            to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } as RouteLocation,
+        }]);
+        return [
+            (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
+            ...filterLNBMenuByPermission(menu.concat([
+                // TODO: need to implement type assertion
+                {
+                    type: 'item',
+                    id: MENU_ID.ASSET_INVENTORY_SERVER,
+                    label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
+                    to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME } as RouteLocation,
+                },
+                {
+                    type: 'item',
+                    id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
+                    label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
+                    to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } as RouteLocation,
+                },
+                {
+                    type: 'item',
+                    id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
+                    label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
+                    to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } as RouteLocation,
+                },
+            ]), store.getters['user/pagePermissionList']),
+        ];
+    }),
 });
 
+const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
+    cloudServiceDetailPageStore.setProviderGroupName(params);
+    cloudServiceDetailPageStore.listCloudServiceTypeData();
+};
+
+const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
+    await router.replace({
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        params: {
+            provider: params.provider,
+            group: params.group,
+            name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
+        },
+        query: route.query,
+    });
+    await cloudServiceDetailPageStore.setSelectedCloudServiceType();
+};
+
+/* Watchers */
+watch(() => state.detailPageParams, async (params) => {
+    if (!params) return;
+    await initCloudServiceDetailLNB(params);
+    if (!params.name) await routeToFirstCloudServiceType(params);
+}, { immediate: true });
+
 </script>
+
+<template>
+    <l-n-b :header="state.header"
+           :back-link="backLink"
+           :top-title="topTitle"
+           :menu-set="state.menuSet"
+    />
+</template>
