@@ -15,10 +15,10 @@
                            style-type="transparent"
                            @select="handleSelectPeriod"
         />
-        <cost-management-custom-range-modal v-if="customRangeModalVisible"
-                                            :visible.sync="customRangeModalVisible"
-                                            :granularity="costAnalysisPageState.granularity"
-                                            @confirm="handleCustomRangeModalConfirm"
+        <custom-date-range-modal v-if="customRangeModalVisible"
+                                 :visible.sync="customRangeModalVisible"
+                                 :granularity="costAnalysisPageState.granularity"
+                                 @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
@@ -40,9 +40,9 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Period, Granularity } from '@/services/cost-explorer/type';
+import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
 
 
 const today = dayjs.utc();
@@ -57,7 +57,7 @@ interface PeriodItem {
 export default {
     name: 'CostAnalysisPeriodSelectDropdown',
     components: {
-        CostManagementCustomRangeModal,
+        CustomDateRangeModal,
         PSelectDropdown,
         PBadge,
     },

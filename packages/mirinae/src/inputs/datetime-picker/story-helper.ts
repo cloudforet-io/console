@@ -55,21 +55,6 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    timezone: {
-        name: 'timezone',
-        type: { name: 'string' },
-        description: 'Timezone. It specifies the timezone of selected dates.',
-        defaultValue: 'UTC',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'UTC',
-            },
-        },
-    },
     minDate: {
         name: 'minDate',
         type: { name: 'string' },

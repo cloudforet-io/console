@@ -31,7 +31,6 @@ export const Template = (args, { argTypes }) => {
         <p-datetime-picker
             :selected-dates.sync="proxySelectedDates"
             :style-type="styleType"
-            :timezone="timezone"
             :min-date="minDate"
             :max-date="maxDate"
             :select-mode="selectMode"
@@ -61,10 +60,15 @@ export const Template = (args, { argTypes }) => {
 <br/>
 <br/>
 
+Datetime Picker does not use timezone. It only operates in UTC. <br/>
+If you want to set timezone, you need to set it in page which uses PDatetimePicker. <br/>
+
+<br/>
+<br/>
+
 It has three select modes and four data types. <br/>
 Depending on the data type, some select modes may not work. <br/>
 Please refer to the table below. <br/>
-<br/>
 
 | dataType\selectMode | single | multiple | range |
 | :-: | :-: | :-: | :-: |
@@ -146,40 +150,6 @@ Please refer to the table below. <br/>
 <br/>
 
 
-## Default With Timezone
-<Canvas>
-    <Story name="Default With Timezone">
-        {{
-            components: { PDatetimePicker },
-            i18n: I18nConnector.i18n,
-            template: `
-<div>
-    <p class="pb-2">UTC - {{ selectedUTCDates }}</p>
-    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="UTC" :selected-dates.sync="selectedUTCDates" /></div>
-    <p class="pb-2">Asia/Seoul (GMT+9) - {{ selectedSeoulDates }}</p>
-    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" /></div>
-    <p class="pb-2">America/New_York (GMT-4) - {{ selectedNewYorkDates }}</p>
-    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" /></div>
-</div>
-`,
-            setup() {
-                const state = reactive({
-                    selectedUTCDates: ['2021-10-01T00:00:00+09:00'],
-                    selectedSeoulDates: ['2021-10-01T10:00:00Z'],
-                    selectedNewYorkDates: ['2021-10-01T10:00:00-04:00'],
-                });
-                return {
-                    ...toRefs(state),
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-
 ## Default With MinDate and MaxDate
 <Canvas>
     <Story name="Default With MinDate and MaxDate">
@@ -190,29 +160,27 @@ Please refer to the table below. <br/>
 <div>
     <p class="py-2">Select dataType.</p>
     <p-select-dropdown v-model="selectedDataType" :items="menu"/>
-    <p class="py-2">Start Date</p>
-    <p-datetime-picker v-model="start" :max-date="(end && end[0]) || maxDate" :min-date="today" :data-type="selectedDataType" />
-    <p class="py-2">End Date</p>
-    <p-datetime-picker v-model="end" :min-date="(start && start[0]) || today" :max-date="maxDate" :data-type="selectedDataType" />
+    <p class="py-2">Min Date = Today</p>
+    <p-datetime-picker v-model="start" :min-date="now" :data-type="selectedDataType" />
+    <p class="py-2">Max Date = Today</p>
+    <p-datetime-picker v-model="end" :max-date="now" :data-type="selectedDataType" />
 </div>
 `,
     setup() {
         const state = reactive({
             menu: [
-                { name: 'yearToDate', label: 'yearToDate. (min: today, max: month later)' },
-                { name: 'yearToMonth', label: 'yearToMonth. (min: today, max: year later)' },
+                { name: 'yearToDate', label: 'yearToDate' },
+                { name: 'yearToMonth', label: 'yearToMonth' },
             ],
             selectedDataType: 'yearToDate',
             start: [],
             end: [],
-            today: dayjs().toISOString(),
-            monthLater: dayjs().add(1, 'month').toISOString(),
-            yearLater: dayjs().add(1, 'year').toISOString(),
-            maxDate: computed(() => {
-                if (state.selectedDataType === 'yearToDate') return state.monthLater
-                if (state.selectedDataType === 'yearToMonth') return state.yearLater
-                return state.monthLater
-            })
+            now: computed(() => {
+                if (state.selectedDataType === 'yearToDate') {
+                    return dayjs.utc().format('YYYY-MM-DD')
+                }
+                return dayjs.utc().format('YYYY-MM')
+            }),
         })
         watch(() => state.selectedDataType, () => {
             state.start = []

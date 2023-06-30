@@ -34,14 +34,18 @@ test.describe('Entire Workspace Dashboard', () => {
         });
 
         await test.step('5. Check the created dashboard', async () => {
-            const locatorScope = page.locator('.p-breadcrumbs > span:nth-child(2) .link');
-            const locatorName = page.locator('.lnb-menu-item .selected .text');
+            const locatorScope = await page.locator('.p-breadcrumbs > span:nth-child(2) .link');
+            const locatorName = await page.locator('.lnb-menu-item .selected .text');
 
             await expect(locatorScope).toContainText(' Workspace ');
             await expect(locatorName).toContainText(dashboardName);
+        });
 
-            // Todo: to be added
-            // await expect(locatorName).toContainText('public');
+        await test.step('6. Delete dashboard', async () => {
+            const deleteButton = await page.locator('.dashboard-title-icon-buttons-wrapper .delete-button');
+            await deleteButton.click();
+            await page.getByRole('button', { name: 'Confirm' }).click();
+            await expect(page).toHaveURL(/dashboards\/all/);
         });
     });
 });
