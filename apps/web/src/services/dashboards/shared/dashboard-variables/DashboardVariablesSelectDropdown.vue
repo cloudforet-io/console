@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-variable-selector">
+    <div class="dashboard-variables-select-dropdown">
         <template v-for="(propertyName, idx) in variableState.order">
             <dashboard-variables-dropdown v-if="variableState.variableProperties[propertyName]?.use"
                                           :key="`${propertyName}-${idx}`"
