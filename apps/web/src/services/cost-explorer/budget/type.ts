@@ -5,6 +5,7 @@ import type { Tags, TimeStamp } from '@/models';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
+
 interface BudgetPlannedLimit {
 	date: string;
 	limit: number;
@@ -105,3 +106,31 @@ export interface BudgetUsageAnalyzeRequestParam {
 	filter?: Query['filter'];
 	keyword?: Query['keyword'];
 }
+
+export interface Pagination {
+	pageStart: number;
+	pageLimit: number;
+}
+
+// budget-form types
+export interface BudgetAmountPlanInfo {
+	limit?: BudgetData['limit'];
+	planned_limits?: BudgetData['planned_limits'];
+	time_unit: BudgetData['time_unit'];
+	start: BudgetData['start'];
+	end: BudgetData['end'];
+}
+
+export interface AutofillOptions {
+	start?: number;
+	growth?: number;
+}
+
+export interface MonthAmountInput {
+	amount?: number;
+	isValid?: boolean;
+}
+
+export type MonthAmountInputMap = Record<string, MonthAmountInput>;
+
+export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>;

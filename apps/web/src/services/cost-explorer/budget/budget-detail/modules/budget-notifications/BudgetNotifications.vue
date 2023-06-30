@@ -1,113 +1,11 @@
-<template>
-    <div class="budget-notifications">
-        <p-card
-            style-type="gray100"
-            size="lg"
-        >
-            <template #header>
-                <section class="header">
-                    <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
-                    <p-icon-button v-if="hasBudgetAlert"
-                                   name="ic_delete"
-                                   :disabled="manageDisabled"
-                                   @click="handleDelete"
-                    />
-                </section>
-            </template>
-            <template #default>
-                <section class="card-body">
-                    <p-spinner v-if="isBudgetLoading"
-                               size="xl"
-                    />
-                    <template v-else-if="hasBudgetAlert">
-                        <article class="noti-condition">
-                            <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.CONDITION') }}</span>
-                            <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_1') }}</span>
-                            <ul class="condition-list">
-                                <li v-for="item in notifications"
-                                    :key="item.id"
-                                >
-                                    <span class="bullet">•</span>
-                                    <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray500' : 'alert'"
-                                             badge-type="solid-outline"
-                                             class="icon"
-                                    >
-                                        {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
-                                    </p-badge>
-                                    <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">
-                                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }} > ${{ commaFormatter(item.threshold) }}
-                                    </span>
-                                    <span v-else>% of budget > {{ item.threshold }}%</span>
-                                </li>
-                            </ul>
-                            <p-button style-type="tertiary"
-                                      icon-left="ic_settings-filled"
-                                      :disabled="manageDisabled || !budgetTargetId"
-                                      @click="handleSetNotifications"
-                            >
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
-                            </p-button>
-                        </article>
-                        <article class="noti-channel">
-                            <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
-                            <div class="desc-wrapper">
-                                <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
-                                <p-anchor v-if="budgetTargetId"
-                                          class="link-text"
-                                          :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                          :to="{
-                                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                                              params: {
-                                                  id: budgetTargetId
-                                              }
-                                          }"
-                                          highlight
-                                />
-                            </div>
-                            <budget-notifications-channel :project-id="budgetTargetId" />
-                        </article>
-                    </template>
-                    <template v-else>
-                        <div class="noti-not-set">
-                            <p class="desc">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
-                            </p>
-                            <p-button style-type="tertiary"
-                                      icon-left="ic_settings-filled"
-                                      :disabled="manageDisabled || !budgetTargetId"
-                                      @click="handleSetNotifications"
-                            >
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
-                            </p-button>
-                        </div>
-                    </template>
-                </section>
-            </template>
-        </p-card>
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
-                      :loading="checkDeleteState.loading"
-                      @confirm="handleDeleteForm"
-        />
-        <budget-notifications-modal v-if="budgetNotificationsModalVisible"
-                                    :visible.sync="budgetNotificationsModalVisible"
-                                    :budget-target-id="budgetTargetId"
-                                    @confirm="handleBudgetNotifications"
-        />
-    </div>
-</template>
+<script lang="ts" setup>
 
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
-
+import { commaFormatter } from '@cloudforet/core-lib';
 import {
     PAnchor, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@spaceone/design-system';
-
-import { commaFormatter } from '@cloudforet/core-lib';
-
-import { i18n } from '@/translations';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -122,90 +20,165 @@ import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-export default {
-    name: 'BudgetNotifications',
-    components: {
-        BudgetNotificationsModal,
-        BudgetNotificationsChannel,
-        PCard,
-        PIconButton,
-        PButton,
-        PAnchor,
-        PBadge,
-        DeleteModal,
-        PSpinner,
-    },
-    props: {
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.$state;
+interface Props {
+    manageDisabled: boolean;
+}
 
-        const state = reactive({
-            hasBudgetAlert: computed(() => {
-                const notifications = budgetPageState.budgetData?.notifications;
-                return notifications ? notifications.length > 0 : false;
-            }),
-            notifications: computed(() => {
-                const notifications = budgetPageState.budgetData?.notifications;
-                return notifications ? notifications.map((d) => ({ ...d, id: getUUID() })) : [];
-            }),
-            budgetNotificationsModalVisible: false,
-            budgetId: computed(() => budgetPageState.budgetData?.budget_id ?? ''),
-            budgetTargetId: computed(() => budgetPageState.budgetData?.project_id || undefined),
-            isBudgetLoading: computed(() => budgetPageState.loading),
-        });
+withDefaults(defineProps<Props>(), {
+    manageDisabled: false,
+});
 
-        const checkDeleteState = reactive({
-            visible: false,
-            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_MODAL_TITLE')),
-            loading: false,
-        });
-        const handleDelete = () => {
-            checkDeleteState.visible = true;
-        };
-        const handleDeleteForm = async () => {
-            try {
-                checkDeleteState.loading = true;
-                await budgetPageStore.updateBudgetNotifications({
-                    budgetId: state.budgetId,
-                    notifications: [],
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                checkDeleteState.loading = false;
-                checkDeleteState.visible = false;
-            }
-        };
+const { t } = useI18n();
 
-        const handleSetNotifications = () => {
-            state.budgetNotificationsModalVisible = true;
-        };
+const budgetPageStore = useBudgetPageStore();
+const budgetPageState = budgetPageStore.$state;
 
-        const handleBudgetNotifications = () => {
-            state.budgetNotificationsModalVisible = false;
-        };
+const state = reactive({
+    hasBudgetAlert: computed(() => {
+        const notifications = budgetPageState.budgetData?.notifications;
+        return notifications ? notifications.length > 0 : false;
+    }),
+    notifications: computed(() => {
+        const notifications = budgetPageState.budgetData?.notifications;
+        return notifications ? notifications.map((d) => ({ ...d, id: getUUID() })) : [];
+    }),
+    budgetNotificationsModalVisible: false,
+    budgetId: computed(() => budgetPageState.budgetData?.budget_id ?? ''),
+    budgetTargetId: computed(() => budgetPageState.budgetData?.project_id || undefined),
+    isBudgetLoading: computed(() => budgetPageState.loading),
+});
 
-        return {
-            ...toRefs(state),
-            checkDeleteState,
-            handleDelete,
-            handleDeleteForm,
-            handleSetNotifications,
-            handleBudgetNotifications,
-            commaFormatter,
-            BUDGET_NOTIFICATIONS_UNIT,
-            BUDGET_NOTIFICATIONS_TYPE,
-            PROJECT_ROUTE,
-        };
-    },
+const checkDeleteState = reactive({
+    visible: false,
+    headerTitle: computed(() => t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DELETE_MODAL_TITLE')),
+    loading: false,
+});
+const handleDelete = () => {
+    checkDeleteState.visible = true;
 };
+const handleDeleteForm = async () => {
+    try {
+        checkDeleteState.loading = true;
+        await budgetPageStore.updateBudgetNotifications({
+            budgetId: state.budgetId,
+            notifications: [],
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        checkDeleteState.loading = false;
+        checkDeleteState.visible = false;
+    }
+};
+
+const handleSetNotifications = () => {
+    state.budgetNotificationsModalVisible = true;
+};
+
+const handleBudgetNotifications = () => {
+    state.budgetNotificationsModalVisible = false;
+};
+
 </script>
+
+<template>
+    <div class="budget-notifications">
+        <p-card
+            style-type="gray100"
+            size="lg"
+        >
+            <template #header>
+                <section class="header">
+                    <span class="title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
+                    <p-icon-button v-if="state.hasBudgetAlert"
+                                   name="ic_delete"
+                                   :disabled="manageDisabled"
+                                   @click="handleDelete"
+                    />
+                </section>
+            </template>
+            <template #default>
+                <section class="card-body">
+                    <p-spinner v-if="state.isBudgetLoading"
+                               size="xl"
+                    />
+                    <template v-else-if="state.hasBudgetAlert">
+                        <article class="noti-condition">
+                            <span class="sub-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.CONDITION') }}</span>
+                            <span class="desc">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_1') }}</span>
+                            <ul class="condition-list">
+                                <li v-for="item in state.notifications"
+                                    :key="item.id"
+                                >
+                                    <span class="bullet">•</span>
+                                    <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray500' : 'alert'"
+                                             badge-type="solid-outline"
+                                             class="icon"
+                                    >
+                                        {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
+                                    </p-badge>
+                                    <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">
+                                        {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }} > ${{ commaFormatter(item.threshold) }}
+                                    </span>
+                                    <span v-else>% of budget > {{ item.threshold }}%</span>
+                                </li>
+                            </ul>
+                            <p-button style-type="tertiary"
+                                      icon-left="ic_settings-filled"
+                                      :disabled="manageDisabled || !state.budgetTargetId"
+                                      @click="handleSetNotifications"
+                            >
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
+                            </p-button>
+                        </article>
+                        <article class="noti-channel">
+                            <span class="sub-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
+                            <div class="desc-wrapper">
+                                <span class="desc">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
+                                <p-anchor v-if="state.budgetTargetId"
+                                          class="link-text"
+                                          :text="t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
+                                          :to="{
+                                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                              params: {
+                                                  id: state.budgetTargetId
+                                              }
+                                          }"
+                                          highlight
+                                />
+                            </div>
+                            <budget-notifications-channel :project-id="state.budgetTargetId" />
+                        </article>
+                    </template>
+                    <template v-else>
+                        <div class="noti-not-set">
+                            <p class="desc">
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
+                            </p>
+                            <p-button style-type="tertiary"
+                                      icon-left="ic_settings-filled"
+                                      :disabled="manageDisabled || !state.budgetTargetId"
+                                      @click="handleSetNotifications"
+                            >
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}
+                            </p-button>
+                        </div>
+                    </template>
+                </section>
+            </template>
+        </p-card>
+        <delete-modal v-model:visible="checkDeleteState.visible"
+                      :header-title="checkDeleteState.headerTitle"
+                      :loading="checkDeleteState.loading"
+                      @confirm="handleDeleteForm"
+        />
+        <budget-notifications-modal v-if="state.budgetNotificationsModalVisible"
+                                    v-model:visible="state.budgetNotificationsModalVisible"
+                                    :budget-target-id="state.budgetTargetId"
+                                    @confirm="handleBudgetNotifications"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-card */

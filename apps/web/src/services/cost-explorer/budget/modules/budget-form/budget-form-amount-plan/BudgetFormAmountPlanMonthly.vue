@@ -1,15 +1,132 @@
+<script lang="ts" setup>
+
+import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import {
+    computed,
+    reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import BudgetFormAmountPlanAutofillModal
+    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
+import BudgetFormAmountPlanMonthInput
+    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
+import type { AutofillOptions, MonthAmountInputMap, MonthAmountInput } from '@/services/cost-explorer/budget/type';
+import type { Period } from '@/services/cost-explorer/type';
+
+interface Props {
+    period: Period;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    period: () => ({}) as Period,
+});
+const emit = defineEmits<{(e: 'update', info: MonthAmountInputMap, valid: boolean): void}>();
+const { t } = useI18n();
+
+const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
+    const months: string[] = [];
+    let _month = month;
+    while (_month.isSameOrBefore(monthEnd, 'month')) {
+        months.push(dayjs.utc(_month).locale('en').format('YYYY-MM'));
+        _month = _month.add(1, 'month');
+    }
+    return months;
+};
+
+const state = reactive({
+    months: computed<string[]>(() => {
+        const { start, end } = props.period;
+        if (!start || !end) return [];
+
+        const month = dayjs.utc(start as string);
+        const monthEnd = dayjs.utc(end as string);
+
+        return getAllMonths(month, monthEnd);
+    }),
+    monthAmountInputMap: {} as MonthAmountInputMap,
+    // autofill
+    visibleAutofillModal: false,
+    autofillOptions: null as AutofillOptions|null,
+    // validation
+    isAllValid: computed<boolean>(() => {
+        const items = Object.values(state.monthAmountInputMap) as MonthAmountInput[];
+        return items.every(({ isValid }) => !!isValid);
+    }),
+});
+
+const getAutofillAmount = (index: number, { start, growth }: AutofillOptions) => {
+    const amount = start ?? 0;
+    const growthAmount = growth ? amount / 100 * growth : 0;
+    return amount + (growthAmount * index);
+};
+
+const fillAmountMapWithOptions = (options: AutofillOptions) => {
+    Object.keys(state.monthAmountInputMap).forEach((month, index) => {
+        state.monthAmountInputMap[month].amount = getAutofillAmount(index, options);
+        state.monthAmountInputMap[month].isValid = true;
+    });
+};
+
+const initAmountInputMapWithMonths = (months: string[]) => {
+    const amountMap: MonthAmountInputMap = {};
+    months.forEach((month, index) => {
+        if (state.autofillOptions) {
+            amountMap[month] = {
+                amount: getAutofillAmount(index, state.autofillOptions),
+                isValid: true,
+            };
+        } else {
+            amountMap[month] = {
+                amount: index === 0 ? 1000 : undefined,
+                isValid: index === 0,
+            };
+        }
+    });
+    state.monthAmountInputMap = amountMap;
+};
+
+/* Handlers */
+const handleAutofillButtonClick = () => {
+    state.visibleAutofillModal = true;
+};
+
+const handleAutofillConfirm = (options: AutofillOptions) => {
+    state.autofillOptions = options;
+
+    fillAmountMapWithOptions(options);
+};
+
+const handleUpdateMonthInput = (month: string, { amount, isValid }: MonthAmountInput) => {
+    state.monthAmountInputMap[month].amount = amount;
+    state.monthAmountInputMap[month].isValid = isValid;
+};
+
+/* Watchers */
+watch(() => state.months, (months) => {
+    initAmountInputMapWithMonths(months);
+}, { immediate: true });
+
+watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
+    emit('update', monthAmountInputMap, state.isAllValid);
+}, { deep: true });
+
+</script>
+
 <template>
     <div class="budget-form-amount-plan-monthly">
         <div class="header">
             <div class="title">
                 <p>
-                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
+                    <p-field-title>{{ t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
                 </p>
             </div>
             <p-button style-type="tertiary"
                       @click="handleAutofillButtonClick"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
+                {{ t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
         <slot name="last-3-months" />
@@ -24,149 +141,12 @@
                                                  @update="handleUpdateMonthInput(month, $event)"
             />
         </div>
-        <budget-form-amount-plan-autofill-modal v-model="visibleAutofillModal"
+        <budget-form-amount-plan-autofill-modal v-model="state.visibleAutofillModal"
                                                 @confirm="handleAutofillConfirm"
         />
     </div>
 </template>
 
-<script lang="ts">
-
-import {
-    computed,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
-
-import type { AutofillOptions } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
-import BudgetFormAmountPlanAutofillModal
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
-import type { MonthAmountInput } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
-import BudgetFormAmountPlanMonthInput
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
-import type { Period } from '@/services/cost-explorer/type';
-
-interface Props {
-    period: Period;
-}
-
-export type MonthAmountInputMap = Record<string, MonthAmountInput>;
-
-export default {
-    name: 'BudgetFormAmountPlanMonthly',
-    components: {
-        BudgetFormAmountPlanAutofillModal,
-        BudgetFormAmountPlanMonthInput,
-        PFieldTitle,
-        PButton,
-        PDivider,
-    },
-    props: {
-        period: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props: Props, { emit }) {
-        const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
-            const months: string[] = [];
-            let _month = month;
-            while (_month.isSameOrBefore(monthEnd, 'month')) {
-                months.push(dayjs.utc(_month).locale('en').format('YYYY-MM'));
-                _month = _month.add(1, 'month');
-            }
-            return months;
-        };
-
-        const state = reactive({
-            months: computed<string[]>(() => {
-                const { start, end } = props.period;
-                if (!start || !end) return [];
-
-                const month = dayjs.utc(start as string);
-                const monthEnd = dayjs.utc(end as string);
-
-                return getAllMonths(month, monthEnd);
-            }),
-            monthAmountInputMap: {} as MonthAmountInputMap,
-            // autofill
-            visibleAutofillModal: false,
-            autofillOptions: null as AutofillOptions|null,
-            // validation
-            isAllValid: computed<boolean>(() => {
-                const items = Object.values(state.monthAmountInputMap) as MonthAmountInput[];
-                return items.every(({ isValid }) => !!isValid);
-            }),
-        });
-
-        const getAutofillAmount = (index: number, { start, growth }: AutofillOptions) => {
-            const amount = start ?? 0;
-            const growthAmount = growth ? amount / 100 * growth : 0;
-            return amount + (growthAmount * index);
-        };
-
-        const fillAmountMapWithOptions = (options: AutofillOptions) => {
-            Object.keys(state.monthAmountInputMap).forEach((month, index) => {
-                state.monthAmountInputMap[month].amount = getAutofillAmount(index, options);
-                state.monthAmountInputMap[month].isValid = true;
-            });
-        };
-
-        const initAmountInputMapWithMonths = (months: string[]) => {
-            const amountMap: MonthAmountInputMap = {};
-            months.forEach((month, index) => {
-                if (state.autofillOptions) {
-                    amountMap[month] = {
-                        amount: getAutofillAmount(index, state.autofillOptions),
-                        isValid: true,
-                    };
-                } else {
-                    amountMap[month] = {
-                        amount: index === 0 ? 1000 : undefined,
-                        isValid: index === 0,
-                    };
-                }
-            });
-            state.monthAmountInputMap = amountMap;
-        };
-
-        /* Handlers */
-        const handleAutofillButtonClick = () => {
-            state.visibleAutofillModal = true;
-        };
-
-        const handleAutofillConfirm = (options: AutofillOptions) => {
-            state.autofillOptions = options;
-
-            fillAmountMapWithOptions(options);
-        };
-
-        const handleUpdateMonthInput = (month: string, { amount, isValid }: MonthAmountInput) => {
-            state.monthAmountInputMap[month].amount = amount;
-            state.monthAmountInputMap[month].isValid = isValid;
-        };
-
-        /* Watchers */
-        watch(() => state.months, (months) => {
-            initAmountInputMapWithMonths(months);
-        }, { immediate: true });
-
-        watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
-            emit('update', monthAmountInputMap, state.isAllValid);
-        }, { deep: true });
-
-        return {
-            ...toRefs(state),
-            handleAutofillButtonClick,
-            handleAutofillConfirm,
-            handleUpdateMonthInput,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .budget-form-amount-plan-monthly {
     max-width: 87rem;

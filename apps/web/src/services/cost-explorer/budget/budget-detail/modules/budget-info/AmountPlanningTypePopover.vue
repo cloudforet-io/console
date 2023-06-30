@@ -1,3 +1,33 @@
+<script lang="ts" setup>
+
+import { PPopover } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { computed, reactive } from 'vue';
+import { useStore } from 'vuex';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import type { BudgetData } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+
+interface Props {
+    budgetData: BudgetData;
+}
+
+withDefaults(defineProps<Props>(), {
+    budgetData: () => ({}) as BudgetData,
+});
+
+const store = useStore();
+
+const state = reactive({
+    currency: computed(() => store.state.display.currency),
+    currencyRates: computed(() => store.state.display.currencyRates),
+});
+const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
+
+</script>
+
 <template>
     <p-popover class="amount-planning-type-popover"
                position="bottom-end"
@@ -8,7 +38,7 @@
                  class="total-wrapper"
             >
                 <p class="total-data">
-                    {{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates, false, 1000000000) }}
+                    {{ currencyMoneyFormatter(budgetData.limit, state.currency, state.currencyRates, false, 1000000000) }}
                 </p>
             </div>
             <template v-else>
@@ -22,7 +52,7 @@
                                 {{ dateFormatter(date) }}
                             </span>
                             <br>
-                            <span>{{ currencyMoneyFormatter(limit, currency, currencyRates, false, 1000000000) }}</span>
+                            <span>{{ currencyMoneyFormatter(limit, state.currency, state.currencyRates, false, 1000000000) }}</span>
                         </span>
                     </p>
                 </div>
@@ -30,48 +60,6 @@
         </template>
     </p-popover>
 </template>
-
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
-
-import { PPopover } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { store } from '@/store';
-
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-
-import type { BudgetData } from '@/services/cost-explorer/budget/type';
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
-
-export default {
-    name: 'AmountPlanningTypePopover',
-    components: {
-        PPopover,
-    },
-    props: {
-        budgetData: {
-            type: Object as () => BudgetData,
-            default: () => ({}),
-        },
-    },
-
-    setup() {
-        const state = reactive({
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
-        });
-        const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
-        return {
-            ...toRefs(state),
-            BUDGET_TIME_UNIT,
-            dateFormatter,
-            currencyMoneyFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-popover */

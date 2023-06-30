@@ -1,5 +1,35 @@
+<script lang="ts" setup>
+import { PButtonModal } from '@spaceone/design-system';
+import {
+    reactive, watch,
+} from 'vue';
+
+interface Props {
+    visible: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
+
+const state = reactive({
+    proxyVisible: props.visible,
+});
+
+const handleConfirm = () => {};
+
+const handleUpdateVisible = (visible) => {
+    state.proxyVisible = visible;
+    emit('update:visible', visible);
+};
+
+watch(() => props.visible, (visible) => {
+    if (visible !== state.proxyVisible) state.proxyVisible = visible;
+});
+
+</script>
+
 <template>
-    <p-button-modal :visible="proxyVisible"
+    <p-button-modal :visible="state.proxyVisible"
                     header-title="Bulk Create Budget"
                     :disabled="false"
                     size="lg"
@@ -11,55 +41,3 @@
         </template>
     </p-button-modal>
 </template>
-
-<script lang="ts">
-import {
-    defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import { PButtonModal } from '@spaceone/design-system';
-
-interface Props {
-    visible: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'BudgetBulkCreateModal',
-    components: {
-        PButtonModal,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            required: true,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyVisible: props.visible,
-        });
-
-        const handleConfirm = () => {};
-
-        const handleUpdateVisible = (visible) => {
-            state.proxyVisible = visible;
-            emit('update:visible', visible);
-        };
-
-        watch(() => props.visible, (visible) => {
-            if (visible !== state.proxyVisible) state.proxyVisible = visible;
-        });
-
-        return {
-            ...toRefs(state),
-            handleConfirm,
-            handleUpdateVisible,
-        };
-    },
-});
-</script>

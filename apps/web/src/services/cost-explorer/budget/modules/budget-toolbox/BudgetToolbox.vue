@@ -1,13 +1,209 @@
+<script lang="ts" setup>
+import {
+    makeDistinctValueHandler,
+    makeReferenceValueHandler,
+} from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import {
+    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
+} from '@spaceone/design-system';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import dayjs from 'dayjs';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+
+import { useQueryTags } from '@/common/composables/query-tags';
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
+
+import BudgetToolboxUsageRange
+    from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
+import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange, Pagination } from '@/services/cost-explorer/budget/type';
+import type { Period } from '@/services/cost-explorer/type';
+
+
+
+
+type I18nSelectDropdownMenu = SelectDropdownMenu | {
+    label: string | TranslateResult;
+};
+
+type Sort = BudgetUsageAnalyzeRequestParam['sort'];
+
+interface Props {
+    filters: ConsoleFilter[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    filters: () => ([]),
+});
+const emit = defineEmits<{(e: 'update-range', value: BudgetUsageRange): void;
+    (e: 'update-pagination', value: Pagination): void;
+    (e: 'update-period', value: Period): void;
+    (e: 'update-filters', value: ConsoleFilter[]): void;
+    (e: 'update-sort', value: Sort): void;
+    (e: 'refresh'): void;
+    (e: 'export'): void;
+}>();
+const store = useStore();
+const { t } = useI18n();
+
+const pageSizeOptions = [12, 24, 36];
+
+const storeState = reactive({
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+});
+
+const handlerState = reactive({
+    keyItemSets: computed<KeyItemSet[]>(() => [{
+        title: 'Properties',
+        items: [
+            { name: 'budget_id', label: 'Budget ID' },
+            { name: 'name', label: 'Name' },
+            { name: 'project_id', label: 'Project', valueSet: storeState.projects },
+            { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
+            { name: 'time_unit', label: 'Time Unit' },
+            { name: 'cost_types.provider', label: '[Cost Type] Provider' },
+            { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account', valueSet: storeState.serviceAccounts },
+            { name: 'cost_types.region_code', label: '[Cost Type] Region' },
+            { name: 'cost_types.product', label: '[Cost Type] Product' },
+        ],
+    }]),
+    valueHandlerMap: {
+        budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
+        name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+        project_id: makeReferenceValueHandler('identity.Project'),
+        project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
+        time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
+        'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
+        'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
+        'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
+        'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
+    } as ValueHandlerMap,
+});
+
+const queryTagsHelper = useQueryTags({
+    referenceStore: {},
+    keyItemSets: handlerState.keyItemSets,
+});
+
+const state = reactive({
+    selectedPeriod: ['total'] as string[],
+    periodList: computed(() => [
+        { name: 'total', label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
+        { name: 'thisMonth', label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },
+    ]),
+    pageStart: 1,
+    pageLimit: 24,
+    // query
+    range: {} as BudgetUsageRange,
+    pagination: computed<Pagination>(() => ({
+        pageStart: state.pageStart,
+        pageLimit: state.pageLimit,
+    })),
+    period: computed<Period>(() => {
+        const period: Period = {};
+
+        if (state.selectedPeriod[0] === 'thisMonth') {
+            period.start = dayjs.utc().format('YYYY-MM');
+            period.end = dayjs.utc().format('YYYY-MM-DD');
+        }
+
+        return period;
+    }),
+    sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'usd_cost' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
+    ])),
+    sortDesc: true,
+    selectedSortKey: 'usage',
+    sort: computed<Sort>(() => ({
+        key: state.selectedSortKey,
+        desc: state.sortDesc,
+    })),
+    queryTags: computed(() => queryTagsHelper.queryTags.value),
+});
+
+/* Handlers */
+const handleUpdateUsageRange = (range: BudgetUsageRange) => {
+    state.range = range;
+};
+
+const handleSelectStatus = (selected: string[]) => {
+    state.selectedPeriod = selected;
+};
+
+const handleChangeToolbox = async (options: ToolboxOptions) => {
+    if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+};
+
+const handleSortType = () => {
+    state.sortDesc = !state.sortDesc;
+};
+
+const handleRefresh = () => {
+    emit('refresh');
+};
+
+const handleExport = () => {
+    emit('export');
+};
+
+/* Watchers */
+watch(() => state.range, (range) => {
+    emit('update-range', range);
+});
+watch(() => state.pagination, (pagination) => {
+    emit('update-pagination', pagination);
+});
+watch(() => state.period, (period) => {
+    emit('update-period', period);
+});
+watch(queryTagsHelper.filters, (filters) => {
+    emit('update-filters', filters);
+});
+watch(() => props.filters, (filters) => {
+    if (filters !== queryTagsHelper.filters.value) {
+        queryTagsHelper.setFilters(filters);
+    }
+});
+watch(() => state.sort, (sort) => { emit('update-sort', sort); });
+
+(async () => {
+    // LOAD REFERENCE STORE
+    await Promise.allSettled([
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/projectGroup/load'),
+        store.dispatch('reference/serviceAccount/load'),
+    ]);
+})();
+
+</script>
+
 <template>
     <div class="budget-toolbox">
         <div class="top">
             <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
             <p-divider :vertical="true" />
             <div class="period-box">
-                <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
-                <p-select-status v-for="(status, idx) in periodList"
+                <span class="label">{{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
+                <p-select-status v-for="(status, idx) in state.periodList"
                                  :key="idx"
-                                 :selected="selectedPeriod"
+                                 :selected="state.selectedPeriod"
                                  :value="status.name"
                                  :multi-selectable="false"
                                  @change="handleSelectStatus"
@@ -25,25 +221,25 @@
                    filters-visible
                    :page-size-options="pageSizeOptions"
                    :page-size="24"
-                   :query-tags="queryTags"
+                   :query-tags="state.queryTags"
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
                    @change="handleChangeToolbox"
-                   @refresh="$emit('refresh')"
-                   @export="$emit('export')"
+                   @refresh="handleRefresh"
+                   @export="handleExport"
         >
             <template #left-area>
                 <div class="left-area">
                     <p-select-dropdown
-                        :items="sortKeyList"
-                        :selected.sync="selectedSortKey"
+                        v-model:selected="state.selectedSortKey"
+                        :items="state.sortKeyList"
                     />
                     <p-button class="sort-box"
                               style-type="tertiary"
                               :icon-left="sort.desc ? 'ic_arrow-down-bold' : 'ic_arrow-up-bold'"
                               @click="handleSortType"
                     >
-                        <span>{{ sort.desc ? $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
+                        <span>{{ sort.desc ? t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
                     </p-button>
                 </div>
             </template>
@@ -51,207 +247,6 @@
     </div>
 </template>
 
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import {
-    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import dayjs from 'dayjs';
-
-import {
-    makeDistinctValueHandler,
-    makeReferenceValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-
-import { useQueryTags } from '@/common/composables/query-tags';
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
-
-import BudgetToolboxUsageRange
-    from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
-import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
-import type { Period } from '@/services/cost-explorer/type';
-
-export interface Pagination {
-    pageStart: number;
-    pageLimit: number;
-}
-
-type I18nSelectDropdownMenu = SelectDropdownMenu | {
-    label: string | TranslateResult;
-};
-
-type Sort = BudgetUsageAnalyzeRequestParam['sort'];
-export default {
-    name: 'BudgetToolbox',
-    components: {
-        CurrencySelectDropdown,
-        BudgetToolboxUsageRange,
-        PToolbox,
-        PSelectStatus,
-        PSelectDropdown,
-        PButton,
-        PDivider,
-    },
-    props: {
-        filters: {
-            type: Array,
-            default: () => [],
-        },
-    },
-    setup(props, { emit }) {
-        const pageSizeOptions = [12, 24, 36];
-
-        const storeState = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-        });
-
-        const handlerState = reactive({
-            keyItemSets: computed<KeyItemSet[]>(() => [{
-                title: 'Properties',
-                items: [
-                    { name: 'budget_id', label: 'Budget ID' },
-                    { name: 'name', label: 'Name' },
-                    { name: 'project_id', label: 'Project', valueSet: storeState.projects },
-                    { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
-                    { name: 'time_unit', label: 'Time Unit' },
-                    { name: 'cost_types.provider', label: '[Cost Type] Provider' },
-                    { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account', valueSet: storeState.serviceAccounts },
-                    { name: 'cost_types.region_code', label: '[Cost Type] Region' },
-                    { name: 'cost_types.product', label: '[Cost Type] Product' },
-                ],
-            }]),
-            valueHandlerMap: {
-                budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
-                name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
-                project_id: makeReferenceValueHandler('identity.Project'),
-                project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
-                time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
-                'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
-                'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
-                'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
-                'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
-            } as ValueHandlerMap,
-        });
-
-        const queryTagsHelper = useQueryTags({
-            referenceStore: {},
-            keyItemSets: handlerState.keyItemSets,
-        });
-
-        const state = reactive({
-            selectedPeriod: ['total'] as string[],
-            periodList: computed(() => [
-                { name: 'total', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
-                { name: 'thisMonth', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },
-            ]),
-            pageStart: 1,
-            pageLimit: 24,
-            // query
-            range: {} as BudgetUsageRange,
-            pagination: computed<Pagination>(() => ({
-                pageStart: state.pageStart,
-                pageLimit: state.pageLimit,
-            })),
-            period: computed<Period>(() => {
-                const period: Period = {};
-
-                if (state.selectedPeriod[0] === 'thisMonth') {
-                    period.start = dayjs.utc().format('YYYY-MM');
-                    period.end = dayjs.utc().format('YYYY-MM-DD');
-                }
-
-                return period;
-            }),
-            sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
-                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'usd_cost' },
-                { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
-            ])),
-            sortDesc: true,
-            selectedSortKey: 'usage',
-            sort: computed<Sort>(() => ({
-                key: state.selectedSortKey,
-                desc: state.sortDesc,
-            })),
-        });
-
-        /* Handlers */
-        const handleUpdateUsageRange = (range: BudgetUsageRange) => {
-            state.range = range;
-        };
-
-        const handleSelectStatus = (selected: string[]) => {
-            state.selectedPeriod = selected;
-        };
-
-        const handleChangeToolbox = async (options: ToolboxOptions) => {
-            if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
-            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
-            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-        };
-
-        const handleSortType = () => {
-            state.sortDesc = !state.sortDesc;
-        };
-
-        /* Watchers */
-        watch(() => state.range, (range) => {
-            emit('update-range', range);
-        });
-        watch(() => state.pagination, (pagination) => {
-            emit('update-pagination', pagination);
-        });
-        watch(() => state.period, (period) => {
-            emit('update-period', period);
-        });
-        watch(queryTagsHelper.filters, (filters) => {
-            emit('update-filters', filters);
-        });
-        watch(() => props.filters, (filters) => {
-            if (filters !== queryTagsHelper.filters.value) {
-                queryTagsHelper.setFilters(filters);
-            }
-        });
-        watch(() => state.sort, (sort) => { emit('update-sort', sort); });
-
-        (async () => {
-            // LOAD REFERENCE STORE
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/serviceAccount/load'),
-            ]);
-        })();
-
-        return {
-            queryTags: computed(() => queryTagsHelper.queryTags.value),
-            ...toRefs(state),
-            pageSizeOptions,
-            handlerState,
-            handleUpdateUsageRange,
-            handleSelectStatus,
-            handleChangeToolbox,
-            handleSortType,
-        };
-    },
-};
-</script>
 <style scoped lang="postcss">
 .budget-toolbox {
     @apply flex flex-wrap flex-col gap-4;

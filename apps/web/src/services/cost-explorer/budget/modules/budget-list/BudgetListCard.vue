@@ -1,109 +1,13 @@
-<template>
-    <router-link :to="linkLocation"
-                 class="budget-list-card"
-    >
-        <div v-if="budgetLoading"
-             class="skeleton-wrapper"
-        >
-            <div class="top">
-                <p-skeleton width="30%"
-                            height="1rem"
-                />
-                <p-skeleton width="23%"
-                            height="1.5rem"
-                />
-            </div>
-            <p-skeleton width="40%"
-                        height="1rem"
-            />
-        </div>
-        <div v-else
-             class="card-wrapper"
-        >
-            <div class="card-header">
-                <div class="flex items-center mb-1">
-                    <span v-for="(name, index) in projects"
-                          :key="name"
-                          class="project-info"
-                          :class="{target: index === projects.length - 1}"
-                    >
-                        <p-i v-if="index === projects.length - 1"
-                             :name="isProject ? 'ic_document-filled' : 'ic_folder-filled'"
-                             color="inherit"
-                             width="1em"
-                             height="1em"
-                             class="mr-1"
-                        />
-                        {{ name }}
-                        <p-i v-if="index < projects.length - 1"
-                             name="ic_chevron-left-thin"
-                             width="1em"
-                             height="1em"
-                        />
-                    </span>
-                </div>
-                <p class="budget-name">
-                    {{ budgetUsage.name }}
-                </p>
-            </div>
-            <p-divider />
-            <div class="card-body">
-                <div class="budget-progress">
-                    <div class="label-wrapper">
-                        <div class="label-left">
-                            <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
-                            </p>
-                            <div class="amount-used-wrapper"
-                                 :class="progressStatus"
-                            >
-                                <span class="cost">{{ currencyMoneyFormatter(cost, storeState.currency, storeState.currencyRates) }}</span>
-                                <span class="percent">(<template v-if="percentage < 0">0.00</template>
-                                    <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
-                            </div>
-                        </div>
-                        <div class="label-right">
-                            <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
-                            </p>
-                            <div class="cost">
-                                {{ currencyMoneyFormatter(limit, storeState.currency, storeState.currencyRates) }}
-                            </div>
-                        </div>
-                    </div>
-                    <budget-usage-progress-bar :usage-rate="percentage" />
-                </div>
-                <div class="budget-description">
-                    <div class="cost-type-wrapper">
-                        <div class="label">
-                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
-                        </div>
-                        <div class="cost-type">
-                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap"
-                                  :key="costTypeLabel"
-                                  class="truncate"
-                            >
-                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </router-link>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
-
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -135,120 +39,197 @@ type CostTypeResourceListMap = Record<string, {
     resourceList: string[];
 }>;
 
-export default {
-    name: 'BudgetListCard',
-    components: {
-        PI,
-        PDivider,
-        PSkeleton,
-        BudgetUsageProgressBar,
-    },
-    props: {
-        budgetUsage: {
-            type: Object,
-            default: () => ({}),
+const props = withDefaults(defineProps<Props>(), {
+    budgetUsage: () => ({}) as BudgetUsageData,
+    budgetLoading: true,
+});
+
+const store = useStore();
+const { t } = useI18n();
+
+const storeState = reactive({
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    currency: computed(() => store.state.display.currency),
+    currencyRates: computed(() => store.state.display.currencyRates),
+});
+const state = reactive({
+    linkLocation: computed<RouteLocation>(() => ({
+        name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+        params: {
+            budgetId: props.budgetUsage.budget_id,
+        } as RouteLocation['params'],
+    } as RouteLocation)),
+    isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
+    projects: computed(() => {
+        const projects: string[] = [];
+        if (state.isProject) {
+            const projectId = props.budgetUsage.project_id as string;
+            const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
+            if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
+            projects.push(project?.name ?? projectId);
+        } else {
+            const projectGroupId = props.budgetUsage.project_group_id as string;
+            const projectGroup: ProjectGroupReferenceItem|undefined = storeState.projectGroups[projectGroupId];
+            if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
+            projects.push(projectGroup?.name ?? projectGroupId);
+        }
+        return projects;
+    }),
+    resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
+        provider: {
+            label: 'Provider',
+            items: storeState.providers,
         },
-        budgetLoading: {
-            type: Boolean,
-            default: true,
+        region_code: {
+            label: 'Region',
+            items: storeState.regions,
         },
-    },
-    setup(props: Props) {
-        const storeState = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
-        });
-        const state = reactive({
-            linkLocation: computed<RouteLocation>(() => ({
-                name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
-                params: {
-                    budgetId: props.budgetUsage.budget_id,
-                },
-            })),
-            isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
-            projects: computed(() => {
-                const projects: string[] = [];
-                if (state.isProject) {
-                    const projectId = props.budgetUsage.project_id as string;
-                    const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
-                    if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
-                    projects.push(project?.name ?? projectId);
-                } else {
-                    const projectGroupId = props.budgetUsage.project_group_id as string;
-                    const projectGroup: ProjectGroupReferenceItem|undefined = storeState.projectGroups[projectGroupId];
-                    if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
-                    projects.push(projectGroup?.name ?? projectGroupId);
-                }
-                return projects;
-            }),
-            resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
-                provider: {
-                    label: 'Provider',
-                    items: storeState.providers,
-                },
-                region_code: {
-                    label: 'Region',
-                    items: storeState.regions,
-                },
-                service_account_id: {
-                    label: 'Service Account',
-                    items: storeState.serviceAccounts,
-                },
-            })),
-            costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
-                const costTypes = props.budgetUsage.cost_types;
+        service_account_id: {
+            label: 'Service Account',
+            items: storeState.serviceAccounts,
+        },
+    })),
+    costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
+        const costTypes = props.budgetUsage.cost_types;
 
-                if (!costTypes) return {};
+        if (!costTypes) return {};
 
-                const costTypeResourceListMap: CostTypeResourceListMap = {};
-                Object.entries(costTypes).forEach(([costType, resources]) => {
-                    if (Array.isArray(resources) && resources.length) {
-                        const resource = state.resourceItemMap[costType];
+        const costTypeResourceListMap: CostTypeResourceListMap = {};
+        Object.entries(costTypes).forEach(([costType, resources]) => {
+            if (Array.isArray(resources) && resources.length) {
+                const resource = state.resourceItemMap[costType];
 
-                        costTypeResourceListMap[costType] = {
-                            costTypeLabel: resource?.label ?? costType,
-                            resourceList: resources.map((d) => (resource?.items[d]?.name ?? d)),
-                        };
-                    }
-                });
-
-                return costTypeResourceListMap;
-            }),
-            cost: computed<number>(() => props.budgetUsage.usd_cost ?? 0),
-            limit: computed<number>(() => props.budgetUsage.limit ?? 0),
-            percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
-            progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
-                if (state.percentage >= 100) return 'overspent';
-                if (state.percentage >= 90) return 'warning';
-                if (state.percentage === 0) return 'unused';
-                return 'common';
-            }),
+                costTypeResourceListMap[costType] = {
+                    costTypeLabel: resource?.label ?? costType,
+                    resourceList: resources.map((d) => (resource?.items[d]?.name ?? d)),
+                };
+            }
         });
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/serviceAccount/load'),
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/region/load'),
-                store.dispatch('reference/provider/load'),
-            ]);
-        })();
+        return costTypeResourceListMap;
+    }),
+    cost: computed<number>(() => props.budgetUsage.usd_cost ?? 0),
+    limit: computed<number>(() => props.budgetUsage.limit ?? 0),
+    percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
+    progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
+        if (state.percentage >= 100) return 'overspent';
+        if (state.percentage >= 90) return 'warning';
+        if (state.percentage === 0) return 'unused';
+        return 'common';
+    }),
+});
 
-        return {
-            ...toRefs(state),
-            storeState,
-            currencyMoneyFormatter,
-        };
-    },
-};
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/serviceAccount/load'),
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/projectGroup/load'),
+        store.dispatch('reference/region/load'),
+        store.dispatch('reference/provider/load'),
+    ]);
+})();
+
 </script>
+
+<template>
+    <router-link :to="state.linkLocation"
+                 class="budget-list-card"
+    >
+        <div v-if="budgetLoading"
+             class="skeleton-wrapper"
+        >
+            <div class="top">
+                <p-skeleton width="30%"
+                            height="1rem"
+                />
+                <p-skeleton width="23%"
+                            height="1.5rem"
+                />
+            </div>
+            <p-skeleton width="40%"
+                        height="1rem"
+            />
+        </div>
+        <div v-else
+             class="card-wrapper"
+        >
+            <div class="card-header">
+                <div class="flex items-center mb-1">
+                    <span v-for="(name, index) in state.projects"
+                          :key="name"
+                          class="project-info"
+                          :class="{target: index === state.projects.length - 1}"
+                    >
+                        <p-i v-if="index === state.projects.length - 1"
+                             :name="state.isProject ? 'ic_document-filled' : 'ic_folder-filled'"
+                             color="inherit"
+                             width="1em"
+                             height="1em"
+                             class="mr-1"
+                        />
+                        {{ name }}
+                        <p-i v-if="index < state.projects.length - 1"
+                             name="ic_chevron-left-thin"
+                             width="1em"
+                             height="1em"
+                        />
+                    </span>
+                </div>
+                <p class="budget-name">
+                    {{ budgetUsage.name }}
+                </p>
+            </div>
+            <p-divider />
+            <div class="card-body">
+                <div class="budget-progress">
+                    <div class="label-wrapper">
+                        <div class="label-left">
+                            <p class="label">
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
+                            </p>
+                            <div class="amount-used-wrapper"
+                                 :class="state.progressStatus"
+                            >
+                                <span class="cost">{{ currencyMoneyFormatter(state.cost, storeState.currency, storeState.currencyRates) }}</span>
+                                <span class="percent">(<template v-if="state.percentage < 0">0.00</template>
+                                    <template v-else>{{ state.percentage.toFixed(2) }}</template>%)</span>
+                            </div>
+                        </div>
+                        <div class="label-right">
+                            <p class="label">
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
+                            </p>
+                            <div class="cost">
+                                {{ currencyMoneyFormatter(state.limit, storeState.currency, storeState.currencyRates) }}
+                            </div>
+                        </div>
+                    </div>
+                    <budget-usage-progress-bar :usage-rate="state.percentage" />
+                </div>
+                <div class="budget-description">
+                    <div class="cost-type-wrapper">
+                        <div class="label">
+                            {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
+                        </div>
+                        <div class="cost-type">
+                            <span v-for="({resourceList, costTypeLabel}) in state.costTypeResourceListMap"
+                                  :key="costTypeLabel"
+                                  class="truncate"
+                            >
+                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </router-link>
+</template>
 
 <style lang="postcss" scoped>
 .skeleton-wrapper {

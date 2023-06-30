@@ -1,3 +1,27 @@
+<script lang="ts" setup>
+import { PPopover } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+const costTypeMap = {
+    region_code: 'Region',
+    service_account_id: 'Service Account',
+    provider: 'Provider',
+    product: 'Product',
+};
+
+interface Props {
+    costTypeKey: string;
+    costTypeValue: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    costTypeKey: '',
+    costTypeValue: undefined,
+});
+const { t } = useI18n();
+
+</script>
+
 <template>
     <p-popover class="budget-cost-type-popover"
                position="bottom-end"
@@ -6,7 +30,7 @@
         <template #content>
             <div class="content-wrapper">
                 <div class="header">
-                    <span class="header-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}</span>
+                    <span class="header-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}</span>
                     <span>{{ costTypeMap[costTypeKey] }}</span>
                 </div>
                 <hr class="divider">
@@ -17,39 +41,6 @@
         </template>
     </p-popover>
 </template>
-
-<script lang="ts">
-import { PPopover } from '@spaceone/design-system';
-
-const costTypeMap = {
-    region_code: 'Region',
-    service_account_id: 'Service Account',
-    provider: 'Provider',
-    product: 'Product',
-};
-
-export default {
-    name: 'BudgetCostTypePopover',
-    components: {
-        PPopover,
-    },
-    props: {
-        costTypeKey: {
-            type: String,
-            default: '',
-        },
-        costTypeValue: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup() {
-        return {
-            costTypeMap,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-popover */

@@ -1,99 +1,12 @@
-<template>
-    <p-button-modal
-        :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SET_BUDGET_NOTIFICATIONS_CONDITION')"
-        centered
-        size="md"
-        fade
-        backdrop
-        :visible.sync="proxyVisible"
-        class="budget-notifications-modal"
-        :disabled="!isAllValid"
-        @confirm="handleConfirm"
-    >
-        <template #body>
-            <div class="desc">
-                <p>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}</p>
-                <p-anchor :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                          :to="{
-                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                              params: {
-                                  id: budgetTargetId
-                              }
-                          }"
-                          highlight
-                />
-            </div>
-            <p-button style-type="tertiary"
-                      icon-left="ic_plus_bold"
-                      @click="handleAddCondition"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
-            </p-button>
-            <section class="condition-wrapper">
-                <p v-if="conditions.length > 0"
-                   class="condition-header"
-                >
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
-                </p>
-                <template v-for="(condition, idx) of conditions">
-                    <div :key="`condition-${idx}`"
-                         class="condition-input-wrapper"
-                    >
-                        <p-select-dropdown v-model="condition.unit"
-                                           class="condition"
-                                           :items="units"
-                                           use-fixed-menu-style
-                        />
-                        <span class="align-middle">&gt;</span>
-                        <p-text-input v-model="condition.threshold"
-                                      class="condition"
-                                      type="number"
-                                      :max="condition.unit === NOTIFICATION_UNIT.PERCENT ? 100 : undefined"
-                                      :min="0"
-                                      :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
-                                          ? '$1000' : '50'"
-                                      :invalid="thresholdValidations[idx] === false"
-                                      @update:value="handleThresholdInput(idx, $event)"
-                        >
-                            <template #right-extra>
-                                <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT"
-                                      class="text-gray-400"
-                                >%</span>
-                            </template>
-                        </p-text-input>
-                        <p-select-dropdown v-model="condition.notification_type"
-                                           class="condition"
-                                           :items="types"
-                                           use-fixed-menu-style
-                        >
-                            <span :class="{'text-alert': condition.notification_type === NOTIFICATION_TYPE.CRITICAL}">
-                                {{ types.find(d => d.name === condition.notification_type).label }}
-                            </span>
-                        </p-select-dropdown>
-                        <p-icon-button name="ic_delete"
-                                       class="delete-button"
-                                       @click="handleDeleteCondition(idx)"
-                        />
-                    </div>
-                </template>
-            </section>
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-
-import {
-    computed, reactive, toRefs,
-} from 'vue';
+<script lang="ts" setup>
 
 import {
     PButtonModal, PTextInput, PAnchor, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -119,116 +32,182 @@ interface Condition {
     notification_type?: NotificationType;
 }
 
-export default {
-    name: 'BudgetNotificationsModal',
-    components: {
-        PButtonModal,
-        PAnchor,
-        PButton,
-        PTextInput,
-        PSelectDropdown,
-        PIconButton,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
+interface Props {
+    visible: boolean;
+    budgetTargetId?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    budgetTargetId: '',
+});
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
+}>();
+const { t } = useI18n();
+
+const budgetPageStore = useBudgetPageStore();
+const budgetPageState = budgetPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    proxyVisible: useProxyValue('visible', props, emit),
+    conditions: budgetPageState.budgetData?.notifications as Condition[],
+    units: computed(() => ([
+        {
+            name: NOTIFICATION_UNIT.ACTUAL_COST,
+            label: t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST'),
         },
-        budgetTargetId: {
-            type: String,
-            default: undefined,
+        {
+            name: NOTIFICATION_UNIT.PERCENT,
+            label: t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_USAGE', { symbol: '%' }),
         },
-    },
-    setup(props, { emit }) {
-        const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.$state;
+    ])),
+    types: computed(() => ([
+        {
+            name: NOTIFICATION_TYPE.WARNING,
+            label: t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.WARNING'),
+        },
+        {
+            name: NOTIFICATION_TYPE.CRITICAL,
+            label: t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CRITICAL'),
+        },
+    ])),
+    budgetId: computed(() => budgetPageState.budgetData?.budget_id),
+    thresholdValidations: budgetPageState.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
+    isAllValid: computed(() => state.thresholdValidations.every((d) => !!d)),
+});
 
-        const state = reactive({
-            loading: true,
-            proxyVisible: useProxyValue('visible', props, emit),
-            conditions: budgetPageState.budgetData?.notifications as Condition[],
-            units: computed(() => ([
-                {
-                    name: NOTIFICATION_UNIT.ACTUAL_COST,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST'),
-                },
-                {
-                    name: NOTIFICATION_UNIT.PERCENT,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_USAGE', { symbol: '%' }),
-                },
-            ])),
-            types: computed(() => ([
-                {
-                    name: NOTIFICATION_TYPE.WARNING,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.WARNING'),
-                },
-                {
-                    name: NOTIFICATION_TYPE.CRITICAL,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CRITICAL'),
-                },
-            ])),
-            budgetId: computed(() => budgetPageState.budgetData?.budget_id),
-            thresholdValidations: budgetPageState.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
-            isAllValid: computed(() => state.thresholdValidations.every((d) => !!d)),
-        });
-
-        const handleAddCondition = () => {
-            state.conditions.push({
-                unit: NOTIFICATION_UNIT.ACTUAL_COST,
-                threshold: null,
-                notification_type: NOTIFICATION_TYPE.WARNING,
-            });
-            state.thresholdValidations.push(undefined);
-        };
-
-        const handleDeleteCondition = (idx) => {
-            const conditions = [...state.conditions];
-            conditions.splice(idx, 1);
-            state.thresholdValidations.splice(idx, 1);
-            state.conditions = conditions;
-        };
-
-        const handleThresholdInput = (idx, threshold?: string) => {
-            let isValid;
-            const numberThreshold = Number(threshold);
-            if (!threshold || Number.isNaN(numberThreshold)) isValid = false;
-            else if (numberThreshold < 0) isValid = false;
-            else if (state.conditions[idx]?.unit === NOTIFICATION_UNIT.PERCENT && numberThreshold > 100) isValid = false;
-            else isValid = true;
-            state.thresholdValidations.splice(idx, 1, isValid);
-        };
-
-        const setBudgetAlert = async () => {
-            try {
-                budgetPageStore.updateBudgetNotifications({
-                    budgetId: state.budgetId,
-                    notifications: state.conditions,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        const handleConfirm = async () => {
-            if (!state.isAllValid) return;
-            await setBudgetAlert();
-            state.proxyVisible = false;
-            emit('confirm');
-        };
-
-        return {
-            ...toRefs(state),
-            handleAddCondition,
-            handleConfirm,
-            handleDeleteCondition,
-            handleThresholdInput,
-            NOTIFICATION_UNIT,
-            NOTIFICATION_TYPE,
-            PROJECT_ROUTE,
-        };
-    },
+const handleAddCondition = () => {
+    state.conditions.push({
+        unit: NOTIFICATION_UNIT.ACTUAL_COST,
+        threshold: null,
+        notification_type: NOTIFICATION_TYPE.WARNING,
+    });
+    state.thresholdValidations.push(undefined);
 };
+
+const handleDeleteCondition = (idx) => {
+    const conditions = [...state.conditions];
+    conditions.splice(idx, 1);
+    state.thresholdValidations.splice(idx, 1);
+    state.conditions = conditions;
+};
+
+const handleThresholdInput = (idx, threshold?: string) => {
+    let isValid;
+    const numberThreshold = Number(threshold);
+    if (!threshold || Number.isNaN(numberThreshold)) isValid = false;
+    else if (numberThreshold < 0) isValid = false;
+    else if (state.conditions[idx]?.unit === NOTIFICATION_UNIT.PERCENT && numberThreshold > 100) isValid = false;
+    else isValid = true;
+    state.thresholdValidations.splice(idx, 1, isValid);
+};
+
+const setBudgetAlert = async () => {
+    try {
+        budgetPageStore.updateBudgetNotifications({
+            budgetId: state.budgetId,
+            notifications: state.conditions,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const handleConfirm = async () => {
+    if (!state.isAllValid) return;
+    await setBudgetAlert();
+    state.proxyVisible = false;
+    emit('confirm');
+};
+
 </script>
+
+<template>
+    <p-button-modal
+        v-model:visible="state.proxyVisible"
+        :header-title="t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.SET_BUDGET_NOTIFICATIONS_CONDITION')"
+        centered
+        size="md"
+        fade
+        backdrop
+        class="budget-notifications-modal"
+        :disabled="!state.isAllValid"
+        @confirm="handleConfirm"
+    >
+        <template #body>
+            <div class="desc">
+                <p>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}</p>
+                <p-anchor :text="t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
+                          :to="{
+                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                              params: {
+                                  id: budgetTargetId
+                              }
+                          }"
+                          highlight
+                />
+            </div>
+            <p-button style-type="tertiary"
+                      icon-left="ic_plus_bold"
+                      @click="handleAddCondition"
+            >
+                {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
+            </p-button>
+            <section class="condition-wrapper">
+                <p v-if="state.conditions.length > 0"
+                   class="condition-header"
+                >
+                    <span>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
+                    <span>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
+                    <span>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
+                </p>
+                <template v-for="(condition, idx) of state.conditions"
+                          :key="`condition-${idx}`"
+                >
+                    <div class="condition-input-wrapper">
+                        <p-select-dropdown v-model="condition.unit"
+                                           class="condition"
+                                           :items="state.units"
+                                           use-fixed-menu-style
+                        />
+                        <span class="align-middle">&gt;</span>
+                        <p-text-input v-model="condition.threshold"
+                                      class="condition"
+                                      type="number"
+                                      :max="condition.unit === NOTIFICATION_UNIT.PERCENT ? 100 : undefined"
+                                      :min="0"
+                                      :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
+                                          ? '$1000' : '50'"
+                                      :invalid="state.thresholdValidations[idx] === false"
+                                      @update:value="handleThresholdInput(idx, $event)"
+                        >
+                            <template #right-extra>
+                                <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT"
+                                      class="text-gray-400"
+                                >%</span>
+                            </template>
+                        </p-text-input>
+                        <p-select-dropdown v-model="condition.notification_type"
+                                           class="condition"
+                                           :items="state.types"
+                                           use-fixed-menu-style
+                        >
+                            <span :class="{'text-alert': condition.notification_type === NOTIFICATION_TYPE.CRITICAL}">
+                                {{ state.types.find(d => d.name === condition.notification_type).label }}
+                            </span>
+                        </p-select-dropdown>
+                        <p-icon-button name="ic_delete"
+                                       class="delete-button"
+                                       @click="handleDeleteCondition(idx)"
+                        />
+                    </div>
+                </template>
+            </section>
+        </template>
+    </p-button-modal>
+</template>
 
 <style lang="postcss" scoped>
 .budget-notifications-modal {
