@@ -264,8 +264,10 @@ const fetchData = async (): Promise<Data[]> => {
         }, { cancelToken: analyzeRequest.token });
         analyzeRequest = undefined;
         return results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    } catch (e: any) {
+        if (!axios.isCancel(e.axiosError)) {
+            ErrorHandler.handleError(e);
+        }
         return [];
     }
 };
@@ -330,7 +332,10 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
-    if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
+    if (chartHelper.root.value) {
+        chartHelper.clearChildrenOfRoot();
+        drawChart(state.outerChartData, state.innerChartData);
+    }
     state.loading = false;
     return state.data;
 };
@@ -341,9 +346,19 @@ const refreshWidget = async (): Promise<Data[]> => {
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
-    if (chartHelper.root.value) drawChart(state.outerChartData, state.innerChartData);
+    if (chartHelper.root.value) {
+        chartHelper.clearChildrenOfRoot();
+        drawChart(state.outerChartData, state.innerChartData);
+    }
     state.loading = false;
     return state.data;
+};
+
+const redrawChart = () => {
+    if (chartHelper.root.value) {
+        chartHelper.clearChildrenOfRoot();
+        drawChart(state.outerChartData, state.innerChartData);
+    }
 };
 
 useWidgetLifecycle({
@@ -351,6 +366,8 @@ useWidgetLifecycle({
     refreshWidget,
     props,
     state,
+    redrawChart,
+    redrawOnLanguageChange: true,
 });
 
 defineExpose<WidgetExpose<Data[]>>({
