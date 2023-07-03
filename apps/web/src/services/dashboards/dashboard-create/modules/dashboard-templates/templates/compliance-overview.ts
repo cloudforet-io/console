@@ -30,7 +30,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig = {
     name: 'Compliance Overview',
-    labels: [DASHBOARD_LABEL.ASSET],
+    labels: [DASHBOARD_LABEL.ASSET, DASHBOARD_LABEL.COMPLIANCE, DASHBOARD_LABEL.SECURITY],
     version: '1',
     description: {
         icon: 'ic_dashboard-template_compliance',
