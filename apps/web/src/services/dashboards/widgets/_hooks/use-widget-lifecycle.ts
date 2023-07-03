@@ -7,7 +7,11 @@ import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
+import { i18n } from '@/translations';
+
 import type { Currency } from '@/store/modules/settings/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -25,6 +29,8 @@ interface UseWidgetLifecycleOptions {
     props: WidgetProps;
     state: UnwrapRef<WidgetState>;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
+    redrawChart?: () => void;
+    redrawOnLanguageChange?: boolean;
 }
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -153,6 +159,8 @@ export const useWidgetLifecycle = ({
     props,
     state,
     onCurrencyUpdate,
+    redrawChart,
+    redrawOnLanguageChange,
 }: UseWidgetLifecycleOptions): void => {
     onUnmounted(() => {
         if (disposeWidget) disposeWidget();
@@ -194,5 +202,16 @@ export const useWidgetLifecycle = ({
                 onCurrencyUpdate(current.currency.value, previous.currency.value);
             }
         });
+    }
+
+    if (redrawOnLanguageChange) {
+        try {
+            if (!redrawChart) throw Error('redrawChart is required');
+            watch(() => i18n.locale, async () => {
+                redrawChart();
+            });
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
     }
 };
