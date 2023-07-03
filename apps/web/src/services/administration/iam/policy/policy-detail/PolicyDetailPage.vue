@@ -47,8 +47,9 @@
         </p-heading>
         <p-pane-layout class="policy-detail-info-wrapper">
             <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
-                <br>
+                <p-field-title class="policy-type">
+                    {{ $t('IAM.POLICY.FORM.TYPE') }}
+                </p-field-title>
                 <div class="policy-detail-type-badge">
                     <p-badge v-if="state.policyType === POLICY_TYPE.MANAGED"
                              badge-type="solid-outline"
@@ -65,12 +66,14 @@
                 </div>
             </div>
             <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.ID') }}</p-field-title>
+                <p-field-title class="policy-type">
+                    {{ $t('IAM.POLICY.FORM.ID') }}
+                </p-field-title>
                 <p>{{ policyState.policyData ? policyState.policyData?.policy_id : '' }}</p>
             </div>
             <div class="policy-detail-contents">
                 <div v-if="state.policyType === POLICY_TYPE.MANAGED">
-                    <p-field-title>
+                    <p-field-title class="policy-type">
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                     </p-field-title>
                     <br>
@@ -88,7 +91,9 @@
                 </p-field-group>
             </div>
             <div class="policy-detail-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
+                <p-field-title class="policy-type">
+                    {{ $t('IAM.POLICY.FORM.PERMISSION') }}
+                </p-field-title>
                 <p-text-editor
                     :read-only="(state.policyType === POLICY_TYPE.MANAGED || !state.hasManagePermission)"
                     :code="state.code"
@@ -215,6 +220,9 @@ const getPolicyData = async () => {
         margin-bottom: 1.125rem;
         .p-text-input {
             width: 70%;
+        }
+        .policy-type {
+            margin-bottom: 0.25rem;
         }
         & p {
             @apply text-sm text-gray-900;
