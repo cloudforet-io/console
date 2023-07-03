@@ -14,31 +14,33 @@
         </template>
 
         <template #default>
-            <p-data-loader :loading="loading"
-                           :data="data"
-                           loader-type="skeleton"
-                           class="card-wrapper"
-                           :class="{'fixed-height': loading || !data.length}"
+            <div v-if="loading"
+                 class="overflow-hidden"
             >
-                <template #loader>
-                    <div v-for="v in skeletons"
-                         :key="`skeleton-${v}`"
-                         class="flex p-4 items-center"
-                    >
-                        <p-skeleton width="2rem"
-                                    height="2rem"
-                                    class="mr-4 flex-shrink-0"
+                <div v-for="v in skeletons"
+                     :key="v"
+                     class="flex p-4 items-center"
+                >
+                    <p-skeleton width="2rem"
+                                height="2rem"
+                                class="mr-4 flex-shrink-0"
+                    />
+                    <div class="grid grid-cols-1 gap-1 w-full">
+                        <p-skeleton width="80%"
+                                    height="0.625rem"
                         />
-                        <div class="grid grid-cols-1 gap-1 w-full">
-                            <p-skeleton width="80%"
-                                        height="0.625rem"
-                            />
-                            <p-skeleton width="100%"
-                                        height="0.625rem"
-                            />
-                        </div>
+                        <p-skeleton width="100%"
+                                    height="0.625rem"
+                        />
                     </div>
-                </template>
+                </div>
+            </div>
+            <p-data-loader
+                v-else
+                :loading="loading"
+                :data="data"
+                class="card-wrapper"
+            >
                 <template #no-data>
                     <p-empty
                         v-if="warningData.length === 0"
@@ -101,7 +103,7 @@
                         </router-link>
                     </div>
                 </div>
-                <div v-for="(item, index) in commonData"
+                <div v-for="(item, index) in data"
                      :key="index"
                      class="daily-update-card"
                 >
@@ -147,7 +149,7 @@ import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import { find, range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -209,10 +211,10 @@ export default {
         const queryHelper = new QueryHelper();
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            serverData: [] as CloudServiceData[],
             cloudServiceData: [] as CloudServiceData[],
             data: [] as Item[],
-            commonData: computed(() => state.data.filter((d) => !d.isCreateWarning && !d.isDeleteWarning)),
-            warningData: computed(() => state.data.filter((d) => d.isCreateWarning || d.isDeleteWarning)),
+            warningData: [] as Item[],
             loading: true,
             skeletons: range(4),
         });
@@ -221,7 +223,7 @@ export default {
         const listCloudServiceData = async (): Promise<void> => {
             state.loading = true;
             try {
-                const params: Record<string, string> = {
+                const params: any = {
                     timezone: store.state.user.timezone,
                 };
                 if (props.projectId) params.project_id = props.projectId;
@@ -286,6 +288,15 @@ export default {
             });
             return results;
         };
+        const getWarningData = (data: Item[]): Item[] => {
+            const warningData: Item[] = [];
+            find(data, (d) => {
+                if (d.isCreateWarning || d.isDeleteWarning) {
+                    warningData.push(d);
+                }
+            });
+            return warningData;
+        };
 
         /* Init */
         const init = async (): Promise<void> => {
@@ -293,7 +304,9 @@ export default {
                 listCloudServiceData(),
                 store.dispatch('reference/provider/load'),
             ]);
-            state.data = getConvertedCloudServiceData(state.cloudServiceData);
+            const data = getConvertedCloudServiceData(state.cloudServiceData);
+            state.warningData = getWarningData(data);
+            state.data = data.filter((x) => !state.warningData.includes(x));
         };
         init();
 
@@ -356,12 +369,16 @@ export default {
     }
 }
 
+.managed-resources {
+    @apply text-gray-700;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin-top: -0.5rem;
+}
+
 .card-wrapper {
     @apply overflow-hidden whitespace-no-wrap w-full rounded-md;
     height: 100%;
-    &.fixed-height {
-        height: 16rem;
-    }
     .daily-update-card {
         @apply flex items-center w-full content-between overflow-hidden;
         padding-left: 1rem;
@@ -413,16 +430,6 @@ export default {
     }
 }
 
-/* custom design-system component - p-data-loader */
-:deep(.p-data-loader) {
-    .data-loader-container {
-        .loader-wrapper {
-            .loader {
-                display: block;
-            }
-        }
-    }
-}
 .card-wrapper .daily-update-card-alert {
     @apply flex items-center w-full content-between border rounded-md;
     flex-wrap: wrap;
