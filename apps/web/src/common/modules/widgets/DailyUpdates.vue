@@ -423,7 +423,7 @@ export default {
         }
     }
 }
-.p-data-loader > .data-loader-container > .loader-wrapper > .loader .card-wrapper .daily-update-card-alert {
+.card-wrapper .daily-update-card-alert {
     @apply flex items-center w-full content-between border rounded-md;
     flex-wrap: wrap;
     overflow: hidden;
