@@ -196,6 +196,8 @@ watch(() => state.selectedRepository, (repository) => {
     }
 
     .provider {
+        @apply flex flex-col;
+        gap: 0.75rem;
         margin-bottom: 1.625rem;
 
         .provider-item {
@@ -204,6 +206,8 @@ watch(() => state.selectedRepository, (repository) => {
     }
 
     .repository {
+        @apply flex flex-col;
+        gap: 0.75rem;
         .repository-item {
             margin-bottom: 0.5rem;
         }

@@ -489,10 +489,12 @@ export default defineComponent<Props>({
     /* custom design-system component - p-json-schema-form */
     :deep(.widget-options-form) {
         /* custom design-system component - p-field-group */
+
+        /* custom design-system component - p-field-title */
         .p-field-group {
             .form-label {
                 width: 100%;
-                > .title {
+                > .title-wrapper .title {
                     display: flex;
                     width: 100%;
                     justify-content: space-between;
