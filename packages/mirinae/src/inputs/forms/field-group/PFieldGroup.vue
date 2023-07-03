@@ -1,24 +1,38 @@
 <template>
     <div class="p-field-group">
         <div class="field-title-box">
-            <p-field-title v-if="label || $scopedSlots.label" class="form-label" @click="$emit('click-field-title')">
+            <p-field-title v-if="label || $scopedSlots.label"
+                           class="form-label"
+                           @click="$emit('click-field-title')"
+            >
                 <slot name="label">
                     {{ label }}
                 </slot>
-                <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
+                <span v-if="!required"
+                      class="optional-mark"
+                >({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
                 <slot name="label-extra" />
             </p-field-title>
         </div>
-        <small v-if="$scopedSlots.help || helpText" class="help-msg">
+        <small v-if="$scopedSlots.help || helpText"
+               class="help-msg"
+        >
             <slot name="help">{{ helpText }}</slot>
         </small>
-        <slot name="default" v-bind="$props" />
-        <div v-show="invalid" class="invalid-feedback">
+        <slot name="default"
+              v-bind="$props"
+        />
+        <div v-show="invalid"
+             class="invalid-feedback"
+        >
             <slot name="invalid">
                 {{ invalidText }}
             </slot>
         </div>
-        <div v-if="validText" class="valid-feedback" :style="{display: valid&&!invalid? 'block':'none'}">
+        <div v-if="validText"
+             class="valid-feedback"
+             :style="{display: valid&&!invalid? 'block':'none'}"
+        >
             <slot name="valid">
                 {{ validText }}
             </slot>
@@ -70,6 +84,9 @@ export default defineComponent({
 <style lang="postcss">
 .p-field-group {
     margin-bottom: 1rem;
+    .form-label {
+        margin-bottom: 0.25rem;
+    }
     .label-box {
         display: flex;
         align-items: center;
