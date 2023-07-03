@@ -85,7 +85,7 @@ export default defineComponent({
 .p-field-group {
     margin-bottom: 1rem;
     .form-label {
-        margin-bottom: 0.25rem;
+        padding-bottom: 0.25rem;
     }
     .label-box {
         display: flex;
