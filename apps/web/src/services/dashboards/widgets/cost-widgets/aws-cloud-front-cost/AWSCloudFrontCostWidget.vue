@@ -54,6 +54,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
@@ -140,8 +141,8 @@ const state = reactive({
         ];
     }),
     dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
+        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
+        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
     widgetLocation: computed<Location>(() => ({
