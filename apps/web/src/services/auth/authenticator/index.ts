@@ -20,7 +20,6 @@ abstract class Authenticator {
         ]);
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');
-        await store.dispatch('settings/loadCurrencyRates');
     }
 
     static async signOut(): Promise<void> {
