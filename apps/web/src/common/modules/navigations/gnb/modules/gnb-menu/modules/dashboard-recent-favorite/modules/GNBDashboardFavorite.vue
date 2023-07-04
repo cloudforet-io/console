@@ -221,6 +221,7 @@ export default defineComponent<Props>({
         overflow-y: auto;
         padding: 0.5rem;
         min-height: 15rem;
+        text-transform: none;
     }
 }
 </style>
