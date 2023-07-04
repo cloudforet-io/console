@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':!state.isScrollEnd }"
+            :class="{ 'overflow-auto':!state.isScrollEnd && defaultTemplateState.boardSets.length }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
