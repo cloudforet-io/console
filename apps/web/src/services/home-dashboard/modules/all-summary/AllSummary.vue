@@ -18,7 +18,11 @@
                                 <span v-if="name === DATA_TYPE.BILLING"
                                       class="dollar-sign"
                                 >$</span>
-                                <span>{{ count[name] }}</span>
+                                <p-skeleton v-if="loading"
+                                            width="2rem"
+                                            height="2rem"
+                                />
+                                <span v-else>{{ count[name] }}</span>
                             </span>
                         </router-link>
                         <span v-if="name === DATA_TYPE.STORAGE"
@@ -168,6 +172,7 @@ export default {
                 { name: 'MONTHLY', label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
+            loading: true,
             count: {
                 [DATA_TYPE.SERVER]: 0,
                 [DATA_TYPE.DATABASE]: 0,
@@ -460,10 +465,12 @@ export default {
         };
 
         const init = async () => {
+            state.loading = true;
             await Promise.all([
                 getCount(),
                 getBillingCount(),
             ]);
+            state.loading = false;
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.SERVER);
@@ -533,7 +540,8 @@ export default {
     padding: 0.5rem 0;
     .count {
         @apply text-indigo-400;
-        display: inline-block;
+        align-self: flex-end;
+        display: inline-flex;
         line-height: 2.5rem;
         &:hover {
             .anchor {
@@ -553,6 +561,8 @@ export default {
             @apply text-indigo-400;
             font-size: 2rem;
             font-weight: bold;
+            display: inline-flex;
+            align-self: flex-end;
         }
         .suffix {
             @apply text-gray-500;
