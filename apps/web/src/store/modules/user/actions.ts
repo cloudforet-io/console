@@ -1,7 +1,6 @@
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { setI18nLocale } from '@/translations';
@@ -130,7 +129,6 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
 export const signOut = (): void => {
     SpaceConnector.flushToken();
-    LocalStorageAccessor.removeItem('hideNotificationEmailModal');
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
