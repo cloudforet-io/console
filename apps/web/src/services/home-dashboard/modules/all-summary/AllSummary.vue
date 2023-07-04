@@ -11,23 +11,25 @@
                      :class="{selected: name === activeTab}"
                 >
                     <div class="count">
-                        <router-link :to="getAllSummaryTabLocation(name)"
-                                     class="anchor"
-                        >
-                            <span class="number">
-                                <span v-if="name === DATA_TYPE.BILLING"
-                                      class="dollar-sign"
-                                >$</span>
-                                <p-skeleton v-if="loading"
-                                            width="2rem"
-                                            height="2rem"
-                                />
-                                <span v-else>{{ count[name] }}</span>
-                            </span>
-                        </router-link>
-                        <span v-if="name === DATA_TYPE.STORAGE"
-                              class="suffix"
-                        >{{ storageBoxSuffix }}</span>
+                        <p-spinner v-if="loading"
+                                   class="loading-spinner"
+                                   size="xl"
+                        />
+                        <template v-else>
+                            <router-link :to="getAllSummaryTabLocation(name)"
+                                         class="anchor"
+                            >
+                                <span class="number">
+                                    <span v-if="name === DATA_TYPE.BILLING"
+                                          class="dollar-sign"
+                                    >$</span>
+                                    <span>{{ count[name] }}</span>
+                                </span>
+                            </router-link>
+                            <span v-if="name === DATA_TYPE.STORAGE"
+                                  class="suffix"
+                            >{{ storageBoxSuffix }}</span>
+                        </template>
                     </div>
                     <div class="title">
                         {{ label }}
@@ -89,7 +91,7 @@ import type { Location } from 'vue-router';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PBalloonTab, PSelectButton, PDataLoader, PSkeleton,
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
@@ -142,6 +144,7 @@ export default {
         PDataLoader,
         PBalloonTab,
         PSelectButton,
+        PSpinner,
     },
     props: {
         extraParams: {
@@ -550,6 +553,9 @@ export default {
                     border: none;
                 }
             }
+        }
+        .loading-spinner {
+            height: 2.5rem;
         }
         .dollar-sign {
             @apply text-gray-500;
