@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':state.hasScroll }"
+            :class="{ 'overflow-auto':!state.isScrollEnd }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -125,8 +125,9 @@
 </template>
 
 <script setup lang="ts">
+import { useScroll } from '@vueuse/core';
 import {
-    computed, nextTick, reactive, toRefs,
+    computed, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import {
@@ -158,16 +159,15 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const templateContainerRef = ref<HTMLElement | null>(null);
+const { arrivedState } = useScroll(templateContainerRef);
+const { bottom: isBottom } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    templateContainerRef: null as HTMLElement | null,
     hasScroll: false,
+    isScrollEnd: computed(() => isBottom.value),
 });
-
-const {
-    templateContainerRef,
-} = toRefs(state);
 
 const defaultTemplateState = reactive({
     thisPage: 1,
@@ -239,21 +239,12 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
-const handleCheckScroll = () => {
-    if (state.templateContainerRef) {
-        state.hasScroll = state.templateContainerRef.scrollHeight > state.templateContainerRef.clientHeight;
-    } else {
-        state.hasScroll = false;
-    }
-};
-
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
         store.dispatch('dashboard/loadDomainDashboard'),
     ]);
     await nextTick();
-    handleCheckScroll();
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
@@ -266,7 +257,6 @@ const handleCheckScroll = () => {
         max-height: calc(100vh - 22.85rem);
         min-height: 40vh;
         &.overflow-auto {
-            padding-bottom: 2.5rem;
             &::after {
                 @apply w-full absolute;
                 height: 2.5rem;
