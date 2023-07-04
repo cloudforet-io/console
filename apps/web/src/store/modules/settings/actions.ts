@@ -56,18 +56,13 @@ const storeCurrencyRates = (rates, commit: Commit) => {
 };
 
 export const loadCurrencyRates: Action<SettingsState, any> = async ({ state, commit }) => {
-    // currency rates
     const storedCurrencyRate: CurrencyRates|undefined = state.currencyRates;
-    const storedRates = storedCurrencyRate ?? {};
-    const isStoredRatesInvalid = Object.values(storedRates).every((d) => d === 1);
-
-    // updated time
     const storedUpdateTime: number|undefined = state.currencyUpdateTime;
     const now = dayjs();
     const storedDate = storedUpdateTime ? dayjs.unix(storedUpdateTime) : undefined;
+    const storedRates = storedCurrencyRate ?? {};
     const isDateStoredToday = storedDate ? storedDate.isSame(now, 'day') : false;
-
-    if (isDateStoredToday || !isStoredRatesInvalid) {
+    if (isDateStoredToday) {
         const localData = { USD: 1 };
         Object.keys(storedRates).forEach((k) => {
             if (CURRENCY[k]) localData[k] = storedRates[k];

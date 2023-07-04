@@ -83,6 +83,10 @@ export class SpaceRouter {
                 }
             }
 
+            // If top notification which indicates authorization error is visible, clear it before moving to next location
+            if (SpaceRouter.router.app?.$store.state.error.visibleAuthorizationError) {
+                SpaceRouter.router.app?.$store.commit('error/setVisibleAuthorizationError', false);
+            }
             next(nextLocation);
         });
 
@@ -93,7 +97,6 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
 
-            if (store.state.error.visibleAuthorizationError) { store.commit('error/setVisibleAuthorizationError', false); }
             const isDomainOwner = store.getters['user/isDomainOwner'];
             if (!isDomainOwner) {
                 const recent = getRecentConfig(to);
