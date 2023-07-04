@@ -165,8 +165,8 @@ const { bottom: isBottom, top: isTop } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    disableScroll: computed(() => isBottom.value && isTop.value),
-    isScrollEnd: computed(() => isBottom.value),
+    disableScroll: computed<boolean>(() => isBottom.value && isTop.value),
+    isScrollEnd: computed<boolean>(() => isBottom.value),
 });
 
 const defaultTemplateState = reactive({
