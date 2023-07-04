@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':!state.isScrollEnd && defaultTemplateState.boardSets.length }"
+            :class="{ 'overflow-auto':!state.isScrollEnd && !state.disableScroll }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -161,11 +161,11 @@ const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
 const { arrivedState } = useScroll(templateContainerRef);
-const { bottom: isBottom } = toRefs(arrivedState);
+const { bottom: isBottom, top: isTop } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    hasScroll: false,
+    disableScroll: computed(() => isBottom.value && isTop.value),
     isScrollEnd: computed(() => isBottom.value),
 });
 
