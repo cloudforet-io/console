@@ -131,7 +131,7 @@ import {
 } from 'vue';
 
 import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI,
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -172,14 +172,17 @@ const state = reactive({
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES)
-        .map((d: DashboardConfig) => ({
-            ...d,
-            // below values are used only for render
-            value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
-        }))
-        .filter((d) => d.name.includes(state.searchValue))
-        .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
+        const regex = getTextHighlightRegex(state.searchValue);
+        return Object.values(DASHBOARD_TEMPLATES)
+            .map((d: DashboardConfig) => ({
+                ...d,
+                // below values are used only for render
+                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
+            }))
+            .filter((d) => regex.test(d.name))
+            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
+    }),
 });
 const existingTemplateState = reactive({
     thisPage: 1,
