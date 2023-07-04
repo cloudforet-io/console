@@ -98,7 +98,7 @@
                             <div class="dashboard-template-overlay-content"
                                  @click="handleOpenDashboardNewTab(board)"
                             >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.VIEW') }}</span>
                                 <p-i name="ic_external-link"
                                      height="1em"
                                      width="1em"
