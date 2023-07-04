@@ -1,3 +1,5 @@
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
@@ -27,6 +29,7 @@ abstract class Authenticator {
         try {
             if (SpaceRouter.router) {
                 await store.dispatch('user/signOut');
+                LocalStorageAccessor.removeItem('hideNotificationEmailModal');
                 await store.dispatch('error/resetErrorState');
                 await store.dispatch('domain/resetBillingEnabled');
             }

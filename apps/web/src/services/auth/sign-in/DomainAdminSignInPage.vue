@@ -126,9 +126,6 @@ export default {
             }
         };
 
-        const hideErrorMessage = () => {
-            store.dispatch('display/hideSignInErrorMessage');
-        };
         const goToUserSignIn = () => {
             if (props.isDomainOwner) vm.$router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
         };
@@ -137,7 +134,6 @@ export default {
             ...toRefs(validationState),
             onSignIn,
             goToUserSignIn,
-            hideErrorMessage,
         };
     },
 };

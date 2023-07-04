@@ -15,6 +15,9 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
+
+const VERBOSE = false;
+
 export default class TokenAPI {
     private static instance: TokenAPI;
 
@@ -99,8 +102,16 @@ export default class TokenAPI {
                 TokenAPI.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
+                if (VERBOSE) {
+                    const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
+                    console.debug('TokenAPI.refreshAccessToken: success');
+                    console.debug(`TokenAPI.refreshAccessToken: new refresh token ttl: ${decoded.ttl}`);
+                }
                 return true;
             } catch (e) {
+                if (VERBOSE) {
+                    console.debug('TokenAPI.refreshAccessToken: failed');
+                }
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
@@ -124,7 +135,10 @@ export default class TokenAPI {
         const storedAccessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
         const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
         const currentTime = TokenAPI.getCurrentTime();
-        return (tokenExpirationTime - currentTime) > 10;
+        if (VERBOSE) {
+            console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
+        }
+        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 1200
     }
 
     static getTokenExpirationTime(token?: string): number {
