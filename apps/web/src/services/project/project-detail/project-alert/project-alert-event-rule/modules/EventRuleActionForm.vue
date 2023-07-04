@@ -12,15 +12,13 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
                 </p>
-                <div class="toggle-wrapper">
-                    <span v-if="proxyActions.no_notification"
-                          class="toggle-text"
-                    >ON</span>
-                    <p-toggle-button
-                        :value="proxyActions.no_notification"
-                        @change-toggle="onToggleChange"
-                    />
-                </div>
+                <p-toggle-button
+                    :value="proxyActions.no_notification"
+                    :show-state-text="proxyActions.no_notification"
+                    position="left"
+                    spacing="md"
+                    @change-toggle="onToggleChange"
+                />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
@@ -313,13 +311,6 @@ export default {
             }
         }
 
-        .toggle-wrapper {
-            @apply flex;
-            .toggle-text {
-                @apply text-secondary;
-                padding-right: 0.5rem;
-            }
-        }
         .project-select-dropdown, .user-search-dropdown {
             width: 60%;
         }

@@ -4,9 +4,7 @@ import type { Getter } from 'vuex';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import {
-    CURRENCY_SYMBOL, SIDEBAR_TYPE,
-} from '@/store/modules/display/config';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
@@ -21,8 +19,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
 export const isHandbookVisible: Getter<DisplayState, any> = (state): boolean => state.visibleSidebar && state.sidebarType === SIDEBAR_TYPE.handbook;
-
-export const currencySymbol: Getter<DisplayState, any> = (state): string => CURRENCY_SYMBOL[state.currency] ?? '$';
 
 export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarProps> => {
     if (state.sidebarType === SIDEBAR_TYPE.info) {

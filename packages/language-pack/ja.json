@@ -2177,12 +2177,12 @@
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "スケジュールの編集に失敗しました",
 				"ALT_S_EDIT_SCHEDULE": "スケジュールの編集が正常に完了しました",
+				"COLLECTOR_SCHEDULE": "コレクタースケジュール",
 				"COLLECT_DATA": "データ収集",
 				"CREATE": "作成",
 				"CREATE_COLLECTOR": "コレクタ生成",
 				"CURRENT_STATUS": "進行状況",
 				"EDIT_MODAL_TITLE": "スケジュールの編集",
-				"EDIT_SCHEDULE": "編集",
 				"HISTORY": "コレクターの履歴",
 				"IN_PROGRESS": "進行中",
 				"JOB_ERROR": "状態: {date}に収集失敗",
@@ -2950,7 +2950,7 @@
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
 				"ROLE": "ロール",
 				"ROLE_HELP_TEXT": "選択したメンバーにロールを割り当ててください。",
-				"ROLE_TOOLTIP": "アカウントに付与されたロールタイプによって選択可能なリストは異なります。",
+				"ROLE_TOOLTIP": "'Project' タイプの役割のみがここにリストされます。",
 				"ROLE_WARNING": "自分自身」をプロジェクトに招待して役割をアサインする場合、アサインされた役割によって該当プロジェクトの権限が制限されることがあります。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"USER_ID": "ユーザーID"

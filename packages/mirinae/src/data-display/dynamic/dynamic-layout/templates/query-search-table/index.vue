@@ -79,6 +79,7 @@ import {
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
@@ -222,11 +223,12 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             }),
         });
 
-        const getFieldData = (rowData, dataPath: string, { type }: DynamicFieldProps): any => {
+        const getFieldData = (rowData, dataPath: string, { type, options }: DynamicFieldProps<TextOptions>): any => {
             if (type === 'more') {
                 return rowData;
             }
-            return getValueByPath(rowData, dataPath);
+            const keyDepth = options?.key_depth ?? null;
+            return getValueByPath(rowData, dataPath, keyDepth);
         };
 
         const onSelect = (selectIndex: number[]) => {

@@ -44,15 +44,16 @@
                            :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
                            position="top"
                 />
-                <p-tooltip v-else
-                           class="icon-fill-wrapper error"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
-                           position="top"
+                <router-link v-else
+                             :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
                 >
-                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
+                    <p-tooltip class="icon-fill-wrapper error"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                               position="top"
+                    >
                         <span class="exclamation-mark">!</span>
-                    </router-link>
-                </p-tooltip>
+                    </p-tooltip>
+                </router-link>
             </div>
         </div>
         <p-text-button v-if="props.item.hasJobList"
@@ -137,8 +138,6 @@ const storeState = reactive({
 
                     .exclamation-mark {
                         @apply text-white text-label-md;
-                        width: 1.125rem;
-                        height: 1.125rem;
                     }
 
                     &:hover {

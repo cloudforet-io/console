@@ -1,6 +1,9 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
+import {
+    TOGGLE_BUTTON_POSITION,
+    TOGGLE_BUTTON_SPACING,
+} from '@/inputs/buttons/toggle-button/config';
 
 
 export const getToggleButtonArgTypes = (): ArgTypes => ({
@@ -22,11 +25,48 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    label: {
-        name: 'label',
+    showStateText: {
+        name: 'showStateText',
+        type: { name: 'boolean' },
+        description: 'Determine whether the toggle button state text is checked.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    position: {
+        name: 'position',
         type: { name: 'string' },
-        description: 'Toggle Label',
-        defaultValue: '',
+        description: 'StateText position',
+        defaultValue: 'right',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'right',
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.keys(TOGGLE_BUTTON_POSITION),
+        },
+    },
+    spacing: {
+        name: 'spacing',
+        type: { name: 'string' },
+        description: 'The spacing between toggle and stateText',
+        defaultValue: 'sm',
         table: {
             type: {
                 summary: 'string',
@@ -37,26 +77,8 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'text',
-        },
-    },
-    styleType: {
-        name: 'styleType',
-        type: { name: 'string' },
-        description: 'Style theme of toggle button.',
-        defaultValue: TOGGLE_BUTTON_THEME.secondary,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: TOGGLE_BUTTON_THEME.secondary,
-            },
-        },
-        control: {
             type: 'select',
-            options: Object.keys(TOGGLE_BUTTON_THEME),
+            options: Object.keys(TOGGLE_BUTTON_SPACING),
         },
     },
     disabled: {

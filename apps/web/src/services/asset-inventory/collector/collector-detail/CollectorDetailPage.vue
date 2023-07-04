@@ -28,13 +28,17 @@
                 </span>
             </template>
             <template #extra>
-                <router-link :to="state.collectorHistoryLink">
-                    <p-button v-if="props.collectorId"
-                              style-type="tertiary"
+                <div class="collector-button-box">
+                    <router-link v-if="state.hasJobs"
+                                 :to="state.collectorHistoryLink"
                     >
-                        {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
-                    </p-button>
-                </router-link>
+                        <p-button v-if="props.collectorId"
+                                  style-type="tertiary"
+                        >
+                            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                        </p-button>
+                    </router-link>
+                </div>
             </template>
         </p-heading>
 
@@ -90,6 +94,7 @@ import {
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -125,6 +130,7 @@ const state = reactive({
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
+    hasJobs: false,
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -164,6 +170,20 @@ const getCollector = async (): Promise<CollectorModel|null> => {
 const fetchDeleteCollector = async () => SpaceConnector.client.inventory.collector.delete({
     collectors: [collectorFormStore.collectorId],
 });
+const jobCountApiHelper = new ApiQueryHelper().setCountOnly();
+const fetchJobCount = async (collectorId: string): Promise<number> => {
+    jobCountApiHelper.setFilters([
+        {
+            k: 'collector_id',
+            v: collectorId,
+            o: '=',
+        },
+    ]);
+    const result = await SpaceConnector.client.inventory.job.list({
+        query: jobCountApiHelper.data,
+    });
+    return result.total_count;
+};
 
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
@@ -201,7 +221,11 @@ const handleUpdateEditModalVisible = (value: boolean) => {
 onMounted(async () => {
     collectorFormStore.$reset();
     const collector = await getCollector();
-    if (collector) collectorFormStore.setOriginCollector(collector);
+    if (collector) {
+        collectorFormStore.setOriginCollector(collector);
+        const jobCount = await fetchJobCount(collector.collector_id);
+        state.hasJobs = jobCount > 0;
+    }
 });
 
 </script>
@@ -216,7 +240,11 @@ onMounted(async () => {
     justify-content: center;
     margin-left: 0.5rem;
 }
-
+.collector-button-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
 </style>
 
 

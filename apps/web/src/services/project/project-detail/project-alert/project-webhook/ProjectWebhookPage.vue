@@ -416,6 +416,7 @@ export default {
         (async () => {
             await Promise.allSettled([
                 store.dispatch('reference/webhook/load'),
+                store.dispatch('reference/plugin/load'),
                 listWebhooks(),
             ]);
         })();

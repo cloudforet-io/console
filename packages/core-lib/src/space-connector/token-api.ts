@@ -5,6 +5,7 @@ import axios from 'axios';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
+import { LocalStorageAccessor } from '@/local-storage-accessor';
 import type {
     AxiosPostResponse,
     SessionTimeoutCallback,
@@ -14,6 +15,9 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
+
+const VERBOSE = false;
+
 export default class TokenAPI {
     private static instance: TokenAPI;
 
@@ -50,13 +54,13 @@ export default class TokenAPI {
     }
 
     loadToken(): void {
-        this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
-        this.refreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
+        this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
+        this.refreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
 
     flushToken(): void {
-        window.localStorage.removeItem(ACCESS_TOKEN_KEY);
-        window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+        LocalStorageAccessor.removeItem(ACCESS_TOKEN_KEY);
+        LocalStorageAccessor.removeItem(REFRESH_TOKEN_KEY);
         this.accessToken = undefined;
         this.refreshToken = undefined;
     }
@@ -64,8 +68,8 @@ export default class TokenAPI {
     setToken(accessToken: string, refreshToken: string): void {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-        window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        LocalStorageAccessor.setItem(ACCESS_TOKEN_KEY, accessToken);
+        LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
         TokenAPI.unsetRefreshingState();
     }
 
@@ -78,15 +82,15 @@ export default class TokenAPI {
     }
 
     static checkRefreshingState(): string|null {
-        return window.localStorage.getItem(IS_REFRESHING_KEY);
+        return LocalStorageAccessor.getItem(IS_REFRESHING_KEY);
     }
 
     static setRefreshingState(): void {
-        return window.localStorage.setItem(IS_REFRESHING_KEY, 'true');
+        return LocalStorageAccessor.setItem(IS_REFRESHING_KEY, true);
     }
 
     static unsetRefreshingState(): void {
-        return window.localStorage.removeItem(IS_REFRESHING_KEY);
+        return LocalStorageAccessor.removeItem(IS_REFRESHING_KEY);
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
@@ -98,8 +102,16 @@ export default class TokenAPI {
                 TokenAPI.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
+                if (VERBOSE) {
+                    const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
+                    console.debug('TokenAPI.refreshAccessToken: success');
+                    console.debug(`TokenAPI.refreshAccessToken: new refresh token ttl: ${decoded.ttl}`);
+                }
                 return true;
             } catch (e) {
+                if (VERBOSE) {
+                    console.debug('TokenAPI.refreshAccessToken: failed');
+                }
                 this.flushToken();
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
@@ -114,16 +126,19 @@ export default class TokenAPI {
     async getActivatedToken() {
         if (this.accessToken && this.refreshToken) {
             const isTokenValid = TokenAPI.checkToken();
-            if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+            if (isTokenValid) this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
         }
     }
 
     static checkToken(): boolean {
-        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
+        const storedAccessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
         const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
         const currentTime = TokenAPI.getCurrentTime();
-        return (tokenExpirationTime - currentTime) > 10;
+        if (VERBOSE) {
+            console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
+        }
+        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 1200
     }
 
     static getTokenExpirationTime(token?: string): number {
@@ -147,7 +162,7 @@ export default class TokenAPI {
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
-            const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
+            const storedRefreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY);
             if (!storedRefreshToken) {
                 throw new Error('Session has expired. No stored refresh token.');
             }

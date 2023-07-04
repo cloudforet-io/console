@@ -7,8 +7,9 @@
         />
         <p-pane-layout class="policy-create-info-wrapper">
             <div class="policy-create-contents">
-                <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
-                <br>
+                <p-field-title class="policy-type">
+                    {{ $t('IAM.POLICY.FORM.TYPE') }}
+                </p-field-title>
                 <p-badge badge-type="solid-outline"
                          style-type="primary1"
                 >
@@ -162,6 +163,9 @@ export default {
         margin-bottom: 1.125rem;
         .p-text-input {
             width: 70%;
+        }
+        .policy-type {
+            margin-bottom: 0.25rem;
         }
     }
 

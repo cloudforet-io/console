@@ -60,6 +60,11 @@ Each type is slightly different, but there are also **common options**.
   - Can be sorted by the field, default true
 - sort_key
   - Sorting key for each field (default sort key: key)
+- key_depth
+  - If the data is an object type, it is the depth of the key to be displayed.
+  - `Null`: Explore the entire object based on the dot (.) delimiter.
+  - `1`: When it comes to `data.compute.instance_type`, only explore up to "data" as an object, and consider `compute.instance_type` as a key.
+  - `2`: In the case of `tags.aws.k8s.io.labels`, only explore up to "tags.aws" as an object, and consider `k8s.io.labels` as a key.
 - translation_id
   - Translation key for the label of the field(optional)
 - default

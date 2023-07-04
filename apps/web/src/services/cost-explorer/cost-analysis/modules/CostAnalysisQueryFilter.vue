@@ -19,11 +19,14 @@
                 >
                     <template v-if="!printMode">
                         <span class="v-divider" />
-                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
-                        <p-toggle-button class="ml-2"
-                                         :value="costAnalysisPageState.stack"
-                                         @change-toggle="handleToggleStack"
-                        />
+                        <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
+                            <template #right>
+                                <p-toggle-button :value="costAnalysisPageState.stack"
+                                                 class="toggle-button"
+                                                 @change-toggle="handleToggleStack"
+                                />
+                            </template>
+                        </p-field-title>
                     </template>
                     <template v-else-if="costAnalysisPageState.stack">
                         <span class="v-divider" />
@@ -62,7 +65,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PIconButton, PSelectDropdown, PToggleButton,
+    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
@@ -89,6 +92,7 @@ export default {
         PSelectDropdown,
         PIconButton,
         PToggleButton,
+        PFieldTitle,
     },
     props: {
         printMode: {
@@ -187,6 +191,9 @@ export default {
         .filter-item {
             display: flex;
             align-items: center;
+            .toggle-button {
+                margin-left: 0.25rem;
+            }
         }
         .v-divider {
             @apply bg-gray-300;

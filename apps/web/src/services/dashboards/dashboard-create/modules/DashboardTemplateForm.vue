@@ -141,7 +141,7 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 
 import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/template-list';
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 

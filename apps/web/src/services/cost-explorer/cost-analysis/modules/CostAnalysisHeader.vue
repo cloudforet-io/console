@@ -107,7 +107,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -168,7 +168,7 @@ export default {
             visiblePdfOverlay: false,
             pdfFileName: computed<string>(() => `${costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
             previewItems: [] as Item[],
-            currency: computed(() => store.state.display.currency),
+            currency: computed(() => store.state.settings.currency),
             pdfFontLanguage: computed<string>(() => {
                 // https://pdfmake.github.io/docs/0.1/fonts/custom-fonts-client-side/url/
                 if (state.currency === CURRENCY.USD) return 'en';
