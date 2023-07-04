@@ -1,5 +1,5 @@
 <template>
-    <div class="all-dashboards-page">
+    <div class="dashboards-main-page">
         <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
                    use-total-count
                    :total-count="dashboardTotalCount"
@@ -102,7 +102,7 @@ import { SCOPE_TYPE } from '@/services/dashboards/dashboard-main/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default {
-    name: 'AllDashboardsPage',
+    name: 'DashboardMainPage',
     components: {
         DashboardMainBoardList,
         DashboardMainSelectFilter,
@@ -155,7 +155,7 @@ export default {
                 ],
             }]),
             valueHandlerMap: computed(() => ({
-                label: combinedDashbaordLabelsAutoCompleteHandler(),
+                label: combinedDashboardLabelsAutoCompleteHandler(),
             })),
             queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
         });
@@ -189,7 +189,7 @@ export default {
             });
         };
 
-        const combinedDashbaordLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
+        const combinedDashboardLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
             const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
             const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
             if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
@@ -242,7 +242,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.all-dashboards-page {
+.dashboards-main-page {
     @apply w-full;
 
     .dashboard-list-wrapper {
