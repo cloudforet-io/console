@@ -26,9 +26,6 @@ ENV FORCE_COLOR=1
 
 RUN npx turbo build --filter=web... --output-logs=new-only --summarize
 
-# Enable only for turbo debugging purposes
-#RUN find .turbo/runs/. -type f -exec cat {} \;
-
 FROM nginx AS runner
 
 ENV PORT 80
@@ -42,6 +39,10 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY apps/web/pkg/proxy.conf ${NGINX_CONF_PATH}/proxy.conf
 
 COPY --from=installer /app/apps/web/dist/. ${ROOT_PATH}/
+
+# Enable only for turbo debugging purposes
+#RUN mkdir -p ${LOG_PATH}/turbo
+#COPY --from=installer /app/.turbo/runs/. ${LOG_PATH}/turbo
 
 EXPOSE ${PORT}
 
