@@ -9,7 +9,7 @@
             <p-datetime-picker :selected-dates="startDates"
                                data-type="yearToMonth"
                                :invalid="!disableValidation && invalidState.startDates"
-                               :max-date="endDates[0] || ''"
+                               :max-date="startMaxDate"
                                @update:selectedDates="handleUpdateSelectedDates('startDates', $event)"
             />
         </p-field-group>
@@ -22,7 +22,7 @@
             <p-datetime-picker :selected-dates="endDates"
                                data-type="yearToMonth"
                                :invalid="!disableValidation && invalidState.endDates"
-                               :min-date="startDates[0] || ''"
+                               :min-date="endMinDate"
                                @update:selectedDates="handleUpdateSelectedDates('endDates', $event)"
             />
         </p-field-group>
@@ -75,23 +75,9 @@ export default defineComponent<Props>({
 
         const handleUpdateSelectedDates = (target: 'startDates'|'endDates', value) => {
             if (target === 'startDates') {
-                let start = value[0];
-                const end = endDates.value[0];
-
-                if (start && end && dayjs.utc(end).isSameOrBefore(dayjs.utc(start))) {
-                    start = undefined;
-                }
-
-                setForm(target, [start]);
+                setForm(target, value);
             } else {
-                let end = value[0];
-                const start = startDates.value[0];
-
-                if (start && end && dayjs.utc(start).isSameOrAfter(dayjs.utc(end))) {
-                    end = undefined;
-                }
-
-                setForm(target, [end]);
+                setForm(target, value);
             }
         };
 
@@ -100,6 +86,14 @@ export default defineComponent<Props>({
                 start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM'),
                 end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM'),
             })),
+            startMaxDate: computed(() => {
+                const end = endDates.value[0];
+                return end ? dayjs.utc(end).format('YYYY-MM') : undefined;
+            }),
+            endMinDate: computed(() => {
+                const start = startDates.value[0];
+                return start ? dayjs.utc(start).format('YYYY-MM') : undefined;
+            }),
         });
 
         watch(() => state.period, (period) => {
