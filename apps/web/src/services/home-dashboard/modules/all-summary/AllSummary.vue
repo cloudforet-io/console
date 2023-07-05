@@ -23,7 +23,7 @@
                                     <span v-if="name === DATA_TYPE.BILLING"
                                           class="dollar-sign"
                                     >$</span>
-                                    <span>{{ count[name] }}</span>
+                                    <span class="value">{{ count[name] }}</span>
                                 </span>
                             </router-link>
                             <span v-if="name === DATA_TYPE.STORAGE"
@@ -545,12 +545,15 @@ export default {
         @apply text-indigo-400;
         align-self: flex-end;
         display: inline-flex;
-        line-height: 2.5rem;
+        height: 3rem;
+        line-height: 2rem;
         &:hover {
             .anchor {
-                border-bottom: 2px solid;
                 &.billing {
                     border: none;
+                }
+                .value {
+                    border-bottom: 2px solid;
                 }
             }
         }
