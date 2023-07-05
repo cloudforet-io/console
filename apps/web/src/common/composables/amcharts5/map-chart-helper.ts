@@ -8,6 +8,9 @@ import { gray } from '@/styles/colors';
 
 export const createMapChart = (root: Root, settings?: IMapChartSettings): am5map.MapChart => root.container.children.push(am5map.MapChart.new(root, {
     projection: am5map.geoMercator(),
+    panX: 'none',
+    panY: 'none',
+    maxZoomLevel: 1,
     ...settings,
 }));
 
