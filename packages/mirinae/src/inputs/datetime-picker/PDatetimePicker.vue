@@ -220,7 +220,6 @@ export default {
             if (state.datePickerRef) {
                 state.datePicker?.clear();
                 createDatePicker(state.datePickerRef);
-                state.datePicker?.setDate(state.proxySelectedDates);
             }
         });
 
