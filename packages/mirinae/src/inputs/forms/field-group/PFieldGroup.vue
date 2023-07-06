@@ -78,6 +78,9 @@ const handleClickFieldTitle = () => {
 <style lang="postcss">
 .p-field-group {
     margin-bottom: 1rem;
+    .form-label {
+        padding-bottom: 0.25rem;
+    }
     .label-box {
         display: flex;
         align-items: center;

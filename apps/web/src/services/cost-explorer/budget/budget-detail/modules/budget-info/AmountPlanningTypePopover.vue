@@ -21,8 +21,8 @@ withDefaults(defineProps<Props>(), {
 const store = useStore();
 
 const state = reactive({
-    currency: computed(() => store.state.display.currency),
-    currencyRates: computed(() => store.state.display.currencyRates),
+    currency: computed(() => store.state.settings.currency),
+    currencyRates: computed(() => store.state.settings.currencyRates),
 });
 const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 

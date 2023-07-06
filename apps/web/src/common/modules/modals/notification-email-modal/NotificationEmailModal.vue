@@ -112,6 +112,8 @@ import {
     PTextInput,
 } from '@spaceone/design-system';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -161,7 +163,7 @@ const handleClickCancel = () => {
     resetFormData();
     state.proxyVisible = false;
     emit('refresh-user');
-    window.localStorage.setItem('hideNotificationEmailModal', 'true');
+    LocalStorageAccessor.setItem('hideNotificationEmailModal', true);
 };
 const resetFormData = () => {
     formState.newNotificationEmail = '';

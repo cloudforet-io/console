@@ -1,5 +1,51 @@
+<script lang="ts" setup>
+import { PSelectDropdown, PBadge } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import {
+    computed,
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
+interface Props {
+    printMode: boolean;
+    defaultCurrencyMode: boolean;
+    currency: Currency;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    printMode: false,
+    defaultCurrencyMode: false,
+    currency: undefined,
+});
+const emit = defineEmits<{(e: 'update:currency', value: Currency): void}>();
+const { t } = useI18n();
+const store = useStore();
+
+const DEFAULT_CURRENCY = CURRENCY.USD;
+const state = reactive({
+    currency: computed(() => props.currency || store.state.settings.currency || DEFAULT_CURRENCY),
+    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        type: 'item',
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+        badge: currency === DEFAULT_CURRENCY ? t('DASHBOARDS.DETAIL.DEFAULT') : '',
+    }))),
+});
+
+const handleSelectCurrency = (currency: Currency) => {
+    store.commit('settings/setCurrency', currency);
+    emit('update:currency', currency);
+};
+
+</script>
+
 <template>
-    <p-select-dropdown :items="currencyItems"
+    <p-select-dropdown :items="state.currencyItems"
                        :selected="currency"
                        style-type="transparent"
                        :read-only="printMode"
@@ -37,67 +83,6 @@
         </template>
     </p-select-dropdown>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    reactive, toRefs,
-} from 'vue';
-
-import { PSelectDropdown, PBadge } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-
-export default {
-    name: 'CurrencySelectDropdown',
-    components: {
-        PSelectDropdown,
-        PBadge,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-        defaultCurrencyMode: {
-            type: Boolean,
-            default: false,
-        },
-        currency: {
-            type: String as PropType<Currency>,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            currency: computed(() => props.currency || store.state.display.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
-                type: 'item',
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-                badge: currency === DEFAULT_CURRENCY ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
-            }))),
-        });
-        const DEFAULT_CURRENCY = CURRENCY.USD;
-
-        const handleSelectCurrency = (currency: Currency) => {
-            store.commit('display/setCurrency', currency);
-            emit('update:currency', currency);
-        };
-
-        return {
-            ...toRefs(state),
-            handleSelectCurrency,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */

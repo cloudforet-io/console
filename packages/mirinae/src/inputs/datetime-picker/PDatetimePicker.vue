@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import Flatpickr from 'flatpickr';
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
@@ -46,7 +45,6 @@ import Instance = Flatpickr.Instance;
 
 
 dayjs.extend(utc);
-dayjs.extend(tz);
 
 /**
  * Used library: flatpickr
@@ -70,10 +68,6 @@ const props = defineProps({
         type: String as PropType<STYLE_TYPE>,
         default: STYLE_TYPE.default,
         validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
-    },
-    timezone: {
-        type: String,
-        default: 'UTC',
     },
     minDate: {
         type: [String, Date] as PropType<DateOption>,
@@ -131,7 +125,6 @@ const state = reactive({
 /* util */
 const resizeInputWidth = (dateString, instance) => {
     const inputSizer = instance.element.childNodes[0];
-    inputSizer.dataset.value = dateString;
     inputSizer.style.minWidth = 'auto';
 };
 
@@ -142,10 +135,8 @@ const handleReady = (selectedDates, dateString, instance: Flatpickr.Instance) =>
         calendarContainer.classList.add('p-datetime-picker-calendar');
     }
 
-    if (selectedDates.length) {
-        state.dateString = dateString;
-        resizeInputWidth(dateString, instance);
-    }
+    state.dateString = dateString;
+    resizeInputWidth(dateString, instance);
 };
 const handleUpdateValue = (selectedDates, dateString, instance) => {
     resizeInputWidth(dateString, instance);
@@ -154,7 +145,7 @@ const handleClosePicker = (selectedDates: Date[], dateStr, instance) => {
     if (props.selectMode !== SELECT_MODE.range || (props.selectMode === SELECT_MODE.range && selectedDates.length === 2)) {
         state.proxySelectedDates = selectedDates.map((d) => {
             const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-            return dayjs.tz(dateString, props.timezone).format();
+            return dayjs.utc(dateString).format();
         });
         state.dateString = dateStr;
     } else {
@@ -188,15 +179,15 @@ const createDatePicker = (datePickerRef: HTMLElement) => {
         let defaultDate;
         if (state.proxySelectedDates.length) {
             if (props.dataType === DATA_TYPE.yearToMonth) {
-                defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
+                defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs.utc(d).toDate(), 'F Y'));
             } else {
-                defaultDate = state.proxySelectedDates.map((d) => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
+                defaultDate = state.proxySelectedDates.map((d) => dayjs.utc(d).format('YYYY-MM-DD HH:mm'));
             }
         }
         state.datePicker = Flatpickr(datePickerRef, {
             mode: state.mode,
             defaultDate,
-            altInput: true,
+            altInput: false,
             altFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
             dateFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
             enableTime: state.enableTime,
@@ -218,8 +209,12 @@ watch(() => state.datePickerRef, (datePickerRef) => {
         createDatePicker(datePickerRef);
     }
 });
-watch([() => props.selectedDates, () => props.minDate, () => props.maxDate, () => state.enableTime, () => state.localeFile], () => {
-    if (state.datePickerRef) createDatePicker(state.datePickerRef);
+watch([() => props.minDate, () => props.maxDate], () => {
+    if (state.datePickerRef) {
+        state.datePicker?.clear();
+        createDatePicker(state.datePickerRef);
+        state.datePicker?.setDate(state.proxySelectedDates);
+    }
 });
 
 </script>
@@ -469,6 +464,9 @@ watch([() => props.selectedDates, () => props.minDate, () => props.maxDate, () =
                     box-shadow: none;
                 }
             }
+        }
+        &.flatpickr-disabled {
+            @apply text-gray-300;
         }
     }
     .flatpickr-monthSelect-months {

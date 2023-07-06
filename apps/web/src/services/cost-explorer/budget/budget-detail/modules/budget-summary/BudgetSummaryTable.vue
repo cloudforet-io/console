@@ -7,9 +7,8 @@ import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';

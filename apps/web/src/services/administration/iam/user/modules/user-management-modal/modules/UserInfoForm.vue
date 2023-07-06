@@ -1,74 +1,10 @@
-<template>
-    <div class="user-info-form-wrapper">
-        <p-field-group :label="t('IDENTITY.USER.FORM.USER_ID')"
-                       :required="true"
-                       :invalid="validationState.isUserIdValid === false"
-                       :invalid-text="validationState.userIdInvalidText"
-                       :valid="validationState.isUserIdValid"
-                       :valid-text="validationState.userIdValidText"
-        >
-            <template v-if="props.activeTab === 'external'
-                          && state.supportFind
-                          && state.externalItems.length > 100"
-                      #help
-            >
-                <div class="external-items-help-text">
-                    <span>{{ t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                </div>
-            </template>
-            <template #default="{invalid}">
-                <div v-if="props.activeTab === 'external' && state.supportFind">
-                    <p-filterable-dropdown
-                        v-model:search-text="state.searchText"
-                        v-model:selected="state.selectedItems"
-                        :class="{invalid}"
-                        show-select-marker
-                        :menu="state.externalItems"
-                        :loading="state.loading"
-                        disable-handler
-                        :exact-mode="false"
-                        use-fixed-menu-style
-                        @select="handleSelectExternalUser"
-                        @delete-tag="handleDeleteSelectedExternalUser"
-                    />
-                </div>
-                <div v-else
-                     class="id-input-form"
-                >
-                    <p-text-input ref="inputRef"
-                                  v-model="formState.userId"
-                                  :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
-                                  :invalid="invalid"
-                                  :disabled="userPageState.visibleUpdateModal"
-                                  class="text-input"
-                    />
-                    <p-button v-if="!userPageState.visibleUpdateModal"
-                              style-type="secondary"
-                              class="user-id-check-button"
-                              @click="handleClickCheckId"
-                    >
-                        {{ t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-field-group>
-        <p-field-group :label="t('IDENTITY.USER.FORM.NAME')"
-                       class="input-form"
-        >
-            <p-text-input v-model="formState.name"
-                          class="text-input"
-                          @update:value="handleChangeInput"
-            />
-        </p-field-group>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PFieldGroup, PTextInput, PButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MaybeElementRef } from '@vueuse/core';
 import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
 import {
@@ -111,7 +47,7 @@ const store = useStore();
 const { t } = useI18n();
 
 const inputRef = ref(null as null|HTMLInputElement);
-useFocus(inputRef, { initialValue: true });
+useFocus(inputRef as unknown as MaybeElementRef, { initialValue: true });
 
 const state = reactive({
     loading: false,
@@ -222,6 +158,7 @@ const handleClickCheckId = async () => {
     const invalidObj = validation.find((item) => item.invalidText.length > 0);
     if (!invalidObj) {
         validationState.isUserIdValid = true;
+        validationState.userIdValidText = t('IDENTITY.USER.FORM.NAME_VALID');
         emit('change-input', { ...formState, userId: formState.userId });
     } else {
         validationState.isUserIdValid = invalidObj.isValid;
@@ -249,6 +186,71 @@ watch(() => state.searchText, (searchText) => {
     }
 });
 </script>
+
+<template>
+    <div class="user-info-form-wrapper">
+        <p-field-group :label="t('IDENTITY.USER.FORM.USER_ID')"
+                       :required="true"
+                       :invalid="validationState.isUserIdValid === false"
+                       :invalid-text="validationState.userIdInvalidText"
+                       :valid="validationState.isUserIdValid"
+                       :valid-text="validationState.userIdValidText"
+        >
+            <template v-if="props.activeTab === 'external'
+                          && state.supportFind
+                          && state.externalItems.length > 100"
+                      #help
+            >
+                <div class="external-items-help-text">
+                    <span>{{ t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                </div>
+            </template>
+            <template #default="{invalid}">
+                <div v-if="props.activeTab === 'external' && state.supportFind">
+                    <p-filterable-dropdown
+                        v-model:search-text="state.searchText"
+                        v-model:selected="state.selectedItems"
+                        :class="{invalid}"
+                        show-select-marker
+                        :menu="state.externalItems"
+                        :loading="state.loading"
+                        disable-handler
+                        :exact-mode="false"
+                        use-fixed-menu-style
+                        @select="handleSelectExternalUser"
+                        @delete-tag="handleDeleteSelectedExternalUser"
+                    />
+                </div>
+                <div v-else
+                     class="id-input-form"
+                >
+                    <p-text-input ref="inputRef"
+                                  v-model="formState.userId"
+                                  :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
+                                  :invalid="invalid"
+                                  :valid="validationState.isUserIdValid"
+                                  :disabled="userPageState.visibleUpdateModal"
+                    />
+                    <p-button v-if="!userPageState.visibleUpdateModal"
+                              style-type="secondary"
+                              class="user-id-check-button"
+                              @click="handleClickCheckId"
+                    >
+                        {{ t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-field-group>
+        <p-field-group :label="t('IDENTITY.USER.FORM.NAME')"
+                       class="input-form"
+        >
+            <p-text-input v-model="formState.name"
+                          class="text-input"
+                          @update:value="handleChangeInput"
+            />
+        </p-field-group>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .user-info-form-wrapper {

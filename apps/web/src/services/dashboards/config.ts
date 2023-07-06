@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
@@ -72,6 +72,12 @@ export interface DashboardConfig {
         text?: string | TranslateResult;
     }
 }
+
+export const DASHBOARD_LABEL = {
+    COST: 'Cost',
+    ASSET: 'Asset',
+} as const;
+export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 
 // variables
 export type DashboardVariables = SingleSelectDashboardVariables | MultiSelectDashboardVariables;

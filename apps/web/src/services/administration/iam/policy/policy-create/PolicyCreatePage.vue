@@ -9,8 +9,6 @@ import {
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { i18n } from '@/translations';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -35,7 +33,7 @@ const {
     policyName: '',
     policyCode: '',
 }, {
-    policyName(value: string) { return value.trim().length > 2 ? '' : i18n.t('IAM.POLICY.FORM.VALIDATION_NAME'); },
+    policyName(value: string) { return value.trim().length > 2 ? '' : t('IAM.POLICY.FORM.VALIDATION_NAME'); },
     policyCode(value: string) { return value.trim().length ? '' : false; },
 });
 
@@ -72,8 +70,9 @@ const handleCreatePolicy = async () => {
         />
         <p-pane-layout class="policy-create-info-wrapper">
             <div class="policy-create-contents">
-                <p-field-title>{{ t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
-                <br>
+                <p-field-title class="policy-type">
+                    {{ t('IAM.POLICY.FORM.TYPE') }}
+                </p-field-title>
                 <p-badge badge-type="solid-outline"
                          style-type="primary1"
                 >
@@ -139,6 +138,9 @@ const handleCreatePolicy = async () => {
         margin-bottom: 1.125rem;
         .p-text-input {
             width: 70%;
+        }
+        .policy-type {
+            margin-bottom: 0.25rem;
         }
     }
 

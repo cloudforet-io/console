@@ -1,3 +1,4 @@
+import type { DynamicFieldOptions, ListOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayoutType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { forEach } from 'lodash';
 
@@ -9,6 +10,7 @@ interface ExcelDataField {
     type?: 'datetime'|'enum';
     enum_items?: any;
     reference?: Reference;
+    options?: DynamicFieldOptions;
 }
 
 /**
@@ -22,11 +24,11 @@ export const getApiActionByLayoutType = (type: DynamicLayoutType): 'getData'|'ge
 };
 
 export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
-    const res: ExcelDataField = { key: d.key, name: d.name ?? d.key };
+    const res: ExcelDataField = { key: d.key, name: d.name ?? d.key, options: d.options };
 
     // lis type case will be deprecated
-    if (d.type === 'list' && (d.options as any)?.sub_key) {
-        res.key = `${d.key}.${(d.options as any).sub_key}`;
+    if (d.type === 'list' && (d.options as ListOptions)?.sub_key) {
+        res.key = `${d.key}.${(d.options as ListOptions).sub_key}`;
     }
 
     if (d.type === 'datetime') {

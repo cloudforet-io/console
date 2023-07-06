@@ -21,6 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { useAlertManagerSettingsStore } from '@/services/alert-manager/store/alert-manager-settings-store';
 
 
 const store = useStore();
@@ -31,12 +32,14 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
 });
+const alertManagerSettingsStore = useAlertManagerSettingsStore();
+alertManagerSettingsStore.initState();
 const state = reactive({
     loading: false,
     items: [],
     totalCount: 0,
     assignedVisible: true,
-    lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', ALERT_MANAGER_ROUTE.ALERT._NAME)),
+    lastCheckedTime: alertManagerSettingsStore.getAlertLastCheckTime,
     isVisible: computed(() => {
         if (state.totalCount && state.assignedVisible) return true;
         return false;
@@ -74,11 +77,7 @@ const getAssignedAlerts = async () => {
 const onHideAlerts = () => {
     state.assignedVisible = false;
     const lastCheckedTime = dayjs.utc().toISOString();
-    store.dispatch('settings/setItem', {
-        key: 'last_checked_time',
-        value: lastCheckedTime,
-        path: ALERT_MANAGER_ROUTE.ALERT._NAME,
-    });
+    alertManagerSettingsStore.setAlertLastCheckTime(lastCheckedTime);
 };
 
 const onClickListItem = (idx) => {

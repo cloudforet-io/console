@@ -84,6 +84,7 @@
 </template>
 
 <script lang="ts">
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
@@ -150,14 +151,20 @@ export default defineComponent({
             store.commit('error/setVisibleSessionExpiredError', false);
             router.push(res);
         };
-        const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
+        const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
         const updateUser = async () => {
             await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
         };
 
         watch(() => route, (value) => {
-            state.notificationEmailModalVisible = !state.isEmailVerified && !window.localStorage.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
+            state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
         });
+
+        watch(() => state.userId, (userId) => {
+            if (userId) {
+                store.dispatch('settings/initSettings');
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

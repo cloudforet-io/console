@@ -7,7 +7,7 @@ import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
-import type { Currency } from '@/store/modules/display/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';

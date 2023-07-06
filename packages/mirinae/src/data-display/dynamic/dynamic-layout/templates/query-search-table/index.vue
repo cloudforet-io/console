@@ -77,6 +77,7 @@ import { useI18n } from 'vue-i18n';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
+import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
@@ -190,11 +191,12 @@ const state = reactive({
     }),
 });
 
-const getFieldData = (rowData, dataPath: string, { type }: DynamicFieldProps): any => {
+const getFieldData = (rowData, dataPath: string, { type, options }: DynamicFieldProps<TextOptions>): any => {
     if (type === 'more') {
         return rowData;
     }
-    return getValueByPath(rowData, dataPath);
+    const keyDepth = options?.key_depth ?? null;
+    return getValueByPath(rowData, dataPath, keyDepth);
 };
 
 const handleSelect = (selectIndex: number[]) => {

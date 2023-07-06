@@ -21,6 +21,9 @@ export const Template = (args, { argTypes }) => ({
         <p-field-title
             :label="label"
             :description="description"
+            :size="size"
+            :font-weight="fontWeight"
+            :color="color"
         >
             <template v-if="defaultSlot"><span v-html="defaultSlot"/></template>
         </p-field-title>
@@ -54,11 +57,7 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## With Description
-
 <Canvas>
     <Story name="With Description">
         {{
@@ -75,12 +74,132 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
+## Size
+<Canvas>
+    <Story name="Size">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title size="sm">Field Title</p-field-title>
+        <p-field-title>Field Title</p-field-title>
+        <p-field-title size="lg">Field Title</p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
 
+## Font Weight
+<Canvas>
+    <Story name="Font Weight">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title font-weight="regular">Field Title</p-field-title>
+        <p-field-title>Field Title</p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Color
+<Canvas>
+    <Story name="Color">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title>Field Title</p-field-title>
+        <p-field-title color="gray">Field Title</p-field-title>
+        <p-field-title font-weight="regular">Field Title</p-field-title>
+        <p-field-title font-weight="regular" color="gray">Field Title</p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Left Slot
+<Canvas>
+    <Story name="Left Slot">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title description="This is description for field title.🤓">
+            Field Title
+            <template #left>
+                <span class="flex items-center justify-center w-4 h-4 bg-gray-500 text-sm" >L</span>
+            </template>
+        </p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Right Slot
+<Canvas>
+    <Story name="Right Slot">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title description="This is description for field title.🤓">
+            Field Title
+            <template #right>
+                <span class="flex items-center justify-center w-4 h-4 bg-gray-500 text-sm" >R</span>
+            </template>
+        </p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Bottom Slot
+<Canvas>
+    <Story name="Bottom Slot">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full overflow p-8">
+        <p-field-title class="w-40">
+            Field Title
+            <template #bottom>
+                <button class="flex items-center justify-center w-20 bg-gray-500 text-sm" >
+                    button
+                </button>
+            </template>
+        </p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Playground
-
 <Canvas>
     <Story name="Playground">
         {Template.bind({})}

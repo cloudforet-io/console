@@ -4,11 +4,10 @@ import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

@@ -1,3 +1,5 @@
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { languages } from '@/store/modules/user/config';
 
 import * as actions from './actions';
@@ -10,9 +12,9 @@ export const STORAGE_KEY = 'store/user';
 let storedUserState: Partial<UserState> = {};
 
 try {
-    storedUserState = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+    storedUserState = LocalStorageAccessor.getItem(STORAGE_KEY) ?? {};
 } catch (e) {
-    window.localStorage.removeItem(STORAGE_KEY);
+    LocalStorageAccessor.removeItem(STORAGE_KEY);
 }
 
 const state: UserState = {

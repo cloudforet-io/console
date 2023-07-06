@@ -64,7 +64,7 @@ const state = reactive({
         };
     })),
     showList: computed(() => props.projectId || props.projectGroupId),
-    currency: computed(() => store.state.display.currency),
+    currency: computed(() => store.state.settings.currency),
     // api request params
     budgetListParams: computed(() => {
         let filters: ConsoleFilter[] = [];

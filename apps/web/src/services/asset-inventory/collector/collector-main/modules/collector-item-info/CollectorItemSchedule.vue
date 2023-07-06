@@ -89,8 +89,8 @@ watch(() => props.item, (item) => {
         <div @click.stop="handleChangeToggle">
             <p-toggle-button
                 :value="state.isScheduleActivated"
-                :label="state.isScheduleActivated ? 'ON' : 'OFF'"
                 :class="state.isScheduleActivated ? 'toggle-active' : ''"
+                show-state-text
                 @change-toggle="handleChangeToggle"
             />
         </div>
@@ -117,18 +117,6 @@ watch(() => props.item, (item) => {
             }
             .icon-schedule {
                 @apply text-blue-700;
-            }
-        }
-    }
-
-    /* custom design-system component - p-toggle-button */
-    :deep(.p-toggle-button) {
-        .label {
-            @apply text-gray-400;
-        }
-        &.toggle-active {
-            .label {
-                @apply text-blue-600;
             }
         }
     }

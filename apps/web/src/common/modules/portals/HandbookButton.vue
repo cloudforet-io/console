@@ -1,123 +1,118 @@
-<template>
-    <fragment>
-        <span style-type="primary"
-              class="handbook-button"
-              @click="handleHandbookButton"
-        >
-            <p-i name="ic_question-mark-circle"
-                 width="0.875rem"
-                 height="0.875rem"
-                 color="inherit"
-            />
-            <span class="text">
-                <slot name="button">{{ $t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}</slot>
-            </span>
-        </span>
-        <portal to="handbook-title">
-            <p class="handbook-title">
-                {{ $t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}
-            </p>
-        </portal>
-        <portal to="handbook-contents">
-            <div class="handbook-contents">
-                <p-tab :tabs="tabs"
-                       :active-tab.sync="proxyActiveTab"
-                >
-                    <template v-for="(_, slot) of $scopedSlots"
-                              #[slot]="scope"
-                    >
-                        <div :key="slot">
-                            <slot :name="slot"
-                                  v-bind="scope"
-                            />
-                        </div>
-                    </template>
-                </p-tab>
-                <div class="no-more">
-                    <p-checkbox v-model="noMore"
-                                :value="true"
-                                @change="onChangeNoMore"
-                    >
-                        {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
-                    </p-checkbox>
-                </div>
-            </div>
-        </portal>
-    </fragment>
-</template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
-} from 'vue';
-
+<script lang="ts" setup>
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import {
     PI, PCheckbox, PTab,
 } from '@spaceone/design-system';
-
-import { store } from '@/store';
+import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import {
+    computed, reactive, watch, onMounted, onUnmounted, useSlots,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-export default defineComponent({
-    name: 'HandbookButton',
-    components: {
-        PI, PCheckbox, PTab,
-    },
-    props: {
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        activeTab: {
-            type: String,
-            default: '',
-        },
-        type: {
-            type: String,
-            required: true,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyActiveTab: useProxyValue('activeTab', props, emit),
-            storageKey: computed<string>(() => `handbook:${store.state.user.userId}:${props.type}`),
-            noMore: false,
-        });
+interface Props {
+    tabs: (TabItem|string)[];
+    activeTab: string;
+    type: string;
+}
 
-        watch(() => state.storageKey, () => {
-            state.noMore = !!JSON.parse(localStorage.getItem(state.storageKey) ?? 'false');
-        }, { immediate: true });
-
-        const onChangeNoMore = (val) => {
-            localStorage.setItem(state.storageKey, val);
-            if (val) store.dispatch('display/hideSidebar');
-        };
-
-        const handleHandbookButton = () => {
-            if (store.getters['display/isHandbookVisible']) store.dispatch('display/hideSidebar');
-            else store.dispatch('display/showHandbook');
-        };
-
-        onMounted(() => {
-            if (!state.noMore && !store.getters['display/isHandbookVisible']) {
-                store.dispatch('display/showHandbook');
-            }
-        });
-        onUnmounted(() => {
-            if (store.getters['display/isHandbookVisible']) {
-                store.dispatch('display/hideSidebar');
-            }
-        });
-        return {
-            ...toRefs(state),
-            onChangeNoMore,
-            handleHandbookButton,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    tabs: () => [],
+    activeTab: '',
 });
+const emit = defineEmits<{(e: 'update:activeTab', value: (TabItem|string)[]): void}>();
+const { t } = useI18n();
+const store = useStore();
+const slots = useSlots();
+
+const state = reactive({
+    proxyActiveTab: useProxyValue('activeTab', props, emit),
+    userId: computed<string>(() => store.state.user.userId),
+    noMore: false,
+});
+
+watch([() => state.userId, () => props.type], ([userId, type]) => {
+    state.noMore = !!((LocalStorageAccessor.getItem(userId) ?? {}).handbook?.[type]);
+}, { immediate: true });
+
+const handleNoMore = (val: string) => {
+    const storageValue = LocalStorageAccessor.getItem(state.userId) || {};
+    LocalStorageAccessor.setItem(state.userId, {
+        ...storageValue,
+        handbook: {
+            ...(storageValue.handbook && storageValue.handbook),
+            [props.type]: val,
+        },
+    });
+    if (val) store.dispatch('display/hideSidebar');
+};
+
+const handleHandbookButton = () => {
+    if (store.getters['display/isHandbookVisible']) store.dispatch('display/hideSidebar');
+    else store.dispatch('display/showHandbook');
+};
+
+onMounted(() => {
+    if (!state.noMore && !store.getters['display/isHandbookVisible']) {
+        store.dispatch('display/showHandbook');
+    }
+});
+onUnmounted(() => {
+    if (store.getters['display/isHandbookVisible']) {
+        store.dispatch('display/hideSidebar');
+    }
+});
+
 </script>
+
+<template>
+    <span style-type="primary"
+          class="handbook-button"
+          @click="handleHandbookButton"
+    >
+        <p-i name="ic_question-mark-circle"
+             width="0.875rem"
+             height="0.875rem"
+             color="inherit"
+        />
+        <span class="text">
+            <slot name="button">{{ t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}</slot>
+        </span>
+    </span>
+    <portal to="handbook-title">
+        <p class="handbook-title">
+            {{ t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}
+        </p>
+    </portal>
+    <portal to="handbook-contents">
+        <div class="handbook-contents">
+            <p-tab v-model:active-tab="state.proxyActiveTab"
+                   :tabs="tabs"
+            >
+                <template v-for="(_, slot) of slots"
+                          :key="slot"
+                          #[slot]="scope"
+                >
+                    <div>
+                        <slot :name="slot"
+                              v-bind="scope"
+                        />
+                    </div>
+                </template>
+            </p-tab>
+            <div class="no-more">
+                <p-checkbox v-model="state.noMore"
+                            :value="true"
+                            @change="handleNoMore"
+                >
+                    {{ t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
+                </p-checkbox>
+            </div>
+        </div>
+    </portal>
+</template>
 
 <style lang="postcss" scoped>
 .handbook-button {

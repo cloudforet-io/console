@@ -131,7 +131,6 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
 export const signOut = (): void => {
     SpaceConnector.flushToken();
-    window.localStorage.removeItem('hideNotificationEmailModal');
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {

@@ -83,6 +83,7 @@ const handleUnitChange = (value?: BudgetTimeUnit) => {
     }
     .title {
         color: inherit;
+        margin-bottom: 0.25rem;
     }
     .desc {
         @apply text-gray-400 text-xs;

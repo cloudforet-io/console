@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PToggleButton, PSelectDropdown } from '@spaceone/design-system';
+import { PToggleButton, PSelectDropdown, PFieldTitle } from '@spaceone/design-system';
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -100,13 +100,15 @@ const getRoleList = async () => {
 
 <template>
     <div class="admin-role-wrapper">
-        <div class="admin-role-headline">
-            <p-toggle-button
-                :value="state.isToggled"
-                @change-toggle="handleUpdateToggle"
-            />
-            <span class="title">{{ t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
-        </div>
+        <p-field-title :label="t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')">
+            <template #left>
+                <p-toggle-button
+                    :value="state.isToggled"
+                    class="toggle-button"
+                    @change-toggle="handleUpdateToggle"
+                />
+            </template>
+        </p-field-title>
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
                            :key="`admin-role-${props.activeTab}`"
@@ -126,12 +128,8 @@ const getRoleList = async () => {
     @apply flex flex-col bg-white rounded-lg;
     padding: 0.75rem;
     gap: 0.875rem;
-    .admin-role-headline {
-        @apply flex items-center;
-        gap: 0.5rem;
-        .title {
-            @apply text-label-md font-bold;
-        }
+    .toggle-button {
+        margin-right: 0.25rem;
     }
 }
 </style>

@@ -61,8 +61,8 @@ const state = reactive({
     budgetUsage: {} as BudgetUsageData,
     loading: false,
     // currency
-    currency: computed(() => store.state.display.currency),
-    currencyRates: computed(() => store.state.display.currencyRates),
+    currency: computed(() => store.state.settings.currency),
+    currencyRates: computed(() => store.state.settings.currencyRates),
     currencySymbol: computed(() => store.getters['display/currencySymbol']),
     // card data
     cards: computed<Card[]>(() => [

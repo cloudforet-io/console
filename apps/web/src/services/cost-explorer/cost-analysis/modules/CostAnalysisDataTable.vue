@@ -166,8 +166,8 @@ export default {
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             //
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            currency: computed(() => store.state.settings.currency),
+            currencyRates: computed(() => store.state.settings.currencyRates),
             groupByStoreMap: computed(() => ({
                 [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
                 [GROUP_BY.PROJECT]: state.projects,

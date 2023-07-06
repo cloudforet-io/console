@@ -16,7 +16,7 @@
                    target="_blank"
                 >
                     <img class="browser-img"
-                         :src="require(`@/assets/images/${browser.img}`)"
+                         :src="`src/assets/images/${browser.img}`"
                     >
                     <span class="browser-name">{{ browser.label }}</span>
                 </a>
@@ -42,6 +42,8 @@ import { reactive, toRefs } from 'vue';
 
 import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
 import { i18n } from '@/translations';
 
 const browserList = [
@@ -61,7 +63,7 @@ export default {
             isSelected: false,
         });
         const handleCloseModal = () => {
-            if (state.isSelected) window.localStorage.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
+            if (state.isSelected) LocalStorageAccessor.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
             state.isVisible = false;
         };
         return {

@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.12.0-dev27",
+  "version": "1.12.0-dev37",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
@@ -67,7 +67,10 @@
     "pinia": "^2.1.4",
     "portal-vue": "^3.0.0-beta.0",
     "process": "^0.11.10",
+    "prosemirror-model": "^1.19.2",
     "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.7.3",
+    "prosemirror-view": "^1.31.5",
     "uuid": "^8.3.2",
     "v-click-outside": "^3.0.1",
     "vue": "^3.3.4",
@@ -84,7 +87,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
     "@cloudforet/stylelint-config-custom": "*",
-    "@playwright/test": "^1.31.1",
+    "@playwright/test": "^1.35.1",
     "@types/bytes": "^3.1.1",
     "@types/color": "^3.0.1",
     "@types/ejs": "^3.1.2",

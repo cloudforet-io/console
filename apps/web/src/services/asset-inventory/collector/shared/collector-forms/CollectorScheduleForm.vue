@@ -143,7 +143,6 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
                        :description="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_TURN_ON_DESC')"
                        class="schedule-desc"
         />
-        <br>
         <p-toggle-button :value="collectorFormState.schedulePower"
                          :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"

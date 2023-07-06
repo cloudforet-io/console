@@ -6,16 +6,28 @@
         <portal to="widget-contents">
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="state.enableDateRange"
-                                     @change-toggle="handleChangeDateRangeToggle"
-                    />
-                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
+                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE')"
+                                   font-weight="regular"
+                    >
+                        <template #left>
+                            <p-toggle-button :value="state.enableDateRange"
+                                             class="toggle-button"
+                                             @change-toggle="handleChangeDateRangeToggle"
+                            />
+                        </template>
+                    </p-field-title>
                 </div>
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="state.enableCurrency"
-                                     @change-toggle="handleChangeCurrencyToggle"
-                    />
-                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
+                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
+                                   font-weight="regular"
+                    >
+                        <template #left>
+                            <p-toggle-button :value="state.enableCurrency"
+                                             class="toggle-button"
+                                             @change-toggle="handleChangeCurrencyToggle"
+                            />
+                        </template>
+                    </p-field-title>
                 </div>
                 <p-divider class="divider" />
                 <p-button style-type="tertiary"
@@ -71,7 +83,7 @@
                 </p-button>
             </div>
         </portal>
-        <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible"
+        <dashboard-widget-add-modal :visible.sync="state.addWidgetModalVisible"
                                     @add-widget="handleAddWidget"
         />
     </div>
@@ -86,13 +98,13 @@ import {
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PDivider, PI, PToggleButton,
+    PButton, PDivider, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
@@ -163,10 +175,11 @@ onUnmounted(() => {
     line-height: 125%;
 
     .selector-wrapper {
-        display: flex;
-        gap: 0.5rem;
         &:first-child {
             padding-bottom: 0.5rem;
+        }
+        .toggle-button {
+            margin-right: 0.25rem;
         }
     }
     .divider {
@@ -216,5 +229,9 @@ onUnmounted(() => {
 $footer-height: 57px;
 .p-sidebar .sidebar-wrapper {
     padding-bottom: $footer-height;
+    .title {
+        @apply text-label-md;
+        min-height: initial;
+    }
 }
 </style>

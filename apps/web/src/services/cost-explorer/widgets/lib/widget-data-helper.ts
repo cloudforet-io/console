@@ -4,8 +4,7 @@ import { isEqual } from 'lodash';
 
 import { store } from '@/store';
 
-import type { Currency } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
