@@ -1,55 +1,70 @@
 <template>
-    <div class="info-item">
-        <p class="info-label">
-            {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
-        </p>
-        <div class="label-description">
-            <div v-if="props.item.schedule">
-                <div v-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
-                     class="scheduled"
-                >
-                    <p-i
-                        name="ic_alarm-clock"
-                        class="alarm-icon"
-                        height="1.25rem"
-                        width="1.25rem"
-                        color="inherit"
-                    />
-                    <p class="description">
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') }}
-                        <span class="emphasis">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+    <div>
+        <div class="info-item">
+            <p class="info-label">
+                {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
+            </p>
+            <div class="label-description">
+                <div v-if="props.item.schedule">
+                    <div v-if="state.status === JOB_STATE.IN_PROGRESS"
+                         class="current-status-progress"
+                    >
+                        <p-i
+                            name="ic_circle"
+                            height="0.875rem"
+                            width="0.875rem"
+                            animation="spin"
+                        />
+                        <span>
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remained_tasks }}%</span>
                         </span>
-                    </p>
+                    </div>
+                    <div v-else-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                         class="scheduled"
+                    >
+                        <p-i
+                            name="ic_alarm-clock"
+                            class="alarm-icon"
+                            height="1.25rem"
+                            width="1.25rem"
+                            color="inherit"
+                        />
+                        <p class="description">
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                        </p>
+                    </div>
+                    <span v-else>
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                    </span>
                 </div>
-                <span v-else-if="state.status === JOB_STATE.IN_PROGRESS"
-                      class="current-status-progress"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} - <span class="remained-task">{{ state.remained_tasks }}%</span>
-                </span>
                 <span v-else>
                     {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                 </span>
             </div>
-            <span v-else>
-                {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-            </span>
         </div>
+        <p-progress-bar :percentage="state.remained_tasks"
+                        :color="PROGRESS_BAR_COLOR"
+                        size="sm"
+                        class="status-progress-bar"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { numberFormatter } from '@cloudforet/core-lib';
+
+import { peacock } from '@/styles/colors';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
 
 const RECENT_COUNT = 5;
+const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
     item?: CollectorItemInfo;
@@ -90,49 +105,36 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply relative flex flex-col flex-wrap;
+    width: 100%;
+    min-height: 2.75rem;
+    gap: 0.5rem;
     .info-label {
         @apply text-label-sm text-gray-500;
     }
-
     .label-description {
         @apply text-label-md text-gray-700;
-        min-height: 2.25rem;
-
-        @screen tablet {
-            min-height: initial;
-        }
-
         .scheduled {
             @apply flex items-center;
             gap: 0.25rem;
-
-            .emphasis {
-                @apply block font-bold text-gray-900 not-italic;
-
-                @screen tablet {
-                    @apply inline;
-                }
-            }
-
             .alarm-icon {
                 margin-bottom: auto;
                 min-width: 1.25rem;
             }
-
-            .current-status-progress {
-                @apply flex items-center;
-                gap: 0.25rem;
-
-                .setting-icon {
-                    @apply text-gray-400;
-                    min-width: 1.25rem;
-                }
-            }
         }
-
+        .current-status-progress {
+            @apply flex items-center;
+            gap: 0.25rem;
+        }
         .remained-task {
             @apply text-label-md font-bold text-gray-900;
+            margin-left: 0.25rem;
         }
     }
+}
+.status-progress-bar {
+    @apply absolute;
+    width: calc(100% - 3rem);
+    margin-top: 1.125rem;
 }
 </style>
