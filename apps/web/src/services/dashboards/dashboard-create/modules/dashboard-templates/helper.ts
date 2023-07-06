@@ -49,7 +49,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
     },
 );
 
-export const getDashboardVariablesSchema = (label: DashboardLabel): DashboardVariablesSchema => {
+export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVariablesSchema => {
     const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
     if (label === DASHBOARD_LABEL.ASSET) {
         managedVariablesPropertiesMap.forEach((value, key) => {

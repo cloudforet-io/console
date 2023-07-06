@@ -29,14 +29,14 @@
             </div>
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data?.results"
+                               :items="state.data ? state.data.results : []"
                                :currency="state.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
                                :color-set="colorSet"
                                :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
+                               :show-next-page="state.data ? state.data.more : false"
                                show-legend
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"
@@ -247,6 +247,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
 };
 
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+    state.data.more = false; // to disable next page button before fetching data
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
