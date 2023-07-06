@@ -28,14 +28,14 @@
 
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data?.results"
+                               :items="state.data ? state.data.results : []"
                                :currency="state.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
                                :color-set="colorSet"
                                :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
+                               :show-next-page="state.data ? state.data.more : false"
                                @update:thisPage="handleUpdateThisPage"
             />
         </div>
@@ -271,6 +271,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
 };
 
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+    state.data.more = false;
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
