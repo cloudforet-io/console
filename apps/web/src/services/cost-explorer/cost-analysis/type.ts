@@ -1,8 +1,9 @@
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
+import type { CostAnalysisPageUrlQueryKey, RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import type {
     Period, Granularity, CostFiltersMap,
+    CostQuerySetModel,
 } from '@/services/cost-explorer/type';
 
 export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>;
@@ -23,4 +24,9 @@ export const CHART_TYPE = Object.freeze({
 export interface QueryItemResource {
     key: string;
     name: string;
+}
+
+export interface SaveQueryEmitParam {
+    updatedQuery: CostQuerySetModel;
+    requestType: RequestType;
 }

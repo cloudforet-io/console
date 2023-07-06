@@ -1,9 +1,10 @@
 import { forEach } from 'lodash';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocation, LocationQueryValue } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 
-export type RouteQueryString = string | (string | null)[] | null | undefined;
+// export type RouteQueryString = string | (string | null)[] | null | undefined;
+export type RouteQueryString = LocationQueryValue | LocationQueryValue[] | undefined;
 export interface ConvertValueToQueryString {
     (value?: any): RouteQueryString;
 }

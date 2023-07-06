@@ -1,3 +1,78 @@
+<script lang="ts" setup>
+import {
+    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
+
+import CostAnalysisPeriodSelectDropdown
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { Granularity } from '@/services/cost-explorer/type';
+
+const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
+
+interface Props {
+    printMode: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    printMode: false,
+});
+const { t } = useI18n();
+
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const state = reactive({
+    granularityItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: GRANULARITY.ACCUMULATED,
+            label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
+        },
+        {
+            type: 'item',
+            name: GRANULARITY.DAILY,
+            label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
+        },
+        {
+            type: 'item',
+            name: GRANULARITY.MONTHLY,
+            label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
+        },
+    ])),
+    setQueryModalVisible: false,
+});
+
+/* event */
+const handleSelectGranularity = async (granularity: Granularity) => {
+    if (granularity !== costAnalysisPageState.granularity) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.period = getInitialDates();
+        });
+    }
+    costAnalysisPageStore.$patch({ granularity });
+};
+const handleToggleStack = async (value) => {
+    costAnalysisPageStore.$patch({ stack: value });
+};
+const handleSelectedDates = (period) => {
+    costAnalysisPageStore.$patch((_state) => {
+        _state.period = period;
+    });
+};
+const handleClickSetFilter = () => {
+    state.setQueryModalVisible = true;
+};
+
+</script>
+
 <template>
     <div class="cost-analysis-query-filter"
          :class="{ 'print-mode': printMode }"
@@ -5,8 +80,8 @@
         <div class="filter-wrapper tablet-off">
             <div class="left-part">
                 <div class="filter-item">
-                    <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
-                    <p-select-dropdown :items="granularityItems"
+                    <b class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
+                    <p-select-dropdown :items="state.granularityItems"
                                        :selected="costAnalysisPageState.granularity"
                                        style-type="transparent"
                                        :read-only="printMode"
@@ -19,7 +94,7 @@
                 >
                     <template v-if="!printMode">
                         <span class="v-divider" />
-                        <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
+                        <p-field-title :label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
                             <template #right>
                                 <p-toggle-button :value="costAnalysisPageState.stack"
                                                  class="toggle-button"
@@ -57,110 +132,9 @@
                 />
             </div>
         </div>
-        <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
+        <cost-analysis-set-query-modal v-model:visible="state.setQueryModalVisible" />
     </div>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
-
-import { i18n } from '@/translations';
-
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
-
-import CostAnalysisPeriodSelectDropdown
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Granularity } from '@/services/cost-explorer/type';
-
-const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
-
-export default {
-    name: 'CostAnalysisQueryFilter',
-    components: {
-        CurrencySelectDropdown,
-        CostAnalysisSetQueryModal,
-        CostAnalysisPeriodSelectDropdown,
-        PSelectDropdown,
-        PIconButton,
-        PToggleButton,
-        PFieldTitle,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.$state;
-
-        const state = reactive({
-            granularityItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: GRANULARITY.ACCUMULATED,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
-                },
-                {
-                    type: 'item',
-                    name: GRANULARITY.DAILY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
-                },
-                {
-                    type: 'item',
-                    name: GRANULARITY.MONTHLY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
-                },
-            ])),
-            setQueryModalVisible: false,
-        });
-
-        /* event */
-        const handleSelectGranularity = async (granularity: Granularity) => {
-            if (granularity !== costAnalysisPageState.granularity) {
-                costAnalysisPageStore.$patch((_state) => {
-                    _state.period = getInitialDates();
-                });
-            }
-            costAnalysisPageStore.$patch({ granularity });
-        };
-        const handleToggleStack = async (value) => {
-            costAnalysisPageStore.$patch({ stack: value });
-        };
-        const handleSelectedDates = (period) => {
-            costAnalysisPageStore.$patch((_state) => {
-                _state.period = period;
-            });
-        };
-        const handleClickSetFilter = () => {
-            state.setQueryModalVisible = true;
-        };
-
-        const dateFormatter = (date) => dayjs.utc(date).format('YYYY/MM/DD');
-
-        return {
-            ...toRefs(state),
-            costAnalysisPageState,
-            GRANULARITY,
-            handleSelectGranularity,
-            handleToggleStack,
-            handleSelectedDates,
-            handleClickSetFilter,
-            dateFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
