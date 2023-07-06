@@ -2,6 +2,17 @@
     <div class="info-item">
         <p class="info-label">
             {{ $t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
+            <p-tooltip
+                :contents="$t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS_TOOLTIP')"
+                position="top-end"
+            >
+                <p-i name="ic_question-mark-circle"
+                     class="title-tooltip"
+                     height="0.875rem"
+                     width="0.875rem"
+                     color="inherit"
+                />
+            </p-tooltip>
         </p>
         <div class="jobs-wrapper">
             <div v-for="(jobStatus, index) in props.item.recentJobAnalyze"
@@ -9,77 +20,73 @@
                  class="jobs-contents"
                  @click.stop
             >
-                <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
-                           class="icon-fill-wrapper success"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
-                           position="top"
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
+                             class="icon-fill-wrapper"
                 >
-                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
+                    <p-tooltip v-if="jobStatus.status === JOB_STATE.SUCCESS"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                               position="top-end"
+                               class="job-tooltip"
+                    >
                         <p-i
                             name="ic_check"
                             class="icon success"
-                            height="1.125rem"
-                            width="1.125rem"
+                            height="1rem"
+                            width="1rem"
                             color="inherit"
                         />
-                    </router-link>
-                </p-tooltip>
-                <p-tooltip v-else-if="jobStatus.status === JOB_STATE.IN_PROGRESS"
-                           class="icon-fill-wrapper progress"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_PROGRESS')"
-                           position="top"
-                >
-                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }">
-                        <p-i
-                            name="ic_settings-filled"
-                            class="icon progress"
-                            height="1.125rem"
-                            width="1.125rem"
-                            color="inherit"
-                        />
-                    </router-link>
-                </p-tooltip>
-                <p-tooltip v-else-if="jobStatus.status === JOB_STATE.NONE"
-                           class="icon-fill-wrapper none"
-                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_NONE')"
-                           position="top"
-                />
-                <router-link v-else
-                             :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
-                >
-                    <p-tooltip class="icon-fill-wrapper error"
-                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
-                               position="top"
+                    </p-tooltip>
+                    <p-tooltip v-else-if="jobStatus.status === JOB_STATE.CANCELED"
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_CANCELED', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                               position="top-end"
+                               class="job-tooltip"
                     >
-                        <span class="exclamation-mark">!</span>
+                        <p-i
+                            name="ic_limit-filed"
+                            class="icon canceled"
+                            height="1rem"
+                            width="1rem"
+                            color="inherit"
+                        />
+                    </p-tooltip>
+                    <p-tooltip v-else
+                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_ERROR', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                               position="top-end"
+                               class="job-tooltip"
+                    >
+                        <p-i
+                            name="ic_exclamation-mark"
+                            class="icon error"
+                            height="1rem"
+                            width="1rem"
+                            color="inherit"
+                        />
                     </p-tooltip>
                 </router-link>
             </div>
-        </div>
-        <p-text-button v-if="props.item.hasJobList"
-                       style-type="highlight"
-                       class="view-history-detail-wrapper"
-                       @click.stop
-        >
             <router-link :to="props.item.historyLink"
-                         class="view-history-detail"
+                         class="jobs-contents history"
             >
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL') }}</span>
-                <p-i
-                    name="ic_chevron-right"
-                    width="0.75rem"
-                    height="0.75rem"
-                    color="inherit transparent"
-                />
+                <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                           position="top-end"
+                           class="job-tooltip"
+                >
+                    <p-i
+                        name="ic_chevron-right"
+                        width="1.125rem"
+                        height="1.125rem"
+                        color="inherit"
+                    />
+                </p-tooltip>
             </router-link>
-        </p-text-button>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTooltip, PI, PTextButton } from '@spaceone/design-system';
+import { PTooltip, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -103,99 +110,64 @@ const storeState = reactive({
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply items-end;
     .info-label {
-        @apply text-label-sm text-gray-500;
-    }
+        @apply flex items-center text-label-sm text-gray-500;
+        gap: 0.25rem;
 
-    .jobs-wrapper {
-        @apply flex;
-        gap: 0.375rem;
-
-        .jobs-contents {
-            @apply flex;
-            width: 1.125rem;
-            height: 1.125rem;
-
-            .icon-fill-wrapper {
-                @apply relative rounded box-border;
-                width: 1.125rem;
-                height: 1.125rem;
-
-                &:hover {
-                    @apply cursor-default;
-                }
-
-                &.success {
-                    @apply bg-green-600;
-
-                    &:hover {
-                        @apply bg-green-500 border border-green-700 cursor-pointer;
-                    }
-                }
-
-                &.error {
-                    @apply flex items-center justify-center bg-red-500;
-
-                    .exclamation-mark {
-                        @apply text-white text-label-md;
-                    }
-
-                    &:hover {
-                        @apply bg-red-300 border border-red-700 cursor-pointer;
-                    }
-                }
-
-                &.progress {
-                    @apply bg-gray-500;
-
-                    &:hover {
-                        @apply border border-gray-700;
-
-                        .progress {
-                            top: -0.065rem;
-                            left: -0.065rem;
-                            animation: rotate 6s linear infinite;
-                            transform-origin: 50% 50%;
-
-                            @keyframes rotate {
-                                100% {
-                                    transform: rotate(360deg);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                &.none {
-                    @apply bg-gray-200;
-                }
-
-                .icon {
-                    @apply absolute text-white;
-
-                    &.success {
-                        @apply text-white;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-35%, -50%);
-                    }
-
-                    &.progress {
-                        top: 0;
-                        left: 0;
-                    }
-                }
+        .title-tooltip {
+            &:hover {
+                @apply text-blue-600;
             }
         }
     }
 
-    .view-history-detail-wrapper {
-        padding: 0;
+    .jobs-wrapper {
+        @apply flex;
 
-        .view-history-detail {
-            @apply flex items-center text-label-sm;
-            height: 1.875rem;
-            margin-top: -0.5rem;
+        .jobs-contents {
+            @apply flex items-center justify-center bg-gray-100 rounded-full border border-white;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-left: -0.25rem;
+            &:hover {
+                @apply bg-blue-200;
+                .icon-fill-wrapper, .job-tooltip {
+                    @apply text-blue-600;
+                    .icon {
+                        &.success {
+                            @apply text-blue-600;
+                        }
+                        &.error {
+                            @apply text-blue-600;
+                        }
+                        &.canceled {
+                            @apply text-blue-600;
+                        }
+                    }
+                }
+            }
+            .icon-fill-wrapper {
+                @apply rounded box-border;
+                width: 1rem;
+                height: 1rem;
+                margin: auto;
+                .job-tooltip {
+                    @apply flex items-center justify-center;
+                }
+                .icon {
+                    &.success {
+                        @apply text-green-500;
+                        margin-right: -0.25rem;
+                    }
+                    &.error {
+                        @apply text-red-400;
+                    }
+                    &.canceled {
+                        @apply text-gray-400;
+                    }
+                }
+            }
         }
     }
 }
