@@ -7,15 +7,7 @@
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
             >
-                <p-i v-if="state.isScheduleActivated"
-                     name="ic_edit"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                <p-i v-else
-                     name="ic_settings-filled"
+                <p-i name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
                      color="inherit"
