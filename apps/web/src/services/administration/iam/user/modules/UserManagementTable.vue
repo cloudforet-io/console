@@ -367,7 +367,7 @@ export default {
                 if (errorDetail.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
                     showErrorMessage(errorDetail.message, '');
                 } else if (errorDetail.code === 'ERROR_PASSWORD_NOT_CHANGED') {
-                    showErrorMessage(errorDetail.message, '');
+                    ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_SAME_PASSWORD'));
                 } else {
                     ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
                 }
