@@ -158,7 +158,7 @@ export default {
             .setSort('name', true)
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
-        const fields = computed(() => ([
+        const fields = [
             { name: 'user_id', label: 'User ID' },
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
@@ -169,7 +169,7 @@ export default {
             { name: 'backend', label: 'Auth Type' },
             { name: 'last_accessed_at', label: 'Last Activity' },
             { name: 'timezone', label: 'Timezone' },
-        ]));
+        ];
 
         const excelFields = [
             { key: 'user_id', name: 'User ID' },
