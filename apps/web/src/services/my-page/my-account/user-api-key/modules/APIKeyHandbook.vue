@@ -101,7 +101,7 @@ import { PAnchor } from '@spaceone/design-system';
 const githubLink = 'https://github.com/cloudforet-io/spacectl';
 const codeBlock = {
     installCode: 'sudo pip3 install --upgrade pip \n\n'
-      + 'sudo pip3 install spaceone-core spaceone-api --upgrade --pre\n\n'
+      + 'sudo pip3 install spaceone-core spaceone-api --upgrade\n\n'
       + 'sudo pip3 install spacectl',
     configCode: 'spacectl config init -f <spacectl_config.yaml>',
     startCode: 'spacectl api-resources',

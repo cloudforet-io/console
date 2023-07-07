@@ -1405,6 +1405,7 @@
 				"AVAILABLE": "使用可能",
 				"BUDGETS": "バジェット",
 				"DESC": "総コスト、予算、使用率とともに、総予算消費の概要を表示します。",
+				"EXCEEDED": "を超えました",
 				"TOTAL_BUDGET": "総予算",
 				"TOTAL_SPENT": "総使用量"
 			},
