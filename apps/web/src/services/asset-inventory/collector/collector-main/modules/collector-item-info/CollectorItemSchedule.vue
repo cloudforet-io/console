@@ -7,21 +7,13 @@
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
             >
-                <p-i v-if="state.isScheduleActivated"
-                     name="ic_edit"
+                <p-i name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
                      color="inherit"
                      class="icon-schedule"
                 />
-                <p-i v-else
-                     name="ic_settings-filled"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                {{ $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
@@ -99,8 +91,10 @@ watch(() => props.item, (item) => {
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply flex justify-between;
+    margin-top: 2.125rem;
     .info-label-wrapper {
-        @apply flex;
+        @apply flex items-center;
         gap: 0.375rem;
 
         .info-label {
@@ -117,6 +111,7 @@ watch(() => props.item, (item) => {
             }
             .icon-schedule {
                 @apply text-blue-700;
+                margin-top: 0.15rem;
             }
         }
     }

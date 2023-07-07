@@ -79,11 +79,9 @@ import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorScheduleModal.vue';
 import {
     COLLECTOR_ITEM_INFO_TYPE,
-    COLLECTOR_QUERY_HELPER_SET, JOB_STATE,
+    COLLECTOR_QUERY_HELPER_SET,
 } from '@/services/asset-inventory/collector/collector-main/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-const RECENT_COUNT = 5;
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
@@ -143,17 +141,6 @@ const state = reactive({
 
             const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
             const recentJobAnalyze = matchedJob?.job_status.slice(-5) || [];
-
-            while (recentJobAnalyze.length < RECENT_COUNT) {
-                const noneValue = {
-                    job_id: '',
-                    status: JOB_STATE.NONE,
-                    finished_at: '',
-                    remained_tasks: 0,
-                    total_tasks: 0,
-                };
-                recentJobAnalyze.unshift(noneValue);
-            }
 
             return {
                 collectorId: d.collector_id,

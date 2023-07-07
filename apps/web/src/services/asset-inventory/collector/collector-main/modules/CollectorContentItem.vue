@@ -12,17 +12,17 @@
                                 height="1.5rem"
                                 class="plugin-icon"
                     />
-                    <span class="plugin-name">{{ state.plugin.name }}</span>
-                    <span class="plugin-version">v{{ state.plugin.version }}</span>
+                    <div class="title-wrapper">
+                        <span class="plugin-name">{{ state.plugin.name }}</span>
+                        <span class="plugin-version">v{{ state.plugin.version }}</span>
+                    </div>
                 </div>
                 <div class="collector-info-wrapper">
                     <div class="collector-info-view">
+                        <collector-item-status :item="props.item" />
                         <collector-item-job-list :item="props.item" />
                     </div>
-                    <div class="collector-info-view">
-                        <collector-item-status :item="props.item" />
-                        <collector-item-schedule :item="props.item" />
-                    </div>
+                    <collector-item-schedule :item="props.item" />
                 </div>
             </div>
             <div class="collector-status-wrapper">
@@ -152,8 +152,8 @@ const handleClickCollectData = async () => {
 
         .collector-item-wrapper {
             @apply flex flex-col;
-            gap: 1rem;
-            padding: 0.75rem 0.625rem;
+            gap: 0.875rem;
+            padding: 0.5rem 0.625rem;
 
             .collector-item-name {
                 @apply text-label-xl font-bold;
@@ -163,18 +163,20 @@ const handleClickCollectData = async () => {
                 @apply flex items-center;
                 gap: 0.5rem;
 
-                .plugin-name {
-                    @apply truncate;
-                }
+                .title-wrapper {
+                    @apply flex flex-col;
+                    .plugin-name {
+                        @apply truncate text-label-md;
+                    }
 
-                .plugin-version {
-                    @apply text-label-sm text-gray-400;
+                    .plugin-version {
+                        @apply text-label-sm text-gray-400;
+                    }
                 }
             }
 
             .collector-info-wrapper {
-                @apply flex;
-                gap: 1.5rem;
+                margin-top: 1.125rem;
 
                 @screen tablet {
                     @apply flex-col;
@@ -182,9 +184,7 @@ const handleClickCollectData = async () => {
                 }
 
                 .collector-info-view {
-                    @apply flex flex-col flex-wrap;
-                    gap: 1rem;
-                    width: 50%;
+                    @apply flex justify-between;
 
                     @screen tablet {
                         width: 100%;
@@ -192,8 +192,6 @@ const handleClickCollectData = async () => {
 
                     .info-item {
                         @apply relative flex flex-col flex-wrap;
-                        width: 100%;
-                        min-height: 2.75rem;
                         gap: 0.5rem;
                     }
                 }
