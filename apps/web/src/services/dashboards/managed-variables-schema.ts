@@ -7,6 +7,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 
 
+
 export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
     properties: {
         [REFERENCE_TYPE_INFO.project.type]: {
