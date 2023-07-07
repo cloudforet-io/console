@@ -213,7 +213,10 @@ const state = reactive({
     leftBudget: computed(() => {
         if (!state.data?.length) return '--';
         const value = state.totalBudget - state.totalSpent;
-        return `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
+        if (value >= 0) {
+            return `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
+        }
+        return `${currencyMoneyFormatter(Math.abs(value), state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`;
     }),
     budgetCount: computed(() => {
         if (!state.data?.length) return '--';

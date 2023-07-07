@@ -1405,6 +1405,7 @@
 				"AVAILABLE": "사용가능",
 				"BUDGETS": "Budgets",
 				"DESC": "조회 기간동안의 전체 발생 비용, 예산 사용상태에 대한 요약 데이터를 나타내주는 위젯.",
+				"EXCEEDED": "초과",
 				"TOTAL_BUDGET": "총 예산",
 				"TOTAL_SPENT": "총 사용 금액"
 			},
