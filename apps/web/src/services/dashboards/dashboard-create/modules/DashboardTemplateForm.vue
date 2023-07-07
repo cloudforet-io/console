@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':state.hasScroll }"
+            :class="{ 'overflow-auto':!state.isScrollEnd && !state.disableScroll }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -98,7 +98,7 @@
                             <div class="dashboard-template-overlay-content"
                                  @click="handleOpenDashboardNewTab(board)"
                             >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.VIEW') }}</span>
                                 <p-i name="ic_external-link"
                                      height="1em"
                                      width="1em"
@@ -125,12 +125,13 @@
 </template>
 
 <script setup lang="ts">
+import { useScroll } from '@vueuse/core';
 import {
-    computed, nextTick, reactive, toRefs,
+    computed, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI,
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -158,28 +159,30 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const templateContainerRef = ref<HTMLElement | null>(null);
+const { arrivedState } = useScroll(templateContainerRef);
+const { bottom: isBottom, top: isTop } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    templateContainerRef: null as HTMLElement | null,
-    hasScroll: false,
+    disableScroll: computed<boolean>(() => isBottom.value && isTop.value),
+    isScrollEnd: computed<boolean>(() => isBottom.value),
 });
-
-const {
-    templateContainerRef,
-} = toRefs(state);
 
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES)
-        .map((d: DashboardConfig) => ({
-            ...d,
-            // below values are used only for render
-            value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
-        }))
-        .filter((d) => d.name.includes(state.searchValue))
-        .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
+        const regex = getTextHighlightRegex(state.searchValue);
+        return Object.values(DASHBOARD_TEMPLATES)
+            .map((d: DashboardConfig) => ({
+                ...d,
+                // below values are used only for render
+                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
+            }))
+            .filter((d) => regex.test(d.name))
+            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
+    }),
 });
 const existingTemplateState = reactive({
     thisPage: 1,
@@ -239,21 +242,12 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
-const handleCheckScroll = () => {
-    if (state.templateContainerRef) {
-        state.hasScroll = state.templateContainerRef.scrollHeight > state.templateContainerRef.clientHeight;
-    } else {
-        state.hasScroll = false;
-    }
-};
-
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
         store.dispatch('dashboard/loadDomainDashboard'),
     ]);
     await nextTick();
-    handleCheckScroll();
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
@@ -266,7 +260,6 @@ const handleCheckScroll = () => {
         max-height: calc(100vh - 22.85rem);
         min-height: 40vh;
         &.overflow-auto {
-            padding-bottom: 2.5rem;
             &::after {
                 @apply w-full absolute;
                 height: 2.5rem;

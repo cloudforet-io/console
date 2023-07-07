@@ -28,14 +28,14 @@
 
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data?.results"
+                               :items="state.data ? state.data.results : []"
                                :currency="state.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
                                :color-set="colorSet"
                                :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
+                               :show-next-page="state.data ? state.data.more : false"
                                @update:thisPage="handleUpdateThisPage"
             />
         </div>
@@ -54,6 +54,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
@@ -140,8 +141,8 @@ const state = reactive({
         ];
     }),
     dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
+        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
+        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
     widgetLocation: computed<Location>(() => ({
@@ -270,6 +271,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
 };
 
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+    state.data.more = false;
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;

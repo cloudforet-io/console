@@ -1235,7 +1235,8 @@
 			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
-			"VALIDATION_TEMPLATE": "Please Select Template."
+			"VALIDATION_TEMPLATE": "Please Select Template.",
+			"VIEW": "View"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "Click + button to add dashboard's label.",

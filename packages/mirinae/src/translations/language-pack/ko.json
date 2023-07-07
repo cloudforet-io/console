@@ -41,7 +41,7 @@
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "확인을 위해 {text}를 입력하세요.",
-		"INVALID_TEXT": "{text}가 아닙니다."
+		"INVALID_TEXT": "잘못 입력하셨습니다. 다시 입력해주세요."
 	},
 	"EMPTY": {
 		"NO_DATA": "데이터가 없습니다."

@@ -41,7 +41,7 @@
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "確認のため{text}を入力してください",
-		"INVALID_TEXT": "{text}ではありません"
+		"INVALID_TEXT": "入力された名前が間違っています。もう一度入力してください。"
 	},
 	"EMPTY": {
 		"NO_DATA": "データがありません"

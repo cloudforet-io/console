@@ -113,16 +113,11 @@ export default defineComponent({
             const _end = dayjs.utc(end).endOf('month').format('YYYY-MM-DD');
             state.selectedDateRange = { start: _start, end: _end };
         };
-        const setCurrentMonthDateRange = () => {
-            const _start = dayjs.utc().format('YYYY-MM-01');
-            const _end = dayjs.utc().format('YYYY-MM-DD');
-            state.selectedDateRange = { start: _start, end: _end };
-        };
 
         const handleSelectMonthMenuItem = (selectedIndex: number) => {
             state.selectedMonthMenuIndex = selectedIndex;
             if (state.monthMenuItems[selectedIndex].name === 'current') {
-                setCurrentMonthDateRange();
+                state.selectedDateRange = { start: undefined, end: undefined };
                 emit('update:date-range', state.selectedDateRange);
             } else if (state.monthMenuItems[selectedIndex].name === 'custom') state.customRangeModalVisible = true;
             else {

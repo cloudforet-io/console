@@ -389,6 +389,9 @@ export default {
                     const billingData = res.results[0].billing_data;
                     summaryState.pastCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === start)?.cost || 0));
                     summaryState.currentCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === end)?.cost || 0));
+                } else {
+                    summaryState.pastCost = 0;
+                    summaryState.currentCost = 0;
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
