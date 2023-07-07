@@ -10,7 +10,7 @@
             :items="userPageState.users"
             :select-index="userPageState.selectedIndices"
             :fields="fields"
-            sort-by.sync="name"
+            sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
             :key-item-sets="keyItemSets"
