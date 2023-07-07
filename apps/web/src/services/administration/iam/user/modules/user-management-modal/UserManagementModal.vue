@@ -6,6 +6,7 @@
                     :backdrop="true"
                     :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
                     :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '')"
+                    :loading="userPageState.modalLoading"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -224,7 +225,6 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
         };
 
         /* init */

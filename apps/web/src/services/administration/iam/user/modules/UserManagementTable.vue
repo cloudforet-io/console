@@ -10,7 +10,7 @@
             :items="userPageState.users"
             :select-index="userPageState.selectedIndices"
             :fields="fields"
-            :sort-by.sync="sortBy"
+            sort-by.sync="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
             :key-item-sets="keyItemSets"
@@ -158,32 +158,32 @@ export default {
             .setSort('name', true)
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
+        const fields = computed(() => ([
+            { name: 'user_id', label: 'User ID' },
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
+            { name: 'user_type', label: 'Access Control' },
+            { name: 'api_key_count', label: 'API Key', sortable: false },
+            { name: 'role_name', label: 'Role', sortable: false },
+            { name: 'tags', label: 'Tags', sortable: false },
+            { name: 'backend', label: 'Auth Type' },
+            { name: 'last_accessed_at', label: 'Last Activity' },
+            { name: 'timezone', label: 'Timezone' },
+        ]));
+
+        const excelFields = [
+            { key: 'user_id', name: 'User ID' },
+            { key: 'name', name: 'Name' },
+            { key: 'state', name: 'State' },
+            { key: 'user_type', name: 'Access Control' },
+            { key: 'api_key_count', name: 'API Key' },
+            { key: 'role_bindings.role_info.name', name: 'Role' },
+            { key: 'backend', name: 'Auth Type' },
+            { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
+            { key: 'timezone', name: 'Timezone' },
+        ];
+
         const state = reactive({
-            fields: computed(() => ([
-                { name: 'user_id', label: 'User ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'user_type', label: 'Access Control' },
-                { name: 'api_key_count', label: 'API Key', sortable: false },
-                { name: 'role_name', label: 'Role', sortable: false },
-                { name: 'tags', label: 'Tags', sortable: false },
-                { name: 'backend', label: 'Auth Type' },
-                { name: 'last_accessed_at', label: 'Last Activity' },
-                { name: 'timezone', label: 'Timezone' },
-            ])),
-            excelFields: [
-                { key: 'user_id', name: 'User ID' },
-                { key: 'name', name: 'Name' },
-                { key: 'state', name: 'State' },
-                { key: 'user_type', name: 'Access Control' },
-                { key: 'api_key_count', name: 'API Key' },
-                { key: 'role_bindings.role_info.name', name: 'Role' },
-                { key: 'backend', name: 'Auth Type' },
-                { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
-                { key: 'timezone', name: 'Timezone' },
-            ],
-            sortBy: 'name',
-            // selected
             isSelected: computed(() => userPageState.selectedIndices.length > 0),
             dropdownMenu: computed(() => ([
                 {
@@ -252,7 +252,7 @@ export default {
                     query: userListApiQuery,
                     include_role_binding: true,
                 },
-                fields: state.excelFields,
+                fields: excelFields,
                 file_name_prefix: FILE_NAME_PREFIX.user,
             });
         };
@@ -324,6 +324,9 @@ export default {
             }
         };
         const addUser = async (item, roleId) => {
+            userPageStore.$patch({
+                modalLoading: true,
+            });
             try {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
@@ -335,10 +338,17 @@ export default {
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
-                userPageStore.$patch({ selectedIndices: [] });
+                userPageStore.$patch({
+                    selectedIndices: [],
+                    visibleCreateModal: false,
+                    modalLoading: false,
+                });
             }
         };
         const updateUser = async (item, roleId) => {
+            userPageStore.$patch({
+                modalLoading: true,
+            });
             try {
                 await SpaceConnector.clientV2.identity.user.update({
                     ...item,
@@ -361,7 +371,11 @@ export default {
                 }
             } finally {
                 await userPageStore.listUsers(userListApiQuery);
-                userPageStore.$patch({ selectedIndices: [] });
+                userPageStore.$patch({
+                    selectedIndices: [],
+                    visibleUpdateModal: false,
+                    modalLoading: false,
+                });
             }
         };
 
@@ -387,6 +401,7 @@ export default {
             userFormState,
             userStateFormatter,
             modalState,
+            fields,
             clickAdd,
             handleUserStatusModalConfirm,
             handleSelectDropdown,
