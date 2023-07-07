@@ -1046,7 +1046,7 @@
 				"STORAGE": "저장소",
 				"TITLE": "일반",
 				"TREND_TITLE": "트렌드",
-				"TYPE_TITLE": "데이터베이스 타입 "
+				"TYPE_TITLE": "{service} 타입 "
 			},
 			"BILLING": {
 				"DAY": "일",
