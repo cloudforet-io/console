@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :visible.sync="proxyVisible"
+    <p-button-modal v-model:visible="proxyVisible"
                     :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
                     :loading="loading"
                     :disabled="!isValid"
@@ -54,16 +54,17 @@
 
                         <div class="column-items-wrapper">
                             <draggable v-model="allColumns"
+                                       item-key="key"
                                        draggable=".draggable-item"
                                        ghost-class="ghost"
                             >
-                                <column-item v-for="(column, idx) in allColumns"
-                                             :key="`${column.key}-${idx}`"
-                                             :selected-keys="selectedAllColumnKeys"
-                                             :item="column"
-                                             :search-text="search"
-                                             @update:selectedKeys="handleUpdateSelectedKeys"
-                                />
+                                <template #item="{column}">
+                                    <column-item :selected-keys="selectedAllColumnKeys"
+                                                 :item="column"
+                                                 :search-text="search"
+                                                 @update:selected-keys="handleUpdateSelectedKeys"
+                                    />
+                                </template>
                             </draggable>
                         </div>
                     </section>
@@ -102,18 +103,17 @@
 
 <script lang="ts">
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
+} from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import {
-    PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

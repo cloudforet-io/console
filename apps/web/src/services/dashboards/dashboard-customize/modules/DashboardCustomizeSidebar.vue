@@ -39,30 +39,30 @@
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD') }}
                 </p-button>
-                <draggable class="draggable-wrapper"
+                <draggable v-model="state.widgetInfoList"
+                           item-key="widget_key"
+                           class="draggable-wrapper"
                            ghost-class="ghost"
-                           :list="state.widgetInfoList"
                 >
-                    <div v-for="(widget, idx) in state.widgetInfoList"
-                         :key="`drag-item-${widget.widget_name}-${idx}`"
-                         class="draggable-item"
-                    >
-                        <span>
-                            <p-i name="ic_drag-handle"
-                                 width="1rem"
-                                 height="1rem"
-                            /></span>
-                        <span class="text">{{ widget.title }}</span>
-                        <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                              class="error-icon-wrapper"
-                        >
-                            <p-i name="ic_error-filled"
-                                 height="1rem"
-                                 width="1rem"
-                                 color="inherit"
-                            />
-                        </span>
-                    </div>
+                    <template #item="{widget}">
+                        <div class="draggable-item">
+                            <span>
+                                <p-i name="ic_drag-handle"
+                                     width="1rem"
+                                     height="1rem"
+                                /></span>
+                            <span class="text">{{ widget.title }}</span>
+                            <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                                  class="error-icon-wrapper"
+                            >
+                                <p-i name="ic_error-filled"
+                                     height="1rem"
+                                     width="1rem"
+                                     color="inherit"
+                                />
+                            </span>
+                        </div>
+                    </template>
                 </draggable>
             </div>
         </portal>
@@ -83,7 +83,7 @@
                 </p-button>
             </div>
         </portal>
-        <dashboard-widget-add-modal :visible.sync="state.addWidgetModalVisible"
+        <dashboard-widget-add-modal v-model:visible="state.addWidgetModalVisible"
                                     @add-widget="handleAddWidget"
         />
     </div>
@@ -91,15 +91,15 @@
 
 <script setup lang="ts">
 import {
+    PButton, PDivider, PI, PToggleButton, PFieldTitle,
+} from '@spaceone/design-system';
+import {
     computed,
     defineEmits,
     onMounted, onUnmounted, reactive,
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import {
-    PButton, PDivider, PI, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

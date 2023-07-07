@@ -7,25 +7,25 @@
                        class="gnb-dashboard-favorite-context"
         >
             <div ref="listContainerRef">
-                <draggable
-                    v-model="sortedFavoriteList"
+                <draggable v-model="sortedFavoriteList"
+                           item-key="itemId"
                 >
-                    <div v-for="(item, index) in sortedFavoriteList"
-                         :key="`favorite-${item.label}-${index}`"
-                    >
-                        <g-n-b-sub-menu :label="item.label"
-                                        :is-draggable="true"
-                                        :to="dashboardRouteFormatter(item.itemId)"
-                                        @navigate="hideMenu"
-                        >
-                            <template #extra-mark>
-                                <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                                 :item-id="item.itemId"
-                                                 scale="0.65"
-                                />
-                            </template>
-                        </g-n-b-sub-menu>
-                    </div>
+                    <template #item="{item}">
+                        <div>
+                            <g-n-b-sub-menu :label="item.label"
+                                            :is-draggable="true"
+                                            :to="dashboardRouteFormatter(item.itemId)"
+                                            @navigate="hideMenu"
+                            >
+                                <template #extra-mark>
+                                    <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                                     :item-id="item.itemId"
+                                                     scale="0.65"
+                                    />
+                                </template>
+                            </g-n-b-sub-menu>
+                        </div>
+                    </template>
                 </draggable>
             </div>
             <template #no-data>
@@ -45,15 +45,15 @@
 </template>
 
 <script lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, nextTick, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import { PDataLoader, PEmpty } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

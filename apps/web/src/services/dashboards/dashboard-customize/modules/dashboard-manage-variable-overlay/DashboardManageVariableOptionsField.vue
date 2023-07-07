@@ -25,40 +25,40 @@
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
             </p-button>
-            <draggable :list="state.proxyOptions"
+            <draggable v-model="state.proxyOptions"
+                       item-key="draggableItemId"
                        class="draggable-wrapper"
                        ghost-class="ghost"
             >
-                <div v-for="(option, index) in state.proxyOptions"
-                     :key="`drag-item-${option.draggableItemId}`"
-                     class="draggable-item"
-                >
-                    <div class="grab-area">
-                        <p-i name="ic_drag-handle"
-                             width="1rem"
-                             height="1rem"
+                <template #item="{option, index}">
+                    <div class="draggable-item">
+                        <div class="grab-area">
+                            <p-i name="ic_drag-handle"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                        </div>
+                        <p-text-input :value="option.key"
+                                      class="option-input"
+                                      :placeholder="$t('Key')"
+                                      :invalid="state.manualOptionValidations[index]"
+                                      @update:value="handleChangeOptionValue(index, $event)"
                         />
-                    </div>
-                    <p-text-input :value="option.key"
-                                  class="option-input"
-                                  :placeholder="$t('Key')"
-                                  :invalid="state.manualOptionValidations[index]"
-                                  @update:value="handleChangeOptionValue(index, $event)"
-                    />
-                    <span class="option-colon">:</span>
-                    <p-text-input :value="option.label"
-                                  class="option-input"
-                                  :placeholder="$t('Label name')"
-                                  :invalid="state.manualOptionValidations[index]"
-                                  @update:value="handleChangeOptionLabel(index, $event)"
-                    />
-                    <div class="option-delete-area">
-                        <p-icon-button v-if="options.length > 1"
-                                       name="ic_delete"
-                                       @click="handleDeleteOption(option.draggableItemId)"
+                        <span class="option-colon">:</span>
+                        <p-text-input :value="option.label"
+                                      class="option-input"
+                                      :placeholder="$t('Label name')"
+                                      :invalid="state.manualOptionValidations[index]"
+                                      @update:value="handleChangeOptionLabel(index, $event)"
                         />
+                        <div class="option-delete-area">
+                            <p-icon-button v-if="options.length > 1"
+                                           name="ic_delete"
+                                           @click="handleDeleteOption(option.draggableItemId)"
+                            />
+                        </div>
                     </div>
-                </div>
+                </template>
             </draggable>
         </div>
         <!--        <dashboard-manage-variable-data-source-options-selector v-if="state.proxyOptionsType === 'DATA_SOURCE'" />-->
@@ -67,12 +67,12 @@
 
 <script setup lang="ts">
 
-import { computed, reactive, watch } from 'vue';
-import draggable from 'vuedraggable';
-
 import {
     PButton, PFieldGroup, PIconButton, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
+import { computed, reactive, watch } from 'vue';
+import draggable from 'vuedraggable';
+
 
 import { getUUID } from '@/lib/component-util/getUUID';
 

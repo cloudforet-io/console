@@ -20,30 +20,29 @@
                 <p class="widget-count">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
+                <!-- TODO: draggable need item-key, should be refactored -->
                 <draggable v-model="editingCustomLayout"
                            tag="ul"
                            class="widget-list"
                            ghost-class="ghost"
                 >
-                    <li
-                        v-for="(widget, idx) in editingCustomLayout"
-                        :key="idx"
-                        class="widget-item"
-                    >
-                        <p-i name="ic_drag-handle-alt"
-                             width="1rem"
-                             height="1rem"
-                             class="drag-icon"
-                        />
-                        <div class="widget-row">
-                            <span v-for="{ name, widget_id } in widget"
-                                  :key="`${widget_id}-${getUUID()}`"
-                                  class="widget-col"
-                            >
-                                {{ name }}
-                            </span>
-                        </div>
-                    </li>
+                    <template #item="{widget}">
+                        <li class="widget-item">
+                            <p-i name="ic_drag-handle-alt"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="drag-icon"
+                            />
+                            <div class="widget-row">
+                                <span v-for="{ name, widget_id } in widget"
+                                      :key="`${widget_id}-${getUUID()}`"
+                                      class="widget-col"
+                                >
+                                    {{ name }}
+                                </span>
+                            </div>
+                        </li>
+                    </template>
                 </draggable>
             </div>
         </portal>
@@ -54,13 +53,13 @@
 </template>
 
 <script lang="ts">
+import { PButton, PI } from '@spaceone/design-system';
 import {
     computed,
     onUnmounted, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
 
-import { PButton, PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
