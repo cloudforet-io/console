@@ -55,6 +55,7 @@
                         @change-verify="handleChangeVerify"
                     />
                     <password-form
+                        v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL"
                         :item="state.data"
                         :is-valid-email="state.data.email_verified"
                         @change-input="handleChangeInputs"
@@ -92,7 +93,7 @@ import PasswordForm from '@/services/administration/iam/user/modules/user-manage
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import type { User, UserManagementData } from '@/services/administration/iam/user/type';
-import { PASSWORD_TYPE } from '@/services/administration/iam/user/type';
+import { PASSWORD_TYPE, USER_BACKEND_TYPE, USER_TYPE } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export default {
@@ -206,12 +207,12 @@ export default {
             };
             if (userPageState.visibleCreateModal) {
                 if (formState.activeTab === 'local') {
-                    data.backend = 'LOCAL';
+                    data.backend = USER_BACKEND_TYPE.LOCAL;
                 } else if (formState.activeTab === 'apiOnly') {
-                    data.backend = 'LOCAL';
-                    data.user_type = 'API_USER';
+                    data.backend = USER_BACKEND_TYPE.LOCAL;
+                    data.user_type = USER_TYPE.API_USER;
                 } else {
-                    data.backend = 'EXTERNAL';
+                    data.backend = USER_BACKEND_TYPE.EXTERNAL;
                 }
             }
             if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
@@ -258,6 +259,7 @@ export default {
             handleClose,
             handleChangeInputs,
             handleChangeVerify,
+            USER_BACKEND_TYPE,
         };
     },
     computed: {
