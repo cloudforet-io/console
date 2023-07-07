@@ -1046,7 +1046,7 @@
 				"STORAGE": "Storage",
 				"TITLE": "General",
 				"TREND_TITLE": "Trend",
-				"TYPE_TITLE": "Database Type"
+				"TYPE_TITLE": "{service} Type"
 			},
 			"BILLING": {
 				"DAY": "Day",
