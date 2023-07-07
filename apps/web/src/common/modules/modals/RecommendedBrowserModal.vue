@@ -16,7 +16,7 @@
                    target="_blank"
                 >
                     <img class="browser-img"
-                         :src="`src/assets/images/${browser.img}`"
+                         :src="browser.img"
                     >
                     <span class="browser-name">{{ browser.label }}</span>
                 </a>
@@ -38,7 +38,7 @@
     </p-button-modal>
 </template>
 <script lang="ts">
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, computed } from 'vue';
 
 import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
@@ -46,10 +46,6 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { i18n } from '@/translations';
 
-const browserList = [
-    { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.CHROME'), img: 'ic_chrome_2x.png', link: 'https://www.google.com/chrome' },
-    { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.EDGE'), img: 'ic_edge_2x.png', link: 'https://www.microsoft.com/edge' },
-];
 
 export default {
     name: 'RecommendedBrowserModal',
@@ -61,6 +57,10 @@ export default {
         const state = reactive({
             isVisible: true,
             isSelected: false,
+            browserList: computed(() => [
+                { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.CHROME'), img: 'images/support-browsers/ic_chrome_2x.png', link: 'https://www.google.com/chrome' },
+                { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.EDGE'), img: 'images/support-browsers/ic_edge_2x.png', link: 'https://www.microsoft.com/edge' },
+            ]),
         });
         const handleCloseModal = () => {
             if (state.isSelected) LocalStorageAccessor.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
@@ -69,7 +69,6 @@ export default {
         return {
             ...toRefs(state),
             handleCloseModal,
-            browserList,
         };
     },
 };
