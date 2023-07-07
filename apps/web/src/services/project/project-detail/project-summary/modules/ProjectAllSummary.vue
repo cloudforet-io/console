@@ -79,7 +79,7 @@
                             >
                                 <div class="text-group">
                                     <span class="provider"
-                                          :style="{ color: getColor(data) }"
+                                          :style="{ color: data.color }"
                                     >{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
@@ -171,6 +171,7 @@ interface SummaryData {
     label: string | TranslateResult;
     count: number | string;
     to: string | Location;
+    color?: string;
 }
 
 const DAY_COUNT = 14;
@@ -194,13 +195,15 @@ export default {
     },
     setup(props) {
         const queryHelper = new QueryHelper();
+        const storeState = reactive({
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+        });
         const state = reactive({
             loading: true,
             summaryLoading: true,
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             //
             selectedDateType: DATE_TYPE.DAILY as DateType,
             dateTypes: computed(() => ([
@@ -229,11 +232,6 @@ export default {
             loading: true,
             registry: {},
             data: [] as ChartData[],
-        });
-        const colorState = reactive({
-            aws: computed(() => state.providers.aws.color),
-            google: computed(() => state.providers.google_cloud.color),
-            azure: computed(() => state.providers.azure.color),
         });
 
         /* Util */
@@ -321,11 +319,6 @@ export default {
                 },
             };
             return location;
-        };
-        const getColor = (data?: SummaryData) => {
-            const label = data?.label as string;
-            if (!label) return '';
-            return colorState[label.toLowerCase()];
         };
 
         /* Api */
@@ -458,7 +451,7 @@ export default {
 
                     summaryData.push({
                         provider: d.provider,
-                        label: state.providers[d.provider]?.label,
+                        label: storeState.providers[d.provider]?.label,
                         type: d.display_name || d.cloud_service_group,
                         count: type === SERVICE_CATEGORY.STORAGE ? byteFormatter(d.size) : commaFormatter(d.count),
                         to: {
@@ -472,6 +465,7 @@ export default {
                                 filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         },
+                        color: storeState.providers[d.provider]?.color,
                     });
                 });
                 state.summaryData = summaryData;
@@ -507,7 +501,7 @@ export default {
         chartInit();
 
         /* Watcher */
-        watch(() => state.providers, (providers) => {
+        watch(() => storeState.providers, (providers) => {
             if (providers) getSummaryInfo(SERVICE_CATEGORY.SERVER);
         }, { immediate: true });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
@@ -534,7 +528,6 @@ export default {
             byteFormatter,
             commaFormatter,
             getLocation,
-            getColor,
         };
     },
 };
