@@ -56,7 +56,7 @@
                         @change-verify="handleChangeVerify"
                     />
                     <password-form
-                        v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL"
+                        v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
                         :item="state.data"
                         :is-valid-email="state.data.email_verified"
                         @change-input="handleChangeInputs"
@@ -260,6 +260,7 @@ export default {
             handleChangeInputs,
             handleChangeVerify,
             USER_BACKEND_TYPE,
+            USER_TYPE,
         };
     },
     computed: {
