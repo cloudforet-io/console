@@ -41,7 +41,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+        <!--        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />-->
     </div>
 </template>
 
