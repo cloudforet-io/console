@@ -75,7 +75,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
+    status: computed(() => {
+        const recentJob = props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
+        return recentJob?.status;
+    }),
     diffSchedule: computed(() => {
         if (props.item.schedule) {
             const current = dayjs.utc();
@@ -98,7 +101,7 @@ const state = reactive({
     }),
     remained_tasks: computed(() => {
         const recentJob = props.item.recentJobAnalyze[RECENT_COUNT - 1];
-        return recentJob.total_tasks > 0 ? numberFormatter(((recentJob.total_tasks - recentJob.remained_tasks) / recentJob.total_tasks) * 100) : 100;
+        return recentJob?.total_tasks > 0 ? numberFormatter(((recentJob.total_tasks - recentJob.remained_tasks) / recentJob.total_tasks) * 100) : 100;
     }),
 });
 </script>
