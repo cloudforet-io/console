@@ -1,24 +1,10 @@
-<template>
-    <component
-        :is="component"
-        :widget-id="widgetId"
-        :name="name"
-        :options="options"
-        :period="period"
-        :filters="filters"
-        :currency="currency"
-        :currency-rates="currencyRates"
-        :print-mode="printMode"
-        v-on="$listeners"
-    />
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, reactive, toRefs,
+    computed, reactive, useAttrs,
 } from 'vue';
 
 import { CURRENCY } from '@/store/modules/settings/config';
+import type { CurrencyRates } from '@/store/modules/settings/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -30,70 +16,55 @@ interface Props extends WidgetProps {
     widgetFileName: string;
 }
 
-export default {
-    name: 'DynamicWidget',
-    props: {
-        widgetId: {
-            type: String,
-            default: '',
-        },
-        name: {
-            type: String,
-            default: '',
-        },
-        widgetFileName: {
-            type: String,
-            default: '',
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        period: {
-            type: Object,
-            default: () => ({}),
-        },
-        filters: {
-            type: Object,
-            default: () => ({}),
-        },
-        currency: {
-            type: String,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object,
-            default: () => ({}),
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: Props) {
-        // noinspection TypeScriptCheckImport
-        const state = reactive({
-            component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(`./../../widgets/${props.widgetFileName}.vue`)) as unknown as () => Promise<any>,
-        });
+const props = withDefaults(defineProps<Props>(), {
+    widgetId: '',
+    name: '',
+    widgetFileName: '',
+    options: () => ({}),
+    period: () => ({}),
+    filters: () => ({}),
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    printMode: false,
+});
+const attrs = useAttrs();
 
-        const getComponent = async () => {
-            try {
-                await state.loader();
+// noinspection TypeScriptCheckImport
+const state = reactive({
+    component: null as any,
+    loader: computed<() => Promise<any>>(() => () => import(`./../../widgets/${props.widgetFileName}.vue`)) as unknown as () => Promise<any>,
+});
 
-                // TODO: throw new Error(`[] Unacceptable Layout: layout type must be one of ${...}. ${props.widgetId} is not acceptable.`);
-                state.component = async () => state.loader();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
+const getComponent = async () => {
+    try {
+        await state.loader();
 
-        (() => getComponent())();
-
-        return {
-            ...toRefs(state),
-            getComponent,
-        };
-    },
+        // TODO: throw new Error(`[] Unacceptable Layout: layout type must be one of ${...}. ${props.widgetId} is not acceptable.`);
+        state.component = async () => state.loader();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
+
+const listeners = {
+    ...attrs,
+};
+
+(() => getComponent())();
+
 </script>
+
+<template>
+    <component
+        :is="state.component"
+        :widget-id="widgetId"
+        :name="name"
+        :options="options"
+        :period="period"
+        :filters="filters"
+        :currency="currency"
+        :currency-rates="currencyRates"
+        :print-mode="printMode"
+        v-on="listeners"
+    />
+</template>

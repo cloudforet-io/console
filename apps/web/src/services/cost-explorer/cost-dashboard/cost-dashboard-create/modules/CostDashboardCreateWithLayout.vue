@@ -1,6 +1,57 @@
+<script lang="ts" setup>
+
+import {
+    PCollapsibleToggle, PSelectCard,
+} from '@spaceone/design-system';
+import { flattenDeep, startCase } from 'lodash';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import type { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
+
+const getNamesOfWidgetList = (widgetList) => {
+    const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
+    if (flattenWidgetList) return flattenWidgetList.map((d) => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_file_name) }));
+    return [];
+};
+
+const { t } = useI18n();
+
+const costDashboardPageStore = useCostDashboardPageStore();
+const costDashboardPageState = costDashboardPageStore.$state;
+
+const state = reactive({
+    selectedLayout: {} as Record<string, DefaultLayout>,
+    unfoldedIndices: [] as number[],
+});
+
+const handleUpdateCollapsed = (idx: number, isCollapsed: boolean) => {
+    const foundIdx = state.unfoldedIndices.findIndex((d) => d === idx);
+    if (isCollapsed) {
+        if (foundIdx !== -1) {
+            state.unfoldedIndices.splice(foundIdx, 1);
+        }
+    } else if (foundIdx === -1) {
+        state.unfoldedIndices.push(idx);
+    }
+};
+
+const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.selectedTemplate = value;
+        _state.defaultFilter = {};
+    });
+};
+
+</script>
+
 <template>
     <div class="basic-dashboard">
-        <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}</h3>
+        <h3>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}</h3>
         <div class="dashboard-list">
             <div v-for="(layoutData, idx) in defaultLayoutData"
                  :key="layoutData.name"
@@ -19,13 +70,13 @@
                      class="widget-list-wrapper"
                 >
                     <div class="widget-title-wrapper">
-                        <span class="widget-list-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.LIST_OF_WIDGETS') }}</span>
-                        <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
+                        <span class="widget-list-title">{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.LIST_OF_WIDGETS') }}</span>
+                        <p-collapsible-toggle :is-collapsed="!state.unfoldedIndices.includes(idx)"
                                               toggle-position="contents"
-                                              @update:isCollapsed="handleUpdateCollapsed(idx, ...arguments)"
+                                              @update:is-collapsed="handleUpdateCollapsed(idx, $event)"
                         />
                     </div>
-                    <ul v-if="unfoldedIndices.includes(idx)"
+                    <ul v-if="state.unfoldedIndices.includes(idx)"
                         class="widgets-list"
                     >
                         <template v-if="layoutData.widgetList.length > 10">
@@ -35,7 +86,7 @@
                                 {{ name }}
                             </li>
                             <li class="text-more">
-                                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.AND_MORE') }}
+                                {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.AND_MORE') }}
                             </li>
                         </template>
                         <template v-else>
@@ -52,72 +103,6 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import { reactive, toRefs } from 'vue';
-
-import {
-    PCollapsibleToggle, PSelectCard,
-} from '@spaceone/design-system';
-import { flattenDeep, startCase } from 'lodash';
-
-import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import type { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
-
-
-const getNamesOfWidgetList = (widgetList) => {
-    const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
-    if (flattenWidgetList) return flattenWidgetList.map((d) => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_file_name) }));
-    return [];
-};
-
-export default {
-    name: 'CostDashboardCreateWithLayout',
-    components: {
-        PSelectCard,
-        PCollapsibleToggle,
-    },
-
-    setup() {
-        const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.$state;
-
-        const state = reactive({
-            selectedLayout: {} as Record<string, DefaultLayout>,
-            unfoldedIndices: [] as number[],
-        });
-
-        const handleUpdateCollapsed = (idx: number, isCollapsed: boolean) => {
-            const foundIdx = state.unfoldedIndices.findIndex((d) => d === idx);
-            if (isCollapsed) {
-                if (foundIdx !== -1) {
-                    state.unfoldedIndices.splice(foundIdx, 1);
-                }
-            } else if (foundIdx === -1) {
-                state.unfoldedIndices.push(idx);
-            }
-        };
-
-        const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.selectedTemplate = value;
-                _state.defaultFilter = {};
-            });
-        };
-
-        return {
-            ...toRefs(state),
-            costDashboardPageState,
-            defaultLayoutData,
-            handleUpdateCollapsed,
-            handleLayoutChange,
-            getNamesOfWidgetList,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .basic-dashboard {
     h3 {

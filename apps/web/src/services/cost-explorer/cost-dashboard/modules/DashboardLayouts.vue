@@ -1,3 +1,147 @@
+<script lang="ts" setup>
+import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
+import {
+    computed, nextTick, reactive, ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
+
+import CostDashboardCustomizeWidgetModal
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
+import CostDashboardUpdateWidgetModal
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
+import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
+import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
+import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
+
+interface Props {
+    layout: WidgetInfo[];
+    period: Period;
+    filters: CostFiltersMap;
+    currency: Currency;
+    currencyRates: CurrencyRates;
+    loading: boolean;
+    printMode: boolean;
+    customizeMode: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+    layout: () => [],
+    period: () => ({}),
+    filters: () => ({}),
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    loading: false,
+    printMode: false,
+    customizeMode: false,
+});
+const emit = defineEmits<{(e: 'add-widget'): void;
+    (e: 'update-widget'): void;
+    (e: 'delete-widget'): void;
+    (e: 'rendered', value: HTMLElement[]): void;
+}>();
+const { t } = useI18n();
+
+const costDashboardPageStore = useCostDashboardPageStore();
+
+const state = reactive({
+    widgetCount: computed<number>(() => props.layout.flat().length),
+    renderedCount: 0,
+    charts: [] as any[][],
+    isAllRendered: computed<boolean>(() => {
+        if (props.loading) return false;
+        return state.renderedCount >= state.widgetCount;
+    }),
+    customizeModalVisible: false,
+    updateModalVisible: false,
+    contextId: getUUID(),
+});
+const dynamicWidgetRows = ref<HTMLElement[]>([]);
+
+const checkDeleteState = reactive({
+    visible: false,
+    headerTitle: t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_TITLE'),
+});
+
+const getAddWidgetColumnByLayout = (widget, rowLength) => {
+    if (widget === 33) return 3 - rowLength;
+    if (widget === 50) return 2 - rowLength;
+    if (widget === 100) return 1 - rowLength;
+    return undefined;
+};
+
+const CUSTOM_WIDGET_FILE_NAME = 'CustomWidget';
+const getWidgetFileName = (widget) => defaultWidgetMap[widget.widget_id]?.widget_file_name ?? CUSTOM_WIDGET_FILE_NAME;
+
+const handleDynamicWidgetInit = () => {
+    state.renderedCount++;
+};
+
+const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.widgetPosition = { row: rowIdx, col: colIdx };
+        _state.originSelectedWidget = widget;
+        _state.editedSelectedWidget = widget;
+    });
+    state.updateModalVisible = true;
+};
+
+const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.widgetPosition = { row: rowIdx, col: colIdx };
+        _state.editedSelectedWidget = widget;
+    });
+    checkDeleteState.visible = true;
+};
+
+const handleDeleteConfirm = () => {
+    checkDeleteState.visible = false;
+    emit('delete-widget');
+};
+
+const handleUpdateConfirm = () => {
+    emit('update-widget');
+};
+
+const handleClickAdd = (rowIdx, colIdx, layout) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.widgetPosition = { row: rowIdx, col: colIdx };
+        _state.layoutOfSpace = layout;
+    });
+    state.customizeModalVisible = true;
+};
+const handleAddWidget = () => {
+    emit('add-widget');
+};
+
+watch(() => props.layout, () => {
+    state.renderedCount = 0;
+});
+
+watch(() => state.isAllRendered, (isAllRendered) => {
+    if (isAllRendered) {
+        const widgetRows: HTMLElement[] = dynamicWidgetRows.value as HTMLElement[] ?? [];
+        nextTick(() => {
+            // wait for animation. amcharts animation is global settings.
+            setTimeout(() => {
+                emit('rendered', widgetRows);
+            }, 1000);
+        });
+    }
+});
+
+</script>
+
 <template>
     <div class="dashboard-layouts">
         <p-data-loader :loading="loading"
@@ -8,19 +152,19 @@
                        :class="{responsive: !printMode}"
         >
             <template #no-data>
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.NO_WIDGET') }}
+                {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.NO_WIDGET') }}
             </template>
             <template #loader>
                 <div />
             </template>
             <div v-for="(row, rowIdx) in layout"
-                 :key="`row-${row[0].name}-${contextId}-${rowIdx}`"
+                 :key="`row-${row[0].name}-${state.contextId}-${rowIdx}`"
                  ref="dynamicWidgetRows"
                  class="row"
                  :class="{'customize':customizeMode}"
             >
                 <div v-for="(widget, colIdx) in row"
-                     :key="`widget-${widget.widget_id}-${contextId}-${colIdx}`"
+                     :key="`widget-${widget.widget_id}-${state.contextId}-${colIdx}`"
                      :class="`col-${widget.options.layout}`"
                 >
                     <div v-if="customizeMode"
@@ -59,204 +203,27 @@
                                   icon-left="ic_plus_bold"
                                   @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
                         >
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
                         </p-button>
                     </div>
                 </template>
             </div>
         </p-data-loader>
-        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible"
-                                               @confirm="$emit('add-widget', $event)"
+        <cost-dashboard-customize-widget-modal v-model:visible="state.customizeModalVisible"
+                                               @confirm="handleAddWidget"
         />
         <delete-modal
+            v-model:visible="checkDeleteState.visible"
             :header-title="checkDeleteState.headerTitle"
-            :visible.sync="checkDeleteState.visible"
-            :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_CONTENTS')"
+            :contents="t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_CONTENTS')"
             @confirm="handleDeleteConfirm"
         />
-        <cost-dashboard-update-widget-modal v-if="updateModalVisible && customizeMode"
-                                            v-model="updateModalVisible"
+        <cost-dashboard-update-widget-modal v-if="state.updateModalVisible && customizeMode"
+                                            v-model:visible="state.updateModalVisible"
                                             @confirm="handleUpdateConfirm"
         />
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { CURRENCY } from '@/store/modules/settings/config';
-
-import { getUUID } from '@/lib/component-util/getUUID';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
-
-import CostDashboardCustomizeWidgetModal
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
-import CostDashboardUpdateWidgetModal
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
-import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
-import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
-import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
-
-
-export default {
-    name: 'DashboardLayouts',
-    components: {
-        CostDashboardUpdateWidgetModal,
-        CostDashboardCustomizeWidgetModal,
-        DynamicWidget,
-        PDataLoader,
-        DeleteModal,
-        PIconButton,
-        PButton,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        layout: {
-            type: Array,
-            default: () => [],
-        },
-        period: {
-            type: Object,
-            default: () => ({}),
-        },
-        filters: {
-            type: Object,
-            default: () => ({}),
-        },
-        currency: {
-            type: String,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object,
-            default: () => ({}),
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-        customizeMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const costDashboardPageStore = useCostDashboardPageStore();
-
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            widgetCount: computed<number>(() => props.layout.flat().length),
-            renderedCount: 0,
-            charts: [] as any[][],
-            isAllRendered: computed<boolean>(() => {
-                if (props.loading) return false;
-                return state.renderedCount >= state.widgetCount;
-            }),
-            customizeModalVisible: false,
-            updateModalVisible: false,
-            contextId: getUUID(),
-        });
-
-        const checkDeleteState = reactive({
-            visible: false,
-            headerTitle: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_TITLE'),
-        });
-
-        const getAddWidgetColumnByLayout = (widget, rowLength) => {
-            if (widget === 33) return 3 - rowLength;
-            if (widget === 50) return 2 - rowLength;
-            if (widget === 100) return 1 - rowLength;
-            return undefined;
-        };
-
-        const CUSTOM_WIDGET_FILE_NAME = 'CustomWidget';
-        const getWidgetFileName = (widget) => defaultWidgetMap[widget.widget_id]?.widget_file_name ?? CUSTOM_WIDGET_FILE_NAME;
-
-        const handleDynamicWidgetInit = () => {
-            state.renderedCount++;
-        };
-
-        const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.widgetPosition = { row: rowIdx, col: colIdx };
-                _state.originSelectedWidget = widget;
-                _state.editedSelectedWidget = widget;
-            });
-            state.updateModalVisible = true;
-        };
-
-        const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.widgetPosition = { row: rowIdx, col: colIdx };
-                _state.editedSelectedWidget = widget;
-            });
-            checkDeleteState.visible = true;
-        };
-
-        const handleDeleteConfirm = () => {
-            checkDeleteState.visible = false;
-            emit('delete-widget');
-        };
-
-        const handleUpdateConfirm = () => {
-            emit('update-widget');
-        };
-
-        const handleClickAdd = (rowIdx, colIdx, layout) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.widgetPosition = { row: rowIdx, col: colIdx };
-                _state.layoutOfSpace = layout;
-            });
-            state.customizeModalVisible = true;
-        };
-
-        watch(() => props.layout, () => {
-            state.renderedCount = 0;
-        });
-
-        watch(() => state.isAllRendered, (isAllRendered) => {
-            if (isAllRendered) {
-                const widgetRows: HTMLElement[] = vm.$refs.dynamicWidgetRows as HTMLElement[] ?? [];
-                vm.$nextTick(() => {
-                    // wait for animation. amcharts animation is global settings.
-                    setTimeout(() => {
-                        emit('rendered', widgetRows);
-                    }, 1000);
-                });
-            }
-        });
-        return {
-            ...toRefs(state),
-            checkDeleteState,
-            defaultWidgetMap,
-            handleDynamicWidgetInit,
-            handleClickUpdate,
-            handleClickDelete,
-            handleClickAdd,
-            handleDeleteConfirm,
-            handleUpdateConfirm,
-            getAddWidgetColumnByLayout,
-            getUUID,
-            getWidgetFileName,
-            BACKGROUND_COLOR,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .dashboard-layouts {

@@ -1,12 +1,66 @@
+<script lang="ts" setup>
+import { PButton, PI } from '@spaceone/design-system';
+import {
+    computed,
+    onUnmounted, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import draggable from 'vuedraggable';
+import { useStore } from 'vuex';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import CostDashboardCustomizeWidgetModal
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
+import type { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+
+const { t } = useI18n();
+const store = useStore();
+const emit = defineEmits<{(e: 'add-widget'): void}>();
+
+const costDashboardPageStore = useCostDashboardPageStore();
+const costDashboardPageState = costDashboardPageStore.$state;
+
+const state = reactive({
+    customizeModalVisible: false,
+    editingCustomLayout: computed<CustomLayout[]|undefined>({
+        get() { return costDashboardPageState.editedCustomLayout; },
+        set(val) {
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedCustomLayout = [...(val || [])];
+            });
+        },
+    }),
+});
+
+const handleClickAddWidget = () => {
+    state.customizeModalVisible = true;
+    costDashboardPageStore.$patch({
+        widgetPosition: undefined,
+        layoutOfSpace: undefined,
+    });
+};
+
+const handleConfirm = () => {
+    emit('add-widget');
+};
+
+onUnmounted(() => {
+    store.dispatch('display/hideSidebar');
+});
+
+</script>
+
 <template>
     <div>
         <portal to="widget-title">
-            <span class="sidebar-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') }}</span> <br>
+            <span class="sidebar-title">{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE_TITLE') }}</span> <br>
         </portal>
         <portal to="widget-contents">
             <div class="sidebar-contents">
                 <p class="sidebar-desc">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
+                    {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
                 </p>
                 <p-button style-type="secondary"
                           icon-left="ic_plus_bold"
@@ -15,13 +69,13 @@
                           class="add-widget-button"
                           @click="handleClickAddWidget"
                 >
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
+                    {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
                 </p-button>
                 <p class="widget-count">
-                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
+                    {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
                 <!-- TODO: draggable need item-key, should be refactored -->
-                <draggable v-model="editingCustomLayout"
+                <draggable v-model="state.editingCustomLayout"
                            tag="ul"
                            class="widget-list"
                            ghost-class="ghost"
@@ -46,74 +100,11 @@
                 </draggable>
             </div>
         </portal>
-        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible"
-                                               @confirm="$emit('add-widget',$event)"
+        <cost-dashboard-customize-widget-modal v-model:visible="state.customizeModalVisible"
+                                               @confirm="handleConfirm"
         />
     </div>
 </template>
-
-<script lang="ts">
-import { PButton, PI } from '@spaceone/design-system';
-import {
-    computed,
-    onUnmounted, reactive, toRefs,
-} from 'vue';
-import draggable from 'vuedraggable';
-
-
-import { store } from '@/store';
-
-import { getUUID } from '@/lib/component-util/getUUID';
-
-import CostDashboardCustomizeWidgetModal
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetModal.vue';
-import type { CustomLayout } from '@/services/cost-explorer/cost-dashboard/type';
-import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
-
-export default {
-    name: 'CostDashboardCustomizeSidebar',
-    components: {
-        CostDashboardCustomizeWidgetModal,
-        PI,
-        PButton,
-        draggable,
-    },
-
-    setup() {
-        const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.$state;
-
-        const state = reactive({
-            customizeModalVisible: false,
-            editingCustomLayout: computed<CustomLayout[]|undefined>({
-                get() { return costDashboardPageState.editedCustomLayout; },
-                set(val) {
-                    costDashboardPageStore.$patch((_state) => {
-                        _state.editedCustomLayout = [...(val || [])];
-                    });
-                },
-            }),
-        });
-
-        const handleClickAddWidget = () => {
-            state.customizeModalVisible = true;
-            costDashboardPageStore.$patch({
-                widgetPosition: undefined,
-                layoutOfSpace: undefined,
-            });
-        };
-
-        onUnmounted(() => {
-            store.dispatch('display/hideSidebar');
-        });
-        return {
-            ...toRefs(state),
-            handleClickAddWidget,
-            getUUID,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .sidebar-title {

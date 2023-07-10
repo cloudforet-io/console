@@ -1,39 +1,11 @@
-<template>
-    <div class="cost-dashboard-create-page">
-        <nav>
-            <p-heading :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')"
-                       show-back-button
-                       @click-back-button="$router.go(-1)"
-            />
-        </nav>
-        <cost-dashboard-create-form :manage-disabled="!hasManagePermission" />
-        <div class="button-group">
-            <p-button style-type="tertiary"
-                      @click="$router.go(-1)"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
-            </p-button>
-            <p-button style-type="primary"
-                      :disabled="!Object.keys(selectedTemplate).length"
-                      @click="handleClickCreate"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE') }}
-            </p-button>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs,
-} from 'vue';
-
-import { PButton, PHeading } from '@spaceone/design-system';
-
+<script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
+import { PButton, PHeading } from '@spaceone/design-system';
+import {
+    computed, onUnmounted, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -54,89 +26,100 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
 
+const router = useRouter();
+const { t } = useI18n();
 
-export default {
-    name: 'CostDashboardCreatePage',
-    components: {
-        CostDashboardCreateForm,
-        PHeading,
-        PButton,
-    },
+const costDashboardPageStore = useCostDashboardPageStore();
+const costDashboardPageState = costDashboardPageStore.$state;
 
-    setup() {
-        const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.$state;
+const state = reactive({
+    selectedTemplate: computed(() => costDashboardPageState.selectedTemplate),
+    defaultFilter: computed<CostFiltersMap>(() => costDashboardPageState.defaultFilter),
+    includesFilter: computed<boolean>(() => costDashboardPageState.includesFilter),
+    selectedPrivacy: computed<DashboardPrivacyType>(() => costDashboardPageState.selectedDashboardPrivacy),
+    hasManagePermission: useManagePermissionState(),
+});
 
-        const state = reactive({
-            selectedTemplate: computed(() => costDashboardPageState.selectedTemplate),
-            defaultFilter: computed<CostFiltersMap>(() => costDashboardPageState.defaultFilter),
-            includesFilter: computed<boolean>(() => costDashboardPageState.includesFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => costDashboardPageState.selectedDashboardPrivacy),
-            hasManagePermission: useManagePermissionState(),
-        });
-
-        const getCustomLayouts = async () => {
-            const hasDefaultId = Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id');
-            if (hasDefaultId && (!Array.isArray(state.selectedTemplate.custom_layouts) || state.selectedTemplate.custom_layouts.length === 0)) {
-                return await fetchDefaultLayoutData(state.selectedTemplate.default_layout_id as string) as CustomLayout[];
-            }
-            return state.selectedTemplate?.custom_layouts as CustomLayout[];
-        };
-
-        const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-            name: state.selectedTemplate?.name?.toString() ?? 'Untitled Dashboard',
-            custom_layouts: await getCustomLayouts(),
-            period_type: state.selectedTemplate.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
-            period: state.selectedTemplate.period as Period,
-            default_filter: state.includesFilter ? state.defaultFilter : {},
-        });
-
-        const createPublicDashboard = async (): Promise<string|undefined> => {
-            try {
-                const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return res.public_dashboard_id;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
-            }
-            return undefined;
-        };
-
-        const createUserDashboard = async (): Promise<string|undefined> => {
-            try {
-                const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return res.user_dashboard_id;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
-            }
-            return undefined;
-        };
-
-        const goToCustomizePage = (dashboardId: string) => {
-            SpaceRouter.router.push({
-                name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
-                params: { dashboardId },
-                query: {
-                    from: 'create',
-                },
-            });
-        };
-        const handleClickCreate = async () => {
-            const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            costDashboardPageStore.$patch({ selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER });
-        };
-
-        onUnmounted(() => {
-            costDashboardPageStore.$reset();
-        });
-
-        return {
-            ...toRefs(state),
-            handleClickCreate,
-        };
-    },
+const getCustomLayouts = async () => {
+    const hasDefaultId = Object.prototype.hasOwnProperty.call(state.selectedTemplate, 'default_layout_id');
+    if (hasDefaultId && (!Array.isArray(state.selectedTemplate.custom_layouts) || state.selectedTemplate.custom_layouts.length === 0)) {
+        return await fetchDefaultLayoutData(state.selectedTemplate.default_layout_id as string) as CustomLayout[];
+    }
+    return state.selectedTemplate?.custom_layouts as CustomLayout[];
 };
+
+const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
+    name: state.selectedTemplate?.name?.toString() ?? 'Untitled Dashboard',
+    custom_layouts: await getCustomLayouts(),
+    period_type: state.selectedTemplate.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
+    period: state.selectedTemplate.period as Period,
+    default_filter: state.includesFilter ? state.defaultFilter : {},
+});
+
+const createPublicDashboard = async (): Promise<string|undefined> => {
+    try {
+        const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+        return res.public_dashboard_id;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+    }
+    return undefined;
+};
+
+const createUserDashboard = async (): Promise<string|undefined> => {
+    try {
+        const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+        return res.user_dashboard_id;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+    }
+    return undefined;
+};
+
+const goToCustomizePage = (dashboardId: string) => {
+    router.push({
+        name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
+        params: { dashboardId },
+        query: {
+            from: 'create',
+        },
+    });
+};
+const handleClickCreate = async () => {
+    const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
+    if (createdDashboardId) goToCustomizePage(createdDashboardId);
+    costDashboardPageStore.$patch({ selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER });
+};
+
+onUnmounted(() => {
+    costDashboardPageStore.$reset();
+});
 </script>
+
+<template>
+    <div class="cost-dashboard-create-page">
+        <nav>
+            <p-heading :title="t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')"
+                       show-back-button
+                       @click-back-button="$router.go(-1)"
+            />
+        </nav>
+        <cost-dashboard-create-form :manage-disabled="!state.hasManagePermission" />
+        <div class="button-group">
+            <p-button style-type="tertiary"
+                      @click="router.go(-1)"
+            >
+                {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
+            </p-button>
+            <p-button style-type="primary"
+                      :disabled="!Object.keys(state.selectedTemplate).length"
+                      @click="handleClickCreate"
+            >
+                {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE') }}
+            </p-button>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .cost-dashboard-create-page {

@@ -1,119 +1,15 @@
-<template>
-    <div class="cost-dashboard-page">
-        <div v-if="costExplorerDashboardStore.dashboardList.length"
-             class="top-wrapper"
-        >
-            <p-heading :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
-                <template #title-left-extra>
-                    <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC"
-                         name="ic_globe-filled"
-                         width="1rem"
-                         height="1rem"
-                         :color="PUBLIC_ICON_COLOR"
-                    />
-                </template>
-                <template #title-right-extra>
-                    <div class="left-part">
-                        <p-icon-button name="ic_edit-text"
-                                       class="edit-btn"
-                                       :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
-                                       @click.stop="handleClickEditDashboard"
-                        />
-                        <cost-dashboard-more-menu :dashboard-id="dashboardId"
-                                                  :dashboard="dashboard"
-                                                  :manage-disabled="!hasManagePermission"
-                        />
-                    </div>
-                    <div class="right-part">
-                        <div>
-                            <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
-                                                                   :period.sync="period"
-                                                                   :period-type.sync="periodType"
-                                                                   :manage-disabled="!hasManagePermission"
-                            />
-                            <div class="left-divider download-pdf">
-                                <pdf-download-button icon-only
-                                                     @click="handleClickPdfDownload"
-                                />
-                            </div>
-                            <div class="left-divider">
-                                <p-button icon-left="ic_edit"
-                                          style-type="tertiary"
-                                          size="sm"
-                                          :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
-                                          @click.stop="handleClickCustomize"
-                                >
-                                    {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
-                                </p-button>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </p-heading>
-            <cost-dashboard-filter :dashboard-id="dashboardId"
-                                   :filters.sync="filters"
-                                   :manage-disabled="!hasManagePermission"
-            />
-        </div>
-        <div v-if="!loading && !costExplorerDashboardState.loading">
-            <dashboard-layouts
-                v-if="costExplorerDashboardStore.dashboardList.length > 0"
-                :loading="loading"
-                :layout="layout"
-                :period="period"
-                :filters="filters"
-                :currency="currency"
-                :currency-rates="currencyRates"
-            />
-            <div v-else
-                 class="empty-dashboard"
-            >
-                <img src="@/assets/images/illust_circle_boy.svg"
-                     class="empty-img"
-                >
-                <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
-                <p-button v-if="hasManagePermission"
-                          icon-left="ic_plus"
-                          style-type="substitutive"
-                          @click="handleClickCreate"
-                >
-                    <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
-                </p-button>
-            </div>
-        </div>
-        <cost-dashboard-update-modal :visible.sync="updateModalVisible"
-                                     :dashboard-id="dashboardId"
-                                     :dashboard-name="dashboard.name"
-                                     @confirm="handleUpdateConfirm"
-        />
-        <pdf-download-overlay v-model="visiblePdfDownload"
-                              :items="previewItems"
-                              :file-name="pdfFileName"
-        >
-            <cost-dashboard-preview v-if="dashboardId"
-                                    :dashboard-id="dashboardId"
-                                    :period="period"
-                                    :filters="filters"
-                                    @rendered="handlePreviewRendered"
-            />
-        </pdf-download-overlay>
-    </div>
-</template>
-
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PI, PIconButton, PButton, PHeading,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -188,6 +84,9 @@ export default {
     },
     setup(props) {
         const costDashboardPageStore = useCostDashboardPageStore();
+        const store = useStore();
+        const router = useRouter();
+        const { t } = useI18n();
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
@@ -223,7 +122,7 @@ export default {
             costDashboardPageStore.$patch((_state) => {
                 _state.editedCustomLayout = state.layout;
             });
-            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
+            router.push({ name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
         };
 
         const handlePreviewRendered = (elements: HTMLElement[]) => {
@@ -247,7 +146,7 @@ export default {
         };
 
         const handleClickCreate = () => {
-            SpaceRouter.router.push({
+            router.push({
                 name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME,
             });
         };
@@ -268,7 +167,7 @@ export default {
         watch([() => props.dashboardId, () => costExplorerDashboardStore.homeDashboardId], async ([dashboardId, homeDashboardId], before) => {
             if (!dashboardId) {
                 if (homeDashboardId) {
-                    SpaceRouter.router.replace({
+                    router.replace({
                         params: { dashboardId: homeDashboardId },
                     });
                 }
@@ -304,10 +203,112 @@ export default {
             handleClickCreate,
             DASHBOARD_TYPE,
             PUBLIC_ICON_COLOR,
+            t,
         };
     },
 };
 </script>
+
+<template>
+    <div class="cost-dashboard-page">
+        <div v-if="costExplorerDashboardStore.dashboardList.length"
+             class="top-wrapper"
+        >
+            <p-heading :title="dashboard.name || t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
+                <template #title-left-extra>
+                    <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC"
+                         name="ic_globe-filled"
+                         width="1rem"
+                         height="1rem"
+                         :color="PUBLIC_ICON_COLOR"
+                    />
+                </template>
+                <template #title-right-extra>
+                    <div class="left-part">
+                        <p-icon-button name="ic_edit-text"
+                                       class="edit-btn"
+                                       :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
+                                       @click.stop="handleClickEditDashboard"
+                        />
+                        <cost-dashboard-more-menu :dashboard-id="dashboardId"
+                                                  :dashboard="dashboard"
+                                                  :manage-disabled="!hasManagePermission"
+                        />
+                    </div>
+                    <div class="right-part">
+                        <div>
+                            <cost-dashboard-period-select-dropdown v-model:period="period"
+                                                                   v-model:period-type="periodType"
+                                                                   :dashboard-id="dashboardId"
+                                                                   :manage-disabled="!hasManagePermission"
+                            />
+                            <div class="left-divider download-pdf">
+                                <pdf-download-button icon-only
+                                                     @click="handleClickPdfDownload"
+                                />
+                            </div>
+                            <div class="left-divider">
+                                <p-button icon-left="ic_edit"
+                                          style-type="tertiary"
+                                          size="sm"
+                                          :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
+                                          @click.stop="handleClickCustomize"
+                                >
+                                    {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CUSTOMIZE') }}
+                                </p-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </p-heading>
+            <cost-dashboard-filter v-model:filters="filters"
+                                   :dashboard-id="dashboardId"
+                                   :manage-disabled="!hasManagePermission"
+            />
+        </div>
+        <div v-if="!loading && !costExplorerDashboardState.loading">
+            <dashboard-layouts v-if="costExplorerDashboardStore.dashboardList.length > 0"
+                               :loading="loading"
+                               :layout="layout"
+                               :period="period"
+                               :filters="filters"
+                               :currency="currency"
+                               :currency-rates="currencyRates"
+            />
+            <div v-else
+                 class="empty-dashboard"
+            >
+                <img src="@/assets/images/illust_circle_boy.svg"
+                     class="empty-img"
+                >
+                <span class="empty-text">{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
+                <p-button v-if="hasManagePermission"
+                          icon-left="ic_plus"
+                          style-type="substitutive"
+                          @click="handleClickCreate"
+                >
+                    <span>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
+                </p-button>
+            </div>
+        </div>
+        <cost-dashboard-update-modal v-model:visible="updateModalVisible"
+                                     :dashboard-id="dashboardId"
+                                     :dashboard-name="dashboard.name"
+                                     @confirm="handleUpdateConfirm"
+        />
+        <pdf-download-overlay v-model:visible="visiblePdfDownload"
+                              :items="previewItems"
+                              :file-name="pdfFileName"
+        >
+            <cost-dashboard-preview v-if="dashboardId"
+                                    :dashboard-id="dashboardId"
+                                    :period="period"
+                                    :filters="filters"
+                                    @rendered="handlePreviewRendered"
+            />
+        </pdf-download-overlay>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .cost-dashboard-page {

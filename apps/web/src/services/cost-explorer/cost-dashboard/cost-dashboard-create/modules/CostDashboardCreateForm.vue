@@ -1,22 +1,6 @@
-<template>
-    <div class="cost-dashboard-create-form">
-        <p-pane-layout>
-            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.TEMPLATE') }}</h2>
-            <p-pane-layout>
-                <cost-dashboard-create-with-layout />
-                <cost-dashboard-create-with-dashboard />
-            </p-pane-layout>
-            <cost-dashboard-create-default-filter />
-        </p-pane-layout>
-        <p-pane-layout>
-            <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.VISIBILITY') }}</h2>
-            <cost-dashboard-create-select-privacy :manage-disabled="manageDisabled" />
-        </p-pane-layout>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import { PPaneLayout } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
 import CostDashboardCreateDefaultFilter
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateDefaultFilter.vue';
@@ -27,27 +11,32 @@ import CostDashboardCreateWithDashboard
 import CostDashboardCreateWithLayout
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/modules/CostDashboardCreateWithLayout.vue';
 
-export default {
-    name: 'CostDashboardCreateForm',
-    components: {
-        CostDashboardCreateDefaultFilter,
-        CostDashboardCreateWithDashboard,
-        CostDashboardCreateWithLayout,
-        CostDashboardCreateSelectPrivacy,
-        PPaneLayout,
-    },
-    props: {
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        return {
-        };
-    },
-};
+interface Props {
+    manageDisabled: boolean;
+}
+
+defineProps<Props>();
+const { t } = useI18n();
+
 </script>
+
+<template>
+    <div class="cost-dashboard-create-form">
+        <p-pane-layout>
+            <h2>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.TEMPLATE') }}</h2>
+            <p-pane-layout>
+                <cost-dashboard-create-with-layout />
+                <cost-dashboard-create-with-dashboard />
+            </p-pane-layout>
+            <cost-dashboard-create-default-filter />
+        </p-pane-layout>
+        <p-pane-layout>
+            <h2>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.VISIBILITY') }}</h2>
+            <cost-dashboard-create-select-privacy :manage-disabled="manageDisabled" />
+        </p-pane-layout>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .cost-dashboard-create-form {
     @apply flex flex-col row-gap-4;

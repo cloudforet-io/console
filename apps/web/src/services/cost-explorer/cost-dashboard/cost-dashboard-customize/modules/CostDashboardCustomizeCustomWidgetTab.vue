@@ -1,16 +1,154 @@
+<script lang="ts" setup>
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PRadio, PTextPagination, PButton, PFieldTitle, PDataLoader,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import CostDashboardCustomizeCostQuery
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
+import CostDashboardCustomizeWidgetConfig
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
+import CustomWidgetPreview
+    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
+import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import type { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+
+
+
+const PAGE_SIZE = 6;
+
+const store = useStore();
+const { t } = useI18n();
+
+const costDashboardPageStore = useCostDashboardPageStore();
+const costDashboardPageState = costDashboardPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    totalCount: 0,
+    widgetList: [] as WidgetInfo[],
+    selectedItem: {} as WidgetInfo | CostQuerySetModel,
+    selectedQuery: {} as CostQuerySetModel,
+    showPreview: computed<boolean>(() => !!Object.keys(state.selectedItem).length),
+    allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
+    thisPage: 1,
+    userId: computed(() => store.state.user.userId),
+    widgetCardImageList: [],
+});
+
+/* Api */
+const apiQueryHelper = new ApiQueryHelper();
+const getParams = () => {
+    apiQueryHelper.setPageStart(getPageStart(state.thisPage, PAGE_SIZE))
+        .setPageLimit(PAGE_SIZE)
+        .setSort('created_at', true);
+    return {
+        query: apiQueryHelper.data,
+        user_id: state.userId,
+    };
+};
+const listCustomWidget = async () => {
+    try {
+        state.loading = true;
+        const { results, total_count } = await SpaceConnector.client.costAnalysis.customWidget.list(getParams());
+        state.totalCount = total_count;
+        state.widgetList = results;
+    } catch (e) {
+        state.totalCount = 0;
+        state.widgetList = [];
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+const deleteCustomWidget = async () => {
+    try {
+        await SpaceConnector.client.costAnalysis.customWidget.delete({
+            widget_id: costDashboardPageState.originSelectedWidget?.widget_id,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+/* Event */
+const handleSelectWidget = async (value: WidgetInfo) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.originSelectedWidget = value;
+        _state.editedSelectedWidget = value;
+    });
+    state.selectedQuery = {};
+    state.selectedItem = value;
+};
+const handleClickRemoveWidget = async () => {
+    await deleteCustomWidget();
+    costDashboardPageStore.$patch((_state) => {
+        _state.originSelectedWidget = undefined;
+        _state.editedSelectedWidget = undefined;
+    });
+    state.selectedItem = {};
+    state.thisPage = 1;
+    await listCustomWidget();
+};
+const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
+    await listCustomWidget();
+    costDashboardPageStore.$patch((_state) => {
+        _state.originSelectedWidget = createdCustomWidget;
+        _state.editedSelectedWidget = createdCustomWidget;
+    });
+    state.selectedQuery = {};
+    state.selectedItem = createdCustomWidget;
+    state.thisPage = 1;
+};
+const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
+
+const getWidgetCardImageList = async (): Promise<void> => {
+    state.widgetCardImageList = await Promise.allSettled(
+        state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
+    );
+};
+
+(async () => {
+    await listCustomWidget();
+    await getWidgetCardImageList();
+})();
+
+watch(() => state.selectedQuery, (selectedQuery) => {
+    if (Object.keys(selectedQuery).length) {
+        state.selectedItem = selectedQuery;
+        costDashboardPageStore.$patch((_state) => {
+            _state.originSelectedWidget = undefined;
+            _state.editedSelectedWidget = undefined;
+        });
+    }
+}, { immediate: false });
+
+</script>
+
 <template>
     <div class="cost-dashboard-customize-custom-widget-tab">
         <div class="left-area">
             <p-data-loader class="widgets-area"
-                           :data="widgetList"
-                           :loading="loading"
+                           :data="state.widgetList"
+                           :loading="state.loading"
             >
-                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-field-title>
+                <p-field-title>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ state.widgetList.length }})</p-field-title>
                 <ul class="widget-list">
-                    <li v-for="(widget, idx) in widgetList"
+                    <li v-for="(widget, idx) in state.widgetList"
                         :key="`widget-${idx}-${widget.name}`"
                         class="widget-card"
-                        :class="{'selected' : selectedItem.widget_id === widget.widget_id}"
+                        :class="{'selected' : state.selectedItem.widget_id === widget.widget_id}"
                         @click="handleSelectWidget(widget)"
                     >
                         <div class="card-header">
@@ -23,29 +161,29 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="widgetCardImageList[idx]?.value?.default"
+                                 :src="state.widgetCardImageList[idx]?.value?.default"
                             >
                         </div>
                     </li>
                 </ul>
                 <p-text-pagination
-                    :this-page.sync="thisPage"
-                    :all-page="allPage"
-                    @pageChange="listCustomWidget"
+                    v-model:this-page="state.thisPage"
+                    :all-page="state.allPage"
+                    @page-change="listCustomWidget"
                 />
                 <template #no-data>
                     <div class="help-text-wrapper">
                         <p class="title">
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET') }}
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET') }}
                         </p>
                         <p class="text">
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET_HELP_TEXT') }}
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_CUSTOM_WIDGET_HELP_TEXT') }}
                         </p>
                     </div>
                 </template>
             </p-data-loader>
-            <cost-dashboard-customize-cost-query :selected-query.sync="selectedQuery"
-                                                 :widget-list="widgetList"
+            <cost-dashboard-customize-cost-query v-model:selected-query="state.selectedQuery"
+                                                 :widget-list="state.widgetList"
                                                  class="cost-query-area"
                                                  @create-custom-widget="handleCreateCustomWidget"
             />
@@ -54,181 +192,19 @@
             <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
                                                     :is-custom="true"
             />
-            <custom-widget-preview v-if="showPreview"
-                                   :selected-item="selectedItem"
+            <custom-widget-preview v-if="state.showPreview"
+                                   :selected-item="state.selectedItem"
             />
             <p-button v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
                       style-type="negative-secondary"
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.REMOVE_WIDGET') }}
+                {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.REMOVE_WIDGET') }}
             </p-button>
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PRadio, PTextPagination, PButton, PFieldTitle, PDataLoader,
-} from '@spaceone/design-system';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import CostDashboardCustomizeCostQuery
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCostQuery.vue';
-import CostDashboardCustomizeWidgetConfig
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
-import CustomWidgetPreview
-    from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CustomWidgetPreview.vue';
-import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import type { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
-
-
-const PAGE_SIZE = 6;
-
-export default {
-    name: 'CostDashboardCustomizeCustomWidgetTab',
-    components: {
-        CostDashboardCustomizeCostQuery,
-        CostDashboardCustomizeWidgetConfig,
-        CustomWidgetPreview,
-        PTextPagination,
-        PRadio,
-        PButton,
-        PFieldTitle,
-        PDataLoader,
-    },
-    setup() {
-        const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.$state;
-
-        const state = reactive({
-            loading: true,
-            totalCount: 0,
-            widgetList: [] as WidgetInfo[],
-            selectedItem: {} as WidgetInfo | CostQuerySetModel,
-            selectedQuery: {} as CostQuerySetModel,
-            showPreview: computed<boolean>(() => !!Object.keys(state.selectedItem).length),
-            allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
-            thisPage: 1,
-            userId: computed(() => store.state.user.userId),
-            widgetCardImageList: [],
-        });
-
-        /* Api */
-        const apiQueryHelper = new ApiQueryHelper();
-        const getParams = () => {
-            apiQueryHelper.setPageStart(getPageStart(state.thisPage, PAGE_SIZE))
-                .setPageLimit(PAGE_SIZE)
-                .setSort('created_at', true);
-            return {
-                query: apiQueryHelper.data,
-                user_id: state.userId,
-            };
-        };
-        const listCustomWidget = async () => {
-            try {
-                state.loading = true;
-                const { results, total_count } = await SpaceConnector.client.costAnalysis.customWidget.list(getParams());
-                state.totalCount = total_count;
-                state.widgetList = results;
-            } catch (e) {
-                state.totalCount = 0;
-                state.widgetList = [];
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-        const deleteCustomWidget = async () => {
-            try {
-                await SpaceConnector.client.costAnalysis.customWidget.delete({
-                    widget_id: costDashboardPageState.originSelectedWidget?.widget_id,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        /* Event */
-        const handleSelectWidget = async (value: WidgetInfo) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.originSelectedWidget = value;
-                _state.editedSelectedWidget = value;
-            });
-            state.selectedQuery = {};
-            state.selectedItem = value;
-        };
-        const handleClickRemoveWidget = async () => {
-            await deleteCustomWidget();
-            costDashboardPageStore.$patch((_state) => {
-                _state.originSelectedWidget = undefined;
-                _state.editedSelectedWidget = undefined;
-            });
-            state.selectedItem = {};
-            state.thisPage = 1;
-            await listCustomWidget();
-        };
-        const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
-            await listCustomWidget();
-            costDashboardPageStore.$patch((_state) => {
-                _state.originSelectedWidget = createdCustomWidget;
-                _state.editedSelectedWidget = createdCustomWidget;
-            });
-            state.selectedQuery = {};
-            state.selectedItem = createdCustomWidget;
-            state.thisPage = 1;
-        };
-        const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
-
-        const getWidgetCardImageList = async (): Promise<void> => {
-            state.widgetCardImageList = await Promise.allSettled(
-                state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
-            );
-        };
-
-        (async () => {
-            await listCustomWidget();
-            await getWidgetCardImageList();
-        })();
-
-        watch(() => state.selectedQuery, (selectedQuery) => {
-            if (Object.keys(selectedQuery).length) {
-                state.selectedItem = selectedQuery;
-                costDashboardPageStore.$patch((_state) => {
-                    _state.originSelectedWidget = undefined;
-                    _state.editedSelectedWidget = undefined;
-                });
-            }
-        }, { immediate: false });
-
-        return {
-            ...toRefs(state),
-            costDashboardPageState,
-            COST_EXPLORER_ROUTE,
-            listCustomWidget,
-            handleSelectWidget,
-            handleClickRemoveWidget,
-            handleCreateCustomWidget,
-            getChartTypeImageFileName,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .cost-dashboard-customize-custom-widget-tab {

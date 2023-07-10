@@ -1,78 +1,7 @@
-<template>
-    <div class="default-widget-tab">
-        <div class="left-area">
-            <div v-if="recommendedWidgetList.length > 0"
-                 class="widgets-area widgets-all"
-            >
-                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.RECOMMENDED_WIDGET') }} ({{ recommendedWidgetList.length }})</p-field-title>
-                <ul class="widget-list">
-                    <li v-for="(widget, index) in recommendedWidgetList"
-                        :key="widget.widget_id"
-                        class="widget-card"
-                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
-                        @click="selectWidget(widget)"
-                    >
-                        <div class="card-header">
-                            <p-radio
-                                :selected="widget"
-                                :value="costDashboardPageState.originSelectedWidget"
-                                @click="selectWidget(widget)"
-                            >
-                                <span @click="selectWidget(widget)">{{ widgetLabel(widget.widget_id) }}</span>
-                            </p-radio>
-                        </div>
-                        <div class="card-content">
-                            <img class="card-image"
-                                 :src="widgetCardImageList[index]?.value.default"
-                            >
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="widgets-area widgets-all">
-                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-field-title>
-                <ul class="widget-list">
-                    <li v-for="(widget, index) in widgetList"
-                        :key="widget.widget_id"
-                        class="widget-card"
-                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
-                        @click="selectWidget(widget)"
-                    >
-                        <div class="card-header">
-                            <p-radio
-                                :selected="widget"
-                                :value="costDashboardPageState.originSelectedWidget"
-                                @click="selectWidget(widget)"
-                            >
-                                <span @click="selectWidget(widget)">{{ widgetLabel(widget.widget_id) }}</span>
-                            </p-radio>
-                        </div>
-                        <div class="card-content">
-                            <img class="card-image"
-                                 :src="widgetCardImageList[index]?.value.default"
-                            >
-                        </div>
-                    </li>
-                </ul>
-                <p-text-pagination :this-page.sync="thisPage"
-                                   :all-page="allPage"
-                                   @pageChange="getWidgets"
-                />
-            </div>
-        </div>
-        <div class="right-area">
-            <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
-                                                    :editable-widget-option-list="editableWidgetOptionList"
-            />
-            <default-widget-preview v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length" />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
+<script lang="ts" setup>
 import { PRadio, PFieldTitle, PTextPagination } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
@@ -89,82 +18,133 @@ import {
 import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
-
 const PAGE_SIZE = 6;
 
-export default {
-    name: 'CostDashboardCustomizeDefaultWidgetTab',
-    components: {
-        DefaultWidgetPreview,
-        CostDashboardCustomizeWidgetConfig,
-        PRadio,
-        PFieldTitle,
-        PTextPagination,
-    },
+const { t } = useI18n();
 
-    setup() {
-        const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.$state;
+const costDashboardPageStore = useCostDashboardPageStore();
+const costDashboardPageState = costDashboardPageStore.$state;
 
-        const state = reactive({
-            widgetList: [] as WidgetInfo[],
-            recommendedWidgetList: computed<WidgetInfo[]>(() => {
-                if (costDashboardPageState.layoutOfSpace) return state.widgetList.filter((widget) => widget.options.layout === costDashboardPageState.layoutOfSpace);
-                return [];
-            }),
-            editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
-                const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
-                if (costDashboardPageState.originSelectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
-                if (costDashboardPageState.originSelectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
-                return optionList;
-            }),
-            widgetLabel: computed(() => (widgetId) => defaultWidgetMap[widgetId]?.widget_name ?? ''),
-            // pagination
-            totalCount: 0,
-            thisPage: 1,
-            allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
-            widgetCardImageList: [],
-        });
-        const getWidgets = async () => {
-            try {
-                const widgets = await import('@/services/cost-explorer/widgets/lib/defaultWidgetList.json');
-                state.totalCount = widgets.length;
-                state.widgetList = widgets.default;
-            } catch (e) {
-                throw new Error('Failed to fetch widget list');
-            }
-        };
-        const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
-
-        const selectWidget = (value: WidgetInfo) => {
-            costDashboardPageStore.$patch((_state) => {
-                _state.originSelectedWidget = value;
-                _state.editedSelectedWidget = value;
-            });
-        };
-
-        const getWidgetCardImageList = async (): Promise<void> => {
-            state.widgetCardImageList = await Promise.allSettled(
-                state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
-            );
-        };
-
-        (async () => {
-            await getWidgets();
-            await getWidgetCardImageList();
-        })();
-
-        return {
-            ...toRefs(state),
-            costDashboardPageState,
-            defaultWidgetMap,
-            selectWidget,
-            getWidgets,
-            getChartTypeImageFileName,
-        };
-    },
+const state = reactive({
+    widgetList: [] as WidgetInfo[],
+    recommendedWidgetList: computed<WidgetInfo[]>(() => {
+        if (costDashboardPageState.layoutOfSpace) return state.widgetList.filter((widget) => widget.options.layout === costDashboardPageState.layoutOfSpace);
+        return [];
+    }),
+    editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
+        const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
+        if (costDashboardPageState.originSelectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
+        if (costDashboardPageState.originSelectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
+        return optionList;
+    }),
+    widgetLabel: computed(() => (widgetId) => defaultWidgetMap[widgetId]?.widget_name ?? ''),
+    // pagination
+    totalCount: 0,
+    thisPage: 1,
+    allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
+    widgetCardImageList: [],
+});
+const getWidgets = async () => {
+    try {
+        const widgets = await import('@/services/cost-explorer/widgets/lib/defaultWidgetList.json');
+        state.totalCount = widgets.length;
+        state.widgetList = widgets.default;
+    } catch (e) {
+        throw new Error('Failed to fetch widget list');
+    }
 };
+const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
+
+const selectWidget = (value: WidgetInfo) => {
+    costDashboardPageStore.$patch((_state) => {
+        _state.originSelectedWidget = value;
+        _state.editedSelectedWidget = value;
+    });
+};
+
+const getWidgetCardImageList = async (): Promise<void> => {
+    state.widgetCardImageList = await Promise.allSettled(
+        state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
+    );
+};
+
+(async () => {
+    await getWidgets();
+    await getWidgetCardImageList();
+})();
+
 </script>
+
+<template>
+    <div class="default-widget-tab">
+        <div class="left-area">
+            <div v-if="state.recommendedWidgetList.length > 0"
+                 class="widgets-area widgets-all"
+            >
+                <p-field-title>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.RECOMMENDED_WIDGET') }} ({{ state.recommendedWidgetList.length }})</p-field-title>
+                <ul class="widget-list">
+                    <li v-for="(widget, index) in state.recommendedWidgetList"
+                        :key="widget.widget_id"
+                        class="widget-card"
+                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
+                        @click="selectWidget(widget)"
+                    >
+                        <div class="card-header">
+                            <p-radio
+                                :selected="widget"
+                                :value="costDashboardPageState.originSelectedWidget"
+                                @click="selectWidget(widget)"
+                            >
+                                <span @click="selectWidget(widget)">{{ state.widgetLabel(widget.widget_id) }}</span>
+                            </p-radio>
+                        </div>
+                        <div class="card-content">
+                            <img class="card-image"
+                                 :src="state.widgetCardImageList[index]?.value.default"
+                            >
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="widgets-area widgets-all">
+                <p-field-title>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ state.widgetList.length }})</p-field-title>
+                <ul class="widget-list">
+                    <li v-for="(widget, index) in state.widgetList"
+                        :key="widget.widget_id"
+                        class="widget-card"
+                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
+                        @click="selectWidget(widget)"
+                    >
+                        <div class="card-header">
+                            <p-radio
+                                :selected="widget"
+                                :value="costDashboardPageState.originSelectedWidget"
+                                @click="selectWidget(widget)"
+                            >
+                                <span @click="selectWidget(widget)">{{ widgetLabel(widget.widget_id) }}</span>
+                            </p-radio>
+                        </div>
+                        <div class="card-content">
+                            <img class="card-image"
+                                 :src="state.widgetCardImageList[index]?.value.default"
+                            >
+                        </div>
+                    </li>
+                </ul>
+                <p-text-pagination v-model:this-page="state.thisPage"
+                                   :all-page="state.allPage"
+                                   @page-change="getWidgets"
+                />
+            </div>
+        </div>
+        <div class="right-area">
+            <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
+                                                    :editable-widget-option-list="state.editableWidgetOptionList"
+            />
+            <default-widget-preview v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length" />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .left-area {
