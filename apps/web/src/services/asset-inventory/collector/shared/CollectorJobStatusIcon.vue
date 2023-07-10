@@ -6,7 +6,7 @@
              class="job-tooltip-wrapper"
         >
             <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
-                       position="top-end"
+                       :position="props.tooltipPosition"
                        class="job-tooltip"
             >
                 <p-i
@@ -21,7 +21,7 @@
              class="job-tooltip-wrapper"
         >
             <p-tooltip :contents="props.contents"
-                       position="top-end"
+                       :position="props.tooltipPosition"
                        class="job-tooltip"
             >
                 <p-i v-if="props.status === JOB_STATE.SUCCESS"
@@ -60,6 +60,7 @@ interface Props {
     contents?: string,
     status?: string,
     isArrow?: boolean,
+    tooltipPosition?: string,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -67,6 +68,7 @@ const props = withDefaults(defineProps<Props>(), {
     contents: '',
     status: undefined,
     isArrow: false,
+    tooltipPosition: 'top-end',
 });
 </script>
 
