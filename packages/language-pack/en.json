@@ -2180,6 +2180,11 @@
 				"ALT_S_EDIT_SCHEDULE": "Schedule successfully edited",
 				"COLLECTOR_SCHEDULE": "Collector Schedule",
 				"COLLECT_DATA": "Collect Data",
+				"COLLECT_DATA_MODAL": {
+					"CONFIRM_BUTTON": "Collect Now",
+					"DESCRIPTION": "Collect data with following associated accounts.",
+					"TITLE": "Do you want to collect data now?"
+				},
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
 				"CURRENT_STATUS": "Current Status",
