@@ -43,9 +43,9 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import CollectorJobStatusIcon
-    from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorJobStatusIcon.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import CollectorJobStatusIcon
+    from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
