@@ -1,0 +1,116 @@
+<template>
+    <router-link :to="props.to"
+                 class="collector-job-status-icon"
+    >
+        <div v-if="props.isArrow"
+             class="job-tooltip-wrapper"
+        >
+            <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                       position="top-end"
+                       class="job-tooltip"
+            >
+                <p-i
+                    name="ic_chevron-right"
+                    width="1.125rem"
+                    height="1.125rem"
+                    color="inherit"
+                />
+            </p-tooltip>
+        </div>
+        <div v-else
+             class="job-tooltip-wrapper"
+        >
+            <p-tooltip :contents="props.contents"
+                       position="top-end"
+                       class="job-tooltip"
+            >
+                <p-i v-if="props.status === JOB_STATE.SUCCESS"
+                     name="ic_check"
+                     class="icon success"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit"
+                />
+                <p-i v-else-if="props.status === JOB_STATE.CANCELED"
+                     name="ic_limit-filed"
+                     class="icon canceled"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit"
+                />
+                <p-i v-else
+                     name="ic_exclamation-mark"
+                     class="icon error"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit"
+                />
+            </p-tooltip>
+        </div>
+    </router-link>
+</template>
+
+<script setup lang="ts">
+import { PTooltip, PI } from '@spaceone/design-system';
+
+import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+
+interface Props {
+    to: string | object,
+    contents?: string,
+    status?: string,
+    isArrow?: boolean,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    to: '',
+    contents: '',
+    status: undefined,
+    isArrow: false,
+});
+</script>
+
+<style lang="postcss" scoped>
+.collector-job-status-icon {
+    @apply bg-gray-100 rounded-full border border-white box-content;
+    width: 1.375rem;
+    height: 1.375rem;
+    .job-tooltip-wrapper {
+        @apply flex items-center justify-center;
+        width: 1.375rem;
+        height: 1.375rem;
+        .job-tooltip {
+            @apply flex items-center justify-center;
+            .icon {
+                &.success {
+                    @apply text-green-500;
+                    margin-right: -0.25rem;
+                }
+                &.error {
+                    @apply text-red-400;
+                }
+                &.canceled {
+                    @apply text-gray-400;
+                }
+            }
+        }
+    }
+    &:hover {
+        @apply bg-blue-200;
+        .job-tooltip {
+            @apply text-blue-600;
+            .icon {
+                &.success {
+                    @apply text-blue-600;
+                }
+                &.error {
+                    @apply text-blue-600;
+                }
+                &.canceled {
+                    @apply text-blue-600;
+                }
+            }
+        }
+    }
+}
+</style>
