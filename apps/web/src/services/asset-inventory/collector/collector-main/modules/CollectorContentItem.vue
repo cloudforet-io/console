@@ -76,7 +76,10 @@ const collectorPageStore = useCollectorPageStore();
 
 const state = reactive({
     loading: false,
-    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
+    status: computed(() => {
+        const lastJobItem = props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
+        return lastJobItem ? lastJobItem.status : '';
+    }),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
         return { name: plugin.name, version: plugin.info.version };
