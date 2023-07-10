@@ -2181,8 +2181,12 @@
 				"COLLECTOR_SCHEDULE": "컬렉터 스케줄",
 				"COLLECT_DATA": "데이터 수집",
 				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "",
 					"CONFIRM_BUTTON": "수집하기",
 					"DESCRIPTION": "",
+					"DUPLICATION_DESCRIPTION": "",
+					"DUPLICATION_TITLE": "",
+					"DURATION": "",
 					"TITLE": ""
 				},
 				"CREATE": "생성",

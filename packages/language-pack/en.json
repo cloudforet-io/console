@@ -2181,8 +2181,12 @@
 				"COLLECTOR_SCHEDULE": "Collector Schedule",
 				"COLLECT_DATA": "Collect Data",
 				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "Account",
 					"CONFIRM_BUTTON": "Collect Now",
 					"DESCRIPTION": "Collect data with following associated accounts.",
+					"DUPLICATION_DESCRIPTION": "Check the ongoing data collection information.",
+					"DUPLICATION_TITLE": "Collecting is still in progress. Do you want to cancel and re-start it?",
+					"DURATION": "Duration",
 					"TITLE": "Do you want to collect data now?"
 				},
 				"CREATE": "Create",
