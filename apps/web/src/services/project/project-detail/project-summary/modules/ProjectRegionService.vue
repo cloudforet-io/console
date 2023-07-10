@@ -243,9 +243,6 @@ export default {
             }
         };
 
-        watch(() => state.providers, (providers) => {
-            if (providers) getData();
-        }, { immediate: true });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
@@ -267,6 +264,7 @@ export default {
                 store.dispatch('reference/provider/load'),
                 store.dispatch('reference/region/load'),
             ]);
+            await getData();
         })();
 
         return {

@@ -51,32 +51,31 @@ const userListApiQueryHelper = new ApiQueryHelper()
 // TODO: need to edit type assertion
     .setFiltersAsRawQueryString(route.query.filters as undefined|string|(string|null)[]);
 
+const fields = [
+    { name: 'user_id', label: 'User ID' },
+    { name: 'name', label: 'Name' },
+    { name: 'state', label: 'State' },
+    { name: 'user_type', label: 'Access Control' },
+    { name: 'api_key_count', label: 'API Key', sortable: false },
+    { name: 'role_name', label: 'Role', sortable: false },
+    { name: 'tags', label: 'Tags', sortable: false },
+    { name: 'backend', label: 'Auth Type' },
+    { name: 'last_accessed_at', label: 'Last Activity' },
+    { name: 'timezone', label: 'Timezone' },
+];
+const excelFields = [
+    { key: 'user_id', name: 'User ID' },
+    { key: 'name', name: 'Name' },
+    { key: 'state', name: 'State' },
+    { key: 'user_type', name: 'Access Control' },
+    { key: 'api_key_count', name: 'API Key' },
+    { key: 'role_bindings.role_info.name', name: 'Role' },
+    { key: 'backend', name: 'Auth Type' },
+    { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
+    { key: 'timezone', name: 'Timezone' },
+];
+
 const state = reactive({
-    fields: computed(() => ([
-        { name: 'user_id', label: 'User ID' },
-        { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'user_type', label: 'Access Control' },
-        { name: 'api_key_count', label: 'API Key', sortable: false },
-        { name: 'role_name', label: 'Role', sortable: false },
-        { name: 'tags', label: 'Tags', sortable: false },
-        { name: 'backend', label: 'Auth Type' },
-        { name: 'last_accessed_at', label: 'Last Activity' },
-        { name: 'timezone', label: 'Timezone' },
-    ])),
-    excelFields: [
-        { key: 'user_id', name: 'User ID' },
-        { key: 'name', name: 'Name' },
-        { key: 'state', name: 'State' },
-        { key: 'user_type', name: 'Access Control' },
-        { key: 'api_key_count', name: 'API Key' },
-        { key: 'role_bindings.role_info.name', name: 'Role' },
-        { key: 'backend', name: 'Auth Type' },
-        { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
-        { key: 'timezone', name: 'Timezone' },
-    ],
-    sortBy: 'name',
-    // selected
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
     dropdownMenu: computed(() => ([
         {
@@ -98,7 +97,7 @@ const state = reactive({
     ] as MenuItem[])),
     keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
     valueHandlerMap: userSearchHandlers.valueHandlerMap,
-    tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
+    tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets as KeyItemSet[]).queryTags,
 });
 
 const modalState = reactive({
@@ -145,7 +144,7 @@ const handleExport = async () => {
             query: userListApiQuery,
             include_role_binding: true,
         },
-        fields: state.excelFields,
+        fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.user,
     });
 };
@@ -217,6 +216,9 @@ const unbindRole = async (userId) => {
     }
 };
 const addUser = async (item, roleId) => {
+    userPageStore.$patch({
+        modalLoading: true,
+    });
     try {
         await SpaceConnector.client.identity.user.create({
             ...item,
@@ -228,10 +230,17 @@ const addUser = async (item, roleId) => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
     } finally {
-        userPageStore.$patch({ selectedIndices: [] });
+        userPageStore.$patch({
+            selectedIndices: [],
+            visibleCreateModal: false,
+            modalLoading: false,
+        });
     }
 };
 const updateUser = async (item, roleId) => {
+    userPageStore.$patch({
+        modalLoading: true,
+    });
     try {
         await SpaceConnector.clientV2.identity.user.update({
             ...item,
@@ -249,12 +258,18 @@ const updateUser = async (item, roleId) => {
         const errorDetail = e.axiosError.response.data.detail;
         if (errorDetail.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
             showErrorMessage(errorDetail.message, '');
+        } else if (errorDetail.code === 'ERROR_PASSWORD_NOT_CHANGED') {
+            ErrorHandler.handleRequestError(e, t('IDENTITY.USER.MAIN.ALT_E_SAME_PASSWORD'));
         } else {
             ErrorHandler.handleRequestError(e, t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
         }
     } finally {
         await userPageStore.listUsers(userListApiQuery);
-        userPageStore.$patch({ selectedIndices: [] });
+        userPageStore.$patch({
+            selectedIndices: [],
+            visibleCreateModal: false,
+            modalLoading: false,
+        });
     }
 };
 
@@ -279,7 +294,7 @@ const handleUserStatusModalConfirm = () => {
 <template>
     <section class="user-management-table">
         <p-toolbox-table
-            v-model:sort-by="state.sortBy"
+            sort-by="name"
             search-type="query"
             searchable
             selectable
@@ -288,7 +303,7 @@ const handleUserStatusModalConfirm = () => {
             :loading="userPageState.loading"
             :items="userPageState.users"
             :select-index="userPageState.selectedIndices"
-            :fields="state.fields"
+            :fields="fields"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
             :key-item-sets="state.keyItemSets"

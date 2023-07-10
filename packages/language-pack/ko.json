@@ -1235,7 +1235,8 @@
 			"STEP2_DESC": "템플릿 또는 기존의 저장된 대시보드를 활용하여 빠르게 시작할 수 있습니다.",
 			"TITLE": "대시보드 생성",
 			"VALIDATION_PROJECT": "프로젝트를 선택해주세요.",
-			"VALIDATION_TEMPLATE": "템플릿을 선택하세요."
+			"VALIDATION_TEMPLATE": "템플릿을 선택하세요.",
+			"VIEW": "보기"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "+ 버튼을 추가하여 레이블을 추가할 수 있습니다.",
@@ -1802,6 +1803,7 @@
 				"ALT_E_DISABLE_API_KEY": "API Key 비활성화 실패",
 				"ALT_E_ENABLE": "사용자 활성화 실패",
 				"ALT_E_ENABLE_API_KEY": "API Key 활성화 실패",
+				"ALT_E_SAME_PASSWORD": "이전과 동일한 비밀번호를 입력하셨습니다. 다시 입력해주세요.",
 				"ALT_E_UPDATE_USER": "사용자 업데이트 실패",
 				"ALT_S_ADD_USER": "사용자 추가 완료",
 				"ALT_S_DELETE_API_KEY": "API 키 삭제 완료",

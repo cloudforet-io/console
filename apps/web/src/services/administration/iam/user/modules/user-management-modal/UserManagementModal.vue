@@ -13,7 +13,7 @@ import PasswordForm from '@/services/administration/iam/user/modules/user-manage
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import type { User, UserManagementData } from '@/services/administration/iam/user/type';
-import { PASSWORD_TYPE } from '@/services/administration/iam/user/type';
+import { PASSWORD_TYPE, USER_BACKEND_TYPE, USER_TYPE } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -110,12 +110,12 @@ const confirm = async () => {
     };
     if (userPageState.visibleCreateModal) {
         if (formState.activeTab === 'local') {
-            data.backend = 'LOCAL';
+            data.backend = USER_BACKEND_TYPE.LOCAL;
         } else if (formState.activeTab === 'apiOnly') {
-            data.backend = 'LOCAL';
-            data.user_type = 'API_USER';
+            data.backend = USER_BACKEND_TYPE.LOCAL;
+            data.user_type = USER_TYPE.API_USER;
         } else {
-            data.backend = 'EXTERNAL';
+            data.backend = USER_BACKEND_TYPE.EXTERNAL;
         }
     }
     if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
@@ -127,7 +127,6 @@ const confirm = async () => {
     } else {
         emit('confirm', data, null);
     }
-    userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
 };
 
 /* init */
@@ -164,6 +163,7 @@ const initAuthTypeList = async () => {
                     :backdrop="true"
                     :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
                     :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '')"
+                    :loading="userPageState.modalLoading"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -213,6 +213,7 @@ const initAuthTypeList = async () => {
                         @change-verify="handleChangeVerify"
                     />
                     <password-form
+                        v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
                         :item="state.data"
                         :is-valid-email="state.data.email_verified"
                         @change-input="handleChangeInputs"

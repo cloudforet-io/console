@@ -1235,7 +1235,8 @@
 			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
-			"VALIDATION_TEMPLATE": "Please Select Template."
+			"VALIDATION_TEMPLATE": "Please Select Template.",
+			"VIEW": "View"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "Click + button to add dashboard's label.",
@@ -1802,6 +1803,7 @@
 				"ALT_E_DISABLE_API_KEY": "Failed to Disable API Key",
 				"ALT_E_ENABLE": "Failed to Enable User",
 				"ALT_E_ENABLE_API_KEY": "Failed to Enable API Key",
+				"ALT_E_SAME_PASSWORD": "The new password cannot be the same as the old password.",
 				"ALT_E_UPDATE_USER": "Failed to Update User",
 				"ALT_S_ADD_USER": "User successfully added",
 				"ALT_S_DELETE_API_KEY": "API Key successfully deleted",

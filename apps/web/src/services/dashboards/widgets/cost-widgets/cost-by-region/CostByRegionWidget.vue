@@ -28,13 +28,13 @@
             </p-data-loader>
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data?.results"
+                               :items="state.data ? state.data.results : []"
                                :currency="state.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
                                :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
+                               :show-next-page="state.data ? state.data.more : false"
                                @update:thisPage="handleUpdateThisPage"
             />
         </div>
@@ -51,6 +51,7 @@ import type { Location } from 'vue-router/types/router';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import {
     groupBy, isEqual, sum, uniqWith,
 } from 'lodash';
@@ -136,8 +137,8 @@ const state = reactive({
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
+        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
+        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
@@ -290,6 +291,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+    state.data.more = false;
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;

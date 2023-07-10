@@ -41,7 +41,7 @@
 	},
 	"DOUBLE_CHECK_MODAL": {
 		"INPUT_DESC": "Type {text} to Confirm.",
-		"INVALID_TEXT": "text is not {text}"
+		"INVALID_TEXT": "Incorrect name entered. Please try again."
 	},
 	"EMPTY": {
 		"NO_DATA": "No Data"

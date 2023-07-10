@@ -413,6 +413,7 @@ const handleClickRow = (rowData) => {
     tbody {
         .no-data-wrapper {
             position: absolute;
+            width: 100%;
             height: calc(100% - 2rem);
             max-height: 12.875rem;
         }

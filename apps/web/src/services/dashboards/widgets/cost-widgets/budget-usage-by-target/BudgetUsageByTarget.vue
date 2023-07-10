@@ -34,6 +34,7 @@ import {
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -91,8 +92,8 @@ const state = reactive({
         progress: d.budget_usage,
     })) ?? []),
     dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
+        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
+        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
     widgetLocation: computed<Location>(() => ({

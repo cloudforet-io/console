@@ -1235,7 +1235,8 @@
 			"STEP2_DESC": "基本テンプレートと既存のダッシュボードを活用し、素早い作成が可能です。",
 			"TITLE": "新規ダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
-			"VALIDATION_TEMPLATE": "テンプレートを選択してください"
+			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
+			"VIEW": "ビュー"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": " +　ボタンを追加してラベルを追加できます。 ",
@@ -1802,6 +1803,7 @@
 				"ALT_E_DISABLE_API_KEY": "API Key無効化に失敗",
 				"ALT_E_ENABLE": "ユーザー有効化に失敗",
 				"ALT_E_ENABLE_API_KEY": "API Key有効かに失敗",
+				"ALT_E_SAME_PASSWORD": "新しいパスワードは古いパスワードと同じものにすることはできません。",
 				"ALT_E_UPDATE_USER": "ユーザー編集に失敗",
 				"ALT_S_ADD_USER": "ユーザー追加完了",
 				"ALT_S_DELETE_API_KEY": "API Key削除完了",

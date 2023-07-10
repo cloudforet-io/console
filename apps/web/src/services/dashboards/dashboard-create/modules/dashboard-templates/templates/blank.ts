@@ -4,6 +4,7 @@ import { i18n } from '@/translations';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import { getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 
 export const blankPreview: DefaultDashboardPreviewConfig = reactive({
     name: 'Blank',
@@ -27,10 +28,7 @@ export const blankDashboard: DashboardConfig = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: {
-        properties: {},
-        order: [],
-    },
+    variables_schema: getDashboardVariablesSchema(),
     variables: {},
     layouts: [],
 };

@@ -349,7 +349,10 @@ export default defineComponent<Props>({
                 });
                 // set default value to default properties
                 widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
-                    state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
+                    const filterProperty = propertyName.replace('filters.', '');
+                    if (dashboardDetailState.variablesSchema.properties[filterProperty]?.use) {
+                        state.schemaFormData[propertyName] = filterProperty;
+                    }
                     _inheritOptions = {
                         ..._inheritOptions,
                         [propertyName]: { enabled: true },

@@ -11,19 +11,25 @@
                      :class="{selected: name === activeTab}"
                 >
                     <div class="count">
-                        <router-link :to="getAllSummaryTabLocation(name)"
-                                     class="anchor"
-                        >
-                            <span class="number">
-                                <span v-if="name === DATA_TYPE.BILLING"
-                                      class="dollar-sign"
-                                >$</span>
-                                <span>{{ count[name] }}</span>
-                            </span>
-                        </router-link>
-                        <span v-if="name === DATA_TYPE.STORAGE"
-                              class="suffix"
-                        >{{ storageBoxSuffix }}</span>
+                        <p-spinner v-if="loading"
+                                   class="loading-spinner"
+                                   size="xl"
+                        />
+                        <template v-else>
+                            <router-link :to="getAllSummaryTabLocation(name)"
+                                         class="anchor"
+                            >
+                                <span class="number">
+                                    <span v-if="name === DATA_TYPE.BILLING"
+                                          class="dollar-sign"
+                                    >$</span>
+                                    <span class="value">{{ count[name] }}</span>
+                                </span>
+                            </router-link>
+                            <span v-if="name === DATA_TYPE.STORAGE"
+                                  class="suffix"
+                            >{{ storageBoxSuffix }}</span>
+                        </template>
                     </div>
                     <div class="title">
                         {{ label }}
@@ -83,7 +89,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PBalloonTab, PSelectButton, PDataLoader, PSkeleton,
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
@@ -137,6 +143,7 @@ export default {
         PDataLoader,
         PBalloonTab,
         PSelectButton,
+        PSpinner,
     },
     props: {
         extraParams: {
@@ -167,6 +174,7 @@ export default {
                 { name: 'MONTHLY', label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
+            loading: true,
             count: {
                 [DATA_TYPE.SERVER]: 0,
                 [DATA_TYPE.DATABASE]: 0,
@@ -459,10 +467,12 @@ export default {
         };
 
         const init = async () => {
+            state.loading = true;
             await Promise.all([
                 getCount(),
                 getBillingCount(),
             ]);
+            state.loading = false;
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.SERVER);
@@ -532,15 +542,22 @@ export default {
     padding: 0.5rem 0;
     .count {
         @apply text-indigo-400;
-        display: inline-block;
-        line-height: 2.5rem;
+        align-self: flex-end;
+        display: inline-flex;
+        height: 3rem;
+        line-height: 2rem;
         &:hover {
             .anchor {
-                border-bottom: 2px solid;
                 &.billing {
                     border: none;
                 }
+                .value {
+                    border-bottom: 2px solid;
+                }
             }
+        }
+        .loading-spinner {
+            height: 2.5rem;
         }
         .dollar-sign {
             @apply text-gray-500;
@@ -552,6 +569,8 @@ export default {
             @apply text-indigo-400;
             font-size: 2rem;
             font-weight: bold;
+            display: inline-flex;
+            align-self: flex-end;
         }
         .suffix {
             @apply text-gray-500;

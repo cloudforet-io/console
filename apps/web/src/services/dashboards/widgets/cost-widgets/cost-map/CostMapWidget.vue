@@ -83,7 +83,7 @@ const state = reactive({
     chartData: computed(() => getRefinedTreemapChartData(state.data, state.groupBy, props.allReferenceTypeInfo)),
     dateRange: computed<DateRange>(() => {
         const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
-        const start = state.settings?.date_range?.start ?? dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
+        const start = state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM');
         return { start, end };
     }),
     widgetLocation: computed<Location>(() => ({

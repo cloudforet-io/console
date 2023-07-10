@@ -65,6 +65,12 @@ export const USER_STATE = Object.freeze({
     DISABLE: 'DISABLED',
 } as const);
 
+export const USER_BACKEND_TYPE = {
+    LOCAL: 'LOCAL',
+    EXTERNAL: 'EXTERNAL',
+    API: 'API',
+} as const;
+
 type ProtocolType = 'INTERNAL' | 'EXTERNAL';
 
 type MetadataDataType = 'PLAIN_TEXT' | 'SECRET';

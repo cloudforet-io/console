@@ -22,6 +22,7 @@ const _getUserType = (userType: UserType) => {
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
         loading: false,
+        modalLoading: false,
         users: [] as User[],
         totalCount: 0,
         selectedIndices: [],
