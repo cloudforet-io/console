@@ -41,7 +41,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
-        <collector-restart-modal @refresh-collector-list="refreshCollectorList" />
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
     </div>
 </template>
 
@@ -73,8 +73,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorContentItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorContentItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
-import CollectorRestartModal
-    from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorRestartModal.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorScheduleModal.vue';
 import {
