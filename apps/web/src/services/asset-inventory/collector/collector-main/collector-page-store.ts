@@ -27,7 +27,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         totalCount: 0,
         schedules: [] as Schedule[],
         visibleScheduleModal: false,
-        visibleRestartModal: false,
+        visibleCollectorModal: false,
 
     }),
     getters: {
@@ -101,17 +101,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 return response;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
-        async restartCollector(collectorId: string) {
-            try {
-                await SpaceConnector.client.inventory.collector.collect({
-                    collector_id: collectorId,
-                });
-                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
                 throw e;
             }
         },

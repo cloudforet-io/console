@@ -31,9 +31,7 @@
                      :key="item.collectorId"
                      @click="handleClickListItem(item.detailLink)"
                 >
-                    <collector-content-item :item="item"
-                                            @refresh-collector-list="refreshCollectorList"
-                    />
+                    <collector-content-item :item="item" />
                 </div>
             </div>
             <template #no-data>
@@ -41,7 +39,7 @@
             </template>
         </p-data-loader>
         <collector-schedule-modal @refresh-collector-list="refreshCollectorList" />
-        <!--        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />-->
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
     </div>
 </template>
 
@@ -79,6 +77,8 @@ import {
     COLLECTOR_ITEM_INFO_TYPE,
     COLLECTOR_QUERY_HELPER_SET,
 } from '@/services/asset-inventory/collector/collector-main/type';
+import CollectorDataModal
+    from '@/services/asset-inventory/collector/shared/collector-data-modal/CollectorDataModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
@@ -216,6 +216,9 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
 };
 const handleClickListItem = (detailLink) => {
     SpaceRouter.router.push(detailLink);
+};
+const handleClickCollectDataConfirm = () => {
+    refreshCollectorList();
 };
 
 /* API */
