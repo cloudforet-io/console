@@ -36,8 +36,16 @@
                              :value="repo.name"
                              class="repository-item"
                     >
-                        <div class="content-menu-item">
-                            {{ repo.label }}
+                        <div class="content-menu-item"
+                             :style="{color: repo.color}"
+                        >
+                            <p-i v-if="repo.icon"
+                                 :name="repo.icon"
+                                 :color="repo.color"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                                 class="mr-1"
+                            />{{ repo.label }}
                         </div>
                     </p-radio>
                 </p-radio-group>
@@ -99,7 +107,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown,
+    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -111,6 +119,8 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { repositoryColorMap, repositoryIconMap } from '@/services/asset-inventory/collector/config';
+import type { RepositoryInfo } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -134,10 +144,14 @@ const state = reactive({
     selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
     repositories: [],
     repositoryList: computed(() => ([
-        { name: 'all', label: 'All Repository' },
-        ...state.repositories.map((repo) => ({
+        {
+            name: 'all', label: 'All Repository', icon: null, color: null,
+        },
+        ...state.repositories.map((repo: RepositoryInfo) => ({
             label: repo.name,
             name: repo.repository_id,
+            icon: repositoryIconMap[repo.repository_type],
+            color: repositoryColorMap[repo.repository_type],
         })),
     ])),
     selectedRepository: 'all',
