@@ -18,7 +18,7 @@
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
-                                      :key="item.name"
+                                      :key="`${item.name}-${item?.repository_info?.repository_id}`"
                                       class="plugin-card-item"
                         >
                             <template #content>
