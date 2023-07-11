@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCenteredLayout from '@/layouts/centered-layout/PCenteredLayout.vue';
 import { getCenteredLayoutArgTypes } from "@/layouts/centered-layout/story-helper";
-
+import { faker } from '@faker-js/faker';
 
 <Meta title='Layouts/Centered Layout' parameters={{
     design: {
@@ -50,13 +50,18 @@ export const Template = (args, { argTypes }) => ({
             <div class="w-full h-full fixed">
                 <p-centered-layout>
                     <template>
-                        <div class="flex justify-center items-center font-bold text-lg">
-                            <span>This is contents</span>
+                        <div class="font-bold text-lg" style="width: 300px;">
+                            {{ faker.lorem.paragraph(100) }}
                         </div>
                     </template>
                 </p-centered-layout>
             </div>
     `,
+            setup() {
+                return {
+                    faker
+                }
+            }
         }}
     </Story>
 </Canvas>
