@@ -27,20 +27,10 @@
             </div>
             <div class="collector-status-wrapper">
                 <p-button style-type="tertiary"
-                          :loading="state.loading"
                           class="collector-data-button"
-                          :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
                 >
-                    <p-i v-if="state.status === JOB_STATE.IN_PROGRESS"
-                         name="ic_settings-filled"
-                         class="progress-icon"
-                         height="1rem"
-                         width="1rem"
-                         animation="spin"
-                         color="inherit"
-                    />
-                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
                 </p-button>
             </div>
         </p-card>
@@ -51,7 +41,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PCard, PLazyImg, PI,
+    PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
@@ -60,7 +50,9 @@ import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import {
+    useCollectorDataModalStore,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
 
 interface Props {
     item?: CollectorItemInfo;
@@ -70,16 +62,10 @@ const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
 
-const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
-
 const collectorPageStore = useCollectorPageStore();
+const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
-    loading: false,
-    status: computed(() => {
-        const lastJobItem = props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
-        return lastJobItem ? lastJobItem.status : '';
-    }),
     plugin: computed(() => {
         const plugin = props.item?.plugin;
         return { name: plugin.name, version: plugin.info.version };
@@ -88,19 +74,15 @@ const state = reactive({
 
 /* API */
 const handleClickCollectData = async () => {
-    state.loading = true;
-    if (state.status === JOB_STATE.IN_PROGRESS) {
-        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
-        collectorPageStore.$patch({
-            visibleRestartModal: true,
-            selectedCollector: collectorCollector,
-        });
-    } else {
-        const collectorId = props.item.collectorId;
-        await collectorPageStore.restartCollector(collectorId);
-    }
-    state.loading = false;
-    emit('refresh-collector-list');
+    collectorPageStore.$patch({
+        visibleCollectorModal: true,
+    });
+    collectorDataModalStore.$patch((_state) => {
+        _state.selectedCollector = {
+            ...props.item,
+            collector_id: props.item.collectorId,
+        };
+    });
 };
 </script>
 
@@ -137,19 +119,9 @@ const handleClickCollectData = async () => {
             gap: 0.25rem;
 
             .collector-data-button {
+                @apply flex items-center;
                 opacity: 0;
-
-                &.in-process {
-                    @apply items-center;
-                    opacity: 1;
-                    padding-right: 0.75rem;
-                    padding-left: 0.75rem;
-                    gap: 0.25rem;
-
-                    .progress-icon {
-                        @apply text-gray-500;
-                    }
-                }
+                padding-top: 0.065rem;
             }
         }
 
