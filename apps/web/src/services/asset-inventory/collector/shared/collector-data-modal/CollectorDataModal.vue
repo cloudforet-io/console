@@ -60,13 +60,13 @@ import {
 import { ACCOUNT_TYPE, COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 interface Props {
-    state?: string;
+    collectDataType?: string;
     accountType?: string;
     isDuplicateJobs?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    state: COLLECT_DATA_TYPE.COLLECTOR,
+    collectDataType: COLLECT_DATA_TYPE.COLLECTOR,
     accountType: ACCOUNT_TYPE.ALL,
     isDuplicateJobs: false,
 });
