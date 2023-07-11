@@ -77,11 +77,11 @@ const handleClickCollectData = async () => {
     collectorPageStore.$patch({
         visibleCollectorModal: true,
     });
-    collectorDataModalStore.$patch({
-        selectedCollector: {
+    collectorDataModalStore.$patch((_state) => {
+        _state.selectedCollector = {
             ...props.item,
             collector_id: props.item.collectorId,
-        },
+        };
     });
 };
 </script>
