@@ -2180,6 +2180,15 @@
 				"ALT_S_EDIT_SCHEDULE": "スケジュールの編集が正常に完了しました",
 				"COLLECTOR_SCHEDULE": "コレクタースケジュール",
 				"COLLECT_DATA": "データ収集",
+				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "",
+					"CONFIRM_BUTTON": "今すぐ収集",
+					"DESCRIPTION": "",
+					"DUPLICATION_DESCRIPTION": "",
+					"DUPLICATION_TITLE": "",
+					"DURATION": "",
+					"TITLE": ""
+				},
 				"CREATE": "作成",
 				"CREATE_COLLECTOR": "コレクタ生成",
 				"CURRENT_STATUS": "進行状況",
