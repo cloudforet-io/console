@@ -3,10 +3,13 @@
          :class="`step-${currentStep}`"
     >
         <template v-if="currentStep === steps[0].step">
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
                                   @set-project="setForm('dashboardProject', $event)"
@@ -31,10 +34,13 @@
             </div>
         </template>
         <template v-if="currentStep === steps[1].step">
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-template-form
                 :dashboard-scope="dashboardScope"
@@ -61,9 +67,12 @@
         </template>
         <template v-if="currentStep === steps[2].step">
             <div class="dashboard-customize-wrapper">
-                <dashboard-create-header :total-steps="steps.length"
-                                         :current-step="currentStep"
-                                         description=""
+                <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                          :total-steps="steps.length"
+                                          :current-step="currentStep"
+                                          show-step
+                                          show-close-button
+                                          @close="handleClickClose"
                 />
                 <dashboard-customize :loading="loading"
                                      :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
@@ -85,7 +94,7 @@ import {
 } from 'vue';
 
 import {
-    PButton,
+    PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -104,7 +113,6 @@ import {
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
 import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
-import DashboardCreateHeader from '@/services/dashboards/dashboard-create/modules/DashboardCreateHeader.vue';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
@@ -123,11 +131,11 @@ export default {
     components: {
         ConfirmBackModal,
         DashboardCustomize,
-        DashboardCreateHeader,
         DashboardViewerForm,
         DashboardTemplateForm,
         DashboardScopeForm,
         PButton,
+        PCenteredLayoutHeader,
     },
     beforeRouteEnter(to, from, next) {
         next((vm) => {
