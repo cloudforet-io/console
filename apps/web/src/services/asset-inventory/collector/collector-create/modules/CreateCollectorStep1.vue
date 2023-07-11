@@ -172,7 +172,7 @@ onMounted(() => {
         margin-top: 1.5rem;
 
         .contents-title {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .right-area {
@@ -181,7 +181,7 @@ onMounted(() => {
             .right-area-contents {
                 .plugin-card-list {
                     @apply flex flex-col gap-2;
-                    height: calc(100vh - 17rem);
+                    height: calc(100vh - 19.5rem);
                     overflow-y: auto;
                     :deep(.p-board-item) {
                         .content-area .content {
