@@ -38,10 +38,12 @@
         position: relative;
         height: 100%;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         overflow-y: auto;
         min-width: 360px;
+        padding: 2rem 2.5rem;
     }
 }
 </style>
