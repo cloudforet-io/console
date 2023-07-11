@@ -1,0 +1,76 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PCenteredLayoutHeader from '@/layouts/centered-layout/centered-layout-header/PCenteredLayoutHeader.vue';
+import { getCenteredLayoutHeaderArgTypes } from "@/layouts/centered-layout/centered-layout-header/story-helper";
+
+
+<Meta title='Layouts/Centered Layout/Centered Layout Header' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228226&t=GVsFwo5txLv6VtoA-4'
+    }
+}} argTypes={getCenteredLayoutHeaderArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: {
+        PCenteredLayoutHeader
+    },
+    template: `
+    <div style="width: 360px">
+        <p-centered-layout-header :title="title"
+            :description="description"
+            :show-step="showStep"
+            :current-step="currentStep"
+            :total-steps="totalSteps"
+            :show-close-button="showCloseButton"
+        >
+        </p-centered-layout-header>
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Centered Layout Header
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: {
+                PCenteredLayoutHeader
+            },
+            template: `
+            <div style="width: 360px">
+                <p-centered-layout-header title="Title" description="Description"
+                    :show-step="true"
+                    :current-step="1"
+                    :total-steps="3"
+                    :show-close-button="true"
+                >
+                </p-centered-layout-header>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
