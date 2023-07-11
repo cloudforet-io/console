@@ -78,7 +78,7 @@ import {
     COLLECTOR_QUERY_HELPER_SET,
 } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorDataModal
-    from '@/services/asset-inventory/collector/shared/collector-data-modal/CollectorDataModal.vue';
+    from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDefaultInner.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
