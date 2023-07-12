@@ -1,10 +1,63 @@
+<script lang="ts" setup>
+import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
+import {
+    computed, reactive, useSlots,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { CurrencySymbol } from '@/store/modules/settings/type';
+
+const UNIT_TYPE = Object.freeze({
+    PERCENT: 'PERCENT',
+    CURRENCY: 'CURRENCY',
+});
+type UnitType = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
+
+interface Props {
+    loading: boolean;
+    title: string;
+    currencySymbol: CurrencySymbol;
+    unitType: UnitType;
+    value?: number|string;
+    showDivider: boolean;
+    description: string;
+    noData: boolean;
+    widgetLink?: RouteLocation|string;
+
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    loading: true,
+    title: '',
+    currencySymbol: CURRENCY_SYMBOL.USD,
+    unitType: UNIT_TYPE.CURRENCY,
+    value: 0,
+    showDivider: true,
+    description: '',
+    noData: false,
+    widgetLink: undefined,
+});
+const slots = useSlots();
+const state = reactive({
+    formattedValue: computed<string|number>(() => {
+        if (props.value === undefined) return 0;
+        if (typeof props.value === 'string') return props.value;
+        if (props.unitType === UNIT_TYPE.PERCENT) return props.value.toFixed(2);
+        return props.value;
+    }),
+});
+
+</script>
+
 <template>
     <p-pane-layout class="card-widget-layout"
                    :class="{'inactive': !loading && noData}"
     >
         <p class="title-wrapper">
             <span class="title">{{ title }}</span>
-            <span v-if="$slots['title-extra']"
+            <span v-if="slots['title-extra']"
                   class="title-extra"
             >
                 <slot name="title-extra" />
@@ -37,7 +90,7 @@
                     <span v-if="unitType === UNIT_TYPE.CURRENCY"
                           class="unit-type"
                     >{{ currencySymbol }}</span>
-                    <span class="value">{{ formattedValue }}</span>
+                    <span class="value">{{ state.formattedValue }}</span>
                     <span v-if="unitType === UNIT_TYPE.PERCENT"
                           class="unit-type"
                     >%</span>
@@ -52,105 +105,6 @@
         </div>
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import { PDivider, PPaneLayout, PSkeleton } from '@spaceone/design-system';
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { RouteLocation } from 'vue-router';
-
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { CurrencySymbol } from '@/store/modules/settings/type';
-
-const UNIT_TYPE = Object.freeze({
-    PERCENT: 'PERCENT',
-    CURRENCY: 'CURRENCY',
-});
-type UnitType = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
-
-interface Props {
-    loading: boolean;
-    title: string;
-    currencySymbol: CurrencySymbol;
-    unitType: UnitType;
-    value?: number|string;
-    showDivider: boolean;
-    description: string;
-    noData: boolean;
-    widgetLink?: RouteLocation|string;
-
-}
-
-export default defineComponent<Props>({
-    name: 'CostDashboardSimpleCardWidget',
-    components: {
-        PPaneLayout,
-        PDivider,
-        PSkeleton,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: true,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        currencySymbol: {
-            type: String as PropType<CurrencySymbol>,
-            default: CURRENCY_SYMBOL.USD,
-            validator(value: CurrencySymbol) {
-                return Object.values(CURRENCY_SYMBOL).includes(value);
-            },
-        },
-        unitType: {
-            type: String as PropType<UnitType>,
-            default: UNIT_TYPE.CURRENCY,
-            validator(value: UnitType) {
-                return Object.values(UNIT_TYPE).includes(value);
-            },
-        },
-        value: {
-            type: [Number, String] as PropType<number|string>,
-            default: 0,
-        },
-        showDivider: {
-            type: Boolean,
-            default: true,
-        },
-        description: {
-            type: String,
-            default: '',
-        },
-        noData: {
-            type: Boolean,
-            default: false,
-        },
-        widgetLink: {
-            type: [Object, String] as PropType<RouteLocation|string>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            formattedValue: computed<string|number>(() => {
-                if (props.value === undefined) return 0;
-                if (typeof props.value === 'string') return props.value;
-                if (props.unitType === UNIT_TYPE.PERCENT) return props.value.toFixed(2);
-                return props.value;
-            }),
-        });
-        return {
-            ...toRefs(state),
-            UNIT_TYPE,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .card-widget-layout {

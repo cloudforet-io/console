@@ -1,16 +1,7 @@
-<template>
-    <p-progress-bar
-        :percentage="percentage"
-        :gradient="gradient"
-        :color="color"
-        :diasble-animation="disableAnimation"
-    />
-</template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
+<script lang="ts" setup>
 import { PProgressBar } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+
 
 import { indigo, red, yellow } from '@/styles/colors';
 
@@ -24,32 +15,30 @@ const budgetGradient = {
     startColor: yellow[500], endColor: red[400], gradientPoint: 90,
 };
 
-export default {
-    name: 'BudgetUsageProgressBar',
-    components: {
-        PProgressBar,
-    },
-    props: {
-        usageRate: {
-            type: Number,
-            default: 200,
-        },
-        disableAnimation: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            percentage: props.usageRate,
-            gradient: computed(() => ((props.usageRate >= 90 && props.usageRate < 100)
-                ? budgetGradient : undefined)),
-            color: computed(() => getColor(props.usageRate)),
-        });
+interface Props {
+    usageRate: number;
+    disableAnimation: boolean;
+}
 
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+const props = withDefaults(defineProps<Props>(), {
+    usageRate: 200,
+    disableAnimation: false,
+});
+
+const state = reactive({
+    percentage: props.usageRate,
+    gradient: computed(() => ((props.usageRate >= 90 && props.usageRate < 100)
+        ? budgetGradient : undefined)),
+    color: computed(() => getColor(props.usageRate)),
+});
+
 </script>
+
+<template>
+    <p-progress-bar
+        :percentage="state.percentage"
+        :gradient="state.gradient"
+        :color="state.color"
+        :diasble-animation="disableAnimation"
+    />
+</template>

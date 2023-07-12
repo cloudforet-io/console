@@ -1,29 +1,12 @@
-<template>
-    <cost-dashboard-card-widget-layout :title="name ? name : $t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')"
-                                       :widget-link="widgetLink"
-                                       :print-mode="printMode"
-    >
-        <cost-dashboard-stacked-column-widget
-            :group-by="groupBy"
-            :currency="currency"
-            :currency-rates="currencyRates"
-            :period="period"
-            :filters="filters"
-            widget-type="LONG"
-            :print-mode="printMode"
-            @rendered="handleRendered"
-        />
-    </cost-dashboard-card-widget-layout>
-</template>
-
-<script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-
+<script lang="ts" setup>
 import dayjs from 'dayjs';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { CURRENCY } from '@/store/modules/settings/config';
+import type { CurrencyRates } from '@/store/modules/settings/type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -36,71 +19,58 @@ import CostDashboardStackedColumnWidget
     from '@/services/cost-explorer/widgets/modules/CostDashboardStackedColumnWidget.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
-export default defineComponent<WidgetProps>({
-    name: 'CostTrendStackedColumnB',
-    components: {
-        CostDashboardStackedColumnWidget,
-        CostDashboardCardWidgetLayout,
-    },
-    props: {
-        name: {
-            type: String,
-            default: undefined,
-        },
-        options: {
-            type: Object as () => WidgetOptions,
-            default: () => ({}),
-        },
-        currency: {
-            type: String,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object,
-            default: () => ({}),
-        },
-        period: {
-            type: Object,
-            default: () => ({}),
-        },
-        filters: {
-            type: Object,
-            default: () => ({}),
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: WidgetProps, { emit }) {
-        const state = reactive({
-            groupBy: computed(() => props.options?.group_by),
-            widgetLink: computed(() => {
-                const _period = {
-                    start: dayjs.utc(props.period.start).format('YYYY-MM-01'),
-                    end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
-                };
-                return {
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                    params: {},
-                    query: {
-                        granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        group_by: arrayToQueryString([state.groupBy]),
-                        period: objectToQueryString(_period),
-                        filters: objectToQueryString(props.filters),
-                    },
-                };
-            }),
-        });
-
-        const handleRendered = (...args) => {
-            emit('rendered', ...args);
-        };
-
-        return {
-            ...toRefs(state),
-            handleRendered,
-        };
-    },
+const props = withDefaults(defineProps<WidgetProps<WidgetOptions>>(), {
+    name: undefined,
+    options: () => ({}) as WidgetOptions,
+    period: () => ({}),
+    filters: () => ({}),
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    printMode: false,
 });
+const emit = defineEmits<{(e: 'rendered'): void}>();
+const { t } = useI18n();
+
+const state = reactive({
+    groupBy: computed(() => props.options?.group_by),
+    widgetLink: computed(() => {
+        const _period = {
+            start: dayjs.utc(props.period.start).format('YYYY-MM-01'),
+            end: dayjs.utc(props.period.end).endOf('month').format('YYYY-MM-DD'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+            params: {},
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                group_by: arrayToQueryString([state.groupBy]),
+                period: objectToQueryString(_period),
+                filters: objectToQueryString(props.filters),
+            },
+        };
+    }),
+});
+
+const handleRendered = () => {
+    emit('rendered');
+};
+
 </script>
+
+<template>
+    <cost-dashboard-card-widget-layout :title="name ? name : t('BILLING.COST_MANAGEMENT.DASHBOARD.COST_TREND_BY_PROVIDER')"
+                                       :widget-link="state.widgetLink"
+                                       :print-mode="printMode"
+    >
+        <cost-dashboard-stacked-column-widget
+            :group-by="state.groupBy"
+            :currency="currency"
+            :currency-rates="currencyRates"
+            :period="period"
+            :filters="filters"
+            widget-type="LONG"
+            :print-mode="printMode"
+            @rendered="handleRendered"
+        />
+    </cost-dashboard-card-widget-layout>
+</template>

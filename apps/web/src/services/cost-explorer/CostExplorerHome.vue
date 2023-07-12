@@ -1,3 +1,47 @@
+<script lang="ts" setup>
+import { PAnchor, PButton, PPaneLayout } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const SERVICE_CONTENTS = {
+    service_name: t('MENU.COST_EXPLORER'),
+    topic: {
+        title: t('BILLING.COST_MANAGEMENT.HOME.TITLE'),
+        description: t('BILLING.COST_MANAGEMENT.HOME.TOPIC_DESC'),
+        button_link: 'https://help.spaceone.megazone.com/hc/ko',
+        button_text: t('BILLING.COST_MANAGEMENT.HOME.ENABLE_BUTTON'),
+        link: 'https://help.spaceone.megazone.com/hc/ko',
+        link_text: t('BILLING.COST_MANAGEMENT.HOME.MORE_INFO'),
+        thumbnail_url: 'img_landing_cost-explorer_hero.png',
+    },
+    sub_menu: [
+        {
+            name: t('MENU.COST_EXPLORER_COST_ANALYSIS'),
+            description: t('BILLING.COST_MANAGEMENT.HOME.COST_ANALYSIS_DESC'),
+            link_text: t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
+            link: 'https://cloudforet.io/docs/guides/cost-explorer/cost-analysis/',
+            thumbnail_url: 'img_landing_cost-explorer_cost-analysis.png',
+        },
+        {
+            name: t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD'),
+            description: t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD_DESC'),
+            link_text: t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
+            link: 'https://cloudforet.io/docs/guides/cost-explorer/dashboard/',
+            thumbnail_url: 'img_landing_cost-explorer_dashboard.png',
+        },
+        {
+            name: t('MENU.COST_EXPLORER_BUDGET'),
+            description: t('BILLING.COST_MANAGEMENT.HOME.COST_BUDGET_DESC'),
+            link_text: t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
+            link: 'https://cloudforet.io/docs/guides/cost-explorer/budget/',
+            thumbnail_url: 'img_landing_cost-explorer_budget.png',
+        },
+    ],
+};
+
+</script>
+
 <template>
     <div class="service-home">
         <div class="service-topic">
@@ -59,61 +103,6 @@
     </div>
 </template>
 
-<script lang="ts">
-import { PAnchor, PButton, PPaneLayout } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-const SERVICE_CONTENTS = {
-    service_name: i18n.t('MENU.COST_EXPLORER'),
-    topic: {
-        title: i18n.t('BILLING.COST_MANAGEMENT.HOME.TITLE'),
-        description: i18n.t('BILLING.COST_MANAGEMENT.HOME.TOPIC_DESC'),
-        button_link: 'https://help.spaceone.megazone.com/hc/ko',
-        button_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.ENABLE_BUTTON'),
-        link: 'https://help.spaceone.megazone.com/hc/ko',
-        link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.MORE_INFO'),
-        thumbnail_url: 'img_landing_cost-explorer_hero.png',
-    },
-    sub_menu: [
-        {
-            name: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_ANALYSIS_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/cost-analysis/',
-            thumbnail_url: 'img_landing_cost-explorer_cost-analysis.png',
-        },
-        {
-            name: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/dashboard/',
-            thumbnail_url: 'img_landing_cost-explorer_dashboard.png',
-        },
-        {
-            name: i18n.t('MENU.COST_EXPLORER_BUDGET'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_BUDGET_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/budget/',
-            thumbnail_url: 'img_landing_cost-explorer_budget.png',
-        },
-    ],
-};
-
-export default {
-    name: 'CostExplorerHome',
-    components: {
-        PPaneLayout,
-        PAnchor,
-        PButton,
-    },
-    setup() {
-        return {
-            SERVICE_CONTENTS,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .service-home {
     max-width: 90rem;

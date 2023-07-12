@@ -1,6 +1,5 @@
-import { defineStore } from 'pinia';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { defineStore } from 'pinia';
 
 import { store } from '@/store';
 
@@ -37,7 +36,7 @@ export const useCostExplorerDashboardStore = defineStore('cost-explorer-dashboar
     },
     actions: {
         async setDashboardList(): Promise<void> {
-            const userId = store.state.user.userId;
+            const userId = store.state['user/userId'];
             this.loading = true;
             try {
                 const publicDashboardList = await SpaceConnector.client.costAnalysis.publicDashboard.list();

@@ -1,3 +1,28 @@
+<script lang="ts" setup>
+import { PI, PCard } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+interface Props {
+    title: string;
+    dataRange: number;
+    widgetLink: string | object;
+    noData: boolean;
+    showTopText: boolean;
+    printMode: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    title: 'Title',
+    dataRange: 15,
+    widgetLink: undefined,
+    noData: false,
+    showTopText: true,
+    printMode: false,
+});
+const { t } = useI18n();
+
+</script>
+
 <template>
     <p-card class="cost-dashboard-card-widget-layout"
             style-type="white"
@@ -10,7 +35,7 @@
                 <p class="title-extra">
                     <span v-if="showTopText"
                           class="show-top-text mr-2"
-                    >{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SHOWING_TOP_NUM', { num : dataRange }) }}
+                    >{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.SHOWING_TOP_NUM', { num : dataRange }) }}
                         <!--                        <p-i name="ic_tooltip" width="1rem" height="1rem"-->
                         <!--                             color="inherit transparent" class="tooltip-button"-->
                         <!--                        />-->
@@ -19,7 +44,7 @@
                                  :to="widgetLink"
                                  class="anchor-button"
                     >
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
+                        {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         <p-i name="ic_chevron-right"
                              width="1rem"
                              height="1rem"
@@ -37,47 +62,6 @@
         <slot v-else />
     </p-card>
 </template>
-
-<script lang="ts">
-import { PI, PCard } from '@spaceone/design-system';
-
-export default {
-    name: 'CostDashboardCardWidgetLayout',
-    components: {
-        PI,
-        PCard,
-    },
-    props: {
-        title: {
-            type: String,
-            default: 'Title',
-        },
-        dataRange: {
-            type: Number,
-            default: 15,
-        },
-        widgetLink: {
-            type: [Object, String],
-            default: undefined,
-        },
-        noData: {
-            type: Boolean,
-            default: false,
-        },
-        showTopText: {
-            type: Boolean,
-            default: true,
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        return {};
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .cost-dashboard-card-widget-layout {

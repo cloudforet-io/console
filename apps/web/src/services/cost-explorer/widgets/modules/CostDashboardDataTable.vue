@@ -1,21 +1,154 @@
+<script lang="ts" setup>
+
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import {
+    PDataTable, PTextPagination, PStatus, PI,
+} from '@spaceone/design-system';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import {
+    computed, reactive,
+} from 'vue';
+
+
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
+import type { Legend } from '@/services/cost-explorer/widgets/type';
+
+interface Field extends DataTableFieldType {
+    type?: 'cost'|'size'|'number';
+}
+
+interface Props {
+    loading: boolean;
+    fields: Field[];
+    items: any[];
+    thisPage: number;
+    pageSize: number;
+    showIndex: boolean;
+    showLegend: boolean;
+    legends: Legend[];
+    currency: Currency;
+    currencyRates: CurrencyRates;
+    // showSharpRises: boolean;
+    paginationVisible: boolean;
+    printMode: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+    fields: () => [],
+    items: () => [],
+    thisPage: 1,
+    pageSize: 5,
+    showIndex: true,
+    showLegend: false,
+    legends: undefined,
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    // showSharpRises: false,
+    paginationVisible: true,
+    printMode: false,
+});
+const emit = defineEmits<{(e: 'update:thisPage', value: number): void;
+    (e: 'toggle-legend', value: number): void;
+}>();
+
+const state = reactive({
+    slicedItems: computed(() => {
+        if (props.printMode) return props.items;
+        const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
+        const endIndex = state.proxyThisPage * props.pageSize;
+        return props.items.slice(startIndex, endIndex);
+    }),
+    totalCount: computed(() => props.items.length),
+    allPage: computed(() => Math.ceil(state.totalCount / props.pageSize) || 1),
+    proxyThisPage: useProxyValue('thisPage', props, emit),
+});
+
+/* util */
+const getConvertedIndex = (index) => index + ((state.proxyThisPage - 1) * props.pageSize);
+const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
+const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
+
+const getLegendIconColor = (index) => {
+    const legend = props.legends[getConvertedIndex(index)];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.color) return legend.color;
+    return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
+};
+const getLegendTextColor = (index) => {
+    const legend = props.legends[getConvertedIndex(index)];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    return null;
+};
+// const getConvertedItems = (items) => {
+//     const convertedItems: Item[] = [];
+//     items.forEach((item) => {
+//         const convertedItem: Item = {};
+//         Object.entries(item).forEach(([k, v]) => {
+//             const date = dayjs.utc(k);
+//             if (date.isValid()) {
+//                 const pastDate = date.subtract(1, 'month').format('YYYY-MM');
+//                 const pastValue = item[pastDate] || undefined;
+//                 let isRaised = false;
+//                 const value: number = v as number;
+//                 if (value && pastValue && pastValue * 1.5 < value) {
+//                     isRaised = true;
+//                 }
+//                 convertedItem[k] = {
+//                     value: commaFormatter(numberFormatter(value)),
+//                     isRaised,
+//                 };
+//             } else {
+//                 convertedItem[k] = {
+//                     value: v,
+//                 };
+//             }
+//         });
+//         convertedItems.push(convertedItem);
+//     });
+//     return convertedItems;
+// };
+
+/* event */
+const handleClickLegend = (index) => {
+    if (props.printMode) return;
+    emit('toggle-legend', index);
+};
+
+// watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
+//     if (showSharpRises && items.length) {
+//         state.convertedItems = getConvertedItems(items);
+//     }
+// }, { immediate: true });
+
+
+</script>
+
 <template>
     <div class="cost-dashboard-data-table"
          :class="{'print-mode': printMode}"
     >
         <p-data-table :fields="items.length ? fields : []"
-                      :items="slicedItems"
-                      :total-count="totalCount"
+                      :items="state.slicedItems"
+                      :total-count="state.totalCount"
                       :loading="loading"
                       :row-height-fixed="!printMode"
                       table-style-type="simple"
                       disable-hover
         >
             <template v-for="field in fields"
+                      :key="field.name"
                       #[`th-${field.name}-format`]
             >
-                <div :key="field.name"
-                     class="tooltip-container"
-                >
+                <div class="tooltip-container">
                     <span>{{ field.label }}</span>
                     <p-i v-if="field.tooltipText"
                          v-tooltip.bottom="field.tooltipText"
@@ -77,193 +210,12 @@
         <div v-if="paginationVisible"
              class="table-pagination-wrapper"
         >
-            <p-text-pagination :all-page="allPage"
-                               :this-page.sync="proxyThisPage"
+            <p-text-pagination v-model:this-page="state.proxyThisPage"
+                               :all-page="state.allPage"
             />
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-import type { PropType } from 'vue';
-
-import {
-    PDataTable, PTextPagination, PStatus, PI,
-} from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
-
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-
-interface Field extends DataTableFieldType {
-    type?: 'cost'|'size'|'number';
-}
-export default {
-    name: 'CostDashboardDataTable',
-    components: {
-        PDataTable,
-        PTextPagination,
-        PStatus,
-        PI,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        fields: {
-            type: Array as PropType<Field[]>,
-            default: () => ([]),
-        },
-        items: {
-            type: Array,
-            default: () => ([]),
-        },
-        thisPage: {
-            type: Number,
-            default: 1,
-        },
-        pageSize: {
-            type: Number,
-            default: 5,
-        },
-        showIndex: {
-            type: Boolean,
-            default: true,
-        },
-        showLegend: {
-            type: Boolean,
-            default: false,
-        },
-        legends: {
-            type: Array,
-            default: undefined,
-        },
-        currency: {
-            type: String,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object,
-            default: () => ({}),
-        },
-        // showSharpRises: {
-        //     type: Boolean,
-        //     default: false,
-        // },
-        paginationVisible: {
-            type: Boolean,
-            default: true,
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            slicedItems: computed(() => {
-                if (props.printMode) return props.items;
-                const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
-                const endIndex = state.proxyThisPage * props.pageSize;
-                return props.items.slice(startIndex, endIndex);
-            }),
-            totalCount: computed(() => props.items.length),
-            allPage: computed(() => Math.ceil(state.totalCount / props.pageSize) || 1),
-            proxyThisPage: useProxyValue('thisPage', props, emit),
-        });
-
-        /* util */
-        const getConvertedIndex = (index) => index + ((state.proxyThisPage - 1) * props.pageSize);
-        const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
-        const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
-        const getIndexNumber = (index) => {
-            const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
-            return tableIndex?.toString();
-        };
-        const getLegendIconColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
-        };
-        const getLegendTextColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            return null;
-        };
-        // const getConvertedItems = (items) => {
-        //     const convertedItems: Item[] = [];
-        //     items.forEach((item) => {
-        //         const convertedItem: Item = {};
-        //         Object.entries(item).forEach(([k, v]) => {
-        //             const date = dayjs.utc(k);
-        //             if (date.isValid()) {
-        //                 const pastDate = date.subtract(1, 'month').format('YYYY-MM');
-        //                 const pastValue = item[pastDate] || undefined;
-        //                 let isRaised = false;
-        //                 const value: number = v as number;
-        //                 if (value && pastValue && pastValue * 1.5 < value) {
-        //                     isRaised = true;
-        //                 }
-        //                 convertedItem[k] = {
-        //                     value: commaFormatter(numberFormatter(value)),
-        //                     isRaised,
-        //                 };
-        //             } else {
-        //                 convertedItem[k] = {
-        //                     value: v,
-        //                 };
-        //             }
-        //         });
-        //         convertedItems.push(convertedItem);
-        //     });
-        //     return convertedItems;
-        // };
-
-        /* event */
-        const handleClickLegend = (index) => {
-            if (props.printMode) return;
-            emit('toggle-legend', index);
-        };
-
-        // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
-        //     if (showSharpRises && items.length) {
-        //         state.convertedItems = getConvertedItems(items);
-        //     }
-        // }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            GROUP_BY,
-            getIndexNumber,
-            getConvertedIndex,
-            getLegendIconColor,
-            getLegendTextColor,
-            handleClickLegend,
-            labelColorFormatter,
-            labelTextFormatter,
-            currencyMoneyFormatter,
-            byteFormatter,
-            numberFormatter,
-            CURRENCY_SYMBOL,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .cost-dashboard-data-table {
