@@ -80,7 +80,6 @@ const collectorPageState = collectorPageStore.$state;
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
-
 const state = reactive({
     initLoading: true,
     hasCollectorList: false,
@@ -94,11 +93,15 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    collectorPageStore.$patch({
+        selectedProvider: queryStringToString(query.provider) ?? 'all',
+    });
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.setSearchFilters(filters);
+        collectorPageStore.$patch({
+            searchFilters: filters,
+        });
     }
 };
 
@@ -120,7 +123,9 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
+    collectorPageStore.$patch({
+        selectedProvider: providerName,
+    });
 };
 
 
@@ -157,18 +162,14 @@ onMounted(async () => {
 /* custom design-system component - p-heading */
 :deep(.p-heading) {
     @apply items-center;
-
     .heading-wrapper {
         flex: 1;
-
         .total-count {
             @apply font-normal;
         }
     }
-
     .extra {
         flex-grow: initial;
-
         .history-button {
             @apply bg-white rounded border border-gray-300 text-label-md font-bold;
             width: 100%;
@@ -176,10 +177,8 @@ onMounted(async () => {
         }
     }
 }
-
 .collector-loader-wrapper {
     min-height: 16.875rem;
-
     .collector-contents-wrapper {
         @apply flex flex-col;
         gap: 1.5rem;

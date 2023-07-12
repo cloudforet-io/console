@@ -23,7 +23,7 @@
             </template>
         </p-toolbox>
         <p-data-loader :data="state.items"
-                       :loading="collectorPageState.loading"
+                       :loading="collectorPageState.loading.collectorList"
                        class="collector-list-wrapper"
         >
             <div class="collector-lists">
@@ -207,7 +207,9 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
         // convert queryTags to filters
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
         // set filters to store
-        collectorPageStore.setSearchFilters(searchQueryHelper.filters);
+        collectorPageStore.$patch({
+            searchFilters: searchQueryHelper.filters,
+        });
         // set filters to apiQueryHelper
         collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     }

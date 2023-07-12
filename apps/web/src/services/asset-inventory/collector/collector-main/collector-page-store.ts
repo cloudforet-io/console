@@ -14,20 +14,26 @@ import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
-        loading: true,
-        isRefreshList: false,
-        pageStart: 1,
-        pageLimit: 24,
-        sortBy: '',
+        loading: {
+            collectorList: false,
+        },
         selectedProvider: 'all',
+
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
         collectorJobStatus: [] as JobAnalyzeModel[],
-        searchFilters: [] as ConsoleFilter[],
-        totalCount: 0,
         schedules: [] as Schedule[],
-        visibleScheduleModal: false,
-        visibleCollectorModal: false,
+
+        totalCount: 0,
+        pageStart: 1,
+        pageLimit: 24,
+        sortBy: '',
+        searchFilters: [] as ConsoleFilter[],
+
+        visible: {
+            scheduleModal: false,
+            collectorModal: false,
+        },
 
     }),
     getters: {
@@ -41,7 +47,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
     },
     actions: {
         async getCollectorList(queryData: Query) {
-            this.loading = true;
+            this.loading.collectorList = true;
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({
                     query: queryData,
@@ -52,7 +58,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             } finally {
-                this.loading = false;
+                this.loading.collectorList = false;
             }
         },
         async setCollectorJobs(ids) {
@@ -103,12 +109,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             }
-        },
-        setSelectedProvider(provider: string) {
-            this.selectedProvider = provider;
-        },
-        setSearchFilters(filters: ConsoleFilter[]) {
-            this.searchFilters = filters;
         },
         setSelectedCollector(id) {
             const itemIndex = this.collectors.findIndex(

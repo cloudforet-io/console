@@ -43,7 +43,7 @@ interface CollectorPlugin {
 interface CollectorLink {
     name: string;
     params: CollectorDetailLinkParameter;
-    query: CollectorDetailLinkQuery;
+    query?: CollectorDetailLinkQuery;
 }
 
 interface CollectorDetailLinkParameter {
