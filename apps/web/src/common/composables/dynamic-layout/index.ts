@@ -1,16 +1,14 @@
-import { debouncedWatch } from '@vueuse/core';
-import {
-    computed, reactive,
-} from 'vue';
-import type { ComputedRef } from 'vue';
-
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
-
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler, makeCloudServiceTagValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import { debouncedWatch } from '@vueuse/core';
+import {
+    computed, reactive,
+} from 'vue';
+import type { ComputedRef } from 'vue';
 
 import { store } from '@/store';
 
@@ -115,7 +113,7 @@ export function useQuerySearchPropsWithSearchSchema(
     }, { immediate: true, debounce: 200 });
 
     return {
-        isAllLoaded: computed(() => store.state.reference.isAllLoaded),
+        isAllLoaded: computed(() => store.state['reference/isAllLoaded']),
         keyItemSets: computed(() => state.keyItemSets),
         valueHandlerMap: computed(() => state.valueHandlerMap),
     };

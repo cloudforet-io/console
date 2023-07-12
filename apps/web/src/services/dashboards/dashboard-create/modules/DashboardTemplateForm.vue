@@ -1,141 +1,15 @@
-<template>
-    <div class="dashboard-template-wrapper">
-        <p-search
-            :value.sync="state.searchValue"
-            @update:value="handleInputSearch"
-        />
-        <div
-            ref="templateContainerRef"
-            class="dashboard-template-container"
-            :class="{ 'overflow-auto':!state.isScrollEnd && !state.disableScroll }"
-        >
-            <div class="card-container default-dashboard-board">
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :style-options="{ column: 3 }"
-                        :board-sets="defaultTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <p-i :name="board.description.icon"
-                                     width="2.5rem"
-                                     height="2.5rem"
-                                />
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-label-wrapper">
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
-                                <span class="dashboard-description-text">{{ board.description.text }}</span>
-                            </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <router-link
-                                v-if="board.description?.preview_image"
-                                :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
-                                target="_blank"
-                            >
-                                <div class="dashboard-template-overlay-content">
-                                    <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
-                                    <p-i name="ic_external-link"
-                                         height="1em"
-                                         width="1em"
-                                    />
-                                </div>
-                            </router-link>
-                        </template>
-                    </p-board>
-                    <p-text-pagination
-                        v-show="defaultTemplateState.allPage >= 2"
-                        :this-page="defaultTemplateState.thisPage"
-                        :all-page="defaultTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
-                </div>
-            </div>
-            <div v-if="existingTemplateState.boardSets.length"
-                 class="card-container existing-dashboard-board"
-            >
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :board-sets="existingTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-info">
-                                    {{ board.groupLabel }}
-                                </div>
-                                <div v-if="board.labels.length > 0"
-                                     class="dashboard-label-wrapper"
-                                >
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
-                            </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <div class="dashboard-template-overlay-content"
-                                 @click="handleOpenDashboardNewTab(board)"
-                            >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.VIEW') }}</span>
-                                <p-i name="ic_external-link"
-                                     height="1em"
-                                     width="1em"
-                                />
-                            </div>
-                        </template>
-                    </p-board>
-                    <p-text-pagination
-                        v-show="existingTemplateState.allPage >= 2"
-                        :this-page="existingTemplateState.thisPage"
-                        :all-page="existingTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
-                </div>
-            </div>
-            <p-empty
-                v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
-                show-image
-            >
-                {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-            </p-empty>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { useScroll } from '@vueuse/core';
-import {
-    computed, nextTick, reactive, ref, toRefs,
-} from 'vue';
-
 import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
 } from '@spaceone/design-system';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
+import { useScroll } from '@vueuse/core';
+import type { MaybeRef } from 'vue';
+import {
+    computed, nextTick, reactive, ref, toRefs,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
@@ -158,9 +32,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
+const store = useStore();
+const { t } = useI18n();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
-const { arrivedState } = useScroll(templateContainerRef);
+const { arrivedState } = useScroll(templateContainerRef as MaybeRef);
 const { bottom: isBottom, top: isTop } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
@@ -216,7 +93,7 @@ const existingTemplateState = reactive({
 const handleOpenDashboardNewTab = (board: DashboardModel) => {
     const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
     const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    const { href } = SpaceRouter.router.resolve({
+    const { href } = router.resolve({
         name: routeName,
         params: {
             dashboardId: isProjectDashboard
@@ -251,6 +128,124 @@ const handleInputSearch = () => {
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
+
+<template>
+    <div class="dashboard-template-wrapper">
+        <p-search v-model:value="state.searchValue"
+                  @update:value="handleInputSearch"
+        />
+        <div ref="templateContainerRef"
+             class="dashboard-template-container"
+             :class="{ 'overflow-auto':!state.isScrollEnd && !state.disableScroll }"
+        >
+            <div class="card-container default-dashboard-board">
+                <span class="card-wrapper-title">
+                    {{ t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
+                </span>
+                <div class="card-wrapper">
+                    <p-board selectable
+                             style-type="cards"
+                             :style-options="{ column: 3 }"
+                             :board-sets="defaultTemplateState.boardSets"
+                             :selected-item="state.selectedTemplateName"
+                             @item-click="handleSelectTemplate"
+                    >
+                        <template #item-content="{board}">
+                            <div class="content-layout">
+                                <p-i :name="board.description.icon"
+                                     width="2.5rem"
+                                     height="2.5rem"
+                                />
+                                <strong class="dashboard-name">{{ board.name }}</strong>
+                                <div class="dashboard-label-wrapper">
+                                    <p-label v-for="(label, idx) in board.labels"
+                                             :key="`board-${board.name}-label-${idx}`"
+                                             :text="label"
+                                             :click-stop="false"
+                                    />
+                                </div>
+                                <span class="dashboard-description-text">{{ board.description.text }}</span>
+                            </div>
+                        </template>
+                        <template #item-overlay-content="{board}">
+                            <router-link v-if="board.description?.preview_image"
+                                         :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                                         target="_blank"
+                            >
+                                <div class="dashboard-template-overlay-content">
+                                    <span class="dashboard-template-overlay-preview">{{ t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                    <p-i name="ic_external-link"
+                                         height="1em"
+                                         width="1em"
+                                    />
+                                </div>
+                            </router-link>
+                        </template>
+                    </p-board>
+                    <p-text-pagination v-show="defaultTemplateState.allPage >= 2"
+                                       :this-page="defaultTemplateState.thisPage"
+                                       :all-page="defaultTemplateState.allPage"
+                                       @page-change="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                    />
+                </div>
+            </div>
+            <div v-if="existingTemplateState.boardSets.length"
+                 class="card-container existing-dashboard-board"
+            >
+                <span class="card-wrapper-title">
+                    {{ t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
+                </span>
+                <div class="card-wrapper">
+                    <p-board selectable
+                             style-type="cards"
+                             :board-sets="existingTemplateState.boardSets"
+                             :selected-item="state.selectedTemplateName"
+                             @item-click="handleSelectTemplate"
+                    >
+                        <template #item-content="{board}">
+                            <div class="content-layout">
+                                <strong class="dashboard-name">{{ board.name }}</strong>
+                                <div class="dashboard-info">
+                                    {{ board.groupLabel }}
+                                </div>
+                                <div v-if="board.labels.length > 0"
+                                     class="dashboard-label-wrapper"
+                                >
+                                    <p-label v-for="(label, idx) in board.labels"
+                                             :key="`board-${board.name}-label-${idx}`"
+                                             :text="label"
+                                             :click-stop="false"
+                                    />
+                                </div>
+                            </div>
+                        </template>
+                        <template #item-overlay-content="{board}">
+                            <div class="dashboard-template-overlay-content"
+                                 @click="handleOpenDashboardNewTab(board)"
+                            >
+                                <span class="dashboard-template-overlay-preview">{{ t('DASHBOARDS.CREATE.VIEW') }}</span>
+                                <p-i name="ic_external-link"
+                                     height="1em"
+                                     width="1em"
+                                />
+                            </div>
+                        </template>
+                    </p-board>
+                    <p-text-pagination v-show="existingTemplateState.allPage >= 2"
+                                       :this-page="existingTemplateState.thisPage"
+                                       :all-page="existingTemplateState.allPage"
+                                       @page-change="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                    />
+                </div>
+            </div>
+            <p-empty v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
+                     show-image
+            >
+                {{ t('DASHBOARDS.CREATE.NO_DATA') }}
+            </p-empty>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-template-wrapper {

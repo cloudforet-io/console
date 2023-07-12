@@ -11,4 +11,5 @@ export const ERROR_CASE_WIDGET_INFO: DashboardLayoutWidgetInfo = {
     size: WIDGET_SIZE.md,
     version: '1',
     inherit_options: {},
-};
+    // TODO: type assertion need to be implemantation
+} as DashboardLayoutWidgetInfo;
