@@ -41,6 +41,15 @@ interface Capability {
     supported_providers?: string[];
     [key: string]: any;
 }
+
+export interface RepositoryInfo {
+    created_at: string;
+    endpoint: string;
+    name: string;
+    repository_id: string;
+    repository_type: string;
+}
+
 export interface RepositoryPluginModel {
     plugin_id: string;
     name: string;
@@ -56,7 +65,7 @@ export interface RepositoryPluginModel {
             schema: JsonSchema;
         }
     };
-    repository_info: object;
+    repository_info: RepositoryInfo;
     project_id: string;
     labels: string[];
     version: string;
