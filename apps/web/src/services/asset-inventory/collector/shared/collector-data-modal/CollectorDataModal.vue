@@ -1,18 +1,8 @@
 <template>
     <div class="collector-data-modal">
-        <p-double-check-modal v-if="props.isDuplicateJobs"
-                              :visible="collectorPageState.visibleCollectorModal"
-                              modal-size="sm"
-                              verification-text="test"
-                              @confirm="handleClickConfirm"
-                              @cancel="handleClickCancel"
-        >
-            <!-- TODO: will be implemented after-->
-            test
-        </p-double-check-modal>
-        <p-button-modal v-else
-                        :visible="collectorPageState.visibleCollectorModal"
-                        :header-title="$t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE')"
+        <p-button-modal :visible="collectorPageState.visibleCollectorModal"
+                        :header-title="state.headerTitle"
+                        :theme-color="props.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
                         size="sm"
                         @confirm="handleClickConfirm"
@@ -20,30 +10,23 @@
                         @close="handleClickCancel"
         >
             <template #body>
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DESCRIPTION') }}</span>
-                <div class="accounts-wrapper">
-                    <p-lazy-img :src="collectorDataModalStore.selectedCollector.plugin.icon"
-                                width="1rem"
-                                height="1rem"
-                                class="plugin-icon"
-                    />
-                    <span>{{ collectorDataModalStore.selectedCollector.name }}</span>
-                    <span v-if="collectorDataModalState.secrets.length > 0">
-                        ({{ collectorDataModalState.secrets.length }})
-                    </span>
+                <div v-if="props.isDuplicateJobs">
+                    <collector-data-duplication-inner :account-type="props.accountType" />
                 </div>
+                <collector-data-default-inner v-else />
             </template>
             <template #confirm-button>
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
+                <span v-if="props.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
+                <span v-else>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
             </template>
         </p-button-modal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { PButtonModal, PDoubleCheckModal, PLazyImg } from '@spaceone/design-system';
+import { PButtonModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -57,6 +40,10 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import CollectorDataDefaultInner
+    from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDefaultInner.vue';
+import CollectorDataDuplicationInner
+    from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDuplicationInner.vue';
 import { ACCOUNT_TYPE, COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 interface Props {
@@ -76,8 +63,10 @@ const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
+
 const state = reactive({
     loading: false,
+    headerTitle: computed(() => (props.isDuplicateJobs ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE') : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();
@@ -106,14 +95,3 @@ const handleClickConfirm = async () => {
     }
 };
 </script>
-
-<style lang="postcss" scoped>
-.collector-data-modal {
-    .accounts-wrapper {
-        @apply flex items-center bg-gray-100 text-paragraph-md;
-        margin-top: 0.5rem;
-        padding: 0.5rem 1rem;
-        gap: 0.5rem;
-    }
-}
-</style>
