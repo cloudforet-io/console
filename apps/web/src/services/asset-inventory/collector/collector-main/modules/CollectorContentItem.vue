@@ -97,58 +97,47 @@ const handleClickCollectData = async () => {
             }
         }
     }
-
     .collector-item {
         @apply relative;
-
         &:hover {
             @apply cursor-pointer;
-
             .collector-status-wrapper {
                 .collector-data-button {
                     opacity: 1;
                 }
             }
         }
-
         .collector-status-wrapper {
             @apply absolute;
             top: 1.25rem;
             right: 1.5rem;
             gap: 0.25rem;
-
             .collector-data-button {
                 @apply flex items-center;
                 opacity: 0;
                 padding-top: 0.065rem;
             }
         }
-
         .collector-item-wrapper {
             @apply flex flex-col;
             gap: 0.875rem;
             padding: 0.5rem 0.625rem;
-
             .collector-item-name {
                 @apply text-label-xl font-bold;
             }
-
             .collector-plugin {
                 @apply flex items-center;
                 gap: 0.5rem;
-
                 .title-wrapper {
                     @apply flex flex-col;
                     .plugin-name {
                         @apply truncate text-label-md;
                     }
-
                     .plugin-version {
                         @apply text-label-sm text-gray-400;
                     }
                 }
             }
-
             .collector-info-wrapper {
                 margin-top: 1.125rem;
 
@@ -156,14 +145,12 @@ const handleClickCollectData = async () => {
                     @apply flex-col;
                     gap: 1rem;
                 }
-
                 .collector-info-view {
                     @apply flex justify-between;
 
                     @screen tablet {
                         width: 100%;
                     }
-
                     .info-item {
                         @apply relative flex flex-col flex-wrap;
                         gap: 0.5rem;

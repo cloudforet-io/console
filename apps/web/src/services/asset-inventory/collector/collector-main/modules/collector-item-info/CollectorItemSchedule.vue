@@ -96,11 +96,9 @@ watch(() => props.item, (item) => {
     .info-label-wrapper {
         @apply flex items-center;
         gap: 0.375rem;
-
         .info-label {
             @apply text-label-sm text-gray-500;
         }
-
         .schedule-button {
             @apply flex items-center text-label-sm text-blue-700 font-normal;
             gap: 0.125rem;

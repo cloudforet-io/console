@@ -67,17 +67,14 @@ const storeState = reactive({
     .info-label {
         @apply flex items-center text-label-sm text-gray-500;
         gap: 0.25rem;
-
         .title-tooltip {
             &:hover {
                 @apply text-blue-600;
             }
         }
     }
-
     .jobs-wrapper {
         @apply flex;
-
         .jobs-contents {
             @apply flex items-center justify-center;
         }
