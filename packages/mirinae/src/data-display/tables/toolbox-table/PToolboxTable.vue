@@ -171,7 +171,7 @@ const handleClickSettings = () => {
 
 const changeSort = (sortBy, sortDesc) => {
     proxyState.thisPage = 1;
-    emitChange({ sortBy, sortDesc });
+    emitChange({ sortBy, sortDesc, pageStart: 1 });
 };
 
 const checkSelectIndex = () => {
