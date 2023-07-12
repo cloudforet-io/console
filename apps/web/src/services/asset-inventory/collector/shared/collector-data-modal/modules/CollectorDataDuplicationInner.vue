@@ -70,6 +70,7 @@ import { PDefinitionTable, PI, PStatus } from '@spaceone/design-system';
 
 import { coral, green } from '@/styles/colors';
 
+import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 const SUCCEEDED_COLOR = green[400];
@@ -77,12 +78,15 @@ const FAILED_COLOR = coral[400];
 
 interface Props {
     accountType?: string;
+    item?: CollectorData;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     accountType: ACCOUNT_TYPE.ALL,
+    item: undefined,
 });
 
+// TODO: temp data
 const tableState = reactive({
     definitionData: computed(() => ({
         account: '123',
@@ -130,10 +134,8 @@ const definitionFields = [
                 font-size: 0.875rem;
                 margin-top: 0.5rem;
                 padding: 1rem 1.5rem;
-
                 .label-wrapper {
                     @apply relative flex text-gray-700;
-
                     .label {
                         margin-left: 0.5rem;
                     }
@@ -142,13 +144,11 @@ const definitionFields = [
                         right: 0;
                     }
                 }
-
                 .progress-bar {
                     @apply inline-flex bg-gray-200;
                     width: 100%;
                     height: 0.5rem;
                     margin-top: 0.5rem;
-
                     .succeeded-bar {
                         @apply bg-green-400;
                         height: 100%;

@@ -11,9 +11,13 @@
         >
             <template #body>
                 <div v-if="props.isDuplicateJobs">
-                    <collector-data-duplication-inner :account-type="props.accountType" />
+                    <collector-data-duplication-inner :account-type="props.accountType"
+                                                      :item="state.item"
+                    />
                 </div>
-                <collector-data-default-inner v-else />
+                <collector-data-default-inner v-else
+                                              :item="state.item"
+                />
             </template>
             <template #confirm-button>
                 <span v-if="props.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
@@ -30,7 +34,10 @@ import { PButtonModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -63,10 +70,23 @@ const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
 
 const state = reactive({
     loading: false,
     headerTitle: computed(() => (props.isDuplicateJobs ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE') : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
+    item: computed(() => {
+        const selectedCollector = collectorDataModalState.selectedCollector;
+        return {
+            ...selectedCollector,
+            plugin: {
+                name: storeState.plugins[selectedCollector.plugin_info?.plugin_id]?.label,
+                icon: storeState.plugins[selectedCollector.plugin_info?.plugin_id]?.icon,
+            },
+        };
+    }),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();
