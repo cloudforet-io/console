@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="collectorPageState.visibleCollectorModal"
+        <p-button-modal :visible="collectorPageState.visible.collectorModal"
                         :header-title="state.headerTitle"
                         :theme-color="props.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
@@ -73,8 +73,8 @@ const emit = defineEmits<{(e: 'click-confirm'): void}>();
 
 /* Components */
 const handleClickCancel = () => {
-    collectorPageStore.$patch({
-        visibleCollectorModal: false,
+    collectorPageStore.$patch((_state) => {
+        _state.visible.collectorModal = false;
     });
 };
 const handleClickConfirm = async () => {

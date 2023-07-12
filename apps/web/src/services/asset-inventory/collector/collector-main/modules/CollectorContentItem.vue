@@ -63,6 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
@@ -74,14 +75,12 @@ const state = reactive({
 
 /* API */
 const handleClickCollectData = async () => {
-    collectorPageStore.$patch({
-        visibleCollectorModal: true,
+    await collectorPageStore.setSelectedCollector(props.item.collectorId);
+    await collectorPageStore.$patch((_state) => {
+        _state.visible.collectorModal = true;
     });
-    collectorDataModalStore.$patch((_state) => {
-        _state.selectedCollector = {
-            ...props.item,
-            collector_id: props.item.collectorId,
-        };
+    await collectorDataModalStore.$patch((_state) => {
+        _state.selectedCollector = collectorPageState.selectedCollector;
     });
 };
 </script>

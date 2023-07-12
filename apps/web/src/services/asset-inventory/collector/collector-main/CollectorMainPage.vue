@@ -94,11 +94,15 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    collectorPageStore.$patch({
+        selectedProvider: queryStringToString(query.provider) ?? 'all',
+    });
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.setSearchFilters(filters);
+        collectorPageStore.$patch({
+            searchFilters: filters,
+        });
     }
 };
 
@@ -120,7 +124,9 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
+    collectorPageStore.$patch({
+        selectedProvider: providerName,
+    });
 };
 
 
