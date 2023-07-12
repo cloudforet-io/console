@@ -185,8 +185,8 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
         // convert queryTags to filters
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
         // set filters to store
-        collectorPageStore.$patch({
-            searchFilters: searchQueryHelper.filters,
+        collectorPageStore.$patch((_state) => {
+            _state.searchFilters = searchQueryHelper.filters;
         });
         // set filters to apiQueryHelper
         collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
