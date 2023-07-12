@@ -1,3 +1,30 @@
+<script setup lang="ts">
+
+import { PBadge } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { computed, reactive } from 'vue';
+
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
+import type { DateRange } from '@/services/dashboards/config';
+
+interface Props {
+    dateRange?: DateRange;
+}
+
+const props = defineProps<Props>();
+
+const state = reactive({
+    dateRange: computed<DateRange>(() => ({
+        start: props.dateRange?.start ?? dayjs.utc().startOf('month').format('YYYY-MM-DD'),
+        end: props.dateRange?.end ?? dayjs.utc().format('YYYY-MM-DD'),
+    })),
+});
+
+const { i18nDayjs } = useI18nDayjs();
+const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
+</script>
+
 <template>
     <p-badge style-type="gray200"
              badge-type="subtle"
@@ -13,31 +40,6 @@
     </p-badge>
 </template>
 
-<script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import { PBadge } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
-import type { DateRange } from '@/services/dashboards/config';
-
-
-const props = defineProps<{
-    dateRange: DateRange;
-}>();
-
-const state = reactive({
-    dateRange: computed<DateRange>(() => ({
-        start: props.dateRange?.start ?? dayjs.utc().startOf('month').format('YYYY-MM-DD'),
-        end: props.dateRange?.end ?? dayjs.utc().format('YYYY-MM-DD'),
-    })),
-});
-
-const { i18nDayjs } = useI18nDayjs();
-const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
-</script>
 <style scoped lang="postcss">
 .dashboard-date-range-badge {
     margin-right: 0.5rem;

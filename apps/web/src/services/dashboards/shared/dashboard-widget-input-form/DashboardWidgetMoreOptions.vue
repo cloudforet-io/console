@@ -1,40 +1,16 @@
-<template>
-    <div v-on-click-outside="hideContextMenu"
-         class="dashboard-widget-more-options"
-    >
-        <p-button ref="targetRef"
-                  style-type="secondary"
-                  icon-left="ic_plus_bold"
-                  block
-                  @click="handleClickAddOptions"
-        >
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
-        </p-button>
-        <p-context-menu v-show="visibleContextMenu"
-                        ref="contextMenuRef"
-                        :menu="refinedMenu"
-                        :selected="selectedOptions"
-                        :style="contextMenuStyle"
-                        use-fixed-menu-style
-                        multi-selectable
-                        item-height-fixed
-                        show-select-marker
-                        @update:selected="handleUpdateSelectedOptions"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import { vOnClickOutside } from '@vueuse/components';
-import {
-    computed, reactive, ref, watch,
-} from 'vue';
 
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import { onClickOutside } from '@vueuse/core';
 import { isEmpty, isEqual, union } from 'lodash';
+import type { MaybeRef } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
@@ -52,6 +28,7 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{(e: 'update:selected-properties', properties: string[]): void}>();
+const { t } = useI18n();
 
 const state = reactive({
     widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
@@ -93,6 +70,7 @@ const sortItems = (items: MenuItem[]) => items.sort((a, b) => {
 });
 
 /* refs */
+const containerRef = ref<HTMLElement|null>(null);
 const targetRef = ref<any|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const selectedOptions = ref<MenuItem[]>([]);
@@ -137,6 +115,8 @@ const handleClickAddOptions = () => {
     else showContextMenu();
 };
 
+onClickOutside(containerRef as MaybeRef, hideContextMenu);
+
 watch(() => props.selectedProperties, (selectedProperties) => {
     const current = selectedOptions.value.map((item) => item.name);
     if (isEqual(current, selectedProperties)) return;
@@ -147,6 +127,32 @@ watch(() => props.selectedProperties, (selectedProperties) => {
 }, { immediate: true });
 
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="dashboard-widget-more-options"
+    >
+        <p-button ref="targetRef"
+                  style-type="secondary"
+                  icon-left="ic_plus_bold"
+                  block
+                  @click="handleClickAddOptions"
+        >
+            {{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
+        </p-button>
+        <p-context-menu v-show="visibleContextMenu"
+                        ref="contextMenuRef"
+                        :menu="refinedMenu"
+                        :selected="selectedOptions"
+                        :style="contextMenuStyle"
+                        use-fixed-menu-style
+                        multi-selectable
+                        item-height-fixed
+                        show-select-marker
+                        @update:selected="handleUpdateSelectedOptions"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-widget-more-options {

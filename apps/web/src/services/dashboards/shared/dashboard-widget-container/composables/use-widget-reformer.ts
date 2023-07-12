@@ -1,7 +1,7 @@
-import type { Ref, AsyncComponent } from 'vue';
+import { flattenDeep } from 'lodash';
+import type { Ref, Component } from 'vue';
 import { computed, reactive, toRef } from 'vue';
 
-import { flattenDeep } from 'lodash';
 
 import {
     widgetThemeAssigner,
@@ -22,7 +22,7 @@ interface ReformedWidgetInfo extends DashboardLayoutWidgetInfo {
     size: WidgetSize;
     theme?: WidgetTheme;
     width: number;
-    component: AsyncComponent|null;
+    component: Component|null;
 }
 export const useWidgetReformer = ({
     dashboardWidgetInfoList, containerWidth,

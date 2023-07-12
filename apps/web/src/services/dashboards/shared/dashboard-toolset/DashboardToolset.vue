@@ -1,20 +1,3 @@
-<template>
-    <div class="dashboard-toolset">
-        <dashboard-date-range-badge v-show="dashboardDetailState.settings.date_range.enabled"
-                                    :date-range="dashboardDetailState.settings.date_range"
-        />
-        <dashboard-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
-                                 :date-range="dashboardDetailState.settings.date_range"
-                                 @update:date-range="handleUpdateDateRange"
-        />
-        <currency-select-dropdown v-show="dashboardDetailState.settings.currency.enabled"
-                                  default-currency-mode
-                                  :currency="dashboardDetailState.settings.currency.value"
-                                  @update:currency="handleUpdateCurrency"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -47,6 +30,23 @@ const handleUpdateCurrency = (currency: Currency) => {
     });
 };
 </script>
+
+<template>
+    <div class="dashboard-toolset">
+        <dashboard-date-range-badge v-show="dashboardDetailState.settings.date_range.enabled"
+                                    :date-range="dashboardDetailState.settings.date_range"
+        />
+        <dashboard-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
+                                 :date-range="dashboardDetailState.settings.date_range"
+                                 @update:date-range="handleUpdateDateRange"
+        />
+        <currency-select-dropdown v-show="dashboardDetailState.settings.currency.enabled"
+                                  default-currency-mode
+                                  :currency="dashboardDetailState.settings.currency.value"
+                                  @update:currency="handleUpdateCurrency"
+        />
+    </div>
+</template>
 
 <style scoped>
 .dashboard-toolset {

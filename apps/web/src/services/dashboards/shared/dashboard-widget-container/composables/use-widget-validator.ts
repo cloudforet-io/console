@@ -1,7 +1,6 @@
+import { isEmpty } from 'lodash';
 import type { Ref } from 'vue';
 import { watch } from 'vue';
-
-import { isEmpty } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
