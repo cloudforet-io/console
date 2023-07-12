@@ -18,7 +18,7 @@
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
-                                      :key="`${item.name}-${item?.repository_info?.repository_id}`"
+                                      :key="getPluginKey(item)"
                                       class="plugin-card-item"
                         >
                             <template #content>
@@ -107,6 +107,7 @@ const state = reactive({
 
 
 const pluginApiQuery = new ApiQueryHelper();
+const getPluginKey = (item) => `${item.name}-${item.repository_info.repository_id}`;
 const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
     state.loading = true;
     try {
