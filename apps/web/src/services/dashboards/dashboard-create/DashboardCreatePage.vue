@@ -73,11 +73,16 @@
                 />
             </div>
         </template>
+        <confirm-back-modal :visible.sync="closeConfirmModalVisible"
+                            @confirm="handleClickBackButton"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, type ComponentPublicInstance,
+} from 'vue';
 
 import {
     PButton,
@@ -89,8 +94,10 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useGoBack } from '@/common/composables/go-back';
 
 import {
     DASHBOARD_SCOPE,
@@ -107,18 +114,26 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { ProjectItemResp } from '@/services/project/type';
 
-
-
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
 
 export default {
     name: 'CreateDashboardPage',
     components: {
+        ConfirmBackModal,
         DashboardCustomize,
         DashboardCreateHeader,
         DashboardViewerForm,
         DashboardTemplateForm,
         DashboardScopeForm,
         PButton,
+    },
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
     },
     setup() {
         const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -155,6 +170,7 @@ export default {
                 if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
                 return false;
             }),
+            closeConfirmModalVisible: false,
         });
 
         const goStep = (direction: 'prev'|'next') => {
@@ -229,6 +245,14 @@ export default {
             }
         };
 
+        const handleClickClose = () => {
+            state.closeConfirmModalVisible = true;
+        };
+
+        const { setPathFrom, handleClickBackButton } = useGoBack({
+            name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+        });
+
         return {
             ...toRefs(state),
             dashboardTemplate,
@@ -237,6 +261,9 @@ export default {
             isAllValid,
             goStep,
             createDashboard,
+            handleClickClose,
+            handleClickBackButton,
+            setPathFrom,
         };
     },
 };
