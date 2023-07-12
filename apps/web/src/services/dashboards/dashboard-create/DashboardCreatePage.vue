@@ -3,10 +3,13 @@
          :class="`step-${currentStep}`"
     >
         <template v-if="currentStep === steps[0].step">
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
                                   @set-project="setForm('dashboardProject', $event)"
@@ -31,10 +34,13 @@
             </div>
         </template>
         <template v-if="currentStep === steps[1].step">
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-template-form
                 :dashboard-scope="dashboardScope"
@@ -61,9 +67,12 @@
         </template>
         <template v-if="currentStep === steps[2].step">
             <div class="dashboard-customize-wrapper">
-                <dashboard-create-header :total-steps="steps.length"
-                                         :current-step="currentStep"
-                                         description=""
+                <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                          :total-steps="steps.length"
+                                          :current-step="currentStep"
+                                          show-step
+                                          show-close-button
+                                          @close="handleClickClose"
                 />
                 <dashboard-customize :loading="loading"
                                      :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
@@ -73,14 +82,19 @@
                 />
             </div>
         </template>
+        <confirm-back-modal :visible.sync="closeConfirmModalVisible"
+                            @confirm="handleClickBackButton"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, type ComponentPublicInstance,
+} from 'vue';
 
 import {
-    PButton,
+    PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -89,15 +103,16 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useGoBack } from '@/common/composables/go-back';
 
 import {
     DASHBOARD_SCOPE,
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
 import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
-import DashboardCreateHeader from '@/services/dashboards/dashboard-create/modules/DashboardCreateHeader.vue';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
@@ -107,18 +122,26 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { ProjectItemResp } from '@/services/project/type';
 
-
-
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
 
 export default {
     name: 'CreateDashboardPage',
     components: {
+        ConfirmBackModal,
         DashboardCustomize,
-        DashboardCreateHeader,
         DashboardViewerForm,
         DashboardTemplateForm,
         DashboardScopeForm,
         PButton,
+        PCenteredLayoutHeader,
+    },
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
     },
     setup() {
         const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -155,6 +178,7 @@ export default {
                 if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
                 return false;
             }),
+            closeConfirmModalVisible: false,
         });
 
         const goStep = (direction: 'prev'|'next') => {
@@ -229,6 +253,14 @@ export default {
             }
         };
 
+        const handleClickClose = () => {
+            state.closeConfirmModalVisible = true;
+        };
+
+        const { setPathFrom, handleClickBackButton } = useGoBack({
+            name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+        });
+
         return {
             ...toRefs(state),
             dashboardTemplate,
@@ -237,6 +269,9 @@ export default {
             isAllValid,
             goStep,
             createDashboard,
+            handleClickClose,
+            handleClickBackButton,
+            setPathFrom,
         };
     },
 };

@@ -796,6 +796,10 @@
 				"VALUE": "값 "
 			}
 		},
+		"CONFIRM_BACK_MODAL": {
+			"CANNOT_CANCEL": "이 작업은 취소 할 수 없습니다.",
+			"TITLE": "컬렉터 생성을 중단하시겠습니까? "
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "알파벳순",
 			"ALT_E_UPDATE_COL": "필드 변경 실패",
