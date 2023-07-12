@@ -1,92 +1,12 @@
-<template>
-    <div class="dashboard-detail-page">
-        <p-heading :title="dashboardDetailState.name">
-            <p-skeleton v-if="!dashboardDetailState.name"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
-                      #title-left-extra
-            >
-                <p-i name="ic_globe-filled"
-                     width="1rem"
-                     height="1rem"
-                     :color="PUBLIC_ICON_COLOR"
-                />
-            </template>
-            <template v-if="dashboardDetailState.name"
-                      #title-right-extra
-            >
-                <span class="dashboard-title-icon-buttons-wrapper">
-                    <div class="favorite-wrapper">
-                        <favorite-button :item-id="props.dashboardId"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.8"
-                        />
-                    </div>
-                    <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
-                                   @click="handleVisibleNameEditModal"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
-                                   class="delete-button"
-                                   @click="handleVisibleDeleteModal"
-                    />
-                </span>
-            </template>
-            <template #extra>
-                <dashboard-control-buttons v-if="state.hasManagePermission"
-                                           :dashboard-id="props.dashboardId"
-                                           :name="dashboardDetailState.name"
-                                           @update:visible-clone-modal="handleVisibleCloneModal"
-                />
-            </template>
-        </p-heading>
-        <div class="filter-box">
-            <dashboard-labels />
-            <dashboard-toolset />
-        </div>
-        <p-divider class="divider" />
-        <div class="dashboard-selectors">
-            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
-                                                 :is-manageable="state.hasManagePermission"
-            />
-            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        :loading="dashboardDetailState.loadingWidgets"
-                                        @refresh="handleRefresh"
-            />
-        </div>
-        <dashboard-widget-container ref="widgetContainerRef" />
-        <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
-                                   :dashboard-id="props.dashboardId"
-                                   :name="dashboardDetailState.name"
-                                   @confirm="handleNameUpdate"
-        />
-        <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
-                                :dashboard-id="props.dashboardId"
-        />
-        <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard="dashboardDetailState"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
+import {
+    PDivider, PI, PIconButton, PHeading, PSkeleton,
+} from '@spaceone/design-system';
 import {
     computed, onMounted, onUnmounted,
     reactive, ref, watch,
 } from 'vue';
-
-import {
-    PDivider, PI, PIconButton, PHeading, PSkeleton,
-} from '@spaceone/design-system';
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -123,6 +43,7 @@ interface Props {
     dashboardId: string;
 }
 const props = defineProps<Props>();
+const router = useRouter();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -164,7 +85,7 @@ const getDashboardData = async (dashboardId: string, force = false) => {
         await dashboardDetailStore.getDashboardInfo(dashboardId, force);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 
@@ -195,7 +116,7 @@ const handleRefresh = () => {
 /* init */
 let urlQueryStringWatcherStop;
 const init = async () => {
-    const currentQuery = SpaceRouter.router.currentRoute.query;
+    const currentQuery = router.currentRoute.value.query;
     const useQueryValue = {
         variables: queryStringToObject(currentQuery.variables),
         dateRange: queryStringToObject(currentQuery.dateRange),
@@ -270,6 +191,84 @@ onMounted(() => {
     });
 });
 </script>
+
+<template>
+    <div class="dashboard-detail-page">
+        <p-heading :title="dashboardDetailState.name">
+            <p-skeleton v-if="!dashboardDetailState.name"
+                        width="20rem"
+                        height="1.5rem"
+            />
+            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                      #title-left-extra
+            >
+                <p-i name="ic_globe-filled"
+                     width="1rem"
+                     height="1rem"
+                     :color="PUBLIC_ICON_COLOR"
+                />
+            </template>
+            <template v-if="dashboardDetailState.name"
+                      #title-right-extra
+            >
+                <span class="dashboard-title-icon-buttons-wrapper">
+                    <div class="favorite-wrapper">
+                        <favorite-button :item-id="props.dashboardId"
+                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                         scale="0.8"
+                        />
+                    </div>
+                    <p-icon-button name="ic_edit-text"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   @click="handleVisibleNameEditModal"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   class="delete-button"
+                                   @click="handleVisibleDeleteModal"
+                    />
+                </span>
+            </template>
+            <template #extra>
+                <dashboard-control-buttons v-if="state.hasManagePermission"
+                                           :dashboard-id="props.dashboardId"
+                                           :name="dashboardDetailState.name"
+                                           @update:visible-clone-modal="handleVisibleCloneModal"
+                />
+            </template>
+        </p-heading>
+        <div class="filter-box">
+            <dashboard-labels />
+            <dashboard-toolset />
+        </div>
+        <p-divider class="divider" />
+        <div class="dashboard-selectors">
+            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
+                                                 :is-manageable="state.hasManagePermission"
+            />
+            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                        :loading="dashboardDetailState.loadingWidgets"
+                                        @refresh="handleRefresh"
+            />
+        </div>
+        <dashboard-widget-container ref="widgetContainerRef" />
+        <dashboard-name-edit-modal v-model:visible="state.nameEditModalVisible"
+                                   :dashboard-id="props.dashboardId"
+                                   :name="dashboardDetailState.name"
+                                   @confirm="handleNameUpdate"
+        />
+        <dashboard-delete-modal v-model:visible="state.deleteModalVisible"
+                                :dashboard-id="props.dashboardId"
+        />
+        <dashboard-clone-modal v-model:visible="state.cloneModalVisible"
+                               :dashboard="dashboardDetailState"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .p-heading {

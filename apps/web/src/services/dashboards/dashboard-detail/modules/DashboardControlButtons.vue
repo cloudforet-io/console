@@ -1,41 +1,13 @@
-<template>
-    <div class="dashboard-control-buttons">
-        <p-button icon-left="ic_dashboard-customize"
-                  style-type="tertiary"
-                  @click="handleClickCustomize"
-        >
-            {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
-        </p-button>
-        <!--        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"-->
-        <!--                             @click="handleVisiblePdfDownloadOverlay"-->
-        <!--        />-->
-        <p-button icon-left="ic_duplicate"
-                  style-type="tertiary"
-                  @click="handleVisibleCloneModal"
-        >
-            {{ $t('DASHBOARDS.DETAIL.CLONE') }}
-        </p-button>
-        <!--        <pdf-download-overlay v-model="state.visiblePdfDownload"-->
-        <!--                              :items="state.previewItems"-->
-        <!--                              :file-name="state.pdfFileName"-->
-        <!--        >-->
-        <!--            <dashboard-detail-preview v-if="props.dashboardId"-->
-        <!--                                      :dashboard-id="props.dashboardId"-->
-        <!--                                      @rendered="handlePreviewRendered"-->
-        <!--            />-->
-        <!--        </pdf-download-overlay>-->
-    </div>
-</template>
-
 <script setup lang="ts">
 import { PButton } from '@spaceone/design-system';
-
-import { SpaceRouter } from '@/router';
-
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const emit = defineEmits(['update:visible-clone-modal', 'update:visible-pdf-download-overlay']);
+const router = useRouter();
+const { t } = useI18n();
 
 const handleVisibleCloneModal = () => {
     emit('update:visible-clone-modal');
@@ -62,10 +34,39 @@ const props = defineProps<{
 
 const handleClickCustomize = () => {
     const routeName = props.dashboardId.startsWith('project') ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
-    SpaceRouter.router.push({ name: routeName, params: { dashboardId: props.dashboardId } });
+    router.push({ name: routeName, params: { dashboardId: props.dashboardId } });
 };
 
 </script>
+
+<template>
+    <div class="dashboard-control-buttons">
+        <p-button icon-left="ic_dashboard-customize"
+                  style-type="tertiary"
+                  @click="handleClickCustomize"
+        >
+            {{ t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
+        </p-button>
+        <!--        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"-->
+        <!--                             @click="handleVisiblePdfDownloadOverlay"-->
+        <!--        />-->
+        <p-button icon-left="ic_duplicate"
+                  style-type="tertiary"
+                  @click="handleVisibleCloneModal"
+        >
+            {{ t('DASHBOARDS.DETAIL.CLONE') }}
+        </p-button>
+        <!--        <pdf-download-overlay v-model="state.visiblePdfDownload"-->
+        <!--                              :items="state.previewItems"-->
+        <!--                              :file-name="state.pdfFileName"-->
+        <!--        >-->
+        <!--            <dashboard-detail-preview v-if="props.dashboardId"-->
+        <!--                                      :dashboard-id="props.dashboardId"-->
+        <!--                                      @rendered="handlePreviewRendered"-->
+        <!--            />-->
+        <!--        </pdf-download-overlay>-->
+    </div>
+</template>
 
 <style lang="postcss">
 .dashboard-control-buttons {
