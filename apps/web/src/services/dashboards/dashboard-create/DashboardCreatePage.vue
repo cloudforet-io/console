@@ -195,30 +195,24 @@ export default {
             try {
                 state.loading = true;
 
+                const apiParam = {
+                    name: dashboardDetailState.name,
+                    labels: dashboardDetailState.labels,
+                    settings: dashboardDetailState.settings,
+                    layouts: [dashboardDetailState.dashboardWidgetInfoList],
+                    variables: dashboardDetailState.variables,
+                    variables_schema: dashboardDetailState.variablesSchema,
+                    tags: { created_by: store.state.user.userId },
+                    viewers: dashboardDetailStore.dashboardViewer,
+                };
                 if (dashboardDetailStore.isProjectDashboard) {
                     const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
-                        name: dashboardDetailState.name,
-                        labels: dashboardDetailState.labels,
-                        settings: dashboardDetailState.settings,
-                        layouts: [dashboardDetailState.dashboardWidgetInfoList],
-                        variables: dashboardDetailState.variables,
-                        variables_schema: dashboardDetailState.variablesSchema,
-                        tags: { created_by: store.state.user.userId },
-                        viewers: dashboardDetailStore.dashboardViewer,
+                        ...apiParam,
                         project_id: dashboardDetailState.projectId,
                     });
                     dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
                 } else {
-                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
-                        name: dashboardDetailState.name,
-                        labels: dashboardDetailState.labels,
-                        settings: dashboardDetailState.settings,
-                        layouts: [dashboardDetailState.dashboardWidgetInfoList],
-                        variables: dashboardDetailState.variables,
-                        variables_schema: dashboardDetailState.variablesSchema,
-                        tags: { created_by: store.state.user.userId },
-                        viewers: dashboardDetailStore.dashboardViewer,
-                    });
+                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(apiParam);
                     dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
                 }
                 const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
