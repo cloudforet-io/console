@@ -45,26 +45,23 @@ const updateDashboardData = async () => {
     try {
         state.loading = true;
 
+        const apiParam = {
+            name: dashboardDetailState.name,
+            labels: dashboardDetailState.labels,
+            settings: dashboardDetailState.settings,
+            layouts: [dashboardDetailState.dashboardWidgetInfoList],
+            variables: dashboardDetailState.variables,
+            variables_schema: dashboardDetailState.variablesSchema,
+            tags: { created_by: store.state.user.userId },
+        };
         if (dashboardDetailStore.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                name: dashboardDetailState.name,
-                labels: dashboardDetailState.labels,
-                settings: dashboardDetailState.settings,
-                layouts: [dashboardDetailState.dashboardWidgetInfoList],
-                variables: dashboardDetailState.variables,
-                variables_schema: dashboardDetailState.variablesSchema,
-                tags: { created_by: store.state.user.userId },
+                ...apiParam,
                 project_dashboard_id: props.dashboardId,
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                name: dashboardDetailState.name,
-                labels: dashboardDetailState.labels,
-                settings: dashboardDetailState.settings,
-                layouts: [dashboardDetailState.dashboardWidgetInfoList],
-                variables: dashboardDetailState.variables,
-                variables_schema: dashboardDetailState.variablesSchema,
-                tags: { created_by: store.state.user.userId },
+                ...apiParam,
                 domain_dashboard_id: props.dashboardId,
             });
         }
