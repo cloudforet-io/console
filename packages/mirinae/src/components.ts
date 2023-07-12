@@ -86,7 +86,8 @@ export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHoriz
 export { default as PPaneLayout } from './layouts/pane-layout/PPaneLayout.vue';
 export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
-
+export { default as PCenteredLayout } from './layouts/centered-layout/PCenteredLayout.vue';
+export { default as PCenteredLayoutHeader } from './layouts/centered-layout/centered-layout-header/PCenteredLayoutHeader.vue';
 
 /* Navigation */
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';
