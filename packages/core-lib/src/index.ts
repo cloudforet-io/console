@@ -3,16 +3,10 @@ import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { isEmpty, flatten } from 'lodash';
-import { DateTime } from 'luxon';
 
 dayjs.extend(tz);
 dayjs.extend(utc);
 
-// formatter
-export const timestampFormatter = (value, timezone) => {
-    if (value && value.seconds) return DateTime.fromSeconds(Number(value.seconds)).setZone(timezone).toFormat('yyyy-LL-dd HH:mm:ss');
-    return '';
-};
 export const iso8601Formatter = (time: string, timezone: string, format = 'YYYY-MM-DD HH:mm:ss') => {
     if (time) return dayjs.tz(dayjs(time), timezone).format(format);
     return '';
