@@ -17,13 +17,6 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     SCHEDULE: 'schedule',
 } as const;
 
-export const COLLECTOR_ITEM_INFO_TYPE = {
-    PLUGIN: 'PLUGIN',
-    STATUS: 'STATUS',
-    JOBS: 'JOBS',
-    SCHEDULE: 'SCHEDULE',
-} as const;
-
 export const JOB_STATE = {
     SUCCESS: 'SUCCESS',
     ERROR: 'ERROR',
