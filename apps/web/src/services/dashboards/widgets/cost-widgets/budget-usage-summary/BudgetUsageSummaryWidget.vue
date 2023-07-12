@@ -50,8 +50,11 @@
                         <div class="budget-value">
                             {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
                         </div>
-                        <div class="budget-info">
-                            {{ state.leftBudget }}
+                        <div v-if="state.leftBudget"
+                             class="budget-info"
+                             :style="{ color: state.leftBudget.color }"
+                        >
+                            {{ state.leftBudget.label }}
                         </div>
                         <template #loader>
                             <div class="skeleton-wrapper">
@@ -189,15 +192,15 @@ const state = reactive({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    totalBudget: computed(() => {
+    totalBudget: computed<number|string>(() => {
         if (!state.data?.length) return '--';
         return state.data[0].total_budget;
     }),
-    totalSpent: computed(() => {
+    totalSpent: computed<number|string>(() => {
         if (!state.data?.length) return '--';
         return state.data[0].total_spent;
     }),
-    spentBudget: computed(() => {
+    spentBudget: computed<{rate: number, isOver: boolean}>(() => {
         let isOver = false;
         let totalBudget = state.totalBudget;
         if (totalBudget === 0) totalBudget = 1;
@@ -210,13 +213,18 @@ const state = reactive({
 
         return { rate, isOver };
     }),
-    leftBudget: computed(() => {
-        if (!state.data?.length) return '--';
+    leftBudget: computed<{label: string, color?: string}|undefined>(() => {
+        if (!state.data?.length) return undefined;
         const value = state.totalBudget - state.totalSpent;
         if (value >= 0) {
-            return `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
+            return {
+                label: `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`,
+            };
         }
-        return `${currencyMoneyFormatter(Math.abs(value), state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`;
+        return {
+            label: `${currencyMoneyFormatter(Math.abs(value), state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`,
+            color: red[400],
+        };
     }),
     budgetCount: computed(() => {
         if (!state.data?.length) return '--';
