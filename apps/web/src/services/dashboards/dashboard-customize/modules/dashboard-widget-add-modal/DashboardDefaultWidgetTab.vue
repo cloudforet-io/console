@@ -1,3 +1,47 @@
+<script lang="ts" setup>
+import { PButtonTab, PLazyImg } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
+
+const { t } = useI18n();
+
+const state = reactive({
+    widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),
+    selectedWidgetConfigId: undefined as string | undefined,
+});
+const tabState = reactive({
+    tabs: computed<TabItem[]>(() => [
+        { name: 'all', label: `${t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALL')} (${getWidgetConfigsByLabel('all').length})` },
+        { name: 'Cost', label: `${t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_COST')} (${getWidgetConfigsByLabel('Cost').length})` },
+        { name: 'Asset', label: `${t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ASSET')} (${getWidgetConfigsByLabel('Asset').length})` },
+        { name: 'Alert', label: `${t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALERT')} (${getWidgetConfigsByLabel('Alert').length})` },
+    ]),
+    activeTab: 'all',
+});
+
+/* Util */
+const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> => {
+    const allConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
+    if (label === 'all') return allConfigs;
+    return allConfigs.filter((config) => config.labels?.includes(label));
+};
+
+/* Event */
+const handleChangeTab = (selectedTab) => {
+    tabState.activeTab = selectedTab;
+    state.selectedWidgetConfigId = undefined;
+};
+const selectWidget = (widgetConfigId: string) => {
+    state.selectedWidgetConfigId = widgetConfigId;
+};
+
+</script>
+
 <template>
     <div class="dashboard-default-widget-tab">
         <div class="left-area">
@@ -6,10 +50,10 @@
                           @change="handleChangeTab"
             />
             <ul class="widget-list">
-                <li v-for="widget in widgets"
+                <li v-for="widget in state.widgets"
                     :key="`card-${widget.widget_config_id}`"
                     class="widget-card"
-                    :class="{'selected' : selectedWidgetConfigId === widget.widget_config_id}"
+                    :class="{'selected' : state.selectedWidgetConfigId === widget.widget_config_id}"
                     @click="selectWidget(widget.widget_config_id)"
                 >
                     <div class="card-header">
@@ -30,78 +74,19 @@
             </ul>
         </div>
         <div class="right-area">
-            <div v-if="!selectedWidgetConfigId"
+            <div v-if="!state.selectedWidgetConfigId"
                  class="no-selected-wrapper"
             >
-                <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
-                <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
+                <span class="title">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
+                <span class="text">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
             </div>
             <dashboard-widget-input-form v-else
-                                         :widget-config-id="selectedWidgetConfigId"
+                                         :widget-config-id="state.selectedWidgetConfigId"
             />
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import { PButtonTab, PLazyImg } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { i18n } from '@/translations';
-
-import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
-
-export default {
-    name: 'DashboardDefaultWidgetTab',
-    components: {
-        DashboardWidgetInputForm,
-        PLazyImg,
-        PButtonTab,
-    },
-    setup() {
-        const state = reactive({
-            widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),
-            selectedWidgetConfigId: undefined as string | undefined,
-        });
-        const tabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { name: 'all', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALL')} (${getWidgetConfigsByLabel('all').length})` },
-                { name: 'Cost', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_COST')} (${getWidgetConfigsByLabel('Cost').length})` },
-                { name: 'Asset', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ASSET')} (${getWidgetConfigsByLabel('Asset').length})` },
-                { name: 'Alert', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALERT')} (${getWidgetConfigsByLabel('Alert').length})` },
-            ]),
-            activeTab: 'all',
-        });
-
-        /* Util */
-        const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> => {
-            const allConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
-            if (label === 'all') return allConfigs;
-            return allConfigs.filter((config) => config.labels?.includes(label));
-        };
-
-        /* Event */
-        const handleChangeTab = (selectedTab) => {
-            tabState.activeTab = selectedTab;
-            state.selectedWidgetConfigId = undefined;
-        };
-        const selectWidget = (widgetConfigId: string) => {
-            state.selectedWidgetConfigId = widgetConfigId;
-        };
-
-        return {
-            ...toRefs(state),
-            tabState,
-            handleChangeTab,
-            selectWidget,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .dashboard-default-widget-tab {
     display: flex;

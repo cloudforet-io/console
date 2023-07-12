@@ -1,44 +1,12 @@
-<template>
-    <div class="dashboard-customize-page">
-        <dashboard-customize-page-name :name.sync="state.name"
-                                       :dashboard-id="props.dashboardId"
-                                       @update:name="handleUpdateDashboardName"
-        />
-        <div class="filters-box">
-            <dashboard-labels editable />
-            <dashboard-toolset />
-        </div>
-        <p-divider />
-        <div class="dashboard-selectors">
-            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
-                                                 is-manageable
-            />
-            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        refresh-disabled
-            />
-        </div>
-        <dashboard-widget-container edit-mode
-                                    reuse-previous-data
-        />
-        <dashboard-customize-sidebar :loading="state.loading"
-                                     @save="handleSave"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { PDivider } from '@spaceone/design-system';
 import {
     computed, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
-
-import { PDivider } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -61,6 +29,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const router = useRouter();
+const { t } = useI18n();
+const store = useStore();
+
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
@@ -84,7 +56,7 @@ const getDashboardData = async () => {
         await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 const updateDashboardData = async () => {
@@ -103,14 +75,14 @@ const updateDashboardData = async () => {
             });
         }
         const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-        await SpaceRouter.router.push({
+        await router.push({
             name: routeName,
             params: {
                 dashboardId: props.dashboardId as string,
             },
         });
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+        ErrorHandler.handleRequestError(e, t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     }
 };
 const createDashboard = async () => {
@@ -132,14 +104,14 @@ const createDashboard = async () => {
             dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
         }
         const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-        await SpaceRouter.router.push({
+        await router.push({
             name: routeName,
             params: {
                 dashboardId: dashboardDetailState.dashboardId as string,
             },
         });
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+        ErrorHandler.handleRequestError(e, t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     }
 };
 
@@ -172,6 +144,34 @@ onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleUnload);
 });
 </script>
+
+<template>
+    <div class="dashboard-customize-page">
+        <dashboard-customize-page-name v-model:name="state.name"
+                                       :dashboard-id="props.dashboardId"
+                                       @update:name="handleUpdateDashboardName"
+        />
+        <div class="filters-box">
+            <dashboard-labels editable />
+            <dashboard-toolset />
+        </div>
+        <p-divider />
+        <div class="dashboard-selectors">
+            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
+                                                 is-manageable
+            />
+            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                        refresh-disabled
+            />
+        </div>
+        <dashboard-widget-container edit-mode
+                                    reuse-previous-data
+        />
+        <dashboard-customize-sidebar :loading="state.loading"
+                                     @save="handleSave"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-customize-page {

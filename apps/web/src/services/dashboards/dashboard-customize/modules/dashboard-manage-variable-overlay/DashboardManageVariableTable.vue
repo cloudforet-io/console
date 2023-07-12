@@ -1,76 +1,12 @@
-<template>
-    <div class="list-wrapper">
-        <div class="variable-select-filter">
-            <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-            <p-select-status v-for="(type, idx) in variableFilterList"
-                             :key="`variable-type-${idx}`"
-                             :selected="selectedVariableType"
-                             :value="type.name"
-                             @change="handleSelectType"
-            >
-                {{ type.label }}
-            </p-select-status>
-        </div>
-        <p-data-table class="variable-table"
-                      :items="orderedVariables"
-                      :fields="variableFields"
-        >
-            <template #col-selection_type-format="{ value }">
-                <span>{{ selectionType[value] }}</span>
-            </template>
-            <template #col-variable_type-format="{ value }">
-                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                         badge-type="solid-outline"
-                >
-                    {{ variableType[value] }}
-                </p-badge>
-            </template>
-            <template #col-use-format="{ value, item }">
-                <p-toggle-button :value="value"
-                                 :disabled="item.disabled"
-                                 @change-toggle="handleToggleUse(item.propertyName, value)"
-                />
-            </template>
-            <template #col-description-format="{ value }">
-                <p-collapsible-panel class="options-area"
-                                     is-collapsed
-                                     :line-clamp="1"
-                >
-                    {{ value }}
-                </p-collapsible-panel>
-            </template>
-            <template #col-managable-format="{ value }">
-                <div v-if="value"
-                     class="button-wrapper"
-                >
-                    <p-icon-button name="ic_duplicate"
-                                   @click="handleClonrVariable(value)"
-                    />
-                    <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(value)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   style-type="negative-transparent"
-                                   @click="handleDeleteVariable(value)"
-                    />
-                </div>
-            </template>
-        </p-data-table>
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -86,6 +22,8 @@ interface EmitFn {
 }
 
 const emit = defineEmits<EmitFn>();
+const { t } = useI18n();
+const store = useStore();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -93,9 +31,9 @@ const dashboardDetailState = dashboardDetailStore.$state;
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
     variableFilterList: computed(() => [
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
-        { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
+        { label: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
+        { label: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
+        { label: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
     ]),
     selectedVariableType: 'ALL',
     variableFields: [
@@ -107,12 +45,12 @@ const state = reactive({
         { name: 'managable', label: ' ', width: '144px' },
     ],
     selectionType: computed(() => ({
-        SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
-        MULTI: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
+        SINGLE: t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
+        MULTI: t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
     })),
     variableType: computed(() => ({
-        MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
-        CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
+        MANAGED: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
+        CUSTOM: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
     allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
@@ -181,6 +119,67 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div class="list-wrapper">
+        <div class="variable-select-filter">
+            <span class="filter-header">{{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
+            <p-select-status v-for="(type, idx) in variableFilterList"
+                             :key="`variable-type-${idx}`"
+                             :selected="selectedVariableType"
+                             :value="type.name"
+                             @change="handleSelectType"
+            >
+                {{ type.label }}
+            </p-select-status>
+        </div>
+        <p-data-table class="variable-table"
+                      :items="orderedVariables"
+                      :fields="variableFields"
+        >
+            <template #col-selection_type-format="{ value }">
+                <span>{{ selectionType[value] }}</span>
+            </template>
+            <template #col-variable_type-format="{ value }">
+                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
+                         badge-type="solid-outline"
+                >
+                    {{ variableType[value] }}
+                </p-badge>
+            </template>
+            <template #col-use-format="{ value, item }">
+                <p-toggle-button :value="value"
+                                 :disabled="item.disabled"
+                                 @change-toggle="handleToggleUse(item.propertyName, value)"
+                />
+            </template>
+            <template #col-description-format="{ value }">
+                <p-collapsible-panel class="options-area"
+                                     is-collapsed
+                                     :line-clamp="1"
+                >
+                    {{ value }}
+                </p-collapsible-panel>
+            </template>
+            <template #col-managable-format="{ value }">
+                <div v-if="value"
+                     class="button-wrapper"
+                >
+                    <p-icon-button name="ic_duplicate"
+                                   @click="handleClonrVariable(value)"
+                    />
+                    <p-icon-button name="ic_edit"
+                                   @click="handleEditVariable(value)"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   style-type="negative-transparent"
+                                   @click="handleDeleteVariable(value)"
+                    />
+                </div>
+            </template>
+        </p-data-table>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .list-wrapper {

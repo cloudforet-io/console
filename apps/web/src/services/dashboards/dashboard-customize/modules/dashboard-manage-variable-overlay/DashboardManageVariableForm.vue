@@ -1,67 +1,11 @@
-<template>
-    <div
-        class="manage-wrapper"
-    >
-        <p-field-group class="name-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
-                       :invalid="invalidState.name"
-                       :invalid-text="invalidTexts.name"
-                       required
-        >
-            <template #default="{ invalid }">
-                <p-text-input class="name-input"
-                              :value="name"
-                              :invalid="invalid"
-                              @update:value="setForm('name', $event)"
-                />
-            </template>
-        </p-field-group>
-        <p-field-group class="selection-type-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
-                       required
-        >
-            <p-select-dropdown class="selection-type-dropdown"
-                               :items="selectionMenu"
-                               :selected.sync="selectionType"
-            />
-        </p-field-group>
-        <p-field-group class="description-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
-        >
-            <p-text-input class="description-input"
-                          :value="description"
-                          @update:value="setForm('description', $event)"
-            />
-        </p-field-group>
-        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
-                                                 :options.sync="options"
-                                                 @update-options-invalid="handleUpdateOptionsInvalid"
-        />
-        <div class="button-wrapper">
-            <p-button style-type="tertiary"
-                      @click="handleCancel"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
-            </p-button>
-            <p-button :disabled="formInvalidState.formInvalid"
-                      @click="handleSave"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
-            </p-button>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    computed, onMounted, reactive, toRefs,
-} from 'vue';
-
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
+import {
+    computed, onMounted, reactive, toRefs,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -92,6 +36,7 @@ interface EmitFn {
 
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
+const { t } = useI18n();
 
 const {
     forms: {
@@ -107,7 +52,7 @@ const {
 }, {
     name(value: string) {
         if (props.variableNames.includes(value)) {
-            return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.VALIDATION_NAME_REQUIRED');
+            return t('DASHBOARDS.CUSTOMIZE.VARIABLES.VALIDATION_NAME_REQUIRED');
         }
         // TODO: add invalid text about name length
         return value.trim().length > 0;
@@ -138,8 +83,8 @@ const state = reactive({
     ] as OptionItem[],
     resourceKey: '', // TODO: setting resource key in 'SEARCH_RESOURCE' option type
     selectionMenu: computed(() => [
-        { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
-        { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
+        { name: 'MULTI', label: t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
+        { name: 'SINGLE', label: t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
     ]),
 });
 
@@ -220,6 +165,60 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div
+        class="manage-wrapper"
+    >
+        <p-field-group class="name-field"
+                       :label="t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
+                       :invalid="invalidState.name"
+                       :invalid-text="invalidTexts.name"
+                       required
+        >
+            <template #default="{ invalid }">
+                <p-text-input class="name-input"
+                              :value="name"
+                              :invalid="invalid"
+                              @update:value="setForm('name', $event)"
+                />
+            </template>
+        </p-field-group>
+        <p-field-group class="selection-type-field"
+                       :label="t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
+                       required
+        >
+            <p-select-dropdown v-model:selected="selectionType"
+                               class="selection-type-dropdown"
+                               :items="selectionMenu"
+            />
+        </p-field-group>
+        <p-field-group class="description-field"
+                       :label="t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
+        >
+            <p-text-input class="description-input"
+                          :value="description"
+                          @update:value="setForm('description', $event)"
+            />
+        </p-field-group>
+        <dashboard-manage-variable-options-field v-model:options-type="optionsType"
+                                                 v-model:options="options"
+                                                 @update-options-invalid="handleUpdateOptionsInvalid"
+        />
+        <div class="button-wrapper">
+            <p-button style-type="tertiary"
+                      @click="handleCancel"
+            >
+                {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
+            </p-button>
+            <p-button :disabled="formInvalidState.formInvalid"
+                      @click="handleSave"
+            >
+                {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
+            </p-button>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .manage-wrapper {
