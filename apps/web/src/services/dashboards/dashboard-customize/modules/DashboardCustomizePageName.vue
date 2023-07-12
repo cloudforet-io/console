@@ -1,6 +1,6 @@
 <template>
     <p-heading show-back-button
-               @click-back-button="$router.go(-1)"
+               @click-back-button="handleClickBackButton"
     >
         <template v-if="props.dashboardId">
             <p-field-group v-if="dashboardDetailState.name"
@@ -64,7 +64,8 @@ const props = defineProps<{
     name: string;
     dashboardId?: string;
 }>();
-const emit = defineEmits<{(e: string, value: string): void}>();
+const emit = defineEmits<{(e: 'update:name', value?: string): void,
+    (e: 'click-back-button'): void}>();
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -121,6 +122,9 @@ const handleEnter = () => {
     if (invalidState.nameInput) {
         updateName(props.name);
     }
+};
+const handleClickBackButton = () => {
+    emit('click-back-button');
 };
 
 watch(() => props.name, (d) => {

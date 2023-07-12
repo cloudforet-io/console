@@ -68,7 +68,8 @@
         </portal>
         <portal to="widget-footer">
             <div class="footer-wrapper">
-                <p-button style-type="transparent"
+                <p-button v-if="!props.hideCancelButton"
+                          style-type="transparent"
                           :disabled="props.loading"
                           @click="handleClickCancelButton"
                 >
@@ -79,7 +80,7 @@
                           :loading="props.loading"
                           @click="handleClickSaveButton"
                 >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
+                    {{ props.saveButtonText || $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
                 </p-button>
             </div>
         </portal>
@@ -95,13 +96,13 @@ import {
     defineEmits,
     onMounted, onUnmounted, reactive,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import draggable from 'vuedraggable';
 
 import {
     PButton, PDivider, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
@@ -110,11 +111,14 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_c
 
 interface Props {
     loading?: boolean;
+    saveButtonText?: TranslateResult;
+    hideCancelButton?: boolean;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: string, value: string): void,
     (e: 'save'): void,
+    (e: 'cancel'): void,
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -141,7 +145,7 @@ const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
 };
 const handleClickCancelButton = () => {
-    SpaceRouter.router.back();
+    emit('cancel');
     // TODO: revert dashboardState here
 };
 const handleClickSaveButton = () => {
@@ -215,12 +219,12 @@ onUnmounted(() => {
     }
 }
 .footer-wrapper {
-    @apply grid grid-cols-12 border-t border-gray-200;
+    @apply flex border-t border-gray-200;
     width: 100%;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    button {
-        @apply col-span-6;
+    .p-button {
+        width: 100%;
     }
 }
 </style>
