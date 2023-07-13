@@ -3,12 +3,25 @@
         <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
         <p-definition-table :fields="definitionFields"
                             :data="tableState.definitionData"
-                            :class="['data-collection-information-table', { 'is-account-type-all': props.accountType === ACCOUNT_TYPE.ALL}]"
+                            :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
                             style-type="white"
                             disable-copy
         >
-            <template #data-status>
-                <div v-if="props.accountType === ACCOUNT_TYPE.ALL"
+            <template #data-account>
+                <div class="accounts-wrapper">
+                    <p-lazy-img :src="props.item.plugin ? props.item.plugin.icon : ''"
+                                width="1rem"
+                                height="1rem"
+                                class="plugin-icon"
+                    />
+                    <span>{{ props.item.name }}</span>
+                </div>
+            </template>
+            <template #data-duration>
+                <span>{{ state.duration }}</span>
+            </template>
+            <template #data-status="{ data }">
+                <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
                      class="in-progress-wrapper"
                 >
                     <span class="in-progress-title">
@@ -22,27 +35,31 @@
                     </span>
                     <div class="chart-wrapper">
                         <div class="label-wrapper">
-                            <div v-if="tableState.definitionData.status.succeededCount > 0">
+                            <div v-if="state.jobTaskStatus.succeeded >= 0">
                                 <p-status :icon-color="SUCCEEDED_COLOR" />
-                                <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ tableState.definitionData.status.succeededCount }}</strong></span>
+                                <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
+                                    <strong>{{ state.jobTaskStatus.succeeded }}</strong>
+                                </span>
                             </div>
-                            <div v-if="tableState.definitionData.status.failedCount > 0"
+                            <div v-if="state.jobTaskStatus.failed >= 0"
                                  class="label"
                             >
                                 <p-status :icon-color="FAILED_COLOR" />
                                 <span :style="{'color': FAILED_COLOR}">
-                                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} =
-                                    <strong>{{ tableState.definitionData.status.failedCount }}</strong>
+                                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
+                                    <strong>{{ state.jobTaskStatus.failed }}</strong>
                                 </span>
                             </div>
-                            <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>100</strong></span>
+                            <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
+                                <strong>{{ state.jobTaskStatus.total }}</strong>
+                            </span>
                         </div>
                         <div class="progress-bar">
                             <span class="succeeded-bar"
-                                  :style="{ width: `${tableState.definitionData.status.succeededPercentage}%` }"
+                                  :style="{ width: `${data.succeededPercentage.value}%` }"
                             />
                             <span class="failed-bar"
-                                  :style="{ width: `${tableState.definitionData.status.failedPercentage}%` }"
+                                  :style="{ width: `${data.failedPercentage.value}%` }"
                             />
                         </div>
                     </div>
@@ -66,55 +83,114 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PDefinitionTable, PI, PStatus } from '@spaceone/design-system';
+import {
+    PDefinitionTable, PI, PLazyImg, PStatus,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { durationFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { coral, green } from '@/styles/colors';
 
+import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
+import {
+    useCollectorDataModalStore,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
 import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 const SUCCEEDED_COLOR = green[400];
 const FAILED_COLOR = coral[400];
 
 interface Props {
-    accountType?: string;
     item?: CollectorData;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    accountType: ACCOUNT_TYPE.ALL,
     item: undefined,
 });
 
-// TODO: temp data
+const collectorDataModalStore = useCollectorDataModalStore();
+const collectorDataModalState = collectorDataModalStore.$state;
+
+const definitionFields = [
+    { label: 'Account', name: 'account' },
+    { label: 'Duration', name: 'duration' },
+    { label: 'Status', name: 'status' },
+];
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
 const tableState = reactive({
     definitionData: computed(() => ({
-        account: '123',
-        duration: 10,
         status: {
-            succeededCount: 5,
-            failedCount: 2,
-            totalCount: 15,
-            succeededPercentage: 50,
-            failedPercentage: 20,
+            succeededPercentage: computed(() => {
+                if (state.jobTaskStatus.total > 0) {
+                    return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
+                }
+                return 0;
+            }),
+            failedPercentage: computed(() => {
+                if (state.jobTaskStatus.total > 0) {
+                    const status = collectorDataModalState.recentJob.status;
+                    if (status === JOB_STATUS.success || status === JOB_STATUS.created) {
+                        return 100 - tableState.definitionData.status.succeededPercentage;
+                    }
+                    return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
+                }
+                return 0;
+            }),
         },
     })),
 });
+const state = reactive({
+    jobTaskStatus: {
+        succeeded: 0,
+        failed: 0,
+        total: 0,
+    },
+    duration: 0,
+});
 
-const definitionFields = [
-    {
-        label: 'Account',
-        name: 'account',
-    },
-    {
-        label: 'Duration',
-        name: 'duration',
-    },
-    {
-        label: 'Status',
-        name: 'status',
-    },
-];
+/* Query helper */
+const apiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('created_at', true);
+
+/* API */
+const getJobProgress = async () => {
+    try {
+        const response = await SpaceConnector.client.inventory.job.getJobProgress({
+            job_id: collectorDataModalState.recentJob.job_id,
+        });
+        state.jobTaskStatus = response.job_task_status;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const getJobLists = async () => {
+    try {
+        const response = await SpaceConnector.client.inventory.job.list({ query: apiQueryHelper.data });
+        const item = response.results[0];
+        state.duration = durationFormatter(item.created_at, dayjs(), storeState.timezone) || '--';
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+/* Init */
+(async () => {
+    await getJobLists();
+    await getJobProgress();
+})();
 </script>
 
 <style lang="postcss" scoped>
@@ -124,6 +200,10 @@ const definitionFields = [
     .data-collection-information-table {
         margin-top: 0.5rem;
         min-height: initial;
+        .accounts-wrapper {
+            @apply flex items-center;
+            gap: 0.5rem;
+        }
         .in-progress-title {
             @apply flex items-center;
             gap: 0.25rem;
