@@ -5,7 +5,7 @@
         <div class="monthly-cost">
             <div class="cost">
                 <p class="cost-label">
-                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedCurrentMonth}) }}
                 </p>
                 <p-data-loader class="data-loader"
                                :loading="state.loading"
@@ -51,7 +51,7 @@
             <p-divider />
             <div class="cost">
                 <p class="cost-label">
-                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.PREVIOUS_MONTH') }}
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedPreviousMonth}) }}
                 </p>
                 <p-data-loader class="data-loader"
                                :loading="state.loading"
@@ -116,6 +116,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { useDateRangeFormatter } from '@/common/composables/date-range-formatter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red } from '@/styles/colors';
@@ -151,6 +152,10 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
+    settingsDateRange: computed<DateRange>(() => {
+        if (!state.settings?.date_range) return {};
+        return state.settings.date_range;
+    }),
     selectedMonth: computed(() => (dayjs.utc(state.dateRange.end))),
     previousMonth: computed(() => (dayjs.utc(state.dateRange.end).subtract(1, 'month'))),
     currentMonthlyCost: computed(() => getMonthlyCost(state.selectedMonth)),
@@ -175,6 +180,16 @@ const state = reactive({
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+
+const [formattedCurrentMonth] = useDateRangeFormatter({
+    start: computed(() => state.dateRange.end),
+    end: computed(() => state.dateRange.end),
+});
+
+const [formattedPreviousMonth] = useDateRangeFormatter({
+    start: computed(() => dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
+    end: computed(() => dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
+});
 
 /* Api */
 let analyzeRequest: CancelTokenSource | undefined;

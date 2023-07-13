@@ -1,15 +1,14 @@
 <template>
     <p-heading show-back-button
-               @click-back-button="$router.go(-1)"
+               @click-back-button="handleClickBackButton"
     >
         <template v-if="props.dashboardId">
-            <p-field-group v-if="props.name"
+            <p-field-group v-if="dashboardDetailState.name"
                            :invalid="invalidState.nameInput"
                            :invalid-text="invalidTexts.nameInput"
             >
                 <template #default>
-                    <input v-show="state.editMode"
-                           ref="inputRef"
+                    <input ref="inputRef"
                            v-on-click-outside="handleEnter"
                            class="name-input"
                            :value="nameInput"
@@ -17,12 +16,6 @@
                            @keydown.esc="handleEscape"
                            @keydown.enter="handleEnter"
                     >
-                    <span v-if="!state.editMode"
-                          class="title-area"
-                          @click="handleClickTitle"
-                    >
-                        {{ nameInput }}
-                    </span>
                 </template>
             </p-field-group>
             <p-skeleton v-else
@@ -53,7 +46,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import {
-    computed, nextTick, onMounted, reactive, ref, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -71,7 +64,8 @@ const props = defineProps<{
     name: string;
     dashboardId?: string;
 }>();
-const emit = defineEmits<{(e: string, value: string): void}>();
+const emit = defineEmits<{(e: 'update:name', value?: string): void,
+    (e: 'click-back-button'): void}>();
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -101,7 +95,7 @@ const {
 });
 
 const inputRef = ref<HTMLElement|null>(null);
-const { focused: isInputFocused } = useFocus(inputRef, { initialValue: true });
+useFocus(inputRef, { initialValue: true });
 const isTextInputFocused = ref(true);
 
 const updateName = (name: string) => {
@@ -115,11 +109,6 @@ const handlePTextInput = (t: string) => {
 };
 
 // handlers for <input /> (customizing feature)
-const handleClickTitle = async () => {
-    state.editMode = true;
-    await nextTick();
-    isInputFocused.value = true;
-};
 const handleInput = (e: InputEvent): void => {
     updateName((e.target as HTMLInputElement).value);
 };
@@ -133,6 +122,9 @@ const handleEnter = () => {
     if (invalidState.nameInput) {
         updateName(props.name);
     }
+};
+const handleClickBackButton = () => {
+    emit('click-back-button');
 };
 
 watch(() => props.name, (d) => {

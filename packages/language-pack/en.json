@@ -796,6 +796,10 @@
 				"VALUE": "Value"
 			}
 		},
+		"CONFIRM_BACK_MODAL": {
+			"CANNOT_CANCEL": "You cannot undo this action.",
+			"TITLE": "Are you sure you want to quit?"
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "Alphabetical",
 			"ALT_E_UPDATE_COL": "Failed to Update Columns",
@@ -1046,7 +1050,7 @@
 				"STORAGE": "Storage",
 				"TITLE": "General",
 				"TREND_TITLE": "Trend",
-				"TYPE_TITLE": "Database Type"
+				"TYPE_TITLE": "{service} Type"
 			},
 			"BILLING": {
 				"DAY": "Day",
@@ -1405,8 +1409,9 @@
 				"AVAILABLE": "available",
 				"BUDGETS": "Budgets",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
+				"EXCEEDED": "exceeded",
 				"TOTAL_BUDGET": "Total budget",
-				"TOTAL_SPENT": "Total spent"
+				"TOTAL_BUDGET_USAGE_IN": "Total budget usage in {period}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "
@@ -1458,9 +1463,8 @@
 			"ERROR_MSG": "There is an error from an incompatibility dashboard's variables and widget options.",
 			"ERROR_TITLE": "Unable to load",
 			"MONTHLY_COST": {
-				"CURRENT_MONTH": "Current month",
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
-				"PREVIOUS_MONTH": "Previous month"
+				"TOTAL_SPENT_IN": "Total spent in {period}"
 			},
 			"NO_DATA": "No Data",
 			"PROJECT_ACTIVITY_SUMMARY": {
