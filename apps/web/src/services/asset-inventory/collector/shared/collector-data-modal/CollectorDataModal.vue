@@ -2,7 +2,7 @@
     <div class="collector-data-modal">
         <p-button-modal :visible="collectorPageState.visible.collectorModal"
                         :header-title="state.headerTitle"
-                        :theme-color="props.isDuplicateJobs ? 'alert' : 'primary'"
+                        :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
                         size="sm"
                         @confirm="handleClickConfirm"
@@ -10,8 +10,8 @@
                         @close="handleClickCancel"
         >
             <template #body>
-                <div v-if="props.isDuplicateJobs">
-                    <collector-data-duplication-inner :account-type="props.accountType"
+                <div v-if="state.isDuplicateJobs">
+                    <collector-data-duplication-inner :account-type="collectorDataModalState.accountType"
                                                       :item="state.item"
                     />
                 </div>
@@ -20,7 +20,7 @@
                 />
             </template>
             <template #confirm-button>
-                <span v-if="props.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
+                <span v-if="state.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
                 <span v-else>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
             </template>
         </p-button-modal>
@@ -44,6 +44,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -51,19 +52,7 @@ import CollectorDataDefaultInner
     from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDefaultInner.vue';
 import CollectorDataDuplicationInner
     from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDuplicationInner.vue';
-import { ACCOUNT_TYPE, COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
-
-interface Props {
-    collectDataType?: string;
-    accountType?: string;
-    isDuplicateJobs?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    collectDataType: COLLECT_DATA_TYPE.COLLECTOR,
-    accountType: ACCOUNT_TYPE.ALL,
-    isDuplicateJobs: false,
-});
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
@@ -76,7 +65,9 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    headerTitle: computed(() => (props.isDuplicateJobs ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE') : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
+    headerTitle: computed(() => (state.isDuplicateJobs
+        ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
+        : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     item: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
         return {
@@ -87,6 +78,11 @@ const state = reactive({
             },
         };
     }),
+    collectDataType: computed(() => {
+        const selectedSecret = collectorDataModalState.selectedSecret;
+        return Object.keys(selectedSecret).length > 0 ? COLLECT_DATA_TYPE.SECRET : COLLECT_DATA_TYPE.COLLECTOR;
+    }),
+    isDuplicateJobs: computed(() => collectorDataModalState.recentJob.status === JOB_STATE.IN_PROGRESS),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();
