@@ -19,7 +19,7 @@
                                    :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType"
                                    :selected-dates="startDates"
                                    :invalid="!!startDates.length && !!endDates.length && invalid"
-                                   @update:selected-dates="handleUpdateStartDates"
+                                   @update:selected-dates="handleUpdateSelectedDates('start', ...arguments)"
                 />
             </p-field-group>
             <p-field-group class="period-select"
@@ -33,7 +33,7 @@
                                    :invalid="!!startDates.length && !!endDates.length && invalid"
                                    :min-date="endDateSetting.minDate"
                                    :max-date="endDateSetting.maxDate"
-                                   @update:selected-dates="handleUpdateEndDates"
+                                   @update:selected-dates="handleUpdateSelectedDates('end', ...arguments)"
                 />
             </p-field-group>
         </template>
@@ -41,9 +41,9 @@
 </template>
 
 <script lang="ts">
-
+import type { PropType } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -54,7 +54,8 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
+
 
 interface CustomRangeModalSettings {
     helpTextFrom?: TranslateResult | undefined;
@@ -67,7 +68,19 @@ interface DateOption {
     maxDate?: string;
 }
 
-export default {
+export interface Period {
+    start?: string;
+    end?: string;
+}
+
+interface Props {
+    visible: boolean;
+    datetimePickerDataType?: DATA_TYPE;
+    granularity?: Granularity;
+    selectedDateRange?: Period;
+}
+
+export default defineComponent<Props>({
     name: 'CustomDateRangeModal',
     components: {
         PButtonModal,
@@ -86,6 +99,10 @@ export default {
         granularity: {
             type: String,
             default: undefined,
+        },
+        selectedDateRange: {
+            type: Object as PropType<Period>,
+            default: () => ({}),
         },
     },
     setup(props, { emit }) {
@@ -151,20 +168,30 @@ export default {
             }
             emit('confirm', period);
         };
-        const handleUpdateStartDates = (selectedDates: string[]) => {
-            if (selectedDates.length && state.startDates[0] !== selectedDates[0]) {
+        const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
+            if (!selectedDates.length) return;
+            if (dayjs.utc(state.startDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+            if (type === 'start') {
                 state.startDates = selectedDates;
                 state.endDates = [];
-            }
-        };
-        const handleUpdateEndDates = (selectedDates: string[]) => {
-            if (selectedDates.length && state.endDates[0] !== selectedDates[0]) {
+            } else {
                 state.endDates = selectedDates;
             }
         };
 
         watch(() => props.visible, (visible) => {
             if (visible) {
+                if (props.selectedDateRange?.start) {
+                    state.startDates = [props.selectedDateRange?.start];
+                } else {
+                    state.startDates = [];
+                }
+                if (props.selectedDateRange?.end) {
+                    state.endDates = [props.selectedDateRange?.end];
+                } else {
+                    state.endDates = [];
+                }
+            } else {
                 state.startDates = [];
                 state.endDates = [];
             }
@@ -173,11 +200,10 @@ export default {
         return {
             ...toRefs(state),
             handleConfirm,
-            handleUpdateStartDates,
-            handleUpdateEndDates,
+            handleUpdateSelectedDates,
         };
     },
-};
+});
 </script>
 
 <style scoped lang="postcss">
