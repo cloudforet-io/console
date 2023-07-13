@@ -249,9 +249,13 @@ onMounted(async () => {
             padding-left: 0.75rem;
         }
         .collector-lists {
-            @apply grid grid-cols-2 gap-4;
+            @apply grid grid-cols-3 gap-4;
 
-            @screen mobile {
+            @screen desktop {
+                @apply grid-cols-2;
+            }
+
+            @screen tablet {
                 @apply flex flex-col;
             }
         }
