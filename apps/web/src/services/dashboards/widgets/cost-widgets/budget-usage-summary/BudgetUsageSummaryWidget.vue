@@ -7,7 +7,7 @@
             <div class="data-container">
                 <div class="budget">
                     <p class="budget-label">
-                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET_USAGE_IN', {period: totalSpentPeriod}) }}
                     </p>
                     <p-data-loader class="data-loader"
                                    :loading="state.loading"
@@ -119,6 +119,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
+import { useDateRangeFormatter } from '@/common/composables/date-range-formatter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, red } from '@/styles/colors';
@@ -233,6 +234,11 @@ const state = reactive({
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+
+const [totalSpentPeriod] = useDateRangeFormatter({
+    start: computed(() => state.settings?.date_range?.start),
+    end: computed(() => state.settings?.date_range?.end),
+});
 
 /* Api */
 let analyzeRequest: CancelTokenSource | undefined;
