@@ -2,7 +2,7 @@ import type { CollectorModel } from '@/services/asset-inventory/collector/model'
 
 export const ATTACHED_ACCOUNT_TYPE = {
     ALL: 'all',
-    SPECIFIC: 'Specific',
+    SPECIFIC: 'specific',
 } as const;
 
 export const COLLECT_DATA_TYPE = {
