@@ -122,7 +122,10 @@ const { t } = useI18n();
 
 const state = reactive({
     contextKey: Math.floor(Math.random() * Date.now()),
-    isNoData: computed(() => every(state.items, (def) => !def.data)),
+    isNoData: computed(() => every(state.items, (def) => {
+        if (typeof def.data === 'boolean') return false;
+        return !def.data;
+    })),
     skeletons: computed(() => range(props.skeletonRows ?? 5)),
     items: computed(() => makeDefItems(props.fields, props.data)),
 });
