@@ -796,6 +796,10 @@
 				"VALUE": "値"
 			}
 		},
+		"CONFIRM_BACK_MODAL": {
+			"CANNOT_CANCEL": "この操作は取り消すことができません。",
+			"TITLE": "中止してもよろしいですか？"
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "アルファベット順",
 			"ALT_E_UPDATE_COL": "フィールド変更に失敗",
@@ -1046,7 +1050,7 @@
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
-				"TYPE_TITLE": "データベースタイプ"
+				"TYPE_TITLE": "{service}タイプ"
 			},
 			"BILLING": {
 				"DAY": "日",
@@ -1405,8 +1409,9 @@
 				"AVAILABLE": "使用可能",
 				"BUDGETS": "バジェット",
 				"DESC": "総コスト、予算、使用率とともに、総予算消費の概要を表示します。",
+				"EXCEEDED": "を超えました",
 				"TOTAL_BUDGET": "総予算",
-				"TOTAL_SPENT": "総使用量"
+				"TOTAL_BUDGET_USAGE_IN": "{period}の予算使用額"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "選択した期間中のプロジェクトごとの予算使用量と不足予測値を表示します。"
@@ -1458,9 +1463,8 @@
 			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
 			"MONTHLY_COST": {
-				"CURRENT_MONTH": "直近月発生費用",
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
-				"PREVIOUS_MONTH": "前月発生費用"
+				"TOTAL_SPENT_IN": "{period}の総支出額"
 			},
 			"NO_DATA": "データがありません",
 			"PROJECT_ACTIVITY_SUMMARY": {

@@ -24,3 +24,6 @@ user.json
 
 # Skaffold
 skaffold
+
+# Doodle
+build_and_push.sh

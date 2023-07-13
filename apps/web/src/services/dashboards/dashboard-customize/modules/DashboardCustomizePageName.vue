@@ -6,10 +6,9 @@ import {
 import { useFocus, onClickOutside } from '@vueuse/core';
 import type { MaybeRef } from 'vue';
 import {
-    computed, nextTick, onMounted, reactive, ref, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -20,8 +19,8 @@ const props = defineProps<{
     name: string;
     dashboardId?: string;
 }>();
-const emit = defineEmits<{(e: 'update:name', value: string): void}>();
-const router = useRouter();
+const emit = defineEmits<{(e: 'update:name', value?: string): void,
+    (e: 'click-back-button'): void}>();
 const { t } = useI18n();
 const store = useStore();
 
@@ -52,7 +51,7 @@ const {
 });
 
 const inputRef = ref<HTMLElement|null>(null);
-const { focused: isInputFocused } = useFocus(inputRef as MaybeRef, { initialValue: true });
+useFocus(inputRef as MaybeRef, { initialValue: true });
 const isTextInputFocused = ref(true);
 
 const updateName = (name: string) => {
@@ -66,11 +65,6 @@ const handlePTextInput = (text: string) => {
 };
 
 // handlers for <input /> (customizing feature)
-const handleClickTitle = async () => {
-    state.editMode = true;
-    await nextTick();
-    isInputFocused.value = true;
-};
 const handleInput = (e: InputEvent): void => {
     updateName((e.target as HTMLInputElement).value);
 };
@@ -84,6 +78,9 @@ const handleEnter = () => {
     if (invalidState.nameInput) {
         updateName(props.name);
     }
+};
+const handleClickBackButton = () => {
+    emit('click-back-button');
 };
 
 watch(() => props.name, (d) => {
@@ -110,28 +107,21 @@ onClickOutside(inputRef as MaybeRef, handleEnter);
 
 <template>
     <p-heading show-back-button
-               @click-back-button="router.go(-1)"
+               @click-back-button="handleClickBackButton"
     >
         <template v-if="props.dashboardId">
-            <p-field-group v-if="props.name"
+            <p-field-group v-if="dashboardDetailState.name"
                            :invalid="invalidState.nameInput"
                            :invalid-text="invalidTexts.nameInput"
             >
                 <template #default>
-                    <input v-show="state.editMode"
-                           ref="inputRef"
+                    <input ref="inputRef"
                            class="name-input"
                            :value="nameInput"
                            @input="handleInput"
                            @keydown.esc="handleEscape"
                            @keydown.enter="handleEnter"
                     >
-                    <span v-if="!state.editMode"
-                          class="title-area"
-                          @click="handleClickTitle"
-                    >
-                        {{ nameInput }}
-                    </span>
                 </template>
             </p-field-group>
             <p-skeleton v-else

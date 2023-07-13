@@ -8,7 +8,6 @@ import {
     onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import draggable from 'vuedraggable';
 import { useStore } from 'vuex';
 
@@ -18,12 +17,15 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_c
 
 interface Props {
     loading?: boolean;
+    saveButtonText?: string;
+    hideCancelButton?: boolean;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'save'): void}>();
+const emit = defineEmits<{(e: 'save'): void;
+    (e: 'cancel'): void;
+}>();
 const { t } = useI18n();
-const router = useRouter();
 const store = useStore();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -50,7 +52,7 @@ const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
 };
 const handleClickCancelButton = () => {
-    router.back();
+    emit('cancel');
     // TODO: revert dashboardState here
 };
 const handleClickSaveButton = () => {
@@ -140,7 +142,8 @@ onUnmounted(() => {
         </portal>
         <portal to="widget-footer">
             <div class="footer-wrapper">
-                <p-button style-type="transparent"
+                <p-button v-if="!props.hideCancelButton"
+                          style-type="transparent"
                           :disabled="props.loading"
                           @click="handleClickCancelButton"
                 >
@@ -151,7 +154,7 @@ onUnmounted(() => {
                           :loading="props.loading"
                           @click="handleClickSaveButton"
                 >
-                    {{ t('DASHBOARDS.CUSTOMIZE.SAVE') }}
+                    {{ props.saveButtonText || t('DASHBOARDS.CUSTOMIZE.SAVE') }}
                 </p-button>
             </div>
         </portal>
@@ -216,12 +219,12 @@ onUnmounted(() => {
     }
 }
 .footer-wrapper {
-    @apply grid grid-cols-12 border-t border-gray-200;
+    @apply flex border-t border-gray-200;
     width: 100%;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    button {
-        @apply col-span-6;
+    .p-button {
+        width: 100%;
     }
 }
 </style>

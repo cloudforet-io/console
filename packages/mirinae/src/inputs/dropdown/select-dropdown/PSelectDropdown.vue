@@ -83,7 +83,6 @@ import type { PropType } from 'vue';
 
 
 
-
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
@@ -216,9 +215,6 @@ const handleClick = (e: MouseEvent) => {
     state.proxyVisibleMenu = !state.proxyVisibleMenu;
     e.stopPropagation();
 };
-const handleClickOutside = () => {
-    state.proxyVisibleMenu = false;
-};
 const handlePressDownKey = () => {
     if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
     nextTick(() => {
@@ -229,7 +225,10 @@ const handlePressDownKey = () => {
     });
 };
 
-onClickOutside(containerRef, handleClickOutside);
+const hideMenu = () => {
+    state.proxyVisibleMenu = false;
+};
+onClickOutside(containerRef, hideMenu);
 
 </script>
 

@@ -1,7 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { getTextHighlightRegex } from '@spaceone/design-system';
 import type { Getter } from 'vuex';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 
 import type { DashboardState } from '@/store/modules/dashboard/type';
 
@@ -21,11 +23,15 @@ const getItems = (items: DashboardModel[], filters: ConsoleFilter[], viewers: st
     filters.forEach((d) => {
         if (d.k === 'label' && Array.isArray(d.v)) {
             d.v.forEach((value) => {
-                result = result.filter((item) => typeof value === 'string' && item.labels.includes(value));
+                if (typeof value === 'string') {
+                    result = result.filter((item) => item.labels.includes(value));
+                }
             });
-        }
-        if (!d.k && d.v) {
-            result = result.filter((item) => item.name.includes(`${d.v}`));
+        } else if (!d.k && d.v) {
+            if (typeof d.v === 'string') {
+                const regex = getTextHighlightRegex(d.v);
+                result = result.filter((item) => regex.test(item.name));
+            }
         }
     });
     return result;

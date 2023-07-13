@@ -248,7 +248,6 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
-    state.data.more = false;
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
@@ -264,6 +263,7 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 /* Event */
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
+    state.data = undefined;
     refreshWidget(thisPage);
 };
 

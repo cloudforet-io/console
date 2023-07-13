@@ -158,7 +158,7 @@ const handleRefresh = () => {
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode"
+                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
                                   :href="props.widgetLink"
                                   :to="props.widgetLocation"
                                   class="anchor-button"
