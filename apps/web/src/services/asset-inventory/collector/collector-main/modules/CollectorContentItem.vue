@@ -80,6 +80,7 @@ const handleClickCollectData = async () => {
         _state.visible.collectorModal = true;
     });
     await collectorDataModalStore.$patch((_state) => {
+        _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
         _state.selectedCollector = collectorPageState.selectedCollector;
     });
 };
