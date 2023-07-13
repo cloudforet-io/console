@@ -1,53 +1,7 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="cost-by-region"
-                  @refresh="handleRefresh"
-    >
-        <div class="content-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.chartData"
-                           :loader-backdrop-opacity="1"
-                           loader-type="skeleton"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-                <div class="legend-wrapper">
-                    <span v-for="(legend, idx) in state.chartLegends"
-                          :key="`${legend.name}-${idx}`"
-                          class="circle-wrapper"
-                    >
-                        <span v-if="legend.name"
-                              class="circle"
-                              :style="{background: storeState.providers[legend.name]?.color}"
-                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
-                    </span>
-                </div>
-            </p-data-loader>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router/types/router';
-
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -55,12 +9,12 @@ import dayjs from 'dayjs';
 import {
     groupBy, isEqual, sum, uniqWith,
 } from 'lodash';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -87,6 +41,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+
 
 type Data = CostAnalyzeDataModel['results'];
 interface FullData {
@@ -119,6 +74,8 @@ interface MapChartData {
 }
 
 const props = defineProps<WidgetProps>();
+const store = useStore();
+
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
@@ -140,16 +97,16 @@ const state = reactive({
         start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -341,6 +298,50 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="cost-by-region"
+                  @refresh="handleRefresh"
+    >
+        <div class="content-wrapper">
+            <p-data-loader class="chart-loader"
+                           :loading="state.loading"
+                           :data="state.chartData"
+                           :loader-backdrop-opacity="1"
+                           loader-type="skeleton"
+                           show-data-from-scratch
+            >
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="legend-wrapper">
+                    <span v-for="(legend, idx) in state.chartLegends"
+                          :key="`${legend.name}-${idx}`"
+                          class="circle-wrapper"
+                    >
+                        <span v-if="legend.name"
+                              class="circle"
+                              :style="{background: storeState.providers[legend.name]?.color}"
+                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
+                    </span>
+                </div>
+            </p-data-loader>
+            <widget-data-table v-model:legends="state.legends"
+                               :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               @update:this-page="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .cost-by-region {
     .content-wrapper {

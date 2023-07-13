@@ -1,4 +1,11 @@
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
+
 import type { ReferenceType } from '@/store/modules/reference/type';
+import type { Currency } from '@/store/modules/settings/type';
+
+import type { DateRange } from '@/services/dashboards/config';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 
 export const UNIT_MAP = {
     B: 'B',
@@ -61,4 +68,28 @@ export type TableSize = typeof TABLE_SIZE[keyof typeof TABLE_SIZE];
 
 export interface WidgetTableData {
     [fieldName: string]: string|number
+}
+
+export interface WidgetFrameProps {
+    title: TranslateResult;
+    size: WidgetSize;
+    width?: number;
+    widgetLink?: string;
+    widgetLocation?: Location;
+    widgetConfigId?: string;
+    dateRange?: DateRange;
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
+    currency?: Currency;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
+    isOnlyFullSize?: boolean;
+    widgetKey: string;
+    overflowY?: string;
+    refreshOnResize?: boolean;
 }

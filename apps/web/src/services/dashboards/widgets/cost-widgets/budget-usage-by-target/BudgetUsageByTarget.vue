@@ -1,47 +1,21 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="budget-usage-by-target"
-                  @refresh="refreshWidget"
-    >
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.tableItems"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           @update:thisPage="handleUpdateThisPage"
-        >
-            <template #col-target="{value}">
-                {{ targetTextFormatter(value) }}
-            </template>
-            <template #col-progress="{value}">
-                <p-progress-bar size="lg"
-                                :percentage="value"
-                />
-            </template>
-        </widget-data-table>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router/types/router';
 
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PProgressBar,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -63,6 +37,7 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
+
 type Data = BudgetDataModel['results'];
 interface FullData {
     results: Data;
@@ -71,6 +46,8 @@ interface FullData {
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
+const store = useStore();
+
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
@@ -96,13 +73,13 @@ const state = reactive({
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
@@ -214,6 +191,30 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="budget-usage-by-target"
+                  @refresh="refreshWidget"
+    >
+        <widget-data-table :loading="state.loading"
+                           :fields="state.tableFields"
+                           :items="state.tableItems"
+                           :currency="state.currency"
+                           :currency-rates="props.currencyRates"
+                           @update:this-page="handleUpdateThisPage"
+        >
+            <template #col-target="{value}">
+                {{ targetTextFormatter(value) }}
+            </template>
+            <template #col-progress="{value}">
+                <p-progress-bar size="lg"
+                                :percentage="value"
+                />
+            </template>
+        </widget-data-table>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .budget-usage-by-target {

@@ -1,5 +1,44 @@
+<script lang="ts" setup>
+
+import { PSelectDropdown } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import {
+    computed,
+    reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
+interface Props {
+    printMode: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    printMode: false,
+});
+const emit = defineEmits<{(e: 'update', value: Currency): void}>();
+const store = useStore();
+
+const state = reactive({
+    currency: computed(() => store.state.settings.currency),
+    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        type: 'item',
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
+});
+
+const handleSelectCurrency = (currency) => {
+    store.commit('settings/setCurrency', currency);
+    emit('update', currency);
+};
+
+</script>
+
 <template>
-    <p-select-dropdown :items="currencyItems"
+    <p-select-dropdown :items="state.currencyItems"
                        :selected="currency"
                        style-type="transparent"
                        :read-only="printMode"
@@ -8,54 +47,6 @@
                        @select="handleSelectCurrency"
     />
 </template>
-
-<script lang="ts">
-
-import {
-    computed,
-    reactive, toRefs,
-} from 'vue';
-
-import { PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-
-import { store } from '@/store';
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-
-export default {
-    name: 'CurrencySelectDropdown',
-    components: {
-        PSelectDropdown,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            currency: computed(() => store.state.settings.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-                type: 'item',
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-            }))),
-        });
-
-        const handleSelectCurrency = (currency) => {
-            store.commit('settings/setCurrency', currency);
-            emit('update', currency);
-        };
-
-        return {
-            ...toRefs(state),
-            handleSelectCurrency,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */

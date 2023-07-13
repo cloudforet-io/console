@@ -1,66 +1,19 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="aws-data-transfer-by-region"
-                  @refresh="refreshWidget"
-    >
-        <template #header-right>
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
-                               :legends="state.legends"
-                               :color-set="colorSet"
-                               show-legend
-                               disable-toggle
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router/types/router';
-
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -90,6 +43,7 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { CostAnalyzeDataModel, Legend } from '@/services/dashboards/widgets/type';
 
 
+
 type Data = CostAnalyzeDataModel['results'];
 interface FullData {
     results: Data;
@@ -112,6 +66,8 @@ const USAGE_SOURCE_UNIT = 'GB';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const props = defineProps<WidgetProps>();
+const store = useStore();
+
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
@@ -140,9 +96,9 @@ const state = reactive({
         start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
@@ -152,8 +108,8 @@ const state = reactive({
                 provider: ['aws'],
                 product: ['AWSDataTransfer'],
             }),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 const storeState = reactive({
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -319,6 +275,51 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="aws-data-transfer-by-region"
+                  @refresh="refreshWidget"
+    >
+        <template #header-right>
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               :legends="state.legends"
+                               :color-set="colorSet"
+                               show-legend
+                               disable-toggle
+                               @update:this-page="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .aws-data-transfer-by-region {
     .data-container {

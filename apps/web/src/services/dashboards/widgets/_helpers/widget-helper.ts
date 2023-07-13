@@ -1,6 +1,6 @@
-import type { AsyncComponent } from 'vue';
-
 import { mergeWith } from 'lodash';
+import type { Component } from 'vue';
+
 
 import type {
     BaseConfigInfo, WidgetConfig,
@@ -66,7 +66,7 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
     return consoleWidgetConfigCacheMap.get(widgetConfigId) as WidgetConfig;
 };
 
-export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
+export const getWidgetComponent = (widgetConfigId: string): Component => {
     const config = getWidgetConfig(widgetConfigId);
     if (!config) throw new Error(`No matching widget configuration found. ${widgetConfigId} does not exist.`);
     const widgetComponent = config.widget_component;

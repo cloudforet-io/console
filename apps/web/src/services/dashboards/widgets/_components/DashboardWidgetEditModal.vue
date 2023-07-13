@@ -1,24 +1,9 @@
-<template>
-    <p-button-modal class="dashboard-widget-edit-modal"
-                    :visible.sync="state.proxyVisible"
-                    :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
-                    :disabled="!widgetFormState.isValid"
-                    size="sm"
-                    @confirm="handleEditModalConfirm"
-    >
-        <template #body>
-            <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
-                                         :widget-key="props.widgetKey"
-            />
-        </template>
-    </p-button-modal>
-</template>
 <script setup lang="ts">
-import { defineEmits, reactive } from 'vue';
-
 import {
     PButtonModal,
 } from '@spaceone/design-system';
+import { defineEmits, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -26,7 +11,6 @@ import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-wid
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
-
 
 interface Props {
     visible: boolean;
@@ -39,6 +23,8 @@ interface EmitFn {
 }
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
+const { t } = useI18n();
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -60,3 +46,19 @@ const handleEditModalConfirm = () => {
     emit('refresh');
 };
 </script>
+
+<template>
+    <p-button-modal v-model:visible="state.proxyVisible"
+                    class="dashboard-widget-edit-modal"
+                    :header-title="t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
+                    :disabled="!widgetFormState.isValid"
+                    size="sm"
+                    @confirm="handleEditModalConfirm"
+    >
+        <template #body>
+            <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
+                                         :widget-key="props.widgetKey"
+            />
+        </template>
+    </p-button-modal>
+</template>

@@ -1,183 +1,14 @@
-<template>
-    <div class="widget-data-table">
-        <p-data-loader class="table-container"
-                       :loading="props.loading"
-                       :data="props.items"
-                       :loader-backdrop-opacity="1"
-                       disable-empty-case
-        >
-            <template #default="{isEmpty}">
-                <table :class="{'ellipsis-table': !props.disableEllipsis }">
-                    <thead>
-                        <tr>
-                            <th v-for="(field, fieldColIndex) in props.fields"
-                                :key="`th-${props.widgetKey}-${fieldColIndex}`"
-                                :style="{
-                                    minWidth: field.width || undefined,
-                                    width: field.width || undefined,
-                                }"
-                            >
-                                <slot :name="`th-${field.name}`"
-                                      v-bind="getHeadSlotProps(field, fieldColIndex)"
-                                >
-                                    <span class="th-contents"
-                                          :class="{
-                                              [field?.textAlign || 'left']: true,
-                                              'has-icon': field.tooltipText,
-                                          }"
-                                    >
-                                        <span class="th-text">
-                                            <slot :name="`th-${field.name}-text`"
-                                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
-                                            >
-                                                {{ field.label ? field.label : field.name }}
-                                            </slot>
-                                            <template v-if="field.tooltipText">
-                                                <p-tooltip :contents="field.tooltipText">
-                                                    <p-i name="ic_question-mark-circle-filled"
-                                                         width="0.875rem"
-                                                         height="0.875rem"
-                                                         :color="gray[300]"
-                                                         class="tooltip-icon"
-                                                    />
-                                                </p-tooltip>
-                                            </template>
-                                        </span>
-                                    </span>
-                                </slot>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody ref="tbodyRef">
-                        <p-empty v-if="isEmpty"
-                                 class="no-data-wrapper"
-                                 :colspan="props.fields.length"
-                        >
-                            {{ $t('DASHBOARDS.WIDGET.NO_DATA') }}
-                        </p-empty>
-                        <slot v-else
-                              name="body"
-                              :items="props.items"
-                              v-bind="{fields: props.fields}"
-                        >
-                            <tr v-for="(item, rowIndex) in props.items"
-                                :key="`tr-${props.widgetKey}-${rowIndex}`"
-                                :data-index="rowIndex"
-                                @click="handleClickRow({rowIndex, item})"
-                            >
-                                <td v-for="(field, colIndex) in props.fields"
-                                    :key="`td-${props.widgetKey}-${rowIndex}-${colIndex}`"
-                                    :class="{
-                                        'has-width': !!field.width,
-                                        [field?.textAlign || 'left']: true,
-                                        [props.size]: true,
-                                        'link-item': field?.link,
-                                        'detail-item': field?.detailOptions?.enabled,
-                                    }"
-                                >
-                                    <slot :name="`col-${field.name}`"
-                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                    >
-                                        <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
-                                        >
-                                            <div class="detail-item-wrapper">
-                                                <span ref="labelRef"
-                                                      class="td-contents"
-                                                >
-                                                    <template v-if="colIndex === 0 && props.showLegend">
-                                                        <p-status v-if="props.showLegend"
-                                                                  class="toggle-button"
-                                                                  :class="{ 'disable-toggle': disableToggle }"
-                                                                  :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
-                                                                  :icon-color="getLegendIconColor(rowIndex)"
-                                                                  :text-color="getLegendTextColor(rowIndex)"
-                                                                  @click.stop="handleClickLegend(rowIndex)"
-                                                        />
-                                                    </template>
-                                                    <template v-if="field?.icon">
-                                                        <p-i :name="getHandler(field.icon, item)"
-                                                             width="1rem"
-                                                             height="1rem"
-                                                             class="icon"
-                                                        />
-                                                    </template>
-
-                                                    <slot :name="`col-${field.name}-text`"
-                                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                                    >
-                                                        <router-link v-if="getHandler(field.link, item)"
-                                                                     :to="getHandler(field.link, item)"
-                                                                     class="link"
-                                                                     :class="{'ellipsis-box': !props.disableEllipsis }"
-                                                        >
-                                                            {{ getValue(item, field) }}
-                                                        </router-link>
-                                                        <div v-else-if="getHandler(field.rapidIncrease, item)"
-                                                             class="rapid-increase"
-                                                        ><span>{{ getValue(item, field) }}</span> <p-i name="ic_arrow-up-bold-alt"
-                                                                                                       width="1rem"
-                                                                                                       height="1rem"
-                                                        />
-                                                        </div>
-                                                        <span v-else
-                                                              class="common-text-box"
-                                                              :class="{'ellipsis-box': !props.disableEllipsis }"
-                                                        >{{ getValue(item, field) }}</span>
-                                                    </slot>
-                                                </span>
-                                                <template v-if="field?.detailOptions?.enabled">
-                                                    <p-popover position="bottom">
-                                                        <span class="detail">{{ $t('DASHBOARDS.WIDGET.DETAILS') }}</span>
-                                                        <template #content>
-                                                            <div class="popover-content">
-                                                                <slot :name="`detail-${field.name}`"
-                                                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                                                />
-                                                            </div>
-                                                        </template>
-                                                    </p-popover>
-                                                </template>
-                                            </div>
-                                        </p-tooltip>
-                                    </slot>
-                                </td>
-                            </tr>
-                        </slot>
-                    </tbody>
-                    <tfoot>
-                        <slot name="foot" />
-                    </tfoot>
-                </table>
-            </template>
-        </p-data-loader>
-        <div v-if="!props.disablePagination"
-             class="table-pagination-wrapper"
-        >
-            <p-text-pagination :this-page.sync="state.proxyThisPage"
-                               :disable-next-page="!props.showNextPage"
-            >
-                <template #default>
-                    <span class="this-page">{{ state.proxyThisPage }}</span>
-                    <span v-if="props.showNextPage"> / ...</span>
-                </template>
-            </p-text-pagination>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    defineProps, reactive, ref,
-} from 'vue';
-
+import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import { cloneDeep } from 'lodash';
-
-import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
+import {
+    defineProps, reactive, ref,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 import { CURRENCY } from '@/store/modules/settings/config';
@@ -195,6 +26,11 @@ import type {
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
 import type { Legend } from '@/services/dashboards/widgets/type';
+
+interface RowData {
+    rowIndex: number;
+    item: WidgetTableData | any;
+}
 
 interface Props {
     loading: boolean;
@@ -229,7 +65,13 @@ const props = withDefaults(defineProps<Props>(), {
     colorSet: () => [],
     disableEllipsis: false,
 });
-const emit = defineEmits<{(e: string, value: any): void}>();
+const emit = defineEmits<{(e: 'thisPage', value: number): void;
+    (e: 'legends', value: Legend[]): void;
+    (e: 'toggle-legend', value: number): void;
+    (e: 'click-row', value: RowData): void;
+}>();
+const { t } = useI18n();
+
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     proxyLegend: useProxyValue('legends', props, emit),
@@ -336,6 +178,174 @@ const handleClickRow = (rowData) => {
     emit('click-row', rowData);
 };
 </script>
+
+<template>
+    <div class="widget-data-table">
+        <p-data-loader class="table-container"
+                       :loading="props.loading"
+                       :data="props.items"
+                       :loader-backdrop-opacity="1"
+                       disable-empty-case
+        >
+            <template #default="{isEmpty}">
+                <table :class="{'ellipsis-table': !props.disableEllipsis }">
+                    <thead>
+                        <tr>
+                            <th v-for="(field, fieldColIndex) in props.fields"
+                                :key="`th-${props.widgetKey}-${fieldColIndex}`"
+                                :style="{
+                                    minWidth: field.width || undefined,
+                                    width: field.width || undefined,
+                                }"
+                            >
+                                <slot :name="`th-${field.name}`"
+                                      v-bind="getHeadSlotProps(field, fieldColIndex)"
+                                >
+                                    <span class="th-contents"
+                                          :class="{
+                                              [field?.textAlign || 'left']: true,
+                                              'has-icon': field.tooltipText,
+                                          }"
+                                    >
+                                        <span class="th-text">
+                                            <slot :name="`th-${field.name}-text`"
+                                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
+                                            >
+                                                {{ field.label ? field.label : field.name }}
+                                            </slot>
+                                            <template v-if="field.tooltipText">
+                                                <p-tooltip :contents="field.tooltipText">
+                                                    <p-i name="ic_question-mark-circle-filled"
+                                                         width="0.875rem"
+                                                         height="0.875rem"
+                                                         :color="gray[300]"
+                                                         class="tooltip-icon"
+                                                    />
+                                                </p-tooltip>
+                                            </template>
+                                        </span>
+                                    </span>
+                                </slot>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody ref="tbodyRef">
+                        <p-empty v-if="isEmpty"
+                                 class="no-data-wrapper"
+                                 :colspan="props.fields.length"
+                        >
+                            {{ t('DASHBOARDS.WIDGET.NO_DATA') }}
+                        </p-empty>
+                        <slot v-else
+                              name="body"
+                              :items="props.items"
+                              v-bind="{fields: props.fields}"
+                        >
+                            <tr v-for="(item, rowIndex) in props.items"
+                                :key="`tr-${props.widgetKey}-${rowIndex}`"
+                                :data-index="rowIndex"
+                                @click="handleClickRow({rowIndex, item})"
+                            >
+                                <td v-for="(field, colIndex) in props.fields"
+                                    :key="`td-${props.widgetKey}-${rowIndex}-${colIndex}`"
+                                    :class="{
+                                        'has-width': !!field.width,
+                                        [field?.textAlign || 'left']: true,
+                                        [props.size]: true,
+                                        'link-item': field?.link,
+                                        'detail-item': field?.detailOptions?.enabled,
+                                    }"
+                                >
+                                    <slot :name="`col-${field.name}`"
+                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                    >
+                                        <p-tooltip position="bottom"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
+                                        >
+                                            <div class="detail-item-wrapper">
+                                                <span ref="labelRef"
+                                                      class="td-contents"
+                                                >
+                                                    <template v-if="colIndex === 0 && props.showLegend">
+                                                        <p-status v-if="props.showLegend"
+                                                                  class="toggle-button"
+                                                                  :class="{ 'disable-toggle': disableToggle }"
+                                                                  :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
+                                                                  :icon-color="getLegendIconColor(rowIndex)"
+                                                                  :text-color="getLegendTextColor(rowIndex)"
+                                                                  @click.stop="handleClickLegend(rowIndex)"
+                                                        />
+                                                    </template>
+                                                    <template v-if="field?.icon">
+                                                        <p-i :name="getHandler(field.icon, item)"
+                                                             width="1rem"
+                                                             height="1rem"
+                                                             class="icon"
+                                                        />
+                                                    </template>
+
+                                                    <slot :name="`col-${field.name}-text`"
+                                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                    >
+                                                        <router-link v-if="getHandler(field.link, item)"
+                                                                     :to="getHandler(field.link, item)"
+                                                                     class="link"
+                                                                     :class="{'ellipsis-box': !props.disableEllipsis }"
+                                                        >
+                                                            {{ getValue(item, field) }}
+                                                        </router-link>
+                                                        <div v-else-if="getHandler(field.rapidIncrease, item)"
+                                                             class="rapid-increase"
+                                                        ><span>{{ getValue(item, field) }}</span> <p-i name="ic_arrow-up-bold-alt"
+                                                                                                       width="1rem"
+                                                                                                       height="1rem"
+                                                        />
+                                                        </div>
+                                                        <span v-else
+                                                              class="common-text-box"
+                                                              :class="{'ellipsis-box': !props.disableEllipsis }"
+                                                        >{{ getValue(item, field) }}</span>
+                                                    </slot>
+                                                </span>
+                                                <template v-if="field?.detailOptions?.enabled">
+                                                    <p-popover position="bottom">
+                                                        <span class="detail">{{ t('DASHBOARDS.WIDGET.DETAILS') }}</span>
+                                                        <template #content>
+                                                            <div class="popover-content">
+                                                                <slot :name="`detail-${field.name}`"
+                                                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                                />
+                                                            </div>
+                                                        </template>
+                                                    </p-popover>
+                                                </template>
+                                            </div>
+                                        </p-tooltip>
+                                    </slot>
+                                </td>
+                            </tr>
+                        </slot>
+                    </tbody>
+                    <tfoot>
+                        <slot name="foot" />
+                    </tfoot>
+                </table>
+            </template>
+        </p-data-loader>
+        <div v-if="!props.disablePagination"
+             class="table-pagination-wrapper"
+        >
+            <p-text-pagination v-model:this-page="state.proxyThisPage"
+                               :disable-next-page="!props.showNextPage"
+            >
+                <template #default>
+                    <span class="this-page">{{ state.proxyThisPage }}</span>
+                    <span v-if="props.showNextPage"> / ...</span>
+                </template>
+            </p-text-pagination>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .widget-data-table {

@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 
-import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/type';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 export const useWidgetFrameProps = (props: any, state: any):ComputedRef => computed<Partial<WidgetFrameProps>>(() => ({

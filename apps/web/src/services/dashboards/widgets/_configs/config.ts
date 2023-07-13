@@ -1,8 +1,8 @@
-import type { AsyncComponent } from 'vue';
-
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import type { Component } from 'vue';
+
+
 
 import type { Tags } from '@/models';
 
@@ -82,7 +82,7 @@ export interface BaseConfigInfo {
 }
 export interface BaseWidgetConfig {
     widget_config_id: string;
-    widget_component?: AsyncComponent;
+    widget_component?: Component;
     base_configs?: BaseConfigInfo[];
     title?: string;
     // labels?: string[];

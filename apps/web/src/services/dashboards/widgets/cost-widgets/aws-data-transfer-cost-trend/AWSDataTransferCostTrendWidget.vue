@@ -1,63 +1,16 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  refresh-on-resize
-                  class="aws-data-transfer-cost-trend"
-                  @refresh="handleRefresh"
-    >
-        <template v-if="state.selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               disable-ellipsis
-                               disable-pagination
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
-
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ComputedRef } from 'vue';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -94,7 +47,7 @@ type Data = CostAnalyzeDataModel['results'];
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 const USAGE_SOURCE_UNIT = 'GB';
-const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc'>, TranslateResult> = {
+const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc'>, string> = {
     'data-transfer.out': 'Transfer-out',
     'data-transfer.in': 'Transfer-in',
     'data-transfer.etc': 'etc.',
@@ -134,16 +87,16 @@ const state = reactive({
         return { start, end };
     }),
     legends: [] as Legend[],
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -299,6 +252,50 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
+                  class="aws-data-transfer-cost-trend"
+                  @refresh="handleRefresh"
+    >
+        <template v-if="state.selectorItems.length"
+                  #header-right
+        >
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table v-model:legends="state.legends"
+                               :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="allReferenceTypeInfo"
+                               :color-set="colorSet"
+                               disable-ellipsis
+                               disable-pagination
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {

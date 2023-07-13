@@ -1,53 +1,19 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="count-of-findings-widget"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
-                                   :disable-next-page="!state.showNextPage"
-                                   @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ state.thisPage }}</span>
-                        <span v-if="state.showNextPage"> / ...</span>
-                    </template>
-                </p-text-pagination>
-            </div>
-        </div>
-    </widget-frame>
-</template>
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
-} from 'vue';
 
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PTextPagination } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
@@ -225,7 +191,7 @@ const drawChart = (chartData) => {
             });
         });
         series.columns.template.onPrivate(('width'), (width, target) => {
-            array.each(target?.dataItem?.bullets, (bullet) => {
+            array.each(target?.dataItem?.bullets ?? [], (bullet) => {
                 if ((width !== undefined) && width < 30) {
                     bullet.get('sprite').hide();
                 }
@@ -278,6 +244,40 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="count-of-findings-widget"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <div class="table-pagination-wrapper">
+                <p-text-pagination :this-page="state.thisPage"
+                                   :disable-next-page="!state.showNextPage"
+                                   @update:this-page="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ state.thisPage }}</span>
+                        <span v-if="state.showNextPage"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </div>
+        </div>
+    </widget-frame>
+</template>
 <style lang="postcss" scoped>
 .count-of-findings-widget {
     &.full {

@@ -1,13 +1,11 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import dayjs from 'dayjs';
+import { flattenDeep, isEmpty, merge } from 'lodash';
 import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
-
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
-import { flattenDeep, isEmpty, merge } from 'lodash';
-
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -26,6 +24,8 @@ import type {
     WidgetFiltersMap,
     WidgetFilter,
     DashboardLayoutWidgetInfo,
+    CostWidgetOptions,
+    AssetWidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -175,8 +175,8 @@ export function useWidgetState<Data = any>(
             return undefined;
         }),
         groupBy: computed(() => {
-            if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_group_by;
-            if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_group_by;
+            if (state.widgetConfig.labels?.includes('Cost')) return (state.options as CostWidgetOptions)?.cost_group_by;
+            if (state.widgetConfig.labels?.includes('Asset')) return (state.options as AssetWidgetOptions)?.asset_group_by;
             return undefined;
         }),
         granularity: computed(() => state.options?.granularity),
@@ -200,8 +200,8 @@ export function useWidgetState<Data = any>(
         })),
         data: undefined as Data|undefined,
         selectorItems: computed<MenuItem[]>(() => {
-            if (!state.options?.selector_options?.enabled) return [];
-            if (state.options?.selector_options.type === 'cost-usage') {
+            if (!(state.options as CostWidgetOptions)?.selector_options?.enabled) return [];
+            if ((state.options as CostWidgetOptions)?.selector_options?.type === 'cost-usage') {
                 if (!state.selectedSelectorType) state.selectedSelectorType = 'cost';
                 return [
                     { type: 'item', name: 'cost', label: 'Cost' },

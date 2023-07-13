@@ -1,63 +1,20 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="base-pie-widget"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                    <template #loader>
-                        <p-skeleton width="155px"
-                                    height="155px"
-                        />
-                    </template>
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results: []"
-                               :legends.sync="state.legends"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more: false"
-                               :color-set="colorSet"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               show-legend
-                               @toggle-legend="handleToggleLegend"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
+
+import { color } from '@amcharts/amcharts5';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
+import dayjs from 'dayjs';
 import {
     computed,
     defineExpose,
     defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
-
-import { color } from '@amcharts/amcharts5';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
-import dayjs from 'dayjs';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
@@ -136,16 +93,16 @@ const state = reactive({
         start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -271,6 +228,48 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="base-pie-widget"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <template #loader>
+                        <p-skeleton width="155px"
+                                    height="155px"
+                        />
+                    </template>
+                </p-data-loader>
+            </div>
+            <widget-data-table v-model:legends="state.legends"
+                               :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results: []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more: false"
+                               :color-set="colorSet"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               show-legend
+                               @toggle-legend="handleToggleLegend"
+                               @update:this-page="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style scoped lang="postcss">
 .base-pie-widget {

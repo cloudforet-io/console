@@ -1,41 +1,17 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  @refresh="handleRefresh"
-    >
-        <div class="cost-map">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               :loader-backdrop-opacity="1"
-                               loader-type="skeleton"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { PDataLoader } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
+import dayjs from 'dayjs';
 import {
     computed,
     defineExpose,
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
-
-import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
-import dayjs from 'dayjs';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -86,16 +62,16 @@ const state = reactive({
         const start = state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM');
         return { start, end };
     }),
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -245,6 +221,28 @@ defineExpose<WidgetExpose<TreemapChartData['children']>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  @refresh="handleRefresh"
+    >
+        <div class="cost-map">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               loader-type="skeleton"
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .cost-map {
     padding-bottom: 1.25rem;

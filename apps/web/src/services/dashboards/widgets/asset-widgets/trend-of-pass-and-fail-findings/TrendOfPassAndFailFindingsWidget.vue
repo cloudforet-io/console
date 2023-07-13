@@ -1,53 +1,17 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="trend-of-pass-and-fail-findings"
-                  refresh-on-resize
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading || state.tableLoading"
-                               :fields="state.tableFields"
-                               :items="state.tableData.results"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.tableData.more"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
-} from 'vue';
 
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
@@ -331,6 +295,41 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="trend-of-pass-and-fail-findings"
+                  refresh-on-resize
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table v-model:legends="state.legends"
+                               :loading="state.loading || state.tableLoading"
+                               :fields="state.tableFields"
+                               :items="state.tableData.results"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :color-set="colorSet"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.tableData.more"
+                               @update:this-page="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .trend-of-pass-and-fail-findings {

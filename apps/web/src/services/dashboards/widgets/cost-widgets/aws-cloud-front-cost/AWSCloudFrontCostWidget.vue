@@ -1,66 +1,21 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="aws-cloud-front-cost"
-                  @refresh="handleRefresh"
-    >
-        <template v-if="state.selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
+import { byteFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-
-import { byteFormatter } from '@cloudforet/core-lib';
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import type { RouteLocation } from 'vue-router';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
@@ -145,9 +100,9 @@ const state = reactive({
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
@@ -157,8 +112,8 @@ const state = reactive({
                 provider: ['aws'],
                 product: ['AmazonCloudFront'],
             }),
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -317,6 +272,51 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="aws-cloud-front-cost"
+                  @refresh="handleRefresh"
+    >
+        <template v-if="state.selectorItems.length"
+                  #header-right
+        >
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+
+            <widget-data-table v-model:legends="state.legends"
+                               :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :color-set="colorSet"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               @update:this-page="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {
     .data-container {

@@ -1,101 +1,7 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="total-failure-and-severity"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="summary-wrapper">
-                <div class="left-wrapper">
-                    <p class="title">
-                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
-                    </p>
-                    <p class="value">
-                        {{ state.totalFailureCount === undefined ? '--' : commaFormatter(state.totalFailureCount) }}
-                    </p>
-                    <div v-if="state.totalFailureComparingMessage"
-                         class="diff-wrapper"
-                    >
-                        <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                             :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
-                        />
-                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
-                        <span class="diff-text">{{ state.totalFailureComparingMessage }}</span>
-                    </div>
-                </div>
-                <p-divider :vertical="true" />
-                <div class="right-wrapper">
-                    <p class="title">
-                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
-                    </p>
-                    <p class="value">
-                        {{ state.failureRate === undefined ? '--' : commaFormatter(state.failureRate) }}%
-                    </p>
-                    <div v-if="state.failureRateComparingMessage"
-                         class="diff-wrapper"
-                    >
-                        <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                             :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
-                        />
-                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
-                        <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <div class="severity-wrapper">
-                <p class="title">
-                    {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.SEVERITY') }}
-                </p>
-                <div class="box-wrapper">
-                    <div v-for="(data, idx) in state.severityData"
-                         :key="`severity-status-box-${idx}`"
-                         class="severity-status-box"
-                         :style="{'background-color': `rgba(${data.rgb.r}, ${data.rgb.g}, ${data.rgb.b}, 0.4)`}"
-                    >
-                        <div class="content-wrapper">
-                            <p class="status-title">
-                                {{ data.label }}
-                            </p>
-                            <p class="status-content">
-                                <span class="status-value">{{ data.value }}</span>
-                                <span v-if="data.diff"
-                                      class="status-rate"
-                                >
-                                    <p-i :name="data.diff > 0 ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                                         :color="data.diff > 0 ? red[500] : green[500]"
-                                         width="1.5rem"
-                                         height="1.5rem"
-                                    />
-                                    <span class="status-rate-value">{{ Math.abs(data.diff) }}</span>
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </widget-frame>
-</template>
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
+import { getRGBFromHex, commaFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
@@ -103,12 +9,12 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
-
-import { getRGBFromHex, commaFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { i18n } from '@/translations';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -152,6 +58,8 @@ const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
+const { t } = useI18n();
+
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
@@ -202,9 +110,9 @@ const state = reactive({
             || state.totalFailureCount === state.prevTotalFailureCount
         ) return undefined;
         if (state.prevTotalFailureCount < state.totalFailureCount) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
+            return t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
+        return t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
     }),
     prevFailureRate: computed<number|undefined>(() => {
         if (!state.data?.realtimeData.length) return undefined;
@@ -223,9 +131,9 @@ const state = reactive({
             || state.failureRate === state.prevFailureRate
         ) return undefined;
         if (state.prevFailureRate < state.failureRate) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
+            return t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
+        return t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
     }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -377,6 +285,99 @@ defineExpose<WidgetExpose>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="total-failure-and-severity"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="summary-wrapper">
+                <div class="left-wrapper">
+                    <p class="title">
+                        {{ t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
+                    </p>
+                    <p class="value">
+                        {{ state.totalFailureCount === undefined ? '--' : commaFormatter(state.totalFailureCount) }}
+                    </p>
+                    <div v-if="state.totalFailureComparingMessage"
+                         class="diff-wrapper"
+                    >
+                        <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                             :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
+                        />
+                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
+                        <span class="diff-text">{{ state.totalFailureComparingMessage }}</span>
+                    </div>
+                </div>
+                <p-divider :vertical="true" />
+                <div class="right-wrapper">
+                    <p class="title">
+                        {{ t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
+                    </p>
+                    <p class="value">
+                        {{ state.failureRate === undefined ? '--' : commaFormatter(state.failureRate) }}%
+                    </p>
+                    <div v-if="state.failureRateComparingMessage"
+                         class="diff-wrapper"
+                    >
+                        <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                             :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
+                        />
+                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
+                        <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <div class="severity-wrapper">
+                <p class="title">
+                    {{ t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.SEVERITY') }}
+                </p>
+                <div class="box-wrapper">
+                    <div v-for="(data, idx) in state.severityData"
+                         :key="`severity-status-box-${idx}`"
+                         class="severity-status-box"
+                         :style="{'background-color': `rgba(${data.rgb.r}, ${data.rgb.g}, ${data.rgb.b}, 0.4)`}"
+                    >
+                        <div class="content-wrapper">
+                            <p class="status-title">
+                                {{ data.label }}
+                            </p>
+                            <p class="status-content">
+                                <span class="status-value">{{ data.value }}</span>
+                                <span v-if="data.diff"
+                                      class="status-rate"
+                                >
+                                    <p-i :name="data.diff > 0 ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                                         :color="data.diff > 0 ? red[500] : green[500]"
+                                         width="1.5rem"
+                                         height="1.5rem"
+                                    />
+                                    <span class="status-rate-value">{{ Math.abs(data.diff) }}</span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .total-failure-and-severity {
     .data-container {

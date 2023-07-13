@@ -1,145 +1,26 @@
-<template>
-    <div class="widget-frame"
-         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
-    >
-        <div class="widget-header">
-            <h3 class="title">
-                {{ props.title }}
-            </h3><slot name="header-right" />
-        </div>
-        <div class="body"
-             :style="{overflowY: props.overflowY}"
-        >
-            <slot v-if="!props.errorMode" />
-            <div v-else
-                 class="error-container"
-            >
-                <div class="error-title">
-                    <span class="error-icon-wrapper">
-                        <p-i name="ic_error-filled"
-                             height="1.5rem"
-                             width="1.5rem"
-                             color="inherit"
-                        />
-                    </span>
-                    <span>{{ $t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
-                </div>
-                <span class="error-message">
-                    {{ $t("DASHBOARDS.WIDGET.ERROR_MSG") }}
-                </span>
-                <p-button class="edit-button"
-                          style-type="tertiary"
-                          @click="handleEditButtonClick"
-                >
-                    {{ $t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
-                </p-button>
-            </div>
-        </div>
-        <div class="widget-footer">
-            <div class="widget-footer-wrapper">
-                <div class="footer-left">
-                    <label v-if="state.dateLabel"
-                           class="widget-footer-label"
-                    >{{ state.dateLabel }}</label>
-                    <p-divider v-if="state.isDivided"
-                               :vertical="true"
-                    />
-                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
-                </div>
-                <div class="footer-right">
-                    <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode"
-                                  :href="props.widgetLink"
-                                  :to="props.widgetLocation"
-                                  class="anchor-button"
-                                  icon-name="ic_chevron-right"
-                        >
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        </p-anchor>
-                    </slot>
-                </div>
-            </div>
-        </div>
-        <div v-if="props.editMode"
-             class="edit-mode-cover"
-        >
-            <div class="button-group">
-                <template v-for="icon in state.editModeIconButtonList">
-                    <p-icon-button v-if="icon.isAvailable"
-                                   :key="`${icon.name}-${getUUID()}`"
-                                   :name="icon.name"
-                                   shape="square"
-                                   style-type="tertiary"
-                                   @click="icon.handleClick"
-                    />
-                </template>
-            </div>
-        </div>
-        <delete-modal :visible.sync="state.visibleDeleteModal"
-                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
-                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
-                      @confirm="handleDeleteModalConfirm"
-        />
-        <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
-                                     :visible.sync="state.visibleEditModal"
-                                     :widget-key="props.widgetKey"
-                                     @refresh="emit('refresh')"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import {
-    reactive, computed,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
-
 import {
     PAnchor, PButton, PDivider, PIconButton, PI,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    reactive, computed,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 
-import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/type';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-
-interface WidgetFrameProps {
-    title: TranslateResult;
-    size: WidgetSize;
-    width?: number;
-    widgetLink?: string;
-    widgetLocation?: Location;
-    widgetConfigId?: string;
-    dateRange?: DateRange;
-    noData?: boolean;
-    printMode?: boolean;
-    selectedDates?: string[];
-    currency?: Currency;
-    editMode?: boolean;
-    errorMode?: boolean;
-    disableExpandIcon?: boolean;
-    disableEditIcon?: boolean;
-    disableDeleteIcon?: boolean;
-    disableFullSize?: boolean;
-    isOnlyFullSize?: boolean;
-    widgetKey: string;
-    overflowY?: string;
-    refreshOnResize?: boolean;
-}
 
 interface IconConfig {
     isAvailable: boolean;
@@ -159,7 +40,8 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     overflowY: undefined,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits<{(e: 'refresh'): void}>();
+const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const state = reactive({
@@ -181,8 +63,8 @@ const state = reactive({
         if (start && !endDayjs) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
-            if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
-            if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
+            if (diff < 1) return t('DASHBOARDS.WIDGET.DATE_TODAY');
+            if (diff >= 6 && diff < 7) return t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
             return i18nDayjs.value(start).from(today.subtract(1, 'day'));
         }
         return undefined;
@@ -220,7 +102,101 @@ const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
 };
+const handleRefresh = () => {
+    emit('refresh');
+};
 </script>
+
+<template>
+    <div class="widget-frame"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
+         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
+    >
+        <div class="widget-header">
+            <h3 class="title">
+                {{ props.title }}
+            </h3><slot name="header-right" />
+        </div>
+        <div class="body"
+             :style="{overflowY: props.overflowY}"
+        >
+            <slot v-if="!props.errorMode" />
+            <div v-else
+                 class="error-container"
+            >
+                <div class="error-title">
+                    <span class="error-icon-wrapper">
+                        <p-i name="ic_error-filled"
+                             height="1.5rem"
+                             width="1.5rem"
+                             color="inherit"
+                        />
+                    </span>
+                    <span>{{ t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
+                </div>
+                <span class="error-message">
+                    {{ t("DASHBOARDS.WIDGET.ERROR_MSG") }}
+                </span>
+                <p-button class="edit-button"
+                          style-type="tertiary"
+                          @click="handleEditButtonClick"
+                >
+                    {{ t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
+                </p-button>
+            </div>
+        </div>
+        <div class="widget-footer">
+            <div class="widget-footer-wrapper">
+                <div class="footer-left">
+                    <label v-if="state.dateLabel"
+                           class="widget-footer-label"
+                    >{{ state.dateLabel }}</label>
+                    <p-divider v-if="state.isDivided"
+                               :vertical="true"
+                    />
+                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                </div>
+                <div class="footer-right">
+                    <slot name="footer-right">
+                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode"
+                                  :href="props.widgetLink"
+                                  :to="props.widgetLocation"
+                                  class="anchor-button"
+                                  icon-name="ic_chevron-right"
+                        >
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
+                        </p-anchor>
+                    </slot>
+                </div>
+            </div>
+        </div>
+        <div v-if="props.editMode"
+             class="edit-mode-cover"
+        >
+            <div class="button-group">
+                <template v-for="icon in state.editModeIconButtonList">
+                    <p-icon-button v-if="icon.isAvailable"
+                                   :key="`${icon.name}-${getUUID()}`"
+                                   :name="icon.name"
+                                   shape="square"
+                                   style-type="tertiary"
+                                   @click="icon.handleClick"
+                    />
+                </template>
+            </div>
+        </div>
+        <delete-modal v-model:visible="state.visibleDeleteModal"
+                      :header-title="t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
+                      @confirm="handleDeleteModalConfirm"
+        />
+        <dashboard-widget-edit-modal v-model:visible="state.visibleEditModal"
+                                     :widget-config-id="props.widgetConfigId"
+                                     :widget-key="props.widgetKey"
+                                     @refresh="handleRefresh"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .widget-frame {

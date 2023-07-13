@@ -1,67 +1,19 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="budget-status-widget"
-                  @refresh="handleRefresh"
-    >
-        <p-data-loader :loading="state.loading"
-                       class="chart-wrapper"
-                       :loader-backdrop-opacity="1"
-        >
-            <template #loader>
-                <p-skeleton height="100%" />
-            </template>
-            <div class="waffle-chart">
-                <div v-for="colIdx in range(0, 20)"
-                     :key="`status-col-${colIdx}`"
-                     class="status-col-wrapper"
-                >
-                    <template v-for="rowIdx in range(0, 10)">
-                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
-                             :key="`status-box-${colIdx}-${rowIdx}`"
-                             v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
-                             class="box status-box"
-                             :style="{ 'background-color': getColor(rowIdx, colIdx) }"
-                        />
-                        <div v-else
-                             :key="`status-box-${colIdx}-${rowIdx}`"
-                             class="box"
-                        />
-                    </template>
-                </div>
-            </div>
-            <div class="legend-wrapper">
-                <div v-for="legend in state.legends"
-                     :key="`legend-${legend.label}`"
-                     class="legend"
-                >
-                    <span class="legend-icon"
-                          :style="{ 'background-color': legend.color }"
-                    />
-                    {{ legend.label }}
-                </div>
-            </div>
-        </p-data-loader>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
-} from 'vue';
-import type { Location } from 'vue-router/types/router';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { i18n } from '@/translations';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocation } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -84,10 +36,11 @@ const DATE_FORMAT = 'YYYY-MM';
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
+const { t } = useI18n();
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
     legends: computed<Omit<Legend, 'name'>[]>(() => ([
-        { label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
+        { label: t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
         { label: '70-90%', color: indigo[500] },
         { label: '< 70%', color: indigo[100] },
@@ -96,13 +49,13 @@ const state = reactive({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocation>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
+        params: {} as RouteLocation['params'],
         query: {
             filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
+        } as RouteLocation['query'],
+    } as RouteLocation)),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -216,6 +169,53 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="budget-status-widget"
+                  @refresh="handleRefresh"
+    >
+        <p-data-loader :loading="state.loading"
+                       class="chart-wrapper"
+                       :loader-backdrop-opacity="1"
+        >
+            <template #loader>
+                <p-skeleton height="100%" />
+            </template>
+            <div class="waffle-chart">
+                <div v-for="colIdx in range(0, 20)"
+                     :key="`status-col-${colIdx}`"
+                     class="status-col-wrapper"
+                >
+                    <template v-for="rowIdx in range(0, 10)">
+                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
+                             :key="`status-box-${colIdx}-${rowIdx}`"
+                             v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
+                             class="box status-box"
+                             :style="{ 'background-color': getColor(rowIdx, colIdx) }"
+                        />
+                        <div v-else
+                             :key="`status-box-${colIdx}-${rowIdx}`"
+                             class="box"
+                        />
+                    </template>
+                </div>
+            </div>
+            <div class="legend-wrapper">
+                <div v-for="legend in state.legends"
+                     :key="`legend-${legend.label}`"
+                     class="legend"
+                >
+                    <span class="legend-icon"
+                          :style="{ 'background-color': legend.color }"
+                    />
+                    {{ legend.label }}
+                </div>
+            </div>
+        </p-data-loader>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .budget-status-widget {
     .chart-wrapper {

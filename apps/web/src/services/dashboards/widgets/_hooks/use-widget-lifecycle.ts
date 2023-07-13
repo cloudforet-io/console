@@ -1,11 +1,11 @@
+import {
+    cloneDeep, isEmpty, isEqual, union,
+} from 'lodash';
 import type { UnwrapRef } from 'vue';
 import {
     onUnmounted, watch,
 } from 'vue';
 
-import {
-    cloneDeep, isEmpty, isEqual, union,
-} from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -207,7 +207,7 @@ export const useWidgetLifecycle = ({
     if (redrawOnLanguageChange) {
         try {
             if (!redrawChart) throw Error('redrawChart is required');
-            watch(() => i18n.locale, async () => {
+            watch(() => i18n.global.locale, async () => {
                 redrawChart();
             });
         } catch (e) {

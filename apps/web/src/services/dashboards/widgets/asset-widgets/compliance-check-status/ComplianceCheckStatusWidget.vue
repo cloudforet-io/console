@@ -1,92 +1,20 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="compliance-check-status"
-                  @refresh="refreshWidget"
-    >
-        <div class="compliance-check-status">
-            <div class="data-container">
-                <div class="summary-wrapper">
-                    <!--                    <div class="left-wrapper">-->
-                    <!--                        <p class="title">-->
-                    <!--                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
-                    <!--                        </p>-->
-                    <!--                        <p class="value">-->
-                    <!--                            {{ state.accountCount }}-->
-                    <!--                        </p>-->
-                    <!--                    </div>-->
-                    <!--                    <p-divider :vertical="true" />-->
-                    <div class="right-wrapper">
-                        <p class="title">
-                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
-                        </p>
-                        <p class="value">
-                            {{ state.complianceCount === undefined ? '--' : commaFormatter(state.complianceCount) }}
-                        </p>
-                        <div v-if="state.complianceCountComparingMessage"
-                             class="diff-wrapper"
-                        >
-                            <p-i :name="state.prevComplianceCount < state.complianceCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                                 :color="state.prevComplianceCount < state.complianceCount ? red[500] : green[500]"
-                            />
-                            <span class="diff-value">{{ Math.abs(state.complianceCount - state.prevComplianceCount) }}</span>
-                            <span class="diff-text">{{ state.complianceCountComparingMessage }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="chart-wrapper">
-                    <p-data-loader class="chart-loader"
-                                   :loading="state.loading"
-                                   loader-type="skeleton"
-                                   disable-empty-case
-                                   :loader-backdrop-opacity="1"
-                                   show-data-from-scratch
-                    >
-                        <div ref="chartContext"
-                             class="chart"
-                        />
-                    </p-data-loader>
-                    <div class="legend-wrapper">
-                        <div v-for="status in COMPLIANCE_STATUS_MAP_VALUES"
-                             :key="`legend-item-${status.name}`"
-                             class="legend-item"
-                        >
-                            <div class="title">
-                                <div class="square-mark"
-                                     :style="{ backgroundColor: status.color }"
-                                />
-                                <span class="text">{{ status.label }}</span>
-                            </div>
-                            <p class="value">
-                                {{ state.checkCount === undefined ? '--' : commaFormatter(state.checkCount[status.name]) }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
+import { commaFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PI } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
-
-import { commaFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { i18n } from '@/translations';
+import {
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+} from 'vue';
+import type { ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
@@ -134,6 +62,8 @@ const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
+const { t } = useI18n();
+
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
@@ -189,15 +119,15 @@ const state = reactive({
         const targetDataList = state.data.filter((d) => d.date === state.dateRange.end && d.key === 'compliance_count');
         return sum(targetDataList.map((d) => d.value));
     }),
-    complianceCountComparingMessage: computed<TranslateResult|undefined>(() => {
+    complianceCountComparingMessage: computed<string|undefined>(() => {
         if (state.complianceCount === undefined
             || state.prevComplianceCount === undefined
             || state.complianceCount === state.prevComplianceCount
         ) return undefined;
         if (state.prevComplianceCount < state.complianceCount) {
-            return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH');
+            return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH');
         }
-        return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.LESS_THAN_PREV_MONTH');
+        return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.LESS_THAN_PREV_MONTH');
     }),
     checkCount: computed(() => {
         if (!state.data) return undefined;
@@ -325,7 +255,7 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
 
-    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
 };
 
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
@@ -376,6 +306,76 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="compliance-check-status"
+                  @refresh="refreshWidget"
+    >
+        <div class="compliance-check-status">
+            <div class="data-container">
+                <div class="summary-wrapper">
+                    <!--                    <div class="left-wrapper">-->
+                    <!--                        <p class="title">-->
+                    <!--                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
+                    <!--                        </p>-->
+                    <!--                        <p class="value">-->
+                    <!--                            {{ state.accountCount }}-->
+                    <!--                        </p>-->
+                    <!--                    </div>-->
+                    <!--                    <p-divider :vertical="true" />-->
+                    <div class="right-wrapper">
+                        <p class="title">
+                            {{ t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
+                        </p>
+                        <p class="value">
+                            {{ state.complianceCount === undefined ? '--' : commaFormatter(state.complianceCount) }}
+                        </p>
+                        <div v-if="state.complianceCountComparingMessage"
+                             class="diff-wrapper"
+                        >
+                            <p-i :name="state.prevComplianceCount < state.complianceCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                                 :color="state.prevComplianceCount < state.complianceCount ? red[500] : green[500]"
+                            />
+                            <span class="diff-value">{{ Math.abs(state.complianceCount - state.prevComplianceCount) }}</span>
+                            <span class="diff-text">{{ state.complianceCountComparingMessage }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <p-data-loader class="chart-loader"
+                                   :loading="state.loading"
+                                   loader-type="skeleton"
+                                   disable-empty-case
+                                   :loader-backdrop-opacity="1"
+                                   show-data-from-scratch
+                    >
+                        <div ref="chartContext"
+                             class="chart"
+                        />
+                    </p-data-loader>
+                    <div class="legend-wrapper">
+                        <div v-for="status in COMPLIANCE_STATUS_MAP_VALUES"
+                             :key="`legend-item-${status.name}`"
+                             class="legend-item"
+                        >
+                            <div class="title">
+                                <div class="square-mark"
+                                     :style="{ backgroundColor: status.color }"
+                                />
+                                <span class="text">{{ status.label }}</span>
+                            </div>
+                            <p class="value">
+                                {{ state.checkCount === undefined ? '--' : commaFormatter(state.checkCount[status.name]) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .compliance-check-status {
     .data-container {
