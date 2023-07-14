@@ -2180,6 +2180,11 @@
 				"TAG": "Tag",
 				"VERSION": "Version"
 			},
+			"HISTORY": {
+				"CANCELED": "Canceled",
+				"FAILURE": "Failure",
+				"SUCCESS": "Success"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "Failed to edit schedule.",
 				"ALT_S_EDIT_SCHEDULE": "Schedule successfully edited",
