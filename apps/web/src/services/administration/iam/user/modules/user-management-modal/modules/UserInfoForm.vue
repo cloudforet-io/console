@@ -35,9 +35,10 @@
                 <div v-else
                      class="id-input-form"
                 >
+                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
                     <p-text-input v-model="formState.userId"
                                   v-focus
-                                  :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
+                                  placeholder="user@spaceone.io"
                                   :invalid="invalid"
                                   :valid="validationState.isUserIdValid"
                                   :disabled="userPageState.visibleUpdateModal"
