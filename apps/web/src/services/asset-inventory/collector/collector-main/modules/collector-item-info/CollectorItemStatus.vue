@@ -30,7 +30,7 @@
                             color="inherit"
                         />
                         <p class="description">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
                         </p>
                     </div>
                     <span v-else>

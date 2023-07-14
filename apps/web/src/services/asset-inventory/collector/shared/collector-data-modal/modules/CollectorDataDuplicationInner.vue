@@ -2,7 +2,7 @@
     <div class="collector-data-duplication-inner">
         <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
         <p-definition-table :fields="definitionFields"
-                            :data="tableState.definitionData"
+                            :data="state"
                             :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
                             style-type="white"
                             disable-copy
@@ -20,63 +20,61 @@
             <template #data-duration>
                 <span>{{ state.duration }}</span>
             </template>
-            <template #data-status="{ data }">
-                <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
-                     class="in-progress-wrapper"
-                >
-                    <span class="in-progress-title">
-                        <p-i
-                            name="ic_circle"
-                            height="0.875rem"
-                            width="0.875rem"
-                            animation="spin"
-                        />
-                        <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
-                    </span>
-                    <div class="chart-wrapper">
-                        <div class="label-wrapper">
-                            <div v-if="state.jobTaskStatus.succeeded >= 0">
-                                <p-status :icon-color="SUCCEEDED_COLOR" />
-                                <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
-                                    <strong>{{ state.jobTaskStatus.succeeded }}</strong>
-                                </span>
-                            </div>
-                            <div v-if="state.jobTaskStatus.failed >= 0"
-                                 class="label"
-                            >
-                                <p-status :icon-color="FAILED_COLOR" />
-                                <span :style="{'color': FAILED_COLOR}">
-                                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
-                                    <strong>{{ state.jobTaskStatus.failed }}</strong>
-                                </span>
-                            </div>
-                            <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
-                                <strong>{{ state.jobTaskStatus.total }}</strong>
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <span class="succeeded-bar"
-                                  :style="{ width: `${data.succeededPercentage.value}%` }"
-                            />
-                            <span class="failed-bar"
-                                  :style="{ width: `${data.failedPercentage.value}%` }"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div v-else>
-                    <span class="in-progress-title">
-                        <p-i
-                            name="ic_circle"
-                            height="0.875rem"
-                            width="0.875rem"
-                            animation="spin"
-                        />
-                        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
-                    </span>
-                </div>
-            </template>
         </p-definition-table>
+        <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
+             class="in-progress-wrapper"
+        >
+            <span class="in-progress-title">
+                <p-i
+                    name="ic_circle"
+                    height="0.875rem"
+                    width="0.875rem"
+                    animation="spin"
+                />
+                <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
+            </span>
+            <div class="chart-wrapper">
+                <div class="label-wrapper">
+                    <div v-if="state.jobTaskStatus.succeeded >= 0">
+                        <p-status :icon-color="SUCCEEDED_COLOR" />
+                        <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
+                            <strong>{{ state.jobTaskStatus.succeeded }}</strong>
+                        </span>
+                    </div>
+                    <div v-if="state.jobTaskStatus.failed >= 0"
+                         class="label"
+                    >
+                        <p-status :icon-color="FAILED_COLOR" />
+                        <span :style="{'color': FAILED_COLOR}">
+                            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
+                            <strong>{{ state.jobTaskStatus.failed }}</strong>
+                        </span>
+                    </div>
+                    <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
+                        <strong>{{ state.jobTaskStatus.total }}</strong>
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <span class="succeeded-bar"
+                          :style="{ width: `${state.status.succeededPercentage}%` }"
+                    />
+                    <span class="failed-bar"
+                          :style="{ width: `${state.status.failedPercentage}%` }"
+                    />
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <span class="in-progress-title">
+                <p-i
+                    name="ic_circle"
+                    height="0.875rem"
+                    width="0.875rem"
+                    animation="spin"
+                />
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+            </span>
+        </div>
     </div>
 </template>
 
@@ -96,7 +94,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { coral, green } from '@/styles/colors';
+import { red, green } from '@/styles/colors';
 
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import {
@@ -105,8 +103,8 @@ import {
 import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
-const SUCCEEDED_COLOR = green[400];
-const FAILED_COLOR = coral[400];
+const SUCCEEDED_COLOR = green[500];
+const FAILED_COLOR = red[400];
 
 interface Props {
     item?: CollectorData;
@@ -122,33 +120,10 @@ const collectorDataModalState = collectorDataModalStore.$state;
 const definitionFields = [
     { label: 'Account', name: 'account' },
     { label: 'Duration', name: 'duration' },
-    { label: 'Status', name: 'status' },
 ];
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
-});
-const tableState = reactive({
-    definitionData: computed(() => ({
-        status: {
-            succeededPercentage: computed(() => {
-                if (state.jobTaskStatus.total > 0) {
-                    return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
-                }
-                return 0;
-            }),
-            failedPercentage: computed(() => {
-                if (state.jobTaskStatus.total > 0) {
-                    const status = collectorDataModalState.recentJob.status;
-                    if (status === JOB_STATUS.success || status === JOB_STATUS.created) {
-                        return 100 - tableState.definitionData.status.succeededPercentage;
-                    }
-                    return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
-                }
-                return 0;
-            }),
-        },
-    })),
 });
 const state = reactive({
     jobTaskStatus: {
@@ -157,6 +132,24 @@ const state = reactive({
         total: 0,
     },
     duration: 0,
+    status: {
+        succeededPercentage: computed(() => {
+            if (state.jobTaskStatus.total > 0) {
+                return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
+            }
+            return 0;
+        }),
+        failedPercentage: computed(() => {
+            if (state.jobTaskStatus.total > 0) {
+                const status = collectorDataModalState.recentJob.status;
+                if (status === JOB_STATUS.success || status === JOB_STATUS.created) {
+                    return 100 - state.status.succeededPercentage;
+                }
+                return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
+            }
+            return 0;
+        }),
+    },
 });
 
 /* Query helper */
@@ -200,43 +193,50 @@ const getJobLists = async () => {
     .data-collection-information-table {
         margin-top: 0.5rem;
         min-height: initial;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
         .accounts-wrapper {
             @apply flex items-center;
             gap: 0.5rem;
         }
+    }
+    .in-progress-wrapper {
+        @apply border border-gray-200;
+        border-top: 0;
+        padding: 1rem;
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
         .in-progress-title {
             @apply flex items-center;
             gap: 0.25rem;
         }
-        .in-progress-wrapper {
-            .chart-wrapper {
-                @apply bg-blue-100 rounded-lg;
-                font-size: 0.875rem;
-                margin-top: 0.5rem;
-                padding: 1rem 1.5rem;
-                .label-wrapper {
-                    @apply relative flex text-gray-700;
-                    .label {
-                        margin-left: 0.5rem;
-                    }
-                    .total-text {
-                        @apply absolute;
-                        right: 0;
-                    }
+        .chart-wrapper {
+            @apply bg-blue-100 rounded-lg;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 1rem 1.5rem;
+            .label-wrapper {
+                @apply relative flex text-gray-700;
+                .label {
+                    margin-left: 0.5rem;
                 }
-                .progress-bar {
-                    @apply inline-flex bg-gray-200;
-                    width: 100%;
-                    height: 0.5rem;
-                    margin-top: 0.5rem;
-                    .succeeded-bar {
-                        @apply bg-green-400;
-                        height: 100%;
-                    }
-                    .failed-bar {
-                        @apply bg-coral-400;
-                        height: 100%;
-                    }
+                .total-text {
+                    @apply absolute;
+                    right: 0;
+                }
+            }
+            .progress-bar {
+                @apply inline-flex bg-gray-200;
+                width: 100%;
+                height: 0.5rem;
+                margin-top: 0.5rem;
+                .succeeded-bar {
+                    @apply bg-green-500;
+                    height: 100%;
+                }
+                .failed-bar {
+                    @apply bg-red-400;
+                    height: 100%;
                 }
             }
         }
@@ -251,16 +251,6 @@ const getJobLists = async () => {
             .value-wrapper {
                 flex: 1;
                 max-width: initial;
-            }
-        }
-        &.is-account-type-all {
-            .p-definition:last-child {
-                .key {
-                    display: none;
-                }
-                .value-wrapper {
-                    display: initial;
-                }
             }
         }
     }
