@@ -14,13 +14,13 @@
                 />
             </p-tooltip>
         </p>
-        <div class="jobs-wrapper">
+        <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
             <div class="jobs-contents"
                  @click.stop
             >
                 <collector-job-status-icon v-for="(jobStatus, index) in props.item.recentJobAnalyze"
                                            :key="`job-item-${index}`"
-                                           class="collector-job-status-icon-wrapper"
+                                           :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
                                            :status="jobStatus.status"
                                            :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                            :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
@@ -29,6 +29,7 @@
             <collector-job-status-icon is-arrow
                                        :to="props.item.historyLink"
                                        class="more-button"
+                                       :class="['more-button', { 'is-mobile': isMobile() }]"
                                        :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
             />
         </div>
@@ -42,6 +43,8 @@ import { PTooltip, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
@@ -75,6 +78,28 @@ const storeState = reactive({
     }
     .jobs-wrapper {
         @apply flex;
+        &.is-mobile {
+            @apply relative;
+            .jobs-contents {
+                &::before {
+                    @apply absolute;
+                    content: '';
+                    top: 0;
+                    bottom: 0;
+                    left: -1rem;
+                    width: calc(100% + 1rem);
+                    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 10%);
+                }
+            }
+            .collector-job-status-icon-wrapper {
+                margin-left: -0.375rem;
+                z-index: 1;
+            }
+            .more-button {
+                display: none;
+                opacity: 0;
+            }
+        }
         .jobs-contents {
             @apply flex items-center justify-center;
         }

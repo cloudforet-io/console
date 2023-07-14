@@ -25,7 +25,7 @@
                     <collector-item-schedule :item="props.item" />
                 </div>
             </div>
-            <div class="collector-status-wrapper">
+            <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
                 <p-button style-type="tertiary"
                           class="collector-data-button"
                           @click.stop="handleClickCollectData"
@@ -43,6 +43,8 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
@@ -113,6 +115,15 @@ const handleClickCollectData = async () => {
             top: 1.25rem;
             right: 1.5rem;
             gap: 0.25rem;
+            &.is-mobile {
+                position: initial;
+                margin-top: 0.75rem;
+                margin-bottom: 0.5rem;
+                .collector-data-button {
+                    width: 100%;
+                    opacity: 1;
+                }
+            }
             .collector-data-button {
                 @apply flex items-center;
                 opacity: 0;
@@ -128,14 +139,20 @@ const handleClickCollectData = async () => {
             }
             .collector-plugin {
                 @apply flex items-center;
+                width: 100%;
                 gap: 0.5rem;
                 .title-wrapper {
-                    @apply flex flex-col;
+                    @apply relative flex flex-col;
+                    height: 2.125rem;
+                    flex: 1;
                     .plugin-name {
                         @apply truncate text-label-md;
                     }
                     .plugin-version {
-                        @apply text-label-sm text-gray-400;
+                        @apply absolute text-label-sm text-gray-400 truncate;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
                     }
                 }
             }
@@ -148,13 +165,23 @@ const handleClickCollectData = async () => {
                 }
                 .collector-info-view {
                     @apply flex justify-between;
+                    .info-item {
+                        @apply relative flex flex-col flex-wrap;
+                        gap: 0.5rem;
+                    }
 
                     @screen tablet {
                         width: 100%;
                     }
-                    .info-item {
-                        @apply relative flex flex-col flex-wrap;
-                        gap: 0.5rem;
+
+                    @screen mobile {
+                        @apply relative;
+                        display: initial;
+                        .info-item {
+                            @apply absolute;
+                            top: 0;
+                            right: 0;
+                        }
                     }
                 }
             }
