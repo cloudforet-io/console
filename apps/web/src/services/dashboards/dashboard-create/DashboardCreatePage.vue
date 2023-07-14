@@ -284,31 +284,6 @@ export default {
     justify-content: center;
     width: 100%;
     height: 100%;
-    &.step-1 {
-        @apply w-full h-full;
-        max-width: 30rem;
-
-        @screen tablet {
-            @apply w-full;
-        }
-    }
-    &.step-2 {
-        width: 62.5rem;
-
-        @screen tablet {
-            @apply w-full;
-
-            .button-area {
-                @apply flex-col w-full mt-4;
-            }
-        }
-    }
-    &.step-3 {
-        .dashboard-customize-wrapper {
-            width: 100%;
-            height: 100%;
-        }
-    }
     .button-area {
         @apply flex justify-end mt-8 gap-4;
     }

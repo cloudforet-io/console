@@ -2122,7 +2122,7 @@
 				"CREATE_NEW_COLLECTOR": "Create New Collector",
 				"FORM_LOAD_FAILED": "Failed to load additional options.",
 				"LEARN_MORE": "learn more",
-				"LOADING_DESC1": "Loading additional options...",
+				"LOADING_DESC1": "Initializing associated options...",
 				"LOADING_DESC2": "(Please wait, this may take about 1-2 minutes)",
 				"NAME": "Name",
 				"NAME_INVALID_DUPLICATED": "Name already registered.",
@@ -2221,7 +2221,7 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_OPTIONS": "No Options"
+			"NO_OPTIONS": "No Supported Options"
 		},
 		"SERVER": {
 			"MAIN": {
