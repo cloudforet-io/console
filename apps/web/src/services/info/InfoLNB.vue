@@ -1,17 +1,11 @@
-<template>
-    <l-n-b :header="header"
-           :menu-set="menuSet"
-    />
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
     computed,
-    defineComponent, reactive, toRefs,
+    reactive,
 } from 'vue';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocation } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -22,29 +16,29 @@ import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import { INFO_ROUTE } from '@/services/info/route-config';
 
-export default defineComponent({
-    name: 'InfoLNB',
-    components: { LNB },
-    props: {},
-    setup() {
-        const state = reactive({
-            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.INFO].translationId)),
-            menuSet: computed<LNBMenu[]>(() => {
-                const allLnbMenu: LNBMenu[] = [
-                    {
-                        type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.INFO_NOTICE].translationId),
-                        id: MENU_ID.INFO_NOTICE,
-                        to: { name: INFO_ROUTE.NOTICE._NAME },
-                    },
-                ];
-                return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
-            }),
-        });
 
-        return {
-            ...toRefs(state),
-        };
-    },
+const store = useStore();
+const { t } = useI18n();
+
+const state = reactive({
+    header: computed(() => t(MENU_INFO_MAP[MENU_ID.INFO].translationId)),
+    menuSet: computed<LNBMenu[]>(() => {
+        const allLnbMenu: LNBMenu[] = [
+            {
+                type: 'item',
+                label: t(MENU_INFO_MAP[MENU_ID.INFO_NOTICE].translationId),
+                id: MENU_ID.INFO_NOTICE,
+                to: { name: INFO_ROUTE.NOTICE._NAME } as RouteLocation,
+            },
+        ];
+        return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
+    }),
 });
+
 </script>
+
+<template>
+    <l-n-b :header="state.header"
+           :menu-set="state.menuSet"
+    />
+</template>

@@ -1,3 +1,25 @@
+<script lang="ts" setup>
+import { PI } from '@spaceone/design-system';
+
+import NewMark from '@/common/components/marks/NewMark.vue';
+import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
+
+interface Props {
+    isPinned: boolean;
+    isNew: boolean;
+    title: string;
+    searchInputText: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    isPinned: false,
+    isNew: false,
+    title: '',
+    searchInputText: '',
+});
+
+</script>
+
 <template>
     <div class="list-title">
         <p-i v-if="isPinned"
@@ -14,40 +36,6 @@
         />
     </div>
 </template>
-
-<script lang="ts">
-import { PI } from '@spaceone/design-system';
-
-import NewMark from '@/common/components/marks/NewMark.vue';
-import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
-
-export default {
-    name: 'ListItemTitle',
-    components: {
-        NewMark,
-        TextHighlighting,
-        PI,
-    },
-    props: {
-        isPinned: {
-            type: Boolean,
-            default: false,
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        searchInputText: {
-            type: String,
-            default: '',
-        },
-    },
-};
-</script>
 
 <style scoped lang="postcss">
 .list-title {

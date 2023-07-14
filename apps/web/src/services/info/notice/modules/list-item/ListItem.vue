@@ -1,74 +1,13 @@
-<template>
-    <component :is="postDirection ? 'div' : 'li'"
-               class="list-item"
-               :class="{ 'pointer': !!post }"
-    >
-        <div v-if="postDirection"
-             class="post-direction"
-        >
-            <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon"
-                                                      width="1rem"
-            />
-        </div>
-        <div v-if="isPostExist">
-            <div class="title">
-                <p-i v-if="isPinned"
-                     class="pin"
-                     name="ic_pin-filled"
-                     width="1.125rem"
-                />
-                <text-highlighting class="title"
-                                   :term="inputText"
-                                   :text="post.title"
-                />
-                <new-mark v-if="isNew"
-                          class="new-mark"
-                />
-            </div>
-            <div class="info">
-                <p-badge badge-type="solid-outline"
-                         :style-type="noticeTypeBadge.style"
-                >
-                    {{ noticeTypeBadge.label }}
-                </p-badge><span>{{ date }}</span><p-i width="0.125rem"
-                                                      name="ic_dot"
-                />
-                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
-                                                   width="0.125rem"
-                                                   name="ic_dot"
-                />
-                <span v-if="hasDomainRoleUser || hasSystemRoleUser"
-                      class="view-count"
-                ><p-i name="ic_eye"
-                      width="1.125rem"
-                /> {{ post.view_count }}</span>
-                <span v-if="hasSystemRoleUser"
-                      class="view-count"
-                >| {{ domainName }}</span>
-            </div>
-        </div>
-        <div v-else
-             class="not-exist-item"
-        >
-            {{ $t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
-        </div>
-    </component>
-</template>
-
-<script lang="ts">
-
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { PropType } from 'vue';
-
-import { PBadge, PI } from '@spaceone/design-system';
-import dayjs from 'dayjs';
+<script lang="ts" setup>
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { PBadge, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -84,73 +23,107 @@ interface Props {
     post: NoticePostModel;
 }
 
-export default defineComponent<Props>({
-    name: 'ListItem',
-    components: {
-        PBadge,
-        PI,
-        NewMark,
-        TextHighlighting,
-    },
-    props: {
-        post: {
-            type: Object as PropType<NoticePostModel|undefined>,
-            default: undefined,
-        },
-        inputText: {
-            type: String,
-            default: '',
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
-        },
-        postDirection: {
-            type: String as PropType<'prev' | 'next' | undefined>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
-            hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
-            hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
-            postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-            date: computed(() => dateFormatter(props.post?.created_at)),
-            isPinned: computed(() => props.post?.options?.is_pinned),
-            isPostExist: computed(() => props.post),
-            postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
-            domainName: '',
-        });
-
-        const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
-
-        const getDomainName = async () => {
-            if (!Object.keys(props.post ?? {}).length || !state.hasSystemRoleUser) return;
-            if (!props.post.domain_id) {
-                state.domainName = 'All Domains';
-                return;
-            }
-            try {
-                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: props.post.domain_id });
-                state.domainName = name;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.domainName = '';
-            }
-        };
-
-        (async () => {
-            if (props.post && state.hasSystemRoleUser) await getDomainName();
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    post: undefined,
+    inputText: '',
+    isNew: false,
+    postDirection: undefined,
 });
+const store = useStore();
+const { t } = useI18n();
+
+const state = reactive({
+    noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
+    hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
+    hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
+    postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? t('INFO.NOTICE.MAIN.PREV') : t('INFO.NOTICE.MAIN.NEXT'))),
+    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    date: computed(() => dateFormatter(props.post?.created_at)),
+    isPinned: computed(() => props.post?.options?.is_pinned),
+    isPostExist: computed(() => props.post),
+    postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
+    domainName: '',
+});
+
+const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
+
+const getDomainName = async () => {
+    if (!Object.keys(props.post ?? {}).length || !state.hasSystemRoleUser) return;
+    if (!props.post.domain_id) {
+        state.domainName = 'All Domains';
+        return;
+    }
+    try {
+        const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: props.post.domain_id });
+        state.domainName = name;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.domainName = '';
+    }
+};
+
+(async () => {
+    if (props.post && state.hasSystemRoleUser) await getDomainName();
+})();
+
 </script>
+
+<template>
+    <component :is="postDirection ? 'div' : 'li'"
+               class="list-item"
+               :class="{ 'pointer': !!post }"
+    >
+        <div v-if="postDirection"
+             class="post-direction"
+        >
+            <span>{{ state.postDirectionLabel }}</span><p-i :name="state.postDirectionIcon"
+                                                            width="1rem"
+            />
+        </div>
+        <div v-if="state.isPostExist">
+            <div class="title">
+                <p-i v-if="state.isPinned"
+                     class="pin"
+                     name="ic_pin-filled"
+                     width="1.125rem"
+                />
+                <text-highlighting class="title"
+                                   :term="inputText"
+                                   :text="post.title"
+                />
+                <new-mark v-if="isNew"
+                          class="new-mark"
+                />
+            </div>
+            <div class="info">
+                <p-badge badge-type="solid-outline"
+                         :style-type="state.noticeTypeBadge.style"
+                >
+                    {{ state.noticeTypeBadge.label }}
+                </p-badge><span>{{ state.date }}</span><p-i width="0.125rem"
+                                                            name="ic_dot"
+                />
+                <span>{{ post.writer }}</span><p-i v-if="state.hasDomainRoleUser || state.hasSystemRoleUser"
+                                                   width="0.125rem"
+                                                   name="ic_dot"
+                />
+                <span v-if="state.hasDomainRoleUser || state.hasSystemRoleUser"
+                      class="view-count"
+                ><p-i name="ic_eye"
+                      width="1.125rem"
+                /> {{ post.view_count }}</span>
+                <span v-if="state.hasSystemRoleUser"
+                      class="view-count"
+                >| {{ state.domainName }}</span>
+            </div>
+        </div>
+        <div v-else
+             class="not-exist-item"
+        >
+            {{ t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
+        </div>
+    </component>
+</template>
 
 <style scoped lang="postcss">
 .list-item {
