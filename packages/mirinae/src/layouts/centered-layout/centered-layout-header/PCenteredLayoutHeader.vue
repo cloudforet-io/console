@@ -41,13 +41,15 @@ const handleClickCloseButton = () => {
                    :title="props.title"
         >
             <template #extra>
-                <p-icon-button v-if="props.showCloseButton"
-                               name="ic_close"
-                               size="md"
-                               color="inherit"
-                               class="close-button"
-                               @click="handleClickCloseButton"
-                />
+                <div class="close-button-wrapper">
+                    <p-icon-button v-if="props.showCloseButton"
+                                   name="ic_close"
+                                   size="md"
+                                   color="inherit"
+                                   class="close-button"
+                                   @click="handleClickCloseButton"
+                    />
+                </div>
             </template>
         </p-heading>
         <p v-if="props.description"
@@ -73,8 +75,12 @@ const handleClickCloseButton = () => {
     > .description {
         @apply text-label-md text-gray-700;
     }
-    > .close-button {
-        height: 2rem;
+    .close-button-wrapper {
+        @apply flex items-center justify-end;
+        width: 100%;
+        > .close-button {
+            height: 2rem;
+        }
     }
 }
 </style>
