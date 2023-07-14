@@ -138,7 +138,6 @@ const props = defineProps<{
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
-    { name: 'secret_id', label: 'Account ID' },
     { name: 'project_id', label: 'Project ID' },
     { name: 'provider', label: 'Provider' },
     { name: 'created_at', label: 'Created' },
