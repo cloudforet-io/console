@@ -38,7 +38,7 @@
                            :read-only="printMode"
                            @select="handleSelectMonthMenuItem"
         />
-        <custom-date-range-modal v-if="customRangeModalVisible"
+        <custom-date-range-modal :selected-date-range="selectedPeriod"
                                  :visible.sync="customRangeModalVisible"
                                  datetime-picker-data-type="yearToMonth"
                                  :granularity="GRANULARITY.MONTHLY"

@@ -1,12 +1,15 @@
 <template>
-    <div class="dashboard-create-page">
-        <div v-if="currentStep === steps[0].step"
-             class="dashboard-create-step1"
-        >
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+    <div class="dashboard-create-page"
+         :class="`step-${currentStep}`"
+    >
+        <template v-if="currentStep === steps[0].step">
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
                                   @set-project="setForm('dashboardProject', $event)"
@@ -24,19 +27,20 @@
                     style-type="primary"
                     size="lg"
                     :disabled="!isValid"
-                    @click="handleGoStep('next')"
+                    @click="goStep('next')"
                 >
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </div>
-        <div v-if="currentStep === steps[1].step"
-             class="dashboard-create-step2"
-        >
-            <dashboard-create-header
-                :description="steps[currentStep - 1].description"
-                :total-steps="steps.length"
-                :current-step="currentStep"
+        </template>
+        <template v-if="currentStep === steps[1].step">
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
             />
             <dashboard-template-form
                 :dashboard-scope="dashboardScope"
@@ -47,7 +51,7 @@
                     style-type="transparent"
                     size="lg"
                     icon-left="ic_arrow-left"
-                    @click="handleGoStep('prev')"
+                    @click="goStep('prev')"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
@@ -55,52 +59,93 @@
                     style-type="primary"
                     size="lg"
                     :disabled="!isAllValid"
-                    @click="handleClickCreate"
+                    @click="goStep('next')"
                 >
-                    {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
+                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </div>
+        </template>
+        <template v-if="currentStep === steps[2].step">
+            <div class="dashboard-customize-wrapper">
+                <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                          :total-steps="steps.length"
+                                          :current-step="currentStep"
+                                          show-step
+                                          show-close-button
+                                          @close="handleClickClose"
+                />
+                <dashboard-customize :loading="loading"
+                                     :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
+                                     hide-cancel-button
+                                     @go-back="goStep('prev')"
+                                     @save="createDashboard"
+                />
+            </div>
+        </template>
+        <confirm-back-modal :visible.sync="closeConfirmModalVisible"
+                            @confirm="handleClickBackButton"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, type ComponentPublicInstance,
+} from 'vue';
 
 import {
-    PButton,
+    PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useGoBack } from '@/common/composables/go-back';
 
 import {
     DASHBOARD_SCOPE,
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
 import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
-import DashboardCreateHeader from '@/services/dashboards/dashboard-create/modules/DashboardCreateHeader.vue';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
+import DashboardCustomize from '@/services/dashboards/dashboard-customize/modules/DashboardCustomize.vue';
 import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { ProjectItemResp } from '@/services/project/type';
 
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
+
 export default {
     name: 'CreateDashboardPage',
     components: {
-        DashboardCreateHeader,
+        ConfirmBackModal,
+        DashboardCustomize,
         DashboardViewerForm,
         DashboardTemplateForm,
         DashboardScopeForm,
         PButton,
+        PCenteredLayoutHeader,
+    },
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
     },
     setup() {
         const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.$state;
         const {
             forms: { dashboardTemplate, dashboardProject },
             setForm,
@@ -119,11 +164,13 @@ export default {
         });
 
         const state = reactive({
+            loading: false,
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
             steps: computed(() => [
                 { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
                 { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
+                { step: 3 },
             ]),
             currentStep: 1,
             isValid: computed(() => {
@@ -131,14 +178,18 @@ export default {
                 if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
                 return false;
             }),
+            closeConfirmModalVisible: false,
         });
 
-        const handleGoStep = (direction: 'prev'|'next') => {
+        const goStep = (direction: 'prev'|'next') => {
+            if (state.currentStep === 2 && direction === 'next') {
+                saveCurrentStateToStore();
+            }
             if (direction === 'prev') state.currentStep--;
             else state.currentStep++;
         };
 
-        const handleClickCreate = () => {
+        const saveCurrentStateToStore = () => {
             let _dashboardTemplate;
             if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
                 _dashboardTemplate = {
@@ -162,9 +213,53 @@ export default {
                 dashboardId: undefined,
                 placeholder: dashboardTemplate.value.name,
             });
-            const routeName = state.dashboardScope === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
-            SpaceRouter.router.push({ name: routeName });
         };
+
+        const createDashboard = async () => {
+            try {
+                state.loading = true;
+
+                const apiParam = {
+                    name: dashboardDetailState.name,
+                    labels: dashboardDetailState.labels,
+                    settings: dashboardDetailState.settings,
+                    layouts: [dashboardDetailState.dashboardWidgetInfoList],
+                    variables: dashboardDetailState.variables,
+                    variables_schema: dashboardDetailState.variablesSchema,
+                    tags: { created_by: store.state.user.userId },
+                    viewers: dashboardDetailStore.dashboardViewer,
+                };
+                if (dashboardDetailStore.isProjectDashboard) {
+                    const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                        ...apiParam,
+                        project_id: dashboardDetailState.projectId,
+                    });
+                    dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
+                } else {
+                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(apiParam);
+                    dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
+                }
+                const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+                await SpaceRouter.router.push({
+                    name: routeName,
+                    params: {
+                        dashboardId: dashboardDetailState.dashboardId as string,
+                    },
+                });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        const handleClickClose = () => {
+            state.closeConfirmModalVisible = true;
+        };
+
+        const { setPathFrom, handleClickBackButton } = useGoBack({
+            name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+        });
 
         return {
             ...toRefs(state),
@@ -172,57 +267,50 @@ export default {
             dashboardProject,
             setForm,
             isAllValid,
-            handleClickCreate,
-            handleGoStep,
+            goStep,
+            createDashboard,
+            handleClickClose,
+            handleClickBackButton,
+            setPathFrom,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.button-area {
-    @apply flex justify-end mt-8 gap-4;
-}
 .dashboard-create-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     width: 100%;
-    .dashboard-create-step1 {
-        @apply w-full;
+    height: 100%;
+    &.step-1 {
+        @apply w-full h-full;
         max-width: 30rem;
-        padding: 2.5rem;
-        margin: 0 auto;
-
-        .p-button {
-            &.transparent {
-                &:focus {
-                    @apply text-gray-900;
-                }
-                &:hover {
-                    @apply text-blue-600;
-                }
-            }
-        }
 
         @screen tablet {
             @apply w-full;
         }
     }
-
-    .dashboard-create-step2 {
+    &.step-2 {
         width: 62.5rem;
-        margin: 0 auto;
-        padding: 2rem 1.5rem 4.0625rem;
 
         @screen tablet {
-            @apply w-full p-8;
+            @apply w-full;
 
             .button-area {
                 @apply flex-col w-full mt-4;
             }
         }
-        .dashboard-create-header {
-            @apply mb-8;
+    }
+    &.step-3 {
+        .dashboard-customize-wrapper {
+            width: 100%;
+            height: 100%;
         }
     }
+    .button-area {
+        @apply flex justify-end mt-8 gap-4;
+    }
 }
-
 </style>

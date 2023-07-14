@@ -9,7 +9,6 @@
             <p-datetime-picker :selected-dates="startDates"
                                data-type="yearToMonth"
                                :invalid="!disableValidation && invalidState.startDates"
-                               :max-date="startMaxDate"
                                @update:selectedDates="handleUpdateSelectedDates('startDates', $event)"
             />
         </p-field-group>
@@ -76,6 +75,7 @@ export default defineComponent<Props>({
         const handleUpdateSelectedDates = (target: 'startDates'|'endDates', value) => {
             if (target === 'startDates') {
                 setForm(target, value);
+                if (endDates.value.length) setForm('endDates', []);
             } else {
                 setForm(target, value);
             }
@@ -86,10 +86,6 @@ export default defineComponent<Props>({
                 start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM'),
                 end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM'),
             })),
-            startMaxDate: computed(() => {
-                const end = endDates.value[0];
-                return end ? dayjs.utc(end).format('YYYY-MM') : undefined;
-            }),
             endMinDate: computed(() => {
                 const start = startDates.value[0];
                 return start ? dayjs.utc(start).format('YYYY-MM') : undefined;
