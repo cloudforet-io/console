@@ -1,12 +1,15 @@
 <template>
     <div class="attached-service-account-form">
-        <p-field-group :label="props.title || $t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
-                       :invalid="invalidState.selectedAttachedServiceAccount"
+        <p-field-group :invalid="invalidState.selectedAttachedServiceAccount"
                        :invalid-text="invalidTexts.selectedAttachedServiceAccount"
                        :valid="state.isAttachedServiceAccountValid"
                        :required="true"
                        :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
         >
+            <p-field-title :label="props.title || $t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
+                           size="lg"
+                           class="mb-2"
+            />
             <!-- NOTE: screen desktop size-->
             <p-radio-group class="attached-service-account-radio-group">
                 <p-radio v-for="(item) in attachedServiceAccountList"

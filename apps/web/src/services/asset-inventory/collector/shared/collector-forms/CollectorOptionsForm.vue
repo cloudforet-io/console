@@ -2,6 +2,7 @@
     <div class="collector-options-form">
         <p-field-title v-if="state.isVisibleTitle"
                        class="additional-options-label"
+                       size="lg"
                        :label="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
         />
         <p-data-loader class="collector-options-form-contents"
@@ -37,17 +38,7 @@
                 <div v-else
                      class="no-data-box"
                 >
-                    <p-empty image-size="sm"
-                             show-image
-                    >
-                        <template #image>
-                            <img src="@/assets/images/illust_circle_boy.svg"
-                                 alt="empty-options"
-                                 class="empty-options-image"
-                            >
-                        </template>
-                        {{ $t('INVENTORY.COLLECTOR.NO_OPTIONS') }}
-                    </p-empty>
+                    {{ $t('INVENTORY.COLLECTOR.NO_OPTIONS') }}
                 </div>
             </template>
             <template #loader>
@@ -71,7 +62,7 @@ import {
 } from 'vue';
 
 import {
-    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PEmpty, PSpinner,
+    PJsonSchemaForm, PButton, PI, PDataLoader, PFieldTitle, PSpinner,
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { isEmpty } from 'lodash';
@@ -166,7 +157,7 @@ watch(() => collectorFormState.provider, async (provider) => {
 
 .collector-options-form {
     .additional-options-label {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
     }
 
     .collector-options-form-contents {
@@ -183,12 +174,8 @@ watch(() => collectorFormState.provider, async (provider) => {
         }
 
         .no-data-box {
-            @apply flex flex-col justify-end;
-            height: 10.625rem;
-
-            .empty-options-image {
-                height: 100%;
-            }
+            @apply flex justify-center items-center;
+            height: 9rem;
         }
 
         .loading-box {
