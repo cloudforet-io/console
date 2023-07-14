@@ -92,6 +92,7 @@ const handleClickCancel = () => {
     collectorPageStore.$patch((_state) => {
         _state.visible.collectorModal = false;
     });
+    emit('click-confirm');
 };
 const handleClickConfirm = async () => {
     state.loading = true;
@@ -106,7 +107,6 @@ const handleClickConfirm = async () => {
         throw e;
     } finally {
         state.loading = false;
-        emit('click-confirm');
         handleClickCancel();
     }
 };
