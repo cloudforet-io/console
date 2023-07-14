@@ -1,3 +1,33 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
+
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
+import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
+import PersonalHealthDashboard
+    from '@/services/home-dashboard/modules/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
+import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
+import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
+import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
+
+const store = useStore();
+
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    timezone: computed(() => store.state.user.timezone || 'UTC'),
+});
+
+</script>
+
 <template>
     <general-page-layout class="home-dashboard">
         <div class="col-span-12 lg:col-span-9
@@ -16,7 +46,7 @@
                         widget-wrapper"
             >
                 <daily-updates class="col-span-12 daily-updates"
-                               :providers="providers"
+                               :providers="state.providers"
                 />
             </div>
             <div class="col-span-12 sm:col-span-6 lg:col-span-12
@@ -31,55 +61,6 @@
         </div>
     </general-page-layout>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
-
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
-import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
-import PersonalHealthDashboard
-    from '@/services/home-dashboard/modules/PersonalHealthDashboard.vue';
-import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
-import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
-import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
-import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
-
-export default {
-    name: 'HomeDashboard',
-    components: {
-        PersonalHealthDashboard,
-        TrustedAdvisor,
-        CollectorProgress,
-        ResourceMap,
-        GeneralPageLayout,
-        CloudServices,
-        DailyUpdates,
-        ServiceAccounts,
-        AllSummary,
-        TopProjects,
-    },
-    setup() {
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .home-dashboard {

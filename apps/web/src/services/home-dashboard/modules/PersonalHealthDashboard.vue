@@ -1,19 +1,132 @@
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDataTable, PI, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { find } from 'lodash';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { ExtraParams } from '@/services/home-dashboard/modules/type';
+
+const EVENT_PERIOD = 7;
+
+interface Props {
+    extraParams: ExtraParams;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    extraParams: () => ({}),
+});
+const { t } = useI18n();
+const store = useStore();
+
+const state = reactive({
+    loading: false,
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    timezone: computed(() => store.state.user.timezone),
+    favoriteProjects: computed(() => store.state.favorite.projectItems),
+    data: [] as any[],
+    fields: computed(() => [
+        { name: 'event', label: t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
+        { name: 'region', label: t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
+        { name: 'affected_projects', label: t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_PROJECT') },
+    ]),
+});
+
+/* Util */
+const getConvertedData = (rawData, projects: ProjectReferenceMap) => rawData.map((d) => {
+    const lastUpdateTime = dayjs.tz(dayjs(d.last_update_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
+
+    return {
+        event: {
+            name: d.event_title,
+            lastUpdate: lastUpdateTime,
+            to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+        },
+        region: state.regions[d.region_code]?.name || d.region_code,
+        affected_projects: d.affected_projects.map((projectId) => ({
+            name: projects[projectId].name,
+            to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
+            isFavorite: !!find(state.favoriteProjects, { id: projectId }),
+        })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
+        showAll: false,
+    };
+});
+
+/* Api */
+const getData = async () => {
+    state.loading = true;
+    try {
+        const { results } = await SpaceConnector.client.statistics.topic.phdSummary({
+            ...props.extraParams,
+            period: EVENT_PERIOD,
+        });
+        return results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* event */
+const handleClickToggle = (index) => {
+    const showAll: boolean = state.data[index].showAll;
+    state.data[index].showAll = !showAll;
+};
+
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/project/load'),
+        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+        store.dispatch('reference/region/load'),
+    ]);
+})();
+
+/* Watcher */
+watch(() => store.state.reference.project.items, async (projects) => {
+    if (projects) {
+        const rawData = await getData();
+        state.data = getConvertedData(rawData, projects);
+    }
+}, { immediate: true });
+
+</script>
+
 <template>
     <widget-layout>
         <template #title>
             <p class="title">
-                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
-                <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
+                <span :style="{ 'color': state.providers.aws ? state.providers.aws.color : '' }">AWS </span>
+                <span>{{ t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
             </p>
         </template>
         <p-data-loader
-            :data="data"
-            :loading="loading"
+            :data="state.data"
+            :loading="state.loading"
         >
             <p-data-table
-                :loading="loading"
-                :fields="fields"
-                :items="data"
+                :loading="state.loading"
+                :fields="state.fields"
+                :items="state.data"
                 :bordered="false"
             >
                 <template #col-event-format="{ index, value }">
@@ -26,9 +139,9 @@
                             </router-link>
                         </span>
                         <span class="event-time"
-                              :class="{ 'show-all': data[index].showAll }"
+                              :class="{ 'show-all': state.data[index].showAll }"
                         >
-                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
+                            {{ t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
                         </span>
                     </div>
                 </template>
@@ -38,12 +151,12 @@
                 <template #col-affected_projects-format="{ index, value }">
                     <div class="affected-projects-wrapper grid grid-cols-12 gap-2">
                         <div class="count col-span-1"
-                             :class="{ 'show-all': data[index].showAll }"
+                             :class="{ 'show-all': state.data[index].showAll }"
                         >
                             {{ value.length }}
                         </div>
                         <div class="col-span-9 project-link-group"
-                             :class="{ 'show-all': data[index].showAll }"
+                             :class="{ 'show-all': state.data[index].showAll }"
                         >
                             <div v-for="(project, pIndex) in value"
                                  :key="`project-link-${project.name}-${pIndex}`"
@@ -66,8 +179,8 @@
                                  class="toggle-button"
                                  @click="handleClickToggle(index)"
                             >
-                                {{ data[index].showAll ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
-                                <p-i :name="data[index].showAll ? 'ic_chevron-up' : 'ic_chevron-down'"
+                                {{ state.data[index].showAll ? t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
+                                <p-i :name="state.data[index].showAll ? 'ic_chevron-up' : 'ic_chevron-down'"
                                      height="1rem"
                                      width="1rem"
                                      color="inherit transparent"
@@ -81,145 +194,19 @@
                 <p-empty
                     show-image
                     image-size="md"
-                    :title="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA_TITLE')"
+                    :title="t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA_TITLE')"
                 >
                     <template #image>
                         <img alt="illust_astronaut_radio"
                              src="@/assets/images/illust_astronaut_radio.svg"
                         >
                     </template>
-                    {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
+                    {{ t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
                 </p-empty>
             </template>
         </p-data-loader>
     </widget-layout>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PDataTable, PI, PEmpty, PDataLoader,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { find } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-const EVENT_PERIOD = 7;
-
-export default {
-    name: 'PersonalHealthDashboard',
-    components: {
-        PI,
-        PDataTable,
-        WidgetLayout,
-        PEmpty,
-        PDataLoader,
-    },
-    props: {
-        extraParams: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            loading: false,
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            timezone: computed(() => store.state.user.timezone),
-            favoriteProjects: computed(() => store.state.favorite.projectItems),
-            data: [] as any[],
-            fields: computed(() => [
-                { name: 'event', label: i18n.t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
-                { name: 'region', label: i18n.t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
-                { name: 'affected_projects', label: i18n.t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_PROJECT') },
-            ]),
-        });
-
-        /* Util */
-        const getConvertedData = (rawData, projects: ProjectReferenceMap) => rawData.map((d) => {
-            const lastUpdateTime = dayjs.tz(dayjs(d.last_update_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
-
-            return {
-                event: {
-                    name: d.event_title,
-                    lastUpdate: lastUpdateTime,
-                    to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
-                },
-                region: state.regions[d.region_code]?.name || d.region_code,
-                affected_projects: d.affected_projects.map((projectId) => ({
-                    name: projects[projectId].name,
-                    to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
-                    isFavorite: !!find(state.favoriteProjects, { id: projectId }),
-                })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
-                showAll: false,
-            };
-        });
-
-        /* Api */
-        const getData = async () => {
-            state.loading = true;
-            try {
-                const { results } = await SpaceConnector.client.statistics.topic.phdSummary({
-                    ...props.extraParams,
-                    period: EVENT_PERIOD,
-                });
-                return results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* event */
-        const handleClickToggle = (index) => {
-            const showAll: boolean = state.data[index].showAll;
-            state.data[index].showAll = !showAll;
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-                store.dispatch('reference/region/load'),
-            ]);
-        })();
-
-        /* Watcher */
-        watch(() => store.state.reference.project.items, async (projects) => {
-            if (projects) {
-                const rawData = await getData();
-                state.data = getConvertedData(rawData, projects);
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            handleClickToggle,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .title {

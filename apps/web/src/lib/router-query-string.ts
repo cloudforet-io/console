@@ -4,6 +4,7 @@ import type { RouteLocation, LocationQueryValue } from 'vue-router';
 import { SpaceRouter } from '@/router';
 
 // export type RouteQueryString = string | (string | null)[] | null | undefined;
+// TODO: need to remove undefined type
 export type RouteQueryString = LocationQueryValue | LocationQueryValue[] | undefined;
 export interface ConvertValueToQueryString {
     (value?: any): RouteQueryString;

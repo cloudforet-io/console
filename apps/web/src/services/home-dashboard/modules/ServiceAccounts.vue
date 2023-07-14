@@ -1,73 +1,4 @@
-<template>
-    <widget-layout class="service-accounts">
-        <template #title>
-            <div class="top">
-                <p class="title">
-                    {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
-                </p>
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
-                             class="add-btn"
-                >
-                    <p-i name="ic_plus"
-                         width="1rem"
-                         height="1rem"
-                         color="inherit"
-                    /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
-                </router-link>
-            </div>
-        </template>
-        <div class="chart-container">
-            <p-data-loader :loading="loading"
-                           :data="data"
-                           class="chart"
-            >
-                <template #loader>
-                    <div ref="loaderRef"
-                         class="w-full h-full"
-                    />
-                </template>
-                <div>
-                    <div ref="chartRef"
-                         class="w-full h-full"
-                    />
-                    <div class="legends">
-                        <template v-if="loading">
-                            <div v-for="v in skeletons"
-                                 :key="v"
-                                 class="flex items-center p-4"
-                            >
-                                <p-skeleton class="flex-grow" />
-                            </div>
-                        </template>
-                        <p-data-table v-else
-                                      :loading="loading"
-                                      :fields="fields"
-                                      :items="data"
-                                      :bordered="false"
-                        >
-                            <template #col-provider-format="{ item }">
-                                <router-link :to="getLink(item)">
-                                    <span :style="{color: item.color}"
-                                          class="provider-label"
-                                    >{{ providers[item.provider].label }}</span>
-                                </router-link>
-                            </template>
-                        </p-data-table>
-                    </div>
-                </div>
-                <template #no-data>
-                    <p-empty
-                        show-image
-                        class="no-data-wrapper"
-                        :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_NO_ACCOUNT')"
-                    />
-                </template>
-            </p-data-loader>
-        </div>
-    </widget-layout>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -77,12 +8,11 @@ import {
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
 import {
-    computed, reactive, toRefs, watch, onUnmounted,
+    computed, reactive, watch, onUnmounted,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -96,6 +26,7 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { ExtraParams } from '@/services/home-dashboard/modules/type';
 
 const DEFAULT_COLOR = violet[200];
 
@@ -109,156 +40,211 @@ interface Data {
 const CATEGORY_KEY = 'name';
 const VALUE_KEY = 'service_account_count';
 
-export default {
-    name: 'ServiceAccounts',
-    components: {
-        WidgetLayout,
-        PI,
-        PDataTable,
-        PSkeleton,
-        PDataLoader,
-        PEmpty,
-    },
-    props: {
-        extraParams: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            skeletons: range(4),
-            loading: true,
-            loaderRef: null,
-            chartRef: null as HTMLElement | null,
-            data: [] as Data[],
-            chart: null as null | any,
-            chartRegistry: {},
-            fields: computed(() => [
-                { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
-                { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
-            ]),
-        });
+interface Props {
+    extraParams: ExtraParams;
+}
 
-        /* Util */
-        const disposeChart = (ctx) => {
-            if (state.chartRegistry[ctx]) {
-                state.chartRegistry[ctx].dispose();
-                delete state.chartRegistry[ctx];
-            }
-        };
-        const drawChart = (ctx, isLoading = false) => {
-            const createChart = () => {
-                disposeChart(ctx);
-                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
-                return state.chartRegistry[ctx];
-            };
-            const chart = createChart();
-            state.chart = chart;
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.responsive.enabled = true;
-            chart.innerRadius = am4core.percent(63);
+const props = withDefaults(defineProps<Props>(), {
+    extraParams: () => ({}),
+});
+const { t } = useI18n();
+const store = useStore();
 
-            if (isLoading) {
-                chart.data = [{
-                    provider: 'Dummy',
-                    service_account_count: 1000,
-                    color: DEFAULT_COLOR,
-                }];
-            } else {
-                chart.data = state.data;
-            }
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    skeletons: range(4),
+    loading: true,
+    loaderRef: null,
+    chartRef: null as HTMLElement | null,
+    data: [] as Data[],
+    chart: null as null | any,
+    chartRegistry: {},
+    fields: computed(() => [
+        { name: 'provider', label: t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
+        { name: 'service_account_count', label: t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
+    ]),
+});
 
-            const series = chart.series.create();
-            series.slices.template.togglable = false;
-            series.slices.template.clickable = false;
-            series.dataFields.value = VALUE_KEY;
-            series.dataFields.category = CATEGORY_KEY;
-            series.slices.template.propertyFields.fill = 'color';
-            series.slices.template.stroke = am4core.color(white);
-            series.slices.template.strokeWidth = 2;
-            series.slices.template.strokeOpacity = 1;
-            series.slices.template.states.getKey('hover').properties.scale = 1;
-            series.tooltip.disabled = true;
-            series.ticks.template.disabled = true;
-            series.labels.template.text = '';
-
-            const label = new am4core.Label();
-            label.parent = series;
-            label.horizontalCenter = 'middle';
-            label.verticalCenter = 'middle';
-            label.fontSize = 25;
-            label.fontWeight = 'lighter';
-            label.fill = am4core.color(gray[900]);
-            if (isLoading) {
-                label.text = '';
-            } else {
-                label.text = '{values.value.sum}';
-            }
-        };
-
-        const getLink = (data): RouteLocation => ({
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-            query: {
-                provider: data.provider,
-            },
-        });
-
-        /* Api */
-        const getData = async () => {
-            state.loading = true;
-            const data: Data[] = [];
-            try {
-                const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
-                forEach(results, (d) => {
-                    data.push({
-                        ...d,
-                        provider: d.provider,
-                        color: state.providers[d.provider].color || '',
-                        href: getLink(d),
-                        service_account_count: d.service_account_count,
-                    });
-                });
-                state.data = data;
-            } catch (e) {
-                state.data = [];
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* Init */
-        (async () => {
-            await store.dispatch('reference/provider/load', true);
-        })();
-
-        /* Watcher */
-        watch(() => state.providers, (providers) => {
-            if (!isEmpty(providers)) getData();
-        }, { immediate: true });
-        watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
-            if (loading && loaderCtx) {
-                drawChart(loaderCtx, true);
-            }
-            if (!loading && chartCtx) {
-                drawChart(chartCtx, false);
-            }
-        }, { immediate: true });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
-        return {
-            ...toRefs(state),
-            ASSET_INVENTORY_ROUTE,
-            getLink,
-        };
-    },
+/* Util */
+const disposeChart = (ctx) => {
+    if (state.chartRegistry[ctx]) {
+        state.chartRegistry[ctx].dispose();
+        delete state.chartRegistry[ctx];
+    }
 };
+const drawChart = (ctx, isLoading = false) => {
+    const createChart = () => {
+        disposeChart(ctx);
+        state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
+        return state.chartRegistry[ctx];
+    };
+    const chart = createChart();
+    state.chart = chart;
+    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+    chart.responsive.enabled = true;
+    chart.innerRadius = am4core.percent(63);
+
+    if (isLoading) {
+        chart.data = [{
+            provider: 'Dummy',
+            service_account_count: 1000,
+            color: DEFAULT_COLOR,
+        }];
+    } else {
+        chart.data = state.data;
+    }
+
+    const series = chart.series.create();
+    series.slices.template.togglable = false;
+    series.slices.template.clickable = false;
+    series.dataFields.value = VALUE_KEY;
+    series.dataFields.category = CATEGORY_KEY;
+    series.slices.template.propertyFields.fill = 'color';
+    series.slices.template.stroke = am4core.color(white);
+    series.slices.template.strokeWidth = 2;
+    series.slices.template.strokeOpacity = 1;
+    series.slices.template.states.getKey('hover').properties.scale = 1;
+    series.tooltip.disabled = true;
+    series.ticks.template.disabled = true;
+    series.labels.template.text = '';
+
+    const label = new am4core.Label();
+    label.parent = series;
+    label.horizontalCenter = 'middle';
+    label.verticalCenter = 'middle';
+    label.fontSize = 25;
+    label.fontWeight = 'lighter';
+    label.fill = am4core.color(gray[900]);
+    if (isLoading) {
+        label.text = '';
+    } else {
+        label.text = '{values.value.sum}';
+    }
+};
+
+const getLink = (data): RouteLocation => ({
+    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+    query: {
+        provider: data.provider,
+    } as RouteLocation['query'],
+} as RouteLocation);
+
+/* Api */
+const getData = async () => {
+    state.loading = true;
+    const data: Data[] = [];
+    try {
+        const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
+        forEach(results, (d) => {
+            data.push({
+                ...d,
+                provider: d.provider,
+                color: state.providers[d.provider].color || '',
+                href: getLink(d),
+                service_account_count: d.service_account_count,
+            });
+        });
+        state.data = data;
+    } catch (e) {
+        state.data = [];
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* Init */
+(async () => {
+    await store.dispatch('reference/provider/load', true);
+})();
+
+/* Watcher */
+watch(() => state.providers, (providers) => {
+    if (!isEmpty(providers)) getData();
+}, { immediate: true });
+watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
+    if (loading && loaderCtx) {
+        drawChart(loaderCtx, true);
+    }
+    if (!loading && chartCtx) {
+        drawChart(chartCtx, false);
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    if (state.chart) state.chart.dispose();
+});
+
 </script>
+
+<template>
+    <widget-layout class="service-accounts">
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
+                </p>
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             class="add-btn"
+                >
+                    <p-i name="ic_plus"
+                         width="1rem"
+                         height="1rem"
+                         color="inherit"
+                    /> {{ t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
+                </router-link>
+            </div>
+        </template>
+        <div class="chart-container">
+            <p-data-loader :loading="state.loading"
+                           :data="data"
+                           class="chart"
+            >
+                <template #loader>
+                    <div ref="loaderRef"
+                         class="w-full h-full"
+                    />
+                </template>
+                <div>
+                    <div ref="chartRef"
+                         class="w-full h-full"
+                    />
+                    <div class="legends">
+                        <template v-if="state.loading">
+                            <div v-for="v in state.skeletons"
+                                 :key="v"
+                                 class="flex items-center p-4"
+                            >
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
+                        <p-data-table v-else
+                                      :loading="state.loading"
+                                      :fields="state.fields"
+                                      :items="data"
+                                      :bordered="false"
+                        >
+                            <template #col-provider-format="{ item }">
+                                <router-link :to="getLink(item)">
+                                    <span :style="{color: item.color}"
+                                          class="provider-label"
+                                    >{{ state.providers[item.provider].label }}</span>
+                                </router-link>
+                            </template>
+                        </p-data-table>
+                    </div>
+                </div>
+                <template #no-data>
+                    <p-empty
+                        show-image
+                        class="no-data-wrapper"
+                        :title="t('COMMON.WIDGETS.SERVICE_ACCOUNTS_NO_ACCOUNT')"
+                    />
+                </template>
+            </p-data-loader>
+        </div>
+    </widget-layout>
+</template>
 
 <style lang="postcss" scoped>
 .top {

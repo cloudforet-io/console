@@ -1,6 +1,8 @@
 export interface DashboardWidgetProps {
-    extraParams?: Record<string, any>;
+    extraParams?: ExtraParams;
 }
+
+export type ExtraParams = Record<string, any>;
 
 // AllSummary
 export type DateType = 'DAILY' | 'MONTHLY';
