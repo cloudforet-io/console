@@ -1,103 +1,11 @@
-<template>
-    <p-icon-modal :visible.sync="proxyVisible"
-                  icon-name="ic_check-circle"
-                  size="md"
-                  :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
-                  :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"
-                  @clickButton="onClickConfirm"
-    >
-        <template #body>
-            <article class="alert-wrapper">
-                <span class="alert-message">
-                    <p-i name="ic_warning-filled"
-                         width="0.75rem"
-                         height="0.75rem"
-                         class="alert-icon"
-                    />
-                    {{ $t('IDENTITY.USER.API_KEY.ALERT_MSG') }}
-                </span>
-            </article>
-            <p-pane-layout class="box-wrapper">
-                <span class="box-header">
-                    {{ $t('IDENTITY.USER.API_KEY.ID') }}
-                </span>
-                <p class="box-contents">
-                    {{ apiKeyItem.api_key_id }}
-                    <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed"
-                                          class="collapsible-toggle"
-                    >
-                        {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
-                    </p-collapsible-toggle>
-                    <p-text-editor v-if="!isAPICollapsed"
-                                   class="m-4"
-                                   :code="apiItem"
-                                   folded
-                                   read-only
-                    />
-                </p>
-                <p-divider class="divider" />
-                <p-button style-type="secondary"
-                          icon-left="ic_download"
-                          class="download-btn"
-                          @click="onClickDownloadFile(FileType.JSON)"
-                >
-                    {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_JSON') }}
-                </p-button>
-            </p-pane-layout>
-            <p-pane-layout class="box-wrapper">
-                <span class="box-header">
-                    {{ $t('IDENTITY.USER.API_KEY.SPACECTL') }}
-                    <div class="box-header-desc">
-                        <p-i name="ic_info-circle"
-                             width="1rem"
-                             height="1rem"
-                             color="inherit"
-                             class="info-icon"
-                        />
-                        <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
-                            <span class="text">
-                                <p-anchor :href="githubLink">
-                                    {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
-                                </p-anchor>
-                            </span>
-                        </p>
-                    </div>
-                </span>
-                <p class="box-contents">
-                    {{ $t('IDENTITY.USER.API_KEY.SPACECTL_CONFIG') }}
-                    <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed"
-                                          class="collapsible-toggle"
-                    >
-                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
-                    </p-collapsible-toggle>
-                    <p-text-editor v-if="!isSpacectlCollapsed"
-                                   class="m-4"
-                                   :code="yamlItem"
-                                   folded
-                                   read-only
-                    />
-                </p>
-                <p-divider class="divider" />
-                <p-button style-type="secondary"
-                          icon-left="ic_download"
-                          class="download-btn"
-                          @click="onClickDownloadFile(FileType.YAML)"
-                >
-                    {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_YAML') }}
-                </p-button>
-            </p-pane-layout>
-        </template>
-    </p-icon-modal>
-</template>
-
-<script lang="ts">
-
-import { reactive, toRefs } from 'vue';
+<script lang="ts" setup>
 
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
 } from '@spaceone/design-system';
 import yaml from 'js-yaml';
+import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -109,87 +17,155 @@ enum FileType {
 interface APIItem {
     api_key: string;
 }
+interface Props {
+    visible: boolean;
+    apiKeyItem: APIItem;
+    endpoints: any;
+}
 
-export default {
-    name: 'UserAPIKeyModal',
-    components: {
-        PIconModal,
-        PI,
-        PPaneLayout,
-        PDivider,
-        PCollapsibleToggle,
-        PTextEditor,
-        PButton,
-        PAnchor,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        apiKeyItem: {
-            type: Object,
-            default: null,
-        },
-        endpoints: {
-            type: Object,
-            default: null,
-        },
-    },
-    setup(props, context) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, context.emit),
-            isAPICollapsed: true,
-            isSpacectlCollapsed: true,
-            apiItem: {} as APIItem,
-            yamlItem: '',
-            githubLink: 'https://github.com/cloudforet-io/spacectl',
-        });
+const props = defineProps<Props>();
+const { t } = useI18n();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'clickButton'): void;
+}>();
 
-        const onClickDownloadFile = (fileType: FileType) => {
-            let blob;
-            if (fileType === FileType.JSON) blob = new Blob([JSON.stringify(state.apiItem)], { type: 'application/json' });
-            if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            if (fileType === FileType.JSON) a.download = 'api_key';
-            if (fileType === FileType.YAML) a.download = 'spacectl_config';
-            a.click();
-            a.remove();
-        };
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    isAPICollapsed: true,
+    isSpacectlCollapsed: true,
+    apiItem: {} as APIItem,
+    yamlItem: '',
+    githubLink: 'https://github.com/cloudforet-io/spacectl',
+});
 
-        const onClickConfirm = () => {
-            context.emit('clickButton');
-        };
-
-        const makeYamlItem = () => {
-            const apiItem = {
-                api_key: props.apiKeyItem.api_key,
-            };
-            const endpoint = props.endpoints;
-            const yamlItem = { ...apiItem, ...endpoint };
-
-            state.yamlItem = yaml.dump(yamlItem, {
-                noArrayIndent: false,
-                lineWidth: -1,
-            });
-        };
-
-        (async () => {
-            if (props.apiKeyItem) state.apiItem = props.apiKeyItem;
-            makeYamlItem();
-        })();
-
-        return {
-            FileType,
-            ...toRefs(state),
-            onClickDownloadFile,
-            onClickConfirm,
-        };
-    },
+const onClickDownloadFile = (fileType: FileType) => {
+    let blob;
+    if (fileType === FileType.JSON) blob = new Blob([JSON.stringify(state.apiItem)], { type: 'application/json' });
+    if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    if (fileType === FileType.JSON) a.download = 'api_key';
+    if (fileType === FileType.YAML) a.download = 'spacectl_config';
+    a.click();
+    a.remove();
 };
+
+const onClickConfirm = () => {
+    emit('clickButton');
+};
+
+const makeYamlItem = () => {
+    const apiItem = {
+        api_key: props.apiKeyItem.api_key,
+    };
+    const endpoint = props.endpoints;
+    const yamlItem = { ...apiItem, ...endpoint };
+
+    state.yamlItem = yaml.dump(yamlItem, {
+        noArrayIndent: false,
+        lineWidth: -1,
+    });
+};
+
+(async () => {
+    if (props.apiKeyItem) state.apiItem = props.apiKeyItem;
+    makeYamlItem();
+})();
+
 </script>
+
+<template>
+    <p-icon-modal v-model:visible="state.proxyVisible"
+                  icon-name="ic_check-circle"
+                  size="md"
+                  :header-title="t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
+                  :button-text="t('COMPONENT.BUTTON_MODAL.CONFIRM')"
+                  @click-button="onClickConfirm"
+    >
+        <template #body>
+            <article class="alert-wrapper">
+                <span class="alert-message">
+                    <p-i name="ic_warning-filled"
+                         width="0.75rem"
+                         height="0.75rem"
+                         class="alert-icon"
+                    />
+                    {{ t('IDENTITY.USER.API_KEY.ALERT_MSG') }}
+                </span>
+            </article>
+            <p-pane-layout class="box-wrapper">
+                <span class="box-header">
+                    {{ t('IDENTITY.USER.API_KEY.ID') }}
+                </span>
+                <p class="box-contents">
+                    {{ apiKeyItem.api_key_id }}
+                    <p-collapsible-toggle v-model:is-collapsed="state.isAPICollapsed"
+                                          class="collapsible-toggle"
+                    >
+                        {{ state.isAPICollapsed ? t('IDENTITY.USER.API_KEY.SHOW') : t('IDENTITY.USER.API_KEY.HIDE') }}
+                    </p-collapsible-toggle>
+                    <p-text-editor v-if="!state.isAPICollapsed"
+                                   class="m-4"
+                                   :code="state.apiItem"
+                                   folded
+                                   read-only
+                    />
+                </p>
+                <p-divider class="divider" />
+                <p-button style-type="secondary"
+                          icon-left="ic_download"
+                          class="download-btn"
+                          @click="onClickDownloadFile(FileType.JSON)"
+                >
+                    {{ t('IDENTITY.USER.API_KEY.DOWNLOAD_JSON') }}
+                </p-button>
+            </p-pane-layout>
+            <p-pane-layout class="box-wrapper">
+                <span class="box-header">
+                    {{ t('IDENTITY.USER.API_KEY.SPACECTL') }}
+                    <div class="box-header-desc">
+                        <p-i name="ic_info-circle"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                             class="info-icon"
+                        />
+                        <p>{{ t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
+                            <span class="text">
+                                <p-anchor :href="state.githubLink">
+                                    {{ t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
+                                </p-anchor>
+                            </span>
+                        </p>
+                    </div>
+                </span>
+                <p class="box-contents">
+                    {{ t('IDENTITY.USER.API_KEY.SPACECTL_CONFIG') }}
+                    <p-collapsible-toggle v-model:is-collapsed="state.isSpacectlCollapsed"
+                                          class="collapsible-toggle"
+                    >
+                        {{ state.isSpacectlCollapsed ? t('IDENTITY.USER.API_KEY.SHOW') : t('IDENTITY.USER.API_KEY.HIDE') }}
+                    </p-collapsible-toggle>
+                    <p-text-editor v-if="!state.isSpacectlCollapsed"
+                                   class="m-4"
+                                   :code="state.yamlItem"
+                                   folded
+                                   read-only
+                    />
+                </p>
+                <p-divider class="divider" />
+                <p-button style-type="secondary"
+                          icon-left="ic_download"
+                          class="download-btn"
+                          @click="onClickDownloadFile(FileType.YAML)"
+                >
+                    {{ t('IDENTITY.USER.API_KEY.DOWNLOAD_YAML') }}
+                </p-button>
+            </p-pane-layout>
+        </template>
+    </p-icon-modal>
+</template>
 
 <style lang="postcss" scoped>
 .alert-wrapper {

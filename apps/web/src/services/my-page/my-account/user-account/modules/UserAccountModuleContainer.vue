@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import { PPaneLayout } from '@spaceone/design-system';
+
+interface Props {
+    title?: string
+}
+const props = withDefaults(defineProps<Props>(), {
+    title: '' as string | undefined,
+});
+</script>
+
 <template>
     <p-pane-layout class="user-account-module-container">
         <slot name="headline">
@@ -10,17 +21,6 @@
         <slot />
     </p-pane-layout>
 </template>
-
-<script setup lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
-
-interface Props {
-    title?: string
-}
-const props = withDefaults(defineProps<Props>(), {
-    title: '' as string | undefined,
-});
-</script>
 
 <style lang="postcss" scoped>
 .user-account-module-container {

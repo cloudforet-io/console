@@ -1,39 +1,56 @@
+<script lang="ts" setup>
+import { PAnchor } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+const githubLink = 'https://github.com/cloudforet-io/spacectl';
+const codeBlock = {
+    installCode: 'sudo pip3 install --upgrade pip \n\n'
+      + 'sudo pip3 install spaceone-core spaceone-api --upgrade\n\n'
+      + 'sudo pip3 install spacectl',
+    configCode: 'spacectl config init -f <spacectl_config.yaml>',
+    startCode: 'spacectl api-resources',
+    helpCode: 'spacectl --help',
+};
+const { t } = useI18n();
+
+</script>
+
 <template>
     <section>
         <article class="desc-wrapper">
             <h2 class="title first">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_1') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_1') }}
             </h2>
             <p class="desc">
-                <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
+                <i18n-t keypath="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
                         <p-anchor :href="githubLink"
                                   class="link"
                         >
-                            {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
+                            {{ t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
-                </i18n>
+                </i18n-t>
                 <br>
-                <strong>{{ $t('IDENTITY.USER.HANDBOOK.DESC_1_REQUIREMENTS') }}</strong>
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_PYTHON_VERSION') }}
+                <strong>{{ t('IDENTITY.USER.HANDBOOK.DESC_1_REQUIREMENTS') }}</strong>
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_1_PYTHON_VERSION') }}
             </p>
         </article>
         <article class="desc-wrapper">
             <h2 class="title">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_2') }}
             </h2>
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-1') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_2-1') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-1') }}
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_2-1') }}
             </p>
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-2') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_2-2') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
             </p>
             <pre lang="commandline"
                  class="code-block"
@@ -43,10 +60,10 @@
                 </code>
             </pre>
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-3') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_2-3') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
             </p>
             <pre lang="commandline"
                  class="code-block"
@@ -58,10 +75,10 @@
         </article>
         <article class="desc-wrapper">
             <h2 class="title">
-                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_3') }}
+                {{ t('IDENTITY.USER.HANDBOOK.TITLE_3') }}
             </h2>
             <p class="desc">
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
             </p>
             <pre lang="commandline"
                  class="code-block"
@@ -71,7 +88,7 @@
                 </code>
             </pre>
             <p class="desc">
-                {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
+                {{ t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
             </p>
             <pre lang="commandline"
                  class="code-block"
@@ -81,46 +98,19 @@
                 </code>
             </pre>
             <p class="desc last">
-                <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
+                <i18n-t keypath="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
                         <p-anchor :href="githubLink"
                                   class="link"
                         >
-                            {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
+                            {{ t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
-                </i18n>
+                </i18n-t>
             </p>
         </article>
     </section>
 </template>
-
-<script lang="ts">
-import { PAnchor } from '@spaceone/design-system';
-
-const githubLink = 'https://github.com/cloudforet-io/spacectl';
-const codeBlock = {
-    installCode: 'sudo pip3 install --upgrade pip \n\n'
-      + 'sudo pip3 install spaceone-core spaceone-api --upgrade\n\n'
-      + 'sudo pip3 install spacectl',
-    configCode: 'spacectl config init -f <spacectl_config.yaml>',
-    startCode: 'spacectl api-resources',
-    helpCode: 'spacectl --help',
-};
-
-export default {
-    name: 'UserAPIKeyHandbook',
-    components: {
-        PAnchor,
-    },
-    setup() {
-        return {
-            githubLink,
-            codeBlock,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .title {
