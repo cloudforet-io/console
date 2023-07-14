@@ -94,7 +94,6 @@ const handleChangeStep = (step: number) => {
     state.step = step;
 };
 
-
 defineExpose({ setPathFrom });
 
 
@@ -104,14 +103,10 @@ defineExpose({ setPathFrom });
 </script>
 
 <style lang="postcss" scoped>
-.close-button {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-}
-
 .collector-creator-page {
-    margin: 2rem 2.5rem 0 2.5rem;
-    max-height: calc(100% - 2rem);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 2rem 2.5rem;
 }
 </style>
