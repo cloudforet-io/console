@@ -2180,6 +2180,11 @@
 				"TAG": "태그",
 				"VERSION": "버전"
 			},
+			"HISTORY": {
+				"CANCELED": "",
+				"FAILURE": "실패",
+				"SUCCESS": "성공"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "스케줄 수정 실패",
 				"ALT_S_EDIT_SCHEDULE": "스케줄 수정 완료",
