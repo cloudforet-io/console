@@ -94,7 +94,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { coral, green } from '@/styles/colors';
+import { red, green } from '@/styles/colors';
 
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import {
@@ -103,8 +103,8 @@ import {
 import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
-const SUCCEEDED_COLOR = green[400];
-const FAILED_COLOR = coral[400];
+const SUCCEEDED_COLOR = green[500];
+const FAILED_COLOR = red[400];
 
 interface Props {
     item?: CollectorData;
@@ -231,11 +231,11 @@ const getJobLists = async () => {
                 height: 0.5rem;
                 margin-top: 0.5rem;
                 .succeeded-bar {
-                    @apply bg-green-400;
+                    @apply bg-green-500;
                     height: 100%;
                 }
                 .failed-bar {
-                    @apply bg-coral-400;
+                    @apply bg-red-400;
                     height: 100%;
                 }
             }
