@@ -109,6 +109,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -143,7 +144,7 @@ const state = reactive({
     ]),
     selectedProvider: computed(() => collectorFormState.provider ?? 'all'),
     repositories: [],
-    repositoryList: computed(() => ([
+    repositoryList: computed<MenuItem[]>(() => ([
         {
             name: 'all', label: 'All Repository', icon: null, color: null,
         },
@@ -152,6 +153,7 @@ const state = reactive({
             name: repo.repository_id,
             icon: repositoryIconMap[repo.repository_type],
             color: repositoryColorMap[repo.repository_type],
+            iconColor: repositoryColorMap[repo.repository_type],
         })),
     ])),
     selectedRepository: 'all',
