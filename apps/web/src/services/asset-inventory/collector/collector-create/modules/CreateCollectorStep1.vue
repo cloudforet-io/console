@@ -78,9 +78,9 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { useLastItemObserver } from 'src/common/composables/last-item-observer';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useLastItemObserver } from '@/common/composables/last-item-observer';
+
 
 import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
