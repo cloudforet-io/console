@@ -1,8 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { cloneDeep } from 'lodash';
-import { getCurrentInstance, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 
 
@@ -22,9 +21,10 @@ interface NotificationItemState {
 	userChannelId?: string;
 	projectChannelId?: string;
 }
-export const useNotificationItem = (obj: NotificationItemState) => {
+type NotificationEmitEvent = (e: 'edit', value?: any) => void;
+
+export const useNotificationItem = (obj: NotificationItemState, emit: NotificationEmitEvent) => {
     const { t } = useI18n();
-    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive<NotificationItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;
@@ -33,7 +33,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
         } else {
             state.dataForEdit = initialData;
         }
-        vm.$emit('edit', undefined);
+        emit('edit', undefined);
     };
 
     const startEdit = (value, initialData) => {
@@ -43,7 +43,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
         } else {
             state.dataForEdit = initialData;
         }
-        vm.$emit('edit', value);
+        emit('edit', value);
     };
 
     const updateUserChannel = async (paramKey, paramValue) => {
@@ -56,7 +56,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             await SpaceConnector.client.notification.userChannel.update(param);
             showSuccessMessage(t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
-            vm.$emit('edit', undefined);
+            emit('edit', undefined);
         } catch (e) {
             ErrorHandler.handleRequestError(e, t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'));
         }
@@ -75,7 +75,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             await SpaceConnector.client.notification.projectChannel.update(param);
             showSuccessMessage(t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '');
             state.isEditMode = false;
-            vm.$emit('edit', undefined);
+            emit('edit', undefined);
         } catch (e) {
             ErrorHandler.handleRequestError(e, t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'));
         }

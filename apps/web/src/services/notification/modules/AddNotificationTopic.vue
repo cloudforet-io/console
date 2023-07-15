@@ -1,9 +1,68 @@
+<script lang="ts" setup>
+import { PRadio, PCheckbox } from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const TOPIC_LIST = [
+    { label: 'Alert', value: 'monitoring.Alert' },
+    { label: 'Budget', value: 'cost_analysis.Budget' },
+];
+
+interface Props {
+    topic: string[];
+    topicMode: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    topic: () => [],
+    topicMode: false,
+});
+const emit = defineEmits<{(e: 'change', value?: {
+        topicMode: boolean;
+        selectedTopic: string[];
+        isTopicValid: boolean;
+    }): void;
+}>();
+const { t } = useI18n();
+
+const state = reactive({
+    topicModeList: computed(() => [{
+        label: t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,
+    }, {
+        label: t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: true,
+    }]),
+    isTopicModeSelected: props.topicMode ? props.topicMode : false,
+    selectedTopic: props.topic.length > 0 ? props.topic : [] as string[],
+    isTopicValid: computed(() => !state.isTopicModeSelected || (state.isTopicModeSelected && state.selectedTopic.length > 0)),
+});
+
+const emitChange = () => {
+    emit('change', {
+        topicMode: state.isTopicModeSelected,
+        selectedTopic: state.selectedTopic,
+        isTopicValid: state.isTopicValid,
+    });
+};
+const onChangeTopicMode = (value) => {
+    state.isTopicModeSelected = value;
+    emitChange();
+};
+
+const onChangeTopic = (value) => {
+    state.selectedTopic = value;
+    emitChange();
+};
+
+</script>
+
 <template>
     <div>
-        <p-radio v-for="(item, i) in topicModeList"
+        <p-radio v-for="(item, i) in state.topicModeList"
                  :key="i"
                  :selected="item.value"
-                 :value="isTopicModeSelected"
+                 :value="state.isTopicModeSelected"
                  class="mr-4"
                  @click="onChangeTopicMode(item.value)"
         >
@@ -11,101 +70,31 @@
                   @click="onChangeTopicMode(item.value)"
             >{{ item.label }}</span>
         </p-radio>
-        <article v-if="isTopicModeSelected"
+        <article v-if="state.isTopicModeSelected"
                  class="topic-wrapper"
         >
             <div class="topic-content-wrapper">
                 <h5 class="setting">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
+                    {{ t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
                 </h5>
                 <p-checkbox v-for="item in TOPIC_LIST"
                             :key="item.value"
-                            v-model="selectedTopic"
+                            v-model:value="state.selectedTopic"
                             :value="item.value"
-                            :invalid="!isTopicValid"
+                            :invalid="!state.isTopicValid"
                             @change="onChangeTopic"
                 >
                     <span class="topic-label">{{ item.label }}</span>
                 </p-checkbox>
             </div>
         </article>
-        <p v-if="!isTopicValid"
+        <p v-if="!state.isTopicValid"
            class="invalid-text"
         >
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC_REQUIRED') }}
+            {{ t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC_REQUIRED') }}
         </p>
     </div>
 </template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import { PRadio, PCheckbox } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-const TOPIC_LIST = [
-    { label: 'Alert', value: 'monitoring.Alert' },
-    { label: 'Budget', value: 'cost_analysis.Budget' },
-];
-
-export default {
-    name: 'AddNotificationTopic',
-    components: {
-        PRadio,
-        PCheckbox,
-    },
-    props: {
-        topic: {
-            type: [Array, String],
-            default: () => [],
-        },
-        topicMode: {
-            type: Boolean,
-            default: null,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            topicModeList: computed(() => [{
-                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,
-            }, {
-                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: true,
-            }]),
-            isTopicModeSelected: props.topicMode ? props.topicMode : false,
-            selectedTopic: props.topic.length > 0 ? props.topic : [] as string[],
-            isTopicValid: computed(() => !state.isTopicModeSelected || (state.isTopicModeSelected && state.selectedTopic.length > 0)),
-        });
-
-        const emitChange = () => {
-            emit('change', {
-                topicMode: state.isTopicModeSelected,
-                selectedTopic: state.selectedTopic,
-                isTopicValid: state.isTopicValid,
-            });
-        };
-        const onChangeTopicMode = (value) => {
-            state.isTopicModeSelected = value;
-            emitChange();
-        };
-
-        const onChangeTopic = (value) => {
-            state.selectedTopic = value;
-            emitChange();
-        };
-
-        return {
-            TOPIC_LIST,
-            ...toRefs(state),
-            onChangeTopicMode,
-            onChangeTopic,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .radio-label {
