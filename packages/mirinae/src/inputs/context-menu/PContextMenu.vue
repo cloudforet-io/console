@@ -62,6 +62,7 @@
                                              :disabled="item.disabled"
                                              :image-url="item.imageUrl"
                                              :icon="item.icon"
+                                             :icon-color="item.iconColor"
                                              :readonly="readonly"
                                              :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
                                              :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
