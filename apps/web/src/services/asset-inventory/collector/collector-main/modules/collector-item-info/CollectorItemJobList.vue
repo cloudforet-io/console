@@ -15,9 +15,7 @@
             </p-tooltip>
         </p>
         <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
-            <div class="jobs-contents"
-                 @click.stop
-            >
+            <div class="jobs-contents">
                 <collector-job-status-icon v-for="(jobStatus, index) in props.item.recentJobAnalyze"
                                            :key="`job-item-${index}`"
                                            :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"

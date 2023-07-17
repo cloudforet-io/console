@@ -2,50 +2,52 @@
     <router-link :to="props.to"
                  class="collector-job-status-icon"
     >
-        <div v-if="props.isArrow"
-             class="job-tooltip-wrapper"
-        >
-            <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
-                       :position="props.tooltipPosition"
-                       class="job-tooltip"
+        <div @click.stop>
+            <div v-if="props.isArrow"
+                 class="job-tooltip-wrapper"
             >
-                <p-i
-                    name="ic_chevron-right"
-                    width="1.125rem"
-                    height="1.125rem"
-                    color="inherit"
-                />
-            </p-tooltip>
-        </div>
-        <div v-else
-             class="job-tooltip-wrapper"
-        >
-            <p-tooltip :contents="props.contents"
-                       :position="props.tooltipPosition"
-                       class="job-tooltip"
+                <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                           :position="props.tooltipPosition"
+                           class="job-tooltip"
+                >
+                    <p-i
+                        name="ic_chevron-right"
+                        width="1.125rem"
+                        height="1.125rem"
+                        color="inherit"
+                    />
+                </p-tooltip>
+            </div>
+            <div v-else
+                 class="job-tooltip-wrapper"
             >
-                <p-i v-if="props.status === JOB_STATE.SUCCESS"
-                     name="ic_check"
-                     class="icon success"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit"
-                />
-                <p-i v-else-if="props.status === JOB_STATE.CANCELED"
-                     name="ic_limit-filed"
-                     class="icon canceled"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit"
-                />
-                <p-i v-else
-                     name="ic_exclamation-mark"
-                     class="icon error"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit"
-                />
-            </p-tooltip>
+                <p-tooltip :contents="props.contents"
+                           :position="props.tooltipPosition"
+                           class="job-tooltip"
+                >
+                    <p-i v-if="props.status === JOB_STATE.SUCCESS"
+                         name="ic_check"
+                         class="icon success"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                    <p-i v-else-if="props.status === JOB_STATE.CANCELED"
+                         name="ic_limit-filed"
+                         class="icon canceled"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                    <p-i v-else
+                         name="ic_exclamation-mark"
+                         class="icon error"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                </p-tooltip>
+            </div>
         </div>
     </router-link>
 </template>
