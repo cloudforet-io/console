@@ -91,7 +91,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, primaryDark, red } from '@/styles/colors';
 
-import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
+import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/type';
 
 const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];

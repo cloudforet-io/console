@@ -17,16 +17,6 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     SCHEDULE: 'schedule',
 } as const;
 
-export const JOB_STATE = {
-    SUCCESS: 'SUCCESS',
-    ERROR: 'ERROR',
-    CREATED: 'CREATED',
-    IN_PROGRESS: 'IN_PROGRESS',
-    TIMEOUT: 'TIMEOUT',
-    CANCELED: 'CANCELED',
-    NONE: 'NONE',
-} as const;
-
 interface CollectorPlugin {
     name?: string;
     icon?: string;

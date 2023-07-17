@@ -1,13 +1,10 @@
-export enum JOB_STATUS {
-    success = 'SUCCESS',
-    //
-    created = 'CREATED',
-    progress = 'IN_PROGRESS',
-    //
-    error = 'ERROR',
-    timeout = 'TIMEOUT',
-    canceled = 'CANCELED',
-}
+export const JOB_SELECTED_STATUS = {
+    SUCCESS: 'SUCCESS',
+    PROGRESS: 'IN_PROGRESS',
+    FAILURE: 'FAILURE',
+    CANCELED: 'CANCELED',
+    ALL: 'ALL',
+} as const;
 
 export enum JOB_TASK_STATUS {
     success = 'SUCCESS',

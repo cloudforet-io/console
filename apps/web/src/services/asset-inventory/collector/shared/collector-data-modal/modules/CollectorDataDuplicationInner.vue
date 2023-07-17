@@ -96,12 +96,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
 
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
 import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const SUCCEEDED_COLOR = green[500];
 const FAILED_COLOR = red[400];
@@ -142,7 +142,7 @@ const state = reactive({
         failedPercentage: computed(() => {
             if (state.jobTaskStatus.total > 0) {
                 const status = collectorDataModalState.recentJob.status;
-                if (status === JOB_STATUS.success || status === JOB_STATUS.created) {
+                if (status === JOB_STATE.SUCCESS || status === JOB_STATE.CREATED) {
                     return 100 - state.status.succeededPercentage;
                 }
                 return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;

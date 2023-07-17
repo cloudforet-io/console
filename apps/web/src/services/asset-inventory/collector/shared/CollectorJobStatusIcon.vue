@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { PTooltip, PI } from '@spaceone/design-system';
 
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 interface Props {
     to: string | object,

@@ -61,7 +61,7 @@ import { numberFormatter } from '@cloudforet/core-lib';
 import { peacock } from '@/styles/colors';
 
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const RECENT_COUNT = 5;
 const PROGRESS_BAR_COLOR = peacock[500];
