@@ -107,6 +107,15 @@ export default defineComponent<Props>({
         });
 
         /* api */
+        const removeEmptyFilters = (filters: CostFiltersMap): CostFiltersMap => {
+            const result: CostFiltersMap = {};
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value?.length) {
+                    result[key] = value;
+                }
+            });
+            return result;
+        };
         const updatePublicDashboardFilters = async (filters: CostFiltersMap) => {
             try {
                 await SpaceConnector.client.costAnalysis.publicDashboard.update({
@@ -142,9 +151,9 @@ export default defineComponent<Props>({
         };
         const handleConfirmSetFilter = (filters: CostFiltersMap) => {
             if (state.isUserDashboard) {
-                updateUserDashboardFilters(filters);
+                updateUserDashboardFilters(removeEmptyFilters(filters));
             } else {
-                updatePublicDashboardFilters(filters);
+                updatePublicDashboardFilters(removeEmptyFilters(filters));
             }
         };
 

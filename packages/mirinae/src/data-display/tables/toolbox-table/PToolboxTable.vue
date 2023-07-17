@@ -25,7 +25,9 @@
                        @refresh="$emit('refresh')"
                        @click-settings="$emit('click-settings')"
             >
-                <template v-if="$scopedSlots['toolbox-left']" #left-area>
+                <template v-if="$scopedSlots['toolbox-left']"
+                          #left-area
+                >
                     <div class="toolbox-left">
                         <slot name="toolbox-left" />
                     </div>
@@ -57,8 +59,13 @@
                       v-on="$listeners"
                       @changeSort="changeSort"
         >
-            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
+            <template v-for="(_, slot) of $scopedSlots"
+                      #[slot]="scope"
+            >
+                <slot v-if="!slot.startsWith('toolbox')"
+                      :name="slot"
+                      v-bind="scope"
+                />
             </template>
         </p-data-table>
         <slot name="toolbox-table-bottom" />
@@ -262,7 +269,7 @@ export default defineComponent<ToolboxTableProps>({
 
         const changeSort = (sortBy, sortDesc) => {
             proxyState.thisPage = 1;
-            emitChange({ sortBy, sortDesc });
+            emitChange({ sortBy, sortDesc, pageStart: 1 });
         };
 
         const checkSelectIndex = () => {

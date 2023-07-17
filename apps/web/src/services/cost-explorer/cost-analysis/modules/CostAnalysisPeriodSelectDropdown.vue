@@ -15,9 +15,9 @@
                            style-type="transparent"
                            @select="handleSelectPeriod"
         />
-        <custom-date-range-modal v-if="customRangeModalVisible"
-                                 :visible.sync="customRangeModalVisible"
+        <custom-date-range-modal :visible.sync="customRangeModalVisible"
                                  :granularity="costAnalysisPageState.granularity"
+                                 :selected-date-range="period"
                                  @confirm="handleCustomRangeModalConfirm"
         />
     </div>

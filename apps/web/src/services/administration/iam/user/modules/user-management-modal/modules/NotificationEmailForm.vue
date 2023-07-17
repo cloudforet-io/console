@@ -7,9 +7,10 @@
         >
             <template #default="{invalid}">
                 <div class="input-form">
+                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
                     <p-text-input :value="email"
                                   :invalid="invalid"
-                                  :placeholder="store.state.user.userId"
+                                  placeholder="user@spaceone.io"
                                   :disabled="userPageState.visibleUpdateModal && !state.isEdit"
                                   class="text-input"
                                   @update:value="handleChangeInput($event)"

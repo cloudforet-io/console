@@ -7,7 +7,9 @@
                        disable-empty-case
         >
             <template #default="{isEmpty}">
-                <table :class="{'ellipsis-table': !props.disableEllipsis }">
+                <table ref="tableRef"
+                       :class="{'ellipsis-table': !props.disableEllipsis }"
+                >
                     <thead>
                         <tr>
                             <th v-for="(field, fieldColIndex) in props.fields"
@@ -66,7 +68,7 @@
                                 @click="handleClickRow({rowIndex, item})"
                             >
                                 <td v-for="(field, colIndex) in props.fields"
-                                    :key="`td-${props.widgetKey}-${rowIndex}-${colIndex}`"
+                                    :key="`td-${props.widgetKey}-${rowIndex}-${colIndex}-${tableWidth}`"
                                     :class="{
                                         'has-width': !!field.width,
                                         [field?.textAlign || 'left']: true,
@@ -167,6 +169,7 @@
 </template>
 
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
 import {
     defineProps, reactive, ref,
 } from 'vue';
@@ -175,7 +178,7 @@ import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, throttle } from 'lodash';
 
 import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
@@ -309,7 +312,7 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
-const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
+const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
     if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
     const tdIndex = props.fields.length * rowIndex + colIndex;
     if (labelRef.value?.length && labelRef.value) {
@@ -317,6 +320,13 @@ const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
         return (labelElement?.offsetWidth < labelElement?.scrollWidth);
     } return false;
 };
+const tableRef = ref<null|HTMLElement>(null);
+const tableWidth = ref<number>(0);
+useResizeObserver(tableRef, throttle((entries) => {
+    const entry = entries[0];
+    const { width } = entry.contentRect;
+    tableWidth.value = width;
+}, 500));
 
 const getTooltipContents = (item, field:Field):string => {
     const value = getValue(item, field);

@@ -1,5 +1,5 @@
 <template>
-    <div v-click-outside="handleClickOutside"
+    <div ref="containerRef"
          class="p-select-dropdown"
          :class="{
              [styleType] : true,
@@ -79,12 +79,12 @@ import {
     reactive,
     toRefs,
     nextTick, toRef,
+    ref,
 } from 'vue';
 import type { SetupContext, PropType } from 'vue';
 
+import { onClickOutside } from '@vueuse/core';
 import { groupBy, reduce } from 'lodash';
-import vClickOutside from 'v-click-outside';
-
 
 
 import PI from '@/foundation/icons/PI.vue';
@@ -106,9 +106,6 @@ export default defineComponent<SelectDropdownProps>({
         PI,
         PIconButton,
         PContextMenu,
-    },
-    directives: {
-        clickOutside: vClickOutside.directive,
     },
     model: {
         prop: 'selected',
@@ -207,6 +204,12 @@ export default defineComponent<SelectDropdownProps>({
             }, {})),
         });
 
+        const containerRef = ref<HTMLElement|null>(null);
+        const hideMenu = () => {
+            state.proxyVisibleMenu = false;
+        };
+        onClickOutside(containerRef, hideMenu);
+
         const {
             targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
@@ -233,9 +236,6 @@ export default defineComponent<SelectDropdownProps>({
             state.proxyVisibleMenu = !state.proxyVisibleMenu;
             e.stopPropagation();
         };
-        const handleClickOutside = () => {
-            state.proxyVisibleMenu = false;
-        };
         const handlePressDownKey = () => {
             if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
             nextTick(() => {
@@ -247,8 +247,8 @@ export default defineComponent<SelectDropdownProps>({
         };
         return {
             ...toRefs(state),
+            containerRef,
             ...toRefs(contextMenuFixedStyleState),
-            handleClickOutside,
             onSelectMenu,
             handleClick,
             handlePressDownKey,
