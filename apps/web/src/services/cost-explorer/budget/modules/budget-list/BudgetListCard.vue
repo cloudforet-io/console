@@ -174,7 +174,7 @@ const state = reactive({
                         />
                         {{ name }}
                         <p-i v-if="index < state.projects.length - 1"
-                             name="ic_chevron-left-thin"
+                             name="ic_chevron-right-thin"
                              width="1em"
                              height="1em"
                         />

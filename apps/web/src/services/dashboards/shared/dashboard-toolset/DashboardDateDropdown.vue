@@ -154,6 +154,7 @@ watch(() => props.dateRange, () => {
         </p-select-dropdown>
         <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
                                  granularity="MONTHLY"
+                                 :selected-date-range="dateRange"
                                  @confirm="handleCustomRangeModalConfirm"
         />
     </div>

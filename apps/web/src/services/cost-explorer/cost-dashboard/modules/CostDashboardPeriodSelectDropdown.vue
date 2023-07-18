@@ -225,8 +225,8 @@ watch([() => props.period, () => props.periodType], ([period, periodType]) => {
                            :read-only="printMode"
                            @select="handleSelectMonthMenuItem"
         />
-        <custom-date-range-modal v-if="state.customRangeModalVisible"
-                                 v-model:visible="state.customRangeModalVisible"
+        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
+                                 :selected-date-range="state.selectedPeriod"
                                  datetime-picker-data-type="yearToMonth"
                                  :granularity="GRANULARITY.MONTHLY"
                                  @confirm="handleCustomRangeModalConfirm"

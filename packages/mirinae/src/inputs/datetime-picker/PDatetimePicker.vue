@@ -104,8 +104,8 @@ const state = reactive({
     plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
         monthSelectPlugin({
             shorthand: false,
-            dateFormat: 'F Y',
-            altFormat: 'F Y',
+            dateFormat: 'Y-m',
+            altFormat: 'Y-m',
             theme: 'light',
         }),
     ] : [])),
@@ -179,7 +179,7 @@ const createDatePicker = (datePickerRef: HTMLElement) => {
         let defaultDate;
         if (state.proxySelectedDates.length) {
             if (props.dataType === DATA_TYPE.yearToMonth) {
-                defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs.utc(d).toDate(), 'F Y'));
+                defaultDate = state.proxySelectedDates.map((d) => dayjs.utc(d).format('YYYY-MM'));
             } else {
                 defaultDate = state.proxySelectedDates.map((d) => dayjs.utc(d).format('YYYY-MM-DD HH:mm'));
             }
@@ -447,10 +447,6 @@ watch([() => props.minDate, () => props.maxDate], () => {
         &.inRange {
             @apply bg-blue-200 border-blue-200;
             box-shadow: none;
-            &.prevMonthDay, &.nextMonthDay, &.today {
-                @apply bg-blue-200 border-blue-200;
-                box-shadow: none;
-            }
         }
         &.selected, &.startRange, &.endRange {
             @apply bg-blue-600 border-blue-600 text-white;

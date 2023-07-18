@@ -189,9 +189,9 @@ watch(() => state.period, (period) => {
                            style-type="transparent"
                            @select="handleSelectPeriod"
         />
-        <custom-date-range-modal v-if="state.customRangeModalVisible"
-                                 v-model:visible="state.customRangeModalVisible"
+        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
                                  :granularity="costAnalysisPageState.granularity"
+                                 :selected-date-range="state.period"
                                  @confirm="handleCustomRangeModalConfirm"
         />
     </div>

@@ -65,7 +65,7 @@ const handleChangeManage = () => {
                 {{ t(translationId) }}
                 <p-i v-if="lIdx < menu.translationIds.length - 1"
                      :key="`label-${menu.translationIds.join('.')}-${lIdx}`"
-                     name="ic_chevron-left-thin"
+                     name="ic_chevron-right-thin"
                      width="1rem"
                      height="1rem"
                 />

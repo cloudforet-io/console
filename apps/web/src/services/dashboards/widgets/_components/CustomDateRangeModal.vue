@@ -11,6 +11,7 @@ import { useI18n } from 'vue-i18n';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';
+import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
 
 interface CustomRangeModalSettings {
     helpTextFrom?: TranslateResult | undefined;
@@ -25,14 +26,16 @@ interface DateOption {
 
 interface Props {
     visible: boolean;
-    datetimePickerDataType: DATA_TYPE;
-    granularity: string;
+    datetimePickerDataType?: DATA_TYPE;
+    granularity?: Granularity;
+    selectedDateRange?: Period;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     datetimePickerDataType: 'yearToDate',
     granularity: undefined,
+    selectedDateRange: () => ({}),
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: Period): void;
@@ -101,20 +104,30 @@ const handleConfirm = () => {
     }
     emit('confirm', period);
 };
-const handleUpdateStartDates = (selectedDates: string[]) => {
-    if (selectedDates.length && state.startDates[0] !== selectedDates[0]) {
+const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
+    if (!selectedDates.length) return;
+    if (dayjs.utc(state.startDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+    if (type === 'start') {
         state.startDates = selectedDates;
         state.endDates = [];
-    }
-};
-const handleUpdateEndDates = (selectedDates: string[]) => {
-    if (selectedDates.length && state.endDates[0] !== selectedDates[0]) {
+    } else {
         state.endDates = selectedDates;
     }
 };
 
 watch(() => props.visible, (visible) => {
     if (visible) {
+        if (props.selectedDateRange?.start) {
+            state.startDates = [props.selectedDateRange?.start];
+        } else {
+            state.startDates = [];
+        }
+        if (props.selectedDateRange?.end) {
+            state.endDates = [props.selectedDateRange?.end];
+        } else {
+            state.endDates = [];
+        }
+    } else {
         state.startDates = [];
         state.endDates = [];
     }
@@ -143,7 +156,7 @@ watch(() => props.visible, (visible) => {
                                    :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
                                    :selected-dates="state.startDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                   @update:selected-dates="handleUpdateStartDates"
+                                   @update:selected-dates="handleUpdateSelectedDates('start', $event)"
                 />
             </p-field-group>
             <p-field-group class="period-select"
@@ -157,7 +170,7 @@ watch(() => props.visible, (visible) => {
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.endDateSetting.minDate"
                                    :max-date="state.endDateSetting.maxDate"
-                                   @update:selected-dates="handleUpdateEndDates"
+                                   @update:selected-dates="handleUpdateSelectedDates('end', $event)"
                 />
             </p-field-group>
         </template>
