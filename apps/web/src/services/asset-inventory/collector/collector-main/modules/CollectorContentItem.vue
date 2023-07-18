@@ -19,7 +19,7 @@
                 </div>
                 <div class="collector-info-wrapper">
                     <div class="collector-info-view">
-                        <collector-item-status :item="props.item" />
+                        <collector-current-status :item="props.item" />
                         <collector-item-job-list :item="props.item" />
                     </div>
                     <collector-item-schedule :item="props.item" />
@@ -50,11 +50,11 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
-import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 interface Props {
     item?: CollectorItemInfo;
