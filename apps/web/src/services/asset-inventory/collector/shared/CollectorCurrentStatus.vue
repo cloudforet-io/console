@@ -63,24 +63,17 @@ import { peacock } from '@/styles/colors';
 import type { Schedule, JobStatus } from '@/services/asset-inventory/collector/model';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
-const RECENT_COUNT = 5;
 const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
     schedule?: Schedule;
-    recentJobAnalyze?: JobStatus[];
+    recentJob?: JobStatus;
 }
 
 const props = defineProps<Props>();
 
 const state = reactive({
-    status: computed<string|undefined>(() => {
-        if (props.recentJobAnalyze) {
-            const recentJob = props.recentJobAnalyze[props.recentJobAnalyze.length - 1];
-            return recentJob?.status;
-        }
-        return undefined;
-    }),
+    status: computed<string|undefined>(() => props.recentJob?.status),
     diffSchedule: computed(() => {
         if (props.schedule) {
             const current = dayjs.utc();
@@ -101,13 +94,9 @@ const state = reactive({
         }
         return { diffHour: 0, diffMin: 0 };
     }),
-    recentJob: computed<JobStatus|undefined>(() => {
-        if (!props.recentJobAnalyze) return undefined;
-        return props.recentJobAnalyze[RECENT_COUNT - 1];
-    }),
     remainedTasksPercentage: computed<number>(() => {
-        const remainedTasks = state.recentJob?.remained_tasks ?? 0;
-        const totalTasks = state.recentJob?.total_tasks ?? 0;
+        const remainedTasks = props.recentJob?.remained_tasks ?? 0;
+        const totalTasks = props.recentJob?.total_tasks ?? 0;
         return totalTasks > 0 ? numberFormatter(((totalTasks - remainedTasks) / totalTasks) * 100) : 100;
     }),
 });
