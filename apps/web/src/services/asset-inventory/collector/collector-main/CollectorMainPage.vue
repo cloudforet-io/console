@@ -159,23 +159,10 @@ onMounted(async () => {
 </script>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-heading */
-:deep(.p-heading) {
-    @apply items-center;
-    .heading-wrapper {
-        flex: 1;
-        .total-count {
-            @apply font-normal;
-        }
-    }
-    .extra {
-        flex-grow: initial;
-        .history-button {
-            @apply bg-white rounded border border-gray-300 text-label-md font-bold;
-            width: 100%;
-            padding: 0.375rem 0.75rem;
-        }
-    }
+.history-button {
+    @apply bg-white rounded border border-gray-300 text-label-md font-bold;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
 }
 .collector-loader-wrapper {
     min-height: 16.875rem;

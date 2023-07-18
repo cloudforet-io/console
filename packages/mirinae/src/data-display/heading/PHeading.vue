@@ -100,6 +100,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-heading {
+    gap: 0.5rem;
     &.heading-main {
         display: flex;
         align-items: flex-start;
@@ -113,29 +114,22 @@ export default defineComponent<Props>({
                 }
             }
             > .total-count {
-                font-weight: bold;
-
                 @apply text-gray-900;
             }
-        }
-        > .extra {
-            margin-left: 0.5rem;
         }
     }
     &.heading-sub {
         display: flex;
         align-items: center;
-        height: 2rem;
+        line-height: 2rem;
         margin: 2rem 1rem 1rem 1rem;
         > .heading-wrapper {
             line-height: 1.2;
             > .total-count {
                 @apply text-gray-500;
                 padding-left: 0.125rem;
+                font-weight: normal;
             }
-        }
-        > .extra {
-            padding-left: 1rem;
         }
     }
     > .heading-wrapper {
@@ -164,6 +158,10 @@ export default defineComponent<Props>({
     }
     > .extra {
         flex-grow: 1;
+    }
+
+    @screen mobile {
+        flex-wrap: wrap;
     }
 }
 </style>
