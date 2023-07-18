@@ -1,40 +1,25 @@
-<template>
-    <section>
-        <notification-channel-list :project-id="projectId"
-                                   :manage-disabled="!hasManagePermission"
-        />
-    </section>
-</template>
-
-<script lang="ts">
-import { getCurrentInstance, reactive, toRefs } from 'vue';
-import type { Vue } from 'vue/types/vue';
+<script lang="ts" setup>
+import { reactive } from 'vue';
+import { useRoute } from 'vue-router';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 
-export default {
-    name: 'ProjectNotificationsPage',
-    components: {
-        NotificationChannelList,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            projectId: vm.$route.params.id,
-            hasManagePermission: useManagePermissionState(),
-        });
+const route = useRoute();
 
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+const state = reactive({
+    projectId: route.params.id,
+    hasManagePermission: useManagePermissionState(),
+});
+
 </script>
+
+<template>
+    <section>
+        <notification-channel-list :project-id="state.projectId"
+                                   :manage-disabled="!state.hasManagePermission"
+        />
+    </section>
+</template>
+

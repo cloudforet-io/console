@@ -1,3 +1,31 @@
+<script lang="ts" setup>
+import { PPaneLayout, PIconButton } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
+
+import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
+
+interface Props {
+    visible: boolean;
+    groupId: string;
+    manageDisabled: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    visible: false,
+    groupId: '',
+    manageDisabled: false,
+});
+const emit = defineEmits<{(e: 'close'): void}>();
+const { t } = useI18n();
+
+const goBack = () => {
+    emit('close');
+};
+
+</script>
+
 <template>
     <overlay-page-layout :visible="visible"
                          class="project-group-member"
@@ -10,7 +38,7 @@
                                    @click="goBack()"
                     />
                     <div class="title">
-                        {{ $t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER') }}
+                        {{ t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER') }}
                     </div>
                 </div>
             </div>
@@ -22,47 +50,6 @@
         </p-pane-layout>
     </overlay-page-layout>
 </template>
-
-<script lang="ts">
-import { PPaneLayout, PIconButton } from '@spaceone/design-system';
-
-import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
-
-import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
-
-export default {
-    name: 'ProjectGroupMember',
-    components: {
-        PPaneLayout,
-        PIconButton,
-        ProjectMemberTab,
-        OverlayPageLayout,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        groupId: {
-            type: String,
-            default: '',
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const goBack = () => {
-            emit('close');
-        };
-
-        return {
-            goBack,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .project-group-member {

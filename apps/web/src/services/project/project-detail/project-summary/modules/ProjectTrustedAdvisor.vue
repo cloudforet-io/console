@@ -1,81 +1,14 @@
-<template>
-    <widget-layout class="simplified-trusted-advisor">
-        <template v-if="awsProvider"
-                  #title
-        >
-            <div class="title">
-                <span :style="{ color: awsProvider ? awsProvider.color : '' }">AWS </span>
-                <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
-            </div>
-        </template>
-        <template v-if="awsProvider">
-            <div v-if="loading" />
-            <div v-else-if="!data"
-                 class="no-data-wrapper"
-            >
-                <img alt="no-data-image"
-                     src="@/assets/images/illust_star.svg"
-                >
-                <div class="text">
-                    {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
-                </div>
-            </div>
-            <template v-else>
-                <div class="content-wrapper">
-                    <div v-for="(category, cIdx) in categories"
-                         :key="cIdx"
-                         class="data-row"
-                    >
-                        <div class="left-part">
-                            <p-i :name="category.icon"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                                 color="inherit transparent"
-                            />
-                            <span class="text">{{ category.label }}</span>
-                        </div>
-                        <div class="right-part grid grid-cols-12 gap-2">
-                            <router-link v-for="(legend, lIdx) in legends"
-                                         :key="lIdx"
-                                         class="box col-span-4"
-                                         :class="legend.name"
-                                         :to="linkFormatter(category.name, legend.name)"
-                            >
-                                <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
-                            </router-link>
-                        </div>
-                    </div>
-                </div>
-                <div class="legend-wrapper">
-                    <div v-for="(legend, index) in legends"
-                         :key="index"
-                         class="legend"
-                         :class="legend.name"
-                    >
-                        <div class="box" />
-                        <span class="text">{{ legend.label }}</span>
-                    </div>
-                </div>
-            </template>
-        </template>
-    </widget-layout>
-</template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-    getCurrentInstance,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PI } from '@spaceone/design-system';
-import { findKey } from 'lodash';
-
+<script lang="ts" setup>
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
+import { PI } from '@spaceone/design-system';
+import { findKey } from 'lodash';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -86,6 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, red, yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
 
 const TRUSTED_ADVISOR = 'Check';
 enum STATUS {
@@ -107,141 +41,191 @@ const ERROR_COLOR = red[500];
 const WARNING_COLOR = yellow[500];
 const OK_COLOR = green[500];
 
-export default {
-    name: 'ProjectTrustedAdvisor',
-    components: {
-        PI,
-        WidgetLayout,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
+interface Props {
+    projectId: string;
+}
+
+const props = defineProps<Props>();
+const store = useStore();
+const { t } = useI18n();
+
+const queryHelper = new QueryHelper();
+
+const state = reactive({
+    loading: false,
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+    trustedAdvisorId: computed<string>(() => {
+        const trustedAdvisorId = findKey(state.cloudServiceTypes, { name: TRUSTED_ADVISOR });
+        return trustedAdvisorId || '';
+    }),
+    legends: computed(() => ([
+        {
+            name: STATUS.error,
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
+            color: ERROR_COLOR,
         },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const queryHelper = new QueryHelper();
+        {
+            name: STATUS.warning,
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
+            color: WARNING_COLOR,
+        },
+        {
+            name: STATUS.ok,
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
+            color: OK_COLOR,
+        },
+    ])),
+    categories: computed(() => ([
+        {
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
+            name: CATEGORY.costOptimizing,
+            icon: 'ic_coin-filled',
+        },
+        {
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
+            name: CATEGORY.performance,
+            icon: 'ic_performance-filled',
+        },
+        {
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
+            name: CATEGORY.security,
+            icon: 'ic_lock-filled',
+        },
+        {
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
+            name: CATEGORY.faultTolerance,
+            icon: 'ic_spanner-filled',
+        },
+        {
+            label: t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
+            name: CATEGORY.serviceLimits,
+            icon: 'ic_limit-filled',
+        },
+    ])),
+    data: null as any,
+    awsProvider: computed(() => state.providers.aws),
+});
 
-        const state = reactive({
-            loading: false,
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            trustedAdvisorId: computed<string>(() => {
-                const trustedAdvisorId = findKey(state.cloudServiceTypes, { name: TRUSTED_ADVISOR });
-                return trustedAdvisorId || '';
-            }),
-            legends: computed(() => ([
-                {
-                    name: STATUS.error,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
-                    color: ERROR_COLOR,
-                },
-                {
-                    name: STATUS.warning,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
-                    color: WARNING_COLOR,
-                },
-                {
-                    name: STATUS.ok,
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
-                    color: OK_COLOR,
-                },
-            ])),
-            categories: computed(() => ([
-                {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
-                    name: CATEGORY.costOptimizing,
-                    icon: 'ic_coin-filled',
-                },
-                {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
-                    name: CATEGORY.performance,
-                    icon: 'ic_performance-filled',
-                },
-                {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
-                    name: CATEGORY.security,
-                    icon: 'ic_lock-filled',
-                },
-                {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
-                    name: CATEGORY.faultTolerance,
-                    icon: 'ic_spanner-filled',
-                },
-                {
-                    label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
-                    name: CATEGORY.serviceLimits,
-                    icon: 'ic_limit-filled',
-                },
-            ])),
-            data: null as any,
-            awsProvider: computed(() => state.providers.aws),
-        });
+const linkFormatter = (category, status) => {
+    if (!state.trustedAdvisorId) return '';
 
-        const linkFormatter = (category, status) => {
-            if (!state.trustedAdvisorId) return '';
+    const filters: ConsoleFilter[] = [];
+    filters.push({ k: 'project_id', o: '=', v: props.projectId });
+    filters.push({ k: 'data.status', o: '=', v: status });
+    filters.push({ k: 'data.category', o: '=', v: category });
 
-            const filters: ConsoleFilter[] = [];
-            filters.push({ k: 'project_id', o: '=', v: props.projectId });
-            filters.push({ k: 'data.status', o: '=', v: status });
-            filters.push({ k: 'data.category', o: '=', v: category });
-
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                query: {
-                    filters: queryHelper.setFilters(filters).rawQueryStrings,
-                },
-                params: {
-                    provider: 'aws',
-                    group: CLOUD_SERVICE_GROUP,
-                    name: CLOUD_SERVICE_NAME,
-                },
-            };
-        };
-        const countFormatter = (category, status) => {
-            const categoryData = state.data[category];
-            if (!categoryData) return 0;
-            const statusData = categoryData[`${status}_count`];
-            if (!statusData) return 0;
-            return statusData;
-        };
-        const getData = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject({
-                    project_id: props.projectId,
-                });
-                state.data = res[props.projectId];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.data = null;
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const init = () => {
-            getData();
-        };
-        init();
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('reference/provider/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            countFormatter,
-            linkFormatter,
-        };
-    },
+    return {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        query: {
+            filters: queryHelper.setFilters(filters).rawQueryStrings,
+        },
+        params: {
+            provider: 'aws',
+            group: CLOUD_SERVICE_GROUP,
+            name: CLOUD_SERVICE_NAME,
+        },
+    };
 };
+const countFormatter = (category, status) => {
+    const categoryData = state.data[category];
+    if (!categoryData) return 0;
+    const statusData = categoryData[`${status}_count`];
+    if (!statusData) return 0;
+    return statusData;
+};
+const getData = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject({
+            project_id: props.projectId,
+        });
+        state.data = res[props.projectId];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.data = null;
+    } finally {
+        state.loading = false;
+    }
+};
+
+const init = () => {
+    getData();
+};
+init();
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/cloudServiceType/load'),
+        store.dispatch('reference/provider/load'),
+    ]);
+})();
+
 </script>
+
+<template>
+    <widget-layout class="simplified-trusted-advisor">
+        <template v-if="state.awsProvider"
+                  #title
+        >
+            <div class="title">
+                <span :style="{ color: state.awsProvider ? state.awsProvider.color : '' }">AWS </span>
+                <span>{{ t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
+            </div>
+        </template>
+        <template v-if="state.awsProvider">
+            <div v-if="state.loading" />
+            <div v-else-if="!state.data"
+                 class="no-data-wrapper"
+            >
+                <img alt="no-data-image"
+                     src="@/assets/images/illust_star.svg"
+                >
+                <div class="text">
+                    {{ t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
+                </div>
+            </div>
+            <template v-else>
+                <div class="content-wrapper">
+                    <div v-for="(category, cIdx) in state.categories"
+                         :key="cIdx"
+                         class="data-row"
+                    >
+                        <div class="left-part">
+                            <p-i :name="category.icon"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                                 color="inherit transparent"
+                            />
+                            <span class="text">{{ category.label }}</span>
+                        </div>
+                        <div class="right-part grid grid-cols-12 gap-2">
+                            <router-link v-for="(legend, lIdx) in state.legends"
+                                         :key="lIdx"
+                                         class="box col-span-4"
+                                         :class="legend.name"
+                                         :to="linkFormatter(category.name, legend.name)"
+                            >
+                                <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend-wrapper">
+                    <div v-for="(legend, index) in state.legends"
+                         :key="index"
+                         class="legend"
+                         :class="legend.name"
+                    >
+                        <div class="box" />
+                        <span class="text">{{ legend.label }}</span>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </widget-layout>
+</template>
 
 <style lang="postcss" scoped>
 .simplified-trusted-advisor {

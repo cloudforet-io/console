@@ -1,78 +1,20 @@
-<template>
-    <section class="event-rule-condition-form">
-        <div class="title-wrapper">
-            <p class="title">
-                <strong>{{ $t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
-            </p>
-            <p-button style-type="tertiary"
-                      icon-left="ic_plus_bold"
-                      class="add-button"
-                      @click="onClickAdd"
-            >
-                {{ $t('PROJECT.EVENT_RULE.ADD') }}
-            </p-button>
-        </div>
-        <div class="content-wrapper">
-            <div class="radio-wrapper">
-                <p-radio v-for="policy in conditionsPolicies"
-                         :key="policy.name"
-                         v-model="proxyConditionsPolicy"
-                         :value="policy.name"
-                         class="mr-4"
-                >
-                    {{ policy.label }}
-                </p-radio>
-                <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
-            </div>
-            <template v-for="(condition, idx) of proxyConditions">
-                <p-divider v-if="idx > 0"
-                           :key="`divider-${idx}`"
-                />
-                <div :key="`condition-${idx}`"
-                     class="input-wrapper"
-                >
-                    <div class="left-part">
-                        <p-select-dropdown v-model="condition.key"
-                                           class="input"
-                                           :items="keys"
-                                           use-fixed-menu-style
-                        />
-                        <p-select-dropdown v-model="condition.operator"
-                                           class="input"
-                                           :items="operators"
-                                           use-fixed-menu-style
-                        />
-                        <p-text-input v-model="condition.value"
-                                      class="input"
-                        />
-                    </div>
-                    <p-icon-button name="ic_delete"
-                                   class="delete-button"
-                                   :class="{ opacity: proxyConditions.length < 2}"
-                                   @click="onClickDelete(idx)"
-                    />
-                </div>
-            </template>
-        </div>
-    </section>
-</template>
-
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
+<script lang="ts" setup>
 
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import type { Condition } from '@/services/project/project-detail/project-alert/project-alert-event-rule/type';
 
 const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',
     ANY: 'ANY',
 });
+type ConditionsPolicy = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
 const OPERATOR = Object.freeze({
     eq: 'eq',
     contain: 'contain',
@@ -80,108 +22,151 @@ const OPERATOR = Object.freeze({
     not_contain: 'not_contain',
 });
 
-export default {
-    name: 'EventRuleConditionForm',
-    components: {
-        PButton,
-        PRadio,
-        PSelectDropdown,
-        PTextInput,
-        PIconButton,
-        PDivider,
-    },
-    props: {
-        conditionsPolicy: {
-            type: String,
-            default: CONDITIONS_POLICY.ALL,
-        },
-        conditions: {
-            type: Array,
-            default: () => ([]),
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            conditionsPolicies: computed(() => ([
-                {
-                    name: CONDITIONS_POLICY.ALL,
-                    label: i18n.t('PROJECT.EVENT_RULE.ALL'),
-                },
-                {
-                    name: CONDITIONS_POLICY.ANY,
-                    label: i18n.t('PROJECT.EVENT_RULE.ANY'),
-                },
-            ])),
-            operators: computed(() => ([
-                {
-                    name: OPERATOR.contain,
-                    label: i18n.t('PROJECT.EVENT_RULE.CONTAINS'),
-                },
-                {
-                    name: OPERATOR.not_contain,
-                    label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_CONTAIN'),
-                },
-                {
-                    name: OPERATOR.eq,
-                    label: i18n.t('PROJECT.EVENT_RULE.EQUALS'),
-                },
-                {
-                    name: OPERATOR.not,
-                    label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
-                },
-            ])),
-            proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
-            proxyConditions: useProxyValue('conditions', props, emit),
-            keys: [
-                {
-                    name: 'title',
-                    label: 'Title',
-                },
-                {
-                    name: 'description',
-                    label: 'Description',
-                },
-                {
-                    name: 'rule',
-                    label: 'Rule',
-                },
-                {
-                    name: 'resource_id',
-                    label: 'Resource ID',
-                },
-                {
-                    name: 'resource_name',
-                    label: 'Resource Name',
-                },
-                {
-                    name: 'resource_type',
-                    label: 'Resource Type',
-                },
-            ],
-        });
+interface Props {
+    conditionsPolicy: ConditionsPolicy
+    conditions: Condition[];
+}
 
-        /* event */
-        const onClickAdd = () => {
-            state.proxyConditions.push({
-                key: '',
-                value: '',
-                operator: OPERATOR.contain,
-            });
-        };
-        const onClickDelete = (idx) => {
-            const conditions = [...state.proxyConditions];
-            conditions.splice(idx, 1);
-            state.proxyConditions = conditions;
-        };
+const props = withDefaults(defineProps<Props>(), {
+    conditionsPolicy: CONDITIONS_POLICY.ALL,
+    conditions: () => ([]),
+});
+const emit = defineEmits<{(e: 'update:conditionsPolicy', value: ConditionsPolicy): void;
+    (e: 'update:conditions', value: Condition[]): void;
+}>();
+const { t } = useI18n();
 
-        return {
-            ...toRefs(state),
-            onClickAdd,
-            onClickDelete,
-        };
-    },
+const state = reactive({
+    conditionsPolicies: computed(() => ([
+        {
+            name: CONDITIONS_POLICY.ALL,
+            label: t('PROJECT.EVENT_RULE.ALL'),
+        },
+        {
+            name: CONDITIONS_POLICY.ANY,
+            label: t('PROJECT.EVENT_RULE.ANY'),
+        },
+    ])),
+    operators: computed(() => ([
+        {
+            name: OPERATOR.contain,
+            label: t('PROJECT.EVENT_RULE.CONTAINS'),
+        },
+        {
+            name: OPERATOR.not_contain,
+            label: t('PROJECT.EVENT_RULE.DOES_NOT_CONTAIN'),
+        },
+        {
+            name: OPERATOR.eq,
+            label: t('PROJECT.EVENT_RULE.EQUALS'),
+        },
+        {
+            name: OPERATOR.not,
+            label: t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
+        },
+    ])),
+    proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
+    proxyConditions: useProxyValue('conditions', props, emit),
+    keys: [
+        {
+            name: 'title',
+            label: 'Title',
+        },
+        {
+            name: 'description',
+            label: 'Description',
+        },
+        {
+            name: 'rule',
+            label: 'Rule',
+        },
+        {
+            name: 'resource_id',
+            label: 'Resource ID',
+        },
+        {
+            name: 'resource_name',
+            label: 'Resource Name',
+        },
+        {
+            name: 'resource_type',
+            label: 'Resource Type',
+        },
+    ],
+});
+
+/* event */
+const onClickAdd = () => {
+    state.proxyConditions.push({
+        key: '',
+        value: '',
+        operator: OPERATOR.contain,
+    });
 };
+const onClickDelete = (idx) => {
+    const conditions = [...state.proxyConditions];
+    conditions.splice(idx, 1);
+    state.proxyConditions = conditions;
+};
+
 </script>
+
+<template>
+    <section class="event-rule-condition-form">
+        <div class="title-wrapper">
+            <p class="title">
+                <strong>{{ t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
+            </p>
+            <p-button style-type="tertiary"
+                      icon-left="ic_plus_bold"
+                      class="add-button"
+                      @click="onClickAdd"
+            >
+                {{ t('PROJECT.EVENT_RULE.ADD') }}
+            </p-button>
+        </div>
+        <div class="content-wrapper">
+            <div class="radio-wrapper">
+                <p-radio v-for="policy in state.conditionsPolicies"
+                         :key="policy.name"
+                         v-model:value="state.proxyConditionsPolicy"
+                         :value="policy.name"
+                         class="mr-4"
+                >
+                    {{ policy.label }}
+                </p-radio>
+                <span>{{ t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
+            </div>
+            <template v-for="(condition, idx) of state.proxyConditions"
+                      :key="`condition-${idx}`"
+            >
+                <p-divider v-if="idx > 0" />
+                <div class="input-wrapper">
+                    <div class="left-part">
+                        <p-select-dropdown v-model:selected="condition.key"
+                                           class="input"
+                                           :items="keys"
+                                           use-fixed-menu-style
+                        />
+                        <p-select-dropdown v-model:selected="condition.operator"
+                                           class="input"
+                                           :items="state.operators"
+                                           use-fixed-menu-style
+                        />
+                        <p-text-input v-model:value="condition.value"
+                                      class="input"
+                        />
+                    </div>
+                    <p-icon-button name="ic_delete"
+                                   class="delete-button"
+                                   :class="{ opacity: state.proxyConditions.length < 2}"
+                                   @click="onClickDelete(idx)"
+                    />
+                </div>
+            </template>
+        </div>
+    </section>
+</template>
 
 <style lang="postcss" scoped>
 .title-wrapper {

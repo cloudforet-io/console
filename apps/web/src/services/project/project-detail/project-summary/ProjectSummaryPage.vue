@@ -1,10 +1,61 @@
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
+
+import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
+import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
+import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';
+import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
+import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
+import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
+
+interface Props {
+    id: string;
+}
+
+const props = defineProps<Props>();
+const store = useStore();
+
+const state = reactive({
+    hasAlertConfig: false,
+});
+
+/* api */
+const getProjectAlertConfig = async () => {
+    try {
+        const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
+            project_id: props.id,
+        });
+        state.hasAlertConfig = !!results.length;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+(async () => {
+    await Promise.allSettled([
+        getProjectAlertConfig(),
+        // LOAD REFERENCE STORE
+        store.dispatch('reference/cloudServiceType/load'),
+    ]);
+})();
+
+</script>
+
 <template>
     <div class="grid grid-cols-12 project-dashboard-page">
         <project-all-summary class="col-span-12"
                              :project-id="id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-alert-widget v-if="hasAlertConfig"
+            <project-alert-widget v-if="state.hasAlertConfig"
                                   class="col-span-12"
                                   :project-id="id"
             />
@@ -32,76 +83,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    reactive, toRefs,
-} from 'vue';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
-
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
-import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
-import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';
-import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
-import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
-import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
-
-export default {
-    name: 'ProjectDashboardPage',
-    components: {
-        ProjectAlertWidget,
-        ProjectBilling,
-        ProjectPersonalHealthDashboard,
-        ProjectTrustedAdvisor,
-        ProjectAllSummary,
-        CloudServices,
-        DailyUpdates,
-        ProjectServiceAccounts,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            hasAlertConfig: false,
-        });
-
-        /* api */
-        const getProjectAlertConfig = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
-                    project_id: props.id,
-                });
-                state.hasAlertConfig = !!results.length;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                getProjectAlertConfig(),
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom widget-layout */

@@ -1,61 +1,4 @@
-<template>
-    <div class="project-alert-widget">
-        <div class="title">
-            <span>{{ $t('PROJECT.DETAIL.SUMMARY.ALERT') }}</span>
-        </div>
-        <div class="content-wrapper">
-            <div class="button-group">
-                <router-link v-for="(alertState, idx) in alertStates"
-                             :key="`button-${idx}`"
-                             :to="alertLinkFormatter(alertState.name)"
-                             class="button"
-                             :style="{ color: alertState.color }"
-                >
-                    <strong>{{ commaFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
-                </router-link>
-            </div>
-            <p-list-card :items="items"
-                         :loading="loading"
-                         :hoverable="true"
-            >
-                <template #header>
-                    <p class="left-part">
-                        <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ commaFormatter(totalCount) }})
-                    </p>
-                    <p class="right-part">
-                        <p-select-button v-for="(state, idx) in assignedStateList"
-                                         :key="`assigned-${idx}`"
-                                         v-model="selectedAssignedState"
-                                         class="assigned-button"
-                                         :value="state.name"
-                                         size="sm"
-                                         style-type="gray"
-                                         @change="listAlerts"
-                        >
-                            {{ state.label }}
-                        </p-select-button>
-                        <p-text-pagination
-                            v-model:this-page="thisPage"
-                            :all-page="allPage"
-                            :show-page-number="false"
-                            @pageChange="listAlerts"
-                        />
-                    </p>
-                </template>
-                <template #item="{item}">
-                    <alert-list-item
-                        :item="item"
-                        :show-member-name="true"
-                        :user-reference="users[item.assignee]"
-                    />
-                </template>
-            </p-list-card>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-
+<script lang="ts" setup>
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -66,12 +9,11 @@ import {
 } from '@spaceone/design-system';
 import { find } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useStore } from 'vuex';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
@@ -81,145 +23,184 @@ import { alert, secondary } from '@/styles/colors';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-import type { AlertListPageUrlQuery } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
 });
+interface Props {
+    projectId: string;
+}
 
-export default {
-    name: 'ProjectAlertWidget',
-    components: {
-        AlertListItem,
-        PListCard,
-        PSelectButton,
-        PTextPagination,
-    },
-    props: {
-        projectId: {
-            type: String,
-            required: true,
+const props = defineProps<Props>();
+const store = useStore();
+const { t } = useI18n();
+
+const state = reactive({
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    alertStates: computed(() => ([
+        {
+            name: ALERT_STATE.TRIGGERED,
+            label: t('PROJECT.DETAIL.SUMMARY.TRIGGERED'),
+            color: alert,
         },
-    },
-    setup(props) {
-        const state = reactive({
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            alertStates: computed(() => ([
-                {
-                    name: ALERT_STATE.TRIGGERED,
-                    label: i18n.t('PROJECT.DETAIL.SUMMARY.TRIGGERED'),
-                    color: alert,
-                },
-                {
-                    name: ALERT_STATE.ACKNOWLEDGED,
-                    label: i18n.t('PROJECT.DETAIL.SUMMARY.ACKNOWLEDGED'),
-                    color: secondary,
-                },
-                {
-                    name: ALERT_STATE.RESOLVED,
-                    label: i18n.t('PROJECT.DETAIL.SUMMARY.RESOLVED'),
-                },
-            ])),
-            alertStateCounts: [],
-            counts: computed(() => ({
-                TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
-                ACKNOWLEDGED: find(state.alertStateCounts, { state: ALERT_STATE.ACKNOWLEDGED })?.total || 0,
-                RESOLVED: find(state.alertStateCounts, { state: ALERT_STATE.RESOLVED })?.total || 0,
-            })),
-            //
-            loading: true,
-            assignedStateList: computed(() => [
-                {
-                    name: ASSIGNED_STATE.ALL,
-                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL'),
-                },
-                {
-                    name: ASSIGNED_STATE.ASSIGNED_TO_ME,
-                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
-                },
-            ]),
-            selectedAssignedState: ASSIGNED_STATE.ALL,
-            items: [],
-            totalCount: 0,
-            thisPage: 1,
-            allPage: 1,
-            pageSize: 10,
-        });
+        {
+            name: ALERT_STATE.ACKNOWLEDGED,
+            label: t('PROJECT.DETAIL.SUMMARY.ACKNOWLEDGED'),
+            color: secondary,
+        },
+        {
+            name: ALERT_STATE.RESOLVED,
+            label: t('PROJECT.DETAIL.SUMMARY.RESOLVED'),
+        },
+    ])),
+    alertStateCounts: [],
+    counts: computed(() => ({
+        TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
+        ACKNOWLEDGED: find(state.alertStateCounts, { state: ALERT_STATE.ACKNOWLEDGED })?.total || 0,
+        RESOLVED: find(state.alertStateCounts, { state: ALERT_STATE.RESOLVED })?.total || 0,
+    })),
+    //
+    loading: true,
+    assignedStateList: computed(() => [
+        {
+            name: ASSIGNED_STATE.ALL,
+            label: t('MONITORING.ALERT.DASHBOARD.ALL'),
+        },
+        {
+            name: ASSIGNED_STATE.ASSIGNED_TO_ME,
+            label: t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
+        },
+    ]),
+    selectedAssignedState: ASSIGNED_STATE.ALL,
+    items: [],
+    totalCount: 0,
+    thisPage: 1,
+    allPage: 1,
+    pageSize: 10,
+});
 
-        /* util */
-        const alertLinkFormatter = (alertState): RouteLocation => ({
-            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
-            query: {
-                state: alertState,
-            } as AlertListPageUrlQuery,
-        });
+/* util */
+const alertLinkFormatter = (alertState): RouteLocation => ({
+    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+    query: {
+        state: alertState,
+    } as RouteLocation['query'],
+} as RouteLocation);
 
-        /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery
-                .setSort('created_at', true)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-            if (state.selectedAssignedState === ASSIGNED_STATE.ASSIGNED_TO_ME) {
-                apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
-            } else {
-                apiQuery.setFilters([
-                    { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
-                ]);
-            }
-            return apiQuery.data;
-        };
-        const listAlerts = async () => {
-            try {
-                state.loading = true;
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
-                    project_id: props.projectId,
-                    query: getQuery(),
-                });
-                state.totalCount = total_count;
-                state.allPage = getAllPage(total_count, 10);
-                state.items = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
-        const statAlerts = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
-                    project_id: props.projectId,
-                });
-                state.alertStateCounts = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.alertStateCounts = 0;
-            }
-        };
-
-        (async () => {
-            await store.dispatch('reference/user/load');
-        })();
-
-        watch(() => props.projectId, async (projectId) => {
-            if (projectId) {
-                await Promise.all([statAlerts(), listAlerts()]);
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            listAlerts,
-            alertLinkFormatter,
-            commaFormatter,
-        };
-    },
+/* api */
+const apiQuery = new ApiQueryHelper();
+const getQuery = () => {
+    apiQuery
+        .setSort('created_at', true)
+        .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+    if (state.selectedAssignedState === ASSIGNED_STATE.ASSIGNED_TO_ME) {
+        apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
+    } else {
+        apiQuery.setFilters([
+            { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
+        ]);
+    }
+    return apiQuery.data;
 };
+const listAlerts = async () => {
+    try {
+        state.loading = true;
+        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+            project_id: props.projectId,
+            query: getQuery(),
+        });
+        state.totalCount = total_count;
+        state.allPage = getAllPage(total_count, 10);
+        state.items = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+const statAlerts = async () => {
+    try {
+        const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
+            project_id: props.projectId,
+        });
+        state.alertStateCounts = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.alertStateCounts = 0;
+    }
+};
+
+(async () => {
+    await store.dispatch('reference/user/load');
+})();
+
+watch(() => props.projectId, async (projectId) => {
+    if (projectId) {
+        await Promise.all([statAlerts(), listAlerts()]);
+    }
+}, { immediate: true });
+
 </script>
+
+<template>
+    <div class="project-alert-widget">
+        <div class="title">
+            <span>{{ t('PROJECT.DETAIL.SUMMARY.ALERT') }}</span>
+        </div>
+        <div class="content-wrapper">
+            <div class="button-group">
+                <router-link v-for="(alertState, idx) in state.alertStates"
+                             :key="`button-${idx}`"
+                             :to="alertLinkFormatter(alertState.name)"
+                             class="button"
+                             :style="{ color: alertState.color }"
+                >
+                    <strong>{{ commaFormatter(state.counts[alertState.name]) }}</strong> {{ alertState.label }}
+                </router-link>
+            </div>
+            <p-list-card :items="state.items"
+                         :loading="state.loading"
+                         :hoverable="true"
+            >
+                <template #header>
+                    <p class="left-part">
+                        <strong>{{ t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ commaFormatter(state.totalCount) }})
+                    </p>
+                    <p class="right-part">
+                        <p-select-button v-for="(_state, idx) in state.assignedStateList"
+                                         :key="`assigned-${idx}`"
+                                         v-model:selected="state.selectedAssignedState"
+                                         class="assigned-button"
+                                         :value="_state.name"
+                                         size="sm"
+                                         style-type="gray"
+                                         @change="listAlerts"
+                        >
+                            {{ _state.label }}
+                        </p-select-button>
+                        <p-text-pagination
+                            v-model:this-page="state.thisPage"
+                            :all-page="state.allPage"
+                            :show-page-number="false"
+                            @page-change="listAlerts"
+                        />
+                    </p>
+                </template>
+                <template #item="{item}">
+                    <alert-list-item
+                        :item="item"
+                        :show-member-name="true"
+                        :user-reference="state.users[item.assignee]"
+                    />
+                </template>
+            </p-list-card>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .title {

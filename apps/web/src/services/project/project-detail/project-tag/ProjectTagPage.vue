@@ -1,3 +1,16 @@
+<script lang="ts" setup>
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
+
+interface Props {
+    id: string;
+}
+
+defineProps<Props>();
+const hasManagePermission = useManagePermissionState();
+
+</script>
+
 <template>
     <tags-panel :resource-id="id"
                 :disabled="!hasManagePermission"
@@ -7,28 +20,6 @@
     />
 </template>
 
-<script lang="ts">
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-
-export default {
-    name: 'ProjectTagPage',
-    components: {
-        TagsPanel,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup() {
-        return {
-            hasManagePermission: useManagePermissionState(),
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .tab-bg {
     @apply pb-0 border-none;

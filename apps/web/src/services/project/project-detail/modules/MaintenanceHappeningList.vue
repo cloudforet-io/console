@@ -1,7 +1,45 @@
+<script lang="ts" setup>
+
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { PListCard, PI } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
+import type { MaintenanceHappening } from '@/services/project/store/project-detail-page-store';
+
+const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
+
+const store = useStore();
+const { t } = useI18n();
+
+const projectDetailPageStore = useProjectDetailPageStore();
+const projectDetailPageState = projectDetailPageStore.$state;
+const state = reactive({
+    loading: false,
+    maintenanceHappenings: computed<MaintenanceHappening[]>(() => projectDetailPageState.maintenanceHappenings),
+    timezone: computed(() => store.state.user.timezone),
+    visible: true,
+});
+
+const onClickHeader = () => {
+    state.visible = false;
+};
+
+/* Init */
+(async () => {
+    state.loading = true;
+    await projectDetailPageStore.loadMaintenanceHappenings();
+    state.loading = false;
+})();
+
+</script>
+
 <template>
-    <p-list-card v-if="visible && !loading && maintenanceHappenings.length !== 0"
-                 :loading="loading"
-                 :items="maintenanceHappenings"
+    <p-list-card v-if="state.visible && !state.loading && state.maintenanceHappenings.length !== 0"
+                 :loading="state.loading"
+                 :items="state.maintenanceHappenings"
                  style-type="yellow500"
     >
         <template #header>
@@ -14,7 +52,7 @@
                      color="inherit"
                      class="icon"
                 />
-                <span class="text">{{ $t('PROJECT.DETAIL.NOW_HAPPENING_MAINTENANCE') }}</span>
+                <span class="text">{{ t('PROJECT.DETAIL.NOW_HAPPENING_MAINTENANCE') }}</span>
                 <p-i name="ic_close"
                      height="1.25rem"
                      width="1.25rem"
@@ -27,64 +65,13 @@
             <div>
                 <span class="title">{{ item.title }}</span>
                 <span>
-                    {{ iso8601Formatter(item.startTime, timezone, TIME_FORMAT) }} ~
-                    {{ iso8601Formatter(item.endTime, timezone, TIME_FORMAT) }}
+                    {{ iso8601Formatter(item.startTime, state.timezone, TIME_FORMAT) }} ~
+                    {{ iso8601Formatter(item.endTime, state.timezone, TIME_FORMAT) }}
                 </span>
             </div>
         </template>
     </p-list-card>
 </template>
-
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
-
-import { PListCard, PI } from '@spaceone/design-system';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-
-import { store } from '@/store';
-
-import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
-import type { MaintenanceHappening } from '@/services/project/store/project-detail-page-store';
-
-const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
-export default {
-    name: 'MaintenanceHappeningList',
-    components: {
-        PListCard,
-        PI,
-    },
-    setup() {
-        const projectDetailPageStore = useProjectDetailPageStore();
-        const projectDetailPageState = projectDetailPageStore.$state;
-        const state = reactive({
-            loading: false,
-            maintenanceHappenings: computed<MaintenanceHappening[]>(() => projectDetailPageState.maintenanceHappenings),
-            timezone: computed(() => store.state.user.timezone),
-            visible: true,
-        });
-
-        const onClickHeader = () => {
-            state.visible = false;
-        };
-
-        /* Init */
-        (async () => {
-            state.loading = true;
-            await projectDetailPageStore.loadMaintenanceHappenings();
-            state.loading = false;
-        })();
-
-        return {
-            ...toRefs(state),
-            onClickHeader,
-            iso8601Formatter,
-            TIME_FORMAT,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .header-wrapper {

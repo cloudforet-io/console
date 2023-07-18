@@ -1,65 +1,13 @@
-<template>
-    <p-button-modal
-        class="webhook-add-modal"
-        size="md"
-        :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
-        :visible.sync="proxyVisible"
-        :disabled="showValidation && (!isNameValid || !isSelectedWebhookType)"
-        :loading="loading"
-        @confirm="onClickConfirm"
-    >
-        <template #body>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_NAME')"
-                required
-                :invalid="showValidation && !isNameValid"
-                :invalid-text="nameInvalidText"
-            >
-                <p-text-input
-                    v-model="webhookName"
-                    :invalid="showValidation && !isNameValid"
-                    :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
-                    :disabled="loading"
-                    @update:value.once="onFirstInputName"
-                />
-            </p-field-group>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_TYPE')"
-                required
-            >
-                <div class="select-card-wrapper">
-                    <p-select-card
-                        v-for="(item, index) in webhookTypeList"
-                        :key="index"
-                        v-model="selectedWebhookType"
-                        :tab-index="index"
-                        :image-url="item.tags.icon"
-                        icon="ic_webhook"
-                        :value="item"
-                        :label="item.name"
-                        :disabled="loading"
-                        :invalid="showValidation"
-                    />
-                </div>
-            </p-field-group>
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
+<script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { i18n } from '@/translations';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -73,128 +21,161 @@ interface WebhookType {
     data: any;
 }
 
-export default {
-    name: 'WebhookAddFormModal',
-    components: {
-        PButtonModal,
-        PFieldGroup,
-        PTextInput,
-        PSelectCard,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            required: false,
-        },
-        projectId: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            loading: false,
-            webhookName: '',
-            nameInvalidText: computed(() => {
-                if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
-                if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
-                return undefined;
-            }),
-            isNameValid: computed(() => !state.nameInvalidText),
-            webhookTypeList: [] as WebhookType[],
-            selectedWebhookType: {} as WebhookType,
-            isSelectedWebhookType: computed(() => {
-                if (Object.keys(state.selectedWebhookType).length === 0) return false;
-                return true;
-            }),
-            showValidation: false,
-        });
+interface Props {
+    projectId: string;
+    visible: boolean;
+}
 
-        /* api */
-        const repositoryIdApiQuery = new ApiQueryHelper();
-        const listApiQuery = new ApiQueryHelper();
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
+}>();
+const { t } = useI18n();
 
-        const getRepositoryID = async () => {
-            repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
-            const res = await SpaceConnector.client.repository.repository.list({
-                query: repositoryIdApiQuery.data,
-            });
-            const repositoryId = res.results[0].repository_id;
-            return repositoryId;
-        };
-        const getListWebhookType = async () => {
-            try {
-                listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
-                const repositoryId = await getRepositoryID();
-                const { results } = await SpaceConnector.client.repository.plugin.list({
-                    repository_id: repositoryId,
-                    query: listApiQuery.data,
-                });
-                state.webhookTypeList = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.webhookTypeList = [];
-            }
-        };
-        const createWebhook = async () => {
-            state.loading = true;
-            try {
-                await SpaceConnector.client.monitoring.webhook.create({
-                    name: state.webhookName,
-                    plugin_info: {
-                        plugin_id: state.selectedWebhookType?.plugin_id,
-                        options: {},
-                    },
-                    project_id: props.projectId,
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
-            } finally {
-                state.loading = false;
-                state.proxyVisible = false;
-            }
-        };
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    loading: false,
+    webhookName: '',
+    nameInvalidText: computed(() => {
+        if (state.webhookName?.length === 0) return t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
+        if (state.webhookName?.length > 40) return t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
+        return undefined;
+    }),
+    isNameValid: computed(() => !state.nameInvalidText),
+    webhookTypeList: [] as WebhookType[],
+    selectedWebhookType: {} as WebhookType,
+    isSelectedWebhookType: computed(() => {
+        if (Object.keys(state.selectedWebhookType).length === 0) return false;
+        return true;
+    }),
+    showValidation: false,
+});
 
-        /* event */
-        const onFirstInputName = (value) => {
-            state.disabled = true;
-            state.showValidation = true;
-            state.webhookName = value;
-        };
-        const onClickConfirm = async () => {
-            if (!state.showValidation) {
-                state.showValidation = true;
-                return;
-            }
+/* api */
+const repositoryIdApiQuery = new ApiQueryHelper();
+const listApiQuery = new ApiQueryHelper();
 
-            await createWebhook();
-            emit('confirm');
-        };
-
-        /* init */
-        const initInputModel = () => {
-            state.webhookName = '';
-            state.selectedWebhookType = {} as WebhookType;
-            state.disabled = false;
-            state.showValidation = false;
-        };
-
-        watch(() => props.visible, () => {
-            initInputModel();
-            getListWebhookType();
-        }, { immediate: true });
-
-
-        return {
-            ...toRefs(state),
-            onClickConfirm,
-            onFirstInputName,
-        };
-    },
+const getRepositoryID = async () => {
+    repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
+    const res = await SpaceConnector.client.repository.repository.list({
+        query: repositoryIdApiQuery.data,
+    });
+    const repositoryId = res.results[0].repository_id;
+    return repositoryId;
 };
+const getListWebhookType = async () => {
+    try {
+        listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
+        const repositoryId = await getRepositoryID();
+        const { results } = await SpaceConnector.client.repository.plugin.list({
+            repository_id: repositoryId,
+            query: listApiQuery.data,
+        });
+        state.webhookTypeList = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.webhookTypeList = [];
+    }
+};
+const createWebhook = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.client.monitoring.webhook.create({
+            name: state.webhookName,
+            plugin_info: {
+                plugin_id: state.selectedWebhookType?.plugin_id,
+                options: {},
+            },
+            project_id: props.projectId,
+        });
+        showSuccessMessage(t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
+    } finally {
+        state.loading = false;
+        state.proxyVisible = false;
+    }
+};
+
+/* event */
+const onFirstInputName = (value) => {
+    state.disabled = true;
+    state.showValidation = true;
+    state.webhookName = value;
+};
+const onClickConfirm = async () => {
+    if (!state.showValidation) {
+        state.showValidation = true;
+        return;
+    }
+
+    await createWebhook();
+    emit('confirm');
+};
+
+/* init */
+const initInputModel = () => {
+    state.webhookName = '';
+    state.selectedWebhookType = {} as WebhookType;
+    state.disabled = false;
+    state.showValidation = false;
+};
+
+watch(() => props.visible, () => {
+    initInputModel();
+    getListWebhookType();
+}, { immediate: true });
+
 </script>
+
+<template>
+    <p-button-modal
+        v-model:visible="state.proxyVisible"
+        class="webhook-add-modal"
+        size="md"
+        :header-title="t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
+        :disabled="state.showValidation && (!state.isNameValid || !state.isSelectedWebhookType)"
+        :loading="state.loading"
+        @confirm="onClickConfirm"
+    >
+        <template #body>
+            <p-field-group
+                :label="t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_NAME')"
+                required
+                :invalid="state.showValidation && !state.isNameValid"
+                :invalid-text="state.nameInvalidText"
+            >
+                <p-text-input
+                    v-model:value="state.webhookName"
+                    :invalid="state.showValidation && !state.isNameValid"
+                    :placeholder="t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
+                    :disabled="state.loading"
+                    @update:value.once="onFirstInputName"
+                />
+            </p-field-group>
+            <p-field-group
+                :label="t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_TYPE')"
+                required
+            >
+                <div class="select-card-wrapper">
+                    <p-select-card
+                        v-for="(item, index) in state.webhookTypeList"
+                        :key="index"
+                        v-model:selected="state.selectedWebhookType"
+                        setup
+                        :tab-index="index"
+                        :image-url="item.tags.icon"
+                        icon="ic_webhook"
+                        :value="item"
+                        :label="item.name"
+                        :disabled="state.loading"
+                        :invalid="state.showValidation"
+                    />
+                </div>
+            </p-field-group>
+        </template>
+    </p-button-modal>
+</template>
 
 <style lang="postcss" scoped>
 .webhook-add-modal {
