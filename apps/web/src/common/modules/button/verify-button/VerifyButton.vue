@@ -1,48 +1,8 @@
-<template>
-    <div class="verify-button-wrapper">
-        <div class="verify-button">
-            <p-button v-if="props.verified"
-                      style-type="tertiary"
-                      :loading="state.loading"
-                      :size="props.isAdministration ? 'sm' : 'md'"
-                      @click.prevent="handleClickVerifiedEmail(MODAL_TYPE.SEND)"
-            >
-                <p-i v-if="!props.isAdministration"
-                     name="ic_edit"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit"
-                     class="icon-edit"
-                />
-                {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
-            </p-button>
-            <p-button v-else
-                      style-type="primary"
-                      :disabled="!props.isAdministration && (props.email === '' || emailValidator(props.email))"
-                      :loading="state.loading"
-                      :size="props.isAdministration ? 'sm' : 'md'"
-                      @click.prevent="handleClickVerifiedEmail(MODAL_TYPE.VERIFY)"
-            >
-                {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
-            </p-button>
-        </div>
-        <notification-email-modal
-            :domain-id="props.domainId"
-            :user-id="props.userId"
-            :email="props.email"
-            :modal-type="state.modalType"
-            :visible.sync="state.isModalVisible"
-            @refresh-user="handleGetUserDetailEmit"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-
 import { PButton, PI } from '@spaceone/design-system';
-
-import { store } from '@/store';
+import { computed, reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationEmail } from '@/lib/helper/verify-email-helper';
@@ -69,6 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'refresh-user', userId: string): void}>();
+const { t } = useI18n();
+const store = useStore();
 
 const state = reactive({
     loading: false,
@@ -110,6 +72,45 @@ watch(() => state.isModalVisible, (value) => {
     }
 });
 </script>
+
+<template>
+    <div class="verify-button-wrapper">
+        <div class="verify-button">
+            <p-button v-if="props.verified"
+                      style-type="tertiary"
+                      :loading="state.loading"
+                      :size="props.isAdministration ? 'sm' : 'md'"
+                      @click.prevent="handleClickVerifiedEmail(MODAL_TYPE.SEND)"
+            >
+                <p-i v-if="!props.isAdministration"
+                     name="ic_edit"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit"
+                     class="icon-edit"
+                />
+                {{ t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
+            </p-button>
+            <p-button v-else
+                      style-type="primary"
+                      :disabled="!props.isAdministration && (props.email === '' || emailValidator(props.email))"
+                      :loading="state.loading"
+                      :size="props.isAdministration ? 'sm' : 'md'"
+                      @click.prevent="handleClickVerifiedEmail(MODAL_TYPE.VERIFY)"
+            >
+                {{ t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
+            </p-button>
+        </div>
+        <notification-email-modal
+            v-model:visible="state.isModalVisible"
+            :domain-id="props.domainId"
+            :user-id="props.userId"
+            :email="props.email"
+            :modal-type="state.modalType"
+            @refresh-user="handleGetUserDetailEmit"
+        />
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .verify-button {

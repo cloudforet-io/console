@@ -1,5 +1,5 @@
 <template>
-    <p-text-input :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
+    <p-text-input :placeholder="t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
                   :handler="handler"
                   :selected="selected"
                   multi-input
@@ -12,18 +12,19 @@
 </template>
 
 <script setup lang="ts">
-import {
-    computed, ref, watch,
-} from 'vue';
 
-import {
-    PTextInput,
-} from '@spaceone/design-system';
-import type { TextInputHandler, InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import {
+    PTextInput,
+} from '@spaceone/design-system';
+import type { TextInputHandler, InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
+import {
+    computed, ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<{
     resourceType: '',
 });
 const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void}>();
+const { t } = useI18n();
 
 /* handler */
 const tagsQueryHelper = new QueryHelper();

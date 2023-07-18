@@ -1,5 +1,5 @@
 <template>
-    <p-query-input :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
+    <p-query-input :placeholder="t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
                    use-fixed-menu-style
                    block
                    :selected="selected"
@@ -12,11 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-    computed,
-    ref, watch,
-} from 'vue';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 import {
     PQueryInput,
 } from '@spaceone/design-system';
@@ -24,10 +23,11 @@ import type {
     QueryItem, ValueHandlerMap, ValueHandler, KeyItemSet,
 } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { isEqual } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import {
+    computed,
+    ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { store } from '@/store';
 
@@ -49,8 +49,8 @@ const props = withDefaults(defineProps<{
     options: () => ({}),
     isServerPage: false,
 });
-
 const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void}>();
+const { t } = useI18n();
 
 /* providers */
 const providersMap = computed<ProviderReferenceMap>(() => ({

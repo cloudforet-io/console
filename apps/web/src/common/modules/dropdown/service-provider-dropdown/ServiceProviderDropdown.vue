@@ -1,17 +1,59 @@
+<script lang="ts" setup>
+import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
+interface Props {
+    hasAll: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    hasAll: false,
+});
+const store = useStore();
+const { t } = useI18n();
+
+const cloudServicePageStore = useCloudServicePageStore();
+const cloudServicePageState = cloudServicePageStore.$state;
+
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    selectedProviderItem: computed(() => state.providers[cloudServicePageState.selectedProvider]),
+    contextMenuItems: computed(() => [
+        { type: 'header', name: 'serviceProvider', label: t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
+        ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
+        ...Object.keys(state.providers).map((k) => ({
+            label: state.providers[k].name,
+            name: k,
+            icon: state.providers[k]?.icon,
+        })),
+    ]),
+});
+const handleSelect = (provider: string) => {
+    cloudServicePageStore.setSelectedProvider(provider);
+};
+
+</script>
+
 <template>
     <p-select-dropdown class="service-provider-dropdown"
                        :selected="cloudServicePageState.selectedProvider"
-                       :items="contextMenuItems"
+                       :items="state.contextMenuItems"
                        @select="handleSelect"
     >
-        <span v-if="selectedProviderItem"
+        <span v-if="state.selectedProviderItem"
               class="text"
         >
             <p-lazy-img width="1rem"
                         height="1rem"
-                        :src="selectedProviderItem.icon"
+                        :src="state.selectedProviderItem.icon"
                         class="mr-1"
-            /><span>{{ selectedProviderItem.name }}</span>
+            /><span>{{ state.selectedProviderItem.name }}</span>
         </span>
         <span v-else-if="hasAll"
               class="text"
@@ -34,64 +76,6 @@
         </template>
     </p-select-dropdown>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
-
-
-export default {
-    name: 'ServiceProviderDropdown',
-    components: {
-        PSelectDropdown,
-        PLazyImg,
-    },
-    model: {
-        prop: 'selectedProvider',
-        event: 'update:selectedProvider',
-    },
-    props: {
-        hasAll: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.$state;
-
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            selectedProviderItem: computed(() => state.providers[cloudServicePageState.selectedProvider]),
-            contextMenuItems: computed(() => [
-                { type: 'header', name: 'serviceProvider', label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
-                ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
-                ...Object.keys(state.providers).map((k) => ({
-                    label: state.providers[k].name,
-                    name: k,
-                    icon: state.providers[k]?.icon,
-                })),
-            ]),
-        });
-        const handleSelect = (provider: string) => {
-            cloudServicePageStore.setSelectedProvider(provider);
-        };
-        return {
-            ...toRefs(state),
-            cloudServicePageState,
-            handleSelect,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */
