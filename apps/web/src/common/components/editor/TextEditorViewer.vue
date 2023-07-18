@@ -1,15 +1,6 @@
-<template>
-    <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents"
-         v-html="refinedContents"
-    />
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
+<script lang="ts" setup>
 import {
     computed,
-    defineComponent,
 } from 'vue';
 
 import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
@@ -22,28 +13,22 @@ interface Props {
     attachments: Attachment[]
 }
 
-export default defineComponent<Props>({
-    name: 'TextEditorViewer',
-    components: {},
-    props: {
-        contents: {
-            type: String,
-            default: '',
-        },
-        attachments: {
-            type: Array as PropType<Attachment[]>,
-            default: () => [],
-        },
-    },
-    setup(props) {
-        loadMonospaceFonts();
-        const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
-        return {
-            refinedContents,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    contents: '',
+    attachments: () => [],
 });
+
+loadMonospaceFonts();
+const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
+
 </script>
+
+<template>
+    <!--        eslint-disable-next-line vue/no-v-html-->
+    <div class="text-editor-contents"
+         v-html="refinedContents"
+    />
+</template>
 
 <style lang="postcss">
 @import './text-editor-nodes.pcss';

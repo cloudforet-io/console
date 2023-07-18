@@ -1,3 +1,28 @@
+<script lang="ts" setup>
+import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+
+interface Props {
+    iconOnly?: boolean;
+    title: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    iconOnly: false,
+    title: 'PDF',
+});
+const emit = defineEmits<{(e: 'click', value?: any): void}>();
+const { t } = useI18n();
+
+const isBrowserSupported = supportsBrowser();
+
+const handleClick = (event) => {
+    emit('click', event);
+};
+</script>
+
 <template>
     <span class="pdf-download-button">
         <p-popover v-if="!isBrowserSupported"
@@ -8,12 +33,12 @@
                            name="ic_download"
                            style-type="tertiary"
                            size="sm"
-                           @click="$emit('click', $event)"
+                           @click="handleClick"
             />
             <p-button v-else
                       icon-left="ic_download"
                       style-type="tertiary"
-                      @click="$emit('click', $event)"
+                      @click="handleClick"
             >
                 {{ title }}
             </p-button>
@@ -22,13 +47,13 @@
                       path="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
                 >
                     <template #desktop>
-                        <span class="font-bold">{{ $t('COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.DESKTOP') }}</span>
+                        <span class="font-bold">{{ t('COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.DESKTOP') }}</span>
                     </template>
                     <template #chrome>
-                        <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.CHROME') }}</span>
+                        <span class="font-bold">{{ t('APP.MODAL.RECOMMEND_BROWSER.CHROME') }}</span>
                     </template>
                     <template #edge>
-                        <span class="font-bold">{{ $t('APP.MODAL.RECOMMEND_BROWSER.EDGE') }}</span>
+                        <span class="font-bold">{{ t('APP.MODAL.RECOMMEND_BROWSER.EDGE') }}</span>
                     </template>
                 </i18n>
             </template>
@@ -38,58 +63,18 @@
                            name="ic_download"
                            style-type="tertiary"
                            size="sm"
-                           @click="$emit('click', $event)"
+                           @click="handleClick"
             />
             <p-button v-else
                       icon-left="ic_download"
                       style-type="tertiary"
-                      @click="$emit('click', $event)"
+                      @click="handleClick"
             >
                 {{ title }}
             </p-button>
         </template>
     </span>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
-
-interface Props {
-    iconOnly?: boolean;
-}
-export default defineComponent<Props>({
-    name: 'PdfDownloadButton',
-    components: {
-        PPopover: PPopover as any,
-        PIconButton,
-        PButton,
-    },
-    props: {
-        iconOnly: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String as PropType<string|TranslateResult>,
-            default: 'PDF',
-        },
-    },
-    setup() {
-        return {
-            i18n,
-            isBrowserSupported: supportsBrowser(),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .pdf-download-button {

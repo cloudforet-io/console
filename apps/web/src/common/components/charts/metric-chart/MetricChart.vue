@@ -1,3 +1,173 @@
+<script lang="ts" setup>
+
+
+import * as am4charts from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import {
+    PDataLoader, PSkeleton, PSpinner, PTooltip,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { get } from 'lodash';
+import {
+    onUnmounted, reactive, ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import config from '@/lib/config';
+
+import type { MetricChartProps } from '@/common/components/charts/metric-chart/type';
+
+import { gray } from '@/styles/colors';
+
+interface ChartData {
+    label: string;
+    [key: string]: number | string;
+}
+
+interface Legend {
+    serverId: string;
+    serverName?: string;
+    color?: string;
+    count: number;
+}
+
+interface Tooltip {
+    date: string;
+    legends: Legend[];
+}
+
+const props = withDefaults(defineProps<MetricChartProps>(), {
+    loading: true,
+    dataset: () => ({}),
+    labels: () => [],
+    resources: () => [],
+    unit: () => ({ x: 'Timestamp', y: 'Count' }),
+    timezone: 'UTC',
+    title: '',
+    error: false,
+});
+const { t } = useI18n();
+
+const chartRef = ref<HTMLElement|null>(null);
+const state = reactive({
+    chart: null as null | XYChart,
+    data: [] as ChartData[],
+    //
+    visibleTooltip: false,
+    tooltip: {
+        date: '',
+        legends: [],
+    } as Tooltip,
+});
+
+const convertChartData = async () => {
+    const chartDataList: ChartData[] = [];
+    const labels = props.labels.map((label) => dayjs.tz(dayjs(label), props.timezone).format('MM/DD HH:mm'));
+    labels.forEach((label, index) => {
+        const chartData: ChartData = { label };
+        Object.entries(props.dataset).forEach(([key, value]) => {
+            chartData[key] = value[index] as number;
+        });
+        chartDataList.push(chartData);
+    });
+    state.data = chartDataList;
+};
+
+const drawChart = (ctx) => {
+    const chart: any = am4core.create(ctx, am4charts.XYChart);
+    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
+    chart.paddingLeft = -5;
+    chart.paddingBottom = -10;
+    chart.paddingTop = 10;
+    chart.data = state.data;
+    if (state.data.length > 0) {
+        chart.events.on('over', () => {
+            state.visibleTooltip = true;
+        });
+        chart.events.on('out', () => {
+            state.visibleTooltip = false;
+        });
+    }
+
+    const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    dateAxis.dataFields.category = 'label';
+    dateAxis.tooltip.label.fontSize = 12;
+    dateAxis.tooltip.label.adapter.add('text', (text) => {
+        if (text) return text.split(' ').join('\n');
+        return text;
+    });
+    dateAxis.renderer.minGridDistance = 60;
+    dateAxis.fontSize = 12;
+    dateAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+    dateAxis.renderer.grid.template.strokeOpacity = 1;
+    dateAxis.renderer.labels.template.adapter.add('text', (label, target) => {
+        if (target.dataItem && (target.dataItem.category)) {
+            return target.dataItem.category.split(' ').join('\n');
+        }
+        return label;
+    });
+
+    const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.tooltip.label.fontSize = 12;
+    valueAxis.fontSize = 12;
+    valueAxis.extraMax = 0.1;
+    valueAxis.min = 0;
+    valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+    valueAxis.renderer.grid.template.strokeOpacity = 1;
+
+    let series;
+    props.resources.forEach((d) => {
+        series = chart.series.push(new am4charts.LineSeries());
+        series.dataFields.categoryX = 'label';
+        series.dataFields.valueY = d.id;
+        series.stroke = am4core.color(d.color);
+    });
+
+    series.adapter.add('tooltipText', (text, target) => {
+        if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+            const tooltipData = target.tooltipDataItem.dataContext;
+            const date = tooltipData.label;
+            const legends = [] as Legend[];
+            props.resources.forEach((d) => {
+                legends.push({
+                    serverId: d.id,
+                    serverName: d.name,
+                    color: d.color,
+                    count: get(tooltipData, d.id),
+                });
+            });
+            state.tooltip = { date, legends };
+        }
+        return text;
+    });
+
+    if (state.data.length > 0) {
+        chart.cursor = new am4charts.XYCursor();
+        chart.cursor.maxTooltipDistance = 20;
+        chart.cursor.fontSize = 12;
+        chart.cursor.lineX.stroke = am4core.color(gray[900]);
+        chart.cursor.lineX.strokeDasharray = '';
+        chart.cursor.lineX.strokeOpacity = 1;
+    }
+
+    state.chart = chart;
+};
+
+watch([() => chartRef.value, () => props.loading], async ([ctx, loading]) => {
+    if (ctx && !loading) {
+        await convertChartData();
+        drawChart(ctx);
+    }
+});
+
+onUnmounted(() => {
+    if (state.chart) state.chart.dispose();
+});
+
+</script>
+
 <template>
     <div class="p-metric-chart">
         <div class="chart-title-wrapper">
@@ -7,10 +177,10 @@
                 <span class="chart-title">{{ title }}</span>
             </p-tooltip>
             <span class="chart-unit ">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
-            <p-spinner v-if="loading && chart" />
+            <p-spinner v-if="loading && state.chart" />
         </div>
-        <p-data-loader :loading="loading && !chart"
-                       :data="data"
+        <p-data-loader :loading="loading && !state.chart"
+                       :data="state.data"
                        class="chart-wrapper"
         >
             <template #loader>
@@ -23,24 +193,24 @@
                 <div v-if="error"
                      class="shade"
                 >
-                    <span>{{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}</span>
+                    <span>{{ t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}</span>
                 </div>
             </transition>
             <template #no-data>
                 <span class="no-data-text">
-                    {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
+                    {{ t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
                 </span>
             </template>
         </p-data-loader>
         <transition name="fade">
             <div class="tooltip-wrapper"
-                 :class="{ 'tooltip-visible': visibleTooltip }"
+                 :class="{ 'tooltip-visible': state.visibleTooltip }"
             >
                 <p class="date">
                     {{ tooltip.date }}
                 </p>
                 <table class="legend-table">
-                    <tr v-for="legend in tooltip.legends"
+                    <tr v-for="legend in state.tooltip.legends"
                         :key="legend.serverId"
                         class="legend"
                     >
@@ -64,215 +234,6 @@
         </transition>
     </div>
 </template>
-
-<script lang="ts">
-
-import {
-    defineComponent, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { PropType } from 'vue';
-
-import * as am4charts from '@amcharts/amcharts4/charts';
-import type { XYChart } from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import {
-    PDataLoader, PSkeleton, PSpinner, PTooltip,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { get } from 'lodash';
-
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
-
-import config from '@/lib/config';
-
-import type { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
-
-import { gray } from '@/styles/colors';
-
-interface ChartData {
-    label: string;
-    [key: string]: number | string;
-}
-
-interface Legend {
-    serverId: string;
-    serverName?: string;
-    color?: string;
-    count: number;
-}
-
-interface Tooltip {
-    date: string;
-    legends: Legend[];
-}
-
-export default defineComponent<MetricChartProps>({
-    name: 'PMetricChart',
-    components: {
-        PSkeleton, PDataLoader, PSpinner, PTooltip,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: true,
-        },
-        dataset: {
-            type: Object as PropType<Record<string, number[]>>,
-            default: () => ({}),
-        },
-        labels: {
-            type: Array as PropType<string[]>,
-            default: () => [],
-        },
-        resources: {
-            type: Array as PropType<MonitoringResourceType[]>,
-            default: () => ([]),
-        },
-        unit: {
-            type: Object as PropType<Unit>,
-            default: () => ({ x: 'Timestamp', y: 'Count' }),
-            validator(unit: Unit) {
-                return typeof unit.x === 'string' && typeof unit.y === 'string';
-            },
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        error: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            chartRef: null as null | HTMLElement,
-            chart: null as null | XYChart,
-            data: [] as ChartData[],
-            //
-            visibleTooltip: false,
-            tooltip: {
-                date: '',
-                legends: [],
-            } as Tooltip,
-        });
-
-        const convertChartData = async () => {
-            const chartDataList: ChartData[] = [];
-            const labels = props.labels.map((label) => dayjs.tz(dayjs(label), props.timezone).format('MM/DD HH:mm'));
-            labels.forEach((label, index) => {
-                const chartData: ChartData = { label };
-                Object.entries(props.dataset).forEach(([key, value]) => {
-                    chartData[key] = value[index] as number;
-                });
-                chartDataList.push(chartData);
-            });
-            state.data = chartDataList;
-        };
-
-        const drawChart = (ctx) => {
-            const chart: any = am4core.create(ctx, am4charts.XYChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.paddingLeft = -5;
-            chart.paddingBottom = -10;
-            chart.paddingTop = 10;
-            chart.data = state.data;
-            if (state.data.length > 0) {
-                chart.events.on('over', () => {
-                    state.visibleTooltip = true;
-                });
-                chart.events.on('out', () => {
-                    state.visibleTooltip = false;
-                });
-            }
-
-            const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            dateAxis.dataFields.category = 'label';
-            dateAxis.tooltip.label.fontSize = 12;
-            dateAxis.tooltip.label.adapter.add('text', (text) => {
-                if (text) return text.split(' ').join('\n');
-                return text;
-            });
-            dateAxis.renderer.minGridDistance = 60;
-            dateAxis.fontSize = 12;
-            dateAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            dateAxis.renderer.grid.template.strokeOpacity = 1;
-            dateAxis.renderer.labels.template.adapter.add('text', (label, target) => {
-                if (target.dataItem && (target.dataItem.category)) {
-                    return target.dataItem.category.split(' ').join('\n');
-                }
-                return label;
-            });
-
-            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-            valueAxis.tooltip.label.fontSize = 12;
-            valueAxis.fontSize = 12;
-            valueAxis.extraMax = 0.1;
-            valueAxis.min = 0;
-            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.grid.template.strokeOpacity = 1;
-
-            let series;
-            props.resources.forEach((d) => {
-                series = chart.series.push(new am4charts.LineSeries());
-                series.dataFields.categoryX = 'label';
-                series.dataFields.valueY = d.id;
-                series.stroke = am4core.color(d.color);
-            });
-
-            series.adapter.add('tooltipText', (text, target) => {
-                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-                    const tooltipData = target.tooltipDataItem.dataContext;
-                    const date = tooltipData.label;
-                    const legends = [] as Legend[];
-                    props.resources.forEach((d) => {
-                        legends.push({
-                            serverId: d.id,
-                            serverName: d.name,
-                            color: d.color,
-                            count: get(tooltipData, d.id),
-                        });
-                    });
-                    state.tooltip = { date, legends };
-                }
-                return text;
-            });
-
-            if (state.data.length > 0) {
-                chart.cursor = new am4charts.XYCursor();
-                chart.cursor.maxTooltipDistance = 20;
-                chart.cursor.fontSize = 12;
-                chart.cursor.lineX.stroke = am4core.color(gray[900]);
-                chart.cursor.lineX.strokeDasharray = '';
-                chart.cursor.lineX.strokeOpacity = 1;
-            }
-
-            state.chart = chart;
-        };
-
-        watch([() => state.chartRef, () => props.loading], async ([ctx, loading]) => {
-            if (ctx && !loading) {
-                await convertChartData();
-                drawChart(ctx);
-            }
-        });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
-        return {
-            ...toRefs(state),
-            numberFormatter,
-            commaFormatter,
-        };
-    },
-});
-</script>
 
 <style lang="postcss">
 .p-metric-chart {

@@ -1,3 +1,77 @@
+<script lang="ts" setup>
+import { useResizeObserver, useThrottleFn } from '@vueuse/core';
+import {
+    computed, MaybeRef, ref,
+} from 'vue';
+
+import vueDiffCode from './Code.vue';
+import type {
+    Meta, Mode, Lines, Line, VirtualScroll,
+} from './types';
+import { renderWords } from './utils';
+
+interface Props {
+    mode: Mode;
+    folding: boolean;
+    language: string;
+    meta: Meta;
+    render: Lines;
+    scrollOptions: false | VirtualScroll;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'setLineHeight', index: number, value: number): void}>();
+
+const lineRef = ref<null | HTMLElement>(null);
+const rowStyle = computed(() => {
+    if (!props.scrollOptions) return undefined;
+    return {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        transform: `translate3d(0, ${props.meta.top}px, 0)`,
+        minHeight: `${props.scrollOptions.lineMinHeight}px`,
+    } as const;
+});
+const isFoldLine = computed(
+    () => props.folding && props.render[0].type === 'equal',
+);
+
+const setCode = (codeLine: Line, render?: Lines, index?: number) => {
+    if (!codeLine.value) return '\n';
+
+    // Compare lines when render, index properties exist and has chkWords value in line property
+    if (
+        typeof render === 'undefined'
+|| typeof index === 'undefined'
+|| !codeLine.chkWords
+    ) {
+        return codeLine.value;
+    }
+
+    const differ = render[index === 0 ? 1 : 0];
+
+    if (!differ.value) return codeLine.value;
+
+    return renderWords(differ.value, codeLine.value); // render with modified tags
+};
+
+const rendered = () => {
+    if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
+    emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
+};
+
+if (props.scrollOptions) {
+    useResizeObserver(
+        lineRef as MaybeRef,
+        useThrottleFn(() => {
+            if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
+            emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
+        }, props.scrollOptions.delay),
+    );
+}
+</script>
+
 <template>
     <div
         ref="lineRef"
@@ -7,9 +81,8 @@
     >
         <!-- split view -->
         <template v-if="mode === 'split'">
-            <template v-for="(line, index) in render">
-                <div :key="`line-${index}`"
-                     class="vue-diff-line"
+            <template v-for="(line, index) in render" :key="`line-${index}`">
+                <div class="vue-diff-line"
                      style="display: inline-flex;"
                 >
                     <template v-if="isFoldLine">
@@ -61,110 +134,9 @@
                 </div>
             </template>
         </template>
-    <!-- // unified view -->
+        <!-- // unified view -->
     </div>
 </template>
-
-<script lang="ts">
-import { useResizeObserver, useThrottleFn } from '@vueuse/core';
-import type { PropType, SetupContext } from 'vue';
-import {
-    computed, defineComponent, ref,
-} from 'vue';
-
-import vueDiffCode from './Code.vue';
-import type {
-    Meta, Mode, Lines, Line, VirtualScroll,
-} from './types';
-import { renderWords } from './utils';
-
-export default defineComponent({
-    name: 'VueDiffLine',
-    components: {
-        vueDiffCode,
-    },
-    props: {
-        mode: {
-            type: String as PropType<Mode>,
-            required: true,
-        },
-        folding: {
-            type: Boolean,
-            default: false,
-        },
-        language: {
-            type: String,
-            required: true,
-        },
-        meta: {
-            type: Object as PropType<Meta>,
-            required: true,
-        },
-        render: {
-            type: Array as PropType<Lines>,
-            required: true,
-        },
-        scrollOptions: {
-            type: [Boolean, Object] as PropType<false | VirtualScroll>,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const lineRef = ref<null | HTMLElement>(null);
-        const rowStyle = computed(() => {
-            if (!props.scrollOptions) return undefined;
-            return {
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                transform: `translate3d(0, ${props.meta.top}px, 0)`,
-                minHeight: `${props.scrollOptions.lineMinHeight}px`,
-            } as const;
-        });
-        const isFoldLine = computed(
-            () => props.folding && props.render[0].type === 'equal',
-        );
-
-        const setCode = (codeLine: Line, render?: Lines, index?: number) => {
-            if (!codeLine.value) return '\n';
-
-            // Compare lines when render, index properties exist and has chkWords value in line property
-            if (
-                typeof render === 'undefined'
-        || typeof index === 'undefined'
-        || !codeLine.chkWords
-            ) {
-                return codeLine.value;
-            }
-
-            const differ = render[index === 0 ? 1 : 0];
-
-            if (!differ.value) return codeLine.value;
-
-            return renderWords(differ.value, codeLine.value); // render with modified tags
-        };
-
-        const rendered = () => {
-            if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
-            emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
-        };
-
-        if (props.scrollOptions) {
-            useResizeObserver(
-                lineRef,
-                useThrottleFn(() => {
-                    if (!lineRef.value || props.meta.height === lineRef.value.offsetHeight) return;
-                    emit('setLineHeight', props.meta.index, lineRef.value.offsetHeight);
-                }, props.scrollOptions.delay),
-            );
-        }
-
-        return {
-            lineRef, isFoldLine, rendered, rowStyle, setCode,
-        };
-    },
-});
-</script>
 
 <style lang="postcss">
 .vue-diff-row {

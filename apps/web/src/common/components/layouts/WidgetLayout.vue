@@ -1,3 +1,18 @@
+<script lang="ts" setup>
+import { PPaneLayout } from '@spaceone/design-system';
+
+interface Props {
+    title: string;
+    overflow: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    title: '',
+    overflow: 'visible',
+});
+
+</script>
+
 <template>
     <p-pane-layout class="widget-layout">
         <slot name="title">
@@ -12,29 +27,6 @@
         </div>
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
-
-export default {
-    name: 'WidgetLayout',
-    components: { PPaneLayout },
-    props: {
-        title: {
-            type: String,
-            default: '',
-        },
-        overflow: {
-            type: String,
-            default: 'visible',
-        },
-    },
-    setup() {
-        return {
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .widget-layout {

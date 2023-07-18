@@ -1,3 +1,115 @@
+<script lang="ts" setup>
+import {
+    PDivider, PI, PIconButton, PPopover, PSelectDropdown,
+} from '@spaceone/design-system';
+import type { Editor } from '@tiptap/vue-3';
+import {
+    computed,
+    reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import ColorPicker from '@/common/components/editor/ColorPicker.vue';
+
+interface Props {
+    editor: Editor
+}
+
+const TEXT_ALIGN_ICONS = {
+    left: 'ic_text-align-left',
+    center: 'ic_text-align-center',
+    right: 'ic_text-align-right',
+    justify: 'ic_text-align-justify',
+};
+
+const TEXT_STYLE_TAGS = {
+    normal: 'p',
+    heading1: 'h1',
+    heading2: 'h2',
+    heading3: 'h3',
+};
+
+const props = defineProps<Props>();
+const { t } = useI18n();
+
+const state = reactive({
+    textStyleItems: computed(() => [
+        { name: 'normal', label: t('COMMON.EDITOR.NORMAL_TEXT') },
+        { name: 'heading1', label: t('COMMON.EDITOR.HEADING1') },
+        { name: 'heading2', label: t('COMMON.EDITOR.HEADING2') },
+        { name: 'heading3', label: t('COMMON.EDITOR.HEADING3') },
+    ]),
+    textAlignItems: computed(() => [
+        { name: 'left', label: t('COMMON.EDITOR.ALIGN_LEFT') },
+        { name: 'center', label: t('COMMON.EDITOR.ALIGN_CENTER') },
+        { name: 'right', label: t('COMMON.EDITOR.ALIGN_RIGHT') },
+        { name: 'justify', label: t('COMMON.EDITOR.ALIGN_JUSTIFY') },
+    ]),
+    selectedTextStyle: computed(() => {
+        if (props.editor.isActive('paragraph')) return 'normal';
+        if (props.editor.isActive('heading', { level: 1 })) return 'heading1';
+        if (props.editor.isActive('heading', { level: 2 })) return 'heading2';
+        if (props.editor.isActive('heading', { level: 3 })) return 'heading3';
+        return 'normal';
+    }),
+    selectedTextAlign: computed(() => {
+        if (props.editor.isActive({ textAlign: 'left' })) return 'left';
+        if (props.editor.isActive({ textAlign: 'center' })) return 'center';
+        if (props.editor.isActive({ textAlign: 'right' })) return 'right';
+        if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
+        return 'left';
+    }),
+    imagePopoverVisible: false,
+});
+
+/* Event Handlers */
+const handleTextStyleSelect = (style: string) => {
+    switch (style) {
+    case 'normal': props.editor.chain().focus().setParagraph().run(); break;
+    case 'heading1': props.editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
+    case 'heading2': props.editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+    case 'heading3': props.editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+    default: props.editor.chain().focus().setParagraph().run(); break;
+    }
+};
+const handleTextAlignSelect = (align: string) => {
+    props.editor.chain().focus().setTextAlign(align).run();
+};
+const handleLinkClick = () => {
+    if (props.editor.isActive('link')) {
+        props.editor.chain().focus().unsetLink().run();
+    } else {
+        const previousUrl = props.editor.getAttributes('link').href;
+        // eslint-disable-next-line no-alert
+        const url = window.prompt('URL', previousUrl);
+
+        // cancelled
+        if (url === null) return;
+
+        // empty
+        if (url === '') {
+            props.editor
+                .chain()
+                .focus()
+                .extendMarkRange('link')
+                .unsetLink()
+                .run();
+
+            return;
+        }
+
+        // update link
+        props.editor
+            .chain()
+            .focus()
+            .extendMarkRange('link')
+            .setLink({ href: url })
+            .run();
+    }
+};
+
+</script>
+
 <template>
     <div class="menu-bar">
         <p-icon-button class="menu-button"
@@ -165,118 +277,6 @@
         />
     </div>
 </template>
-
-<script lang="ts" setup>
-import {
-    PDivider, PI, PIconButton, PPopover, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { Editor } from '@tiptap/vue-3';
-import {
-    computed,
-    reactive,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-
-import ColorPicker from '@/common/components/editor/ColorPicker.vue';
-
-interface Props {
-    editor: Editor
-}
-
-const TEXT_ALIGN_ICONS = {
-    left: 'ic_text-align-left',
-    center: 'ic_text-align-center',
-    right: 'ic_text-align-right',
-    justify: 'ic_text-align-justify',
-};
-
-const TEXT_STYLE_TAGS = {
-    normal: 'p',
-    heading1: 'h1',
-    heading2: 'h2',
-    heading3: 'h3',
-};
-
-const props = defineProps<Props>();
-const { t } = useI18n();
-
-const state = reactive({
-    textStyleItems: computed(() => [
-        { name: 'normal', label: t('COMMON.EDITOR.NORMAL_TEXT') },
-        { name: 'heading1', label: t('COMMON.EDITOR.HEADING1') },
-        { name: 'heading2', label: t('COMMON.EDITOR.HEADING2') },
-        { name: 'heading3', label: t('COMMON.EDITOR.HEADING3') },
-    ]),
-    textAlignItems: computed(() => [
-        { name: 'left', label: t('COMMON.EDITOR.ALIGN_LEFT') },
-        { name: 'center', label: t('COMMON.EDITOR.ALIGN_CENTER') },
-        { name: 'right', label: t('COMMON.EDITOR.ALIGN_RIGHT') },
-        { name: 'justify', label: t('COMMON.EDITOR.ALIGN_JUSTIFY') },
-    ]),
-    selectedTextStyle: computed(() => {
-        if (props.editor.isActive('paragraph')) return 'normal';
-        if (props.editor.isActive('heading', { level: 1 })) return 'heading1';
-        if (props.editor.isActive('heading', { level: 2 })) return 'heading2';
-        if (props.editor.isActive('heading', { level: 3 })) return 'heading3';
-        return 'normal';
-    }),
-    selectedTextAlign: computed(() => {
-        if (props.editor.isActive({ textAlign: 'left' })) return 'left';
-        if (props.editor.isActive({ textAlign: 'center' })) return 'center';
-        if (props.editor.isActive({ textAlign: 'right' })) return 'right';
-        if (props.editor.isActive({ textAlign: 'justify' })) return 'justify';
-        return 'left';
-    }),
-    imagePopoverVisible: false,
-});
-
-/* Event Handlers */
-const handleTextStyleSelect = (style: string) => {
-    switch (style) {
-    case 'normal': props.editor.chain().focus().setParagraph().run(); break;
-    case 'heading1': props.editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
-    case 'heading2': props.editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
-    case 'heading3': props.editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
-    default: props.editor.chain().focus().setParagraph().run(); break;
-    }
-};
-const handleTextAlignSelect = (align: string) => {
-    props.editor.chain().focus().setTextAlign(align).run();
-};
-const handleLinkClick = () => {
-    if (props.editor.isActive('link')) {
-        props.editor.chain().focus().unsetLink().run();
-    } else {
-        const previousUrl = props.editor.getAttributes('link').href;
-        // eslint-disable-next-line no-alert
-        const url = window.prompt('URL', previousUrl);
-
-        // cancelled
-        if (url === null) return;
-
-        // empty
-        if (url === '') {
-            props.editor
-                .chain()
-                .focus()
-                .extendMarkRange('link')
-                .unsetLink()
-                .run();
-
-            return;
-        }
-
-        // update link
-        props.editor
-            .chain()
-            .focus()
-            .extendMarkRange('link')
-            .setLink({ href: url })
-            .run();
-    }
-};
-
-</script>
 
 <style lang="postcss" scoped>
 @import './text-editor-nodes.pcss';

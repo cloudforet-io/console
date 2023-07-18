@@ -1,17 +1,4 @@
-<template>
-    <div v-if="editor"
-         class="text-editor"
-         :class="{invalid: invalid}"
-    >
-        <menu-bar :editor="editor" />
-        <editor-content class="editor-content"
-                        :editor="editor"
-        />
-    </div>
-</template>
-
 <script lang="ts" setup>
-
 
 import { Color } from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
@@ -84,6 +71,18 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
 
 </script>
 
+<template>
+    <div v-if="editor"
+         class="text-editor"
+         :class="{invalid: invalid}"
+    >
+        <menu-bar :editor="editor" />
+        <editor-content class="editor-content"
+                        :editor="editor"
+        />
+    </div>
+</template>
+
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
 .text-editor {
@@ -98,6 +97,7 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
     }
 }
 </style>
+
 <style lang="postcss" scoped>
 .text-editor {
     @apply bg-white border border-gray-200 rounded-lg;

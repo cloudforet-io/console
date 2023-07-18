@@ -17,7 +17,7 @@ import { CURRENCY } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';

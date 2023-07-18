@@ -1,12 +1,9 @@
+<script lang="ts" setup>
+</script>
+
 <template>
     <span class="beta-mark">beta</span>
 </template>
-
-<script lang="ts">
-export default {
-    name: 'BetaMark',
-};
-</script>
 
 <style lang="postcss">
 .beta-mark {

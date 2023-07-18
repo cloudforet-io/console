@@ -1,3 +1,26 @@
+<script lang="ts" setup>
+import { PI } from '@spaceone/design-system';
+
+const STYLE_TYPE = Object.freeze({
+    gray: 'gray',
+    secondary: 'secondary',
+    peacock: 'peacock',
+} as const);
+type StyleType = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
+
+interface Props {
+    styleType: StyleType,
+    message: string,
+    block: boolean,
+}
+
+withDefaults(defineProps<Props>(), {
+    styleType: STYLE_TYPE.gray,
+    message: '',
+    block: false,
+});
+</script>
+
 <template>
     <span class="info-message"
           :class="{[styleType]: true, block}"
@@ -12,41 +35,6 @@
         </span>
     </span>
 </template>
-
-<script lang="ts">
-import { PI } from '@spaceone/design-system';
-
-const STYLE_TYPE = Object.freeze({
-    gray: 'gray',
-    secondary: 'secondary',
-    peacock: 'peacock',
-} as const);
-type StyleType = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
-
-export default {
-    name: 'InfoMessage',
-    components: {
-        PI,
-    },
-    props: {
-        styleType: {
-            type: String,
-            default: STYLE_TYPE.gray,
-            validator(styleType: StyleType): boolean {
-                return Object.values(STYLE_TYPE).includes(styleType);
-            },
-        },
-        message: {
-            type: String,
-            default: '',
-        },
-        block: {
-            type: Boolean,
-            default: false,
-        },
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .info-message {

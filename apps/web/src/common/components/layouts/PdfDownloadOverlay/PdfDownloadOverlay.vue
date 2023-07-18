@@ -1,71 +1,22 @@
-<template>
-    <div v-if="visible"
-         class="pdf-download-overlay"
-    >
-        <div class="header-wrapper">
-            <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PDF_PREVIEW') }}</span>
-            <div class="button-group">
-                <p-button style-type="tertiary"
-                          @click="handleClickCancel"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.CANCEL') }}
-                </p-button>
-                <p-button v-if="mode === 'ELEMENT_EMBED'"
-                          icon-left="ic_download"
-                          style-type="primary"
-                          :loading="loading"
-                          @click="handleClickDownload"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.DOWNLOAD_PDF') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-if="mode === 'PDF_EMBED' ? (loading && !pdfDataUrl) : true"
-             class="preview-wrapper"
-        >
-            <div class="preview">
-                <div class="blocker">
-                    <slot name="default" />
-                </div>
-            </div>
-        </div>
-        <div v-if="loading"
-             class="loader-wrapper"
-        >
-            <div class="loader">
-                <p-spinner size="sm" />
-                <div class="progress-rate">
-                    {{ progressRate }}%
-                </div>
-                <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PROCESSING') }}...</span>
-            </div>
-        </div>
-        <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl"
-                :src="pdfDataUrl"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
-import type { PropType, SetupContext } from 'vue';
+<script lang="ts" setup>
 
 import { PButton, PSpinner } from '@spaceone/design-system';
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import type { TCreatedPdf } from 'pdfmake/build/pdfmake';
 // eslint-disable-next-line import/extensions,import/no-unresolved
-import type { Content, Table, TableCell } from 'pdfmake/interfaces';
+import type { Content, TableCell } from 'pdfmake/interfaces';
+import {
+    computed,
+    reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import type { PdfFontFamily, Language } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 import {
     pdfFontInfoMap, fontLanguages, pdfFontFamily,
 } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
+import type { PdfFontFamily, Language } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
+import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/type';
 
 import { gray, black, white } from '@/styles/colors';
 
@@ -81,17 +32,9 @@ type Mode = typeof modes[number];
 type Orientation = typeof orientations[number];
 type PaperSizeInfo = {width: number; height: number};
 
-type ItemType = 'data-table'|'image';
-
 const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
     A4: { width: 595.28, height: 841.89 },
 });
-
-export interface Item {
-    type?: ItemType; // default: 'image'
-    element?: HTMLElement;
-    tableData?: Pick<Table, 'body' | 'widths'>;
-}
 
 interface Props {
     visible: boolean;
@@ -107,308 +50,307 @@ const COMPLETED_ELEMENT_RATE = 70;
 const COMPLETED_IMAGE_RATE = 90;
 const COMPLETED_PDF_RATE = 100;
 
-export default defineComponent<Props>({
-    name: 'PdfDownloadOverlay',
-    components: {
-        PButton,
-        PSpinner,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            required: true,
-        },
-        mode: {
-            type: String as PropType<Mode>,
-            default: 'PDF_EMBED',
-            validator(mode: Mode): boolean {
-                return modes.includes(mode);
-            },
-        },
-        items: {
-            type: Array as PropType<Array<HTMLElement|Item>>,
-            default: () => [],
-        },
-        paperSize: {
-            type: String as PropType<PaperSize>,
-            default: 'A4',
-            validator(paperSize: PaperSize) {
-                return paperSizes.includes(paperSize);
-            },
-        },
-        orientation: {
-            type: String as PropType<Orientation>,
-            default: 'portrait',
-            validator(orientation: Orientation) {
-                return orientations.includes(orientation);
-            },
-        },
-        fileName: {
-            type: String,
-            default: 'report',
-        },
-        fontLanguage: {
-            type: String,
-            default: fontLanguages.en,
-            validator(value: Language) {
-                return Object.values(fontLanguages).includes(value);
-            },
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyVisible: props.visible,
-            loading: true,
-            createdPdf: null as null|TCreatedPdf,
-            pdfDataUrl: '',
-            paperSizeInfo: computed<PaperSizeInfo>(() => {
-                const paperSizeInfo = paperSizeInfoMap[props.paperSize];
-                if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
-                return paperSizeInfo;
-            }),
-            isMakingContentsStarted: false,
-            isMakingPdfStarted: false,
-            progressRate: 0,
-            font: computed<PdfFontFamily>(() => {
-                if (fontLanguages.ja === props.fontLanguage) return pdfFontFamily.NotoSansJp;
-                if (fontLanguages.ko === props.fontLanguage) return pdfFontFamily.NotoSansKo;
-                return pdfFontFamily.NotoSans;
-            }),
-        });
+const props = withDefaults(defineProps<Props>(), {
+    mode: 'PDF_EMBED',
+    items: () => [],
+    paperSize: 'A4',
+    orientation: 'portrait',
+    fileName: 'report',
+    fontLanguage: fontLanguages.en,
+});
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
+const { t } = useI18n();
 
-        let fakeRateInterval;
-        const addRate = () => {
-            fakeRateInterval = setInterval(() => {
-                let limit = COMPLETED_ELEMENT_RATE;
-                if (state.isMakingContentsStarted) limit = COMPLETED_IMAGE_RATE;
-                else if (state.isMakingPdfStarted) limit = COMPLETED_PDF_RATE;
-                if (state.progressRate < limit) state.progressRate++;
-                if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRateInterval);
-            }, 10);
-        };
-        const resetRate = () => {
-            if (fakeRateInterval) {
-                clearInterval(fakeRateInterval);
-                fakeRateInterval = undefined;
-                state.progressRate = 0;
-            }
-        };
+const state = reactive({
+    proxyVisible: props.visible,
+    loading: true,
+    createdPdf: null as null|TCreatedPdf,
+    pdfDataUrl: '',
+    paperSizeInfo: computed<PaperSizeInfo>(() => {
+        const paperSizeInfo = paperSizeInfoMap[props.paperSize];
+        if (props.orientation === 'landscape') return { width: paperSizeInfo.height, height: paperSizeInfo.width };
+        return paperSizeInfo;
+    }),
+    isMakingContentsStarted: false,
+    isMakingPdfStarted: false,
+    progressRate: 0,
+    font: computed<PdfFontFamily>(() => {
+        if (fontLanguages.ja === props.fontLanguage) return pdfFontFamily.NotoSansJp;
+        if (fontLanguages.ko === props.fontLanguage) return pdfFontFamily.NotoSansKo;
+        return pdfFontFamily.NotoSans;
+    }),
+});
 
-        const setVisible = (value: boolean) => {
-            state.proxyVisible = value;
-            emit('update:visible', value);
-        };
+let fakeRateInterval;
+const addRate = () => {
+    fakeRateInterval = setInterval(() => {
+        let limit = COMPLETED_ELEMENT_RATE;
+        if (state.isMakingContentsStarted) limit = COMPLETED_IMAGE_RATE;
+        else if (state.isMakingPdfStarted) limit = COMPLETED_PDF_RATE;
+        if (state.progressRate < limit) state.progressRate++;
+        if (state.progressRate >= COMPLETED_PDF_RATE) clearInterval(fakeRateInterval);
+    }, 10);
+};
+const resetRate = () => {
+    if (fakeRateInterval) {
+        clearInterval(fakeRateInterval);
+        fakeRateInterval = undefined;
+        state.progressRate = 0;
+    }
+};
 
-        const applyTableHeaderStyle = (data: TableCell[][]): TableCell[][] => {
-            try {
-                let tableData = data;
-                if (tableData[0]) {
-                    tableData[0] = tableData[0].map((item) => ({
-                        text: item,
-                        style: 'tableHeader',
-                    }));
-                    // check if no items
-                    if (!tableData[1]) {
-                        const colsLength = tableData[0].length;
-                        const emptyCell = {
-                            text: 'No Items', rowSpan: EMPTY_ROW_COUNT, colSpan: colsLength, alignment: 'center', style: 'noDataRow',
-                        };
-                        // add first row
-                        tableData.push(tableData[0].map((_, i) => {
-                            if (i === 0) return emptyCell;
-                            return '';
-                        }));
-                        // add blank rows
-                        const fakeRows = new Array(EMPTY_ROW_COUNT - 1).fill(new Array(colsLength).fill(''));
-                        tableData = tableData.concat(fakeRows);
-                    }
-                }
-                return tableData;
-            } catch (e) {
-                console.error(e);
-                return [[]];
-            }
-        };
+const setVisible = (value: boolean) => {
+    state.proxyVisible = value;
+    emit('update:visible', value);
+};
 
-        const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
-            try {
-                if (type === 'data-table' && tableData) {
-                    if (!tableData.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
-                    const tableBody = applyTableHeaderStyle(tableData.body);
-
-                    return tableData.body.length ? {
-                        pageBreak: 'before',
-                        table: {
-                            headerRows: 1,
-                            widths: tableData.widths,
-                            body: tableBody,
-                        },
-                        fillColor: white,
-                        margin: [0, 4],
-                        layout: 'DataTable',
-                    } : {} as Content;
-                }
-
-                // 'image' is default type
-                if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
-                const imageUrl = await toPng(element);
-                if (!imageUrl.split(':')[1]?.split(',')[1]) {
-                    return {} as Content;
-                }
-                return {
-                    image: imageUrl,
-                    width: state.paperSizeInfo.width - (PAGE_PADDING * 2),
-                    style: 'imageRowWrapper',
+const applyTableHeaderStyle = (data: TableCell[][]): TableCell[][] => {
+    try {
+        let tableData = data;
+        if (tableData[0]) {
+            tableData[0] = tableData[0].map((item) => ({
+                text: item,
+                style: 'tableHeader',
+            }));
+            // check if no items
+            if (!tableData[1]) {
+                const colsLength = tableData[0].length;
+                const emptyCell = {
+                    text: 'No Items', rowSpan: EMPTY_ROW_COUNT, colSpan: colsLength, alignment: 'center', style: 'noDataRow',
                 };
-            } catch (e) {
-                console.error(e);
-                return '';
+                // add first row
+                tableData.push(tableData[0].map((_, i) => {
+                    if (i === 0) return emptyCell;
+                    return '';
+                }));
+                // add blank rows
+                const fakeRows = new Array(EMPTY_ROW_COUNT - 1).fill(new Array(colsLength).fill(''));
+                tableData = tableData.concat(fakeRows);
             }
-        };
+        }
+        return tableData;
+    } catch (e) {
+        console.error(e);
+        return [[]];
+    }
+};
 
-        const makeTableLayouts = () => ({
-            DataTable: {
-                hLineWidth: (i, node) => {
-                    if (i === node.table.body.length) return 0;
-                    return 1;
+const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
+    try {
+        if (type === 'data-table' && tableData) {
+            if (!tableData.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+            const tableBody = applyTableHeaderStyle(tableData.body);
+
+            return tableData.body.length ? {
+                pageBreak: 'before',
+                table: {
+                    headerRows: 1,
+                    widths: tableData.widths,
+                    body: tableBody,
                 },
-                vLineWidth: () => 0,
-                hLineColor: (i) => (i === 0 || i === 1 ? black : gray[300]),
-                paddingLeft: (i) => (i === 0 ? 8 : 2),
-                paddingTop: (i) => {
-                    if (i === 0) return 4;
-                    return 6;
-                },
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                paddingRight: (i, node) => (node?.table.widths.length - 1 === i ? 6 : 8),
-                paddingBottom: (i) => {
-                    if (i === 0) return 4;
-                    return 6;
-                },
-            },
-        });
-        const createPdfWithContents = (contents: Content[]) => {
-            const tableLayouts = makeTableLayouts();
-            return pdfMake.createPdf({
-                info: {
-                    title: props.fileName,
-                },
-                pageSize: props.paperSize,
-                pageOrientation: props.orientation,
-                pageMargins: PAGE_PADDING,
-                content: contents,
-                background: () => ({
-                    canvas: [
-                        {
-                            type: 'rect',
-                            x: 0,
-                            y: 0,
-                            w: state.paperSizeInfo.width,
-                            h: state.paperSizeInfo.height,
-                            color: gray[100],
-                        },
-                    ],
-                }),
-                styles: {
-                    imageRowWrapper: {
-                        margin: [0, IMAGE_ROW_MARGIN_Y],
-                    },
-                    tableHeader: {
-                        bold: true,
-                        color: black,
-                    },
-                    noDataRow: {
-                        bold: true,
-                        color: gray[300],
-                    },
-                },
-                defaultStyle: {
-                    font: state.font,
-                    fontSize: 9,
-                },
-            }, tableLayouts, pdfFontInfoMap);
-        };
+                fillColor: white,
+                margin: [0, 4],
+                layout: 'DataTable',
+            } : {} as Content;
+        }
 
-        const makePdfWithItems = async (items: Item[]) => {
-            state.loading = true;
-            try {
-                state.isMakingContentsStarted = true;
-                const contents: Content[] = await Promise.all(items.map((item) => createContentWithItem(item)));
-                state.progressRate = COMPLETED_IMAGE_RATE;
-
-                state.isMakingPdfStarted = true;
-                state.createdPdf = createPdfWithContents(contents);
-                state.progressRate = COMPLETED_PDF_RATE;
-
-                if (props.mode === 'PDF_EMBED') {
-                    state.createdPdf.getDataUrl((pdfDataUrl) => {
-                        state.pdfDataUrl = pdfDataUrl;
-                        state.loading = false;
-                    });
-                } else if (props.mode === 'PDF_NEW_TAB') {
-                    try {
-                        state.createdPdf.open();
-                        setVisible(false);
-                        state.loading = false;
-                    } catch (e) {
-                        // eslint-disable-next-line no-alert
-                        alert(e);
-                    }
-                } else {
-                    state.loading = false;
-                }
-            } catch (e) {
-                console.error(e);
-                state.loading = false;
-            }
-        };
-
-        /* Events */
-        const handleClickCancel = () => {
-            setVisible(false);
-        };
-        const handleClickDownload = () => {
-            if (!state.createdPdf) return;
-            state.createdPdf.download(props.fileName);
-        };
-
-        /* Watchers */
-        watch(() => props.items, async (items) => {
-            if (!items.length) return;
-            state.createdPdf = null;
-            state.pdfDataUrl = '';
-            await makePdfWithItems(items);
-            state.progressRate = COMPLETED_ELEMENT_RATE;
-        });
-        watch(() => props.visible, (visible) => {
-            if (visible !== state.proxyVisible) {
-                // reset states
-                state.proxyVisible = visible;
-                state.loading = true;
-                state.createdPdf = null;
-                state.pdfDataUrl = '';
-                state.progressRate = 0;
-                state.isMakingContentsStarted = false;
-                state.isMakingPdfStarted = false;
-            }
-        });
-        watch(() => state.loading, (loading) => {
-            if (loading) addRate();
-            else resetRate();
-        }, { immediate: true });
-
+        // 'image' is default type
+        if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
+        const imageUrl = await toPng(element);
+        if (!imageUrl.split(':')[1]?.split(',')[1]) {
+            return {} as Content;
+        }
         return {
-            ...toRefs(state),
-            handleClickCancel,
-            handleClickDownload,
+            image: imageUrl,
+            width: state.paperSizeInfo.width - (PAGE_PADDING * 2),
+            style: 'imageRowWrapper',
         };
+    } catch (e) {
+        console.error(e);
+        return '';
+    }
+};
+
+const makeTableLayouts = () => ({
+    DataTable: {
+        hLineWidth: (i, node) => {
+            if (i === node.table.body.length) return 0;
+            return 1;
+        },
+        vLineWidth: () => 0,
+        hLineColor: (i) => (i === 0 || i === 1 ? black : gray[300]),
+        paddingLeft: (i) => (i === 0 ? 8 : 2),
+        paddingTop: (i) => {
+            if (i === 0) return 4;
+            return 6;
+        },
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        paddingRight: (i, node) => (node?.table.widths.length - 1 === i ? 6 : 8),
+        paddingBottom: (i) => {
+            if (i === 0) return 4;
+            return 6;
+        },
     },
 });
+const createPdfWithContents = (contents: Content[]) => {
+    const tableLayouts = makeTableLayouts();
+    return pdfMake.createPdf({
+        info: {
+            title: props.fileName,
+        },
+        pageSize: props.paperSize,
+        pageOrientation: props.orientation,
+        pageMargins: PAGE_PADDING,
+        content: contents,
+        background: () => ({
+            canvas: [
+                {
+                    type: 'rect',
+                    x: 0,
+                    y: 0,
+                    w: state.paperSizeInfo.width,
+                    h: state.paperSizeInfo.height,
+                    color: gray[100],
+                },
+            ],
+        }),
+        styles: {
+            imageRowWrapper: {
+                margin: [0, IMAGE_ROW_MARGIN_Y],
+            },
+            tableHeader: {
+                bold: true,
+                color: black,
+            },
+            noDataRow: {
+                bold: true,
+                color: gray[300],
+            },
+        },
+        defaultStyle: {
+            font: state.font,
+            fontSize: 9,
+        },
+    }, tableLayouts, pdfFontInfoMap);
+};
+
+const makePdfWithItems = async (items: Item[]) => {
+    state.loading = true;
+    try {
+        state.isMakingContentsStarted = true;
+        const contents: Content[] = await Promise.all(items.map((item) => createContentWithItem(item)));
+        state.progressRate = COMPLETED_IMAGE_RATE;
+
+        state.isMakingPdfStarted = true;
+        state.createdPdf = createPdfWithContents(contents);
+        state.progressRate = COMPLETED_PDF_RATE;
+
+        if (props.mode === 'PDF_EMBED') {
+            state.createdPdf.getDataUrl((pdfDataUrl) => {
+                state.pdfDataUrl = pdfDataUrl;
+                state.loading = false;
+            });
+        } else if (props.mode === 'PDF_NEW_TAB') {
+            try {
+                state.createdPdf.open();
+                setVisible(false);
+                state.loading = false;
+            } catch (e) {
+                // eslint-disable-next-line no-alert
+                alert(e);
+            }
+        } else {
+            state.loading = false;
+        }
+    } catch (e) {
+        console.error(e);
+        state.loading = false;
+    }
+};
+
+/* Events */
+const handleClickCancel = () => {
+    setVisible(false);
+};
+const handleClickDownload = () => {
+    if (!state.createdPdf) return;
+    state.createdPdf.download(props.fileName);
+};
+
+/* Watchers */
+watch(() => props.items, async (items) => {
+    if (!items.length) return;
+    state.createdPdf = null;
+    state.pdfDataUrl = '';
+    await makePdfWithItems(items);
+    state.progressRate = COMPLETED_ELEMENT_RATE;
+});
+watch(() => props.visible, (visible) => {
+    if (visible !== state.proxyVisible) {
+        // reset states
+        state.proxyVisible = visible;
+        state.loading = true;
+        state.createdPdf = null;
+        state.pdfDataUrl = '';
+        state.progressRate = 0;
+        state.isMakingContentsStarted = false;
+        state.isMakingPdfStarted = false;
+    }
+});
+watch(() => state.loading, (loading) => {
+    if (loading) addRate();
+    else resetRate();
+}, { immediate: true });
+
 </script>
+
+<template>
+    <div v-if="visible"
+         class="pdf-download-overlay"
+    >
+        <div class="header-wrapper">
+            <span class="title">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PDF_PREVIEW') }}</span>
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          @click="handleClickCancel"
+                >
+                    {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.CANCEL') }}
+                </p-button>
+                <p-button v-if="mode === 'ELEMENT_EMBED'"
+                          icon-left="ic_download"
+                          style-type="primary"
+                          :loading="state.loading"
+                          @click="handleClickDownload"
+                >
+                    {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.DOWNLOAD_PDF') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-if="mode === 'PDF_EMBED' ? (state.loading && !state.pdfDataUrl) : true"
+             class="preview-wrapper"
+        >
+            <div class="preview">
+                <div class="blocker">
+                    <slot name="default" />
+                </div>
+            </div>
+        </div>
+        <div v-if="state.loading"
+             class="loader-wrapper"
+        >
+            <div class="loader">
+                <p-spinner size="sm" />
+                <div class="progress-rate">
+                    {{ state.progressRate }}%
+                </div>
+                <span>{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PROCESSING') }}...</span>
+            </div>
+        </div>
+        <iframe v-if="mode === 'PDF_EMBED' && state.pdfDataUrl"
+                :src="state.pdfDataUrl"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .pdf-download-overlay {

@@ -1,3 +1,49 @@
+<script lang="ts" setup>
+
+import {
+    PBadge,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+
+interface Props {
+    date: string;
+    title: string;
+    count?: number;
+    color: string;
+    timezone: string;
+    selected: boolean;
+    isLastItem: boolean;
+    isTitleVertical: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    date: '',
+    title: '',
+    count: 0,
+    color: 'GRAY',
+    timezone: 'UTC',
+    selected: false,
+    isLastItem: false,
+    isTitleVertical: false,
+});
+const emit = defineEmits<{(e: 'click-timeline'): void}>();
+
+/* Util */
+const getBadgeStyleType = (itemColor: string): string => {
+    if (itemColor === 'GREEN') return 'green200';
+    if (itemColor === 'BLUE') return 'blue200';
+    return 'gray200';
+};
+const getTimezoneDate = (date: string, timezone: string): string => dayjs.utc(date).tz(timezone).format('YYYY/MM/DD HH:mm:ss');
+
+/* Event */
+const handleClickTimeline = () => {
+    emit('click-timeline');
+};
+
+</script>
+
 <template>
     <div class="vertical-timeline"
          :class="{selected: selected}"
@@ -38,93 +84,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import { defineComponent } from 'vue';
-
-import {
-    PBadge,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-
-interface Props {
-    date: string;
-    title: string;
-    count?: number;
-    color: string;
-    timezone: string;
-    selected: boolean;
-    isLastItem: boolean;
-    isTitleVertical: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'VerticalTimeline',
-    components: {
-        PBadge,
-    },
-    props: {
-        date: {
-            type: String,
-            default: '',
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        count: {
-            type: Number,
-            default: 0,
-        },
-        color: {
-            type: String,
-            default: 'GRAY',
-        },
-        timezone: {
-            type: String,
-            default: 'UTC',
-        },
-        selected: {
-            type: Boolean,
-            default: false,
-        },
-        isLastItem: {
-            type: Boolean,
-            default: false,
-        },
-        isTitleVertical: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        /* Util */
-        const getBadgeStyleType = (itemColor: string): string => {
-            if (itemColor === 'GREEN') return 'green200';
-            if (itemColor === 'BLUE') return 'blue200';
-            return 'gray200';
-        };
-        const getTimezoneDate = (date: string, timezone: string): string => dayjs.utc(date).tz(timezone).format('YYYY/MM/DD HH:mm:ss');
-
-        /* Event */
-        const handleClickTimeline = () => {
-            emit('click-timeline');
-        };
-
-        return {
-            iso8601Formatter,
-            getBadgeStyleType,
-            getTimezoneDate,
-            handleClickTimeline,
-        };
-    },
-});
-
-</script>
 
 <style lang="postcss" scoped>
 .vertical-timeline {

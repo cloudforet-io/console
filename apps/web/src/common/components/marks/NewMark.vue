@@ -1,12 +1,9 @@
+<script lang="ts" setup>
+</script>
+
 <template>
     <span class="new-mark">new</span>
 </template>
-
-<script lang="ts">
-export default {
-    name: 'NewMark',
-};
-</script>
 
 <style lang="postcss">
 .new-mark {

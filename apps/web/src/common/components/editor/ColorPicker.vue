@@ -1,7 +1,40 @@
+<script lang="ts" setup>
+import { PI, PSelectDropdown } from '@spaceone/design-system';
+import type { Editor } from '@tiptap/core';
+import {
+    reactive,
+} from 'vue';
+
+
+import {
+    blue, coral, gray, green, peacock, red, violet, yellow,
+} from '@/styles/colors';
+
+const COLOR_PICKER_COLOR_SETS = [
+    [gray[900], violet[500], blue[500], peacock[500], green[500], yellow[500], coral[500], red[500]],
+    [gray[500], violet[700], blue[700], peacock[700], green[700], yellow[700], coral[700], red[700]],
+];
+
+interface Props {
+    editor: Editor
+}
+defineProps<Props>();
+const emit = defineEmits<{(e: 'select', value: string): void}>();
+
+const state = reactive({
+    textColorItems: COLOR_PICKER_COLOR_SETS.flatMap((color) => ({ name: color })),
+});
+
+const handleColorClick = async (color: string) => {
+    emit('select', color);
+};
+
+</script>
+
 <template>
     <p-select-dropdown class="color-picker"
                        style-type="transparent"
-                       :items="textColorItems"
+                       :items="state.textColorItems"
                        index-mode
     >
         <template #menu-menu>
@@ -35,57 +68,6 @@
         />
     </p-select-dropdown>
 </template>
-
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
-
-import { PI, PSelectDropdown } from '@spaceone/design-system';
-import type { Editor } from '@tiptap/core';
-
-import {
-    blue, coral, gray, green, peacock, red, violet, yellow,
-} from '@/styles/colors';
-
-const COLOR_PICKER_COLOR_SETS = [
-    [gray[900], violet[500], blue[500], peacock[500], green[500], yellow[500], coral[500], red[500]],
-    [gray[500], violet[700], blue[700], peacock[700], green[700], yellow[700], coral[700], red[700]],
-];
-
-interface Props {
-    editor: Editor
-}
-export default defineComponent<Props>({
-    name: 'ColorPicker',
-    components: {
-        PSelectDropdown,
-        PI,
-    },
-    props: {
-        editor: {
-            type: Object as PropType<Editor>,
-            required: true,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            textColorItems: COLOR_PICKER_COLOR_SETS.flatMap((color) => ({ name: color })),
-        });
-
-        const handleColorClick = async (color: string) => {
-            emit('select', color);
-        };
-
-        return {
-            ...toRefs(state),
-            handleColorClick,
-            COLOR_PICKER_COLOR_SETS,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .color-picker {

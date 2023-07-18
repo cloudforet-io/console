@@ -1,21 +1,21 @@
 <template>
-    <p-button-modal class="delete-modal"
+    <p-button-modal v-model:visible="state.proxyVisible"
+                    class="delete-modal"
                     :header-title="headerTitle"
                     :size="size"
                     :fade="true"
                     :backdrop="true"
-                    :visible.sync="proxyVisible"
                     :disabled="disabled"
                     :hide-footer="hideFooter"
                     theme-color="alert"
                     :loading="loading"
                     @confirm="handleConfirm"
-                    @close="$emit('close')"
-                    @cancel="$emit('cancel')"
+                    @close="handleClose"
+                    @cancel="handleCancel"
     >
         <template #body>
             <p
-                v-if="contents || $scopedSlots.default"
+                v-if="contents || slots.default"
                 :class="{'delete-modal-content': true, 'enable-scroll': enableScroll}"
             >
                 <slot>{{ contents }}</slot>
@@ -25,9 +25,9 @@
                 <p-button v-if="hideFooter"
                           class="close-button"
                           style-type="tertiary"
-                          @click="handleClose"
+                          @click="handleClickClose"
                 >
-                    {{ $t('APP.MAIN.CLOSE') }}
+                    {{ t('APP.MAIN.CLOSE') }}
                 </p-button>
             </div>
         </template>
@@ -39,82 +39,58 @@
     </p-button-modal>
 </template>
 
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
+<script lang="ts" setup>
 import { PButtonModal, PButton } from '@spaceone/design-system';
+import { reactive, useSlots } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { Size } from '@/common/components/modals/config';
 import { SIZE } from '@/common/components/modals/config';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-export default {
-    name: 'DeleteModal',
-    components: {
-        PButtonModal,
-        PButton,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        headerTitle: {
-            type: String as PropType<TranslateResult>,
-            default: '',
-        },
-        contents: {
-            type: String as PropType<TranslateResult>,
-            default: '',
-        },
-        confirmText: {
-            type: String,
-            default: '',
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        size: {
-            type: String,
-            validator(value: Size): boolean {
-                return Object.values(SIZE).includes(value);
-            },
-            default: SIZE.sm,
-        },
-        hideFooter: {
-            type: Boolean,
-            default: false,
-        },
-        enableScroll: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-        });
-        const handleConfirm = () => {
-            if (props.hideFooter) {
-                state.proxyVisible = false;
-            } else emit('confirm');
-        };
-        const handleClose = () => { state.proxyVisible = false; };
-        return {
-            ...toRefs(state),
-            handleConfirm,
-            handleClose,
-            SIZE,
-        };
-    },
+interface Props {
+    visible: boolean;
+    disabled: boolean;
+    headerTitle: string;
+    contents: string;
+    confirmText: string;
+    loading: boolean;
+    size: Size;
+    hideFooter: boolean;
+    enableScroll: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    disabled: false,
+    headerTitle: '',
+    contents: '',
+    confirmText: '',
+    loading: false,
+    size: SIZE.sm,
+    hideFooter: false,
+    enableScroll: false,
+});
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
+    (e: 'close'): void;
+    (e: 'cancel'): void;
+}>();
+const { t } = useI18n();
+const slots = useSlots();
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+});
+const handleConfirm = () => {
+    if (props.hideFooter) {
+        state.proxyVisible = false;
+    } else emit('confirm');
 };
+const handleClickClose = () => { state.proxyVisible = false; };
+const handleClose = () => { emit('close'); };
+const handleCancel = () => { emit('cancel'); };
+
 </script>
 
 <style lang="postcss" scoped>

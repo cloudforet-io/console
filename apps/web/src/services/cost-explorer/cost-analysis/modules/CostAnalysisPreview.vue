@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
-import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/type';
 
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
