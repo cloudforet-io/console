@@ -1,0 +1,9 @@
+export const JOB_STATE = {
+    CREATED: 'CREATED',
+    IN_PROGRESS: 'IN_PROGRESS',
+    SUCCESS: 'SUCCESS',
+    CANCELED: 'CANCELED',
+    ERROR: 'ERROR',
+    TIMEOUT: 'TIMEOUT',
+    NONE: 'NONE',
+} as const;
