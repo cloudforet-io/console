@@ -105,9 +105,11 @@ const state = reactive({
         if (!props.recentJobAnalyze) return undefined;
         return props.recentJobAnalyze[RECENT_COUNT - 1];
     }),
-    remainedTasks: computed<number>(() => state.recentJob?.remained_tasks ?? 0),
-    totalTasks: computed<number>(() => state.recentJob?.total_tasks ?? 0),
-    remainedTasksPercentage: computed<number>(() => (state.totalTasks > 0 ? numberFormatter(((state.totalTasks - state.remainedTasks) / state.totalTasks) * 100) : 100)),
+    remainedTasksPercentage: computed<number>(() => {
+        const remainedTasks = state.recentJob?.remained_tasks ?? 0;
+        const totalTasks = state.recentJob?.total_tasks ?? 0;
+        return totalTasks > 0 ? numberFormatter(((totalTasks - remainedTasks) / totalTasks) * 100) : 100;
+    }),
 });
 </script>
 
