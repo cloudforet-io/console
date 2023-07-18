@@ -12,14 +12,20 @@
                                 height="1.5rem"
                                 class="plugin-icon"
                     />
-                    <div class="title-wrapper">
+                    <div v-if="state.plugin"
+                         class="title-wrapper"
+                    >
                         <span class="plugin-name">{{ state.plugin.name }}</span>
                         <span class="plugin-version">v{{ state.plugin.version }}</span>
                     </div>
                 </div>
                 <div class="collector-info-wrapper">
-                    <div class="collector-info-view">
-                        <collector-item-status :item="props.item" />
+                    <div v-if="props.item"
+                         class="collector-info-view"
+                    >
+                        <collector-current-status :schedule="props.item.schedule"
+                                                  :recent-job="state.recentJob"
+                        />
                         <collector-item-job-list :item="props.item" />
                     </div>
                     <collector-item-schedule :item="props.item" />
@@ -50,38 +56,44 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
-import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobStatus } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 interface Props {
     item?: CollectorItemInfo;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
+const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
-    plugin: computed(() => {
+    plugin: computed<{name?: string; version: string}|null>(() => {
         const plugin = props.item?.plugin;
-        return { name: plugin.name, version: plugin.info.version };
+        if (plugin) return { name: plugin.name, version: plugin.info.version };
+        return null;
+    }),
+    recentJob: computed<JobStatus|undefined>(() => {
+        if (!props.item) return undefined;
+        return props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
     }),
 });
 
 /* API */
 const handleClickCollectData = async () => {
+    if (!props.item) return;
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
     await collectorPageStore.$patch((_state) => {
         _state.visible.collectorModal = true;
     });
     await collectorDataModalStore.$patch((_state) => {
+        if (!props.item) return;
         _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
         _state.selectedCollector = collectorPageState.selectedCollector;
     });
