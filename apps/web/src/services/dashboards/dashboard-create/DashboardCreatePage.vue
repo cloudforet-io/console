@@ -2,7 +2,7 @@
     <div class="dashboard-create-page"
          :class="`step-${currentStep}`"
     >
-        <template v-if="currentStep === steps[0].step">
+        <div v-if="currentStep === steps[0].step">
             <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
                                       :description="steps[currentStep - 1].description"
                                       :total-steps="steps.length"
@@ -32,8 +32,8 @@
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </template>
-        <template v-if="currentStep === steps[1].step">
+        </div>
+        <div v-if="currentStep === steps[1].step">
             <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
                                       :description="steps[currentStep - 1].description"
                                       :total-steps="steps.length"
@@ -64,24 +64,22 @@
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </template>
-        <template v-if="currentStep === steps[2].step">
-            <div class="dashboard-customize-wrapper">
-                <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                          :total-steps="steps.length"
-                                          :current-step="currentStep"
-                                          show-step
-                                          show-close-button
-                                          @close="handleClickClose"
-                />
-                <dashboard-customize :loading="loading"
-                                     :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
-                                     hide-cancel-button
-                                     @go-back="goStep('prev')"
-                                     @save="createDashboard"
-                />
-            </div>
-        </template>
+        </div>
+        <div v-if="currentStep === steps[2].step">
+            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
+            />
+            <dashboard-customize :loading="loading"
+                                 :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
+                                 hide-cancel-button
+                                 @go-back="goStep('prev')"
+                                 @save="createDashboard"
+            />
+        </div>
         <confirm-back-modal :visible.sync="closeConfirmModalVisible"
                             @confirm="handleClickBackButton"
         />
@@ -279,11 +277,14 @@ export default {
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
+    &.step-2 {
+        width: 100%;
+        max-width: 1000px;
+    }
+    &.step-3 {
+        width: 100%;
+        height: 100%;
+    }
     .button-area {
         @apply flex justify-end mt-8 gap-4;
     }
