@@ -186,7 +186,6 @@ onMounted(() => {
     min-width: 59.5625rem;
     width: 100%;
     overflow: visible;
-    padding-bottom: 2.5rem;
     .contents-container {
         @apply flex justify-between;
         margin-top: 1.5rem;

@@ -106,7 +106,5 @@ defineExpose({ setPathFrom });
 .collector-creator-page {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    padding: 2rem 2.5rem;
 }
 </style>
