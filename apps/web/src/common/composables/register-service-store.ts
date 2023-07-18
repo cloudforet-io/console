@@ -68,10 +68,10 @@ function getGetters(path: string) {
     return result;
 }
 
-export function defineServiceStore<T>(servicePathList: string[], serviceStore = {}): any {
+export function defineServiceStore(servicePathList: string[], serviceStore = {}): any {
     const pathStr = servicePathList.join('/');
     const _getters = getGetters(pathStr);
-    let _state: T = store.state;
+    let _state = store.state;
     servicePathList.forEach((p) => {
         if (_state) _state = _state[p];
     });
@@ -99,5 +99,5 @@ export function registerServiceStore<T>(path: Path, storeModule: Module<T, any>,
 
     registerStore(paths, storeModule, serviceStore);
 
-    defineServiceStore<T>(paths, serviceStore);
+    defineServiceStore(paths, serviceStore);
 }

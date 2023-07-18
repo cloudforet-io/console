@@ -23,13 +23,13 @@ declare module 'vue-router' {
     import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
     interface RouteLabelFormatter {
-        (route: _RouteLocationBase): TranslateResult|TranslateResult[];
+        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): TranslateResult|TranslateResult[];
     }
     interface RouteTranslationIdFormatter {
-        (route: _RouteLocationBase): string|string[];
+        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string|string[];
     }
     interface RouteBreadcrumbsFormatter {
-        (route: _RouteLocationBase): Breadcrumb[];
+        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): Breadcrumb[];
     }
     interface RouteMeta {
         lnbVisible?: boolean;

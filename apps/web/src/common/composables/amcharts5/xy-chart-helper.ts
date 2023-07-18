@@ -3,9 +3,9 @@ import * as am5 from '@amcharts/amcharts5';
 import type { IXYAxis } from '@amcharts/amcharts5/.internal/charts/xy/series/XYSeries';
 import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import * as am5xy from '@amcharts/amcharts5/xy';
+import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 import bytes from 'bytes';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 
 import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
 

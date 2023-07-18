@@ -1,12 +1,10 @@
+import { clone } from 'lodash';
 import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
-import { clone } from 'lodash';
-
-type ValidatorResult = boolean|TranslateResult;
+type ValidatorResult = boolean|string;
 // eslint-disable-next-line no-unused-vars
 interface Validator { (value?: any): ValidatorResult }
 type ValidationResult = boolean;
@@ -40,7 +38,7 @@ function useValueValidator<T = any>(
         return !validationResult.value;
     });
 
-    const invalidText = computed<TranslateResult>(() => {
+    const invalidText = computed<string>(() => {
         if (!validationStarted.value) return '';
 
         const result = validatorResult.value;
@@ -91,7 +89,7 @@ type ValueSetters<T> = {
 
 type InvalidTexts<T> = {
     // eslint-disable-next-line no-unused-vars
-    [K in keyof T]: ComputedRef<TranslateResult>
+    [K in keyof T]: ComputedRef<string>
 };
 
 type InvalidState<T> = {

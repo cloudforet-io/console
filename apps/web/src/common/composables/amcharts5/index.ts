@@ -1,7 +1,3 @@
-import type { Ref } from 'vue';
-import {
-    reactive, toRef, watch,
-} from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
@@ -10,6 +6,10 @@ import type * as am5map from '@amcharts/amcharts5/map';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import type * as am5xy from '@amcharts/amcharts5/xy';
+import {
+    reactive, toRef, watch,
+} from 'vue';
+import type { Ref } from 'vue';
 
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
