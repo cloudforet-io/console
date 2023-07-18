@@ -104,7 +104,7 @@ export const getRefinedWidgetOptionsSchema = (
     const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
         type: 'object',
         properties: {},
-        required: schemaProperties as WidgetOptionsSchemaProperty[],
+        required: [] as WidgetOptionsSchemaProperty[],
         order: schema?.order ?? schemaProperties as WidgetOptionsSchemaProperty[],
     };
     if (!schema?.properties) return refinedJsonSchema;
@@ -115,7 +115,10 @@ export const getRefinedWidgetOptionsSchema = (
         if (!schemaProperties.includes(propertyName as WidgetOptionsSchemaProperty)) return;
         const isInherit = !!inheritOptions[propertyName]?.enabled;
         const refinedWidgetOptionsSchema = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
-        if (refinedWidgetOptionsSchema) refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
+        if (refinedWidgetOptionsSchema) {
+            refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
+            refinedJsonSchema.required?.push(propertyName);
+        }
     });
 
     return refinedJsonSchema;
