@@ -54,7 +54,7 @@
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
+                        :icon-animation="[JOB_STATE.IN_PROGRESS, JOB_STATE.CREATED].includes(value) ? 'spin' : undefined"
                     />
                 </template>
                 <template #col-remained_tasks-format="{value}">
@@ -121,9 +121,9 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import { peacock, green, red } from '@/styles/colors';
 
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 import NoCollectorModal from '@/services/asset-inventory/collector/collector-history/modules/NoCollectorModal.vue';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const PROGRESS_BAR_COLOR = peacock[500];
@@ -131,22 +131,22 @@ const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];
 
 const statusTextFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'Completed';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'In-Progress';
+    if (status === JOB_STATE.SUCCESS) return 'Completed';
+    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return 'In-Progress';
     return capitalize(status);
 };
 const statusTextColorFormatter = (status) => {
-    if ([JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(status)) return FAILED_ICON_COLOR;
+    if ([JOB_STATE.CANCELED, JOB_STATE.ERROR, JOB_STATE.TIMEOUT].includes(status)) return FAILED_ICON_COLOR;
     return undefined;
 };
 const statusIconFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'ic_check';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'ic_gear-filled';
+    if (status === JOB_STATE.SUCCESS) return 'ic_check';
+    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return 'ic_gear-filled';
     return 'ic_error-filled';
 };
 const statusIconColorFormatter = (status) => {
-    if (status === JOB_STATUS.success) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return undefined;
+    if (status === JOB_STATE.SUCCESS) return COMPLETED_ICON_COLOR;
+    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return undefined;
     return FAILED_ICON_COLOR;
 };
 
@@ -182,7 +182,7 @@ export default {
             }]),
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-                status: makeEnumValueHandler(JOB_STATUS),
+                status: makeEnumValueHandler(JOB_STATE),
                 collector_id: makeReferenceValueHandler('inventory.Collector'),
             } as ValueHandlerMap,
         });
@@ -240,13 +240,13 @@ export default {
                 .setPageStart(state.pageStart).setPageLimit(state.pageSize)
                 .setFilters(searchFilters.value);
 
-            let statusValues: JOB_STATUS[] = [];
+            let statusValues: string[] = [];
             if (state.selectedStatus === 'inProgress') {
-                statusValues = [JOB_STATUS.progress];
+                statusValues = [JOB_STATE.IN_PROGRESS];
             } else if (state.selectedStatus === 'completed') {
-                statusValues = [JOB_STATUS.created, JOB_STATUS.success];
+                statusValues = [JOB_STATE.CREATED, JOB_STATE.SUCCESS];
             } else if (state.selectedStatus === 'failed') {
-                statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
+                statusValues = [JOB_STATE.CANCELED, JOB_STATE.ERROR, JOB_STATE.TIMEOUT];
             }
 
             if (statusValues.length > 0) {
@@ -334,7 +334,7 @@ export default {
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,
             ASSET_INVENTORY_ROUTE,
-            JOB_STATUS,
+            JOB_STATE,
             onSelect,
             handleChange,
             handleChangePagination,
