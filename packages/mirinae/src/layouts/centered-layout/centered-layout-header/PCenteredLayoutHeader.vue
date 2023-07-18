@@ -41,15 +41,7 @@ const handleClickCloseButton = () => {
                    :title="props.title"
         >
             <template #extra>
-                <div class="close-button-wrapper">
-                    <p-icon-button v-if="props.showCloseButton"
-                                   name="ic_close"
-                                   size="md"
-                                   color="inherit"
-                                   class="close-button"
-                                   @click="handleClickCloseButton"
-                    />
-                </div>
+                <div class="empty-space-for-close-button" />
             </template>
         </p-heading>
         <p v-if="props.description"
@@ -57,11 +49,22 @@ const handleClickCloseButton = () => {
         >
             {{ props.description }}
         </p>
+        <p-icon-button v-if="props.showCloseButton"
+                       name="ic_close"
+                       size="md"
+                       color="inherit"
+                       class="close-button"
+                       :class="{
+                           'show-step': props.showStep
+                       }"
+                       @click="handleClickCloseButton"
+        />
     </div>
 </template>
 
 <style lang="postcss">
 .p-centered-layout-header {
+    position: relative;
     margin-bottom: 2rem;
     > .step {
         @apply text-label-sm text-gray-900;
@@ -75,11 +78,25 @@ const handleClickCloseButton = () => {
     > .description {
         @apply text-label-md text-gray-700;
     }
-    .close-button-wrapper {
-        @apply flex items-center justify-end;
-        width: 100%;
+    .empty-space-for-close-button {
+        width: 1rem;
+    }
+    > .close-button {
+        position: absolute;
+        top: 0.2rem;
+        right: -0.5rem;
+        z-index: 10;
+        &.show-step {
+            top: 1.2rem;
+        }
+    }
+
+    @screen tablet {
         > .close-button {
-            height: 2rem;
+            top: -0.5rem;
+            &.show-step {
+                top: -0.5rem;
+            }
         }
     }
 }
