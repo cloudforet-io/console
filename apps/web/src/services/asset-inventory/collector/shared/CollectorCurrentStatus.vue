@@ -5,7 +5,7 @@
                 {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
             </p>
             <div class="label-description">
-                <div v-if="props.item.schedule">
+                <div v-if="props.schedule">
                     <div v-if="state.status === JOB_STATE.IN_PROGRESS"
                          class="current-status-progress"
                     >
@@ -16,10 +16,10 @@
                             animation="spin"
                         />
                         <span>
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remained_tasks }}%</span>
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
                         </span>
                     </div>
-                    <div v-else-if="props.item.schedule.hours && props.item.schedule.hours.length > 0"
+                    <div v-else-if="props.schedule.hours && props.schedule.hours.length > 0"
                          class="scheduled"
                     >
                         <p-i
@@ -42,7 +42,7 @@
                 </span>
             </div>
         </div>
-        <p-progress-bar :percentage="state.remained_tasks"
+        <p-progress-bar :percentage="state.remainedTasksPercentage"
                         :color="PROGRESS_BAR_COLOR"
                         size="sm"
                         class="status-progress-bar"
@@ -60,30 +60,32 @@ import { numberFormatter } from '@cloudforet/core-lib';
 
 import { peacock } from '@/styles/colors';
 
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { Schedule, JobStatus } from '@/services/asset-inventory/collector/model';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const RECENT_COUNT = 5;
 const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
-    item?: CollectorItemInfo;
+    schedule?: Schedule;
+    recentJobAnalyze?: JobStatus[];
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
+const props = defineProps<Props>();
 
 const state = reactive({
-    status: computed(() => {
-        const recentJob = props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
-        return recentJob?.status;
+    status: computed<string|undefined>(() => {
+        if (props.recentJobAnalyze) {
+            const recentJob = props.recentJobAnalyze[props.recentJobAnalyze.length - 1];
+            return recentJob?.status;
+        }
+        return undefined;
     }),
     diffSchedule: computed(() => {
-        if (props.item.schedule) {
+        if (props.schedule) {
             const current = dayjs.utc();
 
-            const hours = props.item.schedule.hours ?? [];
+            const hours = props.schedule.hours ?? [];
             const sortedHours = hours.sort((a, b) => a - b);
             const nextScheduledHour = sortedHours.find((num) => num > current.hour());
 
@@ -99,10 +101,13 @@ const state = reactive({
         }
         return { diffHour: 0, diffMin: 0 };
     }),
-    remained_tasks: computed(() => {
-        const recentJob = props.item.recentJobAnalyze[RECENT_COUNT - 1];
-        return recentJob?.total_tasks > 0 ? numberFormatter(((recentJob.total_tasks - recentJob.remained_tasks) / recentJob.total_tasks) * 100) : 100;
+    recentJob: computed<JobStatus|undefined>(() => {
+        if (!props.recentJobAnalyze) return undefined;
+        return props.recentJobAnalyze[RECENT_COUNT - 1];
     }),
+    remainedTasks: computed<number>(() => state.recentJob?.remained_tasks ?? 0),
+    totalTasks: computed<number>(() => state.recentJob?.total_tasks ?? 0),
+    remainedTasksPercentage: computed<number>(() => (state.totalTasks > 0 ? numberFormatter(((state.totalTasks - state.remainedTasks) / state.totalTasks) * 100) : 100)),
 });
 </script>
 

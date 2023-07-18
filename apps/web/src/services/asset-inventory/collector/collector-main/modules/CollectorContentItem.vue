@@ -12,14 +12,20 @@
                                 height="1.5rem"
                                 class="plugin-icon"
                     />
-                    <div class="title-wrapper">
+                    <div v-if="state.plugin"
+                         class="title-wrapper"
+                    >
                         <span class="plugin-name">{{ state.plugin.name }}</span>
                         <span class="plugin-version">v{{ state.plugin.version }}</span>
                     </div>
                 </div>
                 <div class="collector-info-wrapper">
-                    <div class="collector-info-view">
-                        <collector-current-status :item="props.item" />
+                    <div v-if="props.item"
+                         class="collector-info-view"
+                    >
+                        <collector-current-status :schedule="props.item.schedule"
+                                                  :recent-job-analyze="props.item.recentJobAnalyze"
+                        />
                         <collector-item-job-list :item="props.item" />
                     </div>
                     <collector-item-schedule :item="props.item" />
@@ -60,28 +66,29 @@ interface Props {
     item?: CollectorItemInfo;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
+const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
-    plugin: computed(() => {
+    plugin: computed<{name?: string; version: string}|null>(() => {
         const plugin = props.item?.plugin;
-        return { name: plugin.name, version: plugin.info.version };
+        if (plugin) return { name: plugin.name, version: plugin.info.version };
+        return null;
     }),
 });
 
 /* API */
 const handleClickCollectData = async () => {
+    if (!props.item) return;
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
     await collectorPageStore.$patch((_state) => {
         _state.visible.collectorModal = true;
     });
     await collectorDataModalStore.$patch((_state) => {
+        if (!props.item) return;
         _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
         _state.selectedCollector = collectorPageState.selectedCollector;
     });
