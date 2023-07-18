@@ -1,15 +1,44 @@
 <template>
-    <div class="p-centered-layout">
+    <div ref="containerRef"
+         class="p-centered-layout"
+    >
         <div v-if="$slots['top-contents']"
              class="top-contents-wrapper"
         >
             <slot name="top-contents" />
         </div>
-        <div class="layout-contents-wrapper">
+        <div ref="layoutWrapperRef"
+             class="layout-contents-wrapper"
+             :class="{ 'contents-over-wrapper': isContentsOverWrapper }"
+        >
             <slot />
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const containerRef = ref<HTMLElement|null>(null);
+const layoutWrapperRef = ref<HTMLElement|null>(null);
+const isContentsOverWrapper = ref(false);
+
+const observer = new ResizeObserver((entries) => {
+    const containerClientHeight = containerRef.value?.clientHeight ?? 0;
+    if (entries[0].target.scrollHeight > containerClientHeight) {
+        isContentsOverWrapper.value = true;
+    } else {
+        isContentsOverWrapper.value = false;
+    }
+});
+
+onMounted(() => {
+    if (layoutWrapperRef.value) observer.observe(layoutWrapperRef.value);
+});
+onUnmounted(() => {
+    observer.disconnect();
+});
+</script>
 
 <style lang="postcss">
 .p-centered-layout {
@@ -44,6 +73,9 @@
         overflow-y: auto;
         min-width: 360px;
         padding: 2rem 2.5rem;
+        &.contents-over-wrapper {
+            justify-content: flex-start;
+        }
     }
 }
 </style>
