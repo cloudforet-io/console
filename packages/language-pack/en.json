@@ -2122,7 +2122,7 @@
 				"CREATE_NEW_COLLECTOR": "Create New Collector",
 				"FORM_LOAD_FAILED": "Failed to load additional options.",
 				"LEARN_MORE": "learn more",
-				"LOADING_DESC1": "Loading additional options...",
+				"LOADING_DESC1": "Initializing associated options...",
 				"LOADING_DESC2": "(Please wait, this may take about 1-2 minutes)",
 				"NAME": "Name",
 				"NAME_INVALID_DUPLICATED": "Name already registered.",
@@ -2180,17 +2180,33 @@
 				"TAG": "Tag",
 				"VERSION": "Version"
 			},
+			"HISTORY": {
+				"CANCELED": "Canceled",
+				"FAILURE": "Failure",
+				"SUCCESS": "Success"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "Failed to edit schedule.",
 				"ALT_S_EDIT_SCHEDULE": "Schedule successfully edited",
 				"COLLECTOR_SCHEDULE": "Collector Schedule",
 				"COLLECT_DATA": "Collect Data",
+				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "Account",
+					"CONFIRM_BUTTON": "Collect Now",
+					"DESCRIPTION": "Collect data with following associated accounts.",
+					"DUPLICATION_DESCRIPTION": "Check the ongoing data collection information.",
+					"DUPLICATION_TITLE": "Collecting is still in progress. Do you want to cancel and re-start it?",
+					"DURATION": "Duration",
+					"TITLE": "Do you want to collect data now?"
+				},
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
 				"CURRENT_STATUS": "Current Status",
 				"EDIT_MODAL_TITLE": "Edit Schedule",
+				"EDIT_SCHEDULE": "Edit",
 				"HISTORY": "Collector History",
 				"IN_PROGRESS": "In-Progress",
+				"JOB_CANCELED": "Canceled: {date}",
 				"JOB_ERROR": "Status: Failed,\nCollected: {date}",
 				"JOB_NONE": "No collector job",
 				"JOB_PROGRESS": "Status: In-Progress",
@@ -2198,7 +2214,8 @@
 				"NO_DATA": "There’s no collector created yet.",
 				"NO_SCHEDULE": "No Scheduled",
 				"PLUGIN": "Plugin",
-				"RECENT_JOBS": "Recent data collection results within the past 5 days",
+				"RECENT_JOBS": "Recent Collector Jobs",
+				"RECENT_JOBS_TOOLTIP": "Recent data collection results\nwithin the past 5 days",
 				"RESTART": "Re-Start",
 				"RESTART_COLLECT": "Collecting is still in progress. Do you want to re-start it?",
 				"SCHEDULED": "Scheduled",
@@ -2209,7 +2226,7 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_OPTIONS": "No Options"
+			"NO_OPTIONS": "No Supported Options"
 		},
 		"SERVER": {
 			"MAIN": {

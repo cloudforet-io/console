@@ -8,8 +8,15 @@
         />
         <div class="contents">
             <p class="plugin-name">
-                {{ state.name }} <span v-if="state.isBeta"
-                                       class="beta"
+                {{ state.name }} <span :style="{ backgroundColor: repositoryBackgroundColorMap[state.repositoryType], borderRadius: '100%' }"
+                                       class="repository-badge-box"
+                ><p-i v-if="repositoryIconMap[state.repositoryType]"
+                      :name="repositoryIconMap[state.repositoryType]"
+                      :color="repositoryColorMap[state.repositoryType]"
+                      width="1rem"
+                      height="1rem"
+                /></span><span v-if="state.isBeta"
+                               class="beta"
                 >{{ $t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
             </p>
             <div class="plugin-description">
@@ -44,7 +51,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PLazyImg, PLabel,
+    PAnchor, PLazyImg, PLabel, PI,
     screens,
 } from '@spaceone/design-system';
 
@@ -52,7 +59,12 @@ import { store } from '@/store';
 
 import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
-import type { CollectorPluginModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/collector/config';
+import type {
+    CollectorPluginModel,
+    RepositoryInfo,
+    RepositoryPluginModel,
+} from '@/services/asset-inventory/collector/model';
 
 type Size = 'sm' | 'lg';
 
@@ -85,6 +97,7 @@ const state = reactive({
         if (!props.plugin) return undefined;
         return state.plugins[props.plugin.plugin_id];
     }),
+    repositoryType: computed<RepositoryInfo>(() => props.plugin?.repository_info?.repository_type),
 });
 
 // init reference data
@@ -112,8 +125,17 @@ const state = reactive({
         width: 100%;
 
         .plugin-name {
-            @apply text-label-lg text-gray-900;
+            @apply text-label-lg text-gray-900 flex items-center gap-1;
             margin-bottom: 0.375rem;
+
+            .repository-badge-box {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+
             .beta {
                 @apply text-label-xs text-coral-500 font-normal;
             }

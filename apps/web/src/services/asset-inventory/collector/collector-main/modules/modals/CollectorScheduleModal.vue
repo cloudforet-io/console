@@ -4,7 +4,7 @@
                     size="md"
                     fade
                     backdrop
-                    :visible="collectorPageState.visibleScheduleModal"
+                    :visible="collectorPageState.visible.scheduleModal"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
                     @confirm="handleConfirm"
@@ -32,7 +32,6 @@ import CollectorScheduleForm
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
@@ -40,8 +39,8 @@ const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
 /* Components */
 const handleCloseModal = () => {
-    collectorPageStore.$patch({
-        visibleScheduleModal: false,
+    collectorPageStore.$patch((_state) => {
+        _state.visible.scheduleModal = false;
     });
 };
 const handleConfirm = async () => {

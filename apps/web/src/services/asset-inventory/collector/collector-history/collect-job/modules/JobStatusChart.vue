@@ -9,8 +9,8 @@
                     :name="statusIconFormatter(status)"
                     width="1rem"
                     height="1rem"
-                    :animation="status === JOB_STATUS.progress ? 'spin' : undefined"
-                    :color="status === JOB_STATUS.success ? SUCCEEDED_COLOR : undefined"
+                    :animation="status === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                    :color="status === JOB_STATE.SUCCESS ? SUCCEEDED_COLOR : undefined"
                 />
                 {{ statusText }}
             </span>
@@ -59,7 +59,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { coral, green } from '@/styles/colors';
 
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const SUCCEEDED_COLOR = green[400];
 const FAILED_COLOR = coral[400];
@@ -83,8 +83,8 @@ export default {
             job: {},
             status: computed(() => state.job.job_status),
             statusText: computed(() => {
-                if (state.status === JOB_STATUS.progress) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
-                if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
+                if (state.status === JOB_STATE.IN_PROGRESS) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
+                if ([JOB_STATE.SUCCESS].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
                 return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
             }),
             succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
@@ -98,7 +98,7 @@ export default {
             }),
             failedPercentage: computed(() => {
                 if (state.totalCount > 0) {
-                    if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) {
+                    if ([JOB_STATE.SUCCESS].includes(state.status)) {
                         return 100 - state.succeededPercentage;
                     }
                     return (state.failedCount / state.totalCount) * 100;
@@ -109,8 +109,8 @@ export default {
 
         /* util */
         const statusIconFormatter = (status) => {
-            if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_check';
-            if (status === JOB_STATUS.progress) return 'ic_gear-filled';
+            if (status === JOB_STATE.SUCCESS) return 'ic_check';
+            if (status === JOB_STATE.IN_PROGRESS) return 'ic_gear-filled';
             return 'ic_error-filled';
         };
 
@@ -121,7 +121,7 @@ export default {
                 state.job = await SpaceConnector.client.inventory.job.getJobProgress({
                     job_id: props.jobId,
                 });
-                if (state.status !== JOB_STATUS.progress && interval) {
+                if (state.status !== JOB_STATE.IN_PROGRESS && interval) {
                     clearInterval(interval);
                 }
             } catch (e) {
@@ -134,7 +134,7 @@ export default {
         onActivated(async () => {
             await getJob();
 
-            if (state.status === JOB_STATUS.progress) {
+            if (state.status === JOB_STATE.IN_PROGRESS) {
                 interval = setInterval(() => {
                     getJob();
                 }, 5000);
@@ -148,7 +148,7 @@ export default {
         return {
             ...toRefs(state),
             statusIconFormatter,
-            JOB_STATUS,
+            JOB_STATE,
             SUCCEEDED_COLOR,
             FAILED_COLOR,
         };

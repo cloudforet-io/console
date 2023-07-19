@@ -1,20 +1,14 @@
 <template>
     <fragment>
-        <p-icon-button name="ic_close"
-                       color="inherit"
-                       class="close-button"
-                       @click="handleClickClose"
-        />
         <div class="collector-creator-page">
-            <div class="header">
-                <p class="step">
-                    Step {{ state.step }}<span>/4</span>
-                </p>
-                <p-heading :title="$t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')" />
-                <p class="description">
-                    {{ state.descriptionByStep[state.step] }}
-                </p>
-            </div>
+            <p-centered-layout-header :title="$t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')"
+                                      :description="state.descriptionByStep[state.step]"
+                                      show-step
+                                      :current-step="state.step"
+                                      :total-steps="4"
+                                      :show-close-button="true"
+                                      @close="handleClickClose"
+            />
             <create-collector-step1 v-if="state.step===1"
                                     @update:currentStep="handleChangeStep"
             />
@@ -32,10 +26,8 @@
                 </keep-alive>
             </div>
         </div>
-        <delete-modal :header-title="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
-                      :visible.sync="state.deleteModalVisible"
-                      :contents="$t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
-                      @confirm="handleClickBackButton"
+        <confirm-back-modal :visible.sync="state.deleteModalVisible"
+                            @confirm="handleClickBackButton"
         />
     </fragment>
 </template>
@@ -63,13 +55,13 @@ export default defineComponent({
 // eslint-disable-next-line import/no-duplicates
 import { computed, reactive, defineExpose } from 'vue';
 
-import { PHeading, PIconButton } from '@spaceone/design-system';
+import { PCenteredLayoutHeader } from '@spaceone/design-system';
 
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 
 import CreateCollectorStep1
@@ -102,7 +94,6 @@ const handleChangeStep = (step: number) => {
     state.step = step;
 };
 
-
 defineExpose({ setPathFrom });
 
 
@@ -112,32 +103,8 @@ defineExpose({ setPathFrom });
 </script>
 
 <style lang="postcss" scoped>
-.close-button {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-}
-
 .collector-creator-page {
-    margin: 2rem 2.5rem 0 2.5rem;
-    max-height: calc(100% - 2rem);
-
-    .header {
-        margin-bottom: 2rem;
-        .step {
-            @apply text-label-sm text-gray-900;
-            span {
-                @apply text-gray-500;
-            }
-        }
-
-        /* custom design-system component - p-heading */
-        &:deep(.p-heading.heading-main) {
-            margin-bottom: 0.3125rem;
-        }
-        .description {
-            @apply text-label-md text-gray-700;
-        }
-    }
+    display: flex;
+    flex-direction: column;
 }
 </style>

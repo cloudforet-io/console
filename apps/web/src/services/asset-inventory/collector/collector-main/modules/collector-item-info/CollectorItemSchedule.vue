@@ -7,21 +7,13 @@
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
             >
-                <p-i v-if="state.isScheduleActivated"
-                     name="ic_edit"
+                <p-i name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
                      color="inherit"
                      class="icon-schedule"
                 />
-                <p-i v-else
-                     name="ic_settings-filled"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                {{ $t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
@@ -45,16 +37,17 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import type { CollectorUpdateParameter, Schedule } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 interface Props {
-    item?: CollectorItemInfo;
+    collectorId?: string;
+    schedule?: Schedule
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    collectorId: '',
+    schedule: undefined,
 });
 
 const collectorPageStore = useCollectorPageStore();
@@ -70,9 +63,9 @@ const handleChangeToggle = async (value) => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
         const params: CollectorUpdateParameter = {
-            collector_id: props.item.collectorId,
+            collector_id: props.collectorId,
             schedule: {
-                ...props.item.schedule,
+                ...props.schedule,
                 state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
             },
         };
@@ -83,30 +76,30 @@ const handleChangeToggle = async (value) => {
     }
 };
 const handleClickSchedule = () => {
-    collectorPageStore.setSelectedCollector(props.item.collectorId);
-    collectorPageStore.$patch({
-        visibleScheduleModal: true,
+    collectorPageStore.setSelectedCollector(props.collectorId);
+    collectorPageStore.$patch((_state) => {
+        _state.visible.scheduleModal = true;
     });
 };
 
 /* Watcher */
-watch(() => props.item, (item) => {
-    if (item && item.schedule) {
-        state.isScheduleActivated = item.schedule.state === 'ENABLED';
+watch(() => props.schedule, (schedule) => {
+    if (schedule) {
+        state.isScheduleActivated = schedule.state === 'ENABLED';
     }
 }, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply flex justify-between;
+    margin-top: 2.125rem;
     .info-label-wrapper {
-        @apply flex;
+        @apply flex items-center;
         gap: 0.375rem;
-
         .info-label {
             @apply text-label-sm text-gray-500;
         }
-
         .schedule-button {
             @apply flex items-center text-label-sm text-blue-700 font-normal;
             gap: 0.125rem;
@@ -117,6 +110,7 @@ watch(() => props.item, (item) => {
             }
             .icon-schedule {
                 @apply text-blue-700;
+                margin-top: 0.15rem;
             }
         }
     }

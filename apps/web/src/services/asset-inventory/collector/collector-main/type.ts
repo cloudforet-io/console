@@ -17,33 +17,16 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     SCHEDULE: 'schedule',
 } as const;
 
-export const COLLECTOR_ITEM_INFO_TYPE = {
-    PLUGIN: 'PLUGIN',
-    STATUS: 'STATUS',
-    JOBS: 'JOBS',
-    SCHEDULE: 'SCHEDULE',
-} as const;
-
-export const JOB_STATE = {
-    SUCCESS: 'SUCCESS',
-    ERROR: 'ERROR',
-    CREATED: 'CREATED',
-    IN_PROGRESS: 'IN_PROGRESS',
-    TIMEOUT: 'TIMEOUT',
-    CANCELED: 'CANCELED',
-    NONE: 'NONE',
-} as const;
-
 interface CollectorPlugin {
     name?: string;
     icon?: string;
     info: CollectorPluginModel;
 }
 
-interface CollectorLink {
+export interface CollectorLink {
     name: string;
     params: CollectorDetailLinkParameter;
-    query: CollectorDetailLinkQuery;
+    query?: CollectorDetailLinkQuery;
 }
 
 interface CollectorDetailLinkParameter {

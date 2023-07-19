@@ -65,6 +65,29 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## No Step
+
+<Canvas>
+    <Story name="No Step">
+        {{
+            components: {
+                PCenteredLayoutHeader
+            },
+            template: `
+            <div>
+                <p-centered-layout-header title="Title" description="Description"
+                    :show-close-button="true"
+                >
+                </p-centered-layout-header>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

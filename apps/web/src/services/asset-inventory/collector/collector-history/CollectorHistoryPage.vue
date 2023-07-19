@@ -4,7 +4,6 @@
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
-        <p-collector-history-chart @click-date="handleClickDate" />
         <div class="collector-history-table">
             <div class="status-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
@@ -54,17 +53,20 @@
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
+                        :icon-animation="[JOB_STATE.IN_PROGRESS].includes(value) ? 'spin' : undefined"
                     />
                 </template>
+                <!-- TODO: will be calculated after discussing API specs -->
                 <template #col-remained_tasks-format="{value}">
                     <div class="col-remained_tasks-format">
-                        <p-progress-bar
-                            :percentage="value"
-                            :color="PROGRESS_BAR_COLOR"
+                        <span class="succeeded-bar"
+                              :style="{ width: `${50}%` }"
                         />
-                        <span class="text">{{ value }}%</span>
+                        <span class="failed-bar"
+                              :style="{ width: `${20}%` }"
+                        />
                     </div>
+                    <span class="text">{{ value }}%</span>
                 </template>
             </p-toolbox-table>
             <div v-if="items.length > 0"
@@ -91,7 +93,7 @@ import {
 
 import {
     PHeading, PPagination, PLazyImg,
-    PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+    PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { capitalize } from 'lodash';
@@ -121,9 +123,9 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import { peacock, green, red } from '@/styles/colors';
 
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 import NoCollectorModal from '@/services/asset-inventory/collector/collector-history/modules/NoCollectorModal.vue';
+import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/collector/collector-history/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const PROGRESS_BAR_COLOR = peacock[500];
@@ -131,22 +133,25 @@ const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];
 
 const statusTextFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'Completed';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'In-Progress';
+    if (status === JOB_STATE.SUCCESS) return i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS');
+    if (status === JOB_STATE.IN_PROGRESS) return i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS');
+    if (status === JOB_STATE.CANCELED) return i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED');
+    if (status === JOB_STATE.FAILURE) return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
     return capitalize(status);
 };
 const statusTextColorFormatter = (status) => {
-    if ([JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(status)) return FAILED_ICON_COLOR;
+    if ([JOB_STATE.CANCELED, JOB_STATE.FAILURE].includes(status)) return FAILED_ICON_COLOR;
     return undefined;
 };
 const statusIconFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'ic_check';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'ic_gear-filled';
+    if (status === JOB_STATE.SUCCESS) return 'ic_check';
+    if (status === JOB_STATE.IN_PROGRESS) return 'ic_circle';
+    if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
     return 'ic_error-filled';
 };
 const statusIconColorFormatter = (status) => {
-    if (status === JOB_STATUS.success) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return undefined;
+    if (status === JOB_STATE.SUCCESS) return COMPLETED_ICON_COLOR;
+    if (status === JOB_STATE.IN_PROGRESS) return undefined;
     return FAILED_ICON_COLOR;
 };
 
@@ -160,9 +165,7 @@ export default {
         PToolboxTable,
         PHeading,
         PSelectButtonGroup,
-        PProgressBar,
         PStatus,
-        PCollectorHistoryChart,
     },
     setup() {
         const storeState = reactive({
@@ -182,7 +185,7 @@ export default {
             }]),
             valueHandlerMap: {
                 job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-                status: makeEnumValueHandler(JOB_STATUS),
+                status: makeEnumValueHandler(JOB_STATE),
                 collector_id: makeReferenceValueHandler('inventory.Collector'),
             } as ValueHandlerMap,
         });
@@ -210,23 +213,26 @@ export default {
             ]),
             statusList: computed(() => ([
                 {
-                    name: 'all', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
+                    name: JOB_SELECTED_STATUS.ALL, label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
                 },
                 {
-                    name: 'inProgress', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
+                    name: JOB_SELECTED_STATUS.PROGRESS, label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
                 },
                 {
-                    name: 'completed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
+                    name: JOB_SELECTED_STATUS.SUCCESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS'),
                 },
                 {
-                    name: 'failed', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
+                    name: JOB_SELECTED_STATUS.FAILURE, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE'),
+                },
+                {
+                    name: JOB_SELECTED_STATUS.CANCELED, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED'),
                 },
             ])),
             selectedStatus: 'all',
             items: [] as any[],
             //
             pageStart: 1,
-            pageSize: 15,
+            pageSize: 30,
             thisPage: 1,
             totalCount: 0,
         });
@@ -240,13 +246,15 @@ export default {
                 .setPageStart(state.pageStart).setPageLimit(state.pageSize)
                 .setFilters(searchFilters.value);
 
-            let statusValues: JOB_STATUS[] = [];
-            if (state.selectedStatus === 'inProgress') {
-                statusValues = [JOB_STATUS.progress];
-            } else if (state.selectedStatus === 'completed') {
-                statusValues = [JOB_STATUS.created, JOB_STATUS.success];
-            } else if (state.selectedStatus === 'failed') {
-                statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
+            let statusValues: string[] = [];
+            if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
+                statusValues = [JOB_STATE.IN_PROGRESS];
+            } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
+                statusValues = [JOB_STATE.SUCCESS];
+            } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
+                statusValues = [JOB_STATE.FAILURE];
+            } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
+                statusValues = [JOB_STATE.CANCELED];
             }
 
             if (statusValues.length > 0) {
@@ -273,6 +281,20 @@ export default {
             }
         };
 
+        // TODO: will be calculated after discussing API specs
+        // const getJobProgress = async () => {
+        //     try {
+        //         const ids = state.items.map((item) => item.job_id);
+        //         const response = await SpaceConnector.client.inventory.job.getJobProgress({
+        //             job_id: ids,
+        //         });
+        //         console.log(response);
+        //         // state.jobTaskStatus = response.job_task_status;
+        //     } catch (e) {
+        //         ErrorHandler.handleError(e);
+        //     }
+        // };
+
         /* event */
         const onSelect = (item) => {
             SpaceRouter.router.push({
@@ -297,13 +319,6 @@ export default {
         const handleChangePagination = () => {
             state.pageStart = getPageStart(state.thisPage, state.pageSize);
             getJobs();
-        };
-        const handleClickDate = async (data) => {
-            state.selectedStatus = data.type;
-            queryTagsHelper.setFilters([
-                ...searchFilters.value,
-                { k: 'created_at', v: data.date, o: '=' },
-            ]);
         };
 
         (async () => {
@@ -334,11 +349,10 @@ export default {
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,
             ASSET_INVENTORY_ROUTE,
-            JOB_STATUS,
+            JOB_STATE,
             onSelect,
             handleChange,
             handleChangePagination,
-            handleClickDate,
             statusTextFormatter,
             statusTextColorFormatter,
             statusIconFormatter,
@@ -384,11 +398,28 @@ export default {
             }
             .p-data-table {
                 .col-remained_tasks-format {
-                    display: flex;
-                    align-items: center;
-                    .progress-bar {
-                        width: 6.25rem;
-                        margin-right: 0.125rem;
+                    @apply inline-flex items-center bg-gray-200;
+                    width: 6rem;
+                    height: 0.5rem;
+                    margin-right: 0.25rem;
+                    border-radius: 0.125rem;
+                    > span {
+                        &:first-child {
+                            border-top-left-radius: 0.125rem;
+                            border-bottom-left-radius: 0.125rem;
+                        }
+                        &:last-child {
+                            border-top-right-radius: 0.125rem;
+                            border-bottom-right-radius: 0.125rem;
+                        }
+                    }
+                    .succeeded-bar {
+                        @apply bg-green-500;
+                        height: 100%;
+                    }
+                    .failed-bar {
+                        @apply bg-red-400;
+                        height: 100%;
                     }
                     .text {
                         @apply text-gray-700;

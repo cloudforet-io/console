@@ -12,35 +12,33 @@
                                 height="1.5rem"
                                 class="plugin-icon"
                     />
-                    <span class="plugin-name">{{ state.plugin.name }}</span>
-                    <span class="plugin-version">v{{ state.plugin.version }}</span>
+                    <div class="title-wrapper">
+                        <span class="plugin-name">{{ props.item.plugin.name }}</span>
+                        <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
+                    </div>
                 </div>
                 <div class="collector-info-wrapper">
-                    <div class="collector-info-view">
-                        <collector-item-job-list :item="props.item" />
+                    <div v-if="props.item"
+                         class="collector-info-view"
+                    >
+                        <collector-current-status :schedule="props.item.schedule"
+                                                  :recent-job="state.recentJob"
+                        />
+                        <collector-item-job-list :recent-job-analyze="props.item.recentJobAnalyze"
+                                                 :history-link="props.item.historyLink"
+                        />
                     </div>
-                    <div class="collector-info-view">
-                        <collector-item-status :item="props.item" />
-                        <collector-item-schedule :item="props.item" />
-                    </div>
+                    <collector-item-schedule :collector-id="props.item.collectorId"
+                                             :schedule="props.item.schedule"
+                    />
                 </div>
             </div>
-            <div class="collector-status-wrapper">
+            <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
                 <p-button style-type="tertiary"
-                          :loading="state.loading"
                           class="collector-data-button"
-                          :class="state.status === JOB_STATE.IN_PROGRESS && 'in-process'"
                           @click.stop="handleClickCollectData"
                 >
-                    <p-i v-if="state.status === JOB_STATE.IN_PROGRESS"
-                         name="ic_settings-filled"
-                         class="progress-icon"
-                         height="1rem"
-                         width="1rem"
-                         animation="spin"
-                         color="inherit"
-                    />
-                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}</span>
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
                 </p-button>
             </div>
         </p-card>
@@ -51,53 +49,56 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PCard, PLazyImg, PI,
+    PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
-import CollectorItemStatus from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemStatus.vue';
 import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import { JOB_STATE } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobStatus } from '@/services/asset-inventory/collector/model';
+import {
+    useCollectorDataModalStore,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 interface Props {
-    item?: CollectorItemInfo;
+    item: CollectorItemInfo;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-});
-
-const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
+const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.$state;
+const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
-    loading: false,
-    status: computed(() => props.item?.recentJobAnalyze[props.item.recentJobAnalyze.length - 1].status),
-    plugin: computed(() => {
-        const plugin = props.item?.plugin;
-        return { name: plugin.name, version: plugin.info.version };
+    plugin: computed<{name?: string; version: string}|null>(() => {
+        const plugin = props.item.plugin;
+        if (plugin) return { name: plugin.name, version: plugin.info.version };
+        return null;
+    }),
+    recentJob: computed<JobStatus|undefined>(() => {
+        if (!props.item) return undefined;
+        return props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
     }),
 });
 
 /* API */
 const handleClickCollectData = async () => {
-    state.loading = true;
-    if (state.status === JOB_STATE.IN_PROGRESS) {
-        const collectorCollector = collectorPageStore.collectors.find((collector) => collector.collector_id === props.item.collectorId);
-        collectorPageStore.$patch({
-            visibleRestartModal: true,
-            selectedCollector: collectorCollector,
-        });
-    } else {
-        const collectorId = props.item.collectorId;
-        await collectorPageStore.restartCollector(collectorId);
-    }
-    state.loading = false;
-    emit('refresh-collector-list');
+    if (!props.item) return;
+    await collectorPageStore.setSelectedCollector(props.item.collectorId);
+    await collectorPageStore.$patch((_state) => {
+        _state.visible.collectorModal = true;
+    });
+    await collectorDataModalStore.$patch((_state) => {
+        if (!props.item) return;
+        _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
+        _state.selectedCollector = collectorPageState.selectedCollector;
+    });
 };
 </script>
 
@@ -113,88 +114,88 @@ const handleClickCollectData = async () => {
             }
         }
     }
-
     .collector-item {
         @apply relative;
-
         &:hover {
             @apply cursor-pointer;
-
             .collector-status-wrapper {
                 .collector-data-button {
                     opacity: 1;
                 }
             }
         }
-
         .collector-status-wrapper {
             @apply absolute;
             top: 1.25rem;
             right: 1.5rem;
             gap: 0.25rem;
-
-            .collector-data-button {
-                opacity: 0;
-
-                &.in-process {
-                    @apply items-center;
+            &.is-mobile {
+                position: initial;
+                margin-top: 0.75rem;
+                margin-bottom: 0.5rem;
+                .collector-data-button {
+                    width: 100%;
                     opacity: 1;
-                    padding-right: 0.75rem;
-                    padding-left: 0.75rem;
-                    gap: 0.25rem;
-
-                    .progress-icon {
-                        @apply text-gray-500;
-                    }
                 }
             }
+            .collector-data-button {
+                @apply flex items-center;
+                opacity: 0;
+                padding-top: 0.065rem;
+            }
         }
-
         .collector-item-wrapper {
             @apply flex flex-col;
-            gap: 1rem;
-            padding: 0.75rem 0.625rem;
-
+            gap: 0.875rem;
+            padding: 0.5rem 0.625rem;
             .collector-item-name {
                 @apply text-label-xl font-bold;
             }
-
             .collector-plugin {
                 @apply flex items-center;
+                width: 100%;
                 gap: 0.5rem;
-
-                .plugin-name {
-                    @apply truncate;
-                }
-
-                .plugin-version {
-                    @apply text-label-sm text-gray-400;
+                .title-wrapper {
+                    @apply relative flex flex-col truncate;
+                    height: 2.125rem;
+                    flex: 1;
+                    .plugin-name {
+                        @apply truncate text-label-md;
+                    }
+                    .plugin-version {
+                        @apply absolute text-label-sm text-gray-400 truncate;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                    }
                 }
             }
-
             .collector-info-wrapper {
-                @apply flex;
-                gap: 1.5rem;
+                margin-top: 1.125rem;
 
                 @screen tablet {
                     @apply flex-col;
                     gap: 1rem;
                 }
-
                 .collector-info-view {
-                    @apply flex flex-col flex-wrap;
-                    gap: 1rem;
-                    width: 50%;
+                    @apply flex justify-between;
+                    .info-item {
+                        @apply relative flex flex-col flex-wrap;
+                        gap: 0.5rem;
+                    }
 
                     @screen tablet {
                         width: 100%;
                     }
 
-                    .info-item {
-                        @apply relative flex flex-col flex-wrap;
-                        width: 100%;
-                        min-height: 2.75rem;
-                        gap: 0.5rem;
+                    @screen mobile {
+                        @apply relative;
+                        display: initial;
+                        .info-item {
+                            @apply absolute;
+                            top: 0;
+                            right: 0;
+                        }
                     }
                 }
             }
