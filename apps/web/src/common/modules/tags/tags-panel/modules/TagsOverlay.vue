@@ -1,3 +1,57 @@
+<script lang="ts" setup>
+
+import {
+    PIconButton, PPaneLayout, PButton,
+} from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
+import {
+    reactive, computed, onMounted,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
+
+interface Props {
+    title: string | undefined;
+    tags: Tag;
+    loading: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update', value: Tag): void;
+    (e: 'close'): void;
+}>();
+const { t } = useI18n();
+
+const state = reactive({
+    showHeader: computed(() => state.newTags.length > 0),
+    newTags: { ...props.tags },
+    isTagsValid: false,
+    noItem: computed(() => isEmpty(state.newTags)),
+});
+
+/* Api */
+const handleSaveTags = async () => {
+    if (!state.isTagsValid) return;
+    emit('update', state.newTags);
+};
+
+/* Event */
+const handleUpdateTags = (tags?: Tag) => {
+    state.newTags = tags;
+};
+const handleClickClose = () => {
+    emit('close');
+};
+
+/* Init */
+onMounted(() => {
+    state.newTags = { ...props.tags };
+});
+
+</script>
+
 <template>
     <div class="tags-overlay">
         <p-pane-layout class="page-wrapper">
@@ -6,123 +60,51 @@
                     <p-icon-button name="ic_arrow-left"
                                    size="lg"
                                    class="go-back-button mr-2"
-                                   @click="$emit('close')"
+                                   @click="handleClickClose"
                     />
                     <div class="title">
-                        {{ title ?? $t('COMMON.TAGS.TITLE') }}
+                        {{ title ?? t('COMMON.TAGS.TITLE') }}
                     </div>
                 </div>
                 <div class="right" />
             </div>
             <p-pane-layout class="tag-panel">
-                <div v-if="noItem"
+                <div v-if="state.noItem"
                      class="comment"
                 >
-                    <span class="highlight">{{ $t('COMMON.TAGS.NO_TAGS') }}</span><br>
-                    {{ $t('COMMON.TAGS.CLICK_TO_ADD_TAG') }}
+                    <span class="highlight">{{ t('COMMON.TAGS.NO_TAGS') }}</span><br>
+                    {{ t('COMMON.TAGS.CLICK_TO_ADD_TAG') }}
                 </div>
                 <div v-else
                      class="comment"
                 >
-                    <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
-                    {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
+                    <span class="highlight">{{ t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
+                    {{ t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
-                <tags-input-group :tags="newTags"
+                <tags-input-group v-model:is-valid="visTagsValid"
+                                  :tags="state.newTags"
                                   :disabled="loading"
                                   show-validation
-                                  :is-valid.sync="isTagsValid"
-                                  :show-header="showHeader"
+                                  :show-header="state.showHeader"
                                   @update-tags="handleUpdateTags"
                 />
             </p-pane-layout>
             <div class="buttons">
                 <p-button style-type="tertiary"
-                          @click="$emit('close')"
+                          @click="handleClickClose"
                 >
-                    {{ $t('COMMON.TAGS.CANCEL') }}
+                    {{ t('COMMON.TAGS.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :disabled="!isTagsValid"
+                          :disabled="!state.isTagsValid"
                           @click="handleSaveTags"
                 >
-                    {{ $t('COMMON.TAGS.SAVE') }}
+                    {{ t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
         </p-pane-layout>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext, PropType } from 'vue';
-import {
-    reactive, toRefs, computed, onMounted,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import {
-    PIconButton, PPaneLayout, PButton,
-} from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
-
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
-
-export default {
-    name: 'TagsOverlay',
-    components: {
-        TagsInputGroup,
-        PIconButton,
-        PButton,
-        PPaneLayout,
-    },
-    props: {
-        title: {
-            type: String as PropType<TranslateResult|string|undefined>,
-            default: undefined,
-        },
-        tags: {
-            type: Object,
-            default: () => ({}),
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            showHeader: computed(() => state.newTags.length > 0),
-            newTags: { ...props.tags },
-            isTagsValid: false,
-            noItem: computed(() => isEmpty(state.newTags)),
-        });
-
-        /* Api */
-        const handleSaveTags = async () => {
-            if (!state.isTagsValid) return;
-            emit('update', state.newTags);
-        };
-
-        /* Event */
-        const handleUpdateTags = (tags?: Tag) => {
-            state.newTags = tags;
-        };
-
-        /* Init */
-        onMounted(() => {
-            state.newTags = { ...props.tags };
-        });
-
-        return {
-            ...toRefs(state),
-            handleSaveTags,
-            handleUpdateTags,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 .tags-overlay {

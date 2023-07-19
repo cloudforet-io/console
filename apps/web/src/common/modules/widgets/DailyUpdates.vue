@@ -1,143 +1,4 @@
-<template>
-    <widget-layout class="daily-updates"
-                   overflow="auto"
-    >
-        <template #title>
-            <div class="top">
-                <p class="title">
-                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_TITLE') }}
-                </p>
-                <p class="time">
-                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DESC') }}
-                </p>
-            </div>
-        </template>
-
-        <template #default>
-            <p-data-loader :loading="loading"
-                           :data="data"
-                           loader-type="skeleton"
-                           class="card-wrapper"
-                           :class="{'fixed-height': loading || !data.length}"
-            >
-                <template #loader>
-                    <div v-for="v in skeletons"
-                         :key="`skeleton-${v}`"
-                         class="flex p-4 items-center"
-                    >
-                        <p-skeleton width="2rem"
-                                    height="2rem"
-                                    class="mr-4 flex-shrink-0"
-                        />
-                        <div class="grid grid-cols-1 gap-1 w-full">
-                            <p-skeleton width="80%"
-                                        height="0.625rem"
-                            />
-                            <p-skeleton width="100%"
-                                        height="0.625rem"
-                            />
-                        </div>
-                    </div>
-                </template>
-                <template #no-data>
-                    <p-empty
-                        v-if="warningData.length === 0"
-                        show-image
-                        image-size="md"
-                        :title="$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
-                    >
-                        <template #image>
-                            <img alt="empty-image"
-                                 src="@/assets/images/illust_spaceship_3.svg"
-                            >
-                        </template>
-                    </p-empty>
-                </template>
-
-                <div v-if="warningData.length > 0"
-                     class="daily-update-card-alert"
-                >
-                    <div v-for="(item, index) in warningData"
-                         :key="index"
-                         class="daily-update-card"
-                    >
-                        <div>
-                            <p-lazy-img :src="assetUrlConverter(item.icon)"
-                                        width="2rem"
-                                        height="2rem"
-                                        class="rounded flex-shrink-0 service-img"
-                            />
-                        </div>
-                        <p v-if="item.createdCount || item.deletedCount"
-                           class="daily-service"
-                        >
-                            {{ item.title }}<br> <span class="font-bold text-sm">{{ item.totalCount || 0 }}</span>
-                        </p>
-                        <router-link v-if="item.createdCount"
-                                     :to="item.createdHref"
-                                     class="daily-created-count"
-                        >
-                            {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                            <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
-                                <p-i v-if="item.isCreateWarning"
-                                     name="ic_warning-filled"
-                                     width="0.75rem"
-                                     height="0.75rem"
-                                />
-                            </span>
-                        </router-link>
-                        <router-link v-if="item.deletedCount"
-                                     :to="item.deletedHref"
-                                     class="daily-deleted-count"
-                        >
-                            {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
-                            <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
-                                <p-i v-if="item.isDeleteWarning"
-                                     name="ic_warning-filled"
-                                     width="0.75rem"
-                                     height="0.75rem"
-                                />
-                            </span>
-                        </router-link>
-                    </div>
-                </div>
-                <div v-for="(item, index) in commonData"
-                     :key="index"
-                     class="daily-update-card"
-                >
-                    <div>
-                        <p-lazy-img :src="assetUrlConverter(item.icon)"
-                                    width="2rem"
-                                    height="2rem"
-                                    class="rounded flex-shrink-0 service-img"
-                        />
-                    </div>
-                    <p v-if="item.createdCount || item.deletedCount"
-                       class="daily-service"
-                    >
-                        {{ item.title }}<br> <span class="text-sm font-bold">{{ item.totalCount || 0 }}</span>
-                    </p>
-                    <router-link v-if="item.createdCount"
-                                 :to="item.createdHref"
-                                 class="daily-created-count"
-                    >
-                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
-                        <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}</span>
-                    </router-link>
-                    <router-link v-if="item.deletedCount"
-                                 :to="item.deletedHref"
-                                 class="daily-deleted-count"
-                    >
-                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
-                        <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
-                    </router-link>
-                </div>
-            </p-data-loader>
-        </template>
-    </widget-layout>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -146,13 +7,13 @@ import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { find, range } from 'lodash';
+import { range } from 'lodash';
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -188,121 +49,245 @@ interface Item {
     deletedHref?: RouteLocation;
 }
 
-export default {
-    name: 'DailyUpdates',
-    components: {
-        WidgetLayout,
-        PLazyImg,
-        PI,
-        PSkeleton,
-        PDataLoader,
-        PEmpty,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const queryHelper = new QueryHelper();
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            cloudServiceData: [] as CloudServiceData[],
-            data: [] as Item[],
-            commonData: computed(() => state.data.filter((d) => !d.isCreateWarning && !d.isDeleteWarning)),
-            warningData: computed(() => state.data.filter((d) => d.isCreateWarning || d.isDeleteWarning)),
-            loading: true,
-            skeletons: range(4),
-        });
+interface Props {
+    projectId?: string;
+}
 
-        /* API */
-        const listCloudServiceData = async (): Promise<void> => {
-            state.loading = true;
-            try {
-                const params: Record<string, string> = {
-                    timezone: store.state.user.timezone,
-                };
-                if (props.projectId) params.project_id = props.projectId;
-                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService(params);
-                state.cloudServiceData = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.cloudServiceData = [];
-            } finally {
-                state.loading = false;
-            }
+const props = defineProps<Props>();
+const { t } = useI18n();
+const store = useStore();
+
+const queryHelper = new QueryHelper();
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    cloudServiceData: [] as CloudServiceData[],
+    data: [] as Item[],
+    commonData: computed(() => state.data.filter((d) => !d.isCreateWarning && !d.isDeleteWarning)),
+    warningData: computed(() => state.data.filter((d) => d.isCreateWarning || d.isDeleteWarning)),
+    loading: true,
+    skeletons: range(4),
+});
+
+/* API */
+const listCloudServiceData = async (): Promise<void> => {
+    state.loading = true;
+    try {
+        const params: Record<string, string> = {
+            timezone: store.state.user.timezone,
         };
-
-        /* Util */
-        const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
-            const results: Item[] = [];
-            rawData.forEach((d) => {
-                const filters: ConsoleFilter[] = [];
-                if (props.projectId) {
-                    filters.push({ k: 'project_id', v: props.projectId, o: '=' });
-                }
-
-                const result: Item = {
-                    title: d.display_name ?? d.cloud_service_group,
-                    icon: d.icon || state.providers[d.provider]?.icon,
-                    isCreateWarning: d.create_warning,
-                    isDeleteWarning: d.delete_warning,
-                    totalCount: d.total_count,
-                    createdCount: d.created_count,
-                    deletedCount: d.deleted_count,
-                    createdHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                ...filters,
-                                { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                    deletedHref: {
-                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([
-                                ...filters,
-                                { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
-                                { k: 'state', v: 'DELETED', o: '=' },
-                            ]).rawQueryStrings,
-                        },
-                    },
-                };
-                results.push(result);
-            });
-            return results;
-        };
-
-        /* Init */
-        const init = async (): Promise<void> => {
-            await Promise.allSettled([
-                listCloudServiceData(),
-                store.dispatch('reference/provider/load'),
-            ]);
-            state.data = getConvertedCloudServiceData(state.cloudServiceData);
-        };
-        init();
-
-        return {
-            ...toRefs(state),
-            assetUrlConverter,
-        };
-    },
+        if (props.projectId) params.project_id = props.projectId;
+        const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService(params);
+        state.cloudServiceData = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceData = [];
+    } finally {
+        state.loading = false;
+    }
 };
+
+/* Util */
+const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
+    const results: Item[] = [];
+    rawData.forEach((d) => {
+        const filters: ConsoleFilter[] = [];
+        if (props.projectId) {
+            filters.push({ k: 'project_id', v: props.projectId, o: '=' });
+        }
+
+        const result: Item = {
+            title: d.display_name ?? d.cloud_service_group,
+            icon: d.icon || state.providers[d.provider]?.icon,
+            isCreateWarning: d.create_warning,
+            isDeleteWarning: d.delete_warning,
+            totalCount: d.total_count,
+            createdCount: d.created_count,
+            deletedCount: d.deleted_count,
+            createdHref: {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: d.provider,
+                    group: d.cloud_service_group,
+                    name: d.cloud_service_type,
+                } as RouteLocation['params'],
+                query: {
+                    filters: queryHelper.setFilters([
+                        ...filters,
+                        { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                    ]).rawQueryStrings,
+                } as RouteLocation['query'],
+            } as RouteLocation,
+            deletedHref: {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: d.provider,
+                    group: d.cloud_service_group,
+                    name: d.cloud_service_type,
+                } as RouteLocation['params'],
+                query: {
+                    filters: queryHelper.setFilters([
+                        ...filters,
+                        { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                        { k: 'state', v: 'DELETED', o: '=' },
+                    ]).rawQueryStrings,
+                } as RouteLocation['query'],
+            } as RouteLocation,
+        };
+        results.push(result);
+    });
+    return results;
+};
+
+/* Init */
+const init = async (): Promise<void> => {
+    await Promise.allSettled([
+        listCloudServiceData(),
+        store.dispatch('reference/provider/load'),
+    ]);
+    state.data = getConvertedCloudServiceData(state.cloudServiceData);
+};
+init();
+
 </script>
+
+<template>
+    <widget-layout class="daily-updates"
+                   overflow="auto"
+    >
+        <template #title>
+            <div class="top">
+                <p class="title">
+                    {{ t('COMMON.WIDGETS.DAILY_UPDATE_TITLE') }}
+                </p>
+                <p class="time">
+                    {{ t('COMMON.WIDGETS.DAILY_UPDATE_DESC') }}
+                </p>
+            </div>
+        </template>
+
+        <template #default>
+            <p-data-loader :loading="state.loading"
+                           :data="state.data"
+                           loader-type="skeleton"
+                           class="card-wrapper"
+                           :class="{'fixed-height': state.loading || !state.data.length}"
+            >
+                <template #loader>
+                    <div v-for="v in state.skeletons"
+                         :key="`skeleton-${v}`"
+                         class="flex p-4 items-center"
+                    >
+                        <p-skeleton width="2rem"
+                                    height="2rem"
+                                    class="mr-4 flex-shrink-0"
+                        />
+                        <div class="grid grid-cols-1 gap-1 w-full">
+                            <p-skeleton width="80%"
+                                        height="0.625rem"
+                            />
+                            <p-skeleton width="100%"
+                                        height="0.625rem"
+                            />
+                        </div>
+                    </div>
+                </template>
+                <template #no-data>
+                    <p-empty
+                        v-if="state.warningData.length === 0"
+                        show-image
+                        image-size="md"
+                        :title="t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
+                    >
+                        <template #image>
+                            <img alt="empty-image"
+                                 src="@/assets/images/illust_spaceship_3.svg"
+                            >
+                        </template>
+                    </p-empty>
+                </template>
+
+                <div v-if="state.warningData.length > 0"
+                     class="daily-update-card-alert"
+                >
+                    <div v-for="(item, index) in state.warningData"
+                         :key="index"
+                         class="daily-update-card"
+                    >
+                        <div>
+                            <p-lazy-img :src="assetUrlConverter(item.icon)"
+                                        width="2rem"
+                                        height="2rem"
+                                        class="rounded flex-shrink-0 service-img"
+                            />
+                        </div>
+                        <p v-if="item.createdCount || item.deletedCount"
+                           class="daily-service"
+                        >
+                            {{ item.title }}<br> <span class="font-bold text-sm">{{ item.totalCount || 0 }}</span>
+                        </p>
+                        <router-link v-if="item.createdCount"
+                                     :to="item.createdHref"
+                                     class="daily-created-count"
+                        >
+                            {{ t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
+                            <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
+                                <p-i v-if="item.isCreateWarning"
+                                     name="ic_warning-filled"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                />
+                            </span>
+                        </router-link>
+                        <router-link v-if="item.deletedCount"
+                                     :to="item.deletedHref"
+                                     class="daily-deleted-count"
+                        >
+                            {{ t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
+                            <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
+                                <p-i v-if="item.isDeleteWarning"
+                                     name="ic_warning-filled"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                />
+                            </span>
+                        </router-link>
+                    </div>
+                </div>
+                <div v-for="(item, index) in state.commonData"
+                     :key="index"
+                     class="daily-update-card"
+                >
+                    <div>
+                        <p-lazy-img :src="assetUrlConverter(item.icon)"
+                                    width="2rem"
+                                    height="2rem"
+                                    class="rounded flex-shrink-0 service-img"
+                        />
+                    </div>
+                    <p v-if="item.createdCount || item.deletedCount"
+                       class="daily-service"
+                    >
+                        {{ item.title }}<br> <span class="text-sm font-bold">{{ item.totalCount || 0 }}</span>
+                    </p>
+                    <router-link v-if="item.createdCount"
+                                 :to="item.createdHref"
+                                 class="daily-created-count"
+                    >
+                        {{ t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
+                        <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}</span>
+                    </router-link>
+                    <router-link v-if="item.deletedCount"
+                                 :to="item.deletedHref"
+                                 class="daily-deleted-count"
+                    >
+                        {{ t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
+                        <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
+                    </router-link>
+                </div>
+            </p-data-loader>
+        </template>
+    </widget-layout>
+</template>
 
 <style lang="postcss" scoped>
 .daily-updates {

@@ -72,10 +72,7 @@
     "prosemirror-transform": "^1.7.3",
     "prosemirror-view": "^1.31.5",
     "uuid": "^8.3.2",
-    "v-click-outside": "^3.0.1",
     "vue": "^3.3.4",
-    "vue-focus": "^2.1.0",
-    "vue-fragment": "^1.5.1",
     "vue-gtag": "^2.0.1",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.2",
@@ -109,8 +106,7 @@
     "rollup-plugin-visualizer": "^5.9.0",
     "tsconfig": "*",
     "vite": "^4.3.9",
-    "vite-plugin-stylelint": "^3.3.3",
-    "vite-plugin-vue-type-imports": "^0.2.4",
+    "vite-plugin-stylelint": "^4.3.0",
     "vitest": "^0.26.3"
   },
   "browserslist": [

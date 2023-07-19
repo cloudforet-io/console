@@ -1,95 +1,77 @@
-<template>
-    <fragment>
-        <component :is="tag"
-                   v-bind="childProps"
-                   class="info-button"
-                   @click.stop="href ? undefined : $store.dispatch('display/showInfo')"
-        >
-            <p-i name="ic_info-circle"
-                 width="0.875rem"
-                 height="0.875rem"
-                 color="inherit"
-            />
-            <span class="text">
-                <slot name="button">{{ $t('COMMON.INFO_BUTTON.INFO') }}</slot>
-            </span>
-        </component>
-        <portal to="info-title">
-            <slot name="title" />
-        </portal>
-        <portal to="info-contents">
-            <div class="info-contents"
-                 :class="{'no-title': !$scopedSlots.title }"
-            >
-                <slot name="contents" />
-            </div>
-        </portal>
-    </fragment>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
+import { PI, PAnchor } from '@spaceone/design-system';
 import {
     computed,
-    getCurrentInstance,
     onBeforeUnmount,
     reactive,
-    toRefs, watch,
+    useSlots, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
-import { PI, PAnchor } from '@spaceone/design-system';
+interface Props {
+    visible: boolean;
+    href?: string;
+}
 
-export default {
-    name: 'InfoButton',
-    components: {
-        PI, PAnchor,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            tag: computed(() => (props.href ? PAnchor : 'span')),
-            childProps: computed(() => {
-                const res: any = {};
-                if (props.href) {
-                    res.href = props.href;
-                    res.target = '_blank';
-                    res.showIcon = true;
-                }
-                return res;
-            }),
-        });
+const props = defineProps<Props>();
+const slots = useSlots();
+const { t } = useI18n();
+const store = useStore();
 
-        watch(() => props.visible, (after) => {
-            if (after) {
-                vm.$store.dispatch('display/showInfo');
-            } else {
-                vm.$store.dispatch('display/hideSidebar');
-            }
-        }, { immediate: true });
+const state = reactive({
+    tag: computed(() => (props.href ? PAnchor : 'span')),
+    childProps: computed(() => {
+        const res: any = {};
+        if (props.href) {
+            res.href = props.href;
+            res.target = '_blank';
+            res.showIcon = true;
+        }
+        return res;
+    }),
+});
 
-        onBeforeUnmount(() => {
-            vm.$store.dispatch('display/hideSidebar');
-        });
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+watch(() => props.visible, (after) => {
+    if (after) {
+        store.dispatch('display/showInfo');
+    } else {
+        store.dispatch('display/hideSidebar');
+    }
+}, { immediate: true });
+
+onBeforeUnmount(() => {
+    store.dispatch('display/hideSidebar');
+});
+
 </script>
+
+<template>
+    <component :is="state.tag"
+               v-bind="state.childProps"
+               class="info-button"
+               @click.stop="href ? undefined : store.dispatch('display/showInfo')"
+    >
+        <p-i name="ic_info-circle"
+             width="0.875rem"
+             height="0.875rem"
+             color="inherit"
+        />
+        <span class="text">
+            <slot name="button">{{ t('COMMON.INFO_BUTTON.INFO') }}</slot>
+        </span>
+    </component>
+    <portal to="info-title">
+        <slot name="title" />
+    </portal>
+    <portal to="info-contents">
+        <div class="info-contents"
+             :class="{'no-title': !slots.title }"
+        >
+            <slot name="contents" />
+        </div>
+    </portal>
+</template>
 
 <style lang="postcss" scoped>
 .info-button {
