@@ -99,19 +99,25 @@ import { red, green } from '@/styles/colors';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
-import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
-import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import type {
+    CollectorPlugin,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import {
+    ATTACHED_ACCOUNT_TYPE,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const SUCCEEDED_COLOR = green[500];
 const FAILED_COLOR = red[400];
 
 interface Props {
-    item?: CollectorData;
+    name: string;
+    plugin?: CollectorPlugin;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    name: '',
+    plugin: undefined,
 });
 
 const collectorDataModalStore = useCollectorDataModalStore();
