@@ -1,7 +1,55 @@
+<script lang="ts" setup>
+import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
+import {
+    computed, reactive, ref, useAttrs, watch,
+} from 'vue';
+
+
+import FNB from '@/common/modules/navigations/FNB.vue';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+
+interface Props {
+    height?: string;
+    initWidth?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    breadcrumbs?: Breadcrumb[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    height: '100%',
+    initWidth: 260,
+    minWidth: 260,
+    maxWidth: 400,
+    breadcrumbs: () => [],
+});
+const attrs = useAttrs();
+
+const containerRef = ref<HTMLElement|null>(null);
+const state = reactive({
+    copiable: computed(() => {
+        const last = props.breadcrumbs?.[props.breadcrumbs.length - 1];
+        return last?.copiable;
+    }),
+});
+
+const listeners = {
+    ...attrs,
+};
+
+watch(() => props.breadcrumbs, () => {
+    const container = containerRef.value;
+    if (container) {
+        container.scrollTo(0, 0);
+    }
+});
+
+</script>
+
 '<template>
-    <p-vertical-layout v-bind="$props"
+    <p-vertical-layout v-bind="props"
                        class="vertical-page-layout"
-                       v-on="$listeners"
+                       v-on="listeners"
     >
         <template #sidebar="prop">
             <slot name="sidebar"
@@ -15,7 +63,7 @@
                 <div class="header">
                     <p-breadcrumbs v-if="breadcrumbs.length"
                                    :routes="breadcrumbs"
-                                   :copiable="copiable"
+                                   :copiable="state.copiable"
                     />
                     <slot name="handbook" />
                 </div>
@@ -31,61 +79,6 @@
         </template>
     </p-vertical-layout>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import { computed, ref, watch } from 'vue';
-
-import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
-
-export default {
-    name: 'VerticalPageLayout',
-    components: { PVerticalLayout, PBreadcrumbs, FNB },
-    props: {
-        height: {
-            type: String,
-            default: '100%',
-        },
-        initWidth: {
-            type: Number,
-            default: 260,
-        },
-        minWidth: {
-            type: Number,
-            default: 260,
-        },
-        maxWidth: {
-            type: Number,
-            default: 400,
-        },
-        breadcrumbs: {
-            type: Array as PropType<Breadcrumb[]>,
-            default: () => [],
-        },
-    },
-    setup(props) {
-        const containerRef = ref<HTMLElement|null>(null);
-
-        watch(() => props.breadcrumbs, () => {
-            const container = containerRef.value;
-            if (container) {
-                container.scrollTo(0, 0);
-            }
-        });
-
-        return {
-            containerRef,
-            copiable: computed(() => {
-                const last = props.breadcrumbs?.[props.breadcrumbs.length - 1];
-                return last?.copiable;
-            }),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .right-container {

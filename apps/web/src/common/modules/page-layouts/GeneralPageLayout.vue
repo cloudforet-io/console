@@ -1,3 +1,31 @@
+<script lang="ts" setup>
+import { PBreadcrumbs } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+
+
+import FNB from '@/common/modules/navigations/FNB.vue';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+
+interface Props {
+    breadcrumbs?: Breadcrumb[];
+    overflow?: 'auto'|'scroll';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    breadcrumbs: () => [],
+    overflow: 'auto',
+});
+
+const state = reactive({
+    copiable: computed(() => {
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
+        return last?.copiable;
+    }),
+});
+
+</script>
+
 <template>
     <div class="general-page-layout"
          :class="overflow"
@@ -7,7 +35,7 @@
         >
             <p-breadcrumbs v-if="breadcrumbs.length"
                            :routes="breadcrumbs"
-                           :copiable="copiable"
+                           :copiable="state.copiable"
             />
             <slot name="handbook" />
         </div>
@@ -22,40 +50,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import { computed } from 'vue';
-
-import { PBreadcrumbs } from '@spaceone/design-system';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
-
-export default {
-    name: 'GeneralPageLayout',
-    components: { PBreadcrumbs, FNB },
-    props: {
-        breadcrumbs: {
-            type: Array as PropType<Breadcrumb[]>,
-            default: () => [],
-        },
-        overflow: {
-            type: String as PropType<'auto'|'scroll'>,
-            default: 'auto',
-        },
-    },
-    setup(props) {
-        return {
-            copiable: computed(() => {
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
-                return last?.copiable;
-            }),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .general-page-layout {

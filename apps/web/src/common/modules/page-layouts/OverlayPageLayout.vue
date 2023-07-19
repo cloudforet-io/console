@@ -1,3 +1,14 @@
+<script lang="ts" setup>
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+interface Props {
+    visible: boolean;
+}
+
+defineProps<Props>();
+
+</script>
+
 <template>
     <transition name="slide-up">
         <general-page-layout v-if="visible"
@@ -7,25 +18,6 @@
         </general-page-layout>
     </transition>
 </template>
-
-<script lang="ts">
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-
-export default {
-    name: 'OverlayPageLayout',
-    components: { GeneralPageLayout },
-    props: {
-        visible: {
-            type: Boolean,
-            required: true,
-        },
-    },
-    setup() {
-        return {
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .overlay-page-layout {
