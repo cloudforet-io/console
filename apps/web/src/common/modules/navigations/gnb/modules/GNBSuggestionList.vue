@@ -41,7 +41,7 @@
                                                :text="parent.label"
                             />
                             <span :key="`arrow-${pIdx}`">
-                                <p-i name="ic_chevron-left-thin"
+                                <p-i name="ic_chevron-right-thin"
                                      width="1rem"
                                      height="1rem"
                                 />

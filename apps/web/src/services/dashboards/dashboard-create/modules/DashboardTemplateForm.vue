@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':!state.isScrollEnd && !state.disableScroll }"
+            :class="{ 'overflow-blur':!state.hideBlur }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -125,9 +125,9 @@
 </template>
 
 <script setup lang="ts">
-import { useScroll } from '@vueuse/core';
+import { useEventListener } from '@vueuse/core';
 import {
-    computed, nextTick, reactive, ref, toRefs,
+    computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -160,13 +160,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
-const { arrivedState } = useScroll(templateContainerRef);
-const { bottom: isBottom, top: isTop } = toRefs(arrivedState);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    disableScroll: computed<boolean>(() => isBottom.value && isTop.value),
-    isScrollEnd: computed<boolean>(() => isBottom.value),
+    hideBlur: false,
 });
 
 const defaultTemplateState = reactive({
@@ -242,6 +239,20 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
+// NOTE: This is to remove the blur effect when there's no scroll.
+useEventListener(templateContainerRef, 'scroll', (e) => {
+    const eventTarget = (
+        e.target === document ? (e.target as Document).documentElement : e.target
+    ) as HTMLElement;
+    state.hideBlur = eventTarget.scrollTop + eventTarget.clientHeight >= eventTarget.scrollHeight - 1;
+});
+watch(() => state.searchValue, async () => {
+    if (templateContainerRef.value) {
+        await nextTick();
+        state.hideBlur = templateContainerRef.value.clientHeight >= templateContainerRef.value.scrollHeight;
+    }
+});
+
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
@@ -259,7 +270,7 @@ const handleInputSearch = () => {
         @apply overflow-auto;
         max-height: calc(100vh - 22.85rem);
         min-height: 40vh;
-        &.overflow-auto {
+        &.overflow-blur {
             &::after {
                 @apply w-full absolute;
                 height: 2.5rem;

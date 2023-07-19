@@ -46,7 +46,7 @@ const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema['pr
     if (propertyName.startsWith('filters.')) return refineFilterOptionSchema(propertyName, propertySchema, referenceStoreState);
     return propertySchema;
 };
-const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema) => {
+const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema): JsonSchema['properties'] => {
     const availableVariables = Object.entries(variablesSchema.properties)
         .filter(([, d]) => {
             if (!d.use) return false;
@@ -72,25 +72,24 @@ export const getWidgetOptionSchema = (
     referenceStoreState: ReferenceStoreState,
     isInherit: boolean,
     projectId?: string,
-) => {
-    let refinedPropertySchema;
+): JsonSchema['properties'] | undefined => {
     const _referenceType = propertyName.replace('filters.', '');
     const _isProjectDashboard = projectId && _referenceType === REFERENCE_TYPE_INFO.project.type;
-    if (isInherit || _isProjectDashboard) {
-        // inherit case
-        refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
+    if (isInherit) { // inherit case
+        const refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
         if (_isProjectDashboard) {
-            refinedPropertySchema = {
+            return {
                 ...refinedPropertySchema,
                 disabled: true,
                 default: REFERENCE_TYPE_INFO.project.type,
             };
+        } if (variablesSchema.properties[_referenceType]?.use) {
+            return refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
         }
-    } else {
-        // non inherit case
-        refinedPropertySchema = refineOptionSchema(propertyName, propertySchema, referenceStoreState);
+    } else { // non inherit case
+        return refineOptionSchema(propertyName, propertySchema, referenceStoreState);
     }
-    return refinedPropertySchema;
+    return undefined;
 };
 export const getRefinedWidgetOptionsSchema = (
     referenceStoreState: ReferenceStoreState,
@@ -105,7 +104,7 @@ export const getRefinedWidgetOptionsSchema = (
     const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
         type: 'object',
         properties: {},
-        required: schemaProperties as WidgetOptionsSchemaProperty[],
+        required: [] as WidgetOptionsSchemaProperty[],
         order: schema?.order ?? schemaProperties as WidgetOptionsSchemaProperty[],
     };
     if (!schema?.properties) return refinedJsonSchema;
@@ -115,7 +114,11 @@ export const getRefinedWidgetOptionsSchema = (
         // set properties declared in schemaProperties only
         if (!schemaProperties.includes(propertyName as WidgetOptionsSchemaProperty)) return;
         const isInherit = !!inheritOptions[propertyName]?.enabled;
-        refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
+        const refinedWidgetOptionsSchema = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
+        if (refinedWidgetOptionsSchema) {
+            refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
+            refinedJsonSchema.required?.push(propertyName);
+        }
     });
 
     return refinedJsonSchema;

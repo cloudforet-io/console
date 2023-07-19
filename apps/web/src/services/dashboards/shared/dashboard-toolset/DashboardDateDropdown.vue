@@ -35,6 +35,7 @@
         </p-select-dropdown>
         <custom-date-range-modal :visible.sync="customRangeModalVisible"
                                  granularity="MONTHLY"
+                                 :selected-date-range="dateRange"
                                  @confirm="handleCustomRangeModalConfirm"
         />
     </div>

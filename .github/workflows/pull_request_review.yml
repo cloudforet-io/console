@@ -25,6 +25,8 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: 'development'
 
     steps:
       - name: Checkout code

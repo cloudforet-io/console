@@ -247,7 +247,6 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
 };
 
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
-    state.data.more = false; // to disable next page button before fetching data
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
@@ -270,6 +269,7 @@ const handleToggleLegend = (index) => {
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
+    state.data = undefined; // to disable next page button before fetching data
     refreshWidget(thisPage);
 };
 
