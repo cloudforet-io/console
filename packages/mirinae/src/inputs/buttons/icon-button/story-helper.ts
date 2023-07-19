@@ -2,7 +2,7 @@ import type { ArgTypes } from '@storybook/addons';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import icons from '@/foundation/icons/p-icons/icons';
-import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
+import { ICON_BUTTON_STYLE_TYPE, ICON_BUTTON_SHAPE } from '@/inputs/buttons/icon-button/type';
 
 
 export const getIconButtonArgTypes = (): ArgTypes => ({
@@ -170,6 +170,25 @@ export const getIconButtonArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(ANIMATION_TYPE),
+        },
+    },
+    shape: {
+        name: 'shape',
+        type: { name: 'string' },
+        description: `Shape of icon button. ${Object.values(ICON_BUTTON_SHAPE).map((d) => `'${d}'`)} are available.`,
+        defaultValue: ICON_BUTTON_SHAPE.circle,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ICON_BUTTON_SHAPE.circle,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ICON_BUTTON_SHAPE),
         },
     },
     // slots
