@@ -142,7 +142,7 @@ const state = reactive({
         failedPercentage: computed(() => {
             if (state.jobTaskStatus.total > 0) {
                 const status = collectorDataModalState.recentJob.status;
-                if (status === JOB_STATE.SUCCESS || status === JOB_STATE.CREATED) {
+                if (status === JOB_STATE.SUCCESS) {
                     return 100 - state.status.succeededPercentage;
                 }
                 return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;

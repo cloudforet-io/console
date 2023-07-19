@@ -53,7 +53,7 @@
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="[JOB_STATE.IN_PROGRESS, JOB_STATE.CREATED].includes(value) ? 'spin' : undefined"
+                        :icon-animation="[JOB_STATE.IN_PROGRESS].includes(value) ? 'spin' : undefined"
                     />
                 </template>
                 <!-- TODO: will be calculated after discussing API specs -->
@@ -134,24 +134,24 @@ const FAILED_ICON_COLOR = red[400];
 
 const statusTextFormatter = (status) => {
     if (status === JOB_STATE.SUCCESS) return i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS');
-    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS');
+    if (status === JOB_STATE.IN_PROGRESS) return i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS');
     if (status === JOB_STATE.CANCELED) return i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED');
-    if (status === JOB_STATE.ERROR || status === JOB_STATE.TIMEOUT) return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
+    if (status === JOB_STATE.FAILURE) return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
     return capitalize(status);
 };
 const statusTextColorFormatter = (status) => {
-    if ([JOB_STATE.CANCELED, JOB_STATE.ERROR, JOB_STATE.TIMEOUT].includes(status)) return FAILED_ICON_COLOR;
+    if ([JOB_STATE.CANCELED, JOB_STATE.FAILURE].includes(status)) return FAILED_ICON_COLOR;
     return undefined;
 };
 const statusIconFormatter = (status) => {
     if (status === JOB_STATE.SUCCESS) return 'ic_check';
-    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return 'ic_circle';
+    if (status === JOB_STATE.IN_PROGRESS) return 'ic_circle';
     if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
     return 'ic_error-filled';
 };
 const statusIconColorFormatter = (status) => {
     if (status === JOB_STATE.SUCCESS) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATE.IN_PROGRESS || status === JOB_STATE.CREATED) return undefined;
+    if (status === JOB_STATE.IN_PROGRESS) return undefined;
     return FAILED_ICON_COLOR;
 };
 
@@ -248,11 +248,11 @@ export default {
 
             let statusValues: string[] = [];
             if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
-                statusValues = [JOB_STATE.IN_PROGRESS, JOB_STATE.CREATED];
+                statusValues = [JOB_STATE.IN_PROGRESS];
             } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
                 statusValues = [JOB_STATE.SUCCESS];
             } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
-                statusValues = [JOB_STATE.ERROR, JOB_STATE.TIMEOUT];
+                statusValues = [JOB_STATE.FAILURE];
             } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
                 statusValues = [JOB_STATE.CANCELED];
             }
