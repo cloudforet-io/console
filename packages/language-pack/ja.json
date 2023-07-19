@@ -2181,8 +2181,10 @@
 				"VERSION": "バージョン"
 			},
 			"HISTORY": {
+				"ALL": "すべてを表示",
 				"CANCELED": "",
 				"FAILURE": "失敗",
+				"IN_PROGRESS": "進行中",
 				"SUCCESS": "成功"
 			},
 			"MAIN": {

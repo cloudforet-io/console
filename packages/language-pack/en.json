@@ -2181,8 +2181,10 @@
 				"VERSION": "Version"
 			},
 			"HISTORY": {
+				"ALL": "All",
 				"CANCELED": "Canceled",
 				"FAILURE": "Failure",
+				"IN_PROGRESS": "In-Progress",
 				"SUCCESS": "Success"
 			},
 			"MAIN": {
