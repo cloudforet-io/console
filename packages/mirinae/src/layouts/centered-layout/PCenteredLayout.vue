@@ -1,7 +1,5 @@
 <template>
-    <div ref="containerRef"
-         class="p-centered-layout"
-    >
+    <div class="p-centered-layout">
         <div v-if="$slots['top-contents']"
              class="top-contents-wrapper"
         >
@@ -11,7 +9,11 @@
              class="layout-contents-wrapper"
              :class="{ 'contents-over-wrapper': isContentsOverWrapper }"
         >
-            <slot />
+            <div ref="layoutContentsRef"
+                 class="layout-contents"
+            >
+                <slot />
+            </div>
         </div>
     </div>
 </template>
@@ -19,13 +21,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 
-const containerRef = ref<HTMLElement|null>(null);
 const layoutWrapperRef = ref<HTMLElement|null>(null);
+const layoutContentsRef = ref<HTMLElement|null>(null);
 const isContentsOverWrapper = ref(false);
 
 const observer = new ResizeObserver((entries) => {
-    const containerClientHeight = containerRef.value?.clientHeight ?? 0;
-    if (entries[0].target.scrollHeight > containerClientHeight) {
+    if (!layoutWrapperRef.value) return;
+    const wrapperClientHeight = layoutWrapperRef.value.clientHeight;
+    if (entries[0].target.scrollHeight > wrapperClientHeight) {
         isContentsOverWrapper.value = true;
     } else {
         isContentsOverWrapper.value = false;
@@ -33,7 +36,7 @@ const observer = new ResizeObserver((entries) => {
 });
 
 onMounted(() => {
-    if (layoutWrapperRef.value) observer.observe(layoutWrapperRef.value);
+    if (layoutContentsRef.value) observer.observe(layoutContentsRef.value);
 });
 onUnmounted(() => {
     observer.disconnect();
@@ -75,6 +78,11 @@ onUnmounted(() => {
         padding: 2rem 2.5rem;
         &.contents-over-wrapper {
             justify-content: flex-start;
+        }
+        .layout-contents {
+            display: flex;
+            width: 100%;
+            justify-content: center;
         }
     }
 }
