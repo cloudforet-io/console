@@ -23,7 +23,7 @@ interface CollectorPlugin {
     info: CollectorPluginModel;
 }
 
-interface CollectorLink {
+export interface CollectorLink {
     name: string;
     params: CollectorDetailLinkParameter;
     query?: CollectorDetailLinkQuery;

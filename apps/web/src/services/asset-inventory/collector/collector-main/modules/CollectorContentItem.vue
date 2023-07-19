@@ -12,11 +12,9 @@
                                 height="1.5rem"
                                 class="plugin-icon"
                     />
-                    <div v-if="state.plugin"
-                         class="title-wrapper"
-                    >
-                        <span class="plugin-name">{{ state.plugin.name }}</span>
-                        <span class="plugin-version">v{{ state.plugin.version }}</span>
+                    <div class="title-wrapper">
+                        <span class="plugin-name">{{ props.item.plugin.name }}</span>
+                        <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
                     </div>
                 </div>
                 <div class="collector-info-wrapper">
@@ -26,9 +24,13 @@
                         <collector-current-status :schedule="props.item.schedule"
                                                   :recent-job="state.recentJob"
                         />
-                        <collector-item-job-list :item="props.item" />
+                        <collector-item-job-list :recent-job-analyze="props.item.recentJobAnalyze"
+                                                 :history-link="props.item.historyLink"
+                        />
                     </div>
-                    <collector-item-schedule :item="props.item" />
+                    <collector-item-schedule :collector-id="props.item.collectorId"
+                                             :schedule="props.item.schedule"
+                    />
                 </div>
             </div>
             <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
@@ -64,7 +66,7 @@ import {
 import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 interface Props {
-    item?: CollectorItemInfo;
+    item: CollectorItemInfo;
 }
 
 const props = defineProps<Props>();
@@ -75,7 +77,7 @@ const collectorDataModalStore = useCollectorDataModalStore();
 
 const state = reactive({
     plugin: computed<{name?: string; version: string}|null>(() => {
-        const plugin = props.item?.plugin;
+        const plugin = props.item.plugin;
         if (plugin) return { name: plugin.name, version: plugin.info.version };
         return null;
     }),
@@ -154,7 +156,7 @@ const handleClickCollectData = async () => {
                 width: 100%;
                 gap: 0.5rem;
                 .title-wrapper {
-                    @apply relative flex flex-col;
+                    @apply relative flex flex-col truncate;
                     height: 2.125rem;
                     flex: 1;
                     .plugin-name {

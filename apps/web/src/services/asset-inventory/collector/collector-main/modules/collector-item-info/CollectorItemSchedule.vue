@@ -37,16 +37,17 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
+import type { CollectorUpdateParameter, Schedule } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 interface Props {
-    item?: CollectorItemInfo;
+    collectorId?: string;
+    schedule?: Schedule
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    collectorId: '',
+    schedule: undefined,
 });
 
 const collectorPageStore = useCollectorPageStore();
@@ -62,9 +63,9 @@ const handleChangeToggle = async (value) => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
         const params: CollectorUpdateParameter = {
-            collector_id: props.item.collectorId,
+            collector_id: props.collectorId,
             schedule: {
-                ...props.item.schedule,
+                ...props.schedule,
                 state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
             },
         };
@@ -75,16 +76,16 @@ const handleChangeToggle = async (value) => {
     }
 };
 const handleClickSchedule = () => {
-    collectorPageStore.setSelectedCollector(props.item.collectorId);
+    collectorPageStore.setSelectedCollector(props.collectorId);
     collectorPageStore.$patch((_state) => {
         _state.visible.scheduleModal = true;
     });
 };
 
 /* Watcher */
-watch(() => props.item, (item) => {
-    if (item && item.schedule) {
-        state.isScheduleActivated = item.schedule.state === 'ENABLED';
+watch(() => props.schedule, (schedule) => {
+    if (schedule) {
+        state.isScheduleActivated = schedule.state === 'ENABLED';
     }
 }, { immediate: true });
 </script>
