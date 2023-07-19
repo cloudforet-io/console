@@ -11,35 +11,37 @@
                            class="mb-2"
             />
             <!-- NOTE: screen desktop size-->
-            <p-radio-group class="attached-service-account-radio-group">
-                <p-radio v-for="(item) in attachedServiceAccountList"
-                         :key="`${item.name}`"
-                         :value="item.name"
-                         :selected="collectorFormState.attachedServiceAccountType"
-                         @change="handleChangeAttachedServiceAccountType"
-                >
-                    {{ item.label }}
-                </p-radio>
-            </p-radio-group>
-            <!-- NOTE: screen mobile size-->
-            <p-select-dropdown class="attached-service-account-dropdown"
-                               :selected="collectorFormState.attachedServiceAccountType"
-                               :items="attachedServiceAccountList"
-                               @update:selected="handleChangeAttachedServiceAccountType"
-            />
-            <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
-                <p-field-title class="specific-service-account-dropdown-label"
-                               :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
+            <div class="contents-container">
+                <p-radio-group class="attached-service-account-radio-group">
+                    <p-radio v-for="(item) in attachedServiceAccountList"
+                             :key="`${item.name}`"
+                             :value="item.name"
+                             :selected="collectorFormState.attachedServiceAccountType"
+                             @change="handleChangeAttachedServiceAccountType"
+                    >
+                        {{ item.label }}
+                    </p-radio>
+                </p-radio-group>
+                <!-- NOTE: screen mobile size-->
+                <p-select-dropdown class="attached-service-account-dropdown"
+                                   :selected="collectorFormState.attachedServiceAccountType"
+                                   :items="attachedServiceAccountList"
+                                   @update:selected="handleChangeAttachedServiceAccountType"
                 />
-                <p-filterable-dropdown class="specific-service-account-dropdown"
-                                       :selected="selectedAttachedServiceAccount"
-                                       multi-selectable
-                                       show-select-marker
-                                       :handler="serviceAccountHandler"
-                                       appearance-type="stack"
-                                       :reset-selected-on-unmounted="false"
-                                       @update:selected="handleSelectAttachedServiceAccount"
-                />
+                <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
+                    <p-field-title class="specific-service-account-dropdown-label"
+                                   :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
+                    />
+                    <p-filterable-dropdown class="specific-service-account-dropdown"
+                                           :selected="selectedAttachedServiceAccount"
+                                           multi-selectable
+                                           show-select-marker
+                                           :handler="serviceAccountHandler"
+                                           appearance-type="stack"
+                                           :reset-selected-on-unmounted="false"
+                                           @update:selected="handleSelectAttachedServiceAccount"
+                    />
+                </div>
             </div>
         </p-field-group>
     </div>
@@ -206,21 +208,25 @@ watch(() => collectorFormState.provider, () => {
         margin-bottom: 15rem;
     }
 
-    .attached-service-account-radio-group {
-        display: block;
-    }
-    .attached-service-account-dropdown {
-        width: 100%;
-        display: none;
-    }
+    .contents-container {
+        @apply border rounded-xl border-gray-200 p-4;
 
-    .specific-service-account-dropdown {
-        margin-top: 1rem;
-        width: 100%;
-    }
+        .attached-service-account-radio-group {
+            display: block;
+        }
+        .attached-service-account-dropdown {
+            width: 100%;
+            display: none;
+        }
 
-    .specific-service-account-dropdown-label {
-        display: none;
+        .specific-service-account-dropdown {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .specific-service-account-dropdown-label {
+            display: none;
+        }
     }
 }
 
