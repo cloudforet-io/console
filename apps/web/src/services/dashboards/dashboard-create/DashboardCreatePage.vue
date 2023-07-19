@@ -284,6 +284,7 @@ export default {
     &.step-3 {
         width: 100%;
         height: 100%;
+        min-height: calc(100vh - 8rem);
     }
     .button-area {
         @apply flex justify-end mt-8 gap-4;
