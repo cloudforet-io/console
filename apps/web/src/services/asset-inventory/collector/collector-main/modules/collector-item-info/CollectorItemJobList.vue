@@ -16,7 +16,7 @@
         </p>
         <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
             <div class="jobs-contents">
-                <collector-job-status-icon v-for="(jobStatus, index) in props.item.recentJobAnalyze"
+                <collector-job-status-icon v-for="(jobStatus, index) in props.recentJobAnalyze"
                                            :key="`job-item-${index}`"
                                            :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
                                            :status="jobStatus.status"
@@ -25,7 +25,7 @@
                 />
             </div>
             <collector-job-status-icon is-arrow
-                                       :to="props.item.historyLink"
+                                       :to="props.historyLink"
                                        class="more-button"
                                        :class="['more-button', { 'is-mobile': isMobile() }]"
                                        :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
@@ -44,17 +44,20 @@ import { store } from '@/store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobStatus } from '@/services/asset-inventory/collector/model';
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
-    item?: CollectorItemInfo;
+    recentJobAnalyze?: JobStatus[];
+    historyLink?: CollectorLink;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    recentJobAnalyze: undefined,
+    historyLink: undefined,
 });
 
 const storeState = reactive({

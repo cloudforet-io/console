@@ -84,7 +84,7 @@ export default {
             status: computed(() => state.job.job_status),
             statusText: computed(() => {
                 if (state.status === JOB_STATE.IN_PROGRESS) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
-                if ([JOB_STATE.SUCCESS, JOB_STATE.CREATED].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
+                if ([JOB_STATE.SUCCESS].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
                 return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
             }),
             succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
@@ -98,7 +98,7 @@ export default {
             }),
             failedPercentage: computed(() => {
                 if (state.totalCount > 0) {
-                    if ([JOB_STATE.SUCCESS, JOB_STATE.CREATED].includes(state.status)) {
+                    if ([JOB_STATE.SUCCESS].includes(state.status)) {
                         return 100 - state.succeededPercentage;
                     }
                     return (state.failedCount / state.totalCount) * 100;
@@ -109,7 +109,7 @@ export default {
 
         /* util */
         const statusIconFormatter = (status) => {
-            if (status === JOB_STATE.SUCCESS || status === JOB_STATE.CREATED) return 'ic_check';
+            if (status === JOB_STATE.SUCCESS) return 'ic_check';
             if (status === JOB_STATE.IN_PROGRESS) return 'ic_gear-filled';
             return 'ic_error-filled';
         };

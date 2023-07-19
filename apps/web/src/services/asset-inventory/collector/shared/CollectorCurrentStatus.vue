@@ -95,9 +95,12 @@ const state = reactive({
         return { diffHour: 0, diffMin: 0 };
     }),
     remainedTasksPercentage: computed<number>(() => {
-        const remainedTasks = props.recentJob?.remained_tasks ?? 0;
-        const totalTasks = props.recentJob?.total_tasks ?? 0;
-        return totalTasks > 0 ? numberFormatter(((totalTasks - remainedTasks) / totalTasks) * 100) : 100;
+        if (state.status === JOB_STATE.IN_PROGRESS) {
+            const remainedTasks = props.recentJob?.remained_tasks ?? 0;
+            const totalTasks = props.recentJob?.total_tasks ?? 0;
+            return totalTasks > 0 ? numberFormatter(((totalTasks - remainedTasks) / totalTasks) * 100) : 100;
+        }
+        return 0;
     }),
 });
 </script>
