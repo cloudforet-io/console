@@ -1,5 +1,52 @@
+<script lang="ts" setup>
+
+import { PI } from '@spaceone/design-system';
+import { onClickOutside } from '@vueuse/core';
+import type { MaybeRef } from 'vue';
+import { ref } from 'vue';
+
+import type { DisplayMenu } from '@/store/modules/display/type';
+
+import { MENU_ID } from '@/lib/menu/config';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+
+interface Props {
+    disabled: boolean;
+    visible: boolean;
+    menuList: DisplayMenu[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    disabled: false,
+    visible: false,
+    menuList: () => [],
+});
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
+
+const containerRef = ref<HTMLElement|null>(null);
+const showSiteMap = () => {
+    emit('update:visible', true);
+};
+const hideSiteMap = () => {
+    emit('update:visible', false);
+};
+const handleSiteMapButtonClick = () => {
+    if (!props.disabled) {
+        emit('update:visible', !props.visible);
+    }
+};
+const navigateToMenu = (navigate, e) => {
+    navigate(e);
+    hideSiteMap();
+};
+onClickOutside(containerRef as MaybeRef, hideSiteMap);
+
+</script>
+
 <template>
-    <div v-click-outside="hideSiteMap"
+    <div ref="containerRef"
          class="sitemap-container"
          :class="{'disabled': disabled}"
          @click.stop
@@ -74,73 +121,6 @@
         </ul>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { PropType, SetupContext } from 'vue';
-
-import { PI } from '@spaceone/design-system';
-import vClickOutside from 'v-click-outside';
-
-import type { DisplayMenu } from '@/store/modules/display/type';
-
-import { MENU_ID } from '@/lib/menu/config';
-
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-
-
-export default {
-    name: 'SiteMap',
-    components: {
-        BetaMark,
-        NewMark,
-        PI,
-    },
-    directives: {
-        clickOutside: vClickOutside.directive,
-    },
-    props: {
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        menuList: {
-            type: Array as PropType<DisplayMenu[]>,
-            default: () => ([]),
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const showSiteMap = () => {
-            emit('update:visible', true);
-        };
-        const hideSiteMap = () => {
-            emit('update:visible', false);
-        };
-        const handleSiteMapButtonClick = () => {
-            if (!props.disabled) {
-                emit('update:visible', !props.visible);
-            }
-        };
-        const navigateToMenu = (navigate, e) => {
-            navigate(e);
-            hideSiteMap();
-        };
-
-        return {
-            showSiteMap,
-            hideSiteMap,
-            handleSiteMapButtonClick,
-            navigateToMenu,
-            MENU_ID,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .sitemap-container {

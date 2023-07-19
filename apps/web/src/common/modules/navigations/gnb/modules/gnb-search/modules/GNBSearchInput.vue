@@ -1,6 +1,61 @@
+<script lang="ts" setup>
+import { PI } from '@spaceone/design-system';
+import {
+    computed,
+    reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+
+interface Props {
+    value: string;
+    isFocused: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'input', value: string): void;
+    (e: 'update:isFocused', value: boolean): void;
+    (e: 'esc'): void;
+    (e: 'arrow-up'): void;
+    (e: 'arrow-down'): void;
+    (e: 'click'): void;
+}>();
+const { t } = useI18n();
+
+const state = reactive({
+    inputRef: null as null|HTMLElement,
+    placeholder: computed(() => (t('COMMON.GNB.SEARCH.SERACH'))),
+});
+const handleClick = () => {
+    emit('click');
+};
+const handleInput = (value: string) => {
+    emit('input', value);
+};
+const handleIsFocused = (isFocused: boolean) => {
+    emit('update:isFocused', isFocused);
+};
+const handleEsc = () => {
+    emit('esc');
+};
+const handleArrowUp = () => {
+    emit('arrow-up');
+};
+const handleArrowDown = () => {
+    emit('arrow-down');
+};
+
+watch(() => props.isFocused, (isFocused) => {
+    if (!state.inputRef) return;
+    if (isFocused) state.inputRef.focus();
+    else state.inputRef.blur();
+});
+
+</script>
+
 <template>
     <div class="gnb-search-input"
-         @click.stop="$emit('click')"
+         @click.stop="handleClick"
     >
         <p-i v-if="!isFocused"
              name="ic_search"
@@ -10,13 +65,13 @@
         />
         <input ref="inputRef"
                :value="value"
-               :placeholder="placeholder"
-               @input="$emit('input', $event.target.value)"
-               @focus="$emit('update:isFocused', true)"
-               @blur="$emit('update:isFocused', false)"
-               @keyup.esc="$emit('esc')"
-               @keydown.up="$emit('arrow-up')"
-               @keydown.down="$emit('arrow-down')"
+               :placeholder="state.placeholder"
+               @input="handleInput"
+               @focus="handleIsFocused(true)"
+               @blur="handleIsFocused(false)"
+               @keyup.esc="handleEsc"
+               @keydown.up="handleArrowUp"
+               @keydown.down="handleArrowDown"
         >
         <p-i v-if="value"
              name="ic_close"
@@ -24,64 +79,10 @@
              width="1rem"
              color="inherit"
              class="delete-button"
-             @click.stop="$emit('input', '')"
+             @click.stop="handleInput('')"
         />
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import { PI } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-interface Props {
-    value: string;
-    isFocused: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'GNBSearchInput',
-    components: {
-        PI,
-    },
-    model: {
-        prop: 'value',
-        event: 'input',
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        isFocused: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            inputRef: null as null|HTMLElement,
-            placeholder: computed(() => (i18n.t('COMMON.GNB.SEARCH.SERACH'))),
-        });
-
-        watch(() => props.isFocused, (isFocused) => {
-            if (!state.inputRef) return;
-            if (isFocused) state.inputRef.focus();
-            else state.inputRef.blur();
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-search-input {

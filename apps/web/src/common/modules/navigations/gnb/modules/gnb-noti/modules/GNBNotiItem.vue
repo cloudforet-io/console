@@ -1,3 +1,58 @@
+<script lang="ts" setup>
+
+import {
+    PI, PIconButton,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import {
+    computed,
+    reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+interface Props {
+    isRead: boolean;
+    title: string;
+    createdAt?: string;
+    dateHeader?: string;
+    icon?: string;
+    writer?: string;
+    deletable: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isRead: false,
+    title: '',
+    createdAt: '',
+    dateHeader: undefined,
+    icon: undefined,
+    writer: undefined,
+    deletable: false,
+});
+const emit = defineEmits<{(e: 'select'): void;
+    (e: 'delete'): void;
+}>();
+const store = useStore();
+
+const state = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    occurred: computed(() => {
+        if (!props.createdAt) return '';
+        return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
+    }),
+});
+
+/* Event */
+const handleClickItem = () => {
+    emit('select');
+};
+const handleClickDeleteButton = (event) => {
+    event.stopPropagation();
+    emit('delete');
+};
+
+</script>
+
 <template>
     <div class="gnb-noti-item">
         <p v-if="dateHeader"
@@ -22,7 +77,7 @@
                     <span>{{ title }}</span>
                 </p>
                 <div class="additional-text">
-                    {{ occurred }} <span v-if="writer">· {{ writer }}</span>
+                    {{ state.occurred }} <span v-if="writer">· {{ writer }}</span>
                 </div>
             </div>
             <p-icon-button v-if="deletable"
@@ -34,95 +89,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import {
-    PI, PIconButton,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { store } from '@/store';
-
-interface Props {
-    isRead: boolean;
-    title: string;
-    createdAt?: string;
-    dateHeader?: TranslateResult | string;
-    icon?: string;
-    writer?: string;
-    deletable: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'GNBNotiItem',
-    components: {
-        PI,
-        PIconButton,
-    },
-    props: {
-        isRead: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        createdAt: {
-            type: String,
-            default: '',
-        },
-        dateHeader: {
-            type: String,
-            default: undefined,
-        },
-        icon: {
-            type: String,
-            default: undefined,
-        },
-        writer: {
-            type: String,
-            default: undefined,
-        },
-        deletable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            occurred: computed(() => {
-                if (!props.createdAt) return '';
-                return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
-            }),
-        });
-
-        /* Event */
-        const handleClickItem = () => {
-            emit('select');
-        };
-        const handleClickDeleteButton = (event) => {
-            event.stopPropagation();
-            emit('delete');
-        };
-
-        return {
-            ...toRefs(state),
-            handleClickItem,
-            handleClickDeleteButton,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-noti-item {

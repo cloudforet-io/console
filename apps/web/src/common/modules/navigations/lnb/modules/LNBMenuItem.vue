@@ -1,6 +1,71 @@
+<script lang="ts" setup>
+import { PDivider, PI } from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+
+
+interface Props {
+    menuData: LNBMenu;
+    currentPath: string;
+    depth: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    menuData: () => ({}) as LNBMenu,
+    currentPath: '',
+    depth: 1,
+});
+
+const store = useStore();
+const router = useRouter();
+const state = reactive({
+    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+    processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
+    isFolded: false,
+    isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
+    showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
+    hoveredItem: '',
+});
+
+const handleFoldableToggle = () => {
+    state.isFolded = !state.isFolded;
+};
+
+const isSelectedMenu = (selectedMenuRoute: RouteLocation): boolean => {
+    let currentPath = props.currentPath;
+    if (!currentPath) return false;
+
+    const resolved = router.resolve(selectedMenuRoute);
+    if (!resolved) return false;
+
+    if (currentPath.indexOf('?') > 0) {
+        currentPath = currentPath.slice(0, currentPath.indexOf('?'));
+    }
+    let resolvedHref = resolved.href;
+    if (!currentPath.endsWith('/')) currentPath += '/';
+    if (!resolvedHref.endsWith('/')) resolvedHref += '/';
+    return currentPath.startsWith(resolvedHref);
+};
+
+const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
+
+</script>
+
 <template>
     <div class="lnb-menu-list">
-        <div v-for="(item, idx) in processedMenuData"
+        <div v-for="(item, idx) in state.processedMenuData"
              :key="item.id"
              class="lnb-menu-item"
         >
@@ -15,7 +80,7 @@
                       class="title"
                 >{{ item.label }}</span>
                 <slot name="title-right"
-                      v-bind="$props"
+                      v-bind="props"
                 />
                 <new-mark v-if="item.isNew" />
                 <beta-mark v-if="item.isBeta" />
@@ -25,7 +90,7 @@
                 >
                     <p-i width="1rem"
                          height="1rem"
-                         :name="isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         :name="state.isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
                          color="inherit transparent"
                     />
                 </span>
@@ -36,19 +101,19 @@
                 <span class="top-title">{{ item.label }}</span>
             </p>
 
-            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu"
+            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu"
                  class="divider"
             >
                 <p-divider />
             </div>
             <router-link
-                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+                v-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                 class="menu-item"
                 :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
                 :to="item.to"
-                @click.native="$event.stopImmediatePropagation()"
-                @mouseenter.native="hoveredItem = item.id"
-                @mouseleave.native="hoveredItem = ''"
+                @click="$event.stopImmediatePropagation()"
+                @mouseenter="state.hoveredItem = item.id"
+                @mouseleave="state.hoveredItem = ''"
             >
                 <slot name="before-text"
                       v-bind="{...$props, item, index: idx}"
@@ -68,10 +133,10 @@
                     <beta-mark v-if="item.isBeta" />
                 </div>
                 <slot name="right-extra"
-                      v-bind="{...$props, item, index: idx}"
+                      v-bind="{...props, item, index: idx}"
                 />
                 <favorite-button
-                    v-if="!item.hideFavorite && !isDomainOwner"
+                    v-if="!item.hideFavorite && !state.isDomainOwner"
                     :item-id="item.id"
                     :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
                     :visible-active-case-only="!getIsHovered(item.id)"
@@ -82,99 +147,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import { PDivider, PI } from '@spaceone/design-system';
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { RouteLocation } from 'vue-router';
-
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
-
-interface Props {
-    menuData: LNBMenu;
-    currentPath: string;
-}
-
-export default defineComponent<Props>({
-    name: 'LNBMenuItem',
-    components: {
-        FavoriteButton,
-        PI,
-        BetaMark,
-        NewMark,
-        PDivider,
-    },
-    props: {
-        menuData: {
-            type: [Object, Array] as PropType<LNBMenu>,
-            default: () => ({}),
-        },
-        currentPath: {
-            type: String,
-            default: undefined,
-        },
-        depth: {
-            type: Number,
-            default: 1,
-        },
-    },
-
-    setup(props) {
-        const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-            processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
-            isFolded: false,
-            isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
-            showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
-            hoveredItem: '',
-        });
-
-        const handleFoldableToggle = () => {
-            state.isFolded = !state.isFolded;
-        };
-
-        const isSelectedMenu = (selectedMenuRoute: RouteLocation): boolean => {
-            let currentPath = props.currentPath;
-            if (!currentPath) return false;
-
-            const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
-            if (!resolved) return false;
-
-            if (currentPath.indexOf('?') > 0) {
-                currentPath = currentPath.slice(0, currentPath.indexOf('?'));
-            }
-            let resolvedHref = resolved.href;
-            if (!currentPath.endsWith('/')) currentPath += '/';
-            if (!resolvedHref.endsWith('/')) resolvedHref += '/';
-            return currentPath.startsWith(resolvedHref);
-        };
-
-        const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
-
-        return {
-            ...toRefs(state),
-            handleFoldableToggle,
-            isSelectedMenu,
-            FAVORITE_TYPE,
-            MENU_ITEM_TYPE,
-            getIsHovered,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .lnb-menu-item {

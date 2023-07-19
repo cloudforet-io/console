@@ -1,12 +1,94 @@
+<script lang="ts" setup>
+
+import { PI } from '@spaceone/design-system';
+import { onClickOutside } from '@vueuse/core';
+import type { MaybeRef } from 'vue';
+import {
+    computed, reactive, ref,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+import { useRouter } from 'vue-router';
+
+import type { DisplayMenu } from '@/store/modules/display/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
+
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
+import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
+import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+import GNBDashboardMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
+import IntegrationSubMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/Integration-menu/IntegrationSubMenu.vue';
+
+
+interface SubMenu extends DisplayMenu {
+    href?: string;
+}
+
+type RawRouteLocation = RouteLocation | string;
+
+interface Props {
+    show: boolean;
+    menuId: MenuId;
+    label: string;
+    to?: RawRouteLocation;
+    href?: string;
+    hasPermission: boolean;
+    isOpened: boolean;
+    isSelected: boolean;
+    subMenuList: SubMenu[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    show: true,
+    menuId: '' as MenuId,
+    label: '',
+    to: undefined,
+    href: undefined,
+    hasPermission: true,
+    isOpened: false,
+    isSelected: false,
+    subMenuList: () => [],
+});
+const emit = defineEmits<{(e: 'hide-menu'): void;
+    (e: 'open-menu', value: MenuId): void;
+}>();
+const router = useRouter();
+const containerRef = ref<HTMLElement | null>(null);
+const state = reactive({
+    hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
+    hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
+    isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
+});
+const hideMenu = () => { emit('hide-menu'); };
+
+const handleMenu = () => {
+    if (state.isMenuWithAdditionalMenu) {
+        emit('open-menu', props.menuId);
+    } else {
+        const isDuplicatePath = router.currentRoute.value.name === props.menuId;
+        if (isDuplicatePath) return;
+        hideMenu();
+        if (props.to) router.push(props.to);
+        else if (props.href) window.open(props.href, '_blank');
+    }
+};
+
+onClickOutside(containerRef as MaybeRef, hideMenu);
+
+</script>
+
 <template>
     <div v-if="show"
-         v-click-outside="hideMenu"
+         ref="containerRef"
          class="gnb-menu"
          :class="{disabled: !hasPermission}"
     >
         <div class="menu-button"
              :class="[{
-                 opened: isMenuWithAdditionalMenu && isOpened,
+                 opened: state.isMenuWithAdditionalMenu && isOpened,
                  selected: isSelected,
              }]"
         >
@@ -16,7 +98,7 @@
                   @keydown.enter="handleMenu"
             >
                 <span>{{ label }}</span>
-                <p-i v-if="isMenuWithAdditionalMenu"
+                <p-i v-if="state.isMenuWithAdditionalMenu"
                      class="arrow-button"
                      :name="isOpened ? 'ic_chevron-small-up' : 'ic_chevron-small-down'"
                      width="0.5rem"
@@ -25,7 +107,7 @@
                 />
             </span>
 
-            <div v-if="hasCustomMenu"
+            <div v-if="state.hasCustomMenu"
                  v-show="isOpened"
                  class="custom-menu-wrapper"
             >
@@ -36,7 +118,7 @@
                                       @close="hideMenu"
                 />
             </div>
-            <div v-else-if="hasSubMenu"
+            <div v-else-if="state.hasSubMenu"
                  v-show="isOpened"
                  class="sub-menu-wrapper"
             >
@@ -54,130 +136,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import { PI } from '@spaceone/design-system';
-import { vOnClickOutside } from '@vueuse/components';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { PropType, DirectiveFunction, SetupContext } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
-
-
-import { SpaceRouter } from '@/router';
-
-import type { DisplayMenu } from '@/store/modules/display/type';
-import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
-
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-
-import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
-import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
-import GNBDashboardMenu
-    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
-import IntegrationSubMenu
-    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/Integration-menu/IntegrationSubMenu.vue';
-
-interface SubMenu extends DisplayMenu {
-    href?: string;
-}
-
-type RawRouteLocation = RouteLocation | string;
-
-interface Props {
-    show: boolean;
-    menuId: MenuId;
-    label: TranslateResult;
-    to?: RawRouteLocation;
-    href?: string;
-    hasPermission: boolean;
-    isOpened: boolean;
-    isSelected: boolean;
-    subMenuList: SubMenu[];
-}
-export default defineComponent<Props>({
-    name: 'GNBMenu',
-    components: {
-        IntegrationSubMenu,
-        GNBDashboardMenu,
-        PI,
-        GNBSubMenu,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
-    props: {
-        show: {
-            type: Boolean,
-            default: true,
-        },
-        menuId: {
-            type: String as PropType<MenuId>,
-            default: '',
-        },
-        label: {
-            type: String as PropType<string | TranslateResult>,
-            default: '',
-        },
-        to: {
-            type: Object,
-            default: () => ({}),
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-        hasPermission: {
-            type: Boolean,
-            default: true,
-        },
-        isOpened: {
-            type: Boolean,
-            default: false,
-        },
-        isSelected: {
-            type: Boolean,
-            default: false,
-        },
-        subMenuList: {
-            type: Array as PropType<SubMenu[]>,
-            default: () => [],
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
-            hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
-            isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
-        });
-        const hideMenu = () => { emit('hide-menu'); };
-
-        const handleMenu = () => {
-            if (state.isMenuWithAdditionalMenu) {
-                emit('open-menu', props.menuId);
-            } else {
-                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
-                if (isDuplicatePath) return;
-                hideMenu();
-                if (props.to) SpaceRouter.router.push(props.to);
-                else if (props.href) window.open(props.href, '_blank');
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            handleMenu,
-            hideMenu,
-            MENU_ID,
-            DOMAIN_CONFIG_TYPE,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-menu {

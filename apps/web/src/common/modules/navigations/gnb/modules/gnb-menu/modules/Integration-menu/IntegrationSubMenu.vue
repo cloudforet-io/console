@@ -1,43 +1,10 @@
-<template>
-    <div class="integration-sub-menu">
-        <p-tab :tabs="tabs"
-               :active-tab.sync="activeTab"
-        >
-            <template v-for="({title, sub_menu}, index) in integrationMenus"
-                      #[title]
-            >
-                <div :key="`${title}-${index}`"
-                     class="integration-tab-content-wrapper"
-                >
-                    <template v-for="(menu, idx) in sub_menu">
-                        <g-n-b-sub-menu :key="`extra-${menu.label}-${idx}`"
-                                        :label="menu.label"
-                                        :href="menu.link"
-                                        @navigate="hideMenu"
-                        >
-                            <template #extra-mark>
-                                <p-i name="ic_external-link"
-                                     height="1em"
-                                     width="1em"
-                                     color="inherit"
-                                />
-                            </template>
-                        </g-n-b-sub-menu>
-                    </template>
-                </div>
-            </template>
-        </p-tab>
-    </div>
-</template>
-
 <script setup lang="ts">
-
-import {
-    computed, onMounted, reactive, toRefs,
-} from 'vue';
 
 import { PTab, PI } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import {
+    computed, onMounted, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 
@@ -71,6 +38,38 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div class="integration-sub-menu">
+        <p-tab v-model:active-tab="activeTab"
+               :tabs="tabs"
+        >
+            <template v-for="({title, sub_menu}, index) in integrationMenus"
+                      :key="`${title}-${index}`"
+                      #[title]
+            >
+                <div class="integration-tab-content-wrapper">
+                    <template v-for="(menu, idx) in sub_menu"
+                              :key="`extra-${menu.label}-${idx}`"
+                    >
+                        <g-n-b-sub-menu :label="menu.label"
+                                        :href="menu.link"
+                                        @navigate="hideMenu"
+                        >
+                            <template #extra-mark>
+                                <p-i name="ic_external-link"
+                                     height="1em"
+                                     width="1em"
+                                     color="inherit"
+                                />
+                            </template>
+                        </g-n-b-sub-menu>
+                    </template>
+                </div>
+            </template>
+        </p-tab>
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .integration-sub-menu {

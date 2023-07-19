@@ -1,3 +1,18 @@
+<script setup lang="ts">
+import { PI } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
+
+interface Props {
+    width: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    width: '100%',
+});
+const { t } = useI18n();
+
+</script>
+
 <template>
     <div class="fnb h-11 sm:h-10 ">
         <div class="fnb-contents flex flex-col sm:flex-row">
@@ -19,33 +34,11 @@
                 <a class="policy"
                    href="https://lfprojects.org/"
                    target="_blank"
-                >{{ $t('COMMON.FNB.PROJECT_POLICIES') }}</a>
+                >{{ t('COMMON.FNB.PROJECT_POLICIES') }}</a>
             </div>
         </div>
     </div>
 </template>
-
-<script>
-import { PI } from '@spaceone/design-system';
-
-export default {
-    name: 'FNB',
-    components: {
-        PI,
-    },
-    props: {
-        width: {
-            type: String,
-            default: '100%',
-        },
-    },
-    data() {
-        return {
-            temp: false,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .fnb {

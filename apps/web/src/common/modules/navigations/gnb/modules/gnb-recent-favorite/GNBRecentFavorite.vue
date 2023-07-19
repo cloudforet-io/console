@@ -1,5 +1,68 @@
+<script lang="ts" setup>
+
+import {
+    PI, PTab,
+} from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { onClickOutside } from '@vueuse/core';
+import type { MaybeRef } from 'vue';
+import {
+    computed, reactive, ref,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
+import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
+
+
+interface Props {
+    visible: boolean
+}
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
+const store = useStore();
+const { t } = useI18n();
+
+const containerRef = ref<HTMLElement|null>(null);
+const state = reactive({
+    tabs: computed(() => ([
+        { label: t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
+        { label: t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
+    ] as TabItem[])),
+    activeTab: 'recent',
+});
+
+const setVisible = (visible: boolean) => {
+    emit('update:visible', visible);
+};
+const hideRecentFavoriteMenu = () => {
+    setVisible(false);
+};
+const showRecentFavoriteMenu = () => {
+    setVisible(true);
+};
+
+/* Event */
+const handleRecentFavoriteButtonClick = () => {
+    setVisible(!props.visible);
+};
+
+/* Init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/projectGroup/load'),
+        store.dispatch('reference/cloudServiceType/load'),
+    ]);
+})();
+
+onClickOutside(containerRef as MaybeRef, hideRecentFavoriteMenu);
+
+</script>
+
 <template>
-    <div v-click-outside="hideRecentFavoriteMenu"
+    <div ref="containerRef"
          class="gnb-recent-favorite"
          @click.stop
          @keydown.esc="hideRecentFavoriteMenu"
@@ -18,11 +81,11 @@
             />
         </span>
         <p-tab v-show="visible"
-               :tabs="tabs"
-               :active-tab.sync="activeTab"
+               v-model:active-tab="state.activeTab"
+               :tabs="state.tabs"
         >
             <template #recent>
-                <g-n-b-recent :visible="visible && activeTab === 'recent'"
+                <g-n-b-recent :visible="visible && state.activeTab === 'recent'"
                               @close="hideRecentFavoriteMenu"
                 />
             </template>
@@ -33,87 +96,6 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import { vOnClickOutside } from '@vueuse/components';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { DirectiveFunction, SetupContext } from 'vue';
-
-import {
-    PI, PTab,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
-import GNBRecent from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBRecent.vue';
-
-interface Props {
-    visible: boolean
-}
-export default defineComponent<Props>({
-    name: 'GNBRecentFavorite',
-    components: {
-        GNBRecent,
-        GNBFavorite,
-        PI,
-        PTab,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            tabs: computed(() => ([
-                { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
-                { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'recent',
-        });
-
-        const setVisible = (visible: boolean) => {
-            emit('update:visible', visible);
-        };
-        const hideRecentFavoriteMenu = () => {
-            setVisible(false);
-        };
-        const showRecentFavoriteMenu = () => {
-            setVisible(true);
-        };
-
-        /* Event */
-        const handleRecentFavoriteButtonClick = () => {
-            setVisible(!props.visible);
-        };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            hideRecentFavoriteMenu,
-            showRecentFavoriteMenu,
-            handleRecentFavoriteButtonClick,
-        };
-    },
-});
-</script>
 <style lang="postcss" scoped>
 .gnb-recent-favorite {
     @apply relative;

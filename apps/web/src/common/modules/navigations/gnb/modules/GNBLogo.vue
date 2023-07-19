@@ -1,3 +1,25 @@
+<script lang="ts" setup>
+import {
+    computed,
+    reactive,
+} from 'vue';
+import type { RouteLocation } from 'vue-router';
+
+import config from '@/lib/config';
+
+interface Props {
+    to: RouteLocation;
+}
+
+defineProps<Props>();
+
+const state = reactive({
+    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+    ciTextImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT')),
+});
+
+</script>
+
 <template>
     <span class="gnb-logo"
           data-gtm="gtm-gnb-logo"
@@ -7,18 +29,18 @@
                    :to="to"
         >
             <div class="logo-wrapper">
-                <img v-if="ciLogoImage"
+                <img v-if="state.ciLogoImage"
                      class="logo-character"
-                     :src="ciLogoImage"
+                     :src="state.ciLogoImage"
                 >
                 <img v-else
                      class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
                 >
 
-                <img v-if="ciTextImage"
+                <img v-if="state.ciTextImage"
                      class="logo-text"
-                     :src="ciTextImage"
+                     :src="state.ciTextImage"
                 >
                 <img v-else
                      class="logo-text"
@@ -28,35 +50,6 @@
         </component>
     </span>
 </template>
-
-<script lang="ts">
-import {
-    computed, defineComponent,
-    reactive, toRefs,
-} from 'vue';
-
-import config from '@/lib/config';
-
-export default defineComponent({
-    name: 'GNBLogo',
-    props: {
-        to: {
-            type: Object,
-            default: null,
-        },
-    },
-    setup() {
-        const state = reactive({
-            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-            ciTextImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT')),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-logo {

@@ -1,3 +1,51 @@
+<script lang="ts" setup>
+import { PI, PTooltip } from '@spaceone/design-system';
+import {
+    ref, useSlots,
+} from 'vue';
+import type { RouteLocationNormalized } from 'vue-router';
+
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+
+interface Props {
+    show?: boolean;
+    label: string|undefined;
+    to?: RouteLocationNormalized;
+    href?: string;
+    isBeta?: boolean;
+    isNew?: boolean;
+    isDraggable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    show: true,
+    label: '',
+    to: () => ({}) as RouteLocationNormalized,
+    href: undefined,
+    isBeta: false,
+    isNew: false,
+    isDraggable: false,
+});
+const emit = defineEmits<{(e: 'navigate'): void}>();
+const slots = useSlots();
+
+const labelRef = ref<HTMLElement|null>(null);
+
+const isEllipsisActive = () => {
+    if (labelRef.value) {
+        return (labelRef.value?.offsetWidth < labelRef.value?.scrollWidth);
+    } return false;
+};
+
+const handleClickAnchor = (navigateFn, event: Event) => {
+    if (!props.href) navigateFn(event);
+    emit('navigate');
+};
+
+</script>
+
 <template>
     <p-tooltip v-if="show"
                :contents="isEllipsisActive() ? label : undefined"
@@ -15,7 +63,7 @@
                        @click.stop="handleClickAnchor(navigate, $event)"
                     >
                         <div class="contents-left"
-                             :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
+                             :class="{ 'is-exist-extra-mark': slots['extra-mark'] }"
                         >
                             <p-i v-if="isDraggable"
                                  name="ic_drag-handle"
@@ -40,88 +88,6 @@
         </router-link>
     </p-tooltip>
 </template>
-
-<script lang="ts">
-import { PI, PTooltip } from '@spaceone/design-system';
-import type { PropType } from 'vue';
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { RouteLocationNormalized } from 'vue-router';
-
-
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-
-interface Props {
-    show?: boolean;
-    label: string|undefined|TranslateResult;
-    to?: RouteLocationNormalized;
-    href?: string;
-    isBeta?: boolean;
-    isNew?: boolean;
-    isDraggable?: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'GNBSubMenu',
-    components: {
-        NewMark, BetaMark, PI, PTooltip,
-    },
-    props: {
-        show: {
-            type: Boolean,
-            default: true,
-        },
-        to: {
-            type: Object,
-            default: () => ({}),
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-        label: {
-            type: String as PropType<string|undefined|TranslateResult>,
-            default: '',
-        },
-        isBeta: {
-            type: Boolean,
-            default: false,
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
-        },
-        isDraggable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            labelRef: null as HTMLElement|null,
-        });
-        const isEllipsisActive = () => {
-            if (state.labelRef) {
-                return (state.labelRef?.offsetWidth < state.labelRef?.scrollWidth);
-            } return false;
-        };
-
-        const handleClickAnchor = (navigateFn, event: Event) => {
-            if (!props.href) navigateFn(event);
-            emit('navigate');
-        };
-
-        return {
-            ...toRefs(state),
-            isEllipsisActive,
-            handleClickAnchor,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-sub-menu {

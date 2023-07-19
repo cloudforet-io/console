@@ -1,3 +1,54 @@
+<script lang="ts" setup>
+import {
+    PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, useSlots,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
+import type {
+    BackLink, LNBMenu, TopTitle,
+} from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+
+interface Props {
+    header: string;
+    backLink: BackLink;
+    topTitle: TopTitle;
+    menuSet: LNBMenu[];
+    showFavoriteOnly?: boolean | undefined;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    header: '',
+    backLink: () => ({}) as BackLink,
+    topTitle: () => ({}) as TopTitle,
+    menuSet: () => [],
+    showFavoriteOnly: undefined,
+});
+const emit = defineEmits<{(e: 'update:showFavoriteOnly', value: boolean| undefined): void}>();
+const { t } = useI18n();
+const slots = useSlots();
+const route = useRoute();
+
+const state = reactive({
+    currentPath: computed(() => route.fullPath),
+    proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
+});
+
+const handleFavoriteToggle = () => {
+    state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
+};
+
+</script>
+
 <template>
     <nav class="lnb">
         <div class="header">
@@ -44,27 +95,28 @@
                     />
                 </router-link>
             </div>
-            <template v-for="(menuData, idx) in menuSet">
+            <template v-for="(menuData, idx) in menuSet"
+                      :key="`${idx}-${getUUID()}`"
+            >
                 <div v-if="menuData.type === MENU_ITEM_TYPE.FAVORITE_ONLY"
-                     :key="`${idx}-${getUUID()}`"
+
                      class="favorite-only-wrapper"
                 >
-                    <p-field-title :label="$t('DASHBOARDS.LNB.ONLY_FAVORITE')"
+                    <p-field-title :label="t('DASHBOARDS.LNB.ONLY_FAVORITE')"
                                    color="gray"
                                    font-weight="regular"
                                    size="sm"
                     />
-                    <p-toggle-button :value="proxyShowFavoriteOnly"
+                    <p-toggle-button :value="state.proxyShowFavoriteOnly"
                                      @change-toggle="handleFavoriteToggle"
                     />
                 </div>
                 <l-n-b-menu-item v-else
-                                 :key="`${idx}-${getUUID()}`"
                                  :menu-data="menuData"
-                                 :current-path="currentPath"
+                                 :current-path="state.currentPath"
                                  :depth="Array.isArray(menuData) ? 2 : 1"
                 >
-                    <template v-for="(_, slot) of $scopedSlots"
+                    <template v-for="(_, slot) of slots"
                               #[slot]="scope"
                     >
                         <slot :name="slot"
@@ -76,77 +128,6 @@
         </div>
     </nav>
 </template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-
-import { getUUID } from '@/lib/component-util/getUUID';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
-import type {
-    BackLink, LNBMenu, TopTitle,
-} from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
-
-export default {
-    name: 'LNB',
-    components: {
-        LNBMenuItem, PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
-    },
-    props: {
-        header: {
-            type: String,
-            default: '',
-        },
-        backLink: {
-            type: Object as () => BackLink,
-            default: () => ({}),
-        },
-        topTitle: {
-            type: Object as () => TopTitle,
-            default: () => ({}),
-        },
-        menuSet: {
-            type: Array as () => LNBMenu[],
-            default: () => [],
-        },
-        showFavoriteOnly: {
-            type: Boolean,
-            default: undefined,
-        },
-    },
-
-    setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            currentPath: computed(() => vm.$route.fullPath),
-            proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
-        });
-
-        const handleFavoriteToggle = () => {
-            state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
-        };
-
-        return {
-            ...toRefs(state),
-            MENU_ITEM_TYPE,
-            assetUrlConverter,
-            getUUID,
-            handleFavoriteToggle,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .lnb {
