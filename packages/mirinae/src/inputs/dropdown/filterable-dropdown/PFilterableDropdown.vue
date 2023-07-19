@@ -85,6 +85,9 @@
                         @update:selected="handleUpdateSelected"
                         @update:search-text="handleUpdateSearchText"
         >
+            <template #header>
+                <slot name="context-menu-header" />
+            </template>
             <template v-for="(_, slot) of menuSlots"
                       #[slot]="scope"
             >
