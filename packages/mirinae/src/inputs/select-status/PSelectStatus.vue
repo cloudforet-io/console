@@ -2,7 +2,7 @@
     <p-status class="p-select-status"
               :class="{selected: isSelected, 'with-icon': withIcon}"
               :icon="icon || (isSelected && !disableCheckIcon ? 'ic_check' : undefined)"
-              :icon-color="withiconColor"
+              :icon-color="withIconColor"
               :icon-animation="iconAnimation"
               :disable-icon="!withIcon && (!isSelected || disableCheckIcon)"
               @click="onClick"
@@ -83,7 +83,7 @@ export default defineComponent<Props>({
             multiSelectable: computed(() => props.multiSelectable),
         });
         const withIcon = computed(() => props.icon);
-        const withiconColor = computed(() => {
+        const withIconColor = computed(() => {
             if (props.icon) {
                 if (props.iconColor) {
                     return props.iconColor;
@@ -106,7 +106,7 @@ export default defineComponent<Props>({
         return {
             isSelected,
             withIcon,
-            withiconColor,
+            withIconColor,
             onClick,
         };
     },
