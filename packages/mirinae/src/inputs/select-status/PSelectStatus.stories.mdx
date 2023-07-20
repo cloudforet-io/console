@@ -31,6 +31,8 @@ export const Template = (args, { argTypes }) => ({
             :predicate="predicate"
             :multi-selectable="multiSelectable"
             :disable-check-icon="disableCheckIcon"
+            :icon="icon"
+            :icon-color="iconColor"
             @change="onChange"
         >
             <span v-if="defaultSlot" v-html="defaultSlot" />
