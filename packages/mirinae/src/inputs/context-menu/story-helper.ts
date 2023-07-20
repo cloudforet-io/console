@@ -8,6 +8,7 @@ const searchSlots = Object.values(getSearchSlotArgTypes());
 
 
 export const contextMenuSlots: [string, string][] = [
+    ['header', 'A slot that replaces the header area of the context menu.'],
     ['menu', 'A slot that replaces the whole context menu. It\'s useful when you want to use context menu\'s container style, no data & loading container only.'],
     ['items', 'A slot that replaces the area for menu items. This is useful when you want to directly combine and use context menu items in a compound component way.'],
     ['bottom', 'A slot that replaces the bottom area of the context menu.'],

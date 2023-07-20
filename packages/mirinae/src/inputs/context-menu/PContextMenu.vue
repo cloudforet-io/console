@@ -2,6 +2,7 @@
     <div class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
+        <slot name="header" />
         <div class="menu-container">
             <slot v-show="props.menu.length > 0"
                   name="menu"
