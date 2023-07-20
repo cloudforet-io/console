@@ -2,12 +2,12 @@
     <div class="collector-data-default-inner">
         <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DESCRIPTION') }}</span>
         <div class="accounts-wrapper">
-            <p-lazy-img :src="props.item.plugin ? props.item.plugin.icon : ''"
+            <p-lazy-img :src="props.plugin ? props.plugin.icon : ''"
                         width="1rem"
                         height="1rem"
                         class="plugin-icon"
             />
-            <span>{{ props.item.name }}</span>
+            <span>{{ props.name }}</span>
             <span v-if="collectorDataModalState.secrets.length > 0">
                 ({{ collectorDataModalState.secrets.length }})
             </span>
@@ -21,17 +21,19 @@ import { PLazyImg } from '@spaceone/design-system';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
-import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import type { CollectorPlugin } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
 interface Props {
-    item: CollectorData;
+    name: string;
+    plugin?: CollectorPlugin;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    name: '',
+    plugin: undefined,
 });
 
 </script>

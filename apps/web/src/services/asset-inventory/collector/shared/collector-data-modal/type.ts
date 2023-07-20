@@ -1,5 +1,3 @@
-import type { CollectorModel } from '@/services/asset-inventory/collector/model';
-
 export const ATTACHED_ACCOUNT_TYPE = {
     ALL: 'all',
     SPECIFIC: 'specific',
@@ -13,8 +11,4 @@ export const COLLECT_DATA_TYPE = {
 export interface CollectorPlugin {
     name?: string;
     icon?: string;
-}
-
-export interface CollectorData extends CollectorModel {
-    plugin?: CollectorPlugin;
 }

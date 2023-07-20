@@ -2181,8 +2181,10 @@
 				"VERSION": "버전"
 			},
 			"HISTORY": {
+				"ALL": "모두 보기",
 				"CANCELED": "",
 				"FAILURE": "실패",
+				"IN_PROGRESS": "진행중",
 				"SUCCESS": "성공"
 			},
 			"MAIN": {

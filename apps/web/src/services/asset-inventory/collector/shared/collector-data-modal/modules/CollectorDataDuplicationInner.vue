@@ -9,12 +9,12 @@
         >
             <template #data-account>
                 <div class="accounts-wrapper">
-                    <p-lazy-img :src="props.item.plugin ? props.item.plugin.icon : ''"
+                    <p-lazy-img :src="props.plugin ? props.plugin.icon : ''"
                                 width="1rem"
                                 height="1rem"
                                 class="plugin-icon"
                     />
-                    <span>{{ props.item.name }}</span>
+                    <span>{{ props.name }}</span>
                 </div>
             </template>
             <template #data-duration>
@@ -56,10 +56,10 @@
                 </div>
                 <div class="progress-bar">
                     <span class="succeeded-bar"
-                          :style="{ width: `${state.status.succeededPercentage}%` }"
+                          :style="{ width: `${state.succeededPercentage}%` }"
                     />
                     <span class="failed-bar"
-                          :style="{ width: `${state.status.failedPercentage}%` }"
+                          :style="{ width: `${state.failedPercentage}%` }"
                     />
                 </div>
             </div>
@@ -99,19 +99,25 @@ import { red, green } from '@/styles/colors';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
-import type { CollectorData } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
-import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import type {
+    CollectorPlugin,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import {
+    ATTACHED_ACCOUNT_TYPE,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const SUCCEEDED_COLOR = green[500];
 const FAILED_COLOR = red[400];
 
 interface Props {
-    item?: CollectorData;
+    name: string;
+    plugin?: CollectorPlugin;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    name: '',
+    plugin: undefined,
 });
 
 const collectorDataModalStore = useCollectorDataModalStore();
@@ -132,24 +138,22 @@ const state = reactive({
         total: 0,
     },
     duration: 0,
-    status: {
-        succeededPercentage: computed(() => {
-            if (state.jobTaskStatus.total > 0) {
-                return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
+    succeededPercentage: computed(() => {
+        if (state.jobTaskStatus.total > 0) {
+            return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
+        }
+        return 0;
+    }),
+    failedPercentage: computed(() => {
+        if (state.jobTaskStatus.total > 0) {
+            const status = collectorDataModalState.recentJob.status;
+            if (status === JOB_STATE.SUCCESS) {
+                return 100 - state.succeededPercentage;
             }
-            return 0;
-        }),
-        failedPercentage: computed(() => {
-            if (state.jobTaskStatus.total > 0) {
-                const status = collectorDataModalState.recentJob.status;
-                if (status === JOB_STATE.SUCCESS) {
-                    return 100 - state.status.succeededPercentage;
-                }
-                return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
-            }
-            return 0;
-        }),
-    },
+            return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
+        }
+        return 0;
+    }),
 });
 
 /* Query helper */
@@ -158,6 +162,7 @@ const apiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true);
 
 /* API */
+// TODO: This part is temporarily enabled for screen verification purposes and will be removed after the API is updated.
 const getJobProgress = async () => {
     try {
         const response = await SpaceConnector.client.inventory.job.getJobProgress({
@@ -173,7 +178,15 @@ const getJobLists = async () => {
     try {
         const response = await SpaceConnector.client.inventory.job.list({ query: apiQueryHelper.data });
         const item = response.results[0];
+
         state.duration = durationFormatter(item.created_at, dayjs(), storeState.timezone) || '--';
+
+        // TODO: will be active after the API is updated and check.
+        // state.jobTaskStatus = {
+        //     succeeded: item.success_tasks,
+        //     failed: item.failure_tasks,
+        //     total: item.total_tasks,
+        // };
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -182,6 +195,8 @@ const getJobLists = async () => {
 /* Init */
 (async () => {
     await getJobLists();
+
+    // TODO: This part is temporarily enabled for screen verification purposes and will be removed after the API is updated.
     await getJobProgress();
 })();
 </script>

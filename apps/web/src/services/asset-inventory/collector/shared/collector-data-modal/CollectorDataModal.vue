@@ -12,11 +12,13 @@
             <template #body>
                 <div v-if="state.isDuplicateJobs">
                     <collector-data-duplication-inner :account-type="collectorDataModalState.accountType"
-                                                      :item="state.item"
+                                                      :name="state.item.name"
+                                                      :plugin="state.item.plugin"
                     />
                 </div>
                 <collector-data-default-inner v-else
-                                              :item="state.item"
+                                              :name="state.item.name"
+                                              :plugin="state.item.plugin"
                 />
             </template>
             <template #confirm-button>
