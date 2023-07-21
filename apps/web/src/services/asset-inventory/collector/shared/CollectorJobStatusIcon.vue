@@ -88,7 +88,6 @@ const props = withDefaults(defineProps<Props>(), {
             .icon {
                 &.success {
                     @apply text-green-500;
-                    margin-right: -0.25rem;
                 }
                 &.error {
                     @apply text-red-400;

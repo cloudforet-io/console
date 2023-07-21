@@ -122,11 +122,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
+import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/modules/gnb-noti/type';
 
 import { safe } from '@/styles/colors';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
 
 interface NotificationItem {
     notificationId: string;
@@ -139,12 +139,6 @@ interface NotificationItem {
     message: any;
 }
 
-const NOTIFICATION_TYPE_ICONS = {
-    INFO: '',
-    ERROR: 'ic_error-filled',
-    SUCCESS: 'ic_check',
-    WARNING: 'ic_warning-filled',
-} as const;
 const NOTIFICATIONS_ITEM_LIMIT = 15;
 
 export default {
