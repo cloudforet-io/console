@@ -145,7 +145,7 @@ const statusTextColorFormatter = (status) => {
 };
 const statusIconFormatter = (status) => {
     if (status === JOB_STATE.SUCCESS) return 'ic_check';
-    if (status === JOB_STATE.IN_PROGRESS) return 'ic_circle';
+    if (status === JOB_STATE.IN_PROGRESS) return 'ic_peacock-gradient-circle';
     if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
     return 'ic_error-filled';
 };

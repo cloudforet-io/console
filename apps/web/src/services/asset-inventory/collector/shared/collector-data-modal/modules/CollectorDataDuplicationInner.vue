@@ -26,9 +26,9 @@
         >
             <span class="in-progress-title">
                 <p-i
-                    name="ic_circle"
-                    height="0.875rem"
-                    width="0.875rem"
+                    name="ic_peacock-gradient-circle"
+                    height="1rem"
+                    width="1rem"
                     animation="spin"
                 />
                 <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
@@ -67,9 +67,9 @@
         <div v-else>
             <span class="in-progress-title">
                 <p-i
-                    name="ic_circle"
-                    height="0.875rem"
-                    width="0.875rem"
+                    name="ic_peacock-gradient-circle"
+                    height="1rem"
+                    width="1rem"
                     animation="spin"
                 />
                 <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>

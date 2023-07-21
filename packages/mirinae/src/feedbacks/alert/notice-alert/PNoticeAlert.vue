@@ -27,6 +27,7 @@
                      class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
+                     color="inherit transparent"
                 />
                 <a class="title">{{ item.title }}</a>
                 <div class="contents">
@@ -110,6 +111,9 @@ const state = reactive({
     }
     &.alert {
         @mixin notice-color, theme('colors.alert');
+        .item-type-icon {
+            @apply text-red-400;
+        }
     }
     &.warning {
         @mixin notice-color, theme('colors.yellow.500');
