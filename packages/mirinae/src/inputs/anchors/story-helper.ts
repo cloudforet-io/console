@@ -102,7 +102,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         name: 'href',
         type: { name: 'string' },
         description: 'href',
-        defaultValue: '/',
+        defaultValue: 'https://cloudforet.io',
         table: {
             type: {
                 summary: 'string',
