@@ -25,6 +25,7 @@
                         <p-i width="1.25rem"
                              height="1.25rem"
                              name="ic_error-filled"
+                             :color="red[400]"
                         /><span>{{ $t('INVENTORY.COLLECTOR.CREATE.FORM_LOAD_FAILED') }}</span>
                     </div>
                     <p-button style-type="tertiary"
@@ -69,6 +70,8 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
 
 import type { CollectorPluginModel } from '@/services/asset-inventory/collector/model';
 import {
