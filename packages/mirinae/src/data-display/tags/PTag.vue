@@ -7,8 +7,9 @@
         <p-i v-if="invalid"
              class="invalid-icon"
              name="ic_error-filled"
-             width="0.8rem"
-             height="0.8rem"
+             width="1rem"
+             height="1rem"
+             color="inherit transparent"
         />
         <span class="tag-contents">
             <slot name="default">
@@ -108,6 +109,7 @@ export default defineComponent<Props>({
     max-width: 100%;
     width: fit-content;
     margin-right: 0.5rem;
+    gap: 0.25rem;
     &.selected {
         @apply bg-blue-300;
     }
@@ -137,7 +139,7 @@ export default defineComponent<Props>({
         @apply bg-red-100 border border-alert;
 
         .invalid-icon {
-            margin-right: 0.3rem;
+            @apply text-red-400;
         }
         &.selected {
             @apply bg-red-200 border-red-500;
@@ -146,7 +148,6 @@ export default defineComponent<Props>({
     .tag-contents {
         font-size: 0.875rem;
         line-height: 1.25;
-        width: 100%;
         word-break: break-all;
     }
     .category {
