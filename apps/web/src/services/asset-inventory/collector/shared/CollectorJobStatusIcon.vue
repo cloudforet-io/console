@@ -33,7 +33,7 @@
                          color="inherit"
                     />
                     <p-i v-else-if="props.status === JOB_STATE.CANCELED"
-                         name="ic_limit-filed"
+                         name="ic_limit-filled"
                          class="icon canceled"
                          height="1rem"
                          width="1rem"
