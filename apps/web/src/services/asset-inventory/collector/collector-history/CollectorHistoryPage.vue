@@ -57,17 +57,18 @@
                         :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
                     />
                 </template>
-                <template #col-remained_tasks-format="{value}">
-                    <div class="col-remained_tasks-format">
-                        <span class="succeeded-bar"
-                              :style="{ width: `${50}%` }"
-                        />
-                        <span class="failed-bar"
-                              :style="{ width: `${20}%` }"
-                        />
-                    </div>
-                    <span class="text">{{ value }}%</span>
-                </template>
+                <!-- TODO: will be check the color and translation after the API is updated -->
+                <!--                <template #col-progress="{ value }">-->
+                <!--                    <div class="col-progress-format">-->
+                <!--                        <span class="succeeded-bar"-->
+                <!--                              :style="{ width: `${value.succeededPercentage}%` }"-->
+                <!--                        />-->
+                <!--                        <span class="failed-bar"-->
+                <!--                              :style="{ width: `${value.failedPercentage}%` }"-->
+                <!--                        />-->
+                <!--                    </div>-->
+                <!--                    <span class="text">{{ value }}%</span>-->
+                <!--                </template>-->
             </p-toolbox-table>
             <div v-if="state.items.length > 0"
                  class="pagination"
@@ -97,7 +98,7 @@ import {
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
-import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
@@ -141,7 +142,8 @@ const fields = [
     { label: 'Collector', name: 'collector_info.name', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
-    { label: 'Job Progress', name: 'job_id' },
+    // TODO: will be check the color and translation after the API is updated
+    // { label: 'Job Progress', name: 'progress' },
     { label: 'Created', name: 'created_at' },
     { label: 'Duration', name: 'duration', sortable: false },
 ];
@@ -250,7 +252,10 @@ const getJobs = async () => {
         state.totalCount = res.total_count;
         state.items = res.results.map((job) => ({
             ...job,
-            remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
+            progress: {
+                succeededPercentage: (job.success_tasks / job.total_tasks) * 100,
+                failedPercentage: (job.failure_tasks / job.total_tasks) * 100,
+            },
             created_at: iso8601Formatter(job.created_at, storeState.timezone),
             duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
         }));
@@ -316,35 +321,33 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     min-height: 18.75rem;
                 }
             }
-            .p-data-table {
-                .col-remained_tasks-format {
-                    @apply inline-flex items-center bg-gray-200;
-                    width: 6rem;
-                    height: 0.5rem;
-                    margin-right: 0.25rem;
-                    border-radius: 0.125rem;
-                    > span {
-                        &:first-child {
-                            border-top-left-radius: 0.125rem;
-                            border-bottom-left-radius: 0.125rem;
-                        }
-                        &:last-child {
-                            border-top-right-radius: 0.125rem;
-                            border-bottom-right-radius: 0.125rem;
-                        }
-                    }
-                    .succeeded-bar {
-                        @apply bg-green-500;
-                        height: 100%;
-                    }
-                    .failed-bar {
-                        @apply bg-red-400;
-                        height: 100%;
-                    }
-                    .text {
-                        @apply text-gray-700;
-                    }
+        }
+        .col-progress-format {
+            @apply inline-flex items-center bg-gray-200;
+            width: 6rem;
+            height: 0.5rem;
+            margin-right: 0.25rem;
+            border-radius: 0.125rem;
+            > span {
+                &:first-child {
+                    border-top-left-radius: 0.125rem;
+                    border-bottom-left-radius: 0.125rem;
                 }
+                &:last-child {
+                    border-top-right-radius: 0.125rem;
+                    border-bottom-right-radius: 0.125rem;
+                }
+            }
+            .succeeded-bar {
+                @apply bg-green-500;
+                height: 100%;
+            }
+            .failed-bar {
+                @apply bg-red-400;
+                height: 100%;
+            }
+            .text {
+                @apply text-gray-700;
             }
         }
         .pagination {

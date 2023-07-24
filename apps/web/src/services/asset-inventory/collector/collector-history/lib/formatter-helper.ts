@@ -31,11 +31,3 @@ export const statusIconColorFormatter = (status) => {
     if (status === JOB_STATE.IN_PROGRESS) return undefined;
     return FAILURE_ICON_COLOR;
 };
-
-export const taskStateFormatter = (taskId: string, items: any) => {
-    const item = items.findIndex((i) => i.taskId === taskId);
-    const totalTasks = item.total_tasks;
-    const succeededPercentage = (item.success_tasks / totalTasks) * 100;
-    const failedPercentage = (item.failure_tasks / totalTasks) * 100;
-    return { succeededPercentage, failedPercentage };
-};
