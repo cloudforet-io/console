@@ -40,7 +40,32 @@
                                            appearance-type="stack"
                                            :reset-selected-on-unmounted="false"
                                            @update:selected="handleSelectAttachedServiceAccount"
-                    />
+                    >
+                        <template #input-left-area>
+                            <p-i v-if="state.selectedOption === 'exclude'"
+                                 name="ic_minus_circle"
+                                 class="ml-2"
+                                 width="1.25rem"
+                                 heigth="1.25rem"
+                                 :color="red[300]"
+                            />
+                        </template>
+                        <template #context-menu-header>
+                            <div class="include-exclude-selector">
+                                <select-box v-for="item in state.includeExcludeOptionList"
+                                            :key="item.name"
+                                            :selected="state.selectedOption"
+                                            :value="item.name"
+                                            :icon="item.icon"
+                                            :icon-color="item.iconColor"
+                                            :multi-selectable="true"
+                                            @change="handleSelectIncludeExcludeOption"
+                                >
+                                    {{ item.label }}
+                                </select-box>
+                            </div>
+                        </template>
+                    </p-filterable-dropdown>
                 </div>
             </div>
         </p-field-group>
@@ -52,8 +77,9 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
+    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle, PI,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -61,8 +87,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import SelectBox from '@/common/components/select/SelectBox.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { red } from '@/styles/colors';
 
 import type {
     AttachedServiceAccount,
@@ -128,6 +157,19 @@ const state = reactive({
             },
         };
     }),
+    selectedOption: 'include',
+    includeExcludeOptionList: computed<MenuItem[]>(() => [
+        {
+            label: i18n.t('INVENTORY.COLLECTOR.CREATE.INCLUDE'),
+            name: 'include',
+        },
+        {
+            label: i18n.t('INVENTORY.COLLECTOR.CREATE.EXCLUDE'),
+            name: 'exclude',
+            icon: 'ic_minus_circle',
+            iconColor: red[300],
+        },
+    ]),
 });
 
 const serviceAccountHandler: AutocompleteHandler = async (keyword: string) => {
@@ -184,6 +226,10 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
     });
 };
 
+const handleSelectIncludeExcludeOption = (selectedValue: string) => {
+    state.selectedOption = selectedValue;
+};
+
 watch(() => isAllValid.value, (value) => {
     emit('update:isAttachedServiceAccountValid', value);
 }, { immediate: true });
@@ -222,6 +268,13 @@ watch(() => collectorFormState.provider, () => {
         .specific-service-account-dropdown {
             margin-top: 0.5rem;
             width: 100%;
+
+            .include-exclude-selector {
+                @apply flex;
+                margin: 0.75rem 0.5rem;
+                border-radius: 0.25rem;
+                overflow: hidden;
+            }
         }
 
         .specific-service-account-dropdown-label {
