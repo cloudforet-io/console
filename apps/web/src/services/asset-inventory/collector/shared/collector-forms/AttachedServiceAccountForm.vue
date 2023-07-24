@@ -301,6 +301,21 @@ watch(() => collectorFormState.provider, () => {
             display: block;
             margin-top: 1rem;
         }
+
+        .contents-container {
+
+            .specific-service-account-dropdown {
+                margin-top: 0.5rem;
+                width: 100%;
+
+                .include-exclude-selector {
+                    @apply flex flex-col;
+                    margin: 0.75rem 0.5rem;
+                    border-radius: 0.25rem;
+                    overflow: hidden;
+                }
+            }
+        }
     }
 }
 </style>
