@@ -269,6 +269,15 @@ const extraArgTypes: ArgTypes = {
             type: { summary: null },
         },
     },
+    inputLeftArea: {
+        name: 'input-left-area',
+        description: 'This is a slot for the left area of the input.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
     /* events */
     onUpdateVisibleMenu: {
         name: 'update:visible-menu',

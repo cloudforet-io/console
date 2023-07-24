@@ -11,6 +11,7 @@
              @keyup.enter.capture.stop="toggleMenu"
              @click="toggleMenu"
         >
+            <slot name="input-left-area" />
             <div class="selection-display-wrapper">
                 <span v-if="displayValueOnDropdownButton === undefined"
                       class="placeholder"
@@ -310,7 +311,7 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
     @apply w-full;
     position: relative;
     > .dropdown-button {
-        @apply bg-white border rounded-md border-gray-300;
+        @apply bg-white border rounded-md border-gray-300 items-center;
         display: flex;
         width: 100%;
         min-height: 2rem;
