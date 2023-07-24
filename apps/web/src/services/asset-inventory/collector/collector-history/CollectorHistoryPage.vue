@@ -31,7 +31,7 @@
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
                              @refresh="handleChange()"
-                             @rowLeftClick="onSelect"
+                             @rowLeftClick="handleSelect"
             >
                 <template #th-task-format="{ field }">
                     <span>{{ field.label }}</span>
@@ -96,6 +96,7 @@ import {
     PHeading, PPagination, PLazyImg,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
@@ -132,7 +133,7 @@ import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/collector/collec
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-const fields = [
+const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
     { label: 'Collector', name: 'collector_info.name', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
@@ -219,7 +220,7 @@ const getQuery = () => {
 };
 
 /* Components */
-const onSelect = (item) => {
+const handleSelect = (item) => {
     SpaceRouter.router.push({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
         params: { jobId: item.job_id },

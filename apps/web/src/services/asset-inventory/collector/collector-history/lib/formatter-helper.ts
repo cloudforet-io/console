@@ -15,17 +15,17 @@ export const statusTextFormatter = (status) => {
     return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
 };
 
-export const statusTextColorFormatter = (status) => {
+export const statusTextColorFormatter = (status: string): string | undefined => {
     if (status === JOB_STATE.FAILURE) return FAILURE_ICON_COLOR;
     return undefined;
 };
-export const statusIconFormatter = (status) => {
+export const statusIconFormatter = (status: string): string => {
     if (status === JOB_STATE.SUCCESS) return 'ic_check';
     if (status === JOB_STATE.IN_PROGRESS) return 'ic_peacock-gradient-circle';
     if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
     return 'ic_error-filled';
 };
-export const statusIconColorFormatter = (status) => {
+export const statusIconColorFormatter = (status: string): string => {
     if (status === JOB_STATE.SUCCESS) return SUCCESS_ICON_COLOR;
     if (status === JOB_STATE.CANCELED) return CANCELED_ICON_COLOR;
     if (status === JOB_STATE.IN_PROGRESS) return undefined;
