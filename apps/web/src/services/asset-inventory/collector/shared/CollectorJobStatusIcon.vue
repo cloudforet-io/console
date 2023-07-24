@@ -33,7 +33,7 @@
                          color="inherit"
                     />
                     <p-i v-else-if="props.status === JOB_STATE.CANCELED"
-                         name="ic_limit-filed"
+                         name="ic_limit-filled"
                          class="icon canceled"
                          height="1rem"
                          width="1rem"
@@ -88,7 +88,6 @@ const props = withDefaults(defineProps<Props>(), {
             .icon {
                 &.success {
                     @apply text-green-500;
-                    margin-right: -0.25rem;
                 }
                 &.error {
                     @apply text-red-400;
