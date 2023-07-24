@@ -15,6 +15,7 @@
                 <p class="title">
                     <p-i v-if="icon"
                          :name="icon"
+                         :color="iconColor"
                          width="1rem"
                          height="1rem"
                          class="mr-1"
@@ -50,6 +51,10 @@ import {
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
+
+import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/modules/gnb-noti/type';
+
+import { green, red, yellow } from '@/styles/colors';
 
 interface Props {
     isRead: boolean;
@@ -103,6 +108,18 @@ export default defineComponent<Props>({
             occurred: computed(() => {
                 if (!props.createdAt) return '';
                 return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
+            }),
+            iconColor: computed(() => {
+                if (props.icon === NOTIFICATION_TYPE_ICONS.SUCCESS) {
+                    return green[500];
+                }
+                if (props.icon === NOTIFICATION_TYPE_ICONS.ERROR) {
+                    return red[400];
+                }
+                if (props.icon === NOTIFICATION_TYPE_ICONS.WARNING) {
+                    return yellow[500];
+                }
+                return undefined;
             }),
         });
 

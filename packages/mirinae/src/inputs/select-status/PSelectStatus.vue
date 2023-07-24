@@ -2,7 +2,7 @@
     <p-status class="p-select-status"
               :class="{selected: isSelected, 'with-icon': withIcon}"
               :icon="icon || (isSelected && !disableCheckIcon ? 'ic_check' : undefined)"
-              :icon-color="icon ? undefined : 'inherit'"
+              :icon-color="withIconColor"
               :icon-animation="iconAnimation"
               :disable-icon="!withIcon && (!isSelected || disableCheckIcon)"
               @click="onClick"
@@ -21,6 +21,7 @@ import { useSelect } from '@/hooks/select';
 
 interface Props extends SelectProps {
     icon?: string;
+    iconColor?: string;
     iconAnimation?: ANIMATION_TYPE;
     disableCheckIcon?: boolean;
 }
@@ -55,6 +56,10 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
+        iconColor: {
+            type: String,
+            default: undefined,
+        },
         iconAnimation: {
             type: String,
             default: undefined,
@@ -78,6 +83,15 @@ export default defineComponent<Props>({
             multiSelectable: computed(() => props.multiSelectable),
         });
         const withIcon = computed(() => props.icon);
+        const withIconColor = computed(() => {
+            if (props.icon) {
+                if (props.iconColor) {
+                    return props.iconColor;
+                }
+                return undefined;
+            }
+            return 'inherit';
+        });
 
         /* event */
         const onClick = () => {
@@ -92,6 +106,7 @@ export default defineComponent<Props>({
         return {
             isSelected,
             withIcon,
+            withIconColor,
             onClick,
         };
     },

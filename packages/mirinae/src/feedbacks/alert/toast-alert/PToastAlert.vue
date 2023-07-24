@@ -30,6 +30,7 @@
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
+                         color="inherit transparent"
                     />
                     <p-spinner v-if="item.type === 'loading'"
                                class="item-type-icon"
@@ -112,6 +113,11 @@ const state = reactive({
         max-width: 30rem;
         opacity: 0.9;
         padding: 0.55rem;
+        &.alert {
+            .item-type-icon {
+                @apply text-red-400;
+            }
+        }
     }
 
     .icon-wrapper {

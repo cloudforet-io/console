@@ -21,9 +21,9 @@
                         <p-i v-if="editor.isActive('textStyle', {color})"
                              name="ic_check"
                              class="chip-check-mark"
-                             height="16px"
-                             width="16px"
-                             color="inherit"
+                             height="1rem"
+                             width="1rem"
+                             color="white"
                         />
 
                     </span>
@@ -130,11 +130,10 @@ export default defineComponent<Props>({
             opacity: 0.7;
         }
         .chip-check-mark {
-            @apply text-white;
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-35%, -50%);
+            transform: translate(-55%, -50%);
         }
 
         @media (hover: hover) {
