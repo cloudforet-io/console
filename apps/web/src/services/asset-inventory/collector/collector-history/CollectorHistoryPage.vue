@@ -9,25 +9,25 @@
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
                 <p-select-button-group class="select-button-group"
                                        :buttons="statusList"
-                                       :selected.sync="selectedStatus"
+                                       :selected.sync="state.selectedStatus"
                                        theme="text"
                 />
             </div>
             <p-toolbox-table search-type="query"
                              :fields="fields"
-                             :items="items"
+                             :items="state.items"
                              :query-tags="queryTags"
                              :key-item-sets="handlers.keyItemSets"
-                             :value-handler-map="handlers.valueHandlerMap"
-                             :loading="loading"
-                             :total-count="totalCount"
-                             :this-page.sync="thisPage"
-                             :page-size.sync="pageSize"
+                             :value-handler-map="valueHandlerMap"
+                             :loading="state.loading"
+                             :total-count="state.totalCount"
+                             :this-page.sync="state.thisPage"
+                             :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
                              :selectable="false"
                              :exportable="false"
-                             :class="items.length === 0 ? 'no-data' : ''"
+                             :class="state.items.length === 0 ? 'no-data' : ''"
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
                              @refresh="handleChange()"
@@ -48,15 +48,15 @@
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
+                    <!-- TODO: will be check the color and translation after the API is updated -->
                     <p-status
                         :text="statusTextFormatter(value)"
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="[JOB_STATE.IN_PROGRESS].includes(value) ? 'spin' : undefined"
+                        :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
                     />
                 </template>
-                <!-- TODO: will be calculated after discussing API specs -->
                 <template #col-remained_tasks-format="{value}">
                     <div class="col-remained_tasks-format">
                         <span class="succeeded-bar"
@@ -69,26 +69,26 @@
                     <span class="text">{{ value }}%</span>
                 </template>
             </p-toolbox-table>
-            <div v-if="items.length > 0"
+            <div v-if="state.items.length > 0"
                  class="pagination"
             >
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
+                <p-pagination :total-count="state.totalCount"
+                              :this-page.sync="state.thisPage"
+                              :page-size.sync="state.pageSize"
                               @change="handleChangePagination"
                 />
             </div>
         </div>
-        <no-collector-modal :visible.sync="modalVisible"
-                            :manage-disabled="!hasManagePermission"
+        <no-collector-modal :visible.sync="state.modalVisible"
+                            :manage-disabled="!state.hasManagePermission"
                             @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
         />
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -96,7 +96,6 @@ import {
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import { capitalize } from 'lodash';
 
 import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -121,245 +120,168 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { peacock, green, red } from '@/styles/colors';
-
+import {
+    statusIconColorFormatter,
+    statusIconFormatter,
+    statusTextColorFormatter,
+    statusTextFormatter,
+} from '@/services/asset-inventory/collector/collector-history/lib/formatter-helper';
 import NoCollectorModal from '@/services/asset-inventory/collector/collector-history/modules/NoCollectorModal.vue';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/collector/collector-history/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-const PROGRESS_BAR_COLOR = peacock[500];
-const COMPLETED_ICON_COLOR = green[500];
-const FAILED_ICON_COLOR = red[400];
+const valueHandlerMap: ValueHandlerMap = {
+    job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+    status: makeEnumValueHandler(JOB_STATE),
+    collector_id: makeReferenceValueHandler('inventory.Collector'),
+};
+const fields = [
+    { label: 'Job ID', name: 'job_id' },
+    { label: 'Collector', name: 'collector_info.name', sortable: false },
+    { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
+    { label: 'Status', name: 'status', sortable: false },
+    { label: 'Job Progress', name: 'job_id' },
+    { label: 'Created', name: 'created_at' },
+    { label: 'Duration', name: 'duration', sortable: false },
+];
+const statusList = [
+    { name: JOB_SELECTED_STATUS.ALL, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.ALL') },
+    { name: JOB_SELECTED_STATUS.PROGRESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS') },
+    { name: JOB_SELECTED_STATUS.SUCCESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') },
+    { name: JOB_SELECTED_STATUS.FAILURE, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE') },
+    { name: JOB_SELECTED_STATUS.CANCELED, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED') },
+];
 
-const statusTextFormatter = (status) => {
-    if (status === JOB_STATE.SUCCESS) return i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS');
-    if (status === JOB_STATE.IN_PROGRESS) return i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS');
-    if (status === JOB_STATE.CANCELED) return i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED');
-    if (status === JOB_STATE.FAILURE) return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
-    return capitalize(status);
-};
-const statusTextColorFormatter = (status) => {
-    if ([JOB_STATE.CANCELED, JOB_STATE.FAILURE].includes(status)) return FAILED_ICON_COLOR;
-    return undefined;
-};
-const statusIconFormatter = (status) => {
-    if (status === JOB_STATE.SUCCESS) return 'ic_check';
-    if (status === JOB_STATE.IN_PROGRESS) return 'ic_peacock-gradient-circle';
-    if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
-    return 'ic_error-filled';
-};
-const statusIconColorFormatter = (status) => {
-    if (status === JOB_STATE.SUCCESS) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATE.IN_PROGRESS) return undefined;
-    return FAILED_ICON_COLOR;
-};
+const handlers = reactive({
+    keyItemSets: computed<KeyItemSet[]>(() => [{
+        title: 'Properties',
+        items: [
+            { name: 'job_id', label: 'Job ID' },
+            { name: 'status', label: 'Status' },
+            { name: 'collector_id', label: 'Collector', valueSet: storeState.collectors },
+            { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
+        ],
+    }]),
+});
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+const state = reactive({
+    loading: true,
+    modalVisible: false,
+    pageStart: 1,
+    pageSize: 30,
+    thisPage: 1,
+    totalCount: 0,
+    hasManagePermission: useManagePermissionState(),
+    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
+    selectedStatus: 'all',
+    items: [] as any[],
+});
 
-export default {
-    name: 'CollectorHistoryPage',
-    components: {
-        NoCollectorModal,
-        // HandbookButton,
-        PLazyImg,
-        PPagination,
-        PToolboxTable,
-        PHeading,
-        PSelectButtonGroup,
-        PStatus,
+const queryTagsHelper = useQueryTags({
+    keyItemSets: handlers.keyItemSets,
+    referenceStore: {
+        'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
     },
-    setup() {
-        const storeState = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-        });
-        const handlers = reactive({
-            keyItemSets: computed<KeyItemSet[]>(() => [{
-                title: 'Properties',
-                items: [
-                    { name: 'job_id', label: 'Job ID' },
-                    { name: 'status', label: 'Status' },
-                    { name: 'collector_id', label: 'Collector', valueSet: storeState.collectors },
-                    { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
-                ],
-            }]),
-            valueHandlerMap: {
-                job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-                status: makeEnumValueHandler(JOB_STATE),
-                collector_id: makeReferenceValueHandler('inventory.Collector'),
-            } as ValueHandlerMap,
-        });
+});
+const { queryTags, filters: searchFilters } = queryTagsHelper;
 
-        const queryTagsHelper = useQueryTags({
-            keyItemSets: handlers.keyItemSets,
-            referenceStore: {
-                'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
-            },
-        });
-        const { queryTags, filters: searchFilters } = queryTagsHelper;
-        const state = reactive({
-            hasManagePermission: useManagePermissionState(),
-            loading: true,
-            modalVisible: false,
-            isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-            fields: computed(() => [
-                { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector', name: 'collector_info.name', sortable: false },
-                { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
-                { label: 'Status', name: 'status', sortable: false },
-                { label: 'Job Progress', name: 'remained_tasks' },
-                { label: 'Created', name: 'created_at' },
-                { label: 'Duration', name: 'duration', sortable: false },
-            ]),
-            statusList: computed(() => ([
-                {
-                    name: JOB_SELECTED_STATUS.ALL, label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
-                },
-                {
-                    name: JOB_SELECTED_STATUS.PROGRESS, label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
-                },
-                {
-                    name: JOB_SELECTED_STATUS.SUCCESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS'),
-                },
-                {
-                    name: JOB_SELECTED_STATUS.FAILURE, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE'),
-                },
-                {
-                    name: JOB_SELECTED_STATUS.CANCELED, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED'),
-                },
-            ])),
-            selectedStatus: 'all',
-            items: [] as any[],
-            //
-            pageStart: 1,
-            pageSize: 30,
-            thisPage: 1,
-            totalCount: 0,
-        });
+const apiQueryHelper = new ApiQueryHelper();
+const getQuery = () => {
+    apiQueryHelper
+        .setPageStart(state.pageStart)
+        .setPageLimit(state.pageSize)
+        .setSort('created_at', true)
+        .setFilters(searchFilters.value);
 
-        /* api */
-        const apiQueryHelper = new ApiQueryHelper()
-            .setPageStart(1).setPageLimit(15)
-            .setSort('created_at', true);
-        const getQuery = () => {
-            apiQueryHelper
-                .setPageStart(state.pageStart).setPageLimit(state.pageSize)
-                .setFilters(searchFilters.value);
+    let statusValues: string[] = [];
+    if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
+        statusValues = [JOB_STATE.IN_PROGRESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
+        statusValues = [JOB_STATE.SUCCESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
+        statusValues = [JOB_STATE.FAILURE];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
+        statusValues = [JOB_STATE.CANCELED];
+    }
 
-            let statusValues: string[] = [];
-            if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
-                statusValues = [JOB_STATE.IN_PROGRESS];
-            } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
-                statusValues = [JOB_STATE.SUCCESS];
-            } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
-                statusValues = [JOB_STATE.FAILURE];
-            } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
-                statusValues = [JOB_STATE.CANCELED];
-            }
+    if (statusValues.length > 0) {
+        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
+    }
 
-            if (statusValues.length > 0) {
-                apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
-            }
-
-            return apiQueryHelper.data;
-        };
-        const getJobs = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
-                state.totalCount = res.total_count;
-                state.items = res.results.map((job) => ({
-                    ...job,
-                    remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
-                    created_at: iso8601Formatter(job.created_at, storeState.timezone),
-                    duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        // TODO: will be calculated after discussing API specs
-        // const getJobProgress = async () => {
-        //     try {
-        //         const ids = state.items.map((item) => item.job_id);
-        //         const response = await SpaceConnector.client.inventory.job.getJobProgress({
-        //             job_id: ids,
-        //         });
-        //         console.log(response);
-        //         // state.jobTaskStatus = response.job_task_status;
-        //     } catch (e) {
-        //         ErrorHandler.handleError(e);
-        //     }
-        // };
-
-        /* event */
-        const onSelect = (item) => {
-            SpaceRouter.router.push({
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-                params: { jobId: item.job_id },
-            }).catch(() => {});
-        };
-        const handleChange = async (options: ToolboxOptions = {}) => {
-            setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
-            if (options.queryTags) {
-                queryTagsHelper.setQueryTags(options.queryTags);
-                replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
-            }
-            if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
-            if (options?.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-                state.thisPage = 1;
-                state.pageStart = getPageStart(state.thisPage, state.pageSize);
-            }
-            await getJobs();
-        };
-        const handleChangePagination = () => {
-            state.pageStart = getPageStart(state.thisPage, state.pageSize);
-            getJobs();
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/plugin/load'),
-                store.dispatch('reference/collector/load'),
-            ]);
-
-            const currentQuery = SpaceRouter.router.currentRoute.query;
-            queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
-
-            await getJobs();
-            if (state.totalCount === 0) state.modalVisible = true;
-        })();
-
-        watch(() => state.selectedStatus, (selectedStatus) => {
-            state.selectedStatus = selectedStatus;
-            state.thisPage = 1;
-            state.pageStart = 1;
-            getJobs();
-        });
-
-        return {
-            ...toRefs(state),
-            storeState,
-            handlers,
-            queryTags,
-            PROGRESS_BAR_COLOR,
-            COMPLETED_ICON_COLOR,
-            ASSET_INVENTORY_ROUTE,
-            JOB_STATE,
-            onSelect,
-            handleChange,
-            handleChangePagination,
-            statusTextFormatter,
-            statusTextColorFormatter,
-            statusIconFormatter,
-            statusIconColorFormatter,
-        };
-    },
+    return apiQueryHelper.data;
 };
+
+/* Components */
+const onSelect = (item) => {
+    SpaceRouter.router.push({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        params: { jobId: item.job_id },
+    }).catch(() => {});
+};
+const handleChange = async (options: ToolboxOptions = {}) => {
+    setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
+    if (options.queryTags) {
+        queryTagsHelper.setQueryTags(options.queryTags);
+        await replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
+    }
+    if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options?.pageLimit !== undefined) {
+        state.pageSize = options.pageLimit;
+        state.thisPage = 1;
+        state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    }
+    await getJobs();
+};
+const handleChangePagination = () => {
+    state.pageStart = getPageStart(state.thisPage, state.pageSize);
+    getJobs();
+};
+
+/* API */
+const getJobs = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
+        state.totalCount = res.total_count;
+        state.items = res.results.map((job) => ({
+            ...job,
+            remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
+            created_at: iso8601Formatter(job.created_at, storeState.timezone),
+            duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* Watcher */
+watch(() => state.selectedStatus, (selectedStatus) => {
+    state.selectedStatus = selectedStatus;
+    state.thisPage = 1;
+    state.pageStart = 1;
+    getJobs();
+});
+
+/* Init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/plugin/load'),
+        store.dispatch('reference/collector/load'),
+    ]);
+
+    const currentQuery = SpaceRouter.router.currentRoute.query;
+    queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
+
+    await getJobs();
+    if (state.totalCount === 0) state.modalVisible = true;
+})();
 </script>
 
 <style lang="postcss" scoped>
@@ -367,13 +289,11 @@ export default {
     .collector-history-table {
         @apply bg-white border border-gray-200 rounded-lg;
         margin-top: 1rem;
-
         .status-wrapper {
             display: flex;
             align-items: center;
             margin-left: 1rem;
             margin-top: 1.5rem;
-
             .label {
                 font-size: 0.875rem;
                 font-weight: bold;
@@ -427,7 +347,6 @@ export default {
                 }
             }
         }
-
         .pagination {
             text-align: center;
             padding-top: 1.5rem;
