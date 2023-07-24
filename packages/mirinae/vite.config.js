@@ -4,7 +4,7 @@ import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import vue from '@vitejs/plugin-vue';
 import copy from 'rollup-plugin-copy';
 import { defineConfig } from 'vite';
-import StylelintPlugin from 'vite-plugin-stylelint';
+import stylelint from 'vite-plugin-stylelint';
 import svgicon from 'vite-plugin-svgicon';
 
 export default defineConfig(({ mode }) => ({
@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => ({
         svgicon({
             include: ['**/svg-icon/**/*.svg'],
         }),
-        StylelintPlugin({
+        stylelint({
             include: ['src/**/*.{css,vue,pcss,scss}'],
             exclude: ['node_modules'],
             lintOnStart: false,

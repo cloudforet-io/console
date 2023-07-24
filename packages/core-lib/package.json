@@ -34,7 +34,7 @@
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",
     "tsconfig": "*",
-    "vite": "^4.3.9"
+    "vite": "^4.4.4"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

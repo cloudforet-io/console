@@ -1,5 +1,4 @@
-import Vue from 'vue';
-
+import { notify } from '@kyvg/vue3-notification';
 
 /** * @function
  *   @name showErrorMessage
@@ -11,16 +10,14 @@ export const showErrorMessage = (errorTitle, error) => {
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
-    if (Vue) {
-        Vue.notify({
-            group: 'toastTopCenter',
-            type: 'alert',
-            title: errorTitle,
-            text: errorMsg,
-            duration: 5000,
-            speed: 1000,
-        });
-    }
+    notify({
+        group: 'toastTopCenter',
+        type: 'alert',
+        title: errorTitle,
+        text: errorMsg,
+        duration: 5000,
+        speed: 1000,
+    });
 };
 
 
@@ -31,16 +28,14 @@ export const showErrorMessage = (errorTitle, error) => {
  *   @returns
  */
 export const showSuccessMessage = (successTitle, successMessage) => {
-    if (Vue) {
-        Vue.notify({
-            group: 'toastTopCenter',
-            type: 'success',
-            title: successTitle,
-            text: successMessage,
-            duration: 5000,
-            speed: 500,
-        });
-    }
+    notify({
+        group: 'toastTopCenter',
+        type: 'success',
+        title: successTitle,
+        text: successMessage,
+        duration: 5000,
+        speed: 500,
+    });
 };
 
 
@@ -51,16 +46,14 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @returns
  */
 export const showLoadingMessage = (loadingTitle, loadingMessage) => {
-    if (Vue) {
-        (Vue as any).notify({
-            group: 'toastTopCenter',
-            type: 'loading',
-            title: loadingTitle,
-            text: loadingMessage,
-            duration: -1,
-            speed: 500,
-        });
-    }
+    notify({
+        group: 'toastTopCenter',
+        type: 'loading',
+        title: loadingTitle,
+        text: loadingMessage,
+        duration: -1,
+        speed: 500,
+    });
 };
 
 
@@ -69,10 +62,8 @@ export const showLoadingMessage = (loadingTitle, loadingMessage) => {
  *   @returns
  */
 export const hideLoadingMessage = () => {
-    if (Vue) {
-        Vue.notify({
-            group: 'toastTopCenter',
-            clean: true,
-        });
-    }
+    notify({
+        group: 'toastTopCenter',
+        clean: true,
+    });
 };

@@ -1,6 +1,6 @@
+import { SpaceConnector } from '@cloudforet/core-lib/src/space-connector';
 import axios from 'axios';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 

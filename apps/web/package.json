@@ -28,6 +28,7 @@
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
     "@gtm-support/vue-gtm": "^2.0.0",
+    "@kyvg/vue3-notification": "^2.9.1",
     "@lottiefiles/vue-lottie-player": "^1.1.0",
     "@spaceone/design-system": "*",
     "@tiptap/core": "^2.0.3",
@@ -105,7 +106,7 @@
     "postcss-config-custom": "*",
     "rollup-plugin-visualizer": "^5.9.0",
     "tsconfig": "*",
-    "vite": "^4.3.9",
+    "vite": "^4.4.4",
     "vite-plugin-stylelint": "^4.3.0",
     "vitest": "^0.26.3"
   },

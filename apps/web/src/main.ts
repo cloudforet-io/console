@@ -1,5 +1,6 @@
 
 // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
+import Notifications from '@kyvg/vue3-notification';
 import SpaceDesignSystem from '@spaceone/design-system';
 import FloatingVue from 'floating-vue';
 import { createPinia } from 'pinia';
@@ -34,6 +35,7 @@ app.use(router);
 app.use(i18n);
 app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
+app.use(Notifications);
 // app.use(LottieVuePlayer);
 app.use(SpaceDesignSystem, { vueI18n: i18n });
 

@@ -1,6 +1,6 @@
+import { convert as cashifyConvert } from 'cashify';
 import type { NumberFormatOptions } from 'vue-i18n';
 
-import { convert as cashifyConvert } from 'cashify';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
