@@ -25,7 +25,7 @@ export const statusIconFormatter = (status: string): string => {
     if (status === JOB_STATE.CANCELED) return 'ic_limit-filled';
     return 'ic_error-filled';
 };
-export const statusIconColorFormatter = (status: string): string => {
+export const statusIconColorFormatter = (status: string): string | undefined => {
     if (status === JOB_STATE.SUCCESS) return SUCCESS_ICON_COLOR;
     if (status === JOB_STATE.CANCELED) return CANCELED_ICON_COLOR;
     if (status === JOB_STATE.IN_PROGRESS) return undefined;
