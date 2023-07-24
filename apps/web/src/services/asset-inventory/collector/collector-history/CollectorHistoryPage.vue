@@ -18,7 +18,7 @@
                              :items="state.items"
                              :query-tags="queryTags"
                              :key-item-sets="handlers.keyItemSets"
-                             :value-handler-map="valueHandlerMap"
+                             :value-handler-map="handlers.valueHandlerMap"
                              :loading="state.loading"
                              :total-count="state.totalCount"
                              :this-page.sync="state.thisPage"
@@ -103,7 +103,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -132,11 +132,6 @@ import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/collector/collec
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-const valueHandlerMap: ValueHandlerMap = {
-    job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-    status: makeEnumValueHandler(JOB_STATE),
-    collector_id: makeReferenceValueHandler('inventory.Collector'),
-};
 const fields = [
     { label: 'Job ID', name: 'job_id' },
     { label: 'Collector', name: 'collector_info.name', sortable: false },
@@ -165,6 +160,11 @@ const handlers = reactive({
             { dataType: 'datetime', name: 'created_at', label: 'Created Time' },
         ],
     }]),
+    valueHandlerMap: {
+        job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
+        status: makeEnumValueHandler(JOB_STATE),
+        collector_id: makeReferenceValueHandler('inventory.Collector'),
+    },
 });
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
