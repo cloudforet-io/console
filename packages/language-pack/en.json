@@ -2185,6 +2185,7 @@
 				"CANCELED": "Canceled",
 				"FAILURE": "Failure",
 				"IN_PROGRESS": "In-Progress",
+				"PENDING": "Pending",
 				"SUCCESS": "Success"
 			},
 			"MAIN": {
