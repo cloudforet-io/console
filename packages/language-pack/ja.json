@@ -2185,6 +2185,7 @@
 				"CANCELED": "",
 				"FAILURE": "失敗",
 				"IN_PROGRESS": "進行中",
+				"PENDING": "",
 				"SUCCESS": "成功"
 			},
 			"MAIN": {

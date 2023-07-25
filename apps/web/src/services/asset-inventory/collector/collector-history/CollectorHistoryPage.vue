@@ -181,7 +181,7 @@ const state = reactive({
     totalCount: 0,
     hasManagePermission: useManagePermissionState(),
     isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-    selectedStatus: 'all',
+    selectedStatus: 'ALL',
     items: [] as any[],
 });
 
@@ -196,8 +196,7 @@ const { queryTags, filters: searchFilters } = queryTagsHelper;
 const apiQueryHelper = new ApiQueryHelper();
 const getQuery = () => {
     apiQueryHelper
-        .setPageStart(state.pageStart)
-        .setPageLimit(state.pageSize)
+        .setPage(state.pageStart, state.pageSize)
         .setSort('created_at', true)
         .setFilters(searchFilters.value);
 
@@ -273,7 +272,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     state.thisPage = 1;
     state.pageStart = 1;
     getJobs();
-});
+}, { immediate: true });
 
 /* Init */
 (async () => {

@@ -1,32 +1,32 @@
 <template>
     <div>
-        <p-heading :title="jobId"
+        <p-heading :title="props.jobId"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
         <div class="top-wrapper">
-            <job-status-chart :job-id="jobId" />
-            <job-basic-information :job-id="jobId" />
+            <job-status-chart :job-id="props.jobId" />
+            <job-basic-information :job-id="props.jobId" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper"
                              :min-height="350"
         >
             <template #container="{ height }">
                 <job-table :style="{height: `${height}px`}"
-                           :job-id="jobId"
-                           @select="selectedItem = $event"
+                           :job-id="props.jobId"
+                           @select="state.selectedItem = $event"
                 />
             </template>
         </p-horizontal-layout>
-        <job-task-details v-if="selectedItem"
-                          :selected-item="selectedItem"
+        <job-task-details v-if="state.selectedItem"
+                          :selected-item="state.selectedItem"
         />
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    reactive, toRefs, onActivated,
+    reactive, onActivated,
 } from 'vue';
 
 import {
@@ -39,36 +39,21 @@ import JobTaskDetails from '@/services/asset-inventory/collector/collector-histo
 import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
 
-export default {
-    name: 'CollectorJobPage',
-    components: {
-        JobTaskDetails,
-        JobTable,
-        JobBasicInformation,
-        JobStatusChart,
-        PHeading,
-        PHorizontalLayout,
-    },
-    props: {
-        jobId: {
-            type: String,
-            required: true,
-        },
-    },
-    setup() {
-        const state = reactive({
-            selectedItem: null as null|JobTaskData,
-        });
+interface Props {
+    jobId: string;
+}
 
-        onActivated(() => {
-            state.selectedItem = null;
-        });
+const props = withDefaults(defineProps<Props>(), {
+    jobId: '',
+});
 
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+const state = reactive({
+    selectedItem: null as null|JobTaskData,
+});
+
+onActivated(() => {
+    state.selectedItem = null;
+});
 </script>
 
 <style lang="postcss" scoped>
