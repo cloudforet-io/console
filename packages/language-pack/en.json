@@ -1375,6 +1375,13 @@
 		"LNB": {
 			"ONLY_FAVORITE": "Show favorites only"
 		},
+		"VIEW_MODE": {
+			"CANCEL": "Cancel",
+			"EDIT_OPTION": "Edit Option",
+			"EDIT_WIDGET_OPTION": "Edit Widget Option",
+			"SAVE": "Save",
+			"VIEW_MODE": "View mode"
+		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
 				"DESC": "Alert History description"
@@ -1493,11 +1500,7 @@
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."
 			},
 			"UPDATE_TITLE": "Update Widget",
-			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed.",
-			"VIEW_MODE": {
-				"EDIT_OPTION": "Edit Option",
-				"VIEW_MODE": "View mode"
-			}
+			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
 		}
 	},
 	"IAM": {
