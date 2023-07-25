@@ -25,7 +25,7 @@ import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widge
 
 interface UseWidgetLifecycleOptions {
     disposeWidget?: () => void;
-    refreshWidget: () => void;
+    refreshWidget: () => any;
     props: WidgetProps;
     state: UnwrapRef<WidgetState>;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
@@ -34,6 +34,7 @@ interface UseWidgetLifecycleOptions {
 }
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const checkRefreshableByDashboardVariables = (
     inheritOptions: InheritOptions,
@@ -153,6 +154,12 @@ const validateWidget = (
     dashboardDetailStore.updateWidgetValidation(isEmpty(_widgetSchemaErrorMap), widgetKey);
 };
 
+const refreshWidgetAndUpdateDataMap = (refreshWidget: UseWidgetLifecycleOptions['refreshWidget'], widgetKey: string) => {
+    const newData = refreshWidget();
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = newData;
+    });
+};
 export const useWidgetLifecycle = ({
     disposeWidget,
     refreshWidget,
@@ -165,12 +172,12 @@ export const useWidgetLifecycle = ({
     onUnmounted(() => {
         if (disposeWidget) disposeWidget();
     });
-    watch(() => props.dashboardVariables, (after, before) => {
+    watch(() => dashboardDetailState.variables, (after, before) => {
         if (!props.initiated || props.errorMode || !props.inheritOptions) return;
         const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
-        if (_isRefreshable) refreshWidget();
+        if (_isRefreshable) refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
     }, { deep: true });
-    watch(() => props.dashboardVariablesSchema, (after, before) => {
+    watch(() => dashboardDetailState.variablesSchema, (after, before) => {
         if (!props.editMode || !props.inheritOptions || isEqual(after, before)) return;
         if (!state.widgetInfo) return;
 
@@ -191,15 +198,17 @@ export const useWidgetLifecycle = ({
         }
 
         if (!props.initiated) return;
-        if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) refreshWidget();
+        if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) {
+            refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
+        }
     }, { deep: true });
     if (state.settings) {
         watch(() => state.settings, (current, previous) => {
             if (!current || !previous) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
-                refreshWidget();
+                refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
             } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
-                onCurrencyUpdate(current.currency.value, previous.currency.value);
+                onCurrencyUpdate();
             }
         });
     }
