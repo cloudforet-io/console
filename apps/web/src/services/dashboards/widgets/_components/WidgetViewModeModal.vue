@@ -1,8 +1,8 @@
 <template>
     <div class="widget-view-mode-modal"
-         :class="{ 'visible': state.proxyVisible }"
+         :class="{ 'visible': props.visible }"
     >
-        <div v-if="state.proxyVisible"
+        <div v-if="props.visible"
              class="modal-header"
         >
             <p-heading :title="dashboardDetailState.name"
@@ -40,7 +40,7 @@
                            :options="widgetFormState.widgetOptions"
                            :inherit-options="widgetFormState.inheritOptions"
                            size="full"
-                           :theme="props.theme"
+                           :theme="widgetFormState.theme"
                            :currency-rates="state.currencyRates"
                            :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
@@ -64,7 +64,6 @@ import { store } from '@/store';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardVariablesSelectDropdown
@@ -74,22 +73,16 @@ import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
-
 
 interface WidgetViewModeModalProps {
     visible: boolean;
-    widgetKey: string;
-    theme?: WidgetTheme;
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
-    theme: undefined,
 });
-const emit = defineEmits(['update:visible']);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -98,7 +91,6 @@ const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
-    proxyVisible: useProxyValue('visible', props, emit),
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
@@ -125,10 +117,10 @@ const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
 };
 
 const handleCloseModal = () => {
-    state.proxyVisible = false;
-    dashboardDetailStore.$patch({
-        variables: state.variablesSnapshot,
-        variablesSchema: state.variableSchemaSnapshot,
+    dashboardDetailStore.$patch((_state) => {
+        _state.variables = state.variablesSnapshot;
+        _state.variablesSchema = state.variableSchemaSnapshot;
+        _state.widgetViewModeModalVisible = false;
     });
 };
 const handleClickEditOption = () => {
@@ -139,12 +131,10 @@ const handleClickEditOption = () => {
 watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
-        await widgetFormStore.initWidgetForm(props.widgetKey);
-        if (widgetFormState.widgetInfo) {
-            await initWidgetComponent(widgetFormState.widgetInfo);
-            state.widgetRef?.initWidget();
-            state.initiated = true;
-        }
+        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
+        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+        state.widgetRef?.initWidget();
+        state.initiated = true;
     }
 });
 </script>
