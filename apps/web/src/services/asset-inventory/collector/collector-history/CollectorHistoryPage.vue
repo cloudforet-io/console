@@ -268,7 +268,6 @@ const getJobs = async () => {
 
 /* Watcher */
 watch(() => state.selectedStatus, (selectedStatus) => {
-    console.log(selectedStatus);
     state.selectedStatus = selectedStatus;
     state.thisPage = 1;
     state.pageStart = 1;
