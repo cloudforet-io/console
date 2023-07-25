@@ -8,7 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
+
 import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import type {
     DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
@@ -51,6 +54,7 @@ type DashboardDetailInfoStoreGetters = _GettersTree<{
     isProjectDashboard: boolean;
     dashboardViewer: DashboardViewer;
     isWidgetLayoutValid: boolean;
+    dashboardCurrency: Currency;
 }> & _GettersTree<DashboardDetailInfoStoreState>;
 interface DashboardDetailInfoStoreActions {
     resetDashboardData: any;
@@ -134,6 +138,10 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
         },
         dashboardViewer: (state) => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE,
         isWidgetLayoutValid: (state) => Object.values(state.widgetValidMap).every((d) => d === true),
+        dashboardCurrency: (state) => {
+            if (state.settings.currency.value === 'DEFAULT') return store.state.settings.currency;
+            return state.settings.currency.value;
+        },
     },
     actions: {
         resetDashboardData() {
