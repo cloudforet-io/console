@@ -94,8 +94,7 @@
                                      :widget-key="props.widgetKey"
                                      @refresh="emit('refresh')"
         />
-        <widget-view-mode-modal v-if="state.viewModeModalVisible"
-                                :visible.sync="state.viewModeModalVisible"
+        <widget-view-mode-modal :visible.sync="state.viewModeModalVisible"
                                 :widget-key="props.widgetKey"
                                 :theme="props.theme"
         />
