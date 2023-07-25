@@ -94,10 +94,6 @@
                                      :widget-key="props.widgetKey"
                                      @refresh="emit('refresh')"
         />
-        <widget-view-mode-modal :visible.sync="state.viewModeModalVisible"
-                                :widget-key="props.widgetKey"
-                                :theme="props.theme"
-        />
     </div>
 </template>
 
@@ -125,8 +121,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
-import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
@@ -180,6 +176,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 const emit = defineEmits(['refresh']);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -231,7 +228,6 @@ const state = reactive({
             },
         },
     ]),
-    viewModeModalVisible: false,
 });
 
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
@@ -240,7 +236,13 @@ const handleDeleteModalConfirm = () => {
     state.visibleDeleteModal = false;
 };
 const handleClickViewModeButton = () => {
-    state.viewModeModalVisible = true;
+    widgetFormStore.$patch({
+        widgetKey: props.widgetKey,
+        theme: props.theme,
+    });
+    dashboardDetailStore.$patch({
+        widgetViewModeModalVisible: true,
+    });
 };
 </script>
 
