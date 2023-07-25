@@ -1491,7 +1491,11 @@
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."
 			},
 			"UPDATE_TITLE": "Update Widget",
-			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
+			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed.",
+			"VIEW_MODE": {
+				"EDIT_OPTION": "Edit Option",
+				"VIEW_MODE": "View mode"
+			}
 		}
 	},
 	"IAM": {
