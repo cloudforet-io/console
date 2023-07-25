@@ -167,7 +167,7 @@ export function useWidgetState<Data = any>(
             state.widgetConfig.options,
             props.options,
             props.inheritOptions,
-            props.dashboardVariables,
+            dashboardDetailState.variables,
             state.optionsErrorMap,
         )),
         currency: computed(() => {
@@ -187,13 +187,13 @@ export function useWidgetState<Data = any>(
         }),
         loading: true,
         settings: computed<DashboardSettings>(() => ({
-            ...props.dashboardSettings,
-            date_range: props.dashboardSettings.date_range?.enabled ? props.dashboardSettings.date_range : {
+            ...dashboardDetailState.settings,
+            date_range: dashboardDetailState.settings.date_range?.enabled ? dashboardDetailState.settings.date_range : {
                 enabled: false,
                 start: dayjs.utc().format('YYYY-MM'),
                 end: dayjs.utc().format('YYYY-MM'),
             },
-            currency: props.dashboardSettings.currency?.enabled ? props.dashboardSettings.currency : {
+            currency: dashboardDetailState.settings.currency?.enabled ? dashboardDetailState.settings.currency : {
                 enabled: false,
                 value: CURRENCY.USD,
             },
@@ -234,7 +234,7 @@ export function useWidgetState<Data = any>(
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
             props.inheritOptions,
             state.widgetConfig?.options_schema?.schema,
-            props.dashboardVariablesSchema,
+            dashboardDetailState.variablesSchema,
         )),
     }) as UnwrapRef<WidgetState<Data>>;
 
