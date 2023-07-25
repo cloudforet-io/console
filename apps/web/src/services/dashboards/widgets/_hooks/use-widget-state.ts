@@ -171,7 +171,7 @@ export function useWidgetState<Data = any>(
             state.optionsErrorMap,
         )),
         currency: computed(() => {
-            if (state.widgetConfig.labels?.includes('Cost')) return state.settings?.currency?.value ?? CURRENCY.USD;
+            if (state.widgetConfig.labels?.includes('Cost')) return dashboardDetailStore.dashboardCurrency ?? CURRENCY.USD;
             return undefined;
         }),
         groupBy: computed(() => {
