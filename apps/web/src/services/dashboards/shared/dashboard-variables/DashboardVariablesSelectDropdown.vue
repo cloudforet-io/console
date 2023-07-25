@@ -25,15 +25,14 @@
             />
             <span>{{ $t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
         </p-text-button>
-        <p-divider v-if="state.isModified"
+        <p-divider v-if="state.modifiedVariablesSchemaProperties.length"
                    :vertical="true"
         />
-        <p-text-button v-if="state.isModified"
+        <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
                        style-type="highlight"
-                       @click.stop="handleClickSave"
+                       @click.stop="handleClickSaveButton"
         >
-            <!--song-lang-->
-            Save
+            {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
         </p-text-button>
         <dashboard-manage-variable-overlay :visible="state.showOverlay" />
     </div>
@@ -47,7 +46,11 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
@@ -63,6 +66,7 @@ interface Props {
     disableSaveButton?: boolean;
     originVariables?: DashboardVariables;
     originVariablesSchema?: DashboardVariablesSchema;
+    dashboardId?: string;
 }
 
 const props = defineProps<Props>();
@@ -77,12 +81,6 @@ const state = reactive({
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
     allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
-    isModified: computed(() => {
-        if (props.disableSaveButton) return false;
-        const prevVariables = dashboardDetailState.dashboardInfo?.variables;
-        const prevVariablesSchema = dashboardDetailState.dashboardInfo?.variables_schema;
-        return !isEqual(prevVariables, dashboardDetailState.variables) || !isEqual(prevVariablesSchema, dashboardDetailState.variablesSchema);
-    }),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
@@ -95,14 +93,39 @@ const state = reactive({
             }
         });
         // check schema changed
-        results.concat(xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
+        results.push(...xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
         return results;
     }),
 });
 
-const handleClickSave = () => {
-    console.log('Save!');
-    // TODO: Save!
+const updateDashboardVariables = async () => {
+    try {
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                variables: dashboardDetailState.variables,
+                variables_schema: dashboardDetailState.variablesSchema,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                variables: dashboardDetailState.variables,
+                variables_schema: dashboardDetailState.variablesSchema,
+            });
+        }
+        dashboardDetailStore.$patch((_state) => {
+            if (_state.dashboardInfo) {
+                _state.dashboardInfo.variables = dashboardDetailState.variables;
+                _state.dashboardInfo.variables_schema = dashboardDetailState.variablesSchema;
+            }
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+const handleClickSaveButton = () => {
+    updateDashboardVariables();
 };
 
 </script>
