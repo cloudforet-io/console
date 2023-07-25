@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/** This is a component in the experimental stage.
+ * The name and functionality have not been determined yet, and if this selector is used frequently,
+ * You will need to communicate with designers when it gets moved to Mirinae.
+ * */
 import { useElementHover } from '@vueuse/core';
 import { computed, ref } from 'vue';
 
