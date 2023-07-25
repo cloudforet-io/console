@@ -28,6 +28,7 @@
             <div class="filter-wrapper">
                 <div class="left-part">
                     <dashboard-variables-select-dropdown :is-manageable="false"
+                                                         disable-save-button
                                                          :origin-variables="state.variablesSnapshot"
                                                          :origin-variables-schema="state.variableSchemaSnapshot"
                     />
