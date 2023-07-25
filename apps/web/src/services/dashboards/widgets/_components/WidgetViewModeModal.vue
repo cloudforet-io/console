@@ -6,7 +6,6 @@
              class="modal-header"
         >
             <p-heading :title="dashboardDetailState.name"
-                       show-back-button
                        @click-back-button="handleCloseModal"
             />
             <p-icon-button name="ic_close"
@@ -27,7 +26,12 @@
                 </p-button>
             </div>
             <div class="filter-wrapper">
-                <dashboard-variables-select-dropdown :is-manageable="false" />
+                <div class="left-part">
+                    <dashboard-variables-select-dropdown :is-manageable="false" />
+                </div>
+                <div class="right-part">
+                    <dashboard-toolset />
+                </div>
             </div>
             <div v-if="state.component"
                  class="widget-wrapper"
@@ -58,6 +62,7 @@ import {
 } from 'vue';
 
 import { PHeading, PIconButton, PButton } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
@@ -65,7 +70,8 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -98,13 +104,15 @@ const state = reactive({
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
+    settingsSnapshot: {} as DashboardSettings,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
 /* Util */
 const initSnapshot = () => {
-    state.variablesSnapshot = dashboardDetailState.variables;
-    state.variableSchemaSnapshot = dashboardDetailState.variablesSchema;
+    state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
+    state.variableSchemaSnapshot = cloneDeep(dashboardDetailState.variablesSchema);
+    state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
     let component: AsyncComponent|null = null;
@@ -120,6 +128,7 @@ const handleCloseModal = () => {
     dashboardDetailStore.$patch((_state) => {
         _state.variables = state.variablesSnapshot;
         _state.variablesSchema = state.variableSchemaSnapshot;
+        _state.settings = state.settingsSnapshot;
         _state.widgetViewModeModalVisible = false;
     });
 };
@@ -187,6 +196,15 @@ watch(() => props.visible, async (visible) => {
         }
         .filter-wrapper {
             padding: 1rem 0;
+            .left-part {
+                display: inline-block;
+                padding-bottom: 0.75rem;
+            }
+            .right-part {
+                display: inline-block;
+                float: right;
+                padding-bottom: 0.75rem;
+            }
             .dashboard-variables-select-dropdown {
                 @apply relative flex items-center flex-wrap;
                 gap: 0.5rem;
