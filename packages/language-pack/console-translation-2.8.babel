@@ -15006,6 +15006,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>ALT_S_UPDATE_CURRENCY</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>GO_TO_MYPAGE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -15023,6 +15044,27 @@
                                             <translation>
                                                 <language>ko-KR</language>
                                                 <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>LABEL_CURRENCY</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
