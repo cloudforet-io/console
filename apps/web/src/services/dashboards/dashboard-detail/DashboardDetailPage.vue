@@ -57,6 +57,7 @@
         <div class="dashboard-selectors">
             <dashboard-variables-select-dropdown class="variable-selector-wrapper"
                                                  :is-manageable="state.hasManagePermission"
+                                                 :dashboard-id="props.dashboardId"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"
