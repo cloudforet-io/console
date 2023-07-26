@@ -236,7 +236,7 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
             @apply bg-secondary2 border-secondary text-secondary;
         }
         &.active {
-            @apply bg-safe text-white;
+            @apply bg-blue-600 text-white;
         }
         &.disabled {
             cursor: not-allowed;
