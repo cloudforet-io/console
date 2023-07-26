@@ -466,14 +466,18 @@ export default defineComponent<Props>({
     gap: 1rem;
     overflow-y: auto;
 
+    /* custom design-system component - p-field-group */
+
     /* custom design-system component - p-field-title */
     :deep(.name-field) {
         &.p-field-group {
             margin: 0;
-            .title-wrapper .title {
-                @apply text-label-md;
-                display: flex;
-                align-items: center;
+            .p-field-title {
+                .title-wrapper .title {
+                    @apply text-label-md;
+                    display: flex;
+                    align-items: center;
+                }
             }
             .input {
                 width: 100%;
