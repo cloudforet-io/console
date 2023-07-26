@@ -148,6 +148,21 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             },
         },
     },
+    customWidth: {
+        name: 'customWidth',
+        type: { name: 'string' },
+        description: 'Custom Width of key',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',
