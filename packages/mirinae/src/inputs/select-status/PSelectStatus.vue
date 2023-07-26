@@ -2,6 +2,7 @@
     <p-status class="p-select-status"
               :class="{selected: isSelected, 'with-icon': withIcon}"
               :icon="icon || (isSelected && !disableCheckIcon ? 'ic_check' : undefined)"
+              :icon-size="0.875"
               :icon-color="withIconColor"
               :icon-animation="iconAnimation"
               :disable-icon="!withIcon && (!isSelected || disableCheckIcon)"
@@ -115,6 +116,8 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-select-status {
+    @apply items-center;
+    gap: 0.25rem;
     &.p-status {
         @apply text-gray-700;
         cursor: pointer;
