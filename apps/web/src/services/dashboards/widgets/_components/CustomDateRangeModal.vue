@@ -106,7 +106,10 @@ const handleConfirm = () => {
 };
 const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
     if (!selectedDates.length) return;
-    if (dayjs.utc(state.startDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+
+    const originDates = type === 'start' ? state.startDates : state.endDates;
+    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+
     if (type === 'start') {
         state.startDates = selectedDates;
         state.endDates = [];
