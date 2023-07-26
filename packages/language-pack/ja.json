@@ -1471,6 +1471,8 @@
 			"EDIT_WIDGET": "ウィジェットオプションの修正",
 			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "",
 			"MONTHLY_COST": {
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
 				"TOTAL_SPENT_IN": "{period}の総支出額"

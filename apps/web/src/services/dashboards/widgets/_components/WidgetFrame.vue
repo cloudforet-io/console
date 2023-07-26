@@ -54,6 +54,19 @@
                                :vertical="true"
                     />
                     <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <p-divider v-if="props.nonInheritOptionsTooltipText"
+                               :vertical="true"
+                    />
+                    <p-tooltip v-if="props.nonInheritOptionsTooltipText"
+                               class="widget-non-inherit-tooltip"
+                               :contents="props.nonInheritOptionsTooltipText"
+                    >
+                        <p-i name="ic_warning-filled"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
@@ -105,7 +118,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI,
+    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -152,6 +165,7 @@ interface WidgetFrameProps {
     overflowY?: string;
     refreshOnResize?: boolean;
     theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
 }
 
 interface IconConfig {
@@ -171,6 +185,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     currency: undefined,
     overflowY: undefined,
     theme: undefined,
+    nonInheritOptionsTooltipText: undefined,
 });
 
 const emit = defineEmits(['refresh']);
@@ -338,6 +353,9 @@ const handleClickViewModeButton = () => {
                     &.vertical {
                         height: 1rem;
                     }
+                }
+                .widget-non-inherit-tooltip {
+                    @apply text-gray-700;
                 }
             }
             .footer-right {
