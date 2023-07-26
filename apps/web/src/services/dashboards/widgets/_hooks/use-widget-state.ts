@@ -9,6 +9,8 @@ import { flattenDeep, isEmpty, merge } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import { i18n } from '@/translations';
+
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -155,6 +157,7 @@ export interface WidgetState<Data = any> {
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
     optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
+    nonInheritOptionsTooltipText?: ComputedRef<string|undefined>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -236,6 +239,21 @@ export function useWidgetState<Data = any>(
             state.widgetConfig?.options_schema?.schema,
             dashboardDetailState.variablesSchema,
         )),
+        nonInheritOptionsTooltipText: computed<string|undefined>(() => {
+            if (!state.widgetInfo?.schema_properties?.length) return undefined;
+            const enabledInheritOptions: string[] = Object.entries(state.widgetInfo.inherit_options).filter(([, v]) => v.enabled).map(([k]) => k);
+            const nonInheritOptions: string[] = [];
+            Object.keys(state.widgetInfo.inherit_options).forEach((property) => {
+                if (!enabledInheritOptions.includes(property)) nonInheritOptions.push(property);
+            });
+            if (!nonInheritOptions.length) return undefined;
+
+            // TODO: widget option name must be changed to readable name.
+            // const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
+            const tooltipText = nonInheritOptions.map((d) => `<p>• ${d}</p>`).join('\n');
+            return `${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
+            ${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
+        }),
     }) as UnwrapRef<WidgetState<Data>>;
 
     return state;
