@@ -20,6 +20,7 @@
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
                               :block="block || item.block"
+                              :custom-width="customWidth || undefined"
                               :copy-value="item.copyValue"
                               :copy-value-formatter="item.copyValueFormatter"
                 >
@@ -122,6 +123,10 @@ export default defineComponent<DefinitionTableProps>({
         block: {
             type: Boolean,
             default: false,
+        },
+        customWidth: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {

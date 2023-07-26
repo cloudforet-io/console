@@ -27,13 +27,13 @@ export const Template = (args, { argTypes }) => ({
     :disable-copy="disableCopy"
     :style-type="styleType"
     :block="block"
+    :custom-width="customWidth"
 />`,
     setup() {
         return {
         }
     }
 });
-
 
 # Definition Table
 
@@ -44,9 +44,8 @@ export const Template = (args, { argTypes }) => ({
 It uses the [Definition component](?path=/docs/data-display-tables-definition-table-definition--basic) internally. <br/>
 `fields` props is an array of objects whose properties are the set of definition component's props. <br/>
 
-
-
 ## Basic
+
 <Canvas>
     <Story name="Basic">
 {{
@@ -90,11 +89,8 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
-
 ## No Data
+
 <Canvas>
     <Story name="No Data">
         {{
@@ -105,9 +101,6 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
         }}
     </Story>
 </Canvas>
-
-<br/>
-<br/>
 
 ## Loading
 
@@ -149,9 +142,6 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Slots
 
 | Slot name | Description |
@@ -164,12 +154,7 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
 | loading | Slot for replacing loader. |
 | no-data | Slot for no data case. |
 
-<br/>
-<br/>
-
 ### SlotScope(Props)
-
-<br/>
 
 > Except for `no-data` and `loading` slots, all slots provide slot props below:
 
@@ -181,9 +166,6 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
 | value | The actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
 | items | All field and data items ordered by `fields` props. |
 | index | Current item's index. |
-
-<br/>
-<br/>
 
 <Canvas>
     <Story name="Slots">
@@ -279,10 +261,6 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
-
 ## Disable Copy
 
 If you give `true` to `disableCopy` props, it globally off all copy buttons. <br/>
@@ -297,7 +275,6 @@ fields: [
     { label: 'Provider', name: 'provider', disableCopy: true }, // will be hide copy button to this field
 ]
 ```
-
 
 <Canvas>
     <Story name="Disable Copy">
@@ -345,9 +322,6 @@ fields: [
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Custom Copy Value
 
 You can customize the value to be copied by giving ```copyValue``` or ```copyValueFormatter``` properties to each field item. <br/>
@@ -392,10 +366,6 @@ You can customize the value to be copied by giving ```copyValue``` or ```copyVal
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
-
 ## Block
 
 If you give `true` to `block` props, it will make all value column's width full. <br/>
@@ -411,7 +381,6 @@ fields: [
     { label: 'Provider', name: 'provider', block: true }, // will be make block to only this field
 ]
 ```
-
 
 <Canvas>
     <Story name="Block">
@@ -462,10 +431,6 @@ fields: [
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
-
 ## Style Types
 
 <Canvas>
@@ -509,9 +474,6 @@ fields: [
         }}
     </Story>
 </Canvas>
-
-<br/>
-<br/>
 
 ## UI Structure and CSS
 
