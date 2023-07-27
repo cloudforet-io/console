@@ -159,8 +159,9 @@ export interface JobModel {
     remained_tasks: number;
     total_tasks: number;
     failure_tasks: number;
-
-    collector_info: CollectorModel;
+    success_tasks: number;
+    collector_id: string;
+    plugin_id: string;
     created_at: string;
     finished_at: string;
     updated_at: string;
