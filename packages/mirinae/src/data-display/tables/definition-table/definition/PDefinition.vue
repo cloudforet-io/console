@@ -4,6 +4,7 @@
     >
         <td class="key"
             :class="{'auto-width': autoKeyWidth, 'no-copy-button': disableCopy}"
+            :style="{ minWidth: customKeyWidth }"
         >
             <slot name="key"
                   v-bind="{name, label, data, value: displayData}"
@@ -123,6 +124,10 @@ export default defineComponent<DefinitionProps>({
             type: Boolean,
             default: false,
         },
+        customKeyWidth: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -145,30 +150,25 @@ export default defineComponent<DefinitionProps>({
     display: flex;
     > .key {
         @apply font-bold;
-        width: 18rem;
+        min-width: 18rem;
         padding: 0.65rem 1rem 0.35rem 1rem;
         font-size: 0.875rem;
         line-height: 1.25;
 
         &.auto-width {
-            width: auto;
+            min-width: auto;
         }
         &.no-copy-button {
             padding: 0.5rem 1rem;
         }
     }
     > .value-wrapper {
-        max-width: calc(100% - 18rem);
         display: inline-flex;
         align-items: center;
         flex-grow: 1;
         flex-wrap: wrap;
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
-
-        &.auto-width {
-            max-width: none;
-        }
 
         > .value {
             line-height: 1.25;
