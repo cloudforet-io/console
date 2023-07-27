@@ -29,11 +29,13 @@
             </template>
             <template #extra>
                 <div class="collector-button-box">
+                    <collect-data-button-group />
                     <router-link v-if="state.hasJobs"
                                  :to="state.collectorHistoryLink"
                     >
                         <p-button v-if="props.collectorId"
                                   style-type="tertiary"
+                                  icon-left="ic_history"
                         >
                             {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
                         </p-button>
@@ -105,6 +107,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
+import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
+import CollectDataButtonGroup
+    from '@/services/asset-inventory/collector/collector-detail/modules/CollectDataButtonGroup.vue';
 import CollectorBaseInfoSection from '@/services/asset-inventory/collector/collector-detail/modules/CollectorBaseInfoSection.vue';
 import CollectorNameEditModal
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorNameEditModal.vue';
@@ -123,6 +128,8 @@ const props = defineProps<{
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+
+const collectorJobStore = useCollectorJobStore();
 
 const queryHelper = new QueryHelper();
 const state = reactive({
@@ -225,6 +232,10 @@ onMounted(async () => {
         collectorFormStore.setOriginCollector(collector);
         const jobCount = await fetchJobCount(collector.collector_id);
         state.hasJobs = jobCount > 0;
+        collectorJobStore.$patch({
+            collectorId: collector.collector_id,
+        });
+        const jobAnalysis = await collectorJobStore.getRecentJob();
     }
 });
 
@@ -244,6 +255,8 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 </style>
 
