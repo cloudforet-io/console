@@ -44,14 +44,13 @@ import { store } from '@/store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
-import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
-import type { JobStatus } from '@/services/asset-inventory/collector/model';
+import type { CollectorLink, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
-    recentJobAnalyze?: JobStatus[];
+    recentJobAnalyze?: JobAnalyzeStatus[];
     historyLink?: CollectorLink;
 }
 

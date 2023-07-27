@@ -3,7 +3,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
-    CollectorPluginModel, Schedule, JobStatus,
+    CollectorPluginModel, Schedule,
 } from '@/services/asset-inventory/collector/model';
 
 export const COLLECTOR_QUERY_HELPER_SET = {
@@ -45,7 +45,7 @@ export interface CollectorItemInfo {
     historyLink: CollectorLink,
     detailLink: CollectorLink;
     schedule: Schedule;
-    recentJobAnalyze: JobStatus[];
+    recentJobAnalyze: JobAnalyzeStatus[];
     hasJobList?: boolean
 }
 
@@ -54,4 +54,16 @@ export type CollectorMainPageQuery = Partial<Record<'filters'|'provider', RouteQ
 export interface CollectorMainPageQueryValue {
     provider?: string;
     filters?: ConsoleFilter[];
+}
+
+export interface JobAnalyzeStatus {
+    job_id: string;
+    status: string;
+    finished_at: string;
+    remained_tasks: number;
+    total_tasks: number;
+}
+export interface JobAnalyzeInfo {
+    collector_id: string;
+    job_status: JobAnalyzeStatus[]
 }
