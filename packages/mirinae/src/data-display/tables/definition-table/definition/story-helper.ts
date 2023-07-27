@@ -148,8 +148,8 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             },
         },
     },
-    customWidth: {
-        name: 'customWidth',
+    customKeyWidth: {
+        name: 'customKeyWidth',
         type: { name: 'string' },
         description: 'Custom Width of key',
         defaultValue: undefined,

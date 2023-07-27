@@ -4,7 +4,7 @@
     >
         <td class="key"
             :class="{'auto-width': autoKeyWidth, 'no-copy-button': disableCopy}"
-            :style="{ minWidth: customWidth }"
+            :style="{ minWidth: customKeyWidth }"
         >
             <slot name="key"
                   v-bind="{name, label, data, value: displayData}"
@@ -124,7 +124,7 @@ export default defineComponent<DefinitionProps>({
             type: Boolean,
             default: false,
         },
-        customWidth: {
+        customKeyWidth: {
             type: String,
             default: undefined,
         },

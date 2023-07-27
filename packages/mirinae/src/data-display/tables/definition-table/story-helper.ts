@@ -135,8 +135,8 @@ export const getDefinitionTableArgTypes = (): ArgTypes => ({
             },
         },
     },
-    customWidth: {
-        name: 'customWidth',
+    customKeyWidth: {
+        name: 'customKeyWidth',
         type: { name: 'string' },
         description: 'Custom Width of table key',
         defaultValue: undefined,

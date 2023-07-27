@@ -3,7 +3,7 @@
         <p-definition-table :fields="fields"
                             :data="data"
                             :skeleton-rows="10"
-                            custom-width="10rem"
+                            custom-key-width="10rem"
                             style-type="white"
                             block
         >

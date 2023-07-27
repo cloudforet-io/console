@@ -13,7 +13,7 @@ export interface DefinitionTableProps {
     disableCopy?: boolean;
     styleType?: DEFINITION_TABLE_STYLE_TYPE;
     block?: boolean;
-    customWidth?: string;
+    customKeyWidth?: string;
 }
 
 export type DefinitionField = Omit<DefinitionProps, 'data'>;
