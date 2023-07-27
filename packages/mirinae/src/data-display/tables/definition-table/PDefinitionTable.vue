@@ -20,7 +20,7 @@
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
                               :block="block || item.block"
-                              :custom-width="customKeyWidth || undefined"
+                              :custom-key-width="customKeyWidth || undefined"
                               :copy-value="item.copyValue"
                               :copy-value-formatter="item.copyValueFormatter"
                 >

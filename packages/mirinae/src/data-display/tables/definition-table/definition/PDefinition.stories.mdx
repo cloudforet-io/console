@@ -30,7 +30,7 @@ export const Template = (args, { argTypes }) => ({
     :block="block"
     :copy-value="copyValue"
     :auto-key-width="autoKeyWidth"
-    :custom-width="customKeyWidth"
+    :custom-key-width="customKeyWidth"
 >
 </p-definition>`,
     setup(props) {
@@ -353,17 +353,17 @@ export const Template = (args, { argTypes }) => ({
         <p-definition
             name="string data"
             :data="data.stringData"
-            custom-width="10rem"
+            custom-key-width="10rem"
         />
         <p-definition
             name="object data"
             :data="data.objectData"
-            custom-width="20rem"
+            custom-key-width="20rem"
         />
         <p-definition
             name="array data"
             :data="data.arrayData"
-            custom-width="30rem"
+            custom-key-width="30rem"
         />
     </tbody>
 </table>
