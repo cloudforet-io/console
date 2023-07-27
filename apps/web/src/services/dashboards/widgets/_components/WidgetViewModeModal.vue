@@ -13,50 +13,55 @@
                            @click="handleCloseModal"
             />
         </div>
-        <div class="content-wrapper">
-            <div class="edit-button-wrapper">
-                <p-button icon-left="ic_edit"
-                          size="sm"
-                          style-type="tertiary"
-                          :disabled="!state.hasManagePermission"
-                          class="edit-button"
-                          @click="handleClickEditOption"
+        <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
+                                  :widget-key="widgetFormState.widgetKey"
+                                  :visible.sync="state.sidebarVisible"
+        >
+            <div class="content-wrapper">
+                <div class="edit-button-wrapper">
+                    <p-button icon-left="ic_edit"
+                              size="md"
+                              style-type="tertiary"
+                              :disabled="!state.hasManagePermission"
+                              class="edit-button"
+                              @click="handleClickEditOption"
+                    >
+                        {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
+                    </p-button>
+                </div>
+                <div class="filter-wrapper">
+                    <div class="left-part">
+                        <dashboard-variables-select-dropdown :is-manageable="false"
+                                                             disable-save-button
+                                                             :origin-variables="state.variablesSnapshot"
+                                                             :origin-variables-schema="state.variableSchemaSnapshot"
+                        />
+                    </div>
+                    <div class="right-part">
+                        <dashboard-toolset />
+                    </div>
+                </div>
+                <div v-if="state.component"
+                     class="widget-wrapper"
                 >
-                    {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
-                </p-button>
-            </div>
-            <div class="filter-wrapper">
-                <div class="left-part">
-                    <dashboard-variables-select-dropdown :is-manageable="false"
-                                                         disable-save-button
-                                                         :origin-variables="state.variablesSnapshot"
-                                                         :origin-variables-schema="state.variableSchemaSnapshot"
+                    <component :is="state.component"
+                               ref="widgetRef"
+                               :widget-key="widgetFormState.widgetInfo.widget_key"
+                               :widget-config-id="widgetFormState.widgetInfo.widget_name"
+                               :title="widgetFormState.widgetTitle"
+                               :options="widgetFormState.widgetOptions"
+                               :inherit-options="widgetFormState.inheritOptions"
+                               size="full"
+                               :theme="widgetFormState.theme"
+                               :currency-rates="state.currencyRates"
+                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
+                               :all-reference-type-info="state.allReferenceTypeInfo"
+                               :disable-view-mode="true"
+                               :initiated="state.initiated"
                     />
                 </div>
-                <div class="right-part">
-                    <dashboard-toolset />
-                </div>
             </div>
-            <div v-if="state.component"
-                 class="widget-wrapper"
-            >
-                <component :is="state.component"
-                           ref="widgetRef"
-                           :widget-key="widgetFormState.widgetInfo.widget_key"
-                           :widget-config-id="widgetFormState.widgetInfo.widget_name"
-                           :title="widgetFormState.widgetTitle"
-                           :options="widgetFormState.widgetOptions"
-                           :inherit-options="widgetFormState.inheritOptions"
-                           size="full"
-                           :theme="widgetFormState.theme"
-                           :currency-rates="state.currencyRates"
-                           :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
-                           :all-reference-type-info="state.allReferenceTypeInfo"
-                           :disable-view-mode="true"
-                           :initiated="state.initiated"
-                />
-            </div>
-        </div>
+        </widget-view-mode-sidebar>
     </div>
 </template>
 <script setup lang="ts">
@@ -80,6 +85,7 @@ import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import WidgetViewModeSidebar from '@/services/dashboards/widgets/_components/WidgetViewModeSidebar.vue';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -109,6 +115,7 @@ const state = reactive({
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
+    sidebarVisible: false,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -137,8 +144,7 @@ const handleCloseModal = () => {
     });
 };
 const handleClickEditOption = () => {
-    // TODO: open widget edit sidebar
-    // store.dispatch('display/showWidget');
+    state.sidebarVisible = true;
 };
 
 watch(() => props.visible, async (visible) => {
@@ -148,8 +154,11 @@ watch(() => props.visible, async (visible) => {
         await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
         state.widgetRef?.initWidget();
         state.initiated = true;
+    } else {
+        state.sidebarVisible = false;
     }
 });
+// watch(() => )
 </script>
 
 <style lang="postcss" scoped>
@@ -191,6 +200,7 @@ watch(() => props.visible, async (visible) => {
     .content-wrapper {
         @apply bg-gray-100;
         height: calc(100% - 6rem);
+        overflow: auto;
         padding: 0 2rem 2rem 2rem;
         .edit-button-wrapper {
             @apply border-b border-gray-200;

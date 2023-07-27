@@ -3,6 +3,7 @@
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
                        :invalid="isTitleInvalid"
                        :invalid-text="titleInvalidText"
+                       class="name-field"
                        required
         >
             <p-text-input :value="title"
@@ -464,10 +465,23 @@ export default defineComponent<Props>({
     height: 100%;
     gap: 1rem;
     overflow-y: auto;
-    .p-field-group {
-        margin: 0;
-        .input {
-            width: 100%;
+
+    /* custom design-system component - p-field-group */
+
+    /* custom design-system component - p-field-title */
+    :deep(.name-field) {
+        &.p-field-group {
+            margin: 0;
+            .p-field-title {
+                .title-wrapper .title {
+                    @apply text-label-md;
+                    display: flex;
+                    align-items: center;
+                }
+            }
+            .input {
+                width: 100%;
+            }
         }
     }
     .description-text {
@@ -498,6 +512,7 @@ export default defineComponent<Props>({
             .form-label {
                 width: 100%;
                 > .title-wrapper .title {
+                    @apply text-label-md;
                     display: flex;
                     width: 100%;
                     justify-content: space-between;
