@@ -10,7 +10,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type { JobAnalyzeInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { CollectorModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
@@ -21,7 +22,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
 
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
-        collectorJobStatus: [] as JobAnalyzeModel[],
+        collectorJobStatus: [] as JobAnalyzeInfo[],
         schedules: [] as Schedule[],
 
         totalCount: 0,

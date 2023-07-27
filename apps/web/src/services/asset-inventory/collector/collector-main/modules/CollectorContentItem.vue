@@ -58,8 +58,7 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import type { JobStatus } from '@/services/asset-inventory/collector/model';
+import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -81,7 +80,7 @@ const state = reactive({
         if (plugin) return { name: plugin.name, version: plugin.info.version };
         return null;
     }),
-    recentJob: computed<JobStatus|undefined>(() => {
+    recentJob: computed<JobAnalyzeStatus|undefined>(() => {
         if (!props.item) return undefined;
         return props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
     }),

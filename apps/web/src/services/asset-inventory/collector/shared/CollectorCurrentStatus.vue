@@ -60,14 +60,15 @@ import { numberFormatter } from '@cloudforet/core-lib';
 
 import { peacock } from '@/styles/colors';
 
-import type { Schedule, JobStatus } from '@/services/asset-inventory/collector/model';
+import type { JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import type { Schedule } from '@/services/asset-inventory/collector/model';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
     schedule?: Schedule;
-    recentJob?: JobStatus;
+    recentJob?: JobAnalyzeStatus;
 }
 
 const props = defineProps<Props>();

@@ -147,15 +147,22 @@ export interface CollectorDeleteParameter {
     collectors: [string, ...string[]];
 }
 
-// JobAnalyzeModel
-export interface JobStatus {
+type JobStatus = |
+    'IN_PROGRESS'| // One or more JobTasks are running
+    'FAILURE'| // When one or more JobTasks are FAILURE or TIMEOUT
+    'CANCELED'| // When a Job is Canceled
+    'SUCCESS'; // When all JobTasks succeed
+
+export interface JobModel {
     job_id: string;
-    status: string;
-    finished_at: string;
+    status: JobStatus;
     remained_tasks: number;
     total_tasks: number;
-}
-export interface JobAnalyzeModel {
+    failure_tasks: number;
+    success_tasks: number;
     collector_id: string;
-    job_status: JobStatus[]
+    plugin_id: string;
+    created_at: string;
+    finished_at: string;
+    updated_at: string;
 }
