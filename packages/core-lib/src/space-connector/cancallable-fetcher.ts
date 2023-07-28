@@ -1,12 +1,23 @@
 import type { AxiosRequestConfig, CancelTokenSource } from 'axios';
 import axios from 'axios';
 
+
+interface CancelledResponse {
+    status: 'cancelled';
+    response: undefined;
+}
+interface SucceedResponse<T> {
+    status: 'succeed';
+    response: T;
+}
+type CancellableFetcherResponse<T> = CancelledResponse|SucceedResponse<T>;
+
 interface Fetcher {
     (params: object, config?: AxiosRequestConfig): Promise<any>
 }
 
 interface CancellableFetcher<T = any> {
-    (params: object, config?: AxiosRequestConfig): Promise<T|undefined>
+    (params: object, config?: AxiosRequestConfig): Promise<CancellableFetcherResponse<T>>
 }
 
 export function getCancellableFetcher<T = any>(fetcher: Fetcher): CancellableFetcher<T> {
@@ -28,12 +39,12 @@ export function getCancellableFetcher<T = any>(fetcher: Fetcher): CancellableFet
 
             cancelTokenSource = undefined;
 
-            return res;
+            return { status: 'succeed', response: res };
         } catch (e: any) {
             if (!axios.isCancel(e.axiosError)) {
                 throw e;
             }
-            return undefined;
+            return { status: 'cancelled', response: undefined };
         }
     };
 }

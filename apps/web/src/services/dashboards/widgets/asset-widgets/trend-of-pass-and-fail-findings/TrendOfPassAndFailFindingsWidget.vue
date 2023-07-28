@@ -162,7 +162,7 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
-        const res = await fetchChartDataAnalyze({
+        const { status, response } = await fetchChartDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -179,7 +179,7 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
                 ...chartDataApiQueryHelper.data,
             },
         });
-        if (res) return res;
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -192,7 +192,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (state.pageSize) tableDataApiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await fetchTableDataAnalyze({
+        const { status, response } = await fetchTableDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -212,7 +212,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                 ...tableDataApiQueryHelper.data,
             },
         });
-        if (res) return res;
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

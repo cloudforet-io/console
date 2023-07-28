@@ -106,7 +106,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
     try {
         apiQueryHelper.setFilters(state.consoleFilters);
         const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -123,7 +123,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

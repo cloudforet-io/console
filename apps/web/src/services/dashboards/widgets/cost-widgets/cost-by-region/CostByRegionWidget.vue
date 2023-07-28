@@ -206,7 +206,7 @@ const fetchData = async (): Promise<FullData> => {
     try {
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
@@ -222,7 +222,7 @@ const fetchData = async (): Promise<FullData> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res;
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

@@ -196,7 +196,7 @@ const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnec
 const fetchData = async (): Promise<Data> => {
     apiQueryHelper.setFilters(state.consoleFilters);
     try {
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -211,7 +211,7 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

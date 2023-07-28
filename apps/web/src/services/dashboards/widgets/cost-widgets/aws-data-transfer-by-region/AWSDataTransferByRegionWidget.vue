@@ -189,7 +189,7 @@ const fetchData = async (): Promise<FullData> => {
         ]);
         apiQueryHelper.addFilter(...state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.TYPE],
@@ -210,7 +210,12 @@ const fetchData = async (): Promise<FullData> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return { results: sortTableData(res.results, COST_GROUP_BY.TYPE), more: res.more };
+        if (status === 'succeed') {
+            return {
+                results: sortTableData(response.results, COST_GROUP_BY.TYPE),
+                more: response.more,
+            };
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
