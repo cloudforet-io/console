@@ -80,6 +80,7 @@ const state = reactive({
     }),
     collectDataType: computed(() => {
         const selectedSecret = collectorDataModalState.selectedSecret;
+        if (!selectedSecret) return COLLECT_DATA_TYPE.COLLECTOR;
         return Object.keys(selectedSecret).length > 0 ? COLLECT_DATA_TYPE.SECRET : COLLECT_DATA_TYPE.COLLECTOR;
     }),
     isDuplicateJobs: computed(() => collectorDataModalState.recentJob?.status === JOB_STATE.IN_PROGRESS),
@@ -94,6 +95,8 @@ const handleClickCancel = () => {
 };
 const handleClickConfirm = async () => {
     if (!collectorDataModalState.selectedCollector) throw new Error('[CollectorDataModal] selectedCollector is null');
+    if (!collectorDataModalState.selectedSecret) throw new Error('[CollectorDataModal] selectedSecret is null');
+
     state.loading = true;
     try {
         await SpaceConnector.client.inventory.collector.collect({

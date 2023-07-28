@@ -21,7 +21,7 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
         accountType: ATTACHED_ACCOUNT_TYPE.ALL as AttachedAccountType, // In detail page, This state is used for account type.
 
         // Optional
-        selectedSecret: {} as SecretModel, // In detail page, This state is used for API.
-        secrets: [] as SecretModel[], // In detail page, This state is used for account count.
+        selectedSecret: undefined as SecretModel|undefined, // In detail page, This state is used for API.
+        secrets: null as SecretModel[]|null, // In detail page, This state is used for account count.
     }),
 });
