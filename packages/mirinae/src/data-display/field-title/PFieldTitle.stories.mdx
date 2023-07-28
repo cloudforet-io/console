@@ -24,6 +24,7 @@ export const Template = (args, { argTypes }) => ({
             :size="size"
             :font-weight="fontWeight"
             :color="color"
+            :inline="inline"
         >
             <template v-if="defaultSlot"><span v-html="defaultSlot"/></template>
         </p-field-title>
@@ -122,6 +123,27 @@ export const Template = (args, { argTypes }) => ({
         <p-field-title color="gray">Field Title</p-field-title>
         <p-field-title font-weight="regular">Field Title</p-field-title>
         <p-field-title font-weight="regular" color="gray">Field Title</p-field-title>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Inline
+<Canvas>
+    <Story name="Inline">
+        {{
+            components: { PFieldTitle },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-field-title>This is block. (default)</p-field-title>
+        <span>This is contents.</span>
+        <br/><br/>
+        <p-field-title inline>This is inline.</p-field-title>
+        <span>This is contents.</span>
     </div>
     `,
             setup() {
