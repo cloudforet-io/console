@@ -3,6 +3,7 @@
         <p-definition-table :fields="fields"
                             :data="data"
                             :skeleton-rows="10"
+                            custom-key-width="10rem"
                             style-type="white"
                             block
         >
@@ -209,14 +210,6 @@ export default {
     :deep(.p-definition) {
         .key {
             @apply capitalize;
-            width: 10rem;
-        }
-        .value-wrapper {
-            max-width: calc(100% - 10rem);
-
-            @screen tablet {
-                max-width: none;
-            }
         }
     }
 }
