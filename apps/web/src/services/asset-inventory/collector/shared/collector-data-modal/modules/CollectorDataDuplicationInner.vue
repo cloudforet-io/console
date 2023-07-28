@@ -1,83 +1,3 @@
-<template>
-    <div class="collector-data-duplication-inner">
-        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
-        <p-definition-table :fields="definitionFields"
-                            :data="state"
-                            :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
-                            style-type="white"
-                            disable-copy
-        >
-            <template #data-account>
-                <div class="accounts-wrapper">
-                    <p-lazy-img :src="props.plugin ? props.plugin.icon : ''"
-                                width="1rem"
-                                height="1rem"
-                                class="plugin-icon"
-                    />
-                    <span>{{ props.name }}</span>
-                </div>
-            </template>
-            <template #data-duration>
-                <span>{{ state.duration }}</span>
-            </template>
-        </p-definition-table>
-        <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
-             class="in-progress-wrapper"
-        >
-            <span class="in-progress-title">
-                <p-i
-                    name="ic_peacock-gradient-circle"
-                    height="1rem"
-                    width="1rem"
-                    animation="spin"
-                />
-                <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
-            </span>
-            <div class="chart-wrapper">
-                <div class="label-wrapper">
-                    <div v-if="state.jobTaskStatus.succeeded >= 0">
-                        <p-status :icon-color="SUCCEEDED_COLOR" />
-                        <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
-                            <strong>{{ state.jobTaskStatus.succeeded }}</strong>
-                        </span>
-                    </div>
-                    <div v-if="state.jobTaskStatus.failed >= 0"
-                         class="label"
-                    >
-                        <p-status :icon-color="FAILED_COLOR" />
-                        <span :style="{'color': FAILED_COLOR}">
-                            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
-                            <strong>{{ state.jobTaskStatus.failed }}</strong>
-                        </span>
-                    </div>
-                    <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
-                        <strong>{{ state.jobTaskStatus.total }}</strong>
-                    </span>
-                </div>
-                <div class="progress-bar">
-                    <span class="succeeded-bar"
-                          :style="{ width: `${state.succeededPercentage}%` }"
-                    />
-                    <span class="failed-bar"
-                          :style="{ width: `${state.failedPercentage}%` }"
-                    />
-                </div>
-            </div>
-        </div>
-        <div v-else>
-            <span class="in-progress-title">
-                <p-i
-                    name="ic_peacock-gradient-circle"
-                    height="1rem"
-                    width="1rem"
-                    animation="spin"
-                />
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
-            </span>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
@@ -201,6 +121,87 @@ const getJobLists = async () => {
 })();
 </script>
 
+<template>
+    <div class="collector-data-duplication-inner">
+        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
+        <p-definition-table :fields="definitionFields"
+                            :data="state"
+                            :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
+                            custom-key-width="7rem"
+                            style-type="white"
+                            disable-copy
+        >
+            <template #data-account>
+                <div class="accounts-wrapper">
+                    <p-lazy-img :src="props.plugin ? props.plugin.icon : ''"
+                                width="1rem"
+                                height="1rem"
+                                class="plugin-icon"
+                    />
+                    <span>{{ props.name }}</span>
+                </div>
+            </template>
+            <template #data-duration>
+                <span>{{ state.duration }}</span>
+            </template>
+        </p-definition-table>
+        <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
+             class="in-progress-wrapper"
+        >
+            <span class="in-progress-title">
+                <p-i
+                    name="ic_peacock-gradient-circle"
+                    height="1rem"
+                    width="1rem"
+                    animation="spin"
+                />
+                <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
+            </span>
+            <div class="chart-wrapper">
+                <div class="label-wrapper">
+                    <div v-if="state.jobTaskStatus.succeeded >= 0">
+                        <p-status :icon-color="SUCCEEDED_COLOR" />
+                        <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
+                            <strong>{{ state.jobTaskStatus.succeeded }}</strong>
+                        </span>
+                    </div>
+                    <div v-if="state.jobTaskStatus.failed >= 0"
+                         class="label"
+                    >
+                        <p-status :icon-color="FAILED_COLOR" />
+                        <span :style="{'color': FAILED_COLOR}">
+                            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
+                            <strong>{{ state.jobTaskStatus.failed }}</strong>
+                        </span>
+                    </div>
+                    <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
+                        <strong>{{ state.jobTaskStatus.total }}</strong>
+                    </span>
+                </div>
+                <div class="progress-bar">
+                    <span class="succeeded-bar"
+                          :style="{ width: `${state.succeededPercentage}%` }"
+                    />
+                    <span class="failed-bar"
+                          :style="{ width: `${state.failedPercentage}%` }"
+                    />
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <span class="in-progress-title">
+                <p-i
+                    name="ic_peacock-gradient-circle"
+                    height="1rem"
+                    width="1rem"
+                    animation="spin"
+                />
+                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+            </span>
+        </div>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .collector-data-duplication-inner {
     padding-top: 1rem;
@@ -253,19 +254,6 @@ const getJobLists = async () => {
                     @apply bg-red-400;
                     height: 100%;
                 }
-            }
-        }
-    }
-
-    /* custom design-system component - p-definition-table */
-    :deep(.p-definition-table) {
-        .p-definition {
-            .key {
-                width: 7rem;
-            }
-            .value-wrapper {
-                flex: 1;
-                max-width: initial;
             }
         }
     }
