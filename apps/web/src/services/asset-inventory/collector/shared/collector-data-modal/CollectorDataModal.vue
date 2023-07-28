@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="collectorPageState.visible.collectorModal"
+        <p-button-modal :visible="props.visible"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
@@ -45,7 +45,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -56,8 +55,15 @@ import CollectorDataDuplicationInner
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
-const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+
+const props = defineProps<{
+    visible: boolean;
+}>();
+
+const emit = defineEmits<{(e: 'click-confirm'): void,
+    (e: 'update:visible', visible: boolean): void
+}>();
+
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
@@ -87,13 +93,10 @@ const state = reactive({
     isDuplicateJobs: computed(() => collectorDataModalState.recentJob.status === JOB_STATE.IN_PROGRESS),
 });
 
-const emit = defineEmits<{(e: 'click-confirm'): void}>();
 
 /* Components */
 const handleClickCancel = () => {
-    collectorPageStore.$patch((_state) => {
-        _state.visible.collectorModal = false;
-    });
+    emit('update:visible', false);
     emit('click-confirm');
 };
 const handleClickConfirm = async () => {
@@ -104,12 +107,13 @@ const handleClickConfirm = async () => {
             secret_id: collectorDataModalState.selectedSecret.secret_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+        emit('click-confirm');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
         throw e;
     } finally {
         state.loading = false;
-        handleClickCancel();
+        emit('update:visible', false);
     }
 };
 </script>

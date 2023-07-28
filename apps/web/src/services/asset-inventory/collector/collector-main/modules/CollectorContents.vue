@@ -155,6 +155,11 @@ const handleClickListItem = (detailLink) => {
 const handleClickCollectDataConfirm = () => {
     fetchCollectorList();
 };
+const handleUpdateCollectorDataModalVisible = () => {
+    collectorPageStore.$patch((_state) => {
+        _state.visible.collectorModal = false;
+    });
+};
 
 /* API */
 const handleExportExcel = async () => {
@@ -232,7 +237,10 @@ onMounted(async () => {
             </template>
         </p-data-loader>
         <collector-schedule-modal @refresh-collector-list="fetchCollectorList" />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+        <collector-data-modal :visible="collectorPageState.visible.collectorModal"
+                              @update:visible="handleUpdateCollectorDataModalVisible"
+                              @click-confirm="handleClickCollectDataConfirm"
+        />
     </div>
 </template>
 
