@@ -8,18 +8,23 @@ import { store } from '@/store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
-import type { CollectorLink, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+interface MinimalJobInfo {
+    job_id: string;
+    status: string;
+    finished_at: string;
+}
 interface Props {
-    recentJobAnalyze?: JobAnalyzeStatus[];
+    recentJobs?: MinimalJobInfo[];
     historyLink?: CollectorLink;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    recentJobAnalyze: undefined,
+    recentJobs: undefined,
     historyLink: undefined,
 });
 
@@ -29,7 +34,7 @@ const storeState = reactive({
 </script>
 
 <template>
-    <div class="info-item">
+    <div class="recent-collector-job-list">
         <p class="info-label">
             {{ $t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
             <p-tooltip
@@ -46,12 +51,12 @@ const storeState = reactive({
         </p>
         <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
             <div class="jobs-contents">
-                <collector-job-status-icon v-for="(jobStatus, index) in props.recentJobAnalyze"
+                <collector-job-status-icon v-for="(job, index) in props.recentJobs"
                                            :key="`job-item-${index}`"
                                            :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
-                                           :status="jobStatus.status"
-                                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(jobStatus.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
-                                           :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: jobStatus.job_id} }"
+                                           :status="job.status"
+                                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(job.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                                           :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
                 />
             </div>
             <collector-job-status-icon is-arrow
@@ -65,7 +70,7 @@ const storeState = reactive({
 </template>
 
 <style lang="postcss" scoped>
-.info-item {
+.recent-collector-job-list {
     @apply items-end;
     .info-label {
         @apply flex items-center text-label-sm text-gray-500;
