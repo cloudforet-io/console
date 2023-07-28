@@ -20,9 +20,10 @@
 </template>
 
 <script lang="ts">
+import { useDocumentVisibility } from '@vueuse/core';
 import type { SetupContext } from 'vue';
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -139,22 +140,16 @@ export default defineComponent<Props>({
             }
         });
 
-        const handleBrowserVisibilityChange = () => {
-            if (document.hidden) {
-                clearRefreshInterval();
-            } else {
-                executeRefreshInterval();
-            }
-        };
 
-        onMounted(() => {
-            if (props.refreshDisabled) return;
-            executeRefreshInterval();
-            document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
-        });
+        const documentVisibility = useDocumentVisibility();
+        watch(documentVisibility, (visibility) => {
+            if (visibility === 'hidden') {
+                clearRefreshInterval();
+            } else if (!props.refreshDisabled) executeRefreshInterval();
+        }, { immediate: true });
+
         onUnmounted(() => {
             clearRefreshInterval();
-            document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
         });
 
         const handleRefresh = () => {

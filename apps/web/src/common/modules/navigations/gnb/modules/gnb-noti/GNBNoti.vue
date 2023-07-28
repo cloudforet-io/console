@@ -43,6 +43,7 @@
 <script lang="ts">
 
 import { vOnClickOutside } from '@vueuse/components';
+import { useDocumentVisibility } from '@vueuse/core';
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -132,13 +133,14 @@ export default defineComponent<Props>({
             userId: computed(() => store.state.user.userId),
         });
 
-        const handleBrowserVisibilityChange = () => {
-            if (document.hidden) {
+        const documentVisibility = useDocumentVisibility();
+        watch(documentVisibility, (visibility) => {
+            if (visibility === 'hidden') {
                 store.dispatch('display/stopCheckNotification');
             } else {
                 store.dispatch('display/startCheckNotification');
             }
-        };
+        }, { immediate: true });
 
         /* Event */
         const handleNotiButtonClick = () => {
@@ -148,18 +150,17 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
-            document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
             fetchNoticeReadState();
             fetchNoticeCount();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
-            document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
         });
 
         watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
             if (isSessionExpired) store.dispatch('display/stopCheckNotification');
         });
+
 
         return {
             ...toRefs(state),
