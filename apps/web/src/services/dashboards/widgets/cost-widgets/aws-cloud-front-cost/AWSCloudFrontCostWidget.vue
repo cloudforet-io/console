@@ -51,8 +51,6 @@ import type { Location } from 'vue-router/types/router';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -60,6 +58,7 @@ import { cloneDeep } from 'lodash';
 import { byteFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
@@ -164,24 +163,19 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
     if (!state.groupBy) return { results: [], more: false };
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
+    apiQueryHelper.setFilters([
+        { k: 'usage_type', v: ['data-transfer.out', 'requests.http', 'requests.https'], o: '' },
+        { k: 'product', v: 'AmazonCloudFront', o: '=' },
+        { k: 'usage_type', v: null, o: '!=' },
+    ]);
+    apiQueryHelper.addFilter(...state.consoleFilters);
+    if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters([
-            { k: 'usage_type', v: ['data-transfer.out', 'requests.http', 'requests.https'], o: '' },
-            { k: 'product', v: 'AmazonCloudFront', o: '=' },
-            { k: 'usage_type', v: null, o: '!=' },
-        ]);
-        apiQueryHelper.addFilter(...state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const res = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, 'usage_type'],
@@ -201,13 +195,12 @@ const fetchData = async (): Promise<FullData> => {
                 field_group: ['usage_type'],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results: sortTableData(results, 'usage_type'), more };
+        });
+        if (res) return { results: sortTableData(res.results, 'usage_type'), more: res.more };
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
 const drawChart = (chartData) => {

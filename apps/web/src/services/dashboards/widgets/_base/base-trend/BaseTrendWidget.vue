@@ -54,13 +54,12 @@ import type { Location } from 'vue-router/types/router';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
@@ -100,11 +99,8 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
+type Data = CostAnalyzeDataModel;
+
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
@@ -117,7 +113,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => state.legends?.length ?? 0),
 });
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     chart: null as null | XYChart,
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     tableFields: computed<Field[]>(() => {
@@ -157,18 +153,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
-const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<Data> => {
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const res = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy],
@@ -184,13 +175,14 @@ const fetchData = async (): Promise<FullData> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results: sortTableData(getRefinedDateTableData(results, state.dateRange)), more };
+        });
+        if (res) {
+            return { results: sortTableData(getRefinedDateTableData(res.results, state.dateRange)), more: res.more };
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
 /* Util */
@@ -236,7 +228,7 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
@@ -246,7 +238,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (thisPage = 1): Promise<Data> => {
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
@@ -287,7 +279,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<FullData>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });
