@@ -4,6 +4,7 @@
         <p-definition-table :fields="definitionFields"
                             :data="state"
                             :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
+                            custom-key-width="7rem"
                             style-type="white"
                             disable-copy
         >
@@ -253,19 +254,6 @@ const getJobLists = async () => {
                     @apply bg-red-400;
                     height: 100%;
                 }
-            }
-        }
-    }
-
-    /* custom design-system component - p-definition-table */
-    :deep(.p-definition-table) {
-        .p-definition {
-            .key {
-                width: 7rem;
-            }
-            .value-wrapper {
-                flex: 1;
-                max-width: initial;
             }
         }
     }
