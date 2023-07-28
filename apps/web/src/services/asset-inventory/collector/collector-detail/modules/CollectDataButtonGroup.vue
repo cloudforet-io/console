@@ -6,6 +6,8 @@ import {
 import { PButton, PPopover, PIconButton } from '@spaceone/design-system';
 
 import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
+import type { JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 const emit = defineEmits<{(e: 'collect'): void;
 }>();
@@ -16,6 +18,10 @@ const collectorJobState = collectorJobStore.$state;
 const state = reactive({
     isPopoverOpen: false,
     showStatus: computed(() => !!collectorJobState.recentJob),
+    recentJob: computed<JobAnalyzeStatus|undefined>(() => {
+        if (!collectorJobState.recentJob) return undefined;
+        return collectorJobState.recentJob;
+    }),
 });
 const handleClickCollectDataButton = () => {
     emit('collect');
@@ -44,8 +50,12 @@ const handleClickCollectDataButton = () => {
                            class="status-button"
             />
             <template #content>
-                <!-- TODO: Implement status UI -->
-                <div>Current Status</div>
+                <div class="collect-status-wrapper">
+                    <collector-current-status
+                        :schedule="collectorJobStore.schedule"
+                        :recent-job="state.recentJob"
+                    />
+                </div>
             </template>
         </p-popover>
     </div>
@@ -65,6 +75,10 @@ const handleClickCollectDataButton = () => {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         border-left: 0;
+    }
+    .collect-status-wrapper {
+        min-height: 68px;
+        min-width: 250px;
     }
 }
 </style>

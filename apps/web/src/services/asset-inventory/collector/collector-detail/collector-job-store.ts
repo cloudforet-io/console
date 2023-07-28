@@ -5,29 +5,38 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { JobModel } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, JobModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 
-const jobQueryHelper = new ApiQueryHelper().setPageLimit(1);
+const jobQueryHelper = new ApiQueryHelper().setPageLimit(1).setSort('created_at', true);
 export const useCollectorJobStore = defineStore('collector-job', {
     state: () => ({
-        collectorId: undefined as undefined|string,
+        collector: null as null|CollectorModel,
         recentJob: null as null|JobModel,
+        loading: true,
     }),
+    getters: {
+        schedule(): Schedule|null {
+            return this.collector?.schedule ?? null;
+        },
+    },
     actions: {
         async getRecentJob() {
             try {
-                if (!this.collectorId) throw new Error('[useCollectorJobStore] No collectorId');
+                if (!this.collector) throw new Error('[useCollectorJobStore] No collector');
+
+                this.loading = true;
                 jobQueryHelper.setFilters([
-                    { k: 'collector_id', v: this.collectorId, o: '=' },
+                    { k: 'collector_id', v: this.collector.collector_id, o: '=' },
                 ]);
                 const { results } = await SpaceConnector.client.inventory.job.list({
                     query: jobQueryHelper.data,
                 });
                 this.recentJob = results?.[0] ?? null;
-                if (!this.recentJob) throw new Error('[useCollectorJobStore] No recentJob');
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                this.loading = false;
             }
         },
     },
