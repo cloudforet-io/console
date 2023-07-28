@@ -8,7 +8,6 @@ import {
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import CollectorItemJobList from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemJobList.vue';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
@@ -16,6 +15,7 @@ import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
 import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
+import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/RecentCollectorJobList.vue';
 
 interface Props {
     item: CollectorItemInfo;
@@ -80,8 +80,8 @@ const handleClickCollectData = async () => {
                         <collector-current-status :schedule="props.item.schedule"
                                                   :recent-job="state.recentJob"
                         />
-                        <collector-item-job-list :recent-job-analyze="props.item.recentJobAnalyze"
-                                                 :history-link="props.item.historyLink"
+                        <recent-collector-job-list :recent-jobs="props.item.recentJobAnalyze"
+                                                   :history-link="props.item.historyLink"
                         />
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
