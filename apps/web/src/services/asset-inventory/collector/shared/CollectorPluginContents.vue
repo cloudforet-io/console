@@ -1,5 +1,7 @@
 <template>
-    <div class="plugin-data-contents">
+    <div class="plugin-data-contents"
+         :class="{'align-center': props.alignCenter}"
+    >
         <p-lazy-img :src="state.icon"
                     class="plugin-icon"
                     :class="{ 'sm': props.size === 'sm' }"
@@ -7,7 +9,9 @@
                     :height="state.iconSize"
         />
         <div class="contents">
-            <p class="plugin-name">
+            <p class="plugin-name"
+               :class="{emphasize: props.emphasizeName}"
+            >
                 {{ state.name }} <span :style="{ backgroundColor: repositoryBackgroundColorMap[state.repositoryType], borderRadius: '100%' }"
                                        class="repository-badge-box"
                 ><p-i v-if="repositoryIconMap[state.repositoryType]"
@@ -19,27 +23,31 @@
                                class="beta"
                 >{{ $t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
             </p>
-            <div class="plugin-description">
-                <span class="plugin-description-text"
-                      :class="{ 'sm': props.size === 'sm' }"
+            <slot name="contents">
+                <div class="plugin-description">
+                    <span class="plugin-description-text"
+                          :class="{ 'sm': props.size === 'sm' }"
+                    >
+                        {{ state.description }}
+                    </span>
+                    <p-anchor v-if="state.pluginDetailLink"
+                              :href="state.pluginDetailLink"
+                              size="sm"
+                              :highlight="true"
+                    >
+                        {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
+                    </p-anchor>
+                </div>
+                <div v-if="!props.hideLabels"
+                     class="label-container"
                 >
-                    {{ state.description }}
-                </span>
-                <p-anchor v-if="state.pluginDetailLink"
-                          :href="state.pluginDetailLink"
-                          size="sm"
-                          :highlight="true"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-                </p-anchor>
-            </div>
-            <div class="label-container">
-                <p-label v-for="(label, idx) in state.labels"
-                         :key="`${label}-${idx}`"
-                         class="mb-1"
-                         :text="label"
-                />
-            </div>
+                    <p-label v-for="(label, idx) in state.labels"
+                             :key="`${label}-${idx}`"
+                             class="mb-1"
+                             :text="label"
+                    />
+                </div>
+            </slot>
         </div>
     </div>
 </template>
@@ -55,14 +63,10 @@ import {
     screens,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
-import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/collector/config';
 import type {
-    CollectorPluginModel,
-    RepositoryInfo,
     RepositoryPluginModel,
 } from '@/services/asset-inventory/collector/model';
 
@@ -70,8 +74,11 @@ type Size = 'sm' | 'lg';
 
 // TODO: Add plugin data type
 interface Props {
-    plugin?: CollectorPluginModel|RepositoryPluginModel|null;
+    plugin?: RepositoryPluginModel|null;
     size?: Size;
+    hideLabels?: boolean;
+    emphasizeName?: boolean;
+    alignCenter?: boolean;
 }
 
 const { width } = useWindowSize();
@@ -79,31 +86,24 @@ const { width } = useWindowSize();
 const props = withDefaults(defineProps<Props>(), {
     plugin: null,
     size: 'lg',
+    hideLabels: false,
+    emphasizeName: false,
+    alignCenter: false,
 });
 
 const state = reactive({
-    icon: computed<string>(() => state.pluginItem?.icon ?? ''),
+    icon: computed<string>(() => assetUrlConverter(props.plugin?.tags?.icon ?? '')),
     iconSize: computed(() => {
         if (props.size === 'sm' || width.value <= screens.tablet.max) return '2.5rem';
         return '3rem';
     }),
-    name: computed<string>(() => state.pluginItem?.name ?? state.pluginItem?.key ?? ''),
-    description: computed<string>(() => state.pluginItem?.description ?? ''),
+    name: computed<string>(() => props.plugin?.name ?? ''),
+    description: computed<string>(() => props.plugin?.tags?.description ?? ''),
     labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin
     isBeta: computed<boolean>(() => !!(props.plugin as RepositoryPluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
-    pluginDetailLink: computed<string>(() => state.pluginItem?.link ?? ''),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    pluginItem: computed<PluginReferenceItem|undefined>(() => {
-        if (!props.plugin) return undefined;
-        return state.plugins[props.plugin.plugin_id];
-    }),
-    repositoryType: computed<RepositoryInfo>(() => props.plugin?.repository_info?.repository_type),
+    pluginDetailLink: computed<string>(() => props.plugin?.tags?.link ?? ''),
+    repositoryType: computed<string>(() => props.plugin?.repository_info?.repository_type ?? ''),
 });
-
-// init reference data
-(async () => {
-    await store.dispatch('reference/plugin/load');
-})();
 
 
 </script>
@@ -112,6 +112,9 @@ const state = reactive({
 .plugin-data-contents {
     @apply flex;
     width: 100%;
+    &.align-center {
+        align-items: center;
+    }
     .plugin-icon {
         flex-shrink: 0;
         margin-right: 1rem;
@@ -127,6 +130,9 @@ const state = reactive({
         .plugin-name {
             @apply text-label-lg text-gray-900 flex items-center gap-1;
             margin-bottom: 0.375rem;
+            &.emphasize {
+                @apply font-bold;
+            }
 
             .repository-badge-box {
                 display: inline-flex;

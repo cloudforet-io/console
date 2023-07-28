@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-2">
-        <collect-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
+        <collector-plugin-contents :plugin="collectorFormState.repositoryPlugin" />
         <div class="input-form">
             <collector-name-form ref="nameInputRef"
                                  class="name-form"
@@ -71,7 +71,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorNameForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorNameForm.vue';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
-import CollectPluginContents
+import CollectorPluginContents
     from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
 
 
