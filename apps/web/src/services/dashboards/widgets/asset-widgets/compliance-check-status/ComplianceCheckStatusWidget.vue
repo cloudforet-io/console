@@ -241,7 +241,7 @@ const fetchData = async (): Promise<Data[]> => {
                 o: '',
             });
         const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
-        const res = await fetchCloudServiceStatsAnalyze({
+        const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
@@ -256,7 +256,7 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e: any) {
         ErrorHandler.handleError(e);
     }

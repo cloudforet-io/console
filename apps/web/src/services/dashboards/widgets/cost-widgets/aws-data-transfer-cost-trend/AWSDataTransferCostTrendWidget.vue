@@ -163,7 +163,7 @@ const fetchData = async (): Promise<Data> => {
             { k: 'usage_type', v: null, o: '!=' },
         ]);
         apiQueryHelper.addFilter(...state.consoleFilters);
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy],
@@ -184,8 +184,8 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) {
-            const _refinedData = getRefinedTableData(res.results);
+        if (status === 'succeed') {
+            const _refinedData = getRefinedTableData(response.results);
             return sortTableData(getRefinedDateTableData(_refinedData, state.dateRange));
         }
     } catch (e) {

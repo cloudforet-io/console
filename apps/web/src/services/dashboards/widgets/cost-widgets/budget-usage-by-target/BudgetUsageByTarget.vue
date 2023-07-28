@@ -119,7 +119,7 @@ const fetchData = async (): Promise<Data> => {
     try {
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await fetchBudgetUsageAnalyze({
+        const { status, response } = await fetchBudgetUsageAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
@@ -156,7 +156,7 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res;
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

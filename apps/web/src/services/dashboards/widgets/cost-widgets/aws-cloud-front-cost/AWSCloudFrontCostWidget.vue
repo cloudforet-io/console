@@ -175,7 +175,7 @@ const fetchData = async (): Promise<FullData> => {
     apiQueryHelper.addFilter(...state.consoleFilters);
     if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
     try {
-        const res = await fetchCostAnalyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, 'usage_type'],
@@ -196,7 +196,12 @@ const fetchData = async (): Promise<FullData> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return { results: sortTableData(res.results, 'usage_type'), more: res.more };
+        if (status === 'succeed') {
+            return {
+                results: sortTableData(response.results, 'usage_type'),
+                more: response.more,
+            };
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }

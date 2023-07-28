@@ -245,7 +245,7 @@ const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceCo
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
-        const res = await fetchBudgetUsageAnalyze({
+        const { status, response } = await fetchBudgetUsageAnalyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -266,7 +266,7 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

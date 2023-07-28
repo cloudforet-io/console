@@ -131,7 +131,7 @@ const fetchData = async (): Promise<Data[]> => {
         } else {
             apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         }
-        const res = await fetchCloudServiceStatsAnalyze({
+        const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.end,
@@ -148,7 +148,7 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

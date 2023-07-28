@@ -240,7 +240,7 @@ const fetchTrendData = async (): Promise<Data[]> => {
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        const res = await fetchTrendDataAnalyze({
+        const { status, response } = await fetchTrendDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -259,7 +259,7 @@ const fetchTrendData = async (): Promise<Data[]> => {
                 ...trendDataApiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -272,7 +272,7 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
-        const res = await fetchRealtimeDataAnalyze({
+        const { status, response } = await fetchRealtimeDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
@@ -287,7 +287,7 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
                 ...realtimeDataApiQueryHelper.data,
             },
         });
-        if (res) return res.results;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
