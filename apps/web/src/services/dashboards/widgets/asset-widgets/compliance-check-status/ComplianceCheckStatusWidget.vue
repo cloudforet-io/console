@@ -77,13 +77,12 @@ import type { TranslateResult } from 'vue-i18n';
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
 import { PDataLoader, PI } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
@@ -223,15 +222,10 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
@@ -247,7 +241,7 @@ const fetchData = async (): Promise<Data[]> => {
                 o: '',
             });
         const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const res = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
@@ -261,15 +255,12 @@ const fetchData = async (): Promise<Data[]> => {
                 },
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return results;
+        });
+        if (res) return res.results;
     } catch (e: any) {
-        if (!axios.isCancel(e.axiosError)) {
-            ErrorHandler.handleError(e);
-        }
-        return [];
+        ErrorHandler.handleError(e);
     }
+    return [];
 };
 
 /* Util */
