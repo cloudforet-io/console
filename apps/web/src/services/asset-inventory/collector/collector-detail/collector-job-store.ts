@@ -12,8 +12,7 @@ const jobQueryHelper = new ApiQueryHelper().setPageLimit(1).setSort('created_at'
 export const useCollectorJobStore = defineStore('collector-job', {
     state: () => ({
         collector: null as null|CollectorModel,
-        recentJob: null as null|JobModel,
-        loading: true,
+        recentJob: undefined as undefined|null|JobModel, // if undefined, it means that the first request is not yet finished
     }),
     getters: {
         schedule(): Schedule|null {
@@ -25,7 +24,6 @@ export const useCollectorJobStore = defineStore('collector-job', {
             try {
                 if (!this.collector) throw new Error('[useCollectorJobStore] No collector');
 
-                this.loading = true;
                 jobQueryHelper.setFilters([
                     { k: 'collector_id', v: this.collector.collector_id, o: '=' },
                 ]);
@@ -35,8 +33,7 @@ export const useCollectorJobStore = defineStore('collector-job', {
                 this.recentJob = results?.[0] ?? null;
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
-                this.loading = false;
+                this.recentJob = null;
             }
         },
     },

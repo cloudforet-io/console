@@ -28,15 +28,14 @@
                 </span>
             </template>
             <template #extra>
-                <div v-if="!state.jobLoading"
+                <div v-if="!state.jobInitialLoading"
                      class="collector-button-box"
                 >
                     <collect-data-button-group />
                     <router-link v-if="state.hasJobs"
                                  :to="state.collectorHistoryLink"
                     >
-                        <p-button v-if="props.collectorId"
-                                  style-type="tertiary"
+                        <p-button style-type="tertiary"
                                   icon-left="ic_history"
                         >
                             {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
@@ -86,8 +85,10 @@ export default defineComponent({
 
 <script lang="ts" setup>
 /* eslint-disable import/first */
+// eslint-disable-next-line import/order
+import { useTimeoutPoll, useDocumentVisibility } from '@vueuse/core';
 import {
-    defineProps, defineExpose, reactive, onMounted, computed,
+    defineProps, defineExpose, reactive, onMounted, onUnmounted, computed, watch,
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
 import type { Location } from 'vue-router';
@@ -123,6 +124,8 @@ import type { CollectorModel } from '@/services/asset-inventory/collector/model'
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
+
 const props = defineProps<{
     collectorId: string;
 }>();
@@ -140,7 +143,7 @@ const state = reactive({
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     hasJobs: computed(() => !!collectorJobState.recentJob),
-    jobLoading: computed(() => collectorJobState.loading),
+    jobInitialLoading: computed(() => collectorJobState.recentJob === undefined),
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -214,6 +217,23 @@ const handleDeleteModalConfirm = async () => {
 const handleUpdateEditModalVisible = (value: boolean) => {
     state.editModalVisible = value;
 };
+
+/* Api polling */
+const fetchRecentJob = async () => {
+    if (!collectorJobState.collector) return;
+    await collectorJobStore.getRecentJob();
+};
+const { pause, resume } = useTimeoutPoll(fetchRecentJob, 5000);
+const documentVisibility = useDocumentVisibility();
+watch(documentVisibility, (visibility) => {
+    if (visibility === 'hidden') {
+        pause();
+    } else {
+        resume();
+    }
+});
+
+
 onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
@@ -223,9 +243,17 @@ onMounted(async () => {
     });
     if (collector) {
         collectorFormStore.setOriginCollector(collector);
-        await collectorJobStore.getRecentJob();
+        resume();
     }
 });
+onUnmounted(() => {
+    pause();
+    collectorJobStore.$reset();
+    collectorFormStore.$reset();
+});
+
+
+
 
 </script>
 
