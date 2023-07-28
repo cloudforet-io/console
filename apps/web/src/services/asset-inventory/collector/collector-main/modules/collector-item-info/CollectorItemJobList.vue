@@ -1,3 +1,33 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import { PTooltip, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { store } from '@/store';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
+import type { CollectorLink, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import CollectorJobStatusIcon
+    from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+interface Props {
+    recentJobAnalyze?: JobAnalyzeStatus[];
+    historyLink?: CollectorLink;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    recentJobAnalyze: undefined,
+    historyLink: undefined,
+});
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
+</script>
+
 <template>
     <div class="info-item">
         <p class="info-label">
@@ -33,36 +63,6 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import { PTooltip, PI } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import { store } from '@/store';
-
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
-import type { CollectorLink, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
-import CollectorJobStatusIcon
-    from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-interface Props {
-    recentJobAnalyze?: JobAnalyzeStatus[];
-    historyLink?: CollectorLink;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    recentJobAnalyze: undefined,
-    historyLink: undefined,
-});
-
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-});
-</script>
 
 <style lang="postcss" scoped>
 .info-item {

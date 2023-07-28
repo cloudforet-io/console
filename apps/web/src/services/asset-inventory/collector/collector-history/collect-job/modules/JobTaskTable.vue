@@ -1,69 +1,3 @@
-<template>
-    <p-toolbox-table selectable
-                     sortable
-                     search-type="query"
-                     :loading="state.loading"
-                     :fields="fields"
-                     :items="state.items"
-                     :select-index.sync="state.selectIndex"
-                     :sort-by="state.sortBy"
-                     :sort-desc="state.sortDesc"
-                     :page-size="state.pageLimit"
-                     :total-count="state.totalCount"
-                     :query-tags="state.searchTags"
-                     :key-item-sets="querySearchHandlers.keyItemSets"
-                     :value-handler-map="querySearchHandlers.valueHandlerMap"
-                     :multi-select="false"
-                     :excel-visible="false"
-                     :timezone="state.timezone"
-                     @change="handleChange"
-                     @refresh="handleChange()"
-                     @select="handleSelect"
-    >
-        <template #toolbox-top>
-            <div class="status-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group class="select-button-group"
-                                       :buttons="statusList"
-                                       :selected.sync="state.selectedStatus"
-                                       theme="text"
-                />
-            </div>
-        </template>
-        <template #col-service_account_id-format="{ value }">
-            <p-anchor :to="referenceRouter(
-                value,
-                { resource_type: 'identity.ServiceAccount' })"
-            >
-                {{ storeState.serviceAccounts[value] ? storeState.serviceAccounts[value].label : value }}
-            </p-anchor>
-        </template>
-        <template #col-project_id-format="{ value }">
-            <template v-if="value">
-                <p-anchor :to="referenceRouter(
-                    value,
-                    { resource_type: 'identity.Project' })"
-                >
-                    {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                </p-anchor>
-            </template>
-        </template>
-        <!-- TODO: will be checked "Pending" after API is updated-->
-        <template #col-status-format="{ value }">
-            <p-status
-                :text="statusTextFormatter(value)"
-                :text-color="statusTextColorFormatter(value)"
-                :icon="statusIconFormatter(value)"
-                :icon-color="statusIconColorFormatter(value)"
-                :icon-animation="value === JOB_TASK_STATE.IN_PROGRESS ? 'spin' : undefined"
-            />
-        </template>
-        <template #col-errors-format="{ value }">
-            {{ value.length }}
-        </template>
-    </p-toolbox-table>
-</template>
-
 <script setup lang="ts">
 import {
     computed, onActivated, onDeactivated, reactive, watch,
@@ -277,6 +211,72 @@ onDeactivated(() => {
     ]);
 })();
 </script>
+
+<template>
+    <p-toolbox-table selectable
+                     sortable
+                     search-type="query"
+                     :loading="state.loading"
+                     :fields="fields"
+                     :items="state.items"
+                     :select-index.sync="state.selectIndex"
+                     :sort-by="state.sortBy"
+                     :sort-desc="state.sortDesc"
+                     :page-size="state.pageLimit"
+                     :total-count="state.totalCount"
+                     :query-tags="state.searchTags"
+                     :key-item-sets="querySearchHandlers.keyItemSets"
+                     :value-handler-map="querySearchHandlers.valueHandlerMap"
+                     :multi-select="false"
+                     :excel-visible="false"
+                     :timezone="state.timezone"
+                     @change="handleChange"
+                     @refresh="handleChange()"
+                     @select="handleSelect"
+    >
+        <template #toolbox-top>
+            <div class="status-wrapper">
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <p-select-button-group class="select-button-group"
+                                       :buttons="statusList"
+                                       :selected.sync="state.selectedStatus"
+                                       theme="text"
+                />
+            </div>
+        </template>
+        <template #col-service_account_id-format="{ value }">
+            <p-anchor :to="referenceRouter(
+                value,
+                { resource_type: 'identity.ServiceAccount' })"
+            >
+                {{ storeState.serviceAccounts[value] ? storeState.serviceAccounts[value].label : value }}
+            </p-anchor>
+        </template>
+        <template #col-project_id-format="{ value }">
+            <template v-if="value">
+                <p-anchor :to="referenceRouter(
+                    value,
+                    { resource_type: 'identity.Project' })"
+                >
+                    {{ storeState.projects[value] ? storeState.projects[value].label : value }}
+                </p-anchor>
+            </template>
+        </template>
+        <!-- TODO: will be checked "Pending" after API is updated-->
+        <template #col-status-format="{ value }">
+            <p-status
+                :text="statusTextFormatter(value)"
+                :text-color="statusTextColorFormatter(value)"
+                :icon="statusIconFormatter(value)"
+                :icon-color="statusIconColorFormatter(value)"
+                :icon-animation="value === JOB_TASK_STATE.IN_PROGRESS ? 'spin' : undefined"
+            />
+        </template>
+        <template #col-errors-format="{ value }">
+            {{ value.length }}
+        </template>
+    </p-toolbox-table>
+</template>
 
 <style lang="postcss" scoped>
 .p-toolbox-table {

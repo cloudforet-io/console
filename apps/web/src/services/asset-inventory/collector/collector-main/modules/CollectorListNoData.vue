@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { PEmpty } from '@spaceone/design-system';
+</script>
+
 <template>
     <p-empty
         show-image
@@ -11,10 +15,6 @@
         </template>
     </p-empty>
 </template>
-
-<script setup lang="ts">
-import { PEmpty } from '@spaceone/design-system';
-</script>
 
 <style scoped lang="postcss">
 .p-empty {
