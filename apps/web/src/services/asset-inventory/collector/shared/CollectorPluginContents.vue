@@ -72,7 +72,6 @@ import type {
 
 type Size = 'sm' | 'lg';
 
-// TODO: Add plugin data type
 interface Props {
     plugin?: RepositoryPluginModel|null;
     size?: Size;
