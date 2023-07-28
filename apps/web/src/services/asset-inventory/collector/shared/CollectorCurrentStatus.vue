@@ -33,11 +33,15 @@
                             {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
                         </p>
                     </div>
-                    <span v-else>
+                    <span v-else
+                          class="no-schedule"
+                    >
                         {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                     </span>
                 </div>
-                <span v-else>
+                <span v-else
+                      class="no-schedule"
+                >
                     {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                 </span>
             </div>
@@ -124,6 +128,9 @@ const state = reactive({
                 margin-bottom: auto;
                 min-width: 1.25rem;
             }
+        }
+        .no-schedule {
+            @apply text-gray-300;
         }
         .current-status-progress {
             @apply flex items-center;
