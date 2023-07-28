@@ -12,13 +12,13 @@
             <template #body>
                 <div v-if="state.isDuplicateJobs">
                     <collector-data-duplication-inner :account-type="collectorDataModalState.accountType"
-                                                      :name="state.item.name"
-                                                      :plugin="state.item.plugin"
+                                                      :name="state.item?.name"
+                                                      :plugin="state.item?.plugin"
                     />
                 </div>
                 <collector-data-default-inner v-else
-                                              :name="state.item.name"
-                                              :plugin="state.item.plugin"
+                                              :name="state.item?.name"
+                                              :plugin="state.item?.plugin"
                 />
             </template>
             <template #confirm-button>
@@ -69,6 +69,7 @@ const state = reactive({
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     item: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
+        if (!selectedCollector) return undefined;
         return {
             ...selectedCollector,
             plugin: {
@@ -81,7 +82,7 @@ const state = reactive({
         const selectedSecret = collectorDataModalState.selectedSecret;
         return Object.keys(selectedSecret).length > 0 ? COLLECT_DATA_TYPE.SECRET : COLLECT_DATA_TYPE.COLLECTOR;
     }),
-    isDuplicateJobs: computed(() => collectorDataModalState.recentJob.status === JOB_STATE.IN_PROGRESS),
+    isDuplicateJobs: computed(() => collectorDataModalState.recentJob?.status === JOB_STATE.IN_PROGRESS),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();
@@ -92,6 +93,7 @@ const handleClickCancel = () => {
     emit('click-confirm');
 };
 const handleClickConfirm = async () => {
+    if (!collectorDataModalState.selectedCollector) throw new Error('[CollectorDataModal] selectedCollector is null');
     state.loading = true;
     try {
         await SpaceConnector.client.inventory.collector.collect({
