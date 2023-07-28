@@ -118,7 +118,7 @@ const props = defineProps<Props>();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const attachedServiceAccountList = [
+const attachedServiceAccountList = computed(() => [
     {
         label: i18n.t('INVENTORY.COLLECTOR.CREATE.ALL'),
         name: 'all',
@@ -127,7 +127,7 @@ const attachedServiceAccountList = [
         label: i18n.t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT'),
         name: 'specific',
     },
-];
+]);
 
 const queryHelper = new QueryHelper();
 const state = reactive({

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PBadge, PButton, PToolboxTable,
+    PAnchor, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
@@ -46,6 +46,17 @@ const fields: DefinitionField[] = [
     { name: 'created_at', label: 'Created' },
     { name: 'collect', label: ' ' },
 ];
+
+const attachedServiceAccountList = computed(() => [
+    {
+        label: i18n.t('INVENTORY.COLLECTOR.CREATE.ALL'),
+        name: 'all',
+    },
+    {
+        label: i18n.t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT'),
+        name: 'specific',
+    },
+]);
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -174,57 +185,72 @@ onMounted(async () => {
 </script>
 
 <template>
-    <p-toolbox-table :fields="fields"
-                     :items="state.secrets"
-                     :loading="state.loading"
-                     :total-count="state.totalCount"
-                     :query-tags="queryTags"
-                     :key-item-sets="querySearchHandlers.keyItemSets"
-                     :value-handler-map="querySearchHandlers.valueHandlerMap"
-                     :sort-by.sync="state.sortBy"
-                     :sort-desc.sync="state.sortDesc"
-                     :page-size.sync="state.pageLimit"
-                     search-type="query"
-                     searchable
-                     use-cursor-loading
-                     @change="handleToolboxTableChange"
-                     @refresh="handleToolboxTableRefresh"
-    >
-        <template #col-service_account_id-format="{value}">
-            {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
-        </template>
-        <template #col-project_id-format="{value}">
-            <p-anchor v-if="state.projects[value]"
-                      :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+    <div>
+        <p-radio-group class="attached-service-account-radio-group">
+            <p-radio v-for="(item) in attachedServiceAccountList"
+                     :key="`${item.name}`"
+                     :value="item.name"
+                     :selected="collectorFormState.attachedServiceAccountType"
+                     readonly
             >
-                {{ state.projects[value].label }}
-            </p-anchor>
-        </template>
-        <template #col-provider-format="{value}">
-            <p-badge v-if="state.providers[value]"
-                     :background-color="state.providers[value].color"
-                     text-color="white"
-            >
-                {{ state.providers[value].label }}
-            </p-badge>
-        </template>
-        <template #col-collect-format="{item}">
-            <p-button size="sm"
-                      style-type="tertiary"
-                      :disabled="props.manageDisabled"
-                      @click.stop="handleClickCollect(item)"
-            >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
-            </p-button>
-        </template>
-        <template #col-created_at-format="{value}">
-            {{ iso8601Formatter(value, state.timezone) }}
-        </template>
-    </p-toolbox-table>
+                {{ item.label }}
+            </p-radio>
+        </p-radio-group>
+        <p-toolbox-table :fields="fields"
+                         :items="state.secrets"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :query-tags="queryTags"
+                         :key-item-sets="querySearchHandlers.keyItemSets"
+                         :value-handler-map="querySearchHandlers.valueHandlerMap"
+                         :sort-by.sync="state.sortBy"
+                         :sort-desc.sync="state.sortDesc"
+                         :page-size.sync="state.pageLimit"
+                         search-type="query"
+                         searchable
+                         use-cursor-loading
+                         @change="handleToolboxTableChange"
+                         @refresh="handleToolboxTableRefresh"
+        >
+            <template #col-service_account_id-format="{value}">
+                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
+            </template>
+            <template #col-project_id-format="{value}">
+                <p-anchor v-if="state.projects[value]"
+                          :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                >
+                    {{ state.projects[value].label }}
+                </p-anchor>
+            </template>
+            <template #col-provider-format="{value}">
+                <p-badge v-if="state.providers[value]"
+                         :background-color="state.providers[value].color"
+                         text-color="white"
+                >
+                    {{ state.providers[value].label }}
+                </p-badge>
+            </template>
+            <template #col-collect-format="{item}">
+                <p-button size="sm"
+                          style-type="tertiary"
+                          :disabled="props.manageDisabled"
+                          @click.stop="handleClickCollect(item)"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+                </p-button>
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, state.timezone) }}
+            </template>
+        </p-toolbox-table>
+    </div>
 </template>
 
 <style scoped lang="postcss">
 .p-toolbox-table {
     border-color: transparent;
+}
+.attached-service-account-radio-group {
+    padding: 0 1rem;
 }
 </style>
