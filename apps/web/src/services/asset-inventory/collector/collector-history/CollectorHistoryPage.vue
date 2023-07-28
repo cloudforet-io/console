@@ -1,92 +1,3 @@
-<template>
-    <div class="collector-history-page">
-        <p-heading :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
-        />
-        <div class="collector-history-table">
-            <div class="status-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group class="select-button-group"
-                                       :buttons="statusList"
-                                       :selected.sync="state.selectedStatus"
-                                       theme="text"
-                />
-            </div>
-            <p-toolbox-table search-type="query"
-                             :fields="fields"
-                             :items="state.items"
-                             :query-tags="queryTags"
-                             :key-item-sets="handlers.keyItemSets"
-                             :value-handler-map="handlers.valueHandlerMap"
-                             :loading="state.loading"
-                             :total-count="state.totalCount"
-                             :this-page.sync="state.thisPage"
-                             :page-size.sync="state.pageSize"
-                             row-cursor-pointer
-                             sortable
-                             :selectable="false"
-                             :exportable="false"
-                             :class="state.items.length === 0 ? 'no-data' : ''"
-                             :style="{height: '100%', border: 'none'}"
-                             @change="handleChange"
-                             @refresh="handleChange()"
-                             @rowLeftClick="handleSelect"
-            >
-                <template #th-task-format="{ field }">
-                    <span>{{ field.label }}</span>
-                    <span class="th-additional-info-text"> (completed / total)</span>
-                </template>
-                <template #[`col-collector_info.plugin_info-format`]="{ value }">
-                    <template v-if="value">
-                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
-                                    width="1rem"
-                                    height="1rem"
-                                    class="mr-2"
-                        />
-                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
-                    </template>
-                </template>
-                <template #col-status-format="{ value }">
-                    <!-- TODO: will be check the color and translation after the API is updated -->
-                    <p-status
-                        :text="statusTextFormatter(value)"
-                        :text-color="statusTextColorFormatter(value)"
-                        :icon="statusIconFormatter(value)"
-                        :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
-                    />
-                </template>
-                <!-- TODO: will be check the color and translation after the API is updated -->
-                <!--                <template #col-progress="{ value }">-->
-                <!--                    <div class="col-progress-format">-->
-                <!--                        <span class="succeeded-bar"-->
-                <!--                              :style="{ width: `${value.succeededPercentage}%` }"-->
-                <!--                        />-->
-                <!--                        <span class="failed-bar"-->
-                <!--                              :style="{ width: `${value.failedPercentage}%` }"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--                    <span class="text">{{ value }}%</span>-->
-                <!--                </template>-->
-            </p-toolbox-table>
-            <div v-if="state.items.length > 0"
-                 class="pagination"
-            >
-                <p-pagination :total-count="state.totalCount"
-                              :this-page.sync="state.thisPage"
-                              :page-size.sync="state.pageSize"
-                              @change="handleChangePagination"
-                />
-            </div>
-        </div>
-        <no-collector-modal :visible.sync="state.modalVisible"
-                            :manage-disabled="!state.hasManagePermission"
-                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, watch,
@@ -288,6 +199,95 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     if (state.totalCount === 0) state.modalVisible = true;
 })();
 </script>
+
+<template>
+    <div class="collector-history-page">
+        <p-heading :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
+        />
+        <div class="collector-history-table">
+            <div class="status-wrapper">
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <p-select-button-group class="select-button-group"
+                                       :buttons="statusList"
+                                       :selected.sync="state.selectedStatus"
+                                       theme="text"
+                />
+            </div>
+            <p-toolbox-table search-type="query"
+                             :fields="fields"
+                             :items="state.items"
+                             :query-tags="queryTags"
+                             :key-item-sets="handlers.keyItemSets"
+                             :value-handler-map="handlers.valueHandlerMap"
+                             :loading="state.loading"
+                             :total-count="state.totalCount"
+                             :this-page.sync="state.thisPage"
+                             :page-size.sync="state.pageSize"
+                             row-cursor-pointer
+                             sortable
+                             :selectable="false"
+                             :exportable="false"
+                             :class="state.items.length === 0 ? 'no-data' : ''"
+                             :style="{height: '100%', border: 'none'}"
+                             @change="handleChange"
+                             @refresh="handleChange()"
+                             @rowLeftClick="handleSelect"
+            >
+                <template #th-task-format="{ field }">
+                    <span>{{ field.label }}</span>
+                    <span class="th-additional-info-text"> (completed / total)</span>
+                </template>
+                <template #[`col-collector_info.plugin_info-format`]="{ value }">
+                    <template v-if="value">
+                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
+                                    width="1rem"
+                                    height="1rem"
+                                    class="mr-2"
+                        />
+                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
+                    </template>
+                </template>
+                <template #col-status-format="{ value }">
+                    <!-- TODO: will be check the color and translation after the API is updated -->
+                    <p-status
+                        :text="statusTextFormatter(value)"
+                        :text-color="statusTextColorFormatter(value)"
+                        :icon="statusIconFormatter(value)"
+                        :icon-color="statusIconColorFormatter(value)"
+                        :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                    />
+                </template>
+                <!-- TODO: will be check the color and translation after the API is updated -->
+                <!--                <template #col-progress="{ value }">-->
+                <!--                    <div class="col-progress-format">-->
+                <!--                        <span class="succeeded-bar"-->
+                <!--                              :style="{ width: `${value.succeededPercentage}%` }"-->
+                <!--                        />-->
+                <!--                        <span class="failed-bar"-->
+                <!--                              :style="{ width: `${value.failedPercentage}%` }"-->
+                <!--                        />-->
+                <!--                    </div>-->
+                <!--                    <span class="text">{{ value }}%</span>-->
+                <!--                </template>-->
+            </p-toolbox-table>
+            <div v-if="state.items.length > 0"
+                 class="pagination"
+            >
+                <p-pagination :total-count="state.totalCount"
+                              :this-page.sync="state.thisPage"
+                              :page-size.sync="state.pageSize"
+                              @change="handleChangePagination"
+                />
+            </div>
+        </div>
+        <no-collector-modal :visible.sync="state.modalVisible"
+                            :manage-disabled="!state.hasManagePermission"
+                            @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .collector-history-page {

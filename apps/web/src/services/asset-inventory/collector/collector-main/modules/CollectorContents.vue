@@ -1,48 +1,3 @@
-<template>
-    <div class="collector-contents">
-        <p-toolbox
-            exportable
-            filters-visible
-            search-type="query"
-            :key-item-sets="keyItemSets"
-            :query-tags="state.searchTags"
-            :value-handler-map="valueHandlerMap"
-            :total-count="collectorPageState.totalCount"
-            @change="handleChangeToolbox"
-            @refresh="fetchCollectorList"
-            @export="handleExportExcel"
-        >
-            <template #left-area>
-                <p-button
-                    icon-left="ic_plus_bold"
-                    class="create-button"
-                    @click="routeToCreatePage"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
-                </p-button>
-            </template>
-        </p-toolbox>
-        <p-data-loader :data="state.items"
-                       :loading="collectorPageState.loading.collectorList"
-                       class="collector-list-wrapper"
-        >
-            <div class="collector-lists">
-                <div v-for="item in state.items"
-                     :key="item.collectorId"
-                     @click="handleClickListItem(item.detailLink)"
-                >
-                    <collector-content-item :item="item" />
-                </div>
-            </div>
-            <template #no-data>
-                <collector-list-no-data class="collector-no-data" />
-            </template>
-        </p-data-loader>
-        <collector-schedule-modal @refresh-collector-list="fetchCollectorList" />
-        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     onMounted, computed, reactive, watch,
@@ -235,6 +190,51 @@ onMounted(async () => {
     await fetchCollectorList();
 });
 </script>
+
+<template>
+    <div class="collector-contents">
+        <p-toolbox
+            exportable
+            filters-visible
+            search-type="query"
+            :key-item-sets="keyItemSets"
+            :query-tags="state.searchTags"
+            :value-handler-map="valueHandlerMap"
+            :total-count="collectorPageState.totalCount"
+            @change="handleChangeToolbox"
+            @refresh="fetchCollectorList"
+            @export="handleExportExcel"
+        >
+            <template #left-area>
+                <p-button
+                    icon-left="ic_plus_bold"
+                    class="create-button"
+                    @click="routeToCreatePage"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.CREATE') }}
+                </p-button>
+            </template>
+        </p-toolbox>
+        <p-data-loader :data="state.items"
+                       :loading="collectorPageState.loading.collectorList"
+                       class="collector-list-wrapper"
+        >
+            <div class="collector-lists">
+                <div v-for="item in state.items"
+                     :key="item.collectorId"
+                     @click="handleClickListItem(item.detailLink)"
+                >
+                    <collector-content-item :item="item" />
+                </div>
+            </div>
+            <template #no-data>
+                <collector-list-no-data class="collector-no-data" />
+            </template>
+        </p-data-loader>
+        <collector-schedule-modal @refresh-collector-list="fetchCollectorList" />
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
+    </div>
+</template>
 
 <style scoped lang="postcss">
 .collector-contents {

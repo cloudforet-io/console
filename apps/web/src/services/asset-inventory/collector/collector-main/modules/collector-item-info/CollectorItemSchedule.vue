@@ -1,32 +1,3 @@
-<template>
-    <div class="info-item">
-        <div class="info-label-wrapper">
-            <p class="info-label">
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
-            </p>
-            <button class="schedule-button"
-                    @click.stop="handleClickSchedule"
-            >
-                <p-i name="ic_edit"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                {{ $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
-            </button>
-        </div>
-        <div @click.stop="handleChangeToggle">
-            <p-toggle-button
-                :value="state.isScheduleActivated"
-                :class="state.isScheduleActivated ? 'toggle-active' : ''"
-                show-state-text
-                @change-toggle="handleChangeToggle"
-            />
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
@@ -89,6 +60,35 @@ watch(() => props.schedule, (schedule) => {
     }
 }, { immediate: true });
 </script>
+
+<template>
+    <div class="info-item">
+        <div class="info-label-wrapper">
+            <p class="info-label">
+                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE') }}
+            </p>
+            <button class="schedule-button"
+                    @click.stop="handleClickSchedule"
+            >
+                <p-i name="ic_edit"
+                     height="0.75rem"
+                     width="0.75rem"
+                     color="inherit"
+                     class="icon-schedule"
+                />
+                {{ $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
+            </button>
+        </div>
+        <div @click.stop="handleChangeToggle">
+            <p-toggle-button
+                :value="state.isScheduleActivated"
+                :class="state.isScheduleActivated ? 'toggle-active' : ''"
+                show-state-text
+                @change-toggle="handleChangeToggle"
+            />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .info-item {

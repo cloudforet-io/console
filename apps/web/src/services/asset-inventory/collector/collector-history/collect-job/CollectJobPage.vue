@@ -1,29 +1,3 @@
-<template>
-    <div>
-        <p-heading :title="props.jobId"
-                   show-back-button
-                   @click-back-button="$router.go(-1)"
-        />
-        <div class="top-wrapper">
-            <job-status-chart :job-id="props.jobId" />
-            <job-basic-information :job-id="props.jobId" />
-        </div>
-        <p-horizontal-layout class="job-tasks-wrapper"
-                             :min-height="350"
-        >
-            <template #container="{ height }">
-                <job-table :style="{height: `${height}px`}"
-                           :job-id="props.jobId"
-                           @select="state.selectedItem = $event"
-                />
-            </template>
-        </p-horizontal-layout>
-        <job-task-details v-if="state.selectedItem"
-                          :selected-item="state.selectedItem"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     reactive, onActivated,
@@ -55,6 +29,32 @@ onActivated(() => {
     state.selectedItem = null;
 });
 </script>
+
+<template>
+    <div>
+        <p-heading :title="props.jobId"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
+        />
+        <div class="top-wrapper">
+            <job-status-chart :job-id="props.jobId" />
+            <job-basic-information :job-id="props.jobId" />
+        </div>
+        <p-horizontal-layout class="job-tasks-wrapper"
+                             :min-height="350"
+        >
+            <template #container="{ height }">
+                <job-table :style="{height: `${height}px`}"
+                           :job-id="props.jobId"
+                           @select="state.selectedItem = $event"
+                />
+            </template>
+        </p-horizontal-layout>
+        <job-task-details v-if="state.selectedItem"
+                          :selected-item="state.selectedItem"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-horizontal-layout */

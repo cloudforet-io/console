@@ -1,45 +1,3 @@
-<template>
-    <p-pane-layout class="job-status-chart">
-        <div class="status-wrapper">
-            <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span v-if="state.status"
-                  class="value"
-            >
-                <p-i
-                    :name="statusIconFormatter(state.status)"
-                    width="1rem"
-                    height="1rem"
-                    :animation="state.status === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
-                    :color="statusIconColorFormatter(state.status)"
-                />
-                {{ statusTextFormatter(state.status) }}
-            </span>
-        </div>
-        <div class="chart-wrapper">
-            <div class="label-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
-                <template v-if="state.succeededCount > 0">
-                    <p-status :icon-color="green[500]" />
-                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ state.succeededCount }}</strong></span>
-                </template>
-                <template v-if="state.failedCount > 0">
-                    <p-status :icon-color="red[400]" />
-                    <span :style="{'color': red[400]}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ state.failedCount }}</strong></span>
-                </template>
-                <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ state.totalCount }}</strong></span>
-            </div>
-            <div class="progress-bar">
-                <span class="succeeded-bar"
-                      :style="{ width: `${state.succeededPercentage}%` }"
-                />
-                <span class="failed-bar"
-                      :style="{ width: `${state.failedPercentage}%` }"
-                />
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
-
 <script setup lang="ts">
 import {
     computed,
@@ -124,6 +82,48 @@ onDeactivated(() => {
     if (interval) clearInterval(interval);
 });
 </script>
+
+<template>
+    <p-pane-layout class="job-status-chart">
+        <div class="status-wrapper">
+            <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
+            <span v-if="state.status"
+                  class="value"
+            >
+                <p-i
+                    :name="statusIconFormatter(state.status)"
+                    width="1rem"
+                    height="1rem"
+                    :animation="state.status === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                    :color="statusIconColorFormatter(state.status)"
+                />
+                {{ statusTextFormatter(state.status) }}
+            </span>
+        </div>
+        <div class="chart-wrapper">
+            <div class="label-wrapper">
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
+                <template v-if="state.succeededCount > 0">
+                    <p-status :icon-color="green[500]" />
+                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ state.succeededCount }}</strong></span>
+                </template>
+                <template v-if="state.failedCount > 0">
+                    <p-status :icon-color="red[400]" />
+                    <span :style="{'color': red[400]}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ state.failedCount }}</strong></span>
+                </template>
+                <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ state.totalCount }}</strong></span>
+            </div>
+            <div class="progress-bar">
+                <span class="succeeded-bar"
+                      :style="{ width: `${state.succeededPercentage}%` }"
+                />
+                <span class="failed-bar"
+                      :style="{ width: `${state.failedPercentage}%` }"
+                />
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .job-status-chart {

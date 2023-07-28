@@ -1,50 +1,3 @@
-<template>
-    <div class="collector-content-item">
-        <p-card :header="false"
-                style-type="white"
-                class="collector-item"
-        >
-            <div class="collector-item-wrapper">
-                <span class="collector-item-name">{{ props.item.name }}</span>
-                <div class="collector-plugin">
-                    <p-lazy-img :src="props.item.plugin.icon"
-                                width="1.5rem"
-                                height="1.5rem"
-                                class="plugin-icon"
-                    />
-                    <div class="title-wrapper">
-                        <span class="plugin-name">{{ props.item.plugin.name }}</span>
-                        <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
-                    </div>
-                </div>
-                <div class="collector-info-wrapper">
-                    <div v-if="props.item"
-                         class="collector-info-view"
-                    >
-                        <collector-current-status :schedule="props.item.schedule"
-                                                  :recent-job="state.recentJob"
-                        />
-                        <collector-item-job-list :recent-job-analyze="props.item.recentJobAnalyze"
-                                                 :history-link="props.item.historyLink"
-                        />
-                    </div>
-                    <collector-item-schedule :collector-id="props.item.collectorId"
-                                             :schedule="props.item.schedule"
-                    />
-                </div>
-            </div>
-            <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
-                <p-button style-type="tertiary"
-                          class="collector-data-button"
-                          @click.stop="handleClickCollectData"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
-                </p-button>
-            </div>
-        </p-card>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
@@ -100,6 +53,53 @@ const handleClickCollectData = async () => {
     });
 };
 </script>
+
+<template>
+    <div class="collector-content-item">
+        <p-card :header="false"
+                style-type="white"
+                class="collector-item"
+        >
+            <div class="collector-item-wrapper">
+                <span class="collector-item-name">{{ props.item.name }}</span>
+                <div class="collector-plugin">
+                    <p-lazy-img :src="props.item.plugin.icon"
+                                width="1.5rem"
+                                height="1.5rem"
+                                class="plugin-icon"
+                    />
+                    <div class="title-wrapper">
+                        <span class="plugin-name">{{ props.item.plugin.name }}</span>
+                        <span class="plugin-version">v{{ props.item.plugin.info.version }}</span>
+                    </div>
+                </div>
+                <div class="collector-info-wrapper">
+                    <div v-if="props.item"
+                         class="collector-info-view"
+                    >
+                        <collector-current-status :schedule="props.item.schedule"
+                                                  :recent-job="state.recentJob"
+                        />
+                        <collector-item-job-list :recent-job-analyze="props.item.recentJobAnalyze"
+                                                 :history-link="props.item.historyLink"
+                        />
+                    </div>
+                    <collector-item-schedule :collector-id="props.item.collectorId"
+                                             :schedule="props.item.schedule"
+                    />
+                </div>
+            </div>
+            <div :class="['collector-status-wrapper', { 'is-mobile': isMobile()}]">
+                <p-button style-type="tertiary"
+                          class="collector-data-button"
+                          @click.stop="handleClickCollectData"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA') }}
+                </p-button>
+            </div>
+        </p-card>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .collector-content-item {

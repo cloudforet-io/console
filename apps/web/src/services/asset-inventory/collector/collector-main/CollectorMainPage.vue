@@ -1,46 +1,3 @@
-<template>
-    <div class="collector-page">
-        <p-heading
-            use-total-count
-            use-selected-count
-            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.totalCount"
-        >
-            <template #extra>
-                <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
-                >
-                    <p-button style-type="tertiary"
-                              class="history-button"
-                    >
-                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
-                    </p-button>
-                </router-link>
-            </template>
-        </p-heading>
-        <p-data-loader
-            :data="state.hasCollectorList"
-            :loading="state.initLoading"
-            loader-backdrop-color="gray.100"
-            class="collector-loader-wrapper"
-        >
-            <div v-if="state.hasCollectorList"
-                 class="collector-contents-wrapper"
-            >
-                <provider-list
-                    :provider-list="state.providerList"
-                    :selected-provider="collectorPageState.selectedProvider"
-                    @change-provider="handleSelectedProvider"
-                />
-                <collector-contents />
-            </div>
-            <template #no-data>
-                <collector-no-data />
-            </template>
-        </p-data-loader>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core';
 import {
@@ -157,6 +114,49 @@ onMounted(async () => {
     state.initLoading = false;
 });
 </script>
+
+<template>
+    <div class="collector-page">
+        <p-heading
+            use-total-count
+            use-selected-count
+            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+            :total-count="collectorPageState.totalCount"
+        >
+            <template #extra>
+                <router-link
+                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                >
+                    <p-button style-type="tertiary"
+                              class="history-button"
+                    >
+                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
+                    </p-button>
+                </router-link>
+            </template>
+        </p-heading>
+        <p-data-loader
+            :data="state.hasCollectorList"
+            :loading="state.initLoading"
+            loader-backdrop-color="gray.100"
+            class="collector-loader-wrapper"
+        >
+            <div v-if="state.hasCollectorList"
+                 class="collector-contents-wrapper"
+            >
+                <provider-list
+                    :provider-list="state.providerList"
+                    :selected-provider="collectorPageState.selectedProvider"
+                    @change-provider="handleSelectedProvider"
+                />
+                <collector-contents />
+            </div>
+            <template #no-data>
+                <collector-no-data />
+            </template>
+        </p-data-loader>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .history-button {
