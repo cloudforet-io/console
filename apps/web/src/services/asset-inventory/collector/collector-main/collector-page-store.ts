@@ -33,7 +33,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
 
         visible: {
             scheduleModal: false,
-            collectorModal: false,
         },
 
     }),

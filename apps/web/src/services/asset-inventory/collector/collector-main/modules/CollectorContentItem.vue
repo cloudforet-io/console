@@ -43,9 +43,7 @@ const state = reactive({
 const handleClickCollectData = async () => {
     if (!props.item) return;
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
-    await collectorPageStore.$patch((_state) => {
-        _state.visible.collectorModal = true;
-    });
+    await collectorDataModalStore.$patch({ visible: true });
     await collectorDataModalStore.$patch((_state) => {
         if (!props.item) return;
         _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];

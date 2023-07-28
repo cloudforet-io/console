@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="props.visible"
+        <p-button-modal :visible="collectorDataModalState.visible"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
@@ -55,15 +55,6 @@ import CollectorDataDuplicationInner
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
-
-const props = defineProps<{
-    visible: boolean;
-}>();
-
-const emit = defineEmits<{(e: 'click-confirm'): void,
-    (e: 'update:visible', visible: boolean): void
-}>();
-
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
@@ -93,10 +84,11 @@ const state = reactive({
     isDuplicateJobs: computed(() => collectorDataModalState.recentJob.status === JOB_STATE.IN_PROGRESS),
 });
 
+const emit = defineEmits<{(e: 'click-confirm'): void}>();
 
 /* Components */
 const handleClickCancel = () => {
-    emit('update:visible', false);
+    collectorDataModalStore.$patch({ visible: false });
     emit('click-confirm');
 };
 const handleClickConfirm = async () => {
@@ -113,7 +105,7 @@ const handleClickConfirm = async () => {
         throw e;
     } finally {
         state.loading = false;
-        emit('update:visible', false);
+        collectorDataModalStore.$patch({ visible: false });
     }
 };
 </script>
