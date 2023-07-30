@@ -12,29 +12,9 @@
                          :disabled="props.disabled"
                          @change-toggle="handleChangeToggle"
         />
-        <div v-if="!props.enableHoursEdit && collectorFormState.schedulePower"
-             class="collect-data-desc"
-        >
-            <i18n v-if="state.timezoneAppliedHours.length > 0"
-                  path="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
-                  tag="p"
-            >
-                <template #times>
-                    <span class="times">{{ state.timezoneAppliedHoursDisplayText }}</span>
-                </template>
-            </i18n>
-            <template v-else>
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_NOT_SELECTED_YET') }}
-                <p-button style-type="tertiary"
-                          size="sm"
-                          @click="handleClickSelect"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.SELECT') }}
-                </p-button>
-            </template>
-        </div>
-        <p-field-group v-if="props.enableHoursEdit"
+        <p-field-group v-if="collectorFormState.schedulePower"
                        class="hourly-schedule-field-group"
+                       :required="!props.enableHoursEdit"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
                        :help-text="$t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
@@ -44,18 +24,13 @@
                       class="time-block"
                       :class="{
                           active: !!state.timezoneAppliedHours.includes(hour),
-                          disabled: props.disabled
+                          disabled: props.disabled,
+                          'is-set-mode': !props.enableHoursEdit
                       }"
                       @click="handleClickHour(hour)"
                 >
                     {{ hour }}
                 </span>
-                <p-button style-type="tertiary"
-                          :disabled="props.disabled"
-                          @click="handleClickAllHours"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
-                </p-button>
             </div>
         </p-field-group>
     </p-data-loader>
@@ -63,11 +38,11 @@
 
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive, computed, watch,
+    defineProps, reactive, computed, watch,
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PFieldTitle, PToggleButton, PDataLoader,
+    PFieldGroup, PFieldTitle, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
@@ -90,9 +65,6 @@ const props = defineProps<{
     disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
     callApiOnPowerChange?: boolean;
-}>();
-
-const emits = defineEmits<{(event: 'update:enableHoursEdit', value: boolean): void;
 }>();
 
 const collectorFormStore = useCollectorFormStore();
@@ -152,12 +124,9 @@ const handleChangeToggle = async (value: boolean) => {
     }
 };
 
-const handleClickSelect = () => {
-    emits('update:enableHoursEdit', true);
-};
-
 const handleClickHour = (hour: number) => {
     if (props.disabled) return;
+    if (!props.enableHoursEdit) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
@@ -170,16 +139,6 @@ const handleClickHour = (hour: number) => {
         selectedUtcHoursSet.delete(utcHour);
     } else {
         selectedUtcHoursSet.add(utcHour);
-    }
-
-    updateSelectedHours();
-};
-const handleClickAllHours = () => {
-    if (state.isAllHoursSelected) selectedUtcHoursSet.clear();
-    else {
-        hoursMatrix.forEach((hour) => {
-            selectedUtcHoursSet.add(hour);
-        });
     }
 
     updateSelectedHours();
@@ -239,7 +198,16 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
             @apply bg-blue-600 text-white;
         }
         &.disabled {
-            cursor: not-allowed;
+            @apply cursor-not-allowed;
+        }
+        &.is-set-mode {
+            @apply bg-gray-100 text-gray-100 border-none cursor-default;
+            &:hover:not(.active) {
+                @apply bg-gray-100 text-gray-100;
+            }
+            &.active {
+                @apply bg-blue-200 text-blue-600;
+            }
         }
     }
 }
