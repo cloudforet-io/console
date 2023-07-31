@@ -12,13 +12,13 @@
             <template #body>
                 <div v-if="state.isDuplicateJobs">
                     <collector-data-duplication-inner :account-type="collectorDataModalState.accountType"
-                                                      :name="state.item.name"
-                                                      :plugin="state.item.plugin"
+                                                      :name="state.item?.name"
+                                                      :plugin="state.item?.plugin"
                     />
                 </div>
                 <collector-data-default-inner v-else
-                                              :name="state.item.name"
-                                              :plugin="state.item.plugin"
+                                              :name="state.item?.name"
+                                              :plugin="state.item?.plugin"
                 />
             </template>
             <template #confirm-button>
@@ -69,6 +69,7 @@ const state = reactive({
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     item: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
+        if (!selectedCollector) return undefined;
         return {
             ...selectedCollector,
             plugin: {
@@ -79,9 +80,10 @@ const state = reactive({
     }),
     collectDataType: computed(() => {
         const selectedSecret = collectorDataModalState.selectedSecret;
+        if (!selectedSecret) return COLLECT_DATA_TYPE.COLLECTOR;
         return Object.keys(selectedSecret).length > 0 ? COLLECT_DATA_TYPE.SECRET : COLLECT_DATA_TYPE.COLLECTOR;
     }),
-    isDuplicateJobs: computed(() => collectorDataModalState.recentJob.status === JOB_STATE.IN_PROGRESS),
+    isDuplicateJobs: computed(() => collectorDataModalState.recentJob?.status === JOB_STATE.IN_PROGRESS),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();
@@ -92,11 +94,13 @@ const handleClickCancel = () => {
     emit('click-confirm');
 };
 const handleClickConfirm = async () => {
+    if (!collectorDataModalState.selectedCollector) throw new Error('[CollectorDataModal] selectedCollector is null');
+
     state.loading = true;
     try {
         await SpaceConnector.client.inventory.collector.collect({
             collector_id: collectorDataModalState.selectedCollector.collector_id,
-            secret_id: collectorDataModalState.selectedSecret.secret_id,
+            secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         emit('click-confirm');

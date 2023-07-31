@@ -8,8 +8,8 @@
                         class="plugin-icon"
             />
             <span>{{ props.name }}</span>
-            <span v-if="collectorDataModalState.secrets.length > 0">
-                ({{ collectorDataModalState.secrets.length }})
+            <span v-if="collectorDataModalState.secrets?.length > 0">
+                ({{ collectorDataModalState.secrets?.length }})
             </span>
         </div>
     </div>

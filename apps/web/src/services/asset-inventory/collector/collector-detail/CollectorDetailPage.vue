@@ -31,7 +31,7 @@
                 <div v-if="!state.jobInitialLoading"
                      class="collector-button-box"
                 >
-                    <collect-data-button-group />
+                    <collect-data-button-group @collect="handleCollectData" />
                     <router-link v-if="state.hasJobs"
                                  :to="state.collectorHistoryLink"
                     >
@@ -62,6 +62,7 @@
         <collector-name-edit-modal :visible="state.editModalVisible"
                                    @update:visible="handleUpdateEditModalVisible"
         />
+        <collector-data-modal />
     </div>
 </template>
 
@@ -121,6 +122,12 @@ import CollectorScheduleSection from '@/services/asset-inventory/collector/colle
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/collector/collector-detail/modules/CollectorServiceAccountsSection.vue';
 import type { CollectorModel } from '@/services/asset-inventory/collector/model';
+import {
+    useCollectorDataModalStore,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import CollectorDataModal
+    from '@/services/asset-inventory/collector/shared/collector-data-modal/CollectorDataModal.vue';
+import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -135,6 +142,8 @@ const collectorFormState = collectorFormStore.$state;
 
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
+
+const collectorDataModalStore = useCollectorDataModalStore();
 
 const queryHelper = new QueryHelper();
 const state = reactive({
@@ -217,6 +226,16 @@ const handleDeleteModalConfirm = async () => {
 const handleUpdateEditModalVisible = (value: boolean) => {
     state.editModalVisible = value;
 };
+const handleCollectData = () => {
+    collectorDataModalStore.$patch((_state) => {
+        _state.visible = true;
+        _state.recentJob = collectorJobState.recentJob;
+        _state.selectedCollector = collectorFormState.originCollector;
+        _state.accountType = collectorFormState.originCollector?.secret_filter?.state === 'ENABLED' ? ATTACHED_ACCOUNT_TYPE.SPECIFIC : ATTACHED_ACCOUNT_TYPE.ALL;
+        _state.selectedSecret = undefined;
+        _state.secrets = null;
+    });
+};
 
 /* Api polling */
 const fetchRecentJob = async () => {
@@ -237,6 +256,7 @@ watch(documentVisibility, (visibility) => {
 onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
+    collectorDataModalStore.$reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -250,6 +270,7 @@ onUnmounted(() => {
     pause();
     collectorJobStore.$reset();
     collectorFormStore.$reset();
+    collectorDataModalStore.$reset();
 });
 
 

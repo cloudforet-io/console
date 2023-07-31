@@ -21,13 +21,17 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
 import type { SecretModel } from '@/services/asset-inventory/collector/model';
+import {
+    useCollectorDataModalStore,
+} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
@@ -38,6 +42,11 @@ const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+
+const collectorDataModalStore = useCollectorDataModalStore();
+
+const collectorJobStore = useCollectorJobStore();
+const collectorJobState = collectorJobStore.$state;
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -125,18 +134,6 @@ const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promi
         return { results: [], total_count: 0 };
     }
 };
-const fetchCollectBySecret = async (secretId: string) => {
-    try {
-        if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: collectorFormStore.collectorId,
-            secret_id: secretId,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-    }
-};
 
 /* reused functions */
 const getSecrets = async (provider: string, serviceAccounts?: string[]) => {
@@ -166,8 +163,14 @@ const handleToolboxTableRefresh = async () => {
     if (collectorFormStore.collectorProvider) await getSecrets(collectorFormStore.collectorProvider, state.serviceAccountsFilter);
 };
 const handleClickCollect = async (secret: SecretModel) => {
-    const secretId = secret.secret_id;
-    await fetchCollectBySecret(secretId);
+    collectorDataModalStore.$patch((_state) => {
+        _state.visible = true;
+        _state.recentJob = collectorJobState.recentJob;
+        _state.selectedCollector = collectorFormState.originCollector;
+        _state.accountType = collectorFormState.originCollector?.secret_filter?.state === 'ENABLED' ? ATTACHED_ACCOUNT_TYPE.SPECIFIC : ATTACHED_ACCOUNT_TYPE.ALL;
+        _state.selectedSecret = secret;
+        _state.secrets = state.secrets;
+    });
 };
 
 watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFilter], async ([provider, serviceAccounts]) => {
