@@ -2218,6 +2218,7 @@
 				"JOB_PROGRESS": "상태: 수집중",
 				"JOB_SUCCESS": "상태: {date}에 수집 완료 ",
 				"NO_DATA": "생성된 컬렉터가 없습니다.",
+				"NO_JOB": "최근 작업내역 없음",
 				"NO_SCHEDULE": "스케줄 설정 안 되어 있음",
 				"PLUGIN": "플러그인",
 				"RECENT_JOBS": "최근 컬렉터 작업",
