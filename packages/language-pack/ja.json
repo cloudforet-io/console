@@ -2120,11 +2120,11 @@
 				"CREATE_EXIT_MODAL_CONTENT": "この操作は取り消すことができません。",
 				"CREATE_EXIT_MODAL_TITLE": "中止してもよろしいですか？",
 				"CREATE_NEW_COLLECTOR": "新しいコレクターを作成",
-				"EXCLUDE": "",
+				"EXCLUDE": "除外項目",
 				"FORM_LOAD_FAILED": "追加オプションの読み込みに失敗しました。",
-				"INCLUDE": "",
+				"INCLUDE": "含まれる",
 				"LEARN_MORE": "詳細を見る",
-				"LOADING_DESC1": "",
+				"LOADING_DESC1": "関連オプションを初期化しています...",
 				"LOADING_DESC2": "(お待ちください、約1〜2分かかる場合があります)",
 				"NAME": "名前",
 				"NAME_INVALID_DUPLICATED": "名前が重複しています",
@@ -2184,10 +2184,10 @@
 			},
 			"HISTORY": {
 				"ALL": "すべてを表示",
-				"CANCELED": "",
+				"CANCELED": "キャンセル",
 				"FAILURE": "失敗",
 				"IN_PROGRESS": "進行中",
-				"PENDING": "",
+				"PENDING": "保留中",
 				"SUCCESS": "成功"
 			},
 			"MAIN": {
@@ -2196,13 +2196,13 @@
 				"COLLECTOR_SCHEDULE": "コレクタースケジュール",
 				"COLLECT_DATA": "データ収集",
 				"COLLECT_DATA_MODAL": {
-					"ACCOUNT": "",
+					"ACCOUNT": "アカウント",
 					"CONFIRM_BUTTON": "今すぐ収集",
-					"DESCRIPTION": "",
-					"DUPLICATION_DESCRIPTION": "",
-					"DUPLICATION_TITLE": "",
-					"DURATION": "",
-					"TITLE": ""
+					"DESCRIPTION": "次の関連アカウントからデータを収集します。",
+					"DUPLICATION_DESCRIPTION": "在進行中のデータ収集情報をご確認ください。",
+					"DUPLICATION_TITLE": "データの収集はまだ進行中です。キャンセルして再開しますか？",
+					"DURATION": "期間",
+					"TITLE": "今すぐデータを収集しますか？"
 				},
 				"CREATE": "作成",
 				"CREATE_COLLECTOR": "コレクタ生成",
@@ -2211,7 +2211,7 @@
 				"EDIT_SCHEDULE": "編集",
 				"HISTORY": "コレクターの履歴",
 				"IN_PROGRESS": "進行中",
-				"JOB_CANCELED": "",
+				"JOB_CANCELED": "キャンセル: {date}",
 				"JOB_ERROR": "状態: {date}に収集失敗",
 				"JOB_NONE": "収集記録なし",
 				"JOB_PROGRESS": "進捗率: 進行中",
@@ -2219,7 +2219,7 @@
 				"NO_DATA": "作成されたコレクターはありません。",
 				"NO_SCHEDULE": "スケジュールが設定されていません",
 				"PLUGIN": "プラグイン",
-				"RECENT_JOBS": "",
+				"RECENT_JOBS": "最近のコレクタージョブ",
 				"RECENT_JOBS_TOOLTIP": "過去5日間の最新のデータ収集結果です",
 				"RESTART": "再開",
 				"RESTART_COLLECT": "現在、データ収集は進行中です。再開しますか？",
@@ -2231,7 +2231,7 @@
 				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
 			},
 			"NO_DATA": "データがありません",
-			"NO_OPTIONS": ""
+			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
 		"SERVER": {
 			"MAIN": {

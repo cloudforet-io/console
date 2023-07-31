@@ -2125,7 +2125,7 @@
 				"INCLUDE": "Include",
 				"LEARN_MORE": "learn more",
 				"LOADING_DESC1": "Initializing associated options...",
-				"LOADING_DESC2": "(Please wait, this may take about 1-2 minutes)",
+				"LOADING_DESC2": "(Please wait, this may take about 1~2 minutes)",
 				"NAME": "Name",
 				"NAME_INVALID_DUPLICATED": "Name already registered.",
 				"NAME_INVALID_MIN": "Must be longer than 2 characters",
@@ -2198,7 +2198,7 @@
 				"COLLECT_DATA_MODAL": {
 					"ACCOUNT": "Account",
 					"CONFIRM_BUTTON": "Collect Now",
-					"DESCRIPTION": "Collect data with following associated accounts.",
+					"DESCRIPTION": "Collect data from the following associated accounts.",
 					"DUPLICATION_DESCRIPTION": "Check the ongoing data collection information.",
 					"DUPLICATION_TITLE": "Collecting is still in progress. Do you want to cancel and re-start it?",
 					"DURATION": "Duration",
@@ -2231,7 +2231,7 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_OPTIONS": "No Supported Options"
+			"NO_OPTIONS": "No Selectable Options"
 		},
 		"SERVER": {
 			"MAIN": {

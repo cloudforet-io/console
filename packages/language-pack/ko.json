@@ -1807,7 +1807,7 @@
 				"ALT_E_DISABLE_API_KEY": "API Key 비활성화 실패",
 				"ALT_E_ENABLE": "사용자 활성화 실패",
 				"ALT_E_ENABLE_API_KEY": "API Key 활성화 실패",
-				"ALT_E_SAME_PASSWORD": "이전과 동일한 비밀번호를 입력하셨습니다. 다시 입력해주세요.",
+				"ALT_E_SAME_PASSWORD": "이전과 동일한 비밀번호를 입력하셨습니다. 다시 입력해 주세요.",
 				"ALT_E_UPDATE_USER": "사용자 업데이트 실패",
 				"ALT_S_ADD_USER": "사용자 추가 완료",
 				"ALT_S_DELETE_API_KEY": "API 키 삭제 완료",
@@ -2120,12 +2120,12 @@
 				"CREATE_EXIT_MODAL_CONTENT": "이 작업은 취소 할 수 없습니다.",
 				"CREATE_EXIT_MODAL_TITLE": "컬렉터 생성을 중단하시겠습니까? ",
 				"CREATE_NEW_COLLECTOR": "신규 컬렉터 생성",
-				"EXCLUDE": "",
+				"EXCLUDE": "제외항목",
 				"FORM_LOAD_FAILED": "추가 옵션 항목 불러오기에 실패했습니다.",
-				"INCLUDE": "",
+				"INCLUDE": "포함항목",
 				"LEARN_MORE": "더보기",
-				"LOADING_DESC1": "",
-				"LOADING_DESC2": "(잠시만 기다려 주세요. 1-2분 정도 소요될 수 있습니다.)",
+				"LOADING_DESC1": "연관 옵션 불러오는 중...",
+				"LOADING_DESC2": "(잠시만 기다려 주세요. 1~2분 정도 소요될 수 있습니다.)",
 				"NAME": "이름",
 				"NAME_INVALID_DUPLICATED": "중복된 이름입니다.",
 				"NAME_INVALID_MIN": "2 자 이상 입력해주세요.",
@@ -2184,10 +2184,10 @@
 			},
 			"HISTORY": {
 				"ALL": "모두 보기",
-				"CANCELED": "",
+				"CANCELED": "취소됨",
 				"FAILURE": "실패",
 				"IN_PROGRESS": "진행중",
-				"PENDING": "",
+				"PENDING": "처리중",
 				"SUCCESS": "성공"
 			},
 			"MAIN": {
@@ -2196,13 +2196,13 @@
 				"COLLECTOR_SCHEDULE": "컬렉터 스케줄",
 				"COLLECT_DATA": "데이터 수집",
 				"COLLECT_DATA_MODAL": {
-					"ACCOUNT": "",
+					"ACCOUNT": "어카운트‌",
 					"CONFIRM_BUTTON": "수집하기",
-					"DESCRIPTION": "",
-					"DUPLICATION_DESCRIPTION": "",
-					"DUPLICATION_TITLE": "",
-					"DURATION": "",
-					"TITLE": ""
+					"DESCRIPTION": "다음과 같이 연관된 어카운\u001c트에서 데이터를 수집합니다.",
+					"DUPLICATION_DESCRIPTION": "현재 진행 중인 수집 상태를 확인하세요.",
+					"DUPLICATION_TITLE": "수집이 현재 진행 중입니다. 취소 후 재시작하시겠습니까?",
+					"DURATION": "처리시간",
+					"TITLE": "데이터 수집을 진행하시겠습니까?"
 				},
 				"CREATE": "생성",
 				"CREATE_COLLECTOR": "컬렉터 생성",
@@ -2211,7 +2211,7 @@
 				"EDIT_SCHEDULE": "수정",
 				"HISTORY": "컬렉터 히스토리",
 				"IN_PROGRESS": "진행중",
-				"JOB_CANCELED": "",
+				"JOB_CANCELED": "취소됨: {date}",
 				"JOB_ERROR": "상태: {date}에 수집 실패",
 				"JOB_NONE": "수집 기록 없음",
 				"JOB_PROGRESS": "상태: 수집중",
@@ -2219,8 +2219,8 @@
 				"NO_DATA": "생성된 컬렉터가 없습니다.",
 				"NO_SCHEDULE": "스케줄 설정 안 되어 있음",
 				"PLUGIN": "플러그인",
-				"RECENT_JOBS": "",
-				"RECENT_JOBS_TOOLTIP": "최근 5일내 수집 결과",
+				"RECENT_JOBS": "최근 컬렉터 작업",
+				"RECENT_JOBS_TOOLTIP": "최근 5일 동안의 수집 결과",
 				"RESTART": "다시 시작",
 				"RESTART_COLLECT": "현재 데이터 수집이 진행중입니다. 수집을 다시 시작하시겠습니까?",
 				"SCHEDULED": "수집 예정: ",
@@ -2231,7 +2231,7 @@
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
 			},
 			"NO_DATA": "데이터가 없습니다.",
-			"NO_OPTIONS": ""
+			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
 		"SERVER": {
 			"MAIN": {
