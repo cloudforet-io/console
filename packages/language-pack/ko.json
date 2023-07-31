@@ -2198,7 +2198,7 @@
 				"COLLECT_DATA_MODAL": {
 					"ACCOUNT": "어카운트‌",
 					"CONFIRM_BUTTON": "수집하기",
-					"DESCRIPTION": "다음과 같이 연관된 어카운\u001c트에서 데이터를 수집합니다.",
+					"DESCRIPTION": "다음과 같이 연관된 어카운트에서 데이터를 수집합니다.",
 					"DUPLICATION_DESCRIPTION": "현재 진행 중인 수집 상태를 확인하세요.",
 					"DUPLICATION_TITLE": "수집이 현재 진행 중입니다. 취소 후 재시작하시겠습니까?",
 					"DURATION": "처리시간",
