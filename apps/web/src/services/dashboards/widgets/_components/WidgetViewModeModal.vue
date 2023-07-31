@@ -71,7 +71,7 @@ import {
 } from 'vue';
 
 import { PHeading, PIconButton, PButton } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import { store } from '@/store';
 
@@ -90,6 +90,7 @@ import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+
 
 interface WidgetViewModeModalProps {
     visible: boolean;
@@ -158,7 +159,12 @@ watch(() => props.visible, async (visible) => {
         state.sidebarVisible = false;
     }
 });
-// watch(() => )
+watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.widget_options.filters], async ([_inheritOptions, _filters]) => {
+    if (!state.initiated) return;
+    if (isEqual(_inheritOptions, widgetFormState.widgetInfo?.inherit_options)
+        && isEqual(_filters, widgetFormState.widgetInfo?.widget_options.filters)) return;
+    await state.widgetRef?.refreshWidget();
+}, { immediate: false });
 </script>
 
 <style lang="postcss" scoped>

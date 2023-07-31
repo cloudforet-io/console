@@ -27,7 +27,7 @@
                         {{ $t('DASHBOARDS.VIEW_MODE.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!dashboardDetailStore.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
+                              :disabled="!widgetFormState.isValid"
                               @click="handleClickSaveButton"
                     >
                         {{ $t('DASHBOARDS.VIEW_MODE.SAVE') }}
@@ -53,7 +53,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 
 
@@ -72,10 +71,8 @@ const emit = defineEmits<{(e: string, value: string): void,
     (e: 'save'): void,
 }>();
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
-// const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.$state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
