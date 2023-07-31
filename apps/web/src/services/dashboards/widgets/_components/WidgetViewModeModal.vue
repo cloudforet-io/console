@@ -100,6 +100,7 @@ type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
 });
+const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -157,6 +158,7 @@ watch(() => props.visible, async (visible) => {
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
+        emit('refresh-widget', widgetFormState.widgetKey as string);
     }
 });
 watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.widget_options.filters], async ([_inheritOptions, _filters]) => {
