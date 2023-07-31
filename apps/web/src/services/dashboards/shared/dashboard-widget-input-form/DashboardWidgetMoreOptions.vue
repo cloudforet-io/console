@@ -129,7 +129,7 @@ const {
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
     const selectedProperties: string[] = union(state.requiredProperties, sortItems(selected).map((item) => item.name));
     emit('update:selected-properties', selectedProperties);
-    // hideContextMenu();
+    hideContextMenu();
 };
 const handleClickAddOptions = () => {
     initiateMenu();
