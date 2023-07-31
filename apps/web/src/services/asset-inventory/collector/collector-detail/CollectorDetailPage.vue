@@ -232,6 +232,8 @@ const handleCollectData = () => {
         _state.recentJob = collectorJobState.recentJob;
         _state.selectedCollector = collectorFormState.originCollector;
         _state.accountType = collectorFormState.originCollector?.secret_filter?.state === 'ENABLED' ? ATTACHED_ACCOUNT_TYPE.SPECIFIC : ATTACHED_ACCOUNT_TYPE.ALL;
+        _state.selectedSecret = undefined;
+        _state.secrets = null;
     });
 };
 

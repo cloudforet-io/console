@@ -95,13 +95,12 @@ const handleClickCancel = () => {
 };
 const handleClickConfirm = async () => {
     if (!collectorDataModalState.selectedCollector) throw new Error('[CollectorDataModal] selectedCollector is null');
-    if (!collectorDataModalState.selectedSecret) throw new Error('[CollectorDataModal] selectedSecret is null');
 
     state.loading = true;
     try {
         await SpaceConnector.client.inventory.collector.collect({
             collector_id: collectorDataModalState.selectedCollector.collector_id,
-            secret_id: collectorDataModalState.selectedSecret.secret_id,
+            secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         emit('click-confirm');
