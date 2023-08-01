@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PHeading, PButton, PPaneLayout,
@@ -115,6 +115,12 @@ const handleClickSave = async () => {
         state.updateLoading = false;
     }
 };
+
+watch(() => collectorFormState.schedulePower, (schedulePower) => {
+    if (!schedulePower) {
+        state.isEditMode = false;
+    }
+});
 
 </script>
 

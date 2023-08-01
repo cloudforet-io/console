@@ -13,7 +13,7 @@
                          show-state-text
                          @change-toggle="handleChangeToggle"
         />
-        <p-field-group v-if="collectorFormState.schedulePower"
+        <p-field-group v-if="collectorFormState.schedulePower || props.enableHoursEdit"
                        class="hourly-schedule-field-group"
                        :required="!props.enableHoursEdit"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
