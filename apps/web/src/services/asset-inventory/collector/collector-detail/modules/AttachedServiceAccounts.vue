@@ -31,7 +31,7 @@ import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
-import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
@@ -164,10 +164,15 @@ const handleToolboxTableRefresh = async () => {
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
+        const recentJob = collectorJobState.recentJob;
+        if (!recentJob) return;
         _state.visible = true;
-        _state.recentJob = collectorJobState.recentJob;
+        _state.recentJob = {
+            status: recentJob.status,
+            jobId: recentJob.job_id,
+        };
         _state.selectedCollector = collectorFormState.originCollector;
-        _state.accountType = collectorFormState.originCollector?.secret_filter?.state === 'ENABLED' ? ATTACHED_ACCOUNT_TYPE.SPECIFIC : ATTACHED_ACCOUNT_TYPE.ALL;
+        _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;
         _state.selectedSecret = secret;
         _state.secrets = state.secrets;
     });
