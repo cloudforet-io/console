@@ -69,7 +69,7 @@ const state = reactive({
                 View All
             </p-anchor>
         </div>
-        <p-data-loader :data="props.recentJobs"
+        <p-data-loader :data="!!props.recentJobs?.length"
                        :loading="state.loading"
                        loader-type="skeleton"
                        class="data-loader"

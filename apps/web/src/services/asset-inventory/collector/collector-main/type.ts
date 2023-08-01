@@ -44,8 +44,8 @@ export interface CollectorItemInfo {
     plugin: CollectorPlugin;
     historyLink: CollectorLink,
     detailLink: CollectorLink;
-    schedule: Schedule;
-    recentJobAnalyze: JobAnalyzeStatus[];
+    schedule?: Schedule;
+    recentJobAnalyze?: JobAnalyzeStatus[];
     hasJobList?: boolean
 }
 

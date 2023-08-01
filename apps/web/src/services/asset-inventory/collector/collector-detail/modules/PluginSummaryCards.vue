@@ -13,12 +13,21 @@ import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/
 
 const props = defineProps<{
     collector?: CollectorModel|null;
-    recentJobs?: JobModel[]|null;
+    recentJobs?: JobModel[];
     historyLink: Location
 }>();
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
+    sortedRecentJobs: computed<JobModel[]|undefined>(() => {
+        const recentJobs = props.recentJobs;
+        if (!recentJobs) return undefined;
+        return recentJobs.sort((a, b) => {
+            const aDate = new Date(a.created_at);
+            const bDate = new Date(b.created_at);
+            return aDate.getTime() - bDate.getTime();
+        });
+    }),
 });
 </script>
 
@@ -49,7 +58,7 @@ const state = reactive({
             </div>
         </div>
         <div class="plugin-summary-card">
-            <recent-collector-job-list :recent-jobs="props.recentJobs"
+            <recent-collector-job-list :recent-jobs="state.sortedRecentJobs"
                                        :history-link="props.historyLink"
                                        full-mode
             />

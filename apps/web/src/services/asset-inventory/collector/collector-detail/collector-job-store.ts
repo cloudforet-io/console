@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -12,7 +13,7 @@ const jobQueryHelper = new ApiQueryHelper().setPageLimit(5).setSort('created_at'
 export const useCollectorJobStore = defineStore('collector-job', {
     state: () => ({
         collector: null as null|CollectorModel,
-        recentJobs: null as JobModel[]|null, // if null, it means that the first request is not yet finished
+        recentJobs: undefined as JobModel[]|undefined, // if undefined, it means that the first request is not yet finished
     }),
     getters: {
         schedule(): Schedule|null {
@@ -22,16 +23,18 @@ export const useCollectorJobStore = defineStore('collector-job', {
             return this.recentJobs !== null;
         },
         recentJob(): JobModel|null {
-            return this.recentJobs?.[0] ?? null;
+            if (Array.isArray(this.recentJobs) && this.recentJobs.length > 0) return this.recentJobs[this.recentJobs.length - 1];
+            return null;
         },
     },
     actions: {
         async getRecentJob() {
             try {
                 if (!this.collector) throw new Error('[useCollectorJobStore] No collector');
-
+                const fiveDaysAgo = dayjs.utc().subtract(5, 'day').toISOString();
                 jobQueryHelper.setFilters([
                     { k: 'collector_id', v: this.collector.collector_id, o: '=' },
+                    { k: 'created_at', v: fiveDaysAgo, o: '>' },
                 ]);
                 const { results } = await SpaceConnector.client.inventory.job.list({
                     query: jobQueryHelper.data,

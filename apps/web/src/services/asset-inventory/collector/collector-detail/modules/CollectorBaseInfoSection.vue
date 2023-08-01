@@ -86,6 +86,7 @@ import PluginSummaryCards from '@/services/asset-inventory/collector/collector-d
 import type {
     CollectorModel,
     CollectorPluginModel,
+    JobModel,
     CollectorUpdateParameter,
     CollectorUpdatePluginParameter,
     RepositoryPluginModel,
@@ -116,7 +117,7 @@ const state = reactive({
         if (latestVersion) return latestVersion === version;
         return false;
     }),
-    recentJobs: computed(() => collectorJobState.recentJobs),
+    recentJobs: computed<JobModel[]|undefined>(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
