@@ -28,7 +28,7 @@
                 </span>
             </template>
             <template #extra>
-                <div v-if="!state.jobInitialLoading"
+                <div v-if="collectorJobStore.isRecentJobLoaded"
                      class="collector-button-box"
                 >
                     <collect-data-button-group @collect="handleCollectData" />
@@ -45,7 +45,9 @@
             </template>
         </p-heading>
 
-        <collector-base-info-section class="section" />
+        <collector-base-info-section class="section"
+                                     :history-link="state.collectorHistoryLink"
+        />
         <collector-schedule-section class="section" />
         <collector-options-section class="section" />
         <collector-service-accounts-section class="section"
@@ -149,8 +151,7 @@ const state = reactive({
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
-    hasJobs: computed(() => !!collectorJobState.recentJob),
-    jobInitialLoading: computed(() => collectorJobState.recentJob === undefined),
+    hasJobs: computed(() => !!collectorJobState.recentJobs?.length),
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -226,7 +227,7 @@ const handleUpdateEditModalVisible = (value: boolean) => {
 };
 const handleCollectData = () => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobState.recentJob;
+        const recentJob = collectorJobStore.recentJob;
         if (!recentJob) return;
         _state.visible = true;
         _state.recentJob = {

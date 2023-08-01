@@ -21,7 +21,10 @@
             <collector-plugin-info :plugin="state.repositoryPlugin"
                                    :collector="collectorFormState.originCollector"
             />
-            <plugin-summary-cards :collector="collectorFormState.originCollector" />
+            <plugin-summary-cards :collector="collectorFormState.originCollector"
+                                  :recent-jobs="state.recentJobs"
+                                  :history-link="props.historyLink"
+            />
             <collector-tags :tags="collectorFormState.originCollector?.tags" />
         </div>
 
@@ -62,6 +65,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { Location } from 'vue-router';
 
 import {
     PHeading, PButton, PPaneLayout,
@@ -75,6 +79,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
 import CollectorPluginInfo from '@/services/asset-inventory/collector/collector-detail/modules/CollectorPluginInfo.vue';
 import CollectorTags from '@/services/asset-inventory/collector/collector-detail/modules/CollectorTags.vue';
 import PluginSummaryCards from '@/services/asset-inventory/collector/collector-detail/modules/PluginSummaryCards.vue';
@@ -90,8 +95,15 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 
+const props = defineProps<{
+    historyLink: Location
+}>();
+
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+
+const collectorJobStore = useCollectorJobStore();
+const collectorJobState = collectorJobStore.$state;
 
 const state = reactive({
     collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
@@ -104,6 +116,7 @@ const state = reactive({
         if (latestVersion) return latestVersion === version;
         return false;
     }),
+    recentJobs: computed(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
