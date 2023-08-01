@@ -59,12 +59,18 @@ const storeState = reactive({
                                            :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
                 />
             </div>
-            <collector-job-status-icon is-arrow
+            <collector-job-status-icon v-if="props.recentJobs.length > 0 && props.historyLink"
+                                       is-arrow
                                        :to="props.historyLink"
                                        class="more-button"
                                        :class="['more-button', { 'is-mobile': isMobile() }]"
                                        :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
             />
+            <span v-else
+                  class="no-jobs"
+            >
+                {{ $t('INVENTORY.COLLECTOR.MAIN.NO_JOB') }}
+            </span>
         </div>
     </div>
 </template>
@@ -82,7 +88,8 @@ const storeState = reactive({
         }
     }
     .jobs-wrapper {
-        @apply flex;
+        @apply flex justify-end;
+        margin-top: 0.25rem;
         &.is-mobile {
             @apply relative;
             .jobs-contents {
@@ -113,6 +120,10 @@ const storeState = reactive({
         }
         .more-button {
             @apply border-gray-200;
+        }
+        .no-jobs {
+            @apply text-label-md text-gray-300;
+            margin-top: 0.25rem;
         }
     }
 }

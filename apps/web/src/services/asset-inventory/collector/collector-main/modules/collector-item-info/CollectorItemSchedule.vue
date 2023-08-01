@@ -84,6 +84,7 @@ watch(() => props.schedule, (schedule) => {
                 :value="state.isScheduleActivated"
                 :class="state.isScheduleActivated ? 'toggle-active' : ''"
                 show-state-text
+                position="left"
                 @change-toggle="handleChangeToggle"
             />
         </div>

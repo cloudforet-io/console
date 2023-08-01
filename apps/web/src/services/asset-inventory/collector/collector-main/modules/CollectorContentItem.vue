@@ -11,6 +11,7 @@ import { useCollectorPageStore } from '@/services/asset-inventory/collector/coll
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobStatus } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -43,10 +44,14 @@ const state = reactive({
 const handleClickCollectData = async () => {
     if (!props.item) return;
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
-    await collectorDataModalStore.$patch({ visible: true });
     await collectorDataModalStore.$patch((_state) => {
         if (!props.item) return;
-        _state.recentJob = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1];
+        const recentJobAnalyze = props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1] || [];
+        _state.visible = true;
+        _state.recentJob = {
+            jobId: recentJobAnalyze.job_id || '',
+            status: recentJobAnalyze.status as JobStatus,
+        };
         _state.selectedCollector = collectorPageState.selectedCollector;
     });
 };

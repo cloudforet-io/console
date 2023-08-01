@@ -119,6 +119,7 @@ export interface SecretModel {
     service_account_id: string;
     project_id: string;
     created_at: string;
+    name: string;
 }
 
 // collector api parameters
