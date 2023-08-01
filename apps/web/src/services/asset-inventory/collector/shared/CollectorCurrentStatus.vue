@@ -72,7 +72,7 @@ const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
     schedule?: Schedule;
-    recentJob?: JobAnalyzeStatus;
+    recentJob?: JobAnalyzeStatus|null;
 }
 
 const props = defineProps<Props>();

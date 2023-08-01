@@ -46,7 +46,6 @@ const collectorFormState = collectorFormStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 
 const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -164,7 +163,7 @@ const handleToolboxTableRefresh = async () => {
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobState.recentJob;
+        const recentJob = collectorJobStore.recentJob;
         if (!recentJob) return;
         _state.visible = true;
         _state.recentJob = {

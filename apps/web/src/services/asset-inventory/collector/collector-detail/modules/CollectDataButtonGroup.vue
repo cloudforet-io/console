@@ -6,22 +6,18 @@ import {
 import { PButton, PPopover, PIconButton } from '@spaceone/design-system';
 
 import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
-import type { JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
+import type { JobModel } from '@/services/asset-inventory/collector/model';
 import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 
 const emit = defineEmits<{(e: 'collect'): void;
 }>();
 
 const collectorJobStore = useCollectorJobStore();
-const collectorJobState = collectorJobStore.$state;
 
 const state = reactive({
     isPopoverOpen: false,
-    showStatus: computed(() => !!collectorJobState.recentJob),
-    recentJob: computed<JobAnalyzeStatus|undefined>(() => {
-        if (!collectorJobState.recentJob) return undefined;
-        return collectorJobState.recentJob;
-    }),
+    showStatus: computed(() => collectorJobStore.isRecentJobLoaded),
+    recentJob: computed<JobModel|null>(() => collectorJobStore.recentJob),
 });
 const handleClickCollectDataButton = () => {
     emit('collect');
@@ -34,7 +30,6 @@ const handleClickCollectDataButton = () => {
                   size="md"
                   icon-left="ic_collect"
                   class="collect-data-button"
-                  :class="{'dependent': state.showStatus}"
                   @click="handleClickCollectDataButton"
         >
             {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
@@ -66,10 +61,8 @@ const handleClickCollectDataButton = () => {
     display: flex;
     flex-wrap: wrap;
     .collect-data-button {
-        &.dependent {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
     }
     .status-button {
         border-top-left-radius: 0;

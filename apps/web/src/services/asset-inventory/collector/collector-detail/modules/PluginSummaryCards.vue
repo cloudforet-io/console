@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import type { Location } from 'vue-router';
 
 import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
 
@@ -7,10 +8,13 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 
 import { store } from '@/store';
 
-import type { CollectorModel } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, JobModel } from '@/services/asset-inventory/collector/model';
+import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/RecentCollectorJobList.vue';
 
 const props = defineProps<{
-    collector: CollectorModel|null;
+    collector?: CollectorModel|null;
+    recentJobs?: JobModel[]|null;
+    historyLink: Location
 }>();
 
 const state = reactive({
@@ -45,7 +49,10 @@ const state = reactive({
             </div>
         </div>
         <div class="plugin-summary-card">
-            <!-- TODO: Add last collector jobs -->
+            <recent-collector-job-list :recent-jobs="props.recentJobs"
+                                       :history-link="props.historyLink"
+                                       full-mode
+            />
         </div>
     </div>
 </template>

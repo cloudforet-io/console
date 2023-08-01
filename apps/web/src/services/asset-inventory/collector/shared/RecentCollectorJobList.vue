@@ -23,6 +23,8 @@ interface MinimalJobInfo {
 interface Props {
     recentJobs?: MinimalJobInfo[];
     historyLink?: CollectorLink;
+    // TODO: implement fullMode
+    fullMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
