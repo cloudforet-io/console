@@ -3,14 +3,14 @@
         <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
         <p-definition-table :fields="definitionFields"
                             :data="state"
-                            :class="['data-collection-information-table', { 'is-account-type-all': collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL}]"
+                            :class="['data-collection-information-table', { 'is-single-account': collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.SINGLE}]"
                             custom-key-width="7rem"
                             style-type="white"
                             disable-copy
         >
             <template #data-account>
                 <div class="accounts-wrapper">
-                    <p-lazy-img :src="props.plugin ? props.plugin.icon : ''"
+                    <p-lazy-img :src="props.icon"
                                 width="1rem"
                                 height="1rem"
                                 class="plugin-icon"
@@ -21,8 +21,16 @@
             <template #data-duration>
                 <span>{{ state.duration }}</span>
             </template>
+            <template #data-status>
+                <p-i name="ic_peacock-gradient-circle"
+                     height="1rem"
+                     width="1rem"
+                     animation="spin"
+                />
+                <span class="in-progress-title">{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+            </template>
         </p-definition-table>
-        <div v-if="collectorDataModalState.accountType === ATTACHED_ACCOUNT_TYPE.ALL"
+        <div v-if="collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE"
              class="in-progress-wrapper"
         >
             <span class="in-progress-title">
@@ -65,17 +73,6 @@
                 </div>
             </div>
         </div>
-        <div v-else>
-            <span class="in-progress-title">
-                <p-i
-                    name="ic_peacock-gradient-circle"
-                    height="1rem"
-                    width="1rem"
-                    animation="spin"
-                />
-                <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
-            </span>
-        </div>
     </div>
 </template>
 
@@ -97,15 +94,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
 
-import {
-    useCollectorDataModalStore,
-} from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
-import type {
-    CollectorPlugin,
-} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
-import {
-    ATTACHED_ACCOUNT_TYPE,
-} from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import { useCollectorDataModalStore } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const SUCCEEDED_COLOR = green[500];
@@ -113,21 +103,29 @@ const FAILED_COLOR = red[400];
 
 interface Props {
     name: string;
-    plugin?: CollectorPlugin;
+    icon?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     name: '',
-    plugin: undefined,
+    icon: '',
 });
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
-const definitionFields = [
-    { label: 'Account', name: 'account' },
-    { label: 'Duration', name: 'duration' },
-];
+const definitionFields = computed(() => {
+    const defaultField = [
+        { label: 'Account', name: 'account' },
+        { label: 'Duration', name: 'duration' },
+    ];
+    return collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE
+        ? defaultField
+        : [
+            ...defaultField,
+            { label: 'Status', name: 'status' },
+        ];
+});
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -147,13 +145,19 @@ const state = reactive({
     }),
     failedPercentage: computed(() => {
         if (state.jobTaskStatus.total > 0) {
-            const status = collectorDataModalState.recentJob.status;
-            if (status === JOB_STATE.SUCCESS) {
+            const recentJob = collectorDataModalState.recentJob;
+            if (!recentJob) return 0;
+            if (recentJob.status === JOB_STATE.SUCCESS) {
                 return 100 - state.succeededPercentage;
             }
             return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
         }
         return 0;
+    }),
+    status: computed(() => {
+        const recentJob = collectorDataModalState.recentJob;
+        if (!recentJob) return '';
+        return recentJob.status;
     }),
 });
 
@@ -165,9 +169,12 @@ const apiQueryHelper = new ApiQueryHelper()
 /* API */
 // TODO: This part is temporarily enabled for screen verification purposes and will be removed after the API is updated.
 const getJobProgress = async () => {
+    const recentJob = collectorDataModalState.recentJob;
+    if (!recentJob) return;
+
     try {
         const response = await SpaceConnector.client.inventory.job.getJobProgress({
-            job_id: collectorDataModalState.recentJob.job_id,
+            job_id: recentJob.jobId,
         });
         state.jobTaskStatus = response.job_task_status;
     } catch (e) {
@@ -214,6 +221,13 @@ const getJobLists = async () => {
         .accounts-wrapper {
             @apply flex items-center;
             gap: 0.5rem;
+        }
+        &.is-single-account {
+            border-bottom-left-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+            .in-progress-title {
+                margin-right: 0.25rem;
+            }
         }
     }
     .in-progress-wrapper {
