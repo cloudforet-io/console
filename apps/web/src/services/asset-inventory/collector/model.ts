@@ -166,4 +166,5 @@ export interface JobModel {
     created_at: string;
     finished_at: string;
     updated_at: string;
+    secret_id?: string;
 }

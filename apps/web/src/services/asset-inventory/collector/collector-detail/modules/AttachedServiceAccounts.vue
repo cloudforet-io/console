@@ -163,7 +163,7 @@ const handleToolboxTableRefresh = async () => {
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobStore.recentJob;
+        const recentJob = collectorJobStore.recentJobForAllAccounts;
         _state.visible = true;
         _state.recentJob = recentJob ? {
             status: recentJob.status,

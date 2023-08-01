@@ -117,7 +117,7 @@ const state = reactive({
         if (latestVersion) return latestVersion === version;
         return false;
     }),
-    recentJobs: computed<JobModel[]|undefined>(() => collectorJobState.recentJobs),
+    recentJobs: computed<JobModel[]|null>(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,

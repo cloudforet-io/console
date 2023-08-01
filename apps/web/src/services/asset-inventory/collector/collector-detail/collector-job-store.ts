@@ -9,11 +9,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { CollectorModel, JobModel, Schedule } from '@/services/asset-inventory/collector/model';
 
 
-const jobQueryHelper = new ApiQueryHelper().setPageLimit(5).setSort('created_at', true);
+const jobQueryHelper = new ApiQueryHelper().setSort('created_at', true);
 export const useCollectorJobStore = defineStore('collector-job', {
     state: () => ({
         collector: null as null|CollectorModel,
-        recentJobs: undefined as JobModel[]|undefined, // if undefined, it means that the first request is not yet finished
+        recentJobs: null as JobModel[]|null, // if null, it means that the first request is not yet finished
     }),
     getters: {
         schedule(): Schedule|null {
@@ -22,8 +22,11 @@ export const useCollectorJobStore = defineStore('collector-job', {
         isRecentJobLoaded(): boolean {
             return this.recentJobs !== null;
         },
-        recentJob(): JobModel|null {
-            if (Array.isArray(this.recentJobs) && this.recentJobs.length > 0) return this.recentJobs[this.recentJobs.length - 1];
+        recentJobForAllAccounts(): JobModel|null {
+            if (Array.isArray(this.recentJobs) && this.recentJobs.length > 0) {
+                const filteredJobs = this.recentJobs.filter((job) => !job.secret_id);
+                return filteredJobs[0] ?? null;
+            }
             return null;
         },
     },

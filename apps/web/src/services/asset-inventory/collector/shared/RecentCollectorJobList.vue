@@ -37,6 +37,15 @@ const storeState = reactive({
 
 const state = reactive({
     loading: computed(() => !Array.isArray(props.recentJobs)),
+    completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
+        if (Array.isArray(props.recentJobs) && props.recentJobs.length > 0) {
+            return props.recentJobs.filter((job) => job.status !== 'IN_PROGRESS')
+                .sort((a, b) => dayjs(b.finished_at).unix() - dayjs(a.finished_at).unix())
+                .slice(0, 5)
+                .reverse();
+        }
+        return undefined;
+    }),
 });
 
 </script>
@@ -69,16 +78,16 @@ const state = reactive({
                 View All
             </p-anchor>
         </div>
-        <p-data-loader :data="!!props.recentJobs?.length"
+        <p-data-loader :data="!!state.completedJobs?.length"
                        :loading="state.loading"
                        loader-type="skeleton"
                        class="data-loader"
         >
-            <div v-if="props.recentJobs"
+            <div v-if="state.completedJobs"
                  :class="['jobs-wrapper', { 'is-mobile': isMobile() }]"
             >
                 <div class="jobs-contents">
-                    <collector-job-status-icon v-for="(job, index) in props.recentJobs"
+                    <collector-job-status-icon v-for="(job, index) in state.completedJobs"
                                                :key="`job-item-${index}`"
                                                :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
                                                :status="job.status"
@@ -87,7 +96,7 @@ const state = reactive({
                                                :style-type="props.fullMode ? 'white' : 'gray'"
                     />
                 </div>
-                <collector-job-status-icon v-if="props.recentJobs.length > 0 && !props.fullMode && props.historyLink"
+                <collector-job-status-icon v-if="state.completedJobs.length > 0 && !props.fullMode && props.historyLink"
                                            is-arrow
                                            :to="props.historyLink"
                                            class="more-button"

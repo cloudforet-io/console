@@ -85,7 +85,7 @@ const state = reactive({
             ]);
 
             const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = matchedJob ? matchedJob.job_status.slice(-5) : undefined;
+            const recentJobAnalyze = matchedJob ? matchedJob.job_status : undefined;
 
             return {
                 collectorId: d.collector_id,
