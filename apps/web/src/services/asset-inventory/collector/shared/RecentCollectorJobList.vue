@@ -33,6 +33,11 @@ const props = withDefaults(defineProps<Props>(), {
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
+
+const state = reactive({
+    isRecentJobsExist: computed(() => isNotEmpty(props.recentJobs)),
+});
+
 </script>
 
 <template>
@@ -52,7 +57,7 @@ const storeState = reactive({
             </p-tooltip>
         </p>
         <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
-            <template v-if="isNotEmpty(props.recentJobs)">
+            <template v-if="state.isRecentJobsExist">
                 <div class="jobs-contents">
                     <collector-job-status-icon v-for="(job, index) in props.recentJobs"
                                                :key="`job-item-${index}`"
