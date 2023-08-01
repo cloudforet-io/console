@@ -117,14 +117,10 @@ const fetchSecrets = async (provider: string) => {
         const results = await SpaceConnector.client.secret.secret.list({
             query: apiQueryHelper.data,
         });
-        collectorDataModalStore.$patch((_state) => {
-            _state.secrets = results.results;
-        });
+        state.secrets = results.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        collectorDataModalStore.$patch((_state) => {
-            _state.secrets = [];
-        });
+        state.secrets = [];
     }
 };
 

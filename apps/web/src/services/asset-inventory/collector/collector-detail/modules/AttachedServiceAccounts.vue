@@ -173,7 +173,6 @@ const handleClickCollect = async (secret: SecretModel) => {
         _state.selectedCollector = collectorFormState.originCollector;
         _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;
         _state.selectedSecret = secret;
-        _state.secrets = state.secrets;
     });
 };
 

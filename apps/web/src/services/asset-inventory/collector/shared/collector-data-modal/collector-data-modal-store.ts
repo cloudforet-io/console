@@ -19,6 +19,5 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
 
         // Optional
         selectedSecret: undefined as SecretModel|undefined, // In detail page, This state is used for API.
-        secrets: null as SecretModel[]|null, // In detail page, This state is used for account count.
     }),
 });
