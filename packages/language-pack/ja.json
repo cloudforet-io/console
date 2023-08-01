@@ -2165,6 +2165,7 @@
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",
 				"NAME": "名前",
+				"NO_TAG": "",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
 				"REGION": "Region",

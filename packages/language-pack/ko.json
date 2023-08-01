@@ -2165,6 +2165,7 @@
 				"EDIT_COLLECTOR_NAME": "컬렉터 이름 수정",
 				"LAST_COLLECTED": "최근 수집 시간",
 				"NAME": "이름",
+				"NO_TAG": "",
 				"PLUGIN": "플러그인",
 				"PLUGIN_ID": "플러그인 ID",
 				"REGION": "Region",
