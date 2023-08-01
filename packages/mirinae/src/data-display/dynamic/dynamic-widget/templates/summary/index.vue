@@ -25,13 +25,11 @@ import {
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';
-import type {
-    DynamicWidgetProps,
-} from '@/data-display/dynamic/dynamic-widget/type';
+import type { DynamicWidgetProps } from '@/data-display/dynamic/dynamic-widget/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
-type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>;
+type DynamicWidgetSummaryProps = Omit<DynamicWidgetProps, 'type' | 'index'>;
 
 const props = withDefaults(defineProps<DynamicWidgetSummaryProps>(), {
     name: '',

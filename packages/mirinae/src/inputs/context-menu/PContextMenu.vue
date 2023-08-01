@@ -3,7 +3,7 @@
          @keyup.esc="onClickEsc"
     >
         <div class="menu-container">
-            <slot v-show="props.menu.length > 0"
+            <slot v-if="props.menu.length > 0"
                   name="menu"
                   v-bind="{...props}"
             >

@@ -28,10 +28,10 @@ import ic_checkboxPeacockSelected from '../icon-assets/ic_checkbox-peacock-selec
 import ic_checkboxSelected from '../icon-assets/ic_checkbox-selected.svg';
 import ic_checkbox from '../icon-assets/ic_checkbox.svg';
 import ic_chevronDown from '../icon-assets/ic_chevron-down.svg';
-import ic_chevronLeftThin from '../icon-assets/ic_chevron-left-thin.svg';
 import ic_chevronLeft from '../icon-assets/ic_chevron-left.svg';
 import ic_chevronRightCircleFilled from '../icon-assets/ic_chevron-right-circle-filled.svg';
 import ic_chevronRightCircle from '../icon-assets/ic_chevron-right-circle.svg';
+import ic_chevronLeftThin from '../icon-assets/ic_chevron-right-thin.svg';
 import ic_chevronRight from '../icon-assets/ic_chevron-right.svg';
 import ic_chevronSmallDown from '../icon-assets/ic_chevron-small-down.svg';
 import ic_chevronSmallLeft from '../icon-assets/ic_chevron-small-left.svg';

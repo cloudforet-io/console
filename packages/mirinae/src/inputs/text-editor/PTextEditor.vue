@@ -60,24 +60,22 @@ interface Props {
     disableAutoReformat?: boolean;
 }
 
-const defaultOptions = {
-    tabSize: 4,
-    styleActiveLine: true,
-    lineNumbers: true,
-    line: true,
-    mode: 'application/json',
-    lineWrapping: true,
-    theme: 'dracula',
-    matchBrackets: true,
-    autoCloseBrackets: true,
-    autoCloseTags: true,
-    foldGutter: true,
-    gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
-};
-
 const props = withDefaults(defineProps<Props>(), {
     code: '',
-    options: () => (defaultOptions),
+    options: () => ({
+        tabSize: 4,
+        styleActiveLine: true,
+        lineNumbers: true,
+        line: true,
+        mode: 'application/json',
+        lineWrapping: true,
+        theme: 'dracula',
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-addedline', 'CodeMirror-foldgutter'],
+    }),
     readOnly: false,
     loading: false,
     folded: false,

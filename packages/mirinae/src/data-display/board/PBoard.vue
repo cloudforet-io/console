@@ -6,7 +6,7 @@
         <template v-for="(board, index) in state.boardList"
                   :key="`board-${board.value}-${index}`"
         >
-            <p-board-item v-model:selected="selectedItem"
+            <p-board-item :selected="selectedItem"
                           class="p-board-item"
                           :class="{
                               'first-list-item': index === 0,
@@ -51,9 +51,9 @@ import {
 import type { PropType } from 'vue';
 
 
-import PBoardItem from '@/data-display/board-item/PBoardItem.vue';
 import { BOARD_STYLE_TYPE } from '@/data-display/board/type';
 import type { BoardSet, StyleOptions } from '@/data-display/board/type';
+import PBoardItem from '@/data-display/board-item/PBoardItem.vue';
 
 
 /* HACK: This defineProps is Bandage solution.

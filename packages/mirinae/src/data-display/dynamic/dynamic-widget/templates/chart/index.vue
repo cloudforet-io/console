@@ -38,7 +38,8 @@ import type {
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
-type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>;
+type DynamicWidgetChartProps = Omit<DynamicWidgetProps, 'type'>;
+
 
 const props = withDefaults(defineProps<DynamicWidgetChartProps>(), {
     index: 0,

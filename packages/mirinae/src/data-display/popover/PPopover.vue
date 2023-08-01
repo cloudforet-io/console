@@ -1,6 +1,6 @@
 <template>
     <component :is="tag"
-               v-click-outside="handleClickOutside"
+               ref="popoverRef"
                class="p-popover"
                v-on="listeners"
     >
@@ -33,9 +33,9 @@
 
 import type { Instance } from '@popperjs/core';
 import { createPopper } from '@popperjs/core';
-import vClickOutside from 'v-click-outside';
+import { onClickOutside } from '@vueuse/core';
 import {
-    onMounted, onUnmounted, reactive, useAttrs,
+    onMounted, onUnmounted, reactive, ref, useAttrs,
 } from 'vue';
 import type { PropType } from 'vue';
 
@@ -82,6 +82,7 @@ const listeners = {
     ...attrs,
 };
 
+const popoverRef = ref<HTMLElement|null>(null);
 const state = reactive({
     proxyIsVisible: useProxyValue('isVisible', props, emit),
     contentRef: null as null|HTMLElement,
@@ -144,6 +145,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => state.popperObject?.destroy());
+onClickOutside(popoverRef, handleClickOutside);
 
 </script>
 
