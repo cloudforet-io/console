@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@cloudforet/core-lib/src/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import axios from 'axios';
 
 

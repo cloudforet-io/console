@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { SpaceConnector } from '@cloudforet/core-lib/src/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/src/space-connector/helper';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     computed, reactive, watch,
 } from 'vue';

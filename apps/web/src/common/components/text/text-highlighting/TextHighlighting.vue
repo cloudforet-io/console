@@ -17,7 +17,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     text: '',
     term: '',
-    styleType: STYLE_TYPE[0],
+    styleType: 'primary' as StyleType,
 });
 
 const state = reactive({

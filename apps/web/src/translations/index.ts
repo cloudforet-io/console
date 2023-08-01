@@ -2,7 +2,7 @@ import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
 import ko from '@cloudforet/language-pack/ko.json';
 import { messages } from '@spaceone/design-system';
-import type { LocaleMessages, VueI18n } from 'vue-i18n';
+import type { LocaleMessages } from 'vue-i18n';
 import { createI18n } from 'vue-i18n';
 
 
