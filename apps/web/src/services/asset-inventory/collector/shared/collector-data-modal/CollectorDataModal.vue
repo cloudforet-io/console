@@ -11,13 +11,14 @@
         >
             <template #body>
                 <div v-if="state.isDuplicateJobs">
-                    <collector-data-duplication-inner :name="state.provider.label"
+                    <collector-data-duplication-inner :name="state.accountName"
                                                       :icon="state.provider.icon"
                     />
                 </div>
                 <collector-data-default-inner v-else
-                                              :name="state.provider.label"
+                                              :name="state.accountName"
                                               :icon="state.provider.icon"
+                                              :secrets-count="state.secrets.length"
                 />
             </template>
             <template #confirm-button>
@@ -48,6 +49,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -55,6 +57,7 @@ import CollectorDataDefaultInner
     from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDefaultInner.vue';
 import CollectorDataDuplicationInner
     from '@/services/asset-inventory/collector/shared/collector-data-modal/modules/CollectorDataDuplicationInner.vue';
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const collectorDataModalStore = useCollectorDataModalStore();
@@ -67,6 +70,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
+    secrets: [] as SecretModel[],
     headerTitle: computed(() => (state.isDuplicateJobs
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
@@ -78,6 +82,18 @@ const state = reactive({
     provider: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
         return selectedCollector?.provider ? storeState.providers[selectedCollector.provider] : undefined;
+    }),
+    accountName: computed(() => {
+        const collectDataType = collectorDataModalState.collectDataType;
+        if (collectDataType === COLLECT_DATA_TYPE.ENTIRE) {
+            return state.provider.label;
+        }
+
+        const selectedSecret = collectorDataModalState.selectedSecret;
+        if (!selectedSecret) return '';
+        const id = selectedSecret.service_account_id;
+        const fullName = selectedSecret.name;
+        return fullName.split(id)[0] ?? '';
     }),
 });
 
@@ -117,14 +133,10 @@ const fetchSecrets = async (provider: string) => {
         const results = await SpaceConnector.client.secret.secret.list({
             query: apiQueryHelper.data,
         });
-        collectorDataModalStore.$patch((_state) => {
-            _state.secrets = results.results;
-        });
+        state.secrets = results.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        collectorDataModalStore.$patch((_state) => {
-            _state.secrets = [];
-        });
+        state.secrets = [];
     }
 };
 

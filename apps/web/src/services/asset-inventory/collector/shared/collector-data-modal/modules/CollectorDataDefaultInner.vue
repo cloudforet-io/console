@@ -9,18 +9,16 @@
             />
             <div v-if="collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE">
                 <span>{{ props.name }} {{ $t('INVENTORY.COLLECTOR.ACCOUNT') }}</span>
-                <span v-if="collectorDataModalState.secrets && collectorDataModalState.secrets.length > 0">
-                    ({{ collectorDataModalState.secrets && collectorDataModalState.secrets.length }})
+                <span v-if="props.secretsCount > 0">
+                    ({{ props.secretsCount }})
                 </span>
             </div>
-            <span v-else>{{ state.serviceAccountName || '' }}</span>
+            <span v-else>{{ props.name }}</span>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
 import { PLazyImg } from '@spaceone/design-system';
 
 import {
@@ -34,22 +32,13 @@ const collectorDataModalState = collectorDataModalStore.$state;
 interface Props {
     name: string;
     icon: string;
+    secretsCount: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     name: '',
     icon: '',
-});
-
-const state = reactive({
-    serviceAccountName: computed<string>(() => {
-        const selectedSecret = collectorDataModalState.selectedSecret;
-        if (!selectedSecret) return '';
-
-        const id = selectedSecret.service_account_id;
-        const fullName = selectedSecret.name;
-        return fullName.split(id)[0] ?? '';
-    }),
+    secretsCount: 0,
 });
 </script>
 
