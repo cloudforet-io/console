@@ -10,6 +10,7 @@
         />
         <p-toggle-button :value="collectorFormState.schedulePower"
                          :disabled="props.disabled"
+                         show-state-text
                          @change-toggle="handleChangeToggle"
         />
         <p-field-group v-if="collectorFormState.schedulePower"
