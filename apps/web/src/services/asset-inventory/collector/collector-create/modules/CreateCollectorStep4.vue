@@ -1,6 +1,6 @@
 <template>
     <div class="collector-page-4">
-        <collector-schedule-form enable-hours-edit
+        <collector-schedule-form :enable-hours-edit="collectorFormState.schedulePower"
                                  disable-loading
         />
         <div class="step-footer">
