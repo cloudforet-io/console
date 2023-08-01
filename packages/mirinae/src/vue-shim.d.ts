@@ -1,10 +1,7 @@
-declare module 'vue' {
-    import type { CompatVue } from 'vue';
+declare module '*.vue' {
+    import type { DefineComponent } from 'vue';
 
-    const Vue: CompatVue;
-    export default Vue;
-    // eslint-disable-next-line vue/prefer-import-from-vue,import/no-extraneous-dependencies
-    export * from '@vue/runtime-dom';
-    const { configureCompat } = Vue;
-    export { configureCompat };
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const component: DefineComponent<{}, {}, any>;
+    export default component;
 }

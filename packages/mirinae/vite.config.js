@@ -39,15 +39,7 @@ export default defineConfig(({ mode }) => ({
     },
     plugins: [
         viteCommonjs(),
-        vue({
-            template: {
-                compilerOptions: {
-                    compatConfig: {
-                        Mode: 3,
-                    },
-                },
-            },
-        }),
+        vue(),
         svgicon({
             include: ['**/svg-icon/**/*.svg'],
         }),
@@ -70,7 +62,6 @@ export default defineConfig(({ mode }) => ({
     },
     resolve: {
         alias: {
-            vue: '@vue/compat',
             '@': path.resolve(__dirname, './src'),
         },
     },
