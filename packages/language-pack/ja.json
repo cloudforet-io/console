@@ -2086,6 +2086,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "アカウント",
 			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -2218,6 +2219,7 @@
 				"JOB_PROGRESS": "進捗率: 進行中",
 				"JOB_SUCCESS": "状態：{date}に収集完了",
 				"NO_DATA": "作成されたコレクターはありません。",
+				"NO_JOB": "近のジョブはありません",
 				"NO_SCHEDULE": "スケジュールが設定されていません",
 				"PLUGIN": "プラグイン",
 				"RECENT_JOBS": "最近のコレクタージョブ",

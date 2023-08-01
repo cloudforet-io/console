@@ -2086,6 +2086,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
@@ -2218,7 +2219,8 @@
 				"JOB_PROGRESS": "Status: In-Progress",
 				"JOB_SUCCESS": "Status: Completed,\nCollected: {date}",
 				"NO_DATA": "There’s no collector created yet.",
-				"NO_SCHEDULE": "No Scheduled",
+				"NO_JOB": "No recent jobs",
+				"NO_SCHEDULE": "No scheduled",
 				"PLUGIN": "Plugin",
 				"RECENT_JOBS": "Recent Collector Jobs",
 				"RECENT_JOBS_TOOLTIP": "Recent data collection results\nwithin the past 5 days",

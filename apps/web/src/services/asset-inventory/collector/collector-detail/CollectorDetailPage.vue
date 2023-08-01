@@ -127,11 +127,9 @@ import {
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
 import CollectorDataModal
     from '@/services/asset-inventory/collector/shared/collector-data-modal/CollectorDataModal.vue';
-import { ATTACHED_ACCOUNT_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/collector-data-modal/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-
 
 const props = defineProps<{
     collectorId: string;
@@ -228,10 +226,15 @@ const handleUpdateEditModalVisible = (value: boolean) => {
 };
 const handleCollectData = () => {
     collectorDataModalStore.$patch((_state) => {
+        const recentJob = collectorJobState.recentJob;
+        if (!recentJob) return;
         _state.visible = true;
-        _state.recentJob = collectorJobState.recentJob;
+        _state.recentJob = {
+            status: recentJob.status,
+            jobId: recentJob.job_id,
+        };
+        _state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
         _state.selectedCollector = collectorFormState.originCollector;
-        _state.accountType = collectorFormState.originCollector?.secret_filter?.state === 'ENABLED' ? ATTACHED_ACCOUNT_TYPE.SPECIFIC : ATTACHED_ACCOUNT_TYPE.ALL;
         _state.selectedSecret = undefined;
         _state.secrets = null;
     });
