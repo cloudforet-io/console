@@ -15,6 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     InheritOptions, WidgetProps, WidgetConfig, DashboardLayoutWidgetInfo, WidgetFilterKey,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -35,6 +36,8 @@ interface UseWidgetLifecycleOptions {
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.$state;
 
 const checkRefreshableByDashboardVariables = (
     inheritOptions: InheritOptions,
@@ -174,11 +177,13 @@ export const useWidgetLifecycle = ({
     });
     watch(() => dashboardDetailState.variables, (after, before) => {
         if (!props.initiated || props.errorMode || !props.inheritOptions) return;
+        if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return; // disable when it's view mode
         const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
         if (_isRefreshable) refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
     }, { deep: true });
     watch(() => dashboardDetailState.variablesSchema, (after, before) => {
         if (!props.editMode || !props.inheritOptions || isEqual(after, before)) return;
+        if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return;
         if (!state.widgetInfo) return;
 
         const [
@@ -205,6 +210,7 @@ export const useWidgetLifecycle = ({
     if (state.settings) {
         watch(() => state.settings, (current, previous) => {
             if (!current || !previous) return;
+            if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
             } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {

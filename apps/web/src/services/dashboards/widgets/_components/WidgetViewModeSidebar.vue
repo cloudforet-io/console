@@ -27,7 +27,7 @@
                         {{ $t('DASHBOARDS.VIEW_MODE.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!dashboardDetailStore.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
+                              :disabled="!widgetFormState.isValid"
                               @click="handleClickSaveButton"
                     >
                         {{ $t('DASHBOARDS.VIEW_MODE.SAVE') }}
@@ -40,21 +40,26 @@
 
 <script setup lang="ts">
 import {
-    defineEmits, onUnmounted, reactive, watch,
+    onUnmounted, reactive, watch,
 } from 'vue';
 
 import {
     PButton, PSidebar,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
 interface Props {
@@ -68,21 +73,48 @@ const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: string, value: string): void,
-    (e: 'save'): void,
-}>();
+const emit = defineEmits<{(e: string, value: boolean): void}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
-// const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.$state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
 
+/* Api */
+const updateWidgetInfo = async () => {
+    try {
+        if (dashboardDetailStore.isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: dashboardDetailState.dashboardId,
+                layouts: dashboardDetailState.dashboardWidgetInfoList,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: dashboardDetailState.dashboardId,
+                layouts: dashboardDetailState.dashboardWidgetInfoList,
+            });
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
 /* Event */
-const handleClickSaveButton = () => {
-    emit('save');
+const handleClickSaveButton = async () => {
+    // update widget info in dashboard detail store
+    const widgetInfo: DashboardLayoutWidgetInfo = cloneDeep(widgetFormState.widgetInfo);
+    widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
+    widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
+    widgetInfo.inherit_options = widgetFormState.inheritOptions ?? {};
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+
+    // update widget info in widget form store
+    widgetFormStore.initWidgetForm(props.widgetKey);
+
+    await updateWidgetInfo();
     state.proxyVisible = false;
 };
 const handleCloseSidebar = () => {
