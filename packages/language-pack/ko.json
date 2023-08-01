@@ -2234,6 +2234,7 @@
 				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
 			},
 			"NO_DATA": "데이터가 없습니다.",
+			"NO_JOB": "",
 			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
 		"SERVER": {

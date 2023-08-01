@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PTooltip, PI } from '@spaceone/design-system';
+import { PTooltip, PI, PEmpty } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+
+import { isNotEmpty } from '@cloudforet/core-lib';
 
 import { store } from '@/store';
 
@@ -31,6 +33,11 @@ const props = withDefaults(defineProps<Props>(), {
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
+
+const state = reactive({
+    isRecentJobsExist: computed(() => isNotEmpty(props.recentJobs)),
+});
+
 </script>
 
 <template>
@@ -50,27 +57,27 @@ const storeState = reactive({
             </p-tooltip>
         </p>
         <div :class="['jobs-wrapper', { 'is-mobile': isMobile() }]">
-            <div class="jobs-contents">
-                <collector-job-status-icon v-for="(job, index) in props.recentJobs"
-                                           :key="`job-item-${index}`"
-                                           :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
-                                           :status="job.status"
-                                           :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(job.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
-                                           :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
+            <template v-if="state.isRecentJobsExist">
+                <div class="jobs-contents">
+                    <collector-job-status-icon v-for="(job, index) in props.recentJobs"
+                                               :key="`job-item-${index}`"
+                                               :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
+                                               :status="job.status"
+                                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(job.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                                               :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
+                    />
+                </div>
+                <collector-job-status-icon v-if="props.recentJobs.length > 0 && props.historyLink"
+                                           is-arrow
+                                           :to="props.historyLink"
+                                           class="more-button"
+                                           :class="['more-button', { 'is-mobile': isMobile() }]"
+                                           :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                 />
-            </div>
-            <collector-job-status-icon v-if="props.recentJobs.length > 0 && props.historyLink"
-                                       is-arrow
-                                       :to="props.historyLink"
-                                       class="more-button"
-                                       :class="['more-button', { 'is-mobile': isMobile() }]"
-                                       :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
-            />
-            <span v-else
-                  class="no-jobs"
-            >
-                {{ $t('INVENTORY.COLLECTOR.MAIN.NO_JOB') }}
-            </span>
+            </template>
+            <p-empty v-else>
+                {{ $t('INVENTORY.COLLECTOR.NO_JOB') }}
+            </p-empty>
         </div>
     </div>
 </template>
@@ -120,10 +127,6 @@ const storeState = reactive({
         }
         .more-button {
             @apply border-gray-200;
-        }
-        .no-jobs {
-            @apply text-label-md text-gray-300;
-            margin-top: 0.25rem;
         }
     }
 }
