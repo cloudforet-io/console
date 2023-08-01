@@ -2086,6 +2086,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",

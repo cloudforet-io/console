@@ -2086,6 +2086,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "アカウント",
 			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
