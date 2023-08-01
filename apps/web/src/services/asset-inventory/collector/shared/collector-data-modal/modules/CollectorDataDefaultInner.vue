@@ -42,13 +42,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    serviceAccountName: computed(() => {
+    serviceAccountName: computed<string>(() => {
         const selectedSecret = collectorDataModalState.selectedSecret;
         if (!selectedSecret) return '';
 
         const id = selectedSecret.service_account_id;
         const fullName = selectedSecret.name;
-        return fullName.split(id)[0];
+        return fullName.split(id)[0] ?? '';
     }),
 });
 </script>

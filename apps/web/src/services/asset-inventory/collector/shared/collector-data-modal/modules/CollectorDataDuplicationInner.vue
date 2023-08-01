@@ -23,11 +23,11 @@
             </template>
             <template #data-status>
                 <span class="in-progress-title">
-                    <p-i
-                        name="ic_peacock-gradient-circle"
-                        height="1rem"
-                        width="1rem"
-                        animation="spin"
+                    <p-i key="ic_peacock-gradient-circle"
+                         name="ic_peacock-gradient-circle"
+                         height="1rem"
+                         width="1rem"
+                         animation="spin"
                     />
                     <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
                 </span>
@@ -37,11 +37,11 @@
              class="in-progress-wrapper"
         >
             <span class="in-progress-title">
-                <p-i
-                    name="ic_peacock-gradient-circle"
-                    height="1rem"
-                    width="1rem"
-                    animation="spin"
+                <p-i key="ic_peacock-gradient-circle"
+                     name="ic_peacock-gradient-circle"
+                     height="1rem"
+                     width="1rem"
+                     animation="spin"
                 />
                 <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
             </span>
@@ -157,7 +157,7 @@ const state = reactive({
         }
         return 0;
     }),
-    status: computed(() => {
+    status: computed<string>(() => {
         const recentJob = collectorDataModalState.recentJob;
         if (!recentJob) return '';
         return recentJob.status;
