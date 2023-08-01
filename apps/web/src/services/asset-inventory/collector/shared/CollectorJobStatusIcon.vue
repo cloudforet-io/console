@@ -1,6 +1,7 @@
 <template>
     <router-link :to="props.to"
                  class="collector-job-status-icon"
+                 :class="[props.styleType]"
     >
         <div @click.stop>
             <div v-if="props.isArrow"
@@ -63,6 +64,7 @@ interface Props {
     status?: string,
     isArrow?: boolean,
     tooltipPosition?: string,
+    styleType?: 'gray' | 'white',
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,14 +73,21 @@ const props = withDefaults(defineProps<Props>(), {
     status: undefined,
     isArrow: false,
     tooltipPosition: 'top-end',
+    styleType: 'gray',
 });
 </script>
 
 <style lang="postcss" scoped>
 .collector-job-status-icon {
-    @apply bg-gray-100 rounded-full border border-white box-content;
+    @apply rounded-full border border-white box-content;
     width: 1.375rem;
     height: 1.375rem;
+    &.gray {
+        @apply bg-gray-100;
+    }
+    &.white {
+        @apply bg-white;
+    }
     .job-tooltip-wrapper {
         @apply flex items-center justify-center;
         width: 1.375rem;
