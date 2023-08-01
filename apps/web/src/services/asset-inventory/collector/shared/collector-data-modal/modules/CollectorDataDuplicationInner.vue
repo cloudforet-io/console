@@ -22,12 +22,15 @@
                 <span>{{ state.duration }}</span>
             </template>
             <template #data-status>
-                <p-i name="ic_peacock-gradient-circle"
-                     height="1rem"
-                     width="1rem"
-                     animation="spin"
-                />
-                <span class="in-progress-title">{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+                <span class="in-progress-title">
+                    <p-i
+                        name="ic_peacock-gradient-circle"
+                        height="1rem"
+                        width="1rem"
+                        animation="spin"
+                    />
+                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+                </span>
             </template>
         </p-definition-table>
         <div v-if="collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE"
@@ -225,9 +228,6 @@ const getJobLists = async () => {
         &.is-single-account {
             border-bottom-left-radius: 0.375rem;
             border-bottom-right-radius: 0.375rem;
-            .in-progress-title {
-                margin-right: 0.25rem;
-            }
         }
     }
     .in-progress-wrapper {
