@@ -185,7 +185,7 @@ jobs:
           author_name: Github Action Slack
 
   tagging:
-    needs: docker
+    needs: versioning_and_docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
