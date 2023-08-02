@@ -36,16 +36,30 @@
                 </div>
             </template>
         </p-sidebar>
+        <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
+                        :header-title="$t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION')"
+                        size="sm"
+                        @confirm="handleClickSaveButton"
+        >
+            <template #body>
+                <div class="non-inherited-option-modal-body">
+                    <p>
+                        {{ $t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
+                    </p>
+                </div>
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
 <script setup lang="ts">
 import {
+    computed,
     onUnmounted, reactive, watch,
 } from 'vue';
 
 import {
-    PButton, PSidebar,
+    PButton, PSidebar, PButtonModal,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -61,6 +75,7 @@ import DashboardWidgetInputForm
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface Props {
@@ -82,7 +97,26 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
+    nonInheritedOptionModalVisible: false,
+    hasNonInheritedWidgetOptions: computed<boolean>(() => {
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
+        return nonInheritedWidgetOptions.length > 0;
+    }),
 });
+
+/* Util */
+const updateDashboardWidgetStore = () => {
+    // update widget info in dashboard detail store
+    const widgetInfo: DashboardLayoutWidgetInfo = cloneDeep(widgetFormState.widgetInfo);
+    widgetInfo.title = widgetFormState.widgetTitle ?? '';
+    widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
+    widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
+    widgetInfo.inherit_options = widgetFormState.inheritOptions ?? {};
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+
+    // update widget info in widget form store
+    widgetFormStore.initWidgetForm(props.widgetKey);
+};
 
 /* Api */
 const updateWidgetInfo = async () => {
@@ -105,18 +139,14 @@ const updateWidgetInfo = async () => {
 
 /* Event */
 const handleClickSaveButton = async () => {
-    // update widget info in dashboard detail store
-    const widgetInfo: DashboardLayoutWidgetInfo = cloneDeep(widgetFormState.widgetInfo);
-    widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
-    widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
-    widgetInfo.inherit_options = widgetFormState.inheritOptions ?? {};
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
-
-    // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey);
-
+    if (state.hasNonInheritedWidgetOptions && !state.nonInheritedOptionModalVisible) {
+        state.nonInheritedOptionModalVisible = true;
+        return;
+    }
+    updateDashboardWidgetStore();
     await updateWidgetInfo();
     state.proxyVisible = false;
+    state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
     state.proxyVisible = false;

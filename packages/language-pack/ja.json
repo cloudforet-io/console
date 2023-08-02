@@ -1376,9 +1376,12 @@
 			"ONLY_FAVORITE": "お気に入りだけを表示する"
 		},
 		"VIEW_MODE": {
+			"APPLY_NON_INHERITED_OPTION": "",
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "",
 			"CANCEL": "キャンセル",
 			"EDIT_OPTION": "",
 			"EDIT_WIDGET_OPTION": "",
+			"NON_INHERIT_OPTION_APPLIED": "",
 			"SAVE": "保存",
 			"VIEW_MODE": ""
 		},
