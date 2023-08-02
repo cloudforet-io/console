@@ -1471,7 +1471,7 @@
 			"EDIT_WIDGET": "Edit Widget Option",
 			"ERROR_MSG": "There is an error from an incompatibility dashboard's variables and widget options.",
 			"ERROR_TITLE": "Unable to load",
-			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "This widget has its own non-inherited options, and they won't be affected by the main dashboard option until you reset it in view mode.",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "This widget includes non-inherited options which are not affected by the dashboard.",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "List of non-inherited options:",
 			"MONTHLY_COST": {
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",

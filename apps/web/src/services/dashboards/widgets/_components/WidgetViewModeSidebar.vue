@@ -4,6 +4,7 @@
                    style-type="primary"
                    size="md"
                    is-fixed-size
+                   hide-close-button
                    @close="handleCloseSidebar"
         >
             <main class="main">

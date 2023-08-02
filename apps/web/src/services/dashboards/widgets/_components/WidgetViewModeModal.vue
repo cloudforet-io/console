@@ -2,66 +2,71 @@
     <div class="widget-view-mode-modal"
          :class="{ 'visible': props.visible }"
     >
-        <div v-if="props.visible"
-             class="modal-header"
-        >
-            <p-heading :title="dashboardDetailState.name"
-                       @click-back-button="handleCloseModal"
-            />
-            <p-icon-button name="ic_close"
-                           class="close-button"
-                           @click="handleCloseModal"
-            />
-        </div>
-        <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
-                                  :widget-key="widgetFormState.widgetKey"
-                                  :visible.sync="state.sidebarVisible"
-        >
-            <div class="content-wrapper">
-                <div class="edit-button-wrapper">
-                    <p-button icon-left="ic_edit"
-                              size="md"
-                              style-type="tertiary"
-                              :disabled="!state.hasManagePermission"
-                              class="edit-button"
-                              @click="handleClickEditOption"
+        <div class="modal-content">
+            <div v-if="props.visible"
+                 class="modal-header"
+            >
+                <p-heading :title="dashboardDetailState.name"
+                           @click-back-button="handleCloseModal"
+                />
+                <p-icon-button name="ic_close"
+                               class="close-button"
+                               @click="handleCloseModal"
+                />
+            </div>
+            <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
+                                      :widget-key="widgetFormState.widgetKey"
+                                      :visible.sync="state.sidebarVisible"
+            >
+                <div class="content-wrapper">
+                    <div class="edit-button-wrapper">
+                        <p-button icon-left="ic_edit"
+                                  size="md"
+                                  style-type="tertiary"
+                                  :disabled="!state.hasManagePermission"
+                                  class="edit-button"
+                                  @click="handleClickEditOption"
+                        >
+                            {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
+                        </p-button>
+                    </div>
+                    <div class="filter-wrapper">
+                        <div class="left-part">
+                            <dashboard-variables-select-dropdown :is-manageable="false"
+                                                                 disable-save-button
+                                                                 :origin-variables="state.variablesSnapshot"
+                                                                 :origin-variables-schema="state.variableSchemaSnapshot"
+                            />
+                        </div>
+                        <div class="right-part">
+                            <dashboard-toolset />
+                        </div>
+                    </div>
+                    <div v-if="state.component"
+                         class="widget-wrapper"
                     >
-                        {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
-                    </p-button>
-                </div>
-                <div class="filter-wrapper">
-                    <div class="left-part">
-                        <dashboard-variables-select-dropdown :is-manageable="false"
-                                                             disable-save-button
-                                                             :origin-variables="state.variablesSnapshot"
-                                                             :origin-variables-schema="state.variableSchemaSnapshot"
+                        <component :is="state.component"
+                                   ref="widgetRef"
+                                   :widget-key="widgetFormState.widgetInfo.widget_key"
+                                   :widget-config-id="widgetFormState.widgetInfo.widget_name"
+                                   :title="widgetFormState.widgetTitle"
+                                   :options="widgetFormState.widgetOptions"
+                                   :inherit-options="widgetFormState.inheritOptions"
+                                   size="full"
+                                   :theme="widgetFormState.theme"
+                                   :currency-rates="state.currencyRates"
+                                   :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
+                                   :all-reference-type-info="state.allReferenceTypeInfo"
+                                   :disable-view-mode="true"
+                                   :initiated="state.initiated"
                         />
                     </div>
-                    <div class="right-part">
-                        <dashboard-toolset />
-                    </div>
                 </div>
-                <div v-if="state.component"
-                     class="widget-wrapper"
-                >
-                    <component :is="state.component"
-                               ref="widgetRef"
-                               :widget-key="widgetFormState.widgetInfo.widget_key"
-                               :widget-config-id="widgetFormState.widgetInfo.widget_name"
-                               :title="widgetFormState.widgetTitle"
-                               :options="widgetFormState.widgetOptions"
-                               :inherit-options="widgetFormState.inheritOptions"
-                               size="full"
-                               :theme="widgetFormState.theme"
-                               :currency-rates="state.currencyRates"
-                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
-                               :all-reference-type-info="state.allReferenceTypeInfo"
-                               :disable-view-mode="true"
-                               :initiated="state.initiated"
-                    />
-                </div>
-            </div>
-        </widget-view-mode-sidebar>
+            </widget-view-mode-sidebar>
+        </div>
+        <div class="modal-backdrop"
+             :class="{ 'visible': props.visible }"
+        />
     </div>
 </template>
 <script setup lang="ts">
@@ -154,7 +159,9 @@ watch(() => props.visible, async (visible) => {
         initSnapshot();
         await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
         await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
-        state.widgetRef?.initWidget();
+        setTimeout(() => {
+            state.widgetRef?.initWidget(); // NOTE: wait 0.4s for modal animation
+        }, 400);
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
@@ -171,68 +178,85 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.w
 
 <style lang="postcss" scoped>
 .widget-view-mode-modal {
-    @apply bg-white;
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 100;
-    transition: all 0.2s ease-in-out;
-    transform: scale(1);
     &.visible {
-        display: block;
+        .modal-content {
+            transform: scale(1, 1);
+        }
+        .modal-backdrop {
+            display: block;
+        }
     }
+    .modal-content {
+        @apply bg-white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        transition: all 0.4s ease-in-out;
+        transform: scale(0);
 
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        height: 6rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-        padding: 2rem;
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            height: 6rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+            padding: 2rem;
 
-        /* custom design-system component - p-heading */
-        :deep(.p-heading) {
-            min-width: 0;
-            .heading-wrapper {
+            /* custom design-system component - p-heading */
+            :deep(.p-heading) {
+                min-width: 0;
+                .heading-wrapper {
+                    width: 100%;
+                }
+                .title {
+                    @apply truncate;
+                    display: inline-block;
+                    width: calc(100% - 4rem);
+                }
+            }
+        }
+        .content-wrapper {
+            @apply bg-gray-100;
+            height: calc(100% - 6rem);
+            overflow: auto;
+            padding: 0 2rem 2rem 2rem;
+            .edit-button-wrapper {
+                @apply border-b border-gray-200;
                 width: 100%;
+                text-align: right;
+                padding: 1.5rem 0;
             }
-            .title {
-                @apply truncate;
-                display: inline-block;
-                width: calc(100% - 4rem);
+            .filter-wrapper {
+                padding: 1rem 0;
+                .left-part {
+                    display: inline-block;
+                    padding-bottom: 0.75rem;
+                }
+                .right-part {
+                    display: inline-block;
+                    float: right;
+                    padding-bottom: 0.75rem;
+                }
+                .dashboard-variables-select-dropdown {
+                    @apply relative flex items-center flex-wrap;
+                    gap: 0.5rem;
+                    z-index: 10;
+                }
             }
         }
     }
-    .content-wrapper {
-        @apply bg-gray-100;
-        height: calc(100% - 6rem);
-        overflow: auto;
-        padding: 0 2rem 2rem 2rem;
-        .edit-button-wrapper {
-            @apply border-b border-gray-200;
-            width: 100%;
-            text-align: right;
-            padding: 1.5rem 0;
-        }
-        .filter-wrapper {
-            padding: 1rem 0;
-            .left-part {
-                display: inline-block;
-                padding-bottom: 0.75rem;
-            }
-            .right-part {
-                display: inline-block;
-                float: right;
-                padding-bottom: 0.75rem;
-            }
-            .dashboard-variables-select-dropdown {
-                @apply relative flex items-center flex-wrap;
-                gap: 0.5rem;
-                z-index: 10;
-            }
-        }
+    .modal-backdrop {
+        @apply bg-gray-900;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+        opacity: 0.4;
     }
 }
 </style>
