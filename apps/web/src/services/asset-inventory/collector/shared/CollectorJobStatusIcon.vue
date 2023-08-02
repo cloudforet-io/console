@@ -2,54 +2,61 @@
     <router-link :to="props.to"
                  class="collector-job-status-icon"
                  :class="[props.styleType]"
+                 custom
     >
-        <div @click.stop>
-            <div v-if="props.isArrow"
-                 class="job-tooltip-wrapper"
-            >
-                <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
-                           :position="props.tooltipPosition"
-                           class="job-tooltip"
+        <template #default="{href, navigate}">
+            <span>
+                <a v-if="props.isArrow"
+                   class="job-tooltip-wrapper"
+                   :href="href"
+                   @click.stop="navigate"
                 >
-                    <p-i
-                        name="ic_chevron-right"
-                        width="1.125rem"
-                        height="1.125rem"
-                        color="inherit"
-                    />
-                </p-tooltip>
-            </div>
-            <div v-else
-                 class="job-tooltip-wrapper"
-            >
-                <p-tooltip :contents="props.contents"
-                           :position="props.tooltipPosition"
-                           class="job-tooltip"
+                    <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                               :position="props.tooltipPosition"
+                               class="job-tooltip"
+                    >
+                        <p-i
+                            name="ic_chevron-right"
+                            width="1.125rem"
+                            height="1.125rem"
+                            color="inherit"
+                        />
+                    </p-tooltip>
+                </a>
+                <a v-else
+                   class="job-tooltip-wrapper"
+                   :href="href"
+                   @click.stop="navigate"
                 >
-                    <p-i v-if="props.status === JOB_STATE.SUCCESS"
-                         name="ic_check"
-                         class="icon success"
-                         height="1rem"
-                         width="1rem"
-                         color="inherit"
-                    />
-                    <p-i v-else-if="props.status === JOB_STATE.CANCELED"
-                         name="ic_limit-filled"
-                         class="icon canceled"
-                         height="1rem"
-                         width="1rem"
-                         color="inherit"
-                    />
-                    <p-i v-else
-                         name="ic_exclamation-mark"
-                         class="icon error"
-                         height="1rem"
-                         width="1rem"
-                         color="inherit"
-                    />
-                </p-tooltip>
-            </div>
-        </div>
+                    <p-tooltip :contents="props.contents"
+                               :position="props.tooltipPosition"
+                               class="job-tooltip"
+                    >
+                        <p-i v-if="props.status === JOB_STATE.SUCCESS"
+                             name="ic_check"
+                             class="icon success"
+                             height="1rem"
+                             width="1rem"
+                             color="inherit"
+                        />
+                        <p-i v-else-if="props.status === JOB_STATE.CANCELED"
+                             name="ic_limit-filled"
+                             class="icon canceled"
+                             height="1rem"
+                             width="1rem"
+                             color="inherit"
+                        />
+                        <p-i v-else
+                             name="ic_exclamation-mark"
+                             class="icon error"
+                             height="1rem"
+                             width="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
+                </a>
+            </span>
+        </template>
     </router-link>
 </template>
 
