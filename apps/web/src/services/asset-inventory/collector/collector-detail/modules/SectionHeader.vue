@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PHeading } from '@spaceone/design-system';
+import {
+    PButton, PHeading, PIconButton, screens,
+} from '@spaceone/design-system';
 
 const props = defineProps<{
     title: TranslateResult;
@@ -12,6 +15,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{(e: 'click-edit'): void;
 }>();
+
+const { width } = useWindowSize();
 
 const handleClickEdit = () => {
     emit('click-edit');
@@ -24,8 +29,10 @@ const handleClickEdit = () => {
                :use-total-count="props.totalCount !== undefined"
                :total-count="props.totalCount"
     >
-        <template #extra>
-            <p-button v-if="!props.editMode || props.hideEditButton"
+        <template v-if="!props.editMode || props.hideEditButton"
+                  #extra
+        >
+            <p-button v-if="width > screens.mobile.max"
                       size="md"
                       icon-left="ic_edit"
                       style-type="secondary"
@@ -33,6 +40,12 @@ const handleClickEdit = () => {
             >
                 {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
             </p-button>
+            <p-icon-button v-else
+                           name="ic_edit"
+                           style-type="tertiary"
+                           size="md"
+                           shape="square"
+            />
         </template>
     </p-heading>
 </template>

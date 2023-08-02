@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import {
     reactive, defineEmits, computed,
 } from 'vue';
 
-import { PButton, PPopover, PIconButton } from '@spaceone/design-system';
+import {
+    PButton, PPopover, PIconButton, screens,
+} from '@spaceone/design-system';
 
 import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
 import type { JobModel } from '@/services/asset-inventory/collector/model';
@@ -14,14 +17,17 @@ const emit = defineEmits<{(e: 'collect'): void;
 
 const collectorJobStore = useCollectorJobStore();
 
+const { width } = useWindowSize();
+
 const state = reactive({
     isPopoverOpen: false,
-    showStatus: computed(() => collectorJobStore.isRecentJobLoaded),
     recentJob: computed<JobModel|null>(() => collectorJobStore.recentJobForAllAccounts),
+    showStatus: computed(() => width.value > screens.mobile.max),
 });
 const handleClickCollectDataButton = () => {
     emit('collect');
 };
+
 </script>
 
 <template>
@@ -30,6 +36,7 @@ const handleClickCollectDataButton = () => {
                   size="md"
                   icon-left="ic_collect"
                   class="collect-data-button"
+                  :class="{dependent: state.showStatus}"
                   @click="handleClickCollectDataButton"
         >
             {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
@@ -61,8 +68,10 @@ const handleClickCollectDataButton = () => {
     display: flex;
     flex-wrap: wrap;
     .collect-data-button {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        &.dependent {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
     .status-button {
         border-top-left-radius: 0;
