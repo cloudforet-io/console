@@ -77,3 +77,13 @@ export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): Inhe
     });
     return inheritOptions;
 };
+
+export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptions): string[] => {
+    if (!widgetInheritOptions) return [];
+    const enabledInheritedOptions: string[] = Object.entries(widgetInheritOptions).filter(([, v]) => v.enabled).map(([k]) => k);
+    const nonInheritedOptions: string[] = [];
+    Object.keys(widgetInheritOptions).forEach((property) => {
+        if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
+    });
+    return nonInheritedOptions;
+};

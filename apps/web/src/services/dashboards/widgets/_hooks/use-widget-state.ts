@@ -31,6 +31,7 @@ import type {
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
@@ -240,12 +241,7 @@ export function useWidgetState<Data = any>(
             dashboardDetailState.variablesSchema,
         )),
         nonInheritOptionsTooltipText: computed<string|undefined>(() => {
-            if (!state.widgetInfo?.schema_properties?.length) return undefined;
-            const enabledInheritOptions: string[] = Object.entries(state.widgetInfo.inherit_options).filter(([, v]) => v.enabled).map(([k]) => k);
-            const nonInheritOptions: string[] = [];
-            Object.keys(state.widgetInfo.inherit_options).forEach((property) => {
-                if (!enabledInheritOptions.includes(property)) nonInheritOptions.push(property);
-            });
+            const nonInheritOptions = getNonInheritedWidgetOptions(state.widgetInfo?.inherit_options);
             if (!nonInheritOptions.length) return undefined;
 
             // TODO: widget option name must be changed to readable name.
