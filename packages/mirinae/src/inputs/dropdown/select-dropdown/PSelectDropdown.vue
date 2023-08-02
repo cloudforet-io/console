@@ -335,7 +335,6 @@ export default defineComponent<SelectDropdownProps>({
         }
     }
     &.transparent {
-        min-width: unset;
         .dropdown-button {
             @apply border-transparent bg-transparent text-gray-900;
             padding-left: 0;
