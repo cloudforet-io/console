@@ -79,7 +79,7 @@
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
                                                :button-text-ellipsis="uniformWidth"
-                                               class="input-form"
+                                               class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #default="{ item }">
@@ -410,13 +410,19 @@ export default defineComponent<JsonSchemaFormProps>({
 
 <style lang="postcss">
 .p-json-schema-form {
-    > .input-form-wrapper.no-margin {
-        margin-bottom: 0;
+    .input-form-wrapper {
+        min-height: 3.375rem;
+        &.no-margin {
+            margin-bottom: 0;
+        }
     }
     .field-group-default-wrapper {
-        display: flex;
+        @apply relative flex;
         > .input-wrapper {
             flex-grow: 1;
+            .select-dropdown {
+                @apply absolute w-full;
+            }
         }
     }
     .invalid-message {
