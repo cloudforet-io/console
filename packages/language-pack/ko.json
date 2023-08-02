@@ -1376,9 +1376,12 @@
 			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
 		},
 		"VIEW_MODE": {
+			"APPLY_NON_INHERITED_OPTION": "",
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "",
 			"CANCEL": "취소",
 			"EDIT_OPTION": "",
 			"EDIT_WIDGET_OPTION": "",
+			"NON_INHERIT_OPTION_APPLIED": "",
 			"SAVE": "저장",
 			"VIEW_MODE": ""
 		},
