@@ -23,6 +23,7 @@
         <button v-else
                 ref="targetRef"
                 class="dropdown-button"
+                :class="{'text-only': (styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)}"
                 @click="handleClick"
                 @keydown.down="handlePressDownKey"
         >
@@ -308,7 +309,8 @@ export default defineComponent<SelectDropdownProps>({
             line-height: 1.5;
             height: 100%;
             &.placeholder {
-                @apply text-gray-600;
+                @apply text-gray-600 truncate;
+                width: calc(100% - 1.5rem);
             }
         }
         .dropdown-icon {
@@ -348,6 +350,11 @@ export default defineComponent<SelectDropdownProps>({
             }
             .dropdown-icon {
                 @apply text-gray-300;
+            }
+            &.text-only {
+                .placeholder {
+                    width: 100%;
+                }
             }
         }
         &.icon-button {
