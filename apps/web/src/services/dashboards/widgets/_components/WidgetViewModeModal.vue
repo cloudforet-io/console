@@ -32,7 +32,7 @@
                                          class="non-inherit-badge"
                                 >
                                     <span class="text">
-                                        {{ $t('DASHBOARDS.VIEW_MODE.NON_INHERIT_OPTION_APPLIED') }}
+                                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
                                     </span>
                                 </p-badge>
                             </template>
@@ -43,7 +43,7 @@
                                       class="edit-button"
                                       @click="handleClickEditOption"
                             >
-                                {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
+                                {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
                             </p-button>
                         </div>
                     </div>

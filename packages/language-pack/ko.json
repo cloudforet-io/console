@@ -1372,18 +1372,18 @@
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "대시보드 이름은 100글자를 넘을 수 없습니다.",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "동일한 이름의 대시보드가 이미 존재합니다. "
 		},
-		"LNB": {
-			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
-		},
-		"VIEW_MODE": {
+		"FULL_SCREEN_VIEW": {
 			"APPLY_NON_INHERITED_OPTION": "",
 			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "",
 			"CANCEL": "취소",
 			"EDIT_OPTION": "",
 			"EDIT_WIDGET_OPTION": "",
+			"FULL_SCREEN_VIEW": "",
 			"NON_INHERIT_OPTION_APPLIED": "",
-			"SAVE": "저장",
-			"VIEW_MODE": ""
+			"SAVE": "저장"
+		},
+		"LNB": {
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {

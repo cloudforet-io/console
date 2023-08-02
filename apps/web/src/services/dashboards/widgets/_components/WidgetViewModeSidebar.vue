@@ -11,7 +11,7 @@
                 <slot />
             </main>
             <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.VIEW_MODE.EDIT_WIDGET_OPTION') }}</span> <br>
+                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
@@ -25,26 +25,26 @@
                     <p-button style-type="transparent"
                               @click="handleCloseSidebar"
                     >
-                        {{ $t('DASHBOARDS.VIEW_MODE.CANCEL') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
                               :disabled="!widgetFormState.isValid"
                               @click="handleClickSaveButton"
                     >
-                        {{ $t('DASHBOARDS.VIEW_MODE.SAVE') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
                     </p-button>
                 </div>
             </template>
         </p-sidebar>
         <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION')"
+                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION')"
                         size="sm"
                         @confirm="handleClickSaveButton"
         >
             <template #body>
                 <div class="non-inherited-option-modal-body">
                     <p>
-                        {{ $t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
                     </p>
                 </div>
             </template>
