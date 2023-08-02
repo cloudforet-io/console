@@ -162,8 +162,6 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .widget-view-mode-sidebar {
-    padding-top: 0.125rem;
-
     .sidebar-title {
         margin-bottom: 0.75rem;
         font-size: 1.125rem;
@@ -171,14 +169,14 @@ onUnmounted(() => {
     }
     .sidebar-contents {
         position: relative;
-        gap: 1.5625rem;
+        gap: 1.5rem;
         font-size: 0.875rem;
         line-height: 125%;
     }
     .footer-wrapper {
         @apply grid grid-cols-12 border-t border-gray-200;
         position: absolute;
-        bottom: 6rem;
+        bottom: 0;
         width: 100%;
         gap: 0.75rem;
         padding: 0.75rem 1rem;
@@ -187,13 +185,11 @@ onUnmounted(() => {
         }
     }
 }
-$footer-height: 57px;
-$header-height: 6rem;
 
 /* custom design-system component - p-sidebar */
 :deep(.p-sidebar) {
     .sidebar-wrapper {
-        height: calc(100vh - $header-height);
+        height: 100%;
         padding-top: 0;
         padding-bottom: $footer-height;
         .inner {
