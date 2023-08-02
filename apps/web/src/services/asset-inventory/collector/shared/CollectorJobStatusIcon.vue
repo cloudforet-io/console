@@ -1,11 +1,12 @@
 <template>
     <router-link :to="props.to"
-                 class="collector-job-status-icon"
-                 :class="[props.styleType]"
                  custom
     >
         <template #default="{href, navigate}">
-            <span>
+            <!-- CAUTION: Do not delete the span tag below since it will be the root element -->
+            <span class="collector-job-status-icon"
+                  :class="[props.styleType]"
+            >
                 <a v-if="props.isArrow"
                    class="job-tooltip-wrapper"
                    :href="href"
