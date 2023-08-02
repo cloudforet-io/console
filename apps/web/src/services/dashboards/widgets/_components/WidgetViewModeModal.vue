@@ -20,15 +20,32 @@
             >
                 <div class="content-wrapper">
                     <div class="edit-button-wrapper">
-                        <p-button icon-left="ic_edit"
-                                  size="md"
-                                  style-type="tertiary"
-                                  :disabled="!state.hasManagePermission"
-                                  class="edit-button"
-                                  @click="handleClickEditOption"
-                        >
-                            {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
-                        </p-button>
+                        <div class="inner">
+                            <template v-if="state.hasNonInheritedWidgetOptions">
+                                <p-i name="ic_warning-filled"
+                                     width="1rem"
+                                     height="1rem"
+                                     :color="gray[700]"
+                                />
+                                <p-badge badge-type="subtle"
+                                         style-type="primary3"
+                                         class="non-inherit-badge"
+                                >
+                                    <span class="text">
+                                        {{ $t('DASHBOARDS.VIEW_MODE.NON_INHERIT_OPTION_APPLIED') }}
+                                    </span>
+                                </p-badge>
+                            </template>
+                            <p-button icon-left="ic_edit"
+                                      size="md"
+                                      style-type="tertiary"
+                                      :disabled="!state.hasManagePermission"
+                                      class="edit-button"
+                                      @click="handleClickEditOption"
+                            >
+                                {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
+                            </p-button>
+                        </div>
                     </div>
                     <div class="filter-wrapper">
                         <div class="left-part">
@@ -75,7 +92,9 @@ import {
     computed, reactive, toRef, watch,
 } from 'vue';
 
-import { PHeading, PIconButton, PButton } from '@spaceone/design-system';
+import {
+    PHeading, PIconButton, PButton, PBadge, PI,
+} from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
 
 import { store } from '@/store';
@@ -83,6 +102,8 @@ import { store } from '@/store';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
+import { gray } from '@/styles/colors';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
@@ -95,6 +116,7 @@ import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface WidgetViewModeModalProps {
@@ -123,6 +145,10 @@ const state = reactive({
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
+    hasNonInheritedWidgetOptions: computed<boolean>(() => {
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState?.widgetInfo?.inherit_options);
+        return nonInheritedWidgetOptions.length > 0;
+    }),
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -158,9 +184,10 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
         await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
-        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
-        setTimeout(() => {
-            state.widgetRef?.initWidget(); // NOTE: wait 0.4s for modal animation
+        setTimeout(async () => {
+            // NOTE: wait 0.4s for modal animation
+            await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+            state.widgetRef?.initWidget();
         }, 400);
         state.initiated = true;
     } else {
@@ -224,9 +251,17 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.w
             padding: 0 2rem 2rem 2rem;
             .edit-button-wrapper {
                 @apply border-b border-gray-200;
+                display: flex;
                 width: 100%;
-                text-align: right;
                 padding: 1.5rem 0;
+                .inner {
+                    display: flex;
+                    align-items: center;
+                    margin-left: auto;
+                }
+                .non-inherit-badge {
+                    margin-right: 0.5rem;
+                }
             }
             .filter-wrapper {
                 padding: 1rem 0;
