@@ -303,14 +303,15 @@ export default defineComponent<SelectDropdownProps>({
         height: 2rem;
 
         .text {
+            @apply truncate;
             flex-grow: 1;
             flex-shrink: 0;
             padding: 0.25rem 0;
             line-height: 1.5;
             height: 100%;
+            width: calc(100% - 1.5rem);
             &.placeholder {
-                @apply text-gray-600 truncate;
-                width: calc(100% - 1.5rem);
+                @apply text-gray-600;
             }
         }
         .dropdown-icon {
@@ -352,7 +353,7 @@ export default defineComponent<SelectDropdownProps>({
                 @apply text-gray-300;
             }
             &.text-only {
-                .placeholder {
+                .text {
                     width: 100%;
                 }
             }
