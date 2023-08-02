@@ -1,19 +1,9 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
+        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                        :edit-mode="state.isEditMode"
+                        @click-edit="handleClickEdit"
+        />
 
         <div v-if="!state.isEditMode"
              class="contents-wrapper"
@@ -68,7 +58,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PHeading, PButton, PPaneLayout,
+    PButton, PPaneLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -83,6 +73,7 @@ import { useCollectorJobStore } from '@/services/asset-inventory/collector/colle
 import CollectorPluginInfo from '@/services/asset-inventory/collector/collector-detail/modules/CollectorPluginInfo.vue';
 import CollectorTags from '@/services/asset-inventory/collector/collector-detail/modules/CollectorTags.vue';
 import PluginSummaryCards from '@/services/asset-inventory/collector/collector-detail/modules/PluginSummaryCards.vue';
+import SectionHeader from '@/services/asset-inventory/collector/collector-detail/modules/SectionHeader.vue';
 import type {
     CollectorModel,
     CollectorPluginModel,
