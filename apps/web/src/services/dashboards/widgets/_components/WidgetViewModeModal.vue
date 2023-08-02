@@ -233,6 +233,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.w
                     align-items: center;
                     margin-left: auto;
                     .non-inherit-badge {
+                        margin-left: 0.25rem;
                         margin-right: 0.5rem;
                     }
                 }
