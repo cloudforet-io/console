@@ -4,6 +4,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
     CollectorPluginModel, Schedule,
+    JobStatus,
 } from '@/services/asset-inventory/collector/model';
 
 export const COLLECTOR_QUERY_HELPER_SET = {
@@ -44,8 +45,8 @@ export interface CollectorItemInfo {
     plugin: CollectorPlugin;
     historyLink: CollectorLink,
     detailLink: CollectorLink;
-    schedule: Schedule;
-    recentJobAnalyze: JobAnalyzeStatus[];
+    schedule?: Schedule;
+    recentJobAnalyze?: JobAnalyzeStatus[];
     hasJobList?: boolean
 }
 
@@ -58,7 +59,7 @@ export interface CollectorMainPageQueryValue {
 
 export interface JobAnalyzeStatus {
     job_id: string;
-    status: string;
+    status: JobStatus;
     finished_at: string;
     remained_tasks: number;
     total_tasks: number;

@@ -27,6 +27,7 @@ import CollectorContentItem from '@/services/asset-inventory/collector/collector
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/collector/collector-main/modules/modals/CollectorScheduleModal.vue';
+import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorDataModal
     from '@/services/asset-inventory/collector/shared/collector-data-modal/CollectorDataModal.vue';
@@ -69,9 +70,10 @@ const historyLinkQueryHelper = new QueryHelper();
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
+
 const state = reactive({
     searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
-    items: computed(() => {
+    items: computed<CollectorItemInfo[]|undefined>(() => {
         const plugins = storeState.plugins;
         return collectorPageState.collectors?.map((d) => {
             historyLinkQueryHelper.setFilters([
@@ -83,7 +85,7 @@ const state = reactive({
             ]);
 
             const matchedJob = collectorPageState.collectorJobStatus.find((status) => status.collector_id === d.collector_id);
-            const recentJobAnalyze = matchedJob?.job_status.slice(-5) || [];
+            const recentJobAnalyze = matchedJob ? matchedJob.job_status : undefined;
 
             return {
                 collectorId: d.collector_id,

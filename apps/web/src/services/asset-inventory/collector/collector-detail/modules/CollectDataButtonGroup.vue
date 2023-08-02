@@ -17,7 +17,7 @@ const collectorJobStore = useCollectorJobStore();
 const state = reactive({
     isPopoverOpen: false,
     showStatus: computed(() => collectorJobStore.isRecentJobLoaded),
-    recentJob: computed<JobModel|null>(() => collectorJobStore.recentJob),
+    recentJob: computed<JobModel|null>(() => collectorJobStore.recentJobForAllAccounts),
 });
 const handleClickCollectDataButton = () => {
     emit('collect');
