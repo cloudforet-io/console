@@ -8,6 +8,7 @@
              'read-only': readOnly,
              active: proxyVisibleMenu && !readOnly,
              [size] : true,
+             'is-fixed-width': isFixedWidth,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -177,6 +178,11 @@ export default defineComponent<SelectDropdownProps>({
                 return Object.values(SELECT_DROPDOWN_SIZE).includes(size);
             },
         },
+        /* fixed width props */
+        isFixedWidth: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit, slots }: SetupContext) {
         const state = reactive({
@@ -303,13 +309,11 @@ export default defineComponent<SelectDropdownProps>({
         height: 2rem;
 
         .text {
-            @apply truncate;
             flex-grow: 1;
             flex-shrink: 0;
             padding: 0.25rem 0;
             line-height: 1.5;
             height: 100%;
-            width: calc(100% - 1.5rem);
             &.placeholder {
                 @apply text-gray-600;
             }
@@ -351,17 +355,27 @@ export default defineComponent<SelectDropdownProps>({
             .dropdown-icon {
                 @apply text-gray-300;
             }
-            &.text-only {
-                .text {
-                    width: 100%;
-                }
-            }
         }
         &.icon-button {
             display: none;
         }
         &.secondary-button {
             @mixin read-only-style;
+        }
+    }
+
+    /* is-fixed-width */
+    &.is-fixed-width {
+        .dropdown-button {
+            .text {
+                @apply truncate;
+                width: calc(100% - 1.5rem);
+            }
+            &.text-only {
+                .text {
+                    width: 100%;
+                }
+            }
         }
     }
 

@@ -246,6 +246,24 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 options: [...Object.values(CONTEXT_MENU_POSITION)],
             },
         },
+        isFixedWidth: {
+            name: 'isFixedWidth',
+            type: { name: 'boolean' },
+            description: 'Whether to fix width.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         /* model */
         'v-model': {
             name: 'v-model',
