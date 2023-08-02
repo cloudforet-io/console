@@ -97,7 +97,7 @@ const state = reactive({
         return '3rem';
     }),
     name: computed<string>(() => props.plugin?.name ?? ''),
-    description: computed<string>(() => props.plugin?.tags?.description ?? ''),
+    description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
     labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin
     isBeta: computed<boolean>(() => !!(props.plugin as RepositoryPluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
     pluginDetailLink: computed<string>(() => props.plugin?.tags?.link ?? ''),

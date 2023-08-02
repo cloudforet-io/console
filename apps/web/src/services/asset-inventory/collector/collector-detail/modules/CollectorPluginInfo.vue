@@ -13,8 +13,7 @@ const props = defineProps<{
 }>();
 
 const state = reactive({
-    // TODO: check if long_description must be used instead of description
-    description: computed(() => props.plugin?.tags?.description),
+    description: computed(() => props.plugin?.tags?.long_description),
 });
 </script>
 
