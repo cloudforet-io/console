@@ -181,11 +181,9 @@ watch(() => collectorFormState.provider, async (provider) => {
         }
 
         .loading-box {
-            height: 8.625rem;
             .loading-spinner {
-                height: 6rem;
-
                 @apply flex flex-col justify-center items-center w-full;
+                margin-bottom: 1rem;
             }
 
             .loading-description {
