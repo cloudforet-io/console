@@ -136,10 +136,10 @@ const handleClickSaveButton = () => {
         position: relative;
         .circle-mark {
             &.changed {
-                @apply bg-secondary1 rounded-xl;
+                @apply bg-secondary1 rounded-xl border-white border-2;
                 position: absolute;
-                width: 0.5rem;
-                height: 0.5rem;
+                width: 0.75rem;
+                height: 0.75rem;
                 right: -0.25rem;
                 top: -0.125rem;
             }
