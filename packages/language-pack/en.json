@@ -38,7 +38,12 @@
 				"TITLE": "Forgot your password?",
 				"USER_ID": "User ID"
 			},
-			"INVALID_LINK": "The link is invalid",
+			"INVALID_LINK": {
+				"EMAIL": "Email",
+				"HELP_TEXT": "The link has either expired or is no longer valid.",
+				"SENT_BUTTON": "Send a New Link",
+				"TITLE": "The link is invalid"
+			},
 			"MOBILE": {
 				"MOBILE_GUIDE_MODAL_DESC_1": "You must reset password",
 				"MOBILE_GUIDE_MODAL_DESC_2": "on Desktop or Laptop environment",
