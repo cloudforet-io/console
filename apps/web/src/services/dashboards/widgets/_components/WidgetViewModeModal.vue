@@ -3,24 +3,20 @@
          :class="{ 'visible': props.visible }"
     >
         <div class="modal-content">
-            <div v-if="props.visible"
-                 class="modal-header"
-            >
-                <p-heading :title="dashboardDetailState.name"
-                           @click-back-button="handleCloseModal"
-                />
-                <p-icon-button name="ic_close"
-                               class="close-button"
-                               @click="handleCloseModal"
-                />
-            </div>
             <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
                                       :widget-key="widgetFormState.widgetKey"
                                       :visible.sync="state.sidebarVisible"
             >
                 <div class="content-wrapper">
-                    <div class="edit-button-wrapper">
-                        <div class="inner">
+                    <div class="top-wrapper">
+                        <p-button icon-left="ic_arrow-left"
+                                  style-type="transparent"
+                                  size="lg"
+                                  @click="handleCloseModal"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
+                        </p-button>
+                        <div class="right">
                             <template v-if="state.hasNonInheritedWidgetOptions">
                                 <p-i name="ic_warning-filled"
                                      width="1rem"
@@ -32,18 +28,18 @@
                                          class="non-inherit-badge"
                                 >
                                     <span class="text">
-                                        {{ $t('DASHBOARDS.VIEW_MODE.NON_INHERIT_OPTION_APPLIED') }}
+                                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
                                     </span>
                                 </p-badge>
                             </template>
                             <p-button icon-left="ic_edit"
                                       size="md"
                                       style-type="tertiary"
-                                      :disabled="!state.hasManagePermission"
+                                      :disabled="!state.hasManagePermission || state.sidebarVisible"
                                       class="edit-button"
                                       @click="handleClickEditOption"
                             >
-                                {{ $t('DASHBOARDS.VIEW_MODE.EDIT_OPTION') }}
+                                {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
                             </p-button>
                         </div>
                     </div>
@@ -93,7 +89,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PIconButton, PButton, PBadge, PI,
+    PButton, PBadge, PI,
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
 
@@ -214,7 +210,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.w
         }
     }
     .modal-content {
-        @apply bg-white;
+        @apply bg-gray-100;
         position: fixed;
         top: 0;
         left: 0;
@@ -224,43 +220,22 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.w
         transition: all 0.4s ease-in-out;
         transform: scale(0);
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            height: 6rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-            padding: 2rem;
-
-            /* custom design-system component - p-heading */
-            :deep(.p-heading) {
-                min-width: 0;
-                .heading-wrapper {
-                    width: 100%;
-                }
-                .title {
-                    @apply truncate;
-                    display: inline-block;
-                    width: calc(100% - 4rem);
-                }
-            }
-        }
         .content-wrapper {
-            @apply bg-gray-100;
-            height: calc(100% - 6rem);
             overflow: auto;
             padding: 0 2rem 2rem 2rem;
-            .edit-button-wrapper {
+            .top-wrapper {
                 @apply border-b border-gray-200;
                 display: flex;
                 width: 100%;
                 padding: 1.5rem 0;
-                .inner {
+                .right {
                     display: flex;
                     align-items: center;
                     margin-left: auto;
-                }
-                .non-inherit-badge {
-                    margin-right: 0.5rem;
+                    .non-inherit-badge {
+                        margin-left: 0.25rem;
+                        margin-right: 0.5rem;
+                    }
                 }
             }
             .filter-wrapper {

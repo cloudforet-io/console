@@ -11,7 +11,7 @@
                 <slot />
             </main>
             <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.VIEW_MODE.EDIT_WIDGET_OPTION') }}</span> <br>
+                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
@@ -25,26 +25,26 @@
                     <p-button style-type="transparent"
                               @click="handleCloseSidebar"
                     >
-                        {{ $t('DASHBOARDS.VIEW_MODE.CANCEL') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
                               :disabled="!widgetFormState.isValid"
                               @click="handleClickSaveButton"
                     >
-                        {{ $t('DASHBOARDS.VIEW_MODE.SAVE') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
                     </p-button>
                 </div>
             </template>
         </p-sidebar>
         <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION')"
+                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION')"
                         size="sm"
                         @confirm="handleClickSaveButton"
         >
             <template #body>
                 <div class="non-inherited-option-modal-body">
                     <p>
-                        {{ $t('DASHBOARDS.VIEW_MODE.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
                     </p>
                 </div>
             </template>
@@ -162,8 +162,6 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .widget-view-mode-sidebar {
-    padding-top: 0.125rem;
-
     .sidebar-title {
         margin-bottom: 0.75rem;
         font-size: 1.125rem;
@@ -171,14 +169,14 @@ onUnmounted(() => {
     }
     .sidebar-contents {
         position: relative;
-        gap: 1.5625rem;
+        gap: 1.5rem;
         font-size: 0.875rem;
         line-height: 125%;
     }
     .footer-wrapper {
         @apply grid grid-cols-12 border-t border-gray-200;
         position: absolute;
-        bottom: 6rem;
+        bottom: 0;
         width: 100%;
         gap: 0.75rem;
         padding: 0.75rem 1rem;
@@ -187,13 +185,11 @@ onUnmounted(() => {
         }
     }
 }
-$footer-height: 57px;
-$header-height: 6rem;
 
 /* custom design-system component - p-sidebar */
 :deep(.p-sidebar) {
     .sidebar-wrapper {
-        height: calc(100vh - $header-height);
+        height: 100%;
         padding-top: 0;
         padding-bottom: $footer-height;
         .inner {

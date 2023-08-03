@@ -1372,18 +1372,19 @@
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "この名前のダッシュボードはすでに存在します。"
 		},
-		"LNB": {
-			"ONLY_FAVORITE": "お気に入りだけを表示する"
-		},
-		"VIEW_MODE": {
+		"FULL_SCREEN_VIEW": {
 			"APPLY_NON_INHERITED_OPTION": "",
 			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "",
+			"BACK_TO_DASHBOARD": "",
 			"CANCEL": "キャンセル",
 			"EDIT_OPTION": "",
 			"EDIT_WIDGET_OPTION": "",
+			"FULL_SCREEN_VIEW": "",
 			"NON_INHERIT_OPTION_APPLIED": "",
-			"SAVE": "保存",
-			"VIEW_MODE": ""
+			"SAVE": "保存"
+		},
+		"LNB": {
+			"ONLY_FAVORITE": "お気に入りだけを表示する"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
