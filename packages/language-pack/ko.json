@@ -1367,6 +1367,7 @@
 			"LABEL_PUBLIC": "공개 (해당 대시보드 범위에 'View' 엑세스 권한을 갖는 모든 유저)",
 			"LABEL_VIEWERS": "공개 여부",
 			"REQUIRED": "필수 입력 항목입니다.",
+			"RETURN_TO_INITIAL_SETTINGS": "",
 			"UPDATE_TITLE": "대시보드 이름 수정",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "대시보드 이름을 입력해주세요.",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "대시보드 이름은 100글자를 넘을 수 없습니다.",
