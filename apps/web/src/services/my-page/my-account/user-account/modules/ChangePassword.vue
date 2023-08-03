@@ -200,7 +200,6 @@ const updateUser = async (userParam: UpdateUserRequest) => {
         }
     }
     .p-text-input,
-    .p-select-dropdown,
     .p-filterable-dropdown {
         width: 100%;
         max-width: 25rem;

@@ -38,4 +38,5 @@ export interface SelectDropdownProps {
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;
     size?: SelectDropdownSize;
+    isFixedWidth?: boolean;
 }

@@ -41,6 +41,7 @@ export const Template = (args, { argTypes }) => ({
             :style-type="styleType"
             :button-icon="buttonIcon"
             :menu-position="menuPosition"
+            :is-fixed-width="isFixedWidth"
             @select="onSelect"
             @update:selected="onUpdateSelected"
             @focus-menu="onFocusMenu"
@@ -293,6 +294,27 @@ export const Template = (args, { argTypes }) => ({
                 return {
                     menuItems
                 };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Is Fixed Width
+
+<Canvas>
+    <Story name="Is Fixed Width" height={'500px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-select-dropdown :items="menuItems" is-fixed-width class="w-52" placeholder="long long long long long long long long long long long placeholder"></p-select-dropdown>
+                </div>
+            `,
+            setup() {
+                return {
+                    menuItems
+                }
             }
         }}
     </Story>
