@@ -1367,6 +1367,7 @@
 			"LABEL_PUBLIC": "Public (Anyone who has 'View' access to this dashboard scope)",
 			"LABEL_VIEWERS": "Viewers",
 			"REQUIRED": "Required Field",
+			"RETURN_TO_INITIAL_SETTINGS": "Return to Initial Settings",
 			"UPDATE_TITLE": "Edit Dashboard Name",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "Please enter dashboard name.",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "The dashboard name cannot be longer than 100 characters.",

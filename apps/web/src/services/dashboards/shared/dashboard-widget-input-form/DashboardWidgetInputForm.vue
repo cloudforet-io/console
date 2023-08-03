@@ -22,6 +22,13 @@
         <p-data-loader :loading="referenceStoreState.loading"
                        class="widget-options-form-wrapper"
         >
+            <p-text-button icon-left="ic_refresh"
+                           style-type="highlight"
+                           class="return-to-initial-settings-button"
+                           @click="handleReturnToInitialSettings"
+            >
+                {{ $t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
+            </p-text-button>
             <p-json-schema-form v-if="widgetOptionsJsonSchema.properties"
                                 :schema="widgetOptionsJsonSchema"
                                 :form-data.sync="schemaFormData"
@@ -76,7 +83,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -132,6 +139,7 @@ export default defineComponent<Props>({
         PToggleButton,
         PDataLoader,
         PIconButton,
+        PTextButton,
     },
     props: {
         widgetConfigId: {
@@ -268,6 +276,9 @@ export default defineComponent<Props>({
             return widgetInfo.schema_properties ?? [];
         };
 
+        const handleReturnToInitialSettings = () => {
+            initStatesByWidgetConfig(props.widgetConfigId as string, true);
+        };
 
         /* inherit */
         const handleChangeInheritToggle = (propertyName: string, value) => {
@@ -333,7 +344,7 @@ export default defineComponent<Props>({
             state.schemaFormData = {};
             resetTitle();
         };
-        const initStatesByWidgetConfig = (widgetConfigId: string) => {
+        const initStatesByWidgetConfig = (widgetConfigId: string, forceInit = false) => {
             state.schemaFormData = {};
             const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
             // init widget form store states
@@ -342,7 +353,7 @@ export default defineComponent<Props>({
                 _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
                 _state.inheritOptions = {};
             });
-            if (!props.widgetKey) {
+            if (!props.widgetKey || forceInit) {
                 let _inheritOptions = widgetFormState.inheritOptions;
                 // set default value to fixed properties
                 widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
@@ -454,6 +465,7 @@ export default defineComponent<Props>({
             //
             isSelected,
             handleFormValidate,
+            handleReturnToInitialSettings,
         };
     },
 });
@@ -494,6 +506,10 @@ export default defineComponent<Props>({
     .widget-options-form-wrapper {
         height: 100%;
         min-height: 15rem;
+        .return-to-initial-settings-button {
+            float: right;
+            padding: 1rem 0;
+        }
         .delete-button {
             margin-left: 0.25rem;
         }

@@ -1367,6 +1367,7 @@
 			"LABEL_PUBLIC": "公開（選択したダッシュボードの範囲に対して「View」アクセス権を持つすべてのユーザー）",
 			"LABEL_VIEWERS": "公開可否",
 			"REQUIRED": "必須入力項目です",
+			"RETURN_TO_INITIAL_SETTINGS": "",
 			"UPDATE_TITLE": "ダッシュボード名の編集",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "ダッシュボードの名を入力してください。",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
