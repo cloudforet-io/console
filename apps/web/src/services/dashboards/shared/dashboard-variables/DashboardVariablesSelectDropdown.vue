@@ -141,7 +141,7 @@ const handleClickSaveButton = () => {
                 width: 0.75rem;
                 height: 0.75rem;
                 right: -0.25rem;
-                top: -0.125rem;
+                top: -0.25rem;
             }
         }
     }
