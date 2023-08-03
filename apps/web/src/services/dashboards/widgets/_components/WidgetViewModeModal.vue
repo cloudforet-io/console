@@ -6,6 +6,7 @@
             <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
                                       :widget-key="widgetFormState.widgetKey"
                                       :visible.sync="state.sidebarVisible"
+                                      @refresh="handleRefreshWidget"
             >
                 <div class="content-wrapper">
                     <div class="top-wrapper">
@@ -174,6 +175,9 @@ const handleCloseModal = () => {
 };
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
+};
+const handleRefreshWidget = () => {
+    state.widgetRef?.refreshWidget();
 };
 
 watch(() => props.visible, async (visible) => {

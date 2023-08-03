@@ -86,7 +86,9 @@ const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: string, value: boolean): void}>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'refresh'): void;
+}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -148,6 +150,7 @@ const handleClickSaveButton = async () => {
 const handleCloseSidebar = () => {
     widgetFormStore.initWidgetForm(props.widgetKey);
     state.proxyVisible = false;
+    emit('refresh');
 };
 </script>
 
