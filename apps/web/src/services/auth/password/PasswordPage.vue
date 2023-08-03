@@ -18,10 +18,15 @@
                                 {{ state.userInfo.userId }}
                             </span>
                         </p>
-                        <p v-else
+                        <p v-if="props.status === PASSWORD_STATUS.FIND"
                            class="help-text"
                         >
                             {{ $t('AUTH.PASSWORD.FIND.HELP_TEXT') }}
+                        </p>
+                        <p v-else
+                           class="help-text"
+                        >
+                            {{ $t('AUTH.PASSWORD.INVALID_LINK.HELP_TEXT') }}
                         </p>
                     </div>
                 </div>
@@ -46,11 +51,18 @@
                         {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
                     </p-button>
                     <p-button
-                        v-else
+                        v-else-if="props.status === PASSWORD_STATUS.FIND"
                         :disabled="userIdInput === ''"
                         @click="handleClickButton"
                     >
                         {{ $t('AUTH.PASSWORD.FIND.SEND') }}
+                    </p-button>
+                    <p-button
+                        v-else
+                        :disabled="userIdInput === ''"
+                        @click="handleClickButton"
+                    >
+                        {{ $t('AUTH.PASSWORD.INVALID_LINK.SENT_BUTTON') }}
                     </p-button>
                 </div>
                 <div v-if="props.status === PASSWORD_STATUS.FIND"
@@ -80,6 +92,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
@@ -88,6 +101,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ERROR_ROUTE } from '@/router/error-routes';
 
 import type { UserState } from '@/store/modules/user/type';
 
@@ -122,7 +137,7 @@ const state = reactive({
             return i18n.t('AUTH.PASSWORD.FIND.TITLE');
         }
         if (props.status === PASSWORD_STATUS.INVALID) {
-            return i18n.t('AUTH.PASSWORD.INVALID_LINK');
+            return i18n.t('AUTH.PASSWORD.INVALID_LINK.TITLE');
         }
         return i18n.t('AUTH.PASSWORD.RESET.TITLE');
     }),
@@ -177,6 +192,12 @@ const getSSOTokenFromUrl = (): string|undefined => {
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     if (!ssoAccessToken) return undefined;
     const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
+    const expireDate = dayjs((decodedToken.exp || 0) * 1000).utc();
+    if (expireDate.isBefore(dayjs().utc())) {
+        ErrorHandler.handleError('Expired token.');
+        SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+        return undefined;
+    }
     if (decodedToken) return decodedToken.aud as string;
     return undefined;
 };
@@ -235,9 +256,11 @@ const initStatesByUrlSSOToken = async () => {
         state.userInfo.email = userId;
 
         await store.commit('user/setUser', state.userInfo);
-    } catch (e) {
-        ErrorHandler.handleError('Invalid token.');
-        SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+    } catch (e: any) {
+        if (e.message.includes('Invalid token')) {
+            ErrorHandler.handleError('Invalid token.');
+            await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME, params: { statusCode: '401' } });
+        }
     }
 };
 (async () => {
