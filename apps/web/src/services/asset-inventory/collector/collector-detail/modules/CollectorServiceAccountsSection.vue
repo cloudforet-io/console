@@ -1,21 +1,10 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
-                   heading-type="sub"
-                   use-total-count
-                   :total-count="state.totalCount"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
+        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
+                        :edit-mode="state.isEditMode"
+                        :total-count="state.totalCount"
+                        @click-edit="handleClickEdit"
+        />
 
         <attached-service-accounts v-if="!state.isEditMode"
                                    :manage-disabled="props.manageDisabled"
@@ -58,7 +47,7 @@ import {
 
 
 import {
-    PHeading, PButton, PPaneLayout,
+    PButton, PPaneLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -71,6 +60,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AttachedServiceAccounts
     from '@/services/asset-inventory/collector/collector-detail/modules/AttachedServiceAccounts.vue';
+import SectionHeader from '@/services/asset-inventory/collector/collector-detail/modules/SectionHeader.vue';
 import type {
     CollectorModel,
     CollectorUpdateParameter,
