@@ -195,10 +195,9 @@ watch(() => props.visible, async (visible) => {
         emit('refresh-widget', widgetFormState.widgetKey as string);
     }
 });
-watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetInfo?.widget_options.filters], async ([_inheritOptions, _filters]) => {
+watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions], async (after, before) => {
     if (!state.initiated) return;
-    if (isEqual(_inheritOptions, widgetFormState.widgetInfo?.inherit_options)
-        && isEqual(_filters, widgetFormState.widgetInfo?.widget_options.filters)) return;
+    if (isEqual(after[0], before[0]) && isEqual(after[1], before[1])) return;
     await state.widgetRef?.refreshWidget();
 }, { immediate: false });
 </script>
