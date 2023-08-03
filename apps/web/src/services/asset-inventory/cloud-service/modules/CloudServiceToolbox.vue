@@ -85,8 +85,8 @@ interface Props {
 
 const CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS = [
     { key: 'provider', name: 'Provider', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
-    { key: 'cloud_service_type', name: 'Cloud Service Type' },
     { key: 'cloud_service_group', name: 'Cloud Service Group' },
+    { key: 'cloud_service_type', name: 'Cloud Service Type' },
     { key: 'count', name: 'Count' },
 ];
 
