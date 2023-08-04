@@ -262,7 +262,6 @@ onDeactivated(() => {
                 </p-anchor>
             </template>
         </template>
-        <!-- TODO: will be checked "Pending" after API is updated-->
         <template #col-status-format="{ value }">
             <p-status
                 :text="statusTextFormatter(value)"

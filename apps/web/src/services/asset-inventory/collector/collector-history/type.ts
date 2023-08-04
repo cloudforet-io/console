@@ -13,3 +13,13 @@ export const JOB_TASK_STATE = {
     PENDING: 'PENDING',
     SUCCESS: 'SUCCESS',
 } as const;
+
+interface PluginInfo {
+    label: string;
+    icon: string;
+}
+
+export interface JobItemType {
+    label: string;
+    plugin_info: PluginInfo;
+}

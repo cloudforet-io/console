@@ -185,16 +185,9 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
     }
 
     .time-block {
-        @apply bg-white border border-gray-300 rounded-xs;
-        display: inline-block;
+        @apply flex items-center justify-center bg-white border border-gray-300 rounded-xs box-border cursor-pointer;
         height: 2rem;
-        line-height: 2rem;
-        text-align: center;
         font-size: 0.875rem;
-        cursor: pointer;
-        &:hover:not(.disabled) {
-            @apply bg-secondary2 border-secondary text-secondary;
-        }
         &.active {
             @apply bg-blue-600 text-white;
         }
@@ -203,9 +196,6 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
         }
         &.is-set-mode {
             @apply bg-gray-100 text-gray-100 border-none cursor-default;
-            &:hover:not(.active) {
-                @apply bg-gray-100 text-gray-100;
-            }
             &.active {
                 @apply bg-blue-200 text-blue-600;
             }

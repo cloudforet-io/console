@@ -46,11 +46,10 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
-    { label: 'Collector', name: 'collector_info.name', sortable: false },
+    { label: 'Collector', name: 'collector_info.label', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
-    // TODO: will be check the color and translation after the API is updated
-    // { label: 'Job Progress', name: 'progress' },
+    { label: 'Job Progress', name: 'progress' },
     { label: 'Created', name: 'created_at' },
     { label: 'Duration', name: 'duration', sortable: false },
 ];
@@ -161,15 +160,27 @@ const getJobs = async () => {
     try {
         const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
         state.totalCount = res.total_count;
-        state.items = res.results.map((job) => ({
-            ...job,
-            progress: {
-                succeededPercentage: (job.success_tasks / job.total_tasks) * 100,
-                failedPercentage: (job.failure_tasks / job.total_tasks) * 100,
-            },
-            created_at: iso8601Formatter(job.created_at, storeState.timezone),
-            duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
-        }));
+        state.items = res.results.map((job) => {
+            const collector = storeState.collectors[job.collector_id];
+            const plugin = storeState.plugins[job.plugin_id];
+            return {
+                ...job,
+                collector_info: {
+                    label: collector?.name,
+                    plugin_info: {
+                        label: plugin?.label,
+                        icon: plugin?.icon,
+                    },
+                },
+                progress: job.total_tasks === 0 ? { succeededPercentage: 100, failedPercentage: 0 } : {
+                    succeededPercentage: (job.success_tasks / job.total_tasks) * 100,
+                    failedPercentage: (job.failure_tasks / job.total_tasks) * 100,
+                    isCanceled: job.status === JOB_STATE.CANCELED,
+                },
+                created_at: iso8601Formatter(job.created_at, storeState.timezone),
+                duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
+            };
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -235,22 +246,17 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              @refresh="handleChange()"
                              @rowLeftClick="handleSelect"
             >
-                <template #th-task-format="{ field }">
-                    <span>{{ field.label }}</span>
-                    <span class="th-additional-info-text"> (completed / total)</span>
-                </template>
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
-                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
+                        <p-lazy-img :src="value.icon || ''"
                                     width="1rem"
                                     height="1rem"
                                     class="mr-2"
                         />
-                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
+                        {{ value.label || '' }}
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
-                    <!-- TODO: will be check the color and translation after the API is updated -->
                     <p-status
                         :text="statusTextFormatter(value)"
                         :text-color="statusTextColorFormatter(value)"
@@ -259,18 +265,17 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                         :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
                     />
                 </template>
-                <!-- TODO: will be check the color and translation after the API is updated -->
-                <!--                <template #col-progress="{ value }">-->
-                <!--                    <div class="col-progress-format">-->
-                <!--                        <span class="succeeded-bar"-->
-                <!--                              :style="{ width: `${value.succeededPercentage}%` }"-->
-                <!--                        />-->
-                <!--                        <span class="failed-bar"-->
-                <!--                              :style="{ width: `${value.failedPercentage}%` }"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--                    <span class="text">{{ value }}%</span>-->
-                <!--                </template>-->
+                <template #col-progress-format="{ value }">
+                    <div :class="['col-progress-format', {'is-canceled': value.isCanceled}]">
+                        <span class="succeeded-bar"
+                              :style="{ width: `${value.succeededPercentage}%` }"
+                        />
+                        <span class="failed-bar"
+                              :style="{ width: `${value.failedPercentage}%` }"
+                        />
+                    </div>
+                    <span class="succeeded-text">{{ Math.floor(value.succeededPercentage) }}%</span>
+                </template>
             </p-toolbox-table>
             <div v-if="state.items.length > 0"
                  class="pagination"
@@ -346,9 +351,14 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                 @apply bg-red-400;
                 height: 100%;
             }
-            .text {
-                @apply text-gray-700;
+            &.is-canceled {
+                .succeeded-bar, .failed-bar {
+                    @apply bg-gray-400;
+                }
             }
+        }
+        .succeeded-text {
+            @apply text-gray-700;
         }
         .pagination {
             text-align: center;

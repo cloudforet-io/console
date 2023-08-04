@@ -22,6 +22,7 @@ export const statusTextFormatter = (status) => {
 
 export const statusTextColorFormatter = (status: string): string | undefined => {
     if (status === JOB_STATE.FAILURE) return FAILURE_ICON_COLOR;
+    if (status === JOB_TASK_STATE.PENDING) return PENDING_ICON_COLOR;
     return undefined;
 };
 export const statusIconFormatter = (status: string): string => {

@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import {
     computed,
-    onActivated,
-    onDeactivated,
     reactive,
 } from 'vue';
 
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red } from '@/styles/colors';
 
@@ -18,68 +12,33 @@ import {
     statusIconColorFormatter,
     statusIconFormatter, statusTextFormatter,
 } from '@/services/asset-inventory/collector/collector-history/lib/formatter-helper';
+import type { JobModel } from '@/services/asset-inventory/collector/model';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 interface Props {
-    jobId: string;
+    job: JobModel;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    jobId: '',
+    job: undefined,
 });
 
 const state = reactive({
-    job: {},
-    status: computed(() => state.job.job_status),
-    succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
-    failedCount: computed(() => state.job.job_task_status?.failed || 0),
-    totalCount: computed(() => state.job.job_task_status?.total),
     succeededPercentage: computed(() => {
-        if (state.totalCount > 0) {
-            return (state.succeededCount / state.totalCount) * 100;
+        if (props.job.total_tasks > 0) {
+            return (props.job.success_tasks / props.job.total_tasks) * 100;
         }
         return 0;
     }),
     failedPercentage: computed(() => {
-        if (state.totalCount > 0) {
-            if ([JOB_STATE.SUCCESS].includes(state.status)) {
+        if (props.job.total_tasks > 0) {
+            if (props.job.status === JOB_STATE.SUCCESS) {
                 return 100 - state.succeededPercentage;
             }
-            return (state.failedCount / state.totalCount) * 100;
+            return (props.job.failure_tasks / props.job.total_tasks) * 100;
         }
         return 0;
     }),
-});
-
-/* api */
-let interval;
-const getJob = async () => {
-    try {
-        state.job = await SpaceConnector.client.inventory.job.getJobProgress({
-            job_id: props.jobId,
-        });
-        if (state.status !== JOB_STATE.IN_PROGRESS && interval) {
-            clearInterval(interval);
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.job = {};
-    }
-};
-
-/* Init */
-onActivated(async () => {
-    await getJob();
-
-    if (state.status === JOB_STATE.IN_PROGRESS) {
-        interval = setInterval(() => {
-            getJob();
-        }, 5000);
-    }
-});
-
-onDeactivated(() => {
-    if (interval) clearInterval(interval);
 });
 </script>
 
@@ -87,31 +46,31 @@ onDeactivated(() => {
     <p-pane-layout class="job-status-chart">
         <div class="status-wrapper">
             <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span v-if="state.status"
+            <span v-if="props.job.status"
                   class="value"
             >
                 <p-i
-                    :name="statusIconFormatter(state.status)"
+                    :name="statusIconFormatter(props.job.status)"
                     width="1rem"
                     height="1rem"
-                    :animation="state.status === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
-                    :color="statusIconColorFormatter(state.status)"
+                    :animation="props.job.status === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                    :color="statusIconColorFormatter(props.job.status)"
                 />
-                {{ statusTextFormatter(state.status) }}
+                {{ statusTextFormatter(props.job.status) }}
             </span>
         </div>
         <div class="chart-wrapper">
             <div class="label-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
-                <template v-if="state.succeededCount > 0">
+                <template v-if="props.job.success_tasks > 0">
                     <p-status :icon-color="green[500]" />
-                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ state.succeededCount }}</strong></span>
+                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ props.job.success_tasks }}</strong></span>
                 </template>
-                <template v-if="state.failedCount > 0">
+                <template v-if="props.job.failure_tasks > 0">
                     <p-status :icon-color="red[400]" />
-                    <span :style="{'color': red[400]}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ state.failedCount }}</strong></span>
+                    <span :style="{'color': red[400]}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ props.job.failure_tasks }}</strong></span>
                 </template>
-                <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ state.totalCount }}</strong></span>
+                <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ props.job.total_tasks }}</strong></span>
             </div>
             <div class="progress-bar">
                 <span class="succeeded-bar"

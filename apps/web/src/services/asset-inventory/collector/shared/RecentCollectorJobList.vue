@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PTooltip, PI, PEmpty, PAnchor, PDataLoader,
@@ -36,7 +36,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    loading: computed(() => !Array.isArray(props.recentJobs)),
+    loading: true,
     completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
         if (Array.isArray(props.recentJobs) && props.recentJobs.length > 0) {
             return props.recentJobs.filter((job) => job.status !== 'IN_PROGRESS')
@@ -48,6 +48,9 @@ const state = reactive({
     }),
 });
 
+watch(() => props.recentJobs, () => {
+    state.loading = !Array.isArray(props.recentJobs);
+});
 </script>
 
 <template>
