@@ -247,6 +247,10 @@ watch(() => collectorFormState.provider, () => {
     });
 });
 
+watch(() => collectorFormState.attachedServiceAccount, (value) => {
+    setForm('selectedAttachedServiceAccount', value);
+});
+
 </script>
 
 <style lang="postcss" scoped>
