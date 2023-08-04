@@ -89,6 +89,9 @@ interface SecretFilter {
     secrets?: string[];
     service_accounts?: string[];
     schemas?: string[];
+    exclude_secrets?: string[];
+    exclude_service_accounts?: string[];
+    exclude_schemas?: string[];
 }
 export const COLLECTOR_SCHEDULE_STATE = {
     ENABLED: 'ENABLED',
