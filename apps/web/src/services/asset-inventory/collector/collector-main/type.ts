@@ -63,6 +63,7 @@ export interface JobAnalyzeStatus {
     finished_at: string;
     remained_tasks: number;
     total_tasks: number;
+    secret_id?: string;
 }
 export interface JobAnalyzeInfo {
     collector_id: string;

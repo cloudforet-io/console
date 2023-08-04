@@ -162,8 +162,8 @@ const getJobTasks = async () => {
         state.totalCount = res.total_count;
         state.items = res.results.map((jobTask) => ({
             ...jobTask,
-            started_at: iso8601Formatter(jobTask.started_at, state.timezone),
-            duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone),
+            started_at: iso8601Formatter(jobTask.started_at, state.timezone) || '--',
+            duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone) || '--',
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -245,22 +245,24 @@ onDeactivated(() => {
             </div>
         </template>
         <template #col-service_account_id-format="{ value }">
-            <p-anchor :to="referenceRouter(
-                value,
-                { resource_type: 'identity.ServiceAccount' })"
+            <p-anchor v-if="storeState.serviceAccounts[value]"
+                      :to="referenceRouter(
+                          value,
+                          { resource_type: 'identity.ServiceAccount' })"
             >
-                {{ storeState.serviceAccounts[value] ? storeState.serviceAccounts[value].label : value }}
+                {{ storeState.serviceAccounts[value].label }}
             </p-anchor>
+            <span v-else>--</span>
         </template>
         <template #col-project_id-format="{ value }">
-            <template v-if="value">
-                <p-anchor :to="referenceRouter(
-                    value,
-                    { resource_type: 'identity.Project' })"
-                >
-                    {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                </p-anchor>
-            </template>
+            <p-anchor v-if="storeState.projects[value]"
+                      :to="referenceRouter(
+                          value,
+                          { resource_type: 'identity.Project' })"
+            >
+                {{ storeState.projects[value].label }}
+            </p-anchor>
+            <span v-else>--</span>
         </template>
         <template #col-status-format="{ value }">
             <p-status

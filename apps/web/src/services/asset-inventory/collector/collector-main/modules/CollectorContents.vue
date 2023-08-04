@@ -170,6 +170,7 @@ const fetchCollectorList = async () => {
     collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     try {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
+        await collectorPageStore.getJobs();
     } catch (e) {
         ErrorHandler.handleError(e);
         await collectorPageStore.$reset();
