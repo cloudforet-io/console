@@ -300,6 +300,7 @@ const {
     /* custom design-system component - p-context-menu */
     :deep(.options-menu) {
         z-index: 10;
+        margin-top: -1px;
         .label-wrapper {
             min-width: 7rem;
             width: max-content;

@@ -1,8 +1,8 @@
 <template>
-    <div class="widget-view-mode-modal"
-         :class="{ 'visible': props.visible }"
-    >
-        <div class="modal-content">
+    <transition name="slide-up">
+        <div v-if="props.visible"
+             class="widget-view-mode-modal"
+        >
             <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
                                       :widget-key="widgetFormState.widgetKey"
                                       :visible.sync="state.sidebarVisible"
@@ -78,10 +78,7 @@
                 </div>
             </widget-view-mode-sidebar>
         </div>
-        <div class="modal-backdrop"
-             :class="{ 'visible': props.visible }"
-        />
-    </div>
+    </transition>
 </template>
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
@@ -184,11 +181,8 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
         await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
-        setTimeout(async () => {
-            // NOTE: wait 0.4s for modal animation
-            await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
-            state.widgetRef?.initWidget();
-        }, 400);
+        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+        state.widgetRef?.initWidget();
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
@@ -204,72 +198,61 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
 
 <style lang="postcss" scoped>
 .widget-view-mode-modal {
-    &.visible {
-        .modal-content {
-            transform: scale(1, 1);
-        }
-        .modal-backdrop {
-            display: block;
-        }
+    @apply bg-gray-100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    .content-wrapper {
+        overflow: auto;
+        padding: 0 2rem 2rem 2rem;
     }
-    .modal-content {
-        @apply bg-gray-100;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100;
-        transition: all 0.4s ease-in-out;
-        transform: scale(0);
 
-        .content-wrapper {
-            overflow: auto;
-            padding: 0 2rem 2rem 2rem;
-            .top-wrapper {
-                @apply border-b border-gray-200;
-                display: flex;
-                width: 100%;
-                padding: 1.5rem 0;
-                .right {
-                    display: flex;
-                    align-items: center;
-                    margin-left: auto;
-                    .non-inherit-badge {
-                        margin-left: 0.25rem;
-                        margin-right: 0.5rem;
-                    }
-                }
-            }
-            .filter-wrapper {
-                padding: 1rem 0;
-                .left-part {
-                    display: inline-block;
-                    padding-bottom: 0.75rem;
-                }
-                .right-part {
-                    display: inline-block;
-                    float: right;
-                    padding-bottom: 0.75rem;
-                }
-                .dashboard-variables-select-dropdown {
-                    @apply relative flex items-center flex-wrap;
-                    gap: 0.5rem;
-                    z-index: 10;
-                }
+    .top-wrapper {
+        @apply border-b border-gray-200;
+        display: flex;
+        width: 100%;
+        padding: 1.5rem 0;
+        .right {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            .non-inherit-badge {
+                margin-left: 0.25rem;
+                margin-right: 0.5rem;
             }
         }
     }
-    .modal-backdrop {
-        @apply bg-gray-900;
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 99;
-        opacity: 0.4;
+    .filter-wrapper {
+        padding: 1rem 0;
+        .left-part {
+            display: inline-block;
+            padding-bottom: 0.75rem;
+        }
+        .right-part {
+            display: inline-block;
+            float: right;
+            padding-bottom: 0.75rem;
+        }
+        .dashboard-variables-select-dropdown {
+            @apply relative flex items-center flex-wrap;
+            gap: 0.5rem;
+            z-index: 10;
+        }
     }
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
 }
 </style>
