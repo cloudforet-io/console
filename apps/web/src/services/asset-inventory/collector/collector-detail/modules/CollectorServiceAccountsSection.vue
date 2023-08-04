@@ -92,17 +92,30 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         secret_filter: {
             ...originSecretFilter,
             state: collectorFormState.attachedServiceAccountType === 'specific' ? 'ENABLED' : 'DISABLED',
-            service_accounts: collectorFormState.attachedServiceAccountType === 'specific'
-                ? collectorFormStore.serviceAccounts
-                : [],
         },
     };
+    const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
+        service_accounts: collectorFormStore.serviceAccounts,
+    } : {
+        exclude_service_accounts: collectorFormStore.serviceAccounts,
+    };
+    Object.assign(params.secret_filter ?? {}, serviceAccountParams);
     return SpaceConnector.client.inventory.collector.update(params);
 };
 
 
 /* event handlers */
 const handleClickEdit = () => {
+    const isExcludeOption = !!collectorFormState.originCollector?.secret_filter?.exclude_service_accounts?.length;
+    if (isExcludeOption) {
+        collectorFormStore.$patch({
+            selectedServiceAccountFilterOption: 'exclude',
+        });
+    } else {
+        collectorFormStore.$patch({
+            selectedServiceAccountFilterOption: 'include',
+        });
+    }
     state.isEditMode = true;
 };
 const handleChangeIsAttachedServiceAccountValid = (value: boolean) => {

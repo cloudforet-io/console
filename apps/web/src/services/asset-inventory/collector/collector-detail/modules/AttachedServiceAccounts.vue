@@ -76,11 +76,12 @@ const state = reactive({
     sortBy: 'name',
     sortDesc: true,
     totalCount: 0,
+    secretFilter: computed(() => collectorFormState.originCollector?.secret_filter),
+    isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
     serviceAccountsFilter: computed<string[]>(() => {
-        const secretFilter = collectorFormState.originCollector?.secret_filter;
-        if (!secretFilter) return [];
-        if (secretFilter.state === 'DISABLED') return [];
-        return secretFilter.service_accounts ?? [];
+        if (!state.secretFilter) return [];
+        if (state.secretFilter.state === 'DISABLED') return [];
+        return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
     }),
     // reference data
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
@@ -121,7 +122,8 @@ const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promi
             .addFilter({ k: 'provider', v: provider, o: '=' });
 
         if (serviceAccounts?.length) {
-            apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
+            if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '!=' });
+            else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
         }
 
         const results = await SpaceConnector.client.secret.secret.list({
