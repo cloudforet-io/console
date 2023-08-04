@@ -19,6 +19,8 @@ export type AttachedServiceAccount = FilterableDropdownMenuItem[];
 
 export type AttachedServiceAccountType = 'all'|'specific';
 
+export type ServiceAccountFilterOption = 'include'|'exclude';
+
 export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
@@ -32,6 +34,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         schedulePower: false,
         attachedServiceAccount: [] as AttachedServiceAccount,
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
+        selectedServiceAccountFilterOptions: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
         versions: [] as string[],
     }),

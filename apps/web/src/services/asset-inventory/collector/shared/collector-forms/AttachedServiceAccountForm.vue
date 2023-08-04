@@ -42,7 +42,7 @@
                                            @update:selected="handleSelectAttachedServiceAccount"
                     >
                         <template #input-left-area>
-                            <p-i v-if="state.selectedOption === 'exclude'"
+                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOptions === 'exclude'"
                                  name="ic_minus_circle"
                                  class="ml-2"
                                  width="1.25rem"
@@ -54,7 +54,7 @@
                             <div class="include-exclude-selector">
                                 <select-box v-for="item in state.includeExcludeOptionList"
                                             :key="item.name"
-                                            :selected="state.selectedOption"
+                                            :selected="collectorFormState.selectedServiceAccountFilterOptions"
                                             :value="item.name"
                                             :icon="item.icon"
                                             :icon-color="item.iconColor"
@@ -95,7 +95,7 @@ import { red } from '@/styles/colors';
 
 import type {
     AttachedServiceAccount,
-    AttachedServiceAccountType,
+    AttachedServiceAccountType, ServiceAccountFilterOption,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import {
     useCollectorFormStore,
@@ -157,7 +157,6 @@ const state = reactive({
             },
         };
     }),
-    selectedOption: 'include',
     includeExcludeOptionList: computed<MenuItem[]>(() => [
         {
             label: i18n.t('INVENTORY.COLLECTOR.CREATE.INCLUDE'),
@@ -226,8 +225,10 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
     });
 };
 
-const handleSelectIncludeExcludeOption = (selectedValue: string) => {
-    state.selectedOption = selectedValue;
+const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOption) => {
+    collectorFormStore.$patch({
+        selectedServiceAccountFilterOptions: selectedValue,
+    });
 };
 
 watch(() => isAllValid.value, (value) => {
