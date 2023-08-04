@@ -54,8 +54,7 @@
 
 <script setup lang="ts">
 import {
-    computed,
-    onUnmounted, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -64,8 +63,6 @@ import {
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -89,7 +86,9 @@ const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: string, value: boolean): void}>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'refresh'): void;
+}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -107,7 +106,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    const widgetInfo: DashboardLayoutWidgetInfo = cloneDeep(widgetFormState.widgetInfo);
+    const widgetInfo = cloneDeep(widgetFormState.widgetInfo) as DashboardLayoutWidgetInfo;
     widgetInfo.title = widgetFormState.widgetTitle ?? '';
     widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
     widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
@@ -149,15 +148,10 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
+    widgetFormStore.initWidgetForm(props.widgetKey);
     state.proxyVisible = false;
+    emit('refresh');
 };
-
-watch(() => props.widgetKey, (widgetKey) => {
-    if (widgetKey) widgetFormStore.initWidgetForm(widgetKey);
-});
-onUnmounted(() => {
-    store.dispatch('display/hideSidebar');
-});
 </script>
 
 <style lang="postcss" scoped>
