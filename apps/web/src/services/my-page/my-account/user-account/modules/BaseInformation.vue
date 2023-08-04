@@ -50,6 +50,7 @@
         >
             <p-select-dropdown v-model="formState.language"
                                :items="state.languages"
+                               is-fixed-width
             />
         </p-field-group>
         <div class="save-button">

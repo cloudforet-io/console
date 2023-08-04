@@ -41,6 +41,7 @@ export const Template = (args, { argTypes }) => ({
             :style-type="styleType"
             :button-icon="buttonIcon"
             :menu-position="menuPosition"
+            :is-fixed-width="isFixedWidth"
             @select="onSelect"
             @update:selected="onUpdateSelected"
             @focus-menu="onFocusMenu"
@@ -58,10 +59,10 @@ export const Template = (args, { argTypes }) => ({
     }
 });
 
-
 # PSelectDropdown
-<br/>
-<br/>
+
+<br />
+<br />
 
 ## Default
 
@@ -84,14 +85,10 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
-
 ## Disabled
 
 <Canvas>
-    <Story name="Disabled" height={'500px'}>
+    <Story name="Disabled">
         {{
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
@@ -108,9 +105,6 @@ export const Template = (args, { argTypes }) => ({
         }}
     </Story>
 </Canvas>
-
-<br/>
-<br/>
 
 ## Invalid
 
@@ -133,9 +127,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Button Style Type
 
 <Canvas>
@@ -144,7 +135,7 @@ export const Template = (args, { argTypes }) => ({
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-                <table style="border-collapse: separate; border-spacing: 16px;">
+                <table class="w-full border-separate border-spacing-1">
                     <thead>
                         <tr>
                             <th>default</th>
@@ -156,7 +147,7 @@ export const Template = (args, { argTypes }) => ({
                     <tbody>
                         <tr>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                                <p-select-dropdown :items="menuItems" :styleType="styleType" class="m-2"/>
                             </th>
                         </tr>
                     </tbody>
@@ -172,9 +163,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Size
 
 <Canvas>
@@ -183,10 +171,10 @@ export const Template = (args, { argTypes }) => ({
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-                <table style="border-collapse: separate; border-spacing: 16px;">
+                <table class="w-full border-separate border-spacing-1">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th class="w-24"></th>
                             <th>default</th>
                             <th>icon-button</th>
                             <th>transparent</th>
@@ -194,11 +182,17 @@ export const Template = (args, { argTypes }) => ({
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="size in sizes" :size="size">
-                            <th>{{size}}</th>
-                            <td v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
-                            </td>
+                        <tr>
+                            <th>md</th>
+                            <th v-for="styleType in styleTypes" :key="styleType" >
+                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>lg</th>
+                            <th v-for="styleType in styleTypes" :key="styleType">
+                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
+                            </th>
                         </tr>
                     </tbody>
                 </table>
@@ -217,9 +211,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Read Only
 
 <Canvas>
@@ -228,7 +219,7 @@ export const Template = (args, { argTypes }) => ({
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-                <table style="border-collapse: separate; border-spacing: 16px;">
+                <table class="w-full border-separate border-spacing-1">
                     <thead>
                         <tr>
                             <th></th>
@@ -242,13 +233,13 @@ export const Template = (args, { argTypes }) => ({
                         <tr>
                             <th>default</th>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                                <p-select-dropdown :items="menuItems" :styleType="styleType" class="m-2 w-6/12"/>
                             </th>
                         </tr>
                         <tr>
                             <th>readOnly</th>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown read-only :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                                <p-select-dropdown read-only :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
                             </th>
                         </tr>
                     </tbody>
@@ -264,9 +255,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Icon Button Type
 
 <Canvas>
@@ -277,10 +265,10 @@ export const Template = (args, { argTypes }) => ({
                 PSelectDropdown
             },
             template: `
-                <table style="border-collapse: separate; border-spacing: 16px;">
+                <table class="w-full border-separate border-spacing-1">
                     <thead>
                         <tr>
-                            <th>icon / variations</th>
+                            <th class="w-2/12">icon / variations</th>
                             <th>default</th>
                             <th>disabled</th>
                             <th>invalid</th>
@@ -289,15 +277,15 @@ export const Template = (args, { argTypes }) => ({
                     <tbody>
                         <tr>
                             <th>default</th>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" /></td>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" disabled /></td>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" invalid /></td>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" /></th>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" disabled /></th>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" invalid /></th>
                         </tr>
                         <tr>
                             <th>custom</th>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" /></td>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" disabled /></td>
-                            <td><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_setting" invalid /></td>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" disabled /></th>
+                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" invalid /></th>
                         </tr>
                     </tbody>
                 </table>
@@ -311,9 +299,26 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
+## Is Fixed Width
 
+<Canvas>
+    <Story name="Is Fixed Width" height={'500px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-select-dropdown :items="menuItems" is-fixed-width class="w-52" placeholder="long long long long long long long long long long long placeholder"></p-select-dropdown>
+                </div>
+            `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Default Slot
 
@@ -338,9 +343,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-<br/>
-<br/>
-
 ## Use Fixed Menu Style
 
 <Canvas>
@@ -356,7 +358,7 @@ export const Template = (args, { argTypes }) => ({
                     Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
                     When you scroll parent elements, the menu will be automatically hidden.
                 </p>
-                <p-select-dropdown v-if="show" :items="menuItems" :use-fixed-menu-style="useFixedMenuStyle" />
+                <p-select-dropdown v-if="show" :items="menuItems" :use-fixed-menu-style="useFixedMenuStyle"/>
             </div>
         </div>
 `,
@@ -381,10 +383,6 @@ export const Template = (args, { argTypes }) => ({
         }}
     </Story>
 </Canvas>
-
-<br/>
-<br/>
-
 
 ## Playground
 

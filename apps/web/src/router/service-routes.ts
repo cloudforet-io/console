@@ -15,6 +15,7 @@ import dashboardsRoute from '@/services/dashboards/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 import homeDashboardRoute from '@/services/home-dashboard/routes';
 import infoRoute from '@/services/info/routes';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import myPageRoute from '@/services/my-page/routes';
 import projectRoute from '@/services/project/routes';
 
@@ -29,6 +30,7 @@ export const serviceRoutes: RouteConfig[] = [
         name: ROOT_ROUTE._NAME,
         redirect: () => {
             if (store.getters['user/isDomainOwner'] || store.getters['user/hasSystemRole']) return { name: ADMINISTRATION_ROUTE._NAME };
+            if (!store.getters['user/hasPermission']) return { name: MY_PAGE_ROUTE._NAME };
             return ({ name: HOME_DASHBOARD_ROUTE._NAME });
         },
         component: { template: '<router-view />' },

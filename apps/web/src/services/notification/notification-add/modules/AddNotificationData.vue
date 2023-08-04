@@ -27,7 +27,7 @@
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
-        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
+        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER && protocolType === PROTOCOL_TYPE.INTERNAL">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
                            required
             >
@@ -192,6 +192,7 @@ export default {
         return {
             protocol,
             CHANNEL_TYPE,
+            PROTOCOL_TYPE,
             ...toRefs(state),
             onChangeChannelName,
             handleSchemaFormChange,
