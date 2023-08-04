@@ -1375,7 +1375,7 @@
 		},
 		"FULL_SCREEN_VIEW": {
 			"APPLY_NON_INHERITED_OPTION": "Apply Non-inherited Option",
-			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "Until you click the button \"Return to Initial Settings\" this widget has its own non-inherited options, and they won't be affected by the main dashboard option.",
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "This widget will be saved with non-inherited options which won't be affected by dashboard's filters.",
 			"BACK_TO_DASHBOARD": "Back to dashboard",
 			"CANCEL": "Cancel",
 			"EDIT_OPTION": "Edit Option",
