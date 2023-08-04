@@ -181,11 +181,8 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
         await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
-        setTimeout(async () => {
-            // NOTE: wait 0.4s for modal animation
-            await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
-            state.widgetRef?.initWidget();
-        }, 400);
+        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+        state.widgetRef?.initWidget();
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
