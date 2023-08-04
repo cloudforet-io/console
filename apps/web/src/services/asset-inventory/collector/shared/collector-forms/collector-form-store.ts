@@ -34,7 +34,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         schedulePower: false,
         attachedServiceAccount: [] as AttachedServiceAccount,
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
-        selectedServiceAccountFilterOptions: 'include' as ServiceAccountFilterOption,
+        selectedServiceAccountFilterOption: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
         versions: [] as string[],
     }),
@@ -107,7 +107,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             await store.dispatch('reference/serviceAccount/load');
             const accountItems = store.getters['reference/serviceAccountItems'];
             const secretFilter = this.originCollector?.secret_filter;
-            const attachedServiceAccount = this.selectedServiceAccountFilterOptions === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
+            const attachedServiceAccount = this.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
             this.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({
                 label: accountItems[d]?.label ?? d,
                 name: d,

@@ -104,7 +104,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             state: collectorFormState.attachedServiceAccountType === 'specific' ? 'ENABLED' : 'DISABLED',
         },
     };
-    const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOptions === 'include' ? {
+    const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
         service_accounts: collectorFormStore.serviceAccounts,
     } : {
         exclude_service_accounts: collectorFormStore.serviceAccounts,
@@ -119,11 +119,11 @@ const handleClickEdit = () => {
     const isExcludeOption = !!collectorFormState.originCollector?.secret_filter?.exclude_service_accounts?.length;
     if (isExcludeOption) {
         collectorFormStore.$patch({
-            selectedServiceAccountFilterOptions: 'exclude',
+            selectedServiceAccountFilterOption: 'exclude',
         });
     } else {
         collectorFormStore.$patch({
-            selectedServiceAccountFilterOptions: 'include',
+            selectedServiceAccountFilterOption: 'include',
         });
     }
     state.isEditMode = true;

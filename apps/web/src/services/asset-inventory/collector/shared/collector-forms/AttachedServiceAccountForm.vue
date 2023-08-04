@@ -42,7 +42,7 @@
                                            @update:selected="handleSelectAttachedServiceAccount"
                     >
                         <template #input-left-area>
-                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOptions === 'exclude'"
+                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
                                  name="ic_minus_circle"
                                  class="ml-2"
                                  width="1.25rem"
@@ -54,7 +54,7 @@
                             <div class="include-exclude-selector">
                                 <select-box v-for="item in state.includeExcludeOptionList"
                                             :key="item.name"
-                                            :selected="collectorFormState.selectedServiceAccountFilterOptions"
+                                            :selected="collectorFormState.selectedServiceAccountFilterOption"
                                             :value="item.name"
                                             :icon="item.icon"
                                             :icon-color="item.iconColor"
@@ -227,7 +227,7 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
 
 const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOption) => {
     collectorFormStore.$patch({
-        selectedServiceAccountFilterOptions: selectedValue,
+        selectedServiceAccountFilterOption: selectedValue,
     });
 };
 

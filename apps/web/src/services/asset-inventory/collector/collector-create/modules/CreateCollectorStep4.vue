@@ -123,7 +123,7 @@ const handleClickCreateButton = async () => {
             },
             tags: collectorFormState.tags,
         };
-        const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOptions === 'include' ? {
+        const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
             service_accounts: collectorFormStore.serviceAccounts,
         } : {
             exclude_service_accounts: collectorFormStore.serviceAccounts,
