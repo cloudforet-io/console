@@ -142,7 +142,11 @@ export default defineComponent<Props>({
         /* excel */
         const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
             .setPageLimit(0).setPageStart(1)
-            .setSort('count', true);
+            .setMultiSort([
+                { key: 'provider', desc: false },
+                { key: 'cloud_service_group', desc: false },
+                { key: 'count', desc: true },
+            ]);
         const getCloudServiceResources = async () => {
             try {
                 cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
@@ -200,7 +204,12 @@ export default defineComponent<Props>({
                 .setFilters(state.cloudServiceFilters)
                 .addFilter({ k: 'provider', o: '=', v: data.provider })
                 .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
-                .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type });
+                .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type })
+                .setMultiSort([
+                    { key: 'provider', desc: false },
+                    { key: 'cloud_service_group', desc: false },
+                    { key: 'cloud_service_type', desc: false },
+                ]);
             const fields = field;
             if (fields) {
                 excelApiQueryHelper.setOnly(...fields.map((d) => d.key));
@@ -208,7 +217,10 @@ export default defineComponent<Props>({
             return excelApiQueryHelper.data;
         };
         const getCloudServiceResourcesPayload = (): ExcelPayload => {
-            excelApiQueryHelper.setFilters(state.cloudServiceFilters);
+            excelApiQueryHelper.setFilters(state.cloudServiceFilters).setMultiSort([
+                { key: 'provider', desc: true },
+                { key: 'cloud_service_group', desc: true },
+            ]);
             return {
                 url: '/statistics/topic/cloud-service-resources',
                 param: {
