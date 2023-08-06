@@ -240,14 +240,30 @@ export default defineComponent<Props>({
             const excelItems = await getCloudServiceResources();
             const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map((d) => getExcelFields(d)));
 
+
+            const errorString = ['/', '\\', '?', '*', '[', ']'];
+            const removeErrorString = (str: string): string => {
+                let result = str;
+                errorString.forEach((d) => {
+                    result = result.replace(new RegExp(`\\${d}`, 'g'), '0');
+                });
+                return result;
+            };
+            const checkSameSheetNameExist = (list: ExcelPayload[], sheetName: string):string => {
+                const index = list.filter((d) => ((typeof d.sheet_name === 'string') ? d.sheet_name.includes(sheetName) : false)).length;
+                return index ? `${sheetName}${index}` : sheetName;
+            };
             excelFieldList.forEach((excelField, idx) => {
                 const provider = excelItems[idx].provider;
                 const providerName = state.providers[provider]?.label || provider;
-                let sheetName = `${idx}.${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+                let sheetName = `${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+                sheetName = removeErrorString(sheetName);
                 const headerMessage = {
                     title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
                 };
-                if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
+                if (sheetName.length > 29) sheetName = sheetName.substr(0, 29);
+                const checkedSheetName = checkSameSheetNameExist(excelPayloadList, sheetName);
+                if (checkedSheetName !== sheetName) sheetName = checkedSheetName;
 
                 let excelApiUrl;
                 if (excelItems[idx].resource_type === 'inventory.Server') {
