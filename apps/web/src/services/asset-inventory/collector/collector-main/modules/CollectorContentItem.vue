@@ -36,7 +36,7 @@ const state = reactive({
     }),
     recentJob: computed<JobAnalyzeStatus|undefined>(() => {
         if (!props.item) return undefined;
-        return props.item.recentJobAnalyze ? props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1] : undefined;
+        return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.recentJobForAllAccounts?.job_id)[0];
     }),
 });
 
@@ -46,11 +46,10 @@ const handleClickCollectData = async () => {
     await collectorPageStore.setSelectedCollector(props.item.collectorId);
     await collectorDataModalStore.$patch((_state) => {
         if (!props.item) return;
-        const recentJobAnalyze = props.item.recentJobAnalyze ? props.item.recentJobAnalyze[props.item.recentJobAnalyze.length - 1] : undefined;
         _state.visible = true;
         _state.recentJob = {
-            jobId: recentJobAnalyze?.job_id || '',
-            status: recentJobAnalyze?.status as JobStatus,
+            jobId: state.recentJob?.job_id || '',
+            status: state.recentJob?.status as JobStatus,
         };
         _state.selectedCollector = collectorPageState.selectedCollector;
     });

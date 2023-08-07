@@ -7,6 +7,7 @@ import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/c
 interface RecentJob {
     jobId: string;
     status: JobStatus;
+    secretId?: string;
 }
 
 export const useCollectorDataModalStore = defineStore('collector-data-modal', {

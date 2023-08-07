@@ -165,11 +165,12 @@ const handleToolboxTableRefresh = async () => {
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobStore.recentJobForAllAccounts;
+        const recentJob = collectorJobStore.recentJobForSingleAccounts;
         _state.visible = true;
         _state.recentJob = recentJob ? {
             status: recentJob.status,
             jobId: recentJob.job_id,
+            secretId: recentJob.secret_id,
         } : null;
         _state.selectedCollector = collectorFormState.originCollector;
         _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;

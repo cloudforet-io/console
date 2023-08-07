@@ -76,7 +76,11 @@ const state = reactive({
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     isDuplicateJobs: computed(() => {
         const recentJob = collectorDataModalState.recentJob;
+        const selectedSecret = collectorDataModalState.selectedSecret;
         if (!recentJob) return false;
+        if (selectedSecret) {
+            return recentJob.secretId === selectedSecret.secret_id && recentJob.status === JOB_STATE.IN_PROGRESS;
+        }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
     provider: computed(() => {
