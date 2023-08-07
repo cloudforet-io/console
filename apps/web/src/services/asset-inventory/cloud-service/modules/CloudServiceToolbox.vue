@@ -145,7 +145,6 @@ export default defineComponent<Props>({
             .setMultiSort([
                 { key: 'provider', desc: false },
                 { key: 'cloud_service_group', desc: false },
-                { key: 'count', desc: true },
             ]);
         const getCloudServiceResources = async () => {
             try {
@@ -245,7 +244,7 @@ export default defineComponent<Props>({
             const removeErrorString = (str: string): string => {
                 let result = str;
                 errorString.forEach((d) => {
-                    result = result.replace(new RegExp(`\\${d}`, 'g'), '0');
+                    result = result.replace(new RegExp(`\\${d}`, 'g'), ' ');
                 });
                 return result;
             };
