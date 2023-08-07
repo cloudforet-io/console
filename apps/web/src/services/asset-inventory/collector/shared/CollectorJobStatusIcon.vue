@@ -36,22 +36,22 @@
                         <p-i v-if="props.status === JOB_STATE.SUCCESS"
                              name="ic_check"
                              class="icon success"
-                             height="1rem"
-                             width="1rem"
+                             height="0.875rem"
+                             width="0.875rem"
                              color="inherit"
                         />
                         <p-i v-else-if="props.status === JOB_STATE.CANCELED"
                              name="ic_limit-filled"
                              class="icon canceled"
-                             height="1rem"
-                             width="1rem"
+                             height="0.875rem"
+                             width="0.875rem"
                              color="inherit"
                         />
                         <p-i v-else
                              name="ic_exclamation-mark"
                              class="icon error"
-                             height="1rem"
-                             width="1rem"
+                             height="0.875rem"
+                             width="0.875rem"
                              color="inherit"
                         />
                     </p-tooltip>

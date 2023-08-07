@@ -185,18 +185,9 @@ const handleClickCollectData = async () => {
                         gap: 0.5rem;
                     }
 
-                    @screen tablet {
-                        width: 100%;
-                    }
-
                     @screen mobile {
                         @apply relative;
                         display: initial;
-                        .info-item {
-                            @apply absolute;
-                            top: 0;
-                            right: 0;
-                        }
                     }
                 }
             }

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="collector-current-status">
         <div class="info-item">
             <p class="info-label">
                 {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
@@ -111,40 +111,46 @@ const state = reactive({
 </script>
 
 <style lang="postcss" scoped>
-.info-item {
-    @apply relative flex flex-col flex-wrap;
-    width: 100%;
-    min-height: 2.75rem;
-    gap: 0.5rem;
-    .info-label {
-        @apply text-label-sm text-gray-500;
-    }
-    .label-description {
-        @apply text-label-md text-gray-700;
-        .scheduled {
-            @apply flex items-center;
-            gap: 0.25rem;
-            .alarm-icon {
-                margin-bottom: auto;
-                min-width: 1.25rem;
+.collector-current-status {
+    .info-item {
+        @apply relative flex flex-col flex-wrap;
+        width: 100%;
+        min-height: 2.75rem;
+        gap: 0.5rem;
+        .info-label {
+            @apply text-label-sm text-gray-500;
+        }
+        .label-description {
+            @apply text-label-md text-gray-700;
+            .scheduled {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .alarm-icon {
+                    margin-bottom: auto;
+                    min-width: 1.25rem;
+                }
+            }
+            .no-schedule {
+                @apply text-gray-300;
+            }
+            .current-status-progress {
+                @apply flex items-center;
+                gap: 0.25rem;
+            }
+            .remained-task {
+                @apply text-label-md font-bold text-gray-900;
+                margin-left: 0.25rem;
             }
         }
-        .no-schedule {
-            @apply text-gray-300;
-        }
-        .current-status-progress {
-            @apply flex items-center;
-            gap: 0.25rem;
-        }
-        .remained-task {
-            @apply text-label-md font-bold text-gray-900;
-            margin-left: 0.25rem;
-        }
     }
-}
-.status-progress-bar {
-    @apply absolute;
-    width: calc(100% - 3rem);
-    margin-top: 1.125rem;
+    .status-progress-bar {
+        @apply absolute;
+        width: calc(100% - 3rem);
+        margin-top: 1.125rem;
+    }
+
+    @screen mobile {
+        width: 100%;
+    }
 }
 </style>

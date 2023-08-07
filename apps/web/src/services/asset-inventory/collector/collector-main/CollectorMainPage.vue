@@ -129,6 +129,7 @@ onMounted(async () => {
                 >
                     <p-button style-type="tertiary"
                               class="history-button"
+                              icon-left="ic_history"
                     >
                         {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
                     </p-button>
