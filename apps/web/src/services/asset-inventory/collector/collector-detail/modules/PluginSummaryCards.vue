@@ -67,7 +67,7 @@ const state = reactive({
         margin-bottom: 0.25rem;
     }
     .plugin-summary-card {
-        @apply rounded-md bg-gray-100;
+        @apply relative rounded-md bg-gray-100;
         padding: 0.75rem;
         flex-grow: 1;
         max-width: 21.5rem;

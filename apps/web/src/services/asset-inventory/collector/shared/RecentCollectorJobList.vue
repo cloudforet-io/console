@@ -8,8 +8,6 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
 import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
@@ -87,12 +85,12 @@ watch(() => props.recentJobs, () => {
                        class="data-loader"
         >
             <div v-if="state.completedJobs"
-                 :class="['jobs-wrapper', { 'is-mobile': isMobile() }]"
+                 class="jobs-wrapper"
             >
                 <div class="jobs-contents">
                     <collector-job-status-icon v-for="(job, index) in state.completedJobs"
                                                :key="`job-item-${index}`"
-                                               :class="['collector-job-status-icon-wrapper', { 'is-mobile': isMobile() }]"
+                                               class="collector-job-status-icon-wrapper"
                                                :status="job.status"
                                                :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(job.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
                                                :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
@@ -103,7 +101,6 @@ watch(() => props.recentJobs, () => {
                                            is-arrow
                                            :to="props.historyLink"
                                            class="more-button"
-                                           :class="['more-button', { 'is-mobile': isMobile() }]"
                                            :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                 />
             </div>
@@ -140,17 +137,18 @@ watch(() => props.recentJobs, () => {
     .jobs-wrapper {
         display: flex;
         justify-content: flex-end;
-        &.is-mobile {
-            @apply relative;
+
+        @screen mobile {
             .jobs-contents {
+                @apply relative;
                 &::before {
                     @apply absolute;
                     content: '';
                     top: 0;
                     bottom: 0;
-                    left: -1rem;
-                    width: calc(100% + 1rem);
-                    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 10%);
+                    left: -10%;
+                    width: 10%;
+                    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 20%);
                 }
             }
             .collector-job-status-icon-wrapper {
@@ -195,6 +193,12 @@ watch(() => props.recentJobs, () => {
         .empty-case {
             align-items: flex-start;
         }
+    }
+
+    @screen mobile {
+        @apply absolute;
+        top: 0;
+        right: 0;
     }
 }
 </style>
