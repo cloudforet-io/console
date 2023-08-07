@@ -47,7 +47,7 @@ export interface DataTableProps {
     rowHeightFixed?: boolean;
     rowCursorPointer?: boolean;
     invalid?: boolean;
-    getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
+    getRowClassNames?: (item?: any, i?: number) => Record<string, boolean>;
     getRowSelectable?: (item: any, i: number) => boolean;
     beautifyText?: boolean;
 }

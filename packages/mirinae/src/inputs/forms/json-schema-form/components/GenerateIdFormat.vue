@@ -48,8 +48,8 @@ const handleClickGenerate = () => {
     emit('update:value', uuidV4());
 };
 
-const handleUpdateValue = (value?: string) => {
-    emit('update:value', value?.trim());
+const handleUpdateValue = (value?: string | number) => {
+    emit('update:value', value?.toString().trim());
 };
 
 </script>

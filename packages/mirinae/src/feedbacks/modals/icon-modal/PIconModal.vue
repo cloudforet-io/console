@@ -43,9 +43,8 @@
                         >
                             <slot name="body" />
                         </div>
-                        <p-button
-                            :style-type="props.buttonStyleType"
-                            @click="handleClickButton"
+                        <p-button :style-type="props.buttonStyleType"
+                                  @click="handleClickButton"
                         >
                             {{ props.buttonText }}
                         </p-button>
@@ -62,6 +61,7 @@ import { reactive } from 'vue';
 import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
+import type { ButtonStyle } from '@/inputs/buttons/button/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 import { primaryDark } from '@/styles/colors.cjs';
@@ -76,7 +76,7 @@ interface IconModalProps {
     headerTitle?: string;
     headerDesc?: string;
     buttonText: string;
-    buttonStyleType?: string;
+    buttonStyleType?: ButtonStyle;
     backdrop?: boolean;
 }
 const props = withDefaults(defineProps<IconModalProps>(), {

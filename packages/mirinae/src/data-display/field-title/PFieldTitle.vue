@@ -1,6 +1,6 @@
 <template>
     <div class="p-field-title"
-          v-on="listeners"
+         v-on="listeners"
     >
         <div class="title-wrapper">
             <slot name="left"
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, useAttrs } from 'vue';
+import { useAttrs } from 'vue';
 
 interface FieldTitleProps {
     label?: string;

@@ -1,17 +1,16 @@
-import {
-    computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { Ref } from 'vue';
-import type Vue from 'vue';
 
 import type { ResizeObserverEntry } from '@juggle/resize-observer';
 import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
+import type { Ref } from 'vue';
+import {
+    computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 
 interface UseContextMenuFixedStyleOptions {
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
-    targetRef?: Ref<Vue|HTMLElement|null>;
+    targetRef?: Ref<HTMLElement|null>;
 }
 
 const isScrollable = (ele: Element) => {
@@ -36,7 +35,7 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
 
     const contextMenuFixedStyleState = reactive({
         targetRef: targetRef ?? null,
-        targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
+        targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef)?.$el ?? contextMenuFixedStyleState.targetRef),
         contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
     });
 

@@ -43,33 +43,24 @@ import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { SizeMapping } from '@/feedbacks/modals/type';
+import type { ModalSizeType } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
-const props = defineProps({
-    modalSize: {
-        type: String,
-        default: 'md',
-        validator: (value) => Object.keys(SizeMapping).includes(value),
-    },
-    visible: {
-        type: Boolean,
-        default: false,
-    },
-    headerTitle: {
-        type: String,
-        default: undefined,
-    },
-    verificationText: {
-        type: String,
-        required: true,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
+interface Props {
+    modalSize: ModalSizeType;
+    visible: boolean;
+    headerTitle?: string;
+    verificationText: string;
+    loading: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    modalSize: 'md',
+    visible: false,
+    headerTitle: undefined,
+    loading: false,
 });
 const emit = defineEmits(['update:visible', 'cancel', 'confirm']);
 const { t } = useI18n();

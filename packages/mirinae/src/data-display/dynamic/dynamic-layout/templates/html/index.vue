@@ -1,28 +1,27 @@
 <template>
     <div class="p-dynamic-layout-html">
-        <p-heading v-if="layoutName"
+        <p-heading v-if="state.layoutName"
                    heading-type="sub"
         >
-            {{ layoutName }}
+            {{ state.layoutName }}
         </p-heading>
         <div class="inner">
             <iframe ref="iframeRef"
                     :title="name"
                     scrolling="no"
-                    :srcdoc="iframeData"
+                    :srcdoc="state.iframeData"
                     @load="onLoadIFrame"
             />
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
+<script lang="ts" setup>
 import DOMPurify from 'dompurify';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import type { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
@@ -38,62 +37,39 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
         node.setAttribute('rel', 'noopener');
     }
 });
-export default {
-    name: 'PDynamicLayoutHtml',
-    components: { PHeading },
-    props: {
-        name: {
-            type: String,
-            required: true,
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        data: {
-            type: [Object, Array, String],
-            default: undefined,
-        },
-        fetchOptions: {
-            type: Object,
-            default: undefined,
-        },
-        typeOptions: {
-            type: Object,
-            default: undefined,
-        },
-    },
-    setup(props: HtmlDynamicLayoutProps) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
-            rootData: computed<any[]>(() => {
-                if (props.options.root_path) {
-                    return getValueByPath(props.data, props.options.root_path) ?? '';
-                }
-                if (typeof props.data !== 'string') return '';
-                return props.data;
-            }),
-            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['target'] })),
-        });
+
+const props = withDefaults(defineProps<HtmlDynamicLayoutProps>(), {
+    options: () => ({}),
+    data: undefined,
+    fetchOptions: undefined,
+    typeOptions: undefined,
+});
+
+const { t } = useI18n();
+
+const state = reactive({
+    layoutName: computed(() => (props.options.translation_id ? t(props.options.translation_id) : props.name)),
+    rootData: computed<any[]>(() => {
+        if (props.options.root_path) {
+            return getValueByPath(props.data, props.options.root_path) ?? '';
+        }
+        if (typeof props.data !== 'string') return '';
+        return props.data;
+    }),
+    iframeData: computed(() => DOMPurify.sanitize(state.rootData, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['target'] })),
+});
 
 
-        const resizeIframe = (e) => {
-            e.target.style.height = `${e.target.contentDocument.documentElement.scrollHeight}px`;
-        };
-        const onLoadIFrame = (e) => {
-            const el = document.createElement('style');
-            el.textContent = iframeStyle;
-            e.target.contentDocument.head.appendChild(el);
-            resizeIframe(e);
-        };
-
-        return {
-            ...toRefs(state),
-            onLoadIFrame,
-        };
-    },
+const resizeIframe = (e) => {
+    e.target.style.height = `${e.target.contentDocument.documentElement.scrollHeight}px`;
 };
+const onLoadIFrame = (e) => {
+    const el = document.createElement('style');
+    el.textContent = iframeStyle;
+    e.target.contentDocument.head.appendChild(el);
+    resizeIframe(e);
+};
+
 </script>
 
 <style lang="postcss">

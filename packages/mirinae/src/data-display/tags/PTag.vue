@@ -42,7 +42,7 @@ import type { CategoryItem, KeyItem, ValueItem } from '@/inputs/search/query-sea
 
 interface Props {
     keyItem?: KeyItem;
-    valueItem: ValueItem;
+    valueItem?: ValueItem;
     categoryItem?: CategoryItem;
     deletable?: boolean;
     outline?: boolean;
@@ -53,6 +53,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
     keyItem: undefined,
+    valueItem: undefined,
     categoryItem: undefined,
     deletable: true,
     outline: false,

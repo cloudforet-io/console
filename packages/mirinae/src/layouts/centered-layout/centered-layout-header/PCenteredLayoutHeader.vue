@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed } from 'vue';
 
 import PHeading from '@/data-display/heading/PHeading.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';

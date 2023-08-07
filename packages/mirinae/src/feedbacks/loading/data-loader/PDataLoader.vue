@@ -52,12 +52,13 @@
 
 <script setup lang="ts">
 import { isEmpty } from 'lodash';
-import type { ComputedRef, PropType, WatchStopHandle } from 'vue';
+import type { ComputedRef, WatchStopHandle } from 'vue';
 import {
     computed, reactive, useSlots, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import type { LoaderTypes } from '@/feedbacks/loading/data-loader/config';
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
@@ -65,70 +66,32 @@ import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { getColor } from '@/utils/helpers';
 
-// interface Props {
-//     loading: boolean;
-//     data?: any;
-//     loaderType: LOADER_TYPES;
-//     disableEmptyCase: boolean;
-//     showDataFromScratch: boolean;
-//     minLoadingTime: number;
-//     lazyLoadingTime: number;
-//     loaderBackdropOpacity: number;
-//     loaderBackdropColor: string;
-//     disableTransition: boolean;
-// }
+interface Props {
+    loading: boolean;
+    data?: any;
+    loaderType: LoaderTypes;
+    spinnerSize: SpinnerSize;
+    disableEmptyCase: boolean;
+    showDataFromScratch: boolean;
+    minLoadingTime: number;
+    lazyLoadingTime: number;
+    loaderBackdropOpacity: number;
+    loaderBackdropColor: string;
+    disableTransition: boolean;
+}
 
-const props = defineProps({
-    loading: {
-        type: Boolean,
-        default: true,
-    },
-    data: {
-        type: [Array, Object, Boolean, String, Number] as PropType<any>,
-        default: undefined,
-    },
-    loaderType: {
-        type: String as PropType<LOADER_TYPES>,
-        default: LOADER_TYPES.spinner,
-        validator(loaderType: LOADER_TYPES) {
-            return Object.values(LOADER_TYPES).includes(loaderType);
-        },
-    },
-    spinnerSize: {
-        type: String as PropType<SpinnerSize>,
-        default: SPINNER_SIZE.xl,
-        validator(spinnerSize: SpinnerSize) {
-            return Object.values(SPINNER_SIZE).includes(spinnerSize);
-        },
-    },
-    disableEmptyCase: {
-        type: Boolean,
-        default: false,
-    },
-    showDataFromScratch: {
-        type: Boolean,
-        default: false,
-    },
-    minLoadingTime: {
-        type: Number,
-        default: 0,
-    },
-    lazyLoadingTime: {
-        type: Number,
-        default: 0,
-    },
-    loaderBackdropOpacity: {
-        type: Number,
-        default: 0.5,
-    },
-    loaderBackdropColor: {
-        type: String,
-        default: '#fff',
-    },
-    disableTransition: {
-        type: Boolean,
-        default: false,
-    },
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+    data: undefined,
+    loaderType: LOADER_TYPES.spinner,
+    spinnerSize: SPINNER_SIZE.xl,
+    disableEmptyCase: false,
+    showDataFromScratch: false,
+    minLoadingTime: 0,
+    lazyLoadingTime: 0,
+    loaderBackdropOpacity: 0.5,
+    loaderBackdropColor: '#fff',
+    disableTransition: false,
 });
 const { t } = useI18n();
 const slots = useSlots();

@@ -1,6 +1,6 @@
 <template>
     <textarea v-model="state.proxyValue"
-              :placeholder="placeholder"
+              :placeholder="state.stringifiedPlaceholder"
               :readonly="readonly"
               :autofocus="autofocus"
               :disabled="disabled"
@@ -12,6 +12,7 @@
 
 <script setup lang="ts">
 import {
+    computed,
     reactive, useAttrs,
 } from 'vue';
 
@@ -38,6 +39,7 @@ const emit = defineEmits(['update:value']);
 const attrs = useAttrs();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
+    stringifiedPlaceholder: computed(() => `${props.placeholder}`),
 });
 const listeners = {
     ...attrs,

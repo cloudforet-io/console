@@ -1,5 +1,4 @@
 import type { ComputedRef, Ref } from 'vue';
-import type Vue from 'vue';
 import {
     computed, isRef, reactive, ref, toRef,
 } from 'vue';
@@ -11,7 +10,7 @@ import type { MenuItem } from '@/inputs/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
 export interface UseContextMenuControllerOptions {
-    targetRef: Ref<HTMLElement|Vue|null>; // required for style
+    targetRef: Ref<HTMLElement|null>; // required for style
 
     contextMenuRef?: Ref<any|null>; // required when using focusing feature by focusOnContextMenu()
     /*

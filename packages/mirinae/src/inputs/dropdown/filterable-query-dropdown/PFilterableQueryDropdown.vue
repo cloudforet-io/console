@@ -1,6 +1,5 @@
 <template>
     <div ref="containerRef"
-         v-click-outside="hideMenu"
          class="p-filterable-query-dropdown"
     >
         <p-search ref="targetRef"
@@ -93,6 +92,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { FilterableQueryDropdownProps } from '@/inputs/dropdown/filterable-query-dropdown/type';
 import type { KeyMenuItem, ValueMenuItem, QueryItem } from '@/inputs/search/query-search/type';
@@ -162,7 +162,8 @@ const onDeleteTag = (item: FilterableDropdownMenuItem, index: number) => {
     state.proxySelected = [...state.proxySelected];
 };
 
-const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
+const onMenuSelect = async (_item: MenuItem) => {
+    const item = _item as KeyMenuItem | ValueMenuItem;
     const queryItem = await preTreatSelectedMenuItem(item);
     if (queryItem) selectItem(queryItem);
 };

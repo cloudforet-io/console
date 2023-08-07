@@ -1,4 +1,5 @@
-<script lang="ts">
+<script lang="ts" setup>
+
 import { h } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
@@ -9,63 +10,47 @@ import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/fie
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { commaFormatter, getColor } from '@/utils/helpers';
 
-export default {
-    name: 'PDynamicFieldBadge',
-    components: { PBadge },
-    props: {
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: undefined,
-        },
-        typeOptions: {
-            type: Object,
-            default: () => ({}),
-        },
-        extraData: {
-            type: Object,
-            default: () => ({}),
-        },
-        handler: {
-            type: Function,
-            default: undefined,
-        },
-    },
-    setup(props: BadgeDynamicFieldProps) {
-        // eslint-disable-next-line vue/no-setup-props-destructure
-        const options: BadgeOptions = props.options;
+const props = withDefaults(defineProps<BadgeDynamicFieldProps>(), {
+    options: () => ({}) as BadgeOptions,
+    data: undefined,
+    typeOptions: () => ({}),
+    extraData: () => ({}),
+    handler: undefined,
+});
 
-        const badgeProps = {} as BadgeProps;
+// eslint-disable-next-line vue/no-setup-props-destructure
+const options: BadgeOptions = props.options;
 
-        if (options.shape) {
-            badgeProps.shape = BADGE_SHAPE[options.shape];
-        }
+const badgeProps = {} as BadgeProps;
 
-        if (options.outline_color) {
-            badgeProps.backgroundColor = getColor(options.outline_color);
-        } else {
-            badgeProps.backgroundColor = getColor(options.background_color);
-            badgeProps.textColor = getColor(options.text_color);
-        }
+if (options.shape) {
+    badgeProps.shape = BADGE_SHAPE[options.shape];
+}
 
-        let badgeEl = props.data ?? props.options.default;
-        if (badgeEl === undefined || badgeEl === null) return () => undefined;
-        if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
-        badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
+if (options.outline_color) {
+    badgeProps.backgroundColor = getColor(options.outline_color);
+} else {
+    badgeProps.backgroundColor = getColor(options.background_color);
+    badgeProps.textColor = getColor(options.text_color);
+}
 
-        if (options.link) {
-            badgeEl = [h(PAnchor, {
-                attrs: { href: options.link, target: '_blank' },
-            }, badgeEl)];
-        }
+let badgeEl = props.data ?? props.options.default;
+if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
+badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
-        return () => h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
-    },
-};
+if (options.link) {
+    badgeEl = [h(PAnchor, {
+        attrs: { href: options.link, target: '_blank' },
+    }, badgeEl)];
+}
+
+const render = h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
+
 </script>
+
+<template>
+    <render />
+</template>
 
 <style lang="postcss">
 .p-dynamic-field-badge {

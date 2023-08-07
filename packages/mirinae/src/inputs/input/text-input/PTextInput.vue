@@ -1,6 +1,5 @@
 <template>
     <div ref="containerRef"
-         v-on-click-outside="() => hideMenu(false)"
          class="p-text-input"
          :class="{block, focused: isInputFocused, [size]: true}"
     >
@@ -8,7 +7,7 @@
              class="input-container"
              :class="{invalid: isSelectedInvalid || invalid, disabled}"
              @keyup.down="focusOnContextMenu(0)"
-             @keyup.esc.capture.stop="hideMenu"
+             @keyup.esc.capture.stop="handleTypeEsc"
              @click.stop="showMenu(true)"
         >
             <div class="tag-container">
@@ -41,12 +40,12 @@
                 >
                     <input v-bind="attrs"
                            ref="inputRef"
-                           :tabindex="disabled || $attrs.readonly ? -1 : 0"
+                           :tabindex="disabled || attrs.readonly ? -1 : 0"
                            :type="inputType"
                            :value="displayedInputValue"
                            :disabled="disabled"
                            :placeholder="placeholder"
-                           :autocomplete="!attrs.autocomplete ? 'off' : $attrs.autocomplete"
+                           :autocomplete="attrs.autocomplete && typeof attrs.autocomplete === 'string' ? attrs.autocomplete : 'off'"
                            size="1"
                            v-on="listeners"
                            @input="handleInput"
@@ -122,7 +121,6 @@ import { unionBy } from 'lodash';
 import {
     computed, ref, toRef, useAttrs, useSlots, watch,
 } from 'vue';
-import type { PropType } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
@@ -142,106 +140,64 @@ import type {
     InputItem, TextInputHandler, InputSize, InputAppearanceType,
 } from '@/inputs/input/text-input/type';
 
-const props = defineProps({
-    value: {
-        type: [String, Number],
-        default: undefined,
-    },
-    size: {
-        type: String as PropType<InputSize>,
-        default: INPUT_SIZE.md,
-        validator(size: InputSize) {
-            return Object.values(INPUT_SIZE).includes(size);
-        },
-    },
-    isFocused: {
-        type: Boolean,
-        default: false,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    block: {
-        type: Boolean,
-        default: false,
-    },
-    invalid: {
-        type: Boolean,
-        default: false,
-    },
-    placeholder: {
-        type: String,
-        default: '',
-    },
-    multiInput: {
-        type: Boolean,
-        default: false,
-    },
-    selected: {
-        type: Array as PropType<InputItem[]>,
-        default: () => [],
-    },
-    /* context menu fixed style props */
-    visibleMenu: {
-        type: Boolean,
-        default: undefined,
-    },
-    useFixedMenuStyle: {
-        type: Boolean,
-        default: false,
-    },
-    /* context menu props */
-    menu: {
-        type: Array as PropType<MenuItem[]>,
-        default: () => [],
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    /* extra props */
-    handler: {
-        type: Function as PropType<TextInputHandler>,
-        default: undefined,
-    },
-    disableHandler: {
-        type: Boolean,
-        default: false,
-    },
-    useAutoComplete: {
-        type: Boolean,
-        default: false,
-    },
-    showPassword: {
-        type: Boolean,
-        default: true,
-    },
-    appearanceType: {
-        type: String as PropType<InputAppearanceType>,
-        default: INPUT_APPEARANCE_TYPES[0],
-        validator(appearanceType: InputAppearanceType) {
-            return INPUT_APPEARANCE_TYPES.includes(appearanceType);
-        },
-    },
-    pageSize: {
-        type: Number,
-        default: undefined,
-    },
+interface Props {
+    value?: string | number;
+    size: InputSize;
+    isFocused: boolean;
+    disabled: boolean;
+    block: boolean;
+    invalid: boolean;
+    placeholder: string;
+    multiInput: boolean;
+    selected: InputItem[];
+    visibleMenu: boolean;
+    useFixedMenuStyle: boolean;
+    menu: MenuItem[];
+    loading: boolean;
+    handler: TextInputHandler;
+    disableHandler: boolean;
+    useAutoComplete: boolean;
+    showPassword: boolean;
+    appearanceType: InputAppearanceType;
+    pageSize: number;
+    type?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    value: undefined,
+    size: INPUT_SIZE.md,
+    isFocused: false,
+    disabled: false,
+    block: false,
+    invalid: false,
+    placeholder: '',
+    multiInput: false,
+    selected: () => [],
+    visibleMenu: undefined,
+    useFixedMenuStyle: false,
+    menu: () => [],
+    loading: false,
+    handler: undefined,
+    disableHandler: false,
+    useAutoComplete: false,
+    showPassword: true,
+    appearanceType: INPUT_APPEARANCE_TYPES[0],
+    pageSize: undefined,
+    type: 'text',
 });
-const emit = defineEmits([
-    'update:value',
-    'update:is-focused',
-    'update:visibleMenu',
-    'update:selected',
-    'hide-menu',
-    'show-menu',
-    'delete-tag',
-    'delete-all-tags',
-    'focus-menu',
-    'update:show-password',
-    'update',
-]);
+
+const emit = defineEmits<{(e: 'update:value', value?: string | number): void;
+    (e: 'update:is-focused', value: boolean): void;
+    (e: 'update:visibleMenu', value: boolean): void;
+    (e: 'update:selected', value: InputItem[]): void;
+    (e: 'hide-menu'): void;
+    (e: 'show-menu'): void;
+    (e: 'delete-tag', value: InputItem, idx: number): void;
+    (e: 'delete-all-tags'): void;
+    (e: 'focus-menu', idx: string): void;
+    (e: 'update:show-password', value: boolean): void;
+    (e: 'update', selected: InputItem[], valid: boolean): void;
+}>();
 const attrs = useAttrs();
 const slots = useSlots();
 const { t } = useI18n();
@@ -372,6 +328,13 @@ const handleDeleteAllTags = () => {
     emit('delete-all-tags');
 };
 
+const handleTypeEsc = () => {
+    if (proxyVisibleMenu.value) {
+        proxyVisibleMenu.value = false;
+        emit('hide-menu');
+    }
+};
+
 /* context menu event listeners */
 const handleFocusMenuItem = (idx: string) => {
     emit('focus-menu', idx);
@@ -398,10 +361,10 @@ watch(maskingMode, (masking) => {
 /* input type */
 const inputType = computed(() => {
     if (maskingMode.value) {
-        if (attrs.type === 'password') return proxyShowPassword.value ? 'password' : 'text';
-        return attrs.type;
+        if (props.type === 'password') return proxyShowPassword.value ? 'password' : 'text';
+        return props.type;
     }
-    return attrs.type;
+    return props.type;
 });
 
 /* input event listeners */

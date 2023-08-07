@@ -8,7 +8,7 @@
          :style="tableCustomStyle"
     >
         <div class="table-container"
-             :style="tableCustomStyle.maxHeight && { maxHeight: 'inherit', height: 'inherit' }"
+             :style="tableCustomStyle && tableCustomStyle.maxHeight && { maxHeight: 'inherit', height: 'inherit' }"
         >
             <table>
                 <thead>

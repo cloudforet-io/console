@@ -5,13 +5,13 @@
              [size]: true,
          }"
     >
-        <header v-if="header !== false || $slots.header">
+        <header v-if="header !== false || slots.header">
             <slot name="header">
                 {{ header }}
             </slot>
         </header>
         <div class="body"
-             :class="{ 'no-header': !header.length && !$slots.header }"
+             :class="{ 'no-header': typeof header === 'string' && !header.length && !slots.header }"
         >
             <slot />
         </div>
@@ -20,30 +20,23 @@
 
 <script setup lang="ts">
 
-import type { PropType } from 'vue';
+import { useSlots } from 'vue';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
-defineProps({
-    header: {
-        type: [String, Boolean],
-        default: '',
-    },
-    styleType: {
-        type: String as PropType<CARD_STYLE_TYPE>,
-        default: CARD_STYLE_TYPE.gray100,
-        validator(styleType: any) {
-            return Object.values(CARD_STYLE_TYPE).includes(styleType);
-        },
-    },
-    size: {
-        type: String as PropType<CARD_SIZE>,
-        default: CARD_SIZE.md,
-        validator(size: any) {
-            return Object.values(CARD_SIZE).includes(size);
-        },
-    },
+interface Props {
+    header: string | boolean;
+    styleType: CARD_STYLE_TYPE;
+    size: CARD_SIZE;
+}
+
+withDefaults(defineProps<Props>(), {
+    header: '',
+    styleType: CARD_STYLE_TYPE.gray100,
+    size: CARD_SIZE.md,
 });
+
+const slots = useSlots();
 
 </script>
 

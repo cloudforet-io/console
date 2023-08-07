@@ -1,9 +1,9 @@
-<script lang="ts">
+<script lang="ts" setup>
 import bytes from 'bytes';
 import { h, useAttrs } from 'vue';
 
 
-import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
+import type { SizeDynamicFieldProps, SizeTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
@@ -17,72 +17,55 @@ const unitMap: Record<string, bytes.Unit> = {
 };
 const UNIT_SEPARATOR = ' ';
 
-export default {
-    name: 'PDynamicFieldSize',
-    components: { PAnchor },
-    props: {
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: null,
-        },
-        typeOptions: {
-            type: Object,
-            default: () => ({}),
-        },
-        extraData: {
-            type: Object,
-            default: () => ({}),
-        },
-        handler: {
-            type: Function,
-            default: undefined,
-        },
-    },
-    setup(props: SizeDynamicFieldProps) {
-        let value: number|null;
+const props = withDefaults(defineProps<SizeDynamicFieldProps>(), {
+    options: () => ({}) as SizeOptions,
+    data: null,
+    typeOptions: () => ({}) as SizeTypeOptions,
+    extraData: () => ({}),
+    handler: undefined,
+});
 
-        const attrs = useAttrs();
+let value: number|null;
 
-        // eslint-disable-next-line vue/no-setup-props-destructure
-        if (typeof props.data === 'number') value = props.data;
-        else if (typeof props.data === 'string') value = Number(props.data);
-        else if (props.options.default !== undefined) value = props.options.default ?? 0;
-        else value = null;
+const attrs = useAttrs();
 
-        let formattedValue: string;
-        if (value === null) formattedValue = '-';
-        else {
-            const displayUnit: bytes.Unit|undefined = unitMap[props.options.display_unit as string] || undefined;
-            const sourceUnit: bytes.Unit|undefined = unitMap[props.options.source_unit as string] || undefined;
-            const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
+// eslint-disable-next-line vue/no-setup-props-destructure
+if (typeof props.data === 'number') value = props.data;
+else if (typeof props.data === 'string') value = Number(props.data);
+else if (props.options.default !== undefined) value = props.options.default ?? 0;
+else value = null;
 
-            if (sourceUnit) {
-                value = bytes.parse(`${props.data}${sourceUnit}`);
-            }
+let formattedValue: string;
+if (value === null) formattedValue = '-';
+else {
+    const displayUnit: bytes.Unit|undefined = unitMap[props.options.display_unit as string] || undefined;
+    const sourceUnit: bytes.Unit|undefined = unitMap[props.options.source_unit as string] || undefined;
+    const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
 
-            const res = bytes(value, bytesOptions);
-            if (!res) formattedValue = '-';
-            else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
-                formattedValue = `${value} bytes`;
-            } else {
-                formattedValue = res;
-            }
-        }
+    if (sourceUnit) {
+        value = bytes.parse(`${props.data}${sourceUnit}`);
+    }
 
-        let sizeEl = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
+    const res = bytes(value, bytesOptions);
+    if (!res) formattedValue = '-';
+    else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
+        formattedValue = `${value} bytes`;
+    } else {
+        formattedValue = res;
+    }
+}
 
-        if (props.options.link) {
-            sizeEl = h(PAnchor, {
-                attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
-                props: { value, showIcon: !!formattedValue },
-            }, [sizeEl]);
-        }
+let render = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
-        return () => sizeEl;
-    },
-};
+if (props.options.link) {
+    render = h(PAnchor, {
+        attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
+        props: { value, showIcon: !!formattedValue },
+    }, [render]);
+}
+
 </script>
+
+<template>
+    <render />
+</template>

@@ -11,7 +11,7 @@
             <p-text-editor :code="state.jsonInputData"
                            disable-auto-reformat
                            :read-only="schema.disabled"
-                           @update:code="handleUpdateJsonData(schema, ...arguments)"
+                           @update:code="handleUpdateJsonData(schema, $event)"
             />
             <template #invalid>
                 <span v-for="invalidMessage in invalidMessages"
@@ -63,14 +63,14 @@
                                                 :invalid="invalid"
                                                 :full-width="uniformWidth"
                                                 class="input-form"
-                                                @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                                @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             />
                             <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
                                                 :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
                                                 :form-data="state.rawFormData[schemaProperty.propertyName]"
                                                 :schema="schemaProperty"
                                                 :is-root="false"
-                                                @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                                @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             />
                             <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                                :key="`PSelectDropdown-${schemaProperty.propertyName}`"
@@ -80,7 +80,7 @@
                                                :use-fixed-menu-style="useFixedMenuStyle"
                                                :button-text-ellipsis="uniformWidth"
                                                class="input-form"
-                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             >
                                 <template #default="{ item }">
                                     <slot name="dropdown-extra"
@@ -100,11 +100,11 @@
                                                    :invalid="invalid"
                                                    :handler="schemaProperty.referenceHandler"
                                                    class="input-form"
-                                                   @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                                   @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             >
-                                <template #selected-extra="{ items }">
+                                <template #selected-extra="{ item }">
                                     <slot name="dropdown-extra"
-                                          v-bind="{...schemaProperty, selectedItem: items}"
+                                          v-bind="{...schemaProperty, selectedItem: item}"
                                     />
                                 </template>
                             </p-filterable-dropdown>
@@ -124,8 +124,8 @@
                                               :multi-input="schemaProperty.multiInputMode"
                                               :page-size="10"
                                               class="input-form"
-                                              @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
-                                              @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                              @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
+                                              @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                                 />
                             </template>
                         </div>
@@ -147,7 +147,6 @@ import { isEmpty } from 'lodash';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PFilterableDropdown from '@/inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
@@ -179,64 +178,38 @@ import type {
     ValidationMode,
     CustomErrorMap,
 } from '@/inputs/forms/json-schema-form/type';
-import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import type { SupportLanguage } from '@/translations';
-import { supportLanguages } from '@/translations';
 
 const PJsonSchemaForm = () => ({
     // eslint-disable-next-line import/no-self-import
     component: import('./PJsonSchemaForm.vue'),
 });
 
-const props = defineProps({
-    schema: {
-        type: Object as PropType<JsonSchema>,
-        default: undefined,
-    },
-    formData: {
-        type: [Object, String, Number, Boolean, Array], // Only object is available for external usage.
-        default: undefined,
-    },
-    language: {
-        type: String as PropType<SupportLanguage>,
-        default: 'en',
-        validator(lang?: SupportLanguage) {
-            return lang === undefined || supportLanguages.includes(lang);
-        },
-    },
-    validationMode: {
-        type: String as PropType<ValidationMode>,
-        default: 'input',
-        validator(mode?: ValidationMode) {
-            return mode === undefined || VALIDATION_MODES.includes(mode);
-        },
-    },
-    isRoot: {
-        type: Boolean,
-        default: true,
-    },
-    resetOnSchemaChange: {
-        type: Boolean,
-        default: false,
-    },
-    customErrorMap: {
-        type: Object as PropType<CustomErrorMap>,
-        default: () => ({}),
-    },
-    referenceHandler: {
-        type: Function as PropType<ReferenceHandler|undefined>,
-        default: undefined,
-    },
-    useFixedMenuStyle: {
-        type: Boolean,
-        default: false,
-    },
-    uniformWidth: {
-        type: Boolean,
-        default: false,
-    },
+interface Props {
+    schema: JsonSchema;
+    formData: any;
+    language: SupportLanguage;
+    validationMode: ValidationMode;
+    isRoot: boolean;
+    resetOnSchemaChange: boolean;
+    customErrorMap: CustomErrorMap;
+    referenceHandler?: ReferenceHandler;
+    useFixedMenuStyle: boolean;
+    uniformWidth: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    formData: undefined,
+    language: 'en',
+    validationMode: 'input',
+    isRoot: true,
+    resetOnSchemaChange: false,
+    customErrorMap: () => ({}),
+    referenceHandler: undefined,
+    useFixedMenuStyle: false,
+    uniformWidth: false,
 });
 const emit = defineEmits(['update:form-data', 'validate', 'change']);
 

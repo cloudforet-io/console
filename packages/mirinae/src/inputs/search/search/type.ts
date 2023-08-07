@@ -15,7 +15,7 @@ export interface SearchProps {
     disabled?: boolean;
     readonly?: boolean;
     isFocused?: boolean; // sync
-    visibleMenu: boolean;
+    visibleMenu?: boolean;
     useFixedMenuStyle: boolean;
     menu: MenuItem[];
     loading: boolean;

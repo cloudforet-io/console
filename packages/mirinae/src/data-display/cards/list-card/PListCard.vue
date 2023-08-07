@@ -44,46 +44,25 @@ import {
 
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 import PCard from '@/data-display/cards/card/PCard.vue';
+import type { CardProps } from '@/data-display/cards/card/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-/* HACK: this component's props is extended from PCard
-*   interface Props extends CardProps {
-*       items: any[];
-*       loading?: boolean;
-*       disableEmptyCase?: boolean;
-*       hoverable?: boolean;
-*   }
-* */
-const props = defineProps({
+   interface Props extends CardProps {
+       items: any[];
+       loading?: boolean;
+       disableEmptyCase?: boolean;
+       hoverable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
     /* card props */
-    header: {
-        type: [String, Boolean],
-        default: '',
-    },
-    styleType: {
-        type: String,
-        default: CARD_STYLE_TYPE.gray100,
-        validator(styleType: any) {
-            return Object.values(CARD_STYLE_TYPE).includes(styleType);
-        },
-    },
+    header: '',
+    styleType: CARD_STYLE_TYPE.gray100,
     /* list card props */
-    items: {
-        type: Array,
-        default: () => [],
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    disableEmptyCase: {
-        type: Boolean,
-        default: false,
-    },
-    hoverable: {
-        type: Boolean,
-        default: false,
-    },
+    items: () => [],
+    loading: false,
+    disableEmptyCase: false,
+    hoverable: false,
 });
 
 const emit = defineEmits<{(e: 'click', index: number): void;}>();

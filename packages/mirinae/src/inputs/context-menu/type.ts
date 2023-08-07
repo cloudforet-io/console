@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 export const CONTEXT_MENU_TYPE = {
     divider: 'divider',
     header: 'header',
@@ -12,7 +10,7 @@ export type ContextMenuType = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU
 
 export interface MenuItem {
     name?: string;
-    label?: string | TranslateResult;
+    label?: string;
     type?: ContextMenuType;
     disabled?: boolean;
     link?: string;

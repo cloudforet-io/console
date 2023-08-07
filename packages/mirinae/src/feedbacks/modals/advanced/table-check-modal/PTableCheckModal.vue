@@ -49,44 +49,32 @@ import {
 
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import type { DataTableField } from '@/data-display/tables/data-table/type';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { SizeMapping } from '@/feedbacks/modals/type';
+import type { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
+import type { ModalSizeType } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
 
-const props = defineProps({
-    modalSize: {
-        type: String,
-        default: 'md',
-        validator: (value: any) => Object.keys(SizeMapping).includes(value),
-    },
-    visible: {
-        type: Boolean,
-        default: false,
-    },
-    themeColor: {
-        type: String,
-        default: 'primary',
-    },
-    headerTitle: {
-        type: String,
-        default: undefined,
-    },
-    subTitle: {
-        type: String,
-        default: undefined,
-    },
-    fields: {
-        type: Array,
-        default: undefined,
-    },
-    items: {
-        type: Array,
-        default: undefined,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
+interface Props {
+    modalSize: ModalSizeType;
+    visible: boolean;
+    themeColor: ModalThemeColor;
+    headerTitle?: string;
+    subTitle?: string;
+    fields?: DataTableField[];
+    items?: any[];
+    loading: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    modalSize: 'md',
+    visible: false,
+    themeColor: 'primary',
+    headerTitle: undefined,
+    subTitle: undefined,
+    fields: undefined,
+    items: undefined,
+    loading: false,
 });
 const emit = defineEmits(['update:visible', 'cancel', 'confirm']);
 const slots = useSlots();

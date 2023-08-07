@@ -2,7 +2,7 @@
     <span>
         <p-text-list v-if="type !== 'list' && Array.isArray(data)"
                      :items="data"
-                     :delimiter="options.delimiter === undefined ? '<br>' : options.delimiter"
+                     :delimiter="typeof options.delimiter !== 'string' ? '<br>' : options.delimiter"
         >
             <template #default="{value}">
                 <p-dynamic-field :options="options"

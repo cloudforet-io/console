@@ -47,55 +47,28 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
     lg: SPINNER_SIZE.xl,
 };
 
-const props = defineProps({
-    name: {
-        type: String,
-        default: '',
-    },
-    styleType: {
-        type: String as PropType<IconButtonStyleType>,
-        default: ICON_BUTTON_STYLE_TYPE.transparent,
-        validator(value: IconButtonStyleType) {
-            return Object.values(ICON_BUTTON_STYLE_TYPE).includes(value);
-        },
-    },
-    color: {
-        type: String,
-        default: 'inherit',
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    activated: {
-        type: Boolean,
-        default: false,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    size: {
-        type: String as PropType<IconButtonSize>,
-        default: 'md',
-        validator(value: IconButtonSize) {
-            return Object.keys(ICON_BUTTON_SIZE).includes(value);
-        },
-    },
-    animation: {
-        type: String as PropType<AnimationType|undefined>,
-        default: undefined,
-        validator(animation: AnimationType|undefined) {
-            return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-        },
-    },
-    shape: {
-        type: String as PropType<IconButtonShape>,
-        default: ICON_BUTTON_SHAPE.circle,
-        validator(value: IconButtonShape) {
-            return Object.values(ICON_BUTTON_SHAPE).includes(value);
-        },
-    },
+interface Props {
+    name: string;
+    styleType: IconButtonStyleType;
+    color: string;
+    disabled: boolean;
+    activated: boolean;
+    loading: boolean;
+    size: IconButtonSize;
+    animation: AnimationType|undefined;
+    shape: IconButtonShape;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    name: '',
+    styleType: ICON_BUTTON_STYLE_TYPE.transparent,
+    color: 'inherit',
+    disabled: false,
+    activated: false,
+    loading: false,
+    size: 'md',
+    animation: undefined,
+    shape: ICON_BUTTON_SHAPE.circle,
 });
 
 const state = reactive({

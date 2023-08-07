@@ -43,50 +43,19 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
 
-import { themes } from '@/data-display/status/config';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
+import type { StatusProps } from '@/data-display/status/type';
 import PI from '@/foundation/icons/PI.vue';
 import { getColor } from '@/utils/helpers';
 
-const props = defineProps({
-    icon: {
-        type: String,
-        default: null,
-    },
-    text: {
-        type: String,
-        default: null,
-    },
-    textColor: {
-        type: String,
-        default: null,
-    },
-    iconColor: {
-        type: String,
-        default: null,
-    },
-    theme: {
-        type: String,
-        default: null,
-        validator(theme: string|null) {
-            return theme === null || themes.includes(theme);
-        },
-    },
-    disableIcon: {
-        type: Boolean,
-        default: false,
-    },
-    iconSize: {
-        type: Number,
-        default: 1,
-    },
-    iconAnimation: {
-        type: String,
-        default: undefined,
-        validator(animation: any) {
-            return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
-        },
-    },
+const props = withDefaults(defineProps<StatusProps>(), {
+    icon: null,
+    text: null,
+    textColor: null,
+    iconColor: null,
+    theme: '',
+    disableIcon: false,
+    iconSize: 1,
+    iconAnimation: undefined,
 });
 
 const attrs = useAttrs();

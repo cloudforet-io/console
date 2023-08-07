@@ -119,6 +119,7 @@ import type {
     AutocompleteHandler, FilterableDropdownAppearanceType,
 } from '@/inputs/dropdown/filterable-dropdown/type';
 import { FILTERABLE_DROPDOWN_APPEARANCE_TYPES } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 
 /* props */
 interface FilterableDropdownProps {
@@ -140,7 +141,8 @@ interface FilterableDropdownProps {
     // eslint-disable-next-line vue/require-default-prop
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
-    appearanceType?: FilterableDropdownAppearanceType;
+    // TODO: this need to be refactored (with PJsonSchemaForm)
+    appearanceType?: FilterableDropdownAppearanceType | InputAppearanceType;
     // eslint-disable-next-line vue/require-default-prop
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;

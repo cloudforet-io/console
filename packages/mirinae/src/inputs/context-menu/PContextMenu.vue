@@ -63,7 +63,7 @@
                                              :image-url="item.imageUrl"
                                              :icon="item.icon"
                                              :readonly="readonly"
-                                             :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
+                                             :selected="!props.noSelectIndication && state.selectedNameMap[item.name || ''] !== undefined"
                                              :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
@@ -194,9 +194,9 @@ interface ContextMenuEmits {
     (e: 'blur'): void,
     (e: 'keyup:up:end'): void,
     (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index: number, event: Event): void,
+    (e: 'select', item: MenuItem, index?: number, event?: Event): void,
     (e: 'update:search-text', searchText: string): void,
-    (e: 'keyup:esc', mouseEvent: MouseEvent): void,
+    (e: 'keyup:esc', mouseEvent: KeyboardEvent): void,
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
     (e: 'click-done', mouseEvent: MouseEvent): void,
     (e: 'click-show-more', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
@@ -296,7 +296,7 @@ const onClickMenu = (item: MenuItem, index: number, event) => {
 
     emit('select', item, index, event);
 };
-const onClickEsc = (e: MouseEvent) => {
+const onClickEsc = (e: KeyboardEvent) => {
     emit('keyup:esc', e);
     blur();
 };

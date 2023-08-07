@@ -4,8 +4,8 @@ import type {
 } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayoutOptions, DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 import type { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 
 
 export interface DynamicLayoutFetchOptions {
@@ -51,7 +51,7 @@ export interface DynamicLayoutFieldExtraData extends DynamicField {
     index: number;
 }
 
-export type DynamicLayoutFieldHandler<T = undefined> = DynamicFieldHandler<
+export type DynamicLayoutFieldHandler<T = any> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicLayoutFieldExtraData & T

@@ -17,7 +17,7 @@ export const ICON_BUTTON_SIZE = {
     md: '1.5rem',
     lg: '2rem',
 } as const;
-export type IconButtonSize = typeof ICON_BUTTON_SIZE[keyof typeof ICON_BUTTON_SIZE];
+export type IconButtonSize = keyof typeof ICON_BUTTON_SIZE;
 
 export interface IconButtonProps {
     name: string;

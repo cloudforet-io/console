@@ -30,29 +30,16 @@ import { watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-const props = defineProps({
-    thisPage: {
-        type: Number,
-        validator(value: number) {
-            return value > 0;
-        },
-        default: undefined,
-    },
-    allPage: {
-        type: Number,
-        validator(value: number) {
-            return value > 0;
-        },
-        default: undefined,
-    },
-    showPageNumber: {
-        type: Boolean,
-        default: true,
-    },
-    disableNextPage: {
-        type: Boolean,
-        default: false,
-    },
+interface Props {
+    thisPage: number;
+    allPage: number;
+    showPageNumber?: boolean;
+    disableNextPage?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    showPageNumber: true,
+    disableNextPage: false,
 });
 const emit = defineEmits(['update:thisPage', 'pageChange']);
 

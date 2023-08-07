@@ -386,7 +386,8 @@ const onToggle = async (node: TreeNode, path: number[]) => {
     await onNodeFoldedChange(node, path, node.$folded);
 };
 
-const onClickNode = (node: TreeNode, path: number[], e: Store) => {
+// TODO: this need to be refactored, <div> can't take draggable Store type.
+const onClickNode = (node: TreeNode, path: number[], e: any) => {
     emit('click-node', node, path, e);
 
     if (getSelectState(path)) startEdit(node);

@@ -3,7 +3,7 @@
                             type="raw-table"
                             :name="name"
                             :options="{
-                                fields,
+                                fields: state.fields,
                                 translation_id: options.translation_id,
                                 disable_search: options.disable_search,
                             }"
@@ -28,6 +28,7 @@ import {
     computed, reactive, useAttrs, useSlots,
 } from 'vue';
 
+import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
@@ -41,13 +42,13 @@ const attrs = useAttrs();
 const slots = useSlots();
 
 const state = reactive({
-    fields: computed(() => {
+    fields: computed<DynamicField[]>(() => {
         const firstItem = state.rootData[0];
         if (firstItem) {
             if (Array.isArray(props.options?.headers) && props.options?.headers?.length) {
-                return props.options.headers.map((value) => ({ key: value, name: value }));
+                return props.options.headers.map((value) => ({ key: value, name: value } as DynamicField));
             }
-            return getSortingData(Object.keys(firstItem)).map((value) => ({ key: value, name: value }));
+            return getSortingData(Object.keys(firstItem)).map((value) => ({ key: value, name: value } as DynamicField));
         }
         return [];
     }),

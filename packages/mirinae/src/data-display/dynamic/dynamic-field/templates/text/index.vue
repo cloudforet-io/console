@@ -39,7 +39,7 @@ const anchorProps = computed(() => {
         return {
             href: props.options?.link,
             target: '_blank',
-            text: text.value,
+            text: text.value.toString(),
             showIcon: !!text.value,
         };
     }

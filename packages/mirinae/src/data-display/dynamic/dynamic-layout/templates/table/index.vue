@@ -59,7 +59,7 @@
             <template v-for="(_, slot) of slots"
                       #[slot]="scope"
             >
-                <slot v-if="!slot.startsWith('col-')"
+                <slot v-if="!slot.toString().startsWith('col-')"
                       :name="slot"
                       v-bind="scope"
                 />

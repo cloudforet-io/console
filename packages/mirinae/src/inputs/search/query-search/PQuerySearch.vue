@@ -99,6 +99,7 @@ import {
 import PI from '@/foundation/icons/PI.vue';
 import { useQuerySearch } from '@/hooks/query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import type {
     KeyMenuItem, ValueMenuItem, KeyItemSet, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
@@ -157,7 +158,8 @@ const {
 );
 
 /* event */
-const onMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
+const onMenuSelect = async (_item: MenuItem) => {
+    const item = _item as KeyMenuItem | ValueMenuItem;
     const queryItem = await preTreatSelectedMenuItem(item);
     if (queryItem) emit('search', queryItem);
 };

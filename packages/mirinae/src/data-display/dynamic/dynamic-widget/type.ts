@@ -25,7 +25,7 @@ export interface DynamicWidgetViewOptions {
     // TODO
 }
 
-export type DynamicWidgetFieldHandler<T = undefined> = DynamicFieldHandler<
+export type DynamicWidgetFieldHandler<T = any> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicField & T

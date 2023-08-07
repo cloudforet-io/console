@@ -5,11 +5,12 @@ import type {
     FilterableDropdownAppearanceType,
     FilterableDropdownMenuItem,
 } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 
 interface UseDropdownButtonDisplay {
     multiSelectable: Ref<boolean|undefined>;
     selected: Ref<FilterableDropdownMenuItem[]>;
-    appearanceType: Ref<FilterableDropdownAppearanceType|undefined>;
+    appearanceType: Ref<FilterableDropdownAppearanceType|InputAppearanceType|undefined>;
 }
 export const useFilterableDropdownButtonDisplay = ({
     multiSelectable, selected, appearanceType,

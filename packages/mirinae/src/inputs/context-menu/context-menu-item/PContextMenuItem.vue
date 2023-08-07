@@ -58,71 +58,44 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, reactive, useAttrs, useSlots,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 import type { SelectMarker } from '@/inputs/context-menu/context-menu-item/type';
 
-const props = defineProps({
-    name: {
-        type: [String, Number],
-        default: '',
-    },
-    label: {
-        type: [String, Number] as PropType< number | TranslateResult>,
-        default: '',
-    },
-    link: {
-        type: String,
-        default: '',
-    },
-    to: {
-        type: Object as PropType<RouteLocation>,
-        default: undefined,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    selected: {
-        type: Boolean,
-        default: false,
-    },
-    selectMarker: {
-        type: String as PropType<SelectMarker|undefined>,
-        default: undefined,
-        validator(marker?: SelectMarker) {
-            return marker === undefined || SELECT_MARKERS.includes(marker);
-        },
-    },
-    ellipsis: {
-        type: Boolean,
-        default: false,
-    },
-    highlightTerm: {
-        type: String,
-        default: '',
-    },
-    readonly: {
-        type: Boolean,
-        default: false,
-    },
-    icon: {
-        type: String,
-        default: undefined,
-    },
-    imageUrl: {
-        type: String,
-        default: undefined,
-    },
+interface Props {
+    name: string;
+    label?: string;
+    link: string;
+    to?: RouteLocation;
+    disabled: boolean;
+    selected: boolean;
+    selectMarker?: SelectMarker;
+    ellipsis: boolean;
+    highlightTerm: string;
+    readonly: boolean;
+    icon?: string;
+    imageUrl?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    name: '',
+    label: '',
+    link: '',
+    to: undefined,
+    disabled: false,
+    selected: false,
+    selectMarker: undefined,
+    ellipsis: false,
+    highlightTerm: '',
+    readonly: false,
+    icon: undefined,
+    imageUrl: undefined,
 });
 const attrs = useAttrs();
 const slots = useSlots();

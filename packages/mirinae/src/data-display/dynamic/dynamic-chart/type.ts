@@ -5,7 +5,7 @@ import type { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/d
 
 export type DynamicChartType = typeof DYNAMIC_CHART_TYPE[number];
 
-export type DynamicChartFieldHandler<T = undefined> = DynamicFieldHandler<
+export type DynamicChartFieldHandler<T = any> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicField & T

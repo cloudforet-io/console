@@ -65,7 +65,7 @@ export default {
         if (showLoading) {
             if (width) style.width = width;
             if (height) style.height = height;
-            style.opacity = opacity;
+            style.opacity = `${opacity}`;
 
             if (animation) {
                 style.backgroundImage = `linear-gradient(90deg, ${gray[200]}, ${gray[100]}, ${gray[200]})`;

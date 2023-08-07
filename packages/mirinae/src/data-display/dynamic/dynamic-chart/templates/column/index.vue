@@ -1,6 +1,6 @@
 <template>
     <div class="p-dynamic-chart-column">
-        <div v-for="(value, idx) in values"
+        <div v-for="(value, idx) in state.values"
              :key="`${state.contextKey}-${idx}`"
              class="row-wrapper"
         >

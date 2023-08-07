@@ -1,11 +1,11 @@
-import type { TranslateResult } from 'vue-i18n';
 
 export interface StatusProps {
     icon?: string|null;
-    text?: TranslateResult|null;
+    text?: string|null;
     textColor?: string|null;
     iconColor?: string|null;
-    theme?: string|null;
+    theme?: string;
     disableIcon?: boolean;
     iconSize?: number;
+    iconAnimation?: string;
 }

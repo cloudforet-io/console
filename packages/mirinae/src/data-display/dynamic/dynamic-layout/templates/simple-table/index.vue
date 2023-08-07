@@ -52,6 +52,7 @@ import type { SimpleTableOptions } from '@/data-display/dynamic/dynamic-layout/t
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import type { DataTableField } from '@/data-display/tables/data-table/type';
 
 const props = withDefaults(defineProps<SimpleTableDynamicLayoutProps>(), {
     options: () => ({}) as SimpleTableOptions,
@@ -63,7 +64,7 @@ const state = reactive({
     layoutName: computed(() => (props.options.translation_id ? t(props.options.translation_id) : props.name)),
 
     /** table */
-    fields: computed(() => {
+    fields: computed<DataTableField[]>(() => {
         if (!props.options.fields) return [];
 
         return props.options.fields.map((ds) => ({
@@ -72,7 +73,7 @@ const state = reactive({
             sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
             sortKey: ds.options?.sort_key,
             width: ds.options?.width,
-        }));
+        } as DataTableField));
     }),
     rootData: computed<any[]>(() => {
         if (props.options.root_path) {

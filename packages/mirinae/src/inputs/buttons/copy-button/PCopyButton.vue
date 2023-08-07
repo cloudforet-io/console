@@ -41,7 +41,6 @@
 import {
     computed, onUnmounted, reactive, toRefs, useAttrs, useSlots, watch,
 } from 'vue';
-import type Vue from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -50,7 +49,7 @@ import { SIZE } from '@/inputs/buttons/copy-button/type';
 import { copyAnyData, isNotEmpty } from '@/utils/helpers';
 
 interface Props {
-    value?: string|null;
+    value?: string|number|null;
     size?: Size;
     autoHideIcon?: boolean;
     copyManually?: boolean;
@@ -72,7 +71,7 @@ const { t } = useI18n();
 const state = reactive({
     click: false,
     isAlertVisible: false,
-    iconRef: null as Vue|null,
+    iconRef: null as any,
     alertRef: null as Element|null,
     textRef: null as Element|null,
     alertStyle: computed<Partial<CSSStyleDeclaration>>(() => {

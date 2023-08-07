@@ -10,7 +10,7 @@
                  class="search-wrapper"
             >
                 <p-search v-if="searchType === SEARCH_TYPES.plain"
-                          v-model="proxyState.searchText"
+                          v-model:value="proxyState.searchText"
                           @search="onSearch"
                           @delete="onSearch()"
                 />
@@ -88,7 +88,6 @@
 
 <script setup lang="ts">
 import { groupBy } from 'lodash';
-import type { PropType } from 'vue';
 import {
     computed, nextTick, reactive, useSlots,
 } from 'vue';
@@ -99,7 +98,7 @@ import type { MenuItem } from '@/inputs/context-menu/type';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
 import type {
-    KeyItemSet, QueryItem, ValueSet, ValueHandlerMap,
+    QueryItem, ValueSet,
 } from '@/inputs/search/query-search/type';
 import { defaultConverter } from '@/inputs/search/query-search-tags/helper';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
@@ -107,95 +106,29 @@ import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import type { ToolboxOptions } from '@/navigation/toolbox/type';
+import type { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 
-const props = defineProps({
-    paginationVisible: {
-        type: Boolean,
-        default: true,
-    },
-    pageSizeChangeable: {
-        type: Boolean,
-        default: true,
-    },
-    settingsVisible: {
-        type: Boolean,
-        default: false,
-    },
-    sortable: {
-        type: Boolean,
-        default: false,
-    },
-    exportable: {
-        type: Boolean,
-        default: false,
-    },
-    refreshable: {
-        type: Boolean,
-        default: true,
-    },
-    searchable: {
-        type: Boolean,
-        default: true,
-    },
-    filtersVisible: {
-        type: Boolean,
-        default: true,
-    },
-    searchType: {
-        type: String,
-        default: SEARCH_TYPES.plain,
-        validator(searchType) {
-            return Object.values(SEARCH_TYPES).includes(searchType as any);
-        },
-    },
-    thisPage: {
-        type: Number,
-        validator(value?: number) {
-            return value === undefined || value > 0;
-        },
-        default: 1,
-    },
-    pageSize: {
-        type: Number,
-        default: 24,
-    },
-    totalCount: {
-        type: Number,
-        default: 0,
-    },
-    sortBy: {
-        type: String,
-        default: '',
-    },
-    pageSizeOptions: {
-        type: Array,
-        default: () => [24, 36, 48],
-    },
-    sortByOptions: {
-        type: Array as PropType<MenuItem[]>,
-        default: () => [] as MenuItem[],
-    },
-    keyItemSets: {
-        type: Array as PropType<KeyItemSet[]>,
-        default: () => [],
-    },
-    valueHandlerMap: {
-        type: Object as PropType<ValueHandlerMap>,
-        default: () => ({}),
-    },
-    queryTags: {
-        type: Array as PropType<QueryTag[]>,
-        default: () => [],
-    },
-    searchText: {
-        type: String,
-        default: '',
-    },
-    timezone: {
-        type: String,
-        default: 'UTC',
-    },
+const props = withDefaults(defineProps<ToolboxProps>(), {
+    pagenationVisible: true,
+    pageSizeChangeable: true,
+    settingsVisible: false,
+    sortable: false,
+    exportable: false,
+    refreshable: true,
+    searchable: true,
+    filtersVisible: true,
+    searchType: SEARCH_TYPES.plain,
+    thisPage: 1,
+    pageSize: 24,
+    totalCount: 0,
+    sortBy: '',
+    pageSizeOptions: () => [24, 36, 48],
+    sortByOptions: () => [],
+    keyItemSets: () => [],
+    valueHandlerMap: () => ({}),
+    queryTags: () => [],
+    searchText: '',
+    timezone: 'UTC',
 });
 const emit = defineEmits(['update:thisPage', 'update:pageSize', 'update:sortBy', 'update:searchText', 'update:queryTags', 'export', 'refresh', 'click-settings', 'change']);
 const slots = useSlots();
@@ -211,10 +144,10 @@ const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name')
 const state = reactive({
     pageStart: computed(() => ((proxyState.thisPage - 1) * proxyState.pageSize) + 1),
     allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
-    pageMenu: computed(() => {
+    pageMenu: computed<MenuItem[]>(() => {
         if (!Array.isArray(props.pageSizeOptions)) return [];
         return props.pageSizeOptions.map((d) => ({
-            name: d, label: d, type: 'item',
+            name: d.toString(), label: d.toString(), type: 'item',
         }));
     }),
     selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy]?.[0]?.label : proxyState.sortBy)),

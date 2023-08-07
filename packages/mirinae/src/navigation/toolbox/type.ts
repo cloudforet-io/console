@@ -1,6 +1,7 @@
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { QueryTag } from '@/inputs/search/query-search-tags/type';
 import type { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import type { QueryTag } from '@/inputs/search/query-search-tags/type';
+import type { SearchTypes } from '@/navigation/toolbox/config';
 
 export interface ToolboxOptions {
     pageStart?: number;
@@ -19,7 +20,7 @@ export interface ToolboxProps {
     refreshable?: boolean;
     searchable?: boolean;
     filtersVisible?: boolean;
-    searchType?: string;
+    searchType?: SearchTypes;
     thisPage?: number;
     pageSize?: number;
     totalCount?: number;

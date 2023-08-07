@@ -79,9 +79,6 @@ import {
     computed, ref, reactive,
     nextTick, toRef, useSlots,
 } from 'vue';
-import type { PropType } from 'vue';
-
-
 
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
@@ -95,71 +92,41 @@ import {
     CONTEXT_MENU_POSITION, SELECT_DROPDOWN_SIZE,
 } from '@/inputs/dropdown/select-dropdown/type';
 
-const props = defineProps({
+interface Props {
     /* context menu fixed style props */
-    useFixedMenuStyle: {
-        type: Boolean,
-        default: false,
-    },
-    visibleMenu: {
-        type: Boolean,
-        default: undefined,
-    },
+    useFixedMenuStyle: boolean;
+    visibleMenu?: boolean;
     /* context menu props */
-    invalid: {
-        type: Boolean,
-        default: false,
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
+    invalid: boolean;
+    loading: boolean;
     /* select dropdown props */
-    items: {
-        type: Array,
-        default: () => [],
-    },
-    selected: {
-        type: [String, Number],
-        default: undefined,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    indexMode: {
-        type: Boolean,
-        default: false,
-    },
-    placeholder: {
-        type: String,
-        default: '',
-    },
-    styleType: {
-        type: String,
-        default: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
-        validator: (value: SELECT_DROPDOWN_STYLE_TYPE) => Object.values(SELECT_DROPDOWN_STYLE_TYPE).includes(value),
-    },
-    buttonIcon: {
-        type: String,
-        default: undefined,
-    },
-    menuPosition: {
-        type: String,
-        default: CONTEXT_MENU_POSITION.LEFT,
-        validator: (value: CONTEXT_MENU_POSITION) => Object.values(CONTEXT_MENU_POSITION).includes(value),
-    },
-    readOnly: {
-        type: Boolean,
-        default: false,
-    },
-    size: {
-        type: String as PropType<SelectDropdownSize>,
-        default: SELECT_DROPDOWN_SIZE.md,
-        validator(size: SelectDropdownSize) {
-            return Object.values(SELECT_DROPDOWN_SIZE).includes(size);
-        },
-    },
+    items: MenuItem[];
+    selected?: string | number;
+    disabled: boolean;
+    indexMode: boolean;
+    placeholder: string;
+    styleType: SELECT_DROPDOWN_STYLE_TYPE;
+    buttonIcon?: string;
+    menuPosition: CONTEXT_MENU_POSITION;
+    readOnly: boolean;
+    size: SelectDropdownSize;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    useFixedMenuStyle: false,
+    visibleMenu: undefined,
+    invalid: false,
+    loading: false,
+    items: () => [],
+    selected: undefined,
+    disabled: false,
+    indexMode: false,
+    placeholder: '',
+    styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
+    buttonIcon: undefined,
+    menuPosition: CONTEXT_MENU_POSITION.LEFT,
+    readOnly: false,
+    size: SELECT_DROPDOWN_SIZE.md,
 });
 const emit = defineEmits(['update:selected', 'select', 'update:visibleMenu', 'focus-menu']);
 const slots = useSlots();

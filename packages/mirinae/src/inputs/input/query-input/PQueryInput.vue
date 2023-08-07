@@ -104,6 +104,7 @@ import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import type { FilterableDropdownAppearanceType } from '@/inputs/dropdown/filterable-dropdown/type';
 import { useInputDeletion } from '@/inputs/input/composables/use-input-deletion';
 import { useSelectedValidation } from '@/inputs/input/composables/use-selected-validation';
@@ -199,7 +200,8 @@ const addToSelected = (queryItem: QueryItem) => {
         proxySelected.value = [queryItem];
     }
 };
-const handleMenuSelect = async (item: KeyMenuItem | ValueMenuItem) => {
+const handleMenuSelect = async (_item: MenuItem) => {
+    const item = _item as KeyMenuItem | ValueMenuItem;
     const queryItem = await preTreatSelectedMenuItem(item);
     if (queryItem) addToSelected(queryItem);
 };

@@ -1,5 +1,4 @@
-import type { ContextMenuType } from '@/inputs/context-menu/type';
-
+import type { ContextMenuType, MenuItem as ContextMenuItem } from '@/inputs/context-menu/type';
 
 export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', 'object'] as const;
 export type KeyDataType = typeof dataTypes[number];
@@ -25,7 +24,7 @@ export interface CategoryItem {
     name: any;
 }
 
-export interface ValueItem {
+export interface ValueItem extends ContextMenuItem {
     label: string;
     name: any;
     icon?: string;
@@ -34,7 +33,7 @@ export interface ValueItem {
 
 export type ValueSet = Record<string, ValueItem>;
 
-export interface KeyItem {
+export interface KeyItem extends ContextMenuItem {
     label: string;
     name: any;
     valueSet?: ValueSet;

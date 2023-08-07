@@ -1,5 +1,4 @@
 import { defineComponent } from 'vue';
-import Vue from 'vue';
 
 import {
     Node, Path, UnfoldOptions,
@@ -9,12 +8,12 @@ import { walkTreeData } from '../utils';
 
 export function foldAll(treeData) {
     walkTreeData(treeData, (childNode) => {
-        Vue.set(childNode, '$folded', true);
+        childNode.$folded = true;
     });
 }
 export function unfoldAll(treeData) {
     walkTreeData(treeData, (childNode) => {
-        Vue.set(childNode, '$folded', false);
+        childNode.$folded = false;
     });
 }
 
@@ -33,7 +32,7 @@ export default defineComponent({
     methods: {
         fold(node) {
             if (!node.$folded) {
-                this.$set(node, '$folded', true);
+                node.$folded = true;
                 this.$emit('nodeFoldedChanged', node);
             }
         },
@@ -47,7 +46,7 @@ export default defineComponent({
                 this.foldAll();
             }
             if (node.$folded) {
-                this.$set(node, '$folded', false);
+                node.$folded = false;
                 this.$emit('nodeFoldedChanged', node);
                 this.$emit('node-folded-changed', node);
             }

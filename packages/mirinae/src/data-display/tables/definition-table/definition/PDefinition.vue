@@ -6,7 +6,7 @@
             :class="{'auto-width': autoKeyWidth, 'no-copy-button': disableCopy}"
         >
             <slot name="key"
-                  v-bind="{name, label, data, value: displayData}"
+                  v-bind="{name, label, data, value: state.displayData}"
             >
                 {{ label || name }}
             </slot>
@@ -17,63 +17,63 @@
             <span class="value">
                 <slot v-if="disableCopy"
                       name="default"
-                      v-bind="{name, label, data, value: displayData}"
+                      v-bind="{name, label, data, value: state.displayData}"
                 >
-                    <template v-if="dataType === 'object'">
-                        <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
+                    <template v-if="state.dataType === 'object'">
+                        <p-tag v-for="([objKey, objValue], idx) in Object.entries(state.displayData)"
                                :key="`tag-${idx}-${objKey}`"
                                :key-item="{ name: objKey, label: objKey }"
-                               :value-item="{ name: objValue, label: objValue }"
+                               :value-item="{ name: objValue, label: `${objValue}` }"
                                :deletable="false"
                         />
                     </template>
-                    <template v-else-if="dataType === 'array'">
-                        <p-text-list :items="displayData" />
+                    <template v-else-if="state.dataType === 'array'">
+                        <p-text-list :items="state.displayData" />
                     </template>
                     <template v-else>
-                        {{ displayData }}
+                        {{ state.displayData }}
                     </template>
                 </slot>
                 <p-copy-button v-else
                                width="0.8rem"
                                height="0.8rem"
-                               :value="copyValueFormatter ? copyValueFormatter(data, $props) : copyValue"
+                               :value="copyValueFormatter ? copyValueFormatter(data, props) : copyValue"
                                auto-hide-icon
                 >
                     <slot name="default"
-                          v-bind="{name, label, data, value: displayData}"
+                          v-bind="{name, label, data, value: state.displayData}"
                     >
-                        <template v-if="dataType === 'object'">
-                            <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
+                        <template v-if="state.dataType === 'object'">
+                            <p-tag v-for="([objKey, objValue], idx) in Object.entries(state.displayData)"
                                    :key="`tag-${idx}-${objKey}`"
                                    :key-item="{ name: objKey, label: objKey }"
-                                   :value-item="{ name: objValue, label: objValue }"
+                                   :value-item="{ name: objValue, label: `${objValue}` }"
                                    :deletable="false"
                             />
                         </template>
-                        <template v-else-if="dataType === 'array'">
-                            <p-text-list :items="displayData" />
+                        <template v-else-if="state.dataType === 'array'">
+                            <p-text-list :items="state.displayData" />
                         </template>
                         <template v-else>
-                            {{ displayData }}
+                            {{ state.displayData }}
                         </template>
                     </slot>
                 </p-copy-button>
             </span>
-            <span v-if="$scopedSlots.extra"
+            <span v-if="slots.extra"
                   class="extra"
             >
                 <slot name="extra"
-                      v-bind="{name, label, data, value: displayData}"
+                      v-bind="{name, label, data, value: state.displayData}"
                 />
             </span>
         </td>
     </tr>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, useSlots,
 } from 'vue';
 
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
@@ -81,63 +81,26 @@ import PTag from '@/data-display/tags/PTag.vue';
 import PTextList from '@/data-display/text-list/PTextList.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
-export default defineComponent<DefinitionProps>({
-    name: 'PDefinition',
-    components: {
-        PTag, PTextList, PCopyButton,
-    },
-    props: {
-        name: {
-            type: String,
-            default: '',
-        },
-        label: {
-            type: String,
-            default: '',
-        },
-        data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: undefined,
-        },
-        disableCopy: {
-            type: Boolean,
-            default: undefined,
-        },
-        formatter: {
-            type: Function,
-            default: undefined,
-        },
-        block: {
-            type: Boolean,
-            default: false,
-        },
-        copyValue: {
-            type: [String, Number],
-            default: undefined,
-        },
-        copyValueFormatter: {
-            type: Function,
-            default: undefined,
-        },
-        autoKeyWidth: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
-            dataType: computed(() => {
-                if (Array.isArray(props.data)) return 'array';
-                return typeof props.data;
-            }),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<DefinitionProps>(), {
+    name: '',
+    label: '',
+    data: undefined,
+    disableCopy: undefined,
+    formatter: undefined,
+    block: false,
+    copyValue: undefined,
+    copyValueFormatter: undefined,
 });
+
+const slots = useSlots();
+const state = reactive({
+    displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
+    dataType: computed(() => {
+        if (Array.isArray(props.data)) return 'array';
+        return typeof props.data;
+    }),
+});
+
 </script>
 
 <style lang="postcss">
