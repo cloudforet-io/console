@@ -37,7 +37,7 @@ const initRouter = (app: App, domainName?: string) => {
 };
 
 const initI18n = () => {
-    setI18nLocale(store.state['user/language']);
+    setI18nLocale(store.state.user.language);
 };
 
 const removeInitializer = () => {
@@ -71,9 +71,9 @@ const init = async (app: App) => {
 
 const MIN_LOADING_TIME = 1000;
 export const siteInit = async (app: App) => {
-    store.dispatch('display/startInitializing');
+    await store.dispatch('display/startInitializing');
 
-    store.watch((_store) => _store.state.display.isInitialized, (isInitialized) => {
+    store.watch((_store) => _store.state?.display.isInitialized, (isInitialized) => {
         if (isInitialized) {
             const el = document.getElementById('site-loader-wrapper');
             if (el?.parentElement) el.parentElement.removeChild(el);

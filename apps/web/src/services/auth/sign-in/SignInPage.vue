@@ -18,9 +18,7 @@ import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
 
-const router = useRouter();
-const route = useRoute();
-const store = useStore();
+
 
 export default {
     name: 'SignInPage',
@@ -53,6 +51,10 @@ export default {
         },
     },
     setup(props) {
+        const router = useRouter();
+        const route = useRoute();
+        const store = useStore();
+
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),

@@ -22,7 +22,7 @@ export class GTag {
         app.use(VueGtag, {
             config: { id: gtagId },
         });
-        GTag._gtag = app.config.globalProperties.gtag;
+        GTag._gtag = app.config.globalProperties.$gtag;
     }
 
     static init(app: App) {

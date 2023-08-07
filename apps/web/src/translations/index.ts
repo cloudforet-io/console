@@ -13,9 +13,9 @@ import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 
 import { loadFonts } from '@/styles/fonts';
 
-const componentEN = messages.en;
-const componentJA = messages.ja;
-const componentKO = messages.ko;
+const componentEN = messages?.en;
+const componentJA = messages?.ja;
+const componentKO = messages?.ko;
 
 // simple recursive remove keys with empty value
 // TODO: find appropriate type and refactor

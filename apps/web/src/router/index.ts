@@ -31,7 +31,7 @@ export class SpaceRouter {
         });
 
         app.use(SpaceRouter.router);
-        const store = app.$store;
+        const store = app.config.globalProperties.$store;
 
         let nextPath: string;
 
@@ -56,6 +56,7 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
+            console.log('beforeEach', store.getters['user/pagePermissionList']);
             const userPagePermissions = store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to.name as string, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
@@ -84,8 +85,8 @@ export class SpaceRouter {
             }
 
             // If top notification which indicates authorization error is visible, clear it before moving to next location
-            if (SpaceRouter.router.app?.$store.state.error.visibleAuthorizationError) {
-                SpaceRouter.router.app?.$store.commit('error/setVisibleAuthorizationError', false);
+            if (store.state.error.visibleAuthorizationError) {
+                store.commit('error/setVisibleAuthorizationError', false);
             }
             next(nextLocation);
         });

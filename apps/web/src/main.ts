@@ -2,6 +2,7 @@
 // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import Notifications from '@kyvg/vue3-notification';
 import SpaceDesignSystem from '@spaceone/design-system';
+import type { MirinaeOptions } from '@spaceone/design-system/types/install';
 import FloatingVue from 'floating-vue';
 import { createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
@@ -19,7 +20,7 @@ import App from './App.vue';
 import '@/styles/style.pcss';
 // eslint-disable-next-line
 import '@spaceone/design-system/css/light-style.css';
-import '@spaceone/design-system/dist/css/style.css';
+import '@spaceone/design-system/css/style.css';
 
 /** ********** CREATE VUE APP INSTANCE ************** */
 const app = createApp(App);
@@ -37,7 +38,7 @@ app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
 app.use(Notifications);
 // app.use(LottieVuePlayer);
-app.use(SpaceDesignSystem, { vueI18n: i18n });
+app.use<any>(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** INITIALIZE ************** */
 (async () => {

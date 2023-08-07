@@ -22,15 +22,7 @@ export default defineConfig(async ({ command, mode }) => {
             ],
         },
         plugins: [
-            vue({
-                template: {
-                    compilerOptions: {
-                        compatConfig: {
-                            MODE: 2,
-                        },
-                    },
-                },
-            }),
+            vue(),
             stylelint({
                 include: ['src/**/*.{css,vue,pcss,scss}'],
                 exclude: ['node_modules'],
@@ -56,8 +48,8 @@ export default defineConfig(async ({ command, mode }) => {
         },
         resolve: {
             alias: {
-                vue: '@vue/compat',
                 '@': path.resolve(__dirname, './src'),
+                // '@spaceone/design-system': path.resolve(__dirname, '../../packages/mirinae/dist/'),
                 '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
                 '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
             },
