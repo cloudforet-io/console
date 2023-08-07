@@ -85,8 +85,8 @@ interface Props {
 
 const CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS = [
     { key: 'provider', name: 'Provider', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
-    { key: 'cloud_service_type', name: 'Cloud Service Type' },
     { key: 'cloud_service_group', name: 'Cloud Service Group' },
+    { key: 'cloud_service_type', name: 'Cloud Service Type' },
     { key: 'count', name: 'Count' },
 ];
 
@@ -142,7 +142,10 @@ export default defineComponent<Props>({
         /* excel */
         const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
             .setPageLimit(0).setPageStart(1)
-            .setSort('count', true);
+            .setMultiSort([
+                { key: 'provider', desc: false },
+                { key: 'cloud_service_group', desc: false },
+            ]);
         const getCloudServiceResources = async () => {
             try {
                 cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
@@ -200,7 +203,12 @@ export default defineComponent<Props>({
                 .setFilters(state.cloudServiceFilters)
                 .addFilter({ k: 'provider', o: '=', v: data.provider })
                 .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
-                .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type });
+                .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type })
+                .setMultiSort([
+                    { key: 'provider', desc: false },
+                    { key: 'cloud_service_group', desc: false },
+                    { key: 'cloud_service_type', desc: false },
+                ]);
             const fields = field;
             if (fields) {
                 excelApiQueryHelper.setOnly(...fields.map((d) => d.key));
@@ -208,7 +216,10 @@ export default defineComponent<Props>({
             return excelApiQueryHelper.data;
         };
         const getCloudServiceResourcesPayload = (): ExcelPayload => {
-            excelApiQueryHelper.setFilters(state.cloudServiceFilters);
+            excelApiQueryHelper.setFilters(state.cloudServiceFilters).setMultiSort([
+                { key: 'provider', desc: true },
+                { key: 'cloud_service_group', desc: true },
+            ]);
             return {
                 url: '/statistics/topic/cloud-service-resources',
                 param: {
@@ -228,14 +239,30 @@ export default defineComponent<Props>({
             const excelItems = await getCloudServiceResources();
             const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map((d) => getExcelFields(d)));
 
+
+            const errorString = ['/', '\\', '?', '*', '[', ']'];
+            const removeErrorString = (str: string): string => {
+                let result = str;
+                errorString.forEach((d) => {
+                    result = result.replace(new RegExp(`\\${d}`, 'g'), ' ');
+                });
+                return result;
+            };
+            const checkSameSheetNameExist = (list: ExcelPayload[], sheetName: string):string => {
+                const index = list.filter((d) => ((typeof d.sheet_name === 'string') ? d.sheet_name.includes(sheetName) : false)).length;
+                return index ? `${sheetName}${index}` : sheetName;
+            };
             excelFieldList.forEach((excelField, idx) => {
                 const provider = excelItems[idx].provider;
                 const providerName = state.providers[provider]?.label || provider;
-                let sheetName = `${idx}.${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+                let sheetName = `${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+                sheetName = removeErrorString(sheetName);
                 const headerMessage = {
                     title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
                 };
-                if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
+                if (sheetName.length > 29) sheetName = sheetName.substr(0, 29);
+                const checkedSheetName = checkSameSheetNameExist(excelPayloadList, sheetName);
+                if (checkedSheetName !== sheetName) sheetName = checkedSheetName;
 
                 let excelApiUrl;
                 if (excelItems[idx].resource_type === 'inventory.Server') {
