@@ -64,7 +64,7 @@
         <collector-name-edit-modal :visible="state.editModalVisible"
                                    @update:visible="handleUpdateEditModalVisible"
         />
-        <collector-data-modal />
+        <collector-data-modal @click-confirm="handleClickCollectDataConfirm" />
     </div>
 </template>
 
@@ -237,6 +237,11 @@ const handleCollectData = () => {
         _state.selectedCollector = collectorFormState.originCollector;
         _state.selectedSecret = undefined;
     });
+};
+const handleClickCollectDataConfirm = () => {
+    // pause and resume api polling to update recent job status after collect data immediately
+    pause();
+    resume();
 };
 
 /* Api polling */
