@@ -19,6 +19,7 @@
                         multi-selectable
                         item-height-fixed
                         show-select-marker
+                        :reset-selected-on-unmounted="false"
                         @update:selected="handleUpdateSelectedOptions"
         />
     </div>
