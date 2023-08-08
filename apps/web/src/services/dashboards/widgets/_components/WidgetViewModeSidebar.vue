@@ -162,6 +162,12 @@ const handleCloseSidebar = () => {
 
 <style lang="postcss" scoped>
 .widget-view-mode-sidebar {
+    position: absolute;
+    width: 20rem;
+    top: 0;
+    right: 0;
+    z-index: 10;
+
     .sidebar-title {
         margin-bottom: 0.75rem;
         font-size: 1.125rem;
