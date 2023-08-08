@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-up">
-        <div v-if="props.visible"
+        <div v-show="props.visible"
              class="widget-view-mode-modal"
         >
             <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"

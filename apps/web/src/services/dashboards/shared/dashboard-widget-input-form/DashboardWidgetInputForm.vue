@@ -24,6 +24,7 @@
         >
             <p-text-button icon-left="ic_refresh"
                            style-type="highlight"
+                           :disabled="!isFormDataChanged"
                            class="return-to-initial-settings-button"
                            @click="handleReturnToInitialSettings"
             >
@@ -89,9 +90,10 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    cloneDeep, isEmpty, union, xor,
+    cloneDeep, isEmpty, isEqual, union, xor,
 } from 'lodash';
 
+import { getDefaultWidgetFormData } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
@@ -161,7 +163,6 @@ export default defineComponent<Props>({
             widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
             schemaFormData: {},
-            //
             fixedProperties: computed<string[]>(() => state.widgetConfig.options_schema?.fixed_properties ?? []),
             inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
                 .filter(([, inheritOption]) => !!inheritOption.enabled)
@@ -171,11 +172,13 @@ export default defineComponent<Props>({
                 state.widgetConfig?.options_schema?.schema,
                 dashboardDetailState.variablesSchema,
             )),
+            isFocused: false,
+            //
+            defaultWidgetFormData: computed(() => (props.widgetConfigId ? getDefaultWidgetFormData(props.widgetConfigId) : {})),
+            isFormDataChanged: computed(() => !isEqual(state.schemaFormData, state.defaultWidgetFormData)),
             // validation
             isSchemaFormValid: undefined,
             isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
-
-            isFocused: false,
         });
 
         const referenceHandler = getReferenceHandler();

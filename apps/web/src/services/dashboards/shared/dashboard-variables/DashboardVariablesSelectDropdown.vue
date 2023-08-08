@@ -7,15 +7,19 @@
             >
                 <dashboard-variables-dropdown :property-name="propertyName"
                                               :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
+                                              :disabled="state.saveLoading"
                 />
                 <span class="circle-mark"
                       :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
                 />
             </div>
         </template>
-        <dashboard-variables-more-button :is-manageable="props.isManageable" />
+        <dashboard-variables-more-button :is-manageable="props.isManageable"
+                                         :disabled="state.saveLoading"
+        />
         <p-text-button style-type="highlight"
                        class="reset-button"
+                       :disabled="state.saveLoading"
                        @click="dashboardDetailStore.resetVariables(props.originVariables, props.originVariablesSchema)"
         >
             <p-i name="ic_refresh"
@@ -30,6 +34,8 @@
         />
         <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
                        style-type="highlight"
+                       :loading="state.saveLoading"
+                       :disabled="state.saveLoading"
                        @click.stop="handleClickSaveButton"
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
@@ -96,9 +102,11 @@ const state = reactive({
         results.push(...xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
         return results;
     }),
+    saveLoading: false,
 });
 
 const updateDashboardVariables = async () => {
+    state.saveLoading = true;
     try {
         const isProjectDashboard = props.dashboardId?.startsWith('project');
         if (isProjectDashboard) {
@@ -122,6 +130,8 @@ const updateDashboardVariables = async () => {
         });
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.saveLoading = false;
     }
 };
 const handleClickSaveButton = () => {
