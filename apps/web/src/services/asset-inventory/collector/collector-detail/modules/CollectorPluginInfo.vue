@@ -20,10 +20,8 @@ const state = reactive({
 <template>
     <div class="collector-plugin-info">
         <collector-plugin-contents :plugin="props.plugin"
-                                   size="sm"
                                    :hide-labels="props.showMinimal"
                                    emphasize-name
-                                   align-center
         >
             <template v-if="!props.showMinimal"
                       #contents

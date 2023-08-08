@@ -59,7 +59,7 @@ const state = reactive({
 
 <style scoped lang="postcss">
 .plugin-summary-cards {
-    display: flex;
+    @apply flex flex-wrap;
     gap: 0.5rem;
     width: 100%;
     margin-bottom: 1.5rem;
@@ -71,6 +71,8 @@ const state = reactive({
         padding: 0.75rem;
         flex-grow: 1;
         max-width: 21.5rem;
+        min-width: 15rem;
+        height: 4.75rem;
         .contents {
             @apply text-paragraph-md;
         }
