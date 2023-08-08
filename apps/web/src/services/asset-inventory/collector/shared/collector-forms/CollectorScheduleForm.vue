@@ -19,14 +19,15 @@
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
                        :help-text="$t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
-            <div class="hourly-schedule-wrapper">
+            <div class="hourly-schedule-wrapper"
+                 :class="{'is-set-mode': !props.enableHoursEdit}"
+            >
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
                       class="time-block"
                       :class="{
                           active: !!state.timezoneAppliedHours.includes(hour),
                           disabled: props.disabled,
-                          'is-set-mode': !props.enableHoursEdit
                       }"
                       @click="handleClickHour(hour)"
                 >
@@ -184,6 +185,16 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
         grid-template-columns: repeat(4, 2rem);
     }
 
+    &.is-set-mode {
+        gap: 0.25rem;
+        .time-block {
+            @apply bg-gray-100 text-gray-100 border-none cursor-default;
+            &.active {
+                @apply bg-blue-200 text-blue-600;
+            }
+        }
+    }
+
     .time-block {
         @apply flex items-center justify-center bg-white border border-gray-300 rounded-xs box-border cursor-pointer;
         height: 2rem;
@@ -193,12 +204,6 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
         }
         &.disabled {
             @apply cursor-not-allowed;
-        }
-        &.is-set-mode {
-            @apply bg-gray-100 text-gray-100 border-none cursor-default;
-            &.active {
-                @apply bg-blue-200 text-blue-600;
-            }
         }
     }
 }

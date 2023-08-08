@@ -60,7 +60,7 @@ watch(() => props.recentJobs, () => {
                 {{ $t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
                 <p-tooltip
                     :contents="$t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS_TOOLTIP')"
-                    position="top-end"
+                    position="top-start"
                 >
                     <p-i name="ic_question-mark-circle"
                          class="title-tooltip"
@@ -176,6 +176,7 @@ watch(() => props.recentJobs, () => {
         width: 100%;
     }
     &.full-mode {
+        position: initial;
         .header {
             margin-bottom: 0.5rem;
         }

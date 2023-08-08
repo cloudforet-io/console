@@ -208,7 +208,8 @@ watch(() => state.collectorPluginInfo, async (pluginInfo) => {
 
 <style lang="postcss" scoped>
 .contents-wrapper {
-    padding: 0 1rem 2.5rem 1rem;
+    max-width: 65.5rem;
+    padding: 1rem 1rem 2.5rem 1rem;
 }
 .collector-base-info-edit {
     padding: 0 1rem 1rem;
