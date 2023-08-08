@@ -17,7 +17,7 @@ test.describe('Collector List', () => {
         await page.close();
     });
 
-    /* Test */\
+    /* Test */
     test('Go to asset collector page.', async () => {
         const pageTitleName = page.locator('.heading-wrapper>h2.has-right>span.title');
         await expect(pageTitleName).toContainText('Collector');
