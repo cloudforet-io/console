@@ -44,7 +44,13 @@
             <template #body>
                 <div class="non-inherited-option-modal-body">
                     <p>
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}
+                        <p-i name="ic_warning-filled"
+                             color="inherit"
+                             width="1rem"
+                             height="1rem"
+                             class="warning-icon"
+                        />
+                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
                     </p>
                 </div>
             </template>
@@ -58,7 +64,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PSidebar, PButtonModal,
+    PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -178,7 +184,14 @@ const handleCloseSidebar = () => {
             @apply col-span-6;
         }
     }
+    .non-inherited-option-modal-body {
+        .warning-icon {
+            margin-right: 0.25rem;
+        }
+    }
 }
+
+$footer-height: 57px;
 
 /* custom design-system component - p-sidebar */
 :deep(.p-sidebar) {
