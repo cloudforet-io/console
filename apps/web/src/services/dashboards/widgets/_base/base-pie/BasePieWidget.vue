@@ -1,12 +1,10 @@
 <script setup lang="ts">
-
 import { color } from '@amcharts/amcharts5';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     computed,
@@ -48,11 +46,7 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { Legend, CostAnalyzeDataModel, PieChartData } from '@/services/dashboards/widgets/type';
 
 
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
+type Data = CostAnalyzeDataModel;
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -62,7 +56,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
     chartData: computed<PieChartData[]>(() => {
@@ -107,18 +101,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
-const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<Data> => {
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy],
@@ -133,13 +122,12 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results, more };
+        });
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
 const drawChart = (chartData: PieChartData[]) => {
@@ -176,7 +164,7 @@ const drawChart = (chartData: PieChartData[]) => {
     state.series = series;
 };
 
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getPieChartLegends(state.data.results, state.groupBy);
@@ -186,7 +174,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (thisPage = 1): Promise<Data> => {
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
@@ -223,7 +211,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<FullData>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });

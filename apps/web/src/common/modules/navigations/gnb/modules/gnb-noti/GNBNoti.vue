@@ -6,7 +6,7 @@ import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, useDocumentVisibility } from '@vueuse/core';
 import type { MaybeRef } from 'vue';
 import {
     computed, onMounted, onUnmounted, reactive, ref, watch,
@@ -77,13 +77,15 @@ const {
     userId: computed(() => store.state.user.userId),
 });
 
-const handleBrowserVisibilityChange = () => {
-    if (document.hidden) {
+
+const documentVisibility = useDocumentVisibility();
+watch(documentVisibility, (visibility) => {
+    if (visibility === 'hidden') {
         store.dispatch('display/stopCheckNotification');
     } else {
         store.dispatch('display/startCheckNotification');
     }
-};
+}, { immediate: true });
 
 /* Event */
 const handleNotiButtonClick = () => {
@@ -93,13 +95,11 @@ const handleNotiButtonClick = () => {
 
 onMounted(() => {
     store.dispatch('display/startCheckNotification');
-    document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
     fetchNoticeReadState();
     fetchNoticeCount();
 });
 onUnmounted(() => {
     store.dispatch('display/stopCheckNotification');
-    document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
 });
 
 watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {

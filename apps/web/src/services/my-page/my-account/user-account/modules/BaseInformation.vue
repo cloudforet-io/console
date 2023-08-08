@@ -143,8 +143,9 @@ watch(() => store.state.user.language, (language) => {
                        :label="t('COMMON.PROFILE.LANGUAGE')"
                        class="input-form"
         >
-            <p-select-dropdown v-model="formState.language"
+            <p-select-dropdown v-model:selected="formState.language"
                                :items="state.languages"
+                               is-fixed-width
             />
         </p-field-group>
         <div class="save-button">

@@ -79,7 +79,8 @@
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
                                                :button-text-ellipsis="uniformWidth"
-                                               class="input-form"
+                                               is-fixed-width
+                                               class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             >
                                 <template #default="{ item }">
@@ -363,11 +364,13 @@ watch(() => state.refinedFormData, (refinedFormData) => {
 
 <style lang="postcss">
 .p-json-schema-form {
-    > .input-form-wrapper.no-margin {
-        margin-bottom: 0;
+    .input-form-wrapper {
+        &.no-margin {
+            margin-bottom: 0;
+        }
     }
     .field-group-default-wrapper {
-        display: flex;
+        @apply flex;
         > .input-wrapper {
             flex-grow: 1;
         }

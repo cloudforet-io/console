@@ -1,5 +1,6 @@
 <template>
     <div class="p-field-title"
+         :class="{inline: props.inline}"
          v-on="listeners"
     >
         <div class="title-wrapper">
@@ -35,6 +36,7 @@ interface FieldTitleProps {
     size?: 'sm' | 'md' | 'lg';
     fontWeight?: 'regular' | 'bold';
     color?: 'dark' | 'gray';
+    inline?: boolean;
 }
 
 const props = withDefaults(defineProps<FieldTitleProps>(), {
@@ -43,6 +45,7 @@ const props = withDefaults(defineProps<FieldTitleProps>(), {
     size: 'md',
     fontWeight: 'bold',
     color: 'dark',
+    inline: false,
 });
 const attrs = useAttrs();
 const listeners = { ...attrs };
@@ -53,6 +56,9 @@ const listeners = { ...attrs };
 .p-field-title {
     @apply flex flex-col text-gray-900;
     letter-spacing: 0;
+    &.inline {
+        display: inline-flex;
+    }
 
     .title-wrapper {
         @apply flex;

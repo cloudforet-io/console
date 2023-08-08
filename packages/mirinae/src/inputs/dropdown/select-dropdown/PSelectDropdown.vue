@@ -8,6 +8,7 @@
              'read-only': readOnly,
              active: state.proxyVisibleMenu && !readOnly,
              [size] : true,
+             'is-fixed-width': isFixedWidth,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -23,6 +24,7 @@
         <button v-else
                 ref="targetRef"
                 class="dropdown-button"
+                :class="{'text-only': (styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)}"
                 @click="handleClick"
                 @keydown.down="handlePressDownKey"
         >
@@ -110,6 +112,7 @@ interface Props {
     menuPosition: CONTEXT_MENU_POSITION;
     readOnly: boolean;
     size: SelectDropdownSize;
+    isFixedWidth: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -127,6 +130,7 @@ const props = withDefaults(defineProps<Props>(), {
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     readOnly: false,
     size: SELECT_DROPDOWN_SIZE.md,
+    isFixedWidth: false,
 });
 const emit = defineEmits(['update:selected', 'select', 'update:visibleMenu', 'focus-menu']);
 const slots = useSlots();
@@ -273,7 +277,6 @@ onClickOutside(containerRef, hideMenu);
         }
     }
     &.transparent {
-        min-width: unset;
         .dropdown-button {
             @apply border-transparent bg-transparent text-gray-900;
             padding-left: 0;
@@ -296,6 +299,21 @@ onClickOutside(containerRef, hideMenu);
         }
         &.secondary-button {
             @mixin read-only-style;
+        }
+    }
+
+    /* is-fixed-width */
+    &.is-fixed-width {
+        .dropdown-button {
+            .text {
+                @apply truncate;
+                width: calc(100% - 1.5rem);
+            }
+            &.text-only {
+                .text {
+                    width: 100%;
+                }
+            }
         }
     }
 

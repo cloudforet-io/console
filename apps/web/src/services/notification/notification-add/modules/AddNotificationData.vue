@@ -44,6 +44,7 @@ const emit = defineEmits<{(e: 'change', value: {
         notificationLevel: string;
         schemaForm: object;
         selectedMember: string[];
+        data: any;
     }): void;
 }>();
 const route = useRoute();
@@ -167,7 +168,7 @@ watch([() => props.protocolId, () => props.supportedSchema, () => props.protocol
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
-        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
+        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER && protocolType === PROTOCOL_TYPE.INTERNAL">
             <p-field-group :label="t('MENU.ADMINISTRATION_USER')"
                            required
             >

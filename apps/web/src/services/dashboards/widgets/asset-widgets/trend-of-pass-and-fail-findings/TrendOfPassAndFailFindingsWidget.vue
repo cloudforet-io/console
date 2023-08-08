@@ -2,10 +2,9 @@
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import {
@@ -117,21 +116,17 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let chartAnalyzeRequest: CancelTokenSource | undefined;
-let tableAnalyzeRequest: CancelTokenSource | undefined;
+const chartDataApiQueryHelper = new ApiQueryHelper();
+const tableDataApiQueryHelper = new ApiQueryHelper();
+const fetchChartDataAnalyze = getCancellableFetcher<FullData['chartData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchTableDataAnalyze = getCancellableFetcher<FullData['tableData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchChartData = async (): Promise<FullData['chartData']> => {
-    if (chartAnalyzeRequest) {
-        chartAnalyzeRequest.cancel('Next request has been called.');
-        chartAnalyzeRequest = undefined;
-    }
-    chartAnalyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper
+        chartDataApiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
-        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const { status, response } = await fetchChartDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -145,30 +140,23 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
                 },
                 field_group: ['key'],
                 sort: [{ key: DATE_FIELD_NAME, desc: false }],
-                ...apiQueryHelper.data,
+                ...chartDataApiQueryHelper.data,
             },
-        }, { cancelToken: chartAnalyzeRequest.token });
-        chartAnalyzeRequest = undefined;
-        return res;
+        });
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [] };
     }
+    return { results: [] };
 };
 const fetchTableData = async (): Promise<FullData['tableData']> => {
-    if (tableAnalyzeRequest) {
-        tableAnalyzeRequest.cancel('Next request has been called.');
-        tableAnalyzeRequest = undefined;
-    }
-    tableAnalyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper
+        tableDataApiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        if (state.pageSize) tableDataApiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { status, response } = await fetchTableDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -185,15 +173,14 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                     { key: DATE_FIELD_NAME, desc: false },
                     { key: '_total_value', desc: true },
                 ],
-                ...apiQueryHelper.data,
+                ...tableDataApiQueryHelper.data,
             },
-        }, { cancelToken: tableAnalyzeRequest.token });
-        tableAnalyzeRequest = undefined;
-        return res;
+        });
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { more: false, results: [] };
     }
+    return { more: false, results: [] };
 };
 
 /* Util */
