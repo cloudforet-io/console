@@ -1,50 +1,26 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
-
 import { PToggleButton, PI } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorUpdateParameter, Schedule } from '@/services/asset-inventory/collector/model';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 interface Props {
     collectorId?: string;
-    schedule?: Schedule
+    isScheduleActivated?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     collectorId: '',
-    schedule: undefined,
+    isScheduleActivated: false,
 });
 
 const collectorPageStore = useCollectorPageStore();
-const collectorFormStore = useCollectorFormStore();
 
-const state = reactive({
-    isScheduleActivated: false,
-});
+const emit = defineEmits<{(e: 'change-toggle', boolean): void}>();
 
 /* Components */
 const handleChangeToggle = async (value) => {
     if (Object.keys(value).length > 0) return;
-    try {
-        state.isScheduleActivated = !state.isScheduleActivated;
-        const params: CollectorUpdateParameter = {
-            collector_id: props.collectorId,
-            schedule: {
-                ...props.schedule,
-                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
-            },
-        };
-        const response = await collectorPageStore.updateCollectorSchedule(params);
-        await collectorFormStore.setOriginCollector(response);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
-    }
+    emit('change-toggle', value);
 };
 const handleClickSchedule = () => {
     collectorPageStore.setSelectedCollector(props.collectorId);
@@ -52,13 +28,6 @@ const handleClickSchedule = () => {
         _state.visible.scheduleModal = true;
     });
 };
-
-/* Watcher */
-watch(() => props.schedule, (schedule) => {
-    if (schedule) {
-        state.isScheduleActivated = schedule.state === 'ENABLED';
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -81,8 +50,8 @@ watch(() => props.schedule, (schedule) => {
         </div>
         <div @click.stop="handleChangeToggle">
             <p-toggle-button
-                :value="state.isScheduleActivated"
-                :class="state.isScheduleActivated ? 'toggle-active' : ''"
+                :value="props.isScheduleActivated"
+                :class="props.isScheduleActivated ? 'toggle-active' : ''"
                 show-state-text
                 position="left"
                 @change-toggle="handleChangeToggle"

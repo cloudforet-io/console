@@ -5,7 +5,9 @@
                 {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
             </p>
             <div class="label-description">
-                <div v-if="props.schedule">
+                <div v-if="props.isScheduleActivated"
+                     class="description-view"
+                >
                     <div v-if="state.status === JOB_STATE.IN_PROGRESS"
                          class="current-status-progress"
                     >
@@ -19,7 +21,7 @@
                             {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
                         </span>
                     </div>
-                    <div v-else-if="props.schedule.hours && props.schedule.hours.length > 0"
+                    <div v-else-if="props.schedule && props.schedule.hours && props.schedule.hours.length > 0"
                          class="scheduled"
                     >
                         <p-i
@@ -40,7 +42,7 @@
                     </span>
                 </div>
                 <span v-else
-                      class="no-schedule"
+                      class="no-schedule description-view"
                 >
                     {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                 </span>
@@ -73,6 +75,7 @@ const PROGRESS_BAR_COLOR = peacock[500];
 interface Props {
     schedule?: Schedule;
     recentJob?: JobAnalyzeStatus|null;
+    isScheduleActivated?: boolean;
 }
 
 const props = defineProps<Props>();
