@@ -242,6 +242,7 @@ onMounted(async () => {
                 <p-button size="sm"
                           style-type="tertiary"
                           :disabled="props.manageDisabled"
+                          class="service-account-collect-data-button"
                           @click.stop="handleClickCollect(item)"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
