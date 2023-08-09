@@ -39,3 +39,11 @@ export const statusIconColorFormatter = (status: string): string | undefined => 
     if (status === JOB_TASK_STATE.PENDING) return PENDING_ICON_COLOR;
     return FAILURE_ICON_COLOR;
 };
+
+export const statusClassFormatter = (status: string): string => {
+    if (status === JOB_STATE.SUCCESS) return 'success';
+    if (status === JOB_STATE.CANCELED) return 'canceled';
+    if (status === JOB_STATE.IN_PROGRESS) return 'in-progress';
+    if (status === JOB_TASK_STATE.PENDING) return 'pending';
+    return 'failure';
+};

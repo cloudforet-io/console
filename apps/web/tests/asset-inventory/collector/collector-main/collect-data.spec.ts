@@ -27,15 +27,17 @@ test.describe('Collector Data', () => {
         }
     };
 
-    const clickCollectDataButton = () => {
-        const collectDataButton = page.locator('.collector-lists>div:nth-child(1) .collector-status-wrapper>.p-button');
-        collectDataButton.click();
+    const checkInProgressStatus = async () => {
+        const currentStatus = page.locator('.collector-lists>div:last-child .current-status-progress svg');
+        await currentStatus.waitFor({ state: 'visible', timeout: 5000 });
+
+        const classAttribute = await currentStatus.getAttribute('class');
+        const hasSpinClass = classAttribute.includes('spin');
+        await expect(hasSpinClass).toBeTruthy();
     }
 
     /* Test */
     test('Collect data in collect main page', async () => {
-        const currentStatus = page.locator('.collector-lists>div:nth-child(1) .current-status-progress>span');
-
         await test.step('1. Go to collector page', async () => {
             await page.goto('/asset-inventory/collector');
             const pageTitleName = page.locator('.heading-wrapper>h2.has-right>span.title');
@@ -43,25 +45,20 @@ test.describe('Collector Data', () => {
         });
 
         await test.step('2. Click collect data button', async () => {
-            await clickCollectDataButton();
+            const collectDataButton = page.locator('.collector-lists>div:last-child .collector-status-wrapper>.p-button');
+            collectDataButton.first().click();
 
-            const modalTitle = page.locator('.collector-data-modal .modal-header');
-            if (modalTitle.textContent() === 'Do you want to collect data now?') {
-                await handleApiResponse();
-
-                await test.step('3. Check collect data API', async () => {
-                    await expect(currentStatus).toContainText('In-Progress 0%');
-                    await clickCollectDataButton();
-                });
-            } else {
-                await handleApiResponse();
+            const alertModal = page.locator('.collector-data-modal .alert-header');
+            try {
+                await alertModal.waitFor({ state: 'visible', timeout: 5000 });
 
                 await test.step('4. Check duplication collect data API', async () => {
-                    await expect(currentStatus).toContainText('In-Progress 0%');
+                    await handleApiResponse();
+                    await checkInProgressStatus()
                 });
 
                 await test.step('5. go to history page', async () => {
-                    const moreButton = page.locator('.collector-lists>div:nth-child(1) .more-button');
+                    const moreButton = page.locator('.collector-lists>div:last-child .more-button');
                     await moreButton.first().click();
 
                     const pageTitleName = page.locator('.heading-wrapper>h2>span.title');
@@ -69,12 +66,24 @@ test.describe('Collector Data', () => {
                 });
 
                 await test.step('6. Check history job status', async () => {
-                    const inProgressRow = page.locator('table tbody tr:nth-child(1) .p-status .text');
-                    const canceledRow = page.locator('table tbody tr:nth-child(2) .p-status .text');
+                    const inProgressRow = page.locator('table tbody tr:nth-child(1) .p-status');
+                    const canceledRow = page.locator('table tbody tr:nth-child(2) .p-status');
 
-                    await expect(inProgressRow).toContainText('In-Progress');
-                    await expect(canceledRow).toContainText('Canceled');
+                    const hasInProgressClass = await page.$eval(inProgressRow, (el) => {
+                        return el.classList.contains('in-progress');
+                    });
+                    const hasCanceledClass = await page.$eval(canceledRow, (element) => {
+                        return element.classList.contains('canceled');
+                    });
+                    await expect(hasInProgressClass).toBeTruthy();
+                    await expect(hasCanceledClass).toBeTruthy();
                 });
+            } catch (error) {
+                await test.step('3. Check collect data API', async () => {
+                    await handleApiResponse();
+                    await checkInProgressStatus();
+                });
+
             }
         });
     });
