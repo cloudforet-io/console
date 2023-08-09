@@ -3,80 +3,80 @@
         <div v-show="props.visible"
              class="widget-view-mode-modal"
         >
-            <widget-view-mode-sidebar :widget-config-id="widgetFormState.widgetConfigId"
+            <div class="content-wrapper">
+                <div class="top-wrapper">
+                    <p-button icon-left="ic_arrow-left"
+                              style-type="transparent"
+                              size="lg"
+                              @click="handleCloseModal"
+                    >
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
+                    </p-button>
+                    <div class="right">
+                        <template v-if="state.hasNonInheritedWidgetOptions">
+                            <p-i name="ic_warning-filled"
+                                 width="1rem"
+                                 height="1rem"
+                                 :color="gray[700]"
+                            />
+                            <p-badge badge-type="subtle"
+                                     style-type="primary3"
+                                     class="non-inherit-badge"
+                            >
+                                <span class="text">
+                                    {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
+                                </span>
+                            </p-badge>
+                        </template>
+                        <p-button icon-left="ic_edit"
+                                  size="md"
+                                  style-type="tertiary"
+                                  :disabled="!state.hasManagePermission || state.sidebarVisible"
+                                  class="edit-button"
+                                  @click="handleClickEditOption"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
+                        </p-button>
+                    </div>
+                </div>
+                <div class="filter-wrapper">
+                    <div class="left-part">
+                        <dashboard-variables-select-dropdown :is-manageable="false"
+                                                             disable-save-button
+                                                             :origin-variables="state.variablesSnapshot"
+                                                             :origin-variables-schema="state.variableSchemaSnapshot"
+                        />
+                    </div>
+                    <div class="right-part">
+                        <dashboard-toolset />
+                    </div>
+                </div>
+                <div v-if="state.component"
+                     class="widget-wrapper"
+                >
+                    <component :is="state.component"
+                               ref="widgetRef"
+                               :widget-key="widgetFormState.widgetInfo.widget_key"
+                               :widget-config-id="widgetFormState.widgetInfo.widget_name"
+                               :title="widgetFormState.widgetTitle"
+                               :options="widgetFormState.widgetOptions"
+                               :inherit-options="widgetFormState.inheritOptions"
+                               size="full"
+                               :theme="widgetFormState.theme"
+                               :currency-rates="state.currencyRates"
+                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
+                               :all-reference-type-info="state.allReferenceTypeInfo"
+                               :disable-view-mode="true"
+                               :initiated="state.initiated"
+                    />
+                </div>
+            </div>
+            <widget-view-mode-sidebar v-if="state.sidebarVisible"
+                                      :widget-config-id="widgetFormState.widgetConfigId"
                                       :widget-key="widgetFormState.widgetKey"
                                       :visible.sync="state.sidebarVisible"
                                       @refresh="handleRefreshWidget"
-            >
-                <div class="content-wrapper">
-                    <div class="top-wrapper">
-                        <p-button icon-left="ic_arrow-left"
-                                  style-type="transparent"
-                                  size="lg"
-                                  @click="handleCloseModal"
-                        >
-                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
-                        </p-button>
-                        <div class="right">
-                            <template v-if="state.hasNonInheritedWidgetOptions">
-                                <p-i name="ic_warning-filled"
-                                     width="1rem"
-                                     height="1rem"
-                                     :color="gray[700]"
-                                />
-                                <p-badge badge-type="subtle"
-                                         style-type="primary3"
-                                         class="non-inherit-badge"
-                                >
-                                    <span class="text">
-                                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
-                                    </span>
-                                </p-badge>
-                            </template>
-                            <p-button icon-left="ic_edit"
-                                      size="md"
-                                      style-type="tertiary"
-                                      :disabled="!state.hasManagePermission || state.sidebarVisible"
-                                      class="edit-button"
-                                      @click="handleClickEditOption"
-                            >
-                                {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
-                            </p-button>
-                        </div>
-                    </div>
-                    <div class="filter-wrapper">
-                        <div class="left-part">
-                            <dashboard-variables-select-dropdown :is-manageable="false"
-                                                                 disable-save-button
-                                                                 :origin-variables="state.variablesSnapshot"
-                                                                 :origin-variables-schema="state.variableSchemaSnapshot"
-                            />
-                        </div>
-                        <div class="right-part">
-                            <dashboard-toolset />
-                        </div>
-                    </div>
-                    <div v-if="state.component"
-                         class="widget-wrapper"
-                    >
-                        <component :is="state.component"
-                                   ref="widgetRef"
-                                   :widget-key="widgetFormState.widgetInfo.widget_key"
-                                   :widget-config-id="widgetFormState.widgetInfo.widget_name"
-                                   :title="widgetFormState.widgetTitle"
-                                   :options="widgetFormState.widgetOptions"
-                                   :inherit-options="widgetFormState.inheritOptions"
-                                   size="full"
-                                   :theme="widgetFormState.theme"
-                                   :currency-rates="state.currencyRates"
-                                   :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
-                                   :all-reference-type-info="state.allReferenceTypeInfo"
-                                   :disable-view-mode="true"
-                                   :initiated="state.initiated"
-                        />
-                    </div>
-                </div>
-            </widget-view-mode-sidebar>
+            />
         </div>
     </transition>
 </template>
