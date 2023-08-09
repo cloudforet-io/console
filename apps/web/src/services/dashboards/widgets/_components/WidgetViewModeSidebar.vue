@@ -37,7 +37,7 @@
             </template>
         </p-sidebar>
         <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION')"
+                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
                         size="sm"
                         @confirm="handleClickSaveButton"
         >
