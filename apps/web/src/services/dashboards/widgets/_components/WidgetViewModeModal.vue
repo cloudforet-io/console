@@ -71,12 +71,14 @@
                     />
                 </div>
             </div>
-            <widget-view-mode-sidebar v-if="state.sidebarVisible"
-                                      :widget-config-id="widgetFormState.widgetConfigId"
-                                      :widget-key="widgetFormState.widgetKey"
-                                      :visible.sync="state.sidebarVisible"
-                                      @refresh="handleRefreshWidget"
-            />
+            <transition name="slide-left">
+                <widget-view-mode-sidebar v-if="state.sidebarVisible"
+                                          :widget-config-id="widgetFormState.widgetConfigId"
+                                          :widget-key="widgetFormState.widgetKey"
+                                          :visible.sync="state.sidebarVisible"
+                                          @refresh="handleRefreshWidget"
+                />
+            </transition>
         </div>
     </transition>
 </template>
@@ -254,5 +256,15 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
 .slide-up-enter, .slide-up-leave-to {
     transform: translateY(100px);
     opacity: 0;
+}
+.slide-left-leave-active,
+.slide-left-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-left-enter {
+    transform: translate(100%, 0);
+}
+.slide-left-leave-to {
+    transform: translate(100%, 0);
 }
 </style>
