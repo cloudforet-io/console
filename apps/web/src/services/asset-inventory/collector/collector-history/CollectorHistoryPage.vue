@@ -34,6 +34,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
+    statusClassFormatter,
     statusIconColorFormatter,
     statusIconFormatter,
     statusTextColorFormatter,
@@ -263,6 +264,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
                         :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                        :class="statusClassFormatter(value)"
                     />
                 </template>
                 <template #col-progress-format="{ value }">
