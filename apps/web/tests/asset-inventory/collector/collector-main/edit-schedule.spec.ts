@@ -12,20 +12,6 @@ test.describe('Edit Schedule', () => {
         await page.close();
     });
 
-    /* API */
-    const handleApiResponse = async () => {
-        const confirmButton = page.locator('.collector-data-modal .modal-footer .confirm-button');
-        await confirmButton.click();
-
-        try {
-            const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/collect`);
-            await page.waitForLoadState('networkidle');
-            expect(apiResponse.status()).toBe(200);
-        } catch (error) {
-            console.error('Error occurred:', error);
-        }
-    };
-
     /* Test - The test must start with the schedule unset. */
     test('Edit collector schedule', async () => {
         await test.step('1. Go to collector page', async () => {
