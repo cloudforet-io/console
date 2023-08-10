@@ -13,7 +13,6 @@ import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-confi
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -229,9 +228,6 @@ export interface WidgetProps {
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
-    dashboardVariables?: DashboardVariables;
-    dashboardVariablesSchema?: DashboardVariablesSchema;
-    dashboardSettings: DashboardSettings;
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
@@ -241,6 +237,7 @@ export interface WidgetProps {
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     initiated?: boolean;
+    disableViewMode?: boolean;
 }
 
 export interface WidgetExpose<Data = any> {

@@ -63,6 +63,7 @@ interface Props {
     editable?: boolean;
 }
 const props = defineProps<Props>();
+const emit = defineEmits(['update-labels']);
 
 const {
     forms: {
@@ -108,10 +109,12 @@ const handlePushLabel = (e: KeyboardEvent) => {
     state.labelList.push(inputText.value);
     setForm('inputText', '');
     dashboardDetailStore.$patch({ labels: state.labelList });
+    emit('update-labels', state.labelList);
 };
 const handleDelete = (index: number) => {
     state.labelList.splice(index, 1);
     dashboardDetailStore.$patch({ labels: state.labelList });
+    emit('update-labels', state.labelList);
 };
 
 </script>

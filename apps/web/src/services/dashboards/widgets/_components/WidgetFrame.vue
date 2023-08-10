@@ -1,13 +1,21 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
+         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
+        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
+                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
+                       class="view-mode-button"
+                       name="ic_arrows-expand-all"
+                       shape="square"
+                       style-type="tertiary"
+                       @click="handleClickViewModeButton"
+        />
         <div class="body"
              :style="{overflowY: props.overflowY}"
         >
@@ -46,6 +54,19 @@
                                :vertical="true"
                     />
                     <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <p-divider v-if="props.nonInheritOptionsTooltipText"
+                               :vertical="true"
+                    />
+                    <p-tooltip v-if="props.nonInheritOptionsTooltipText"
+                               class="widget-non-inherit-tooltip"
+                               :contents="props.nonInheritOptionsTooltipText"
+                    >
+                        <p-i name="ic_warning-filled"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
@@ -97,7 +118,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI,
+    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -113,9 +134,12 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+
 
 interface WidgetFrameProps {
     title: TranslateResult;
@@ -135,10 +159,13 @@ interface WidgetFrameProps {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
+    disableViewMode?: boolean;
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
     refreshOnResize?: boolean;
+    theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
 }
 
 interface IconConfig {
@@ -157,11 +184,14 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     selectedDates: () => [],
     currency: undefined,
     overflowY: undefined,
+    theme: undefined,
+    nonInheritOptionsTooltipText: undefined,
 });
 
 const emit = defineEmits(['refresh']);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -220,10 +250,20 @@ const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
 };
+const handleClickViewModeButton = () => {
+    widgetFormStore.$patch({
+        widgetKey: props.widgetKey,
+        theme: props.theme,
+    });
+    dashboardDetailStore.$patch({
+        widgetViewModeModalVisible: true,
+    });
+};
 </script>
 
 <style lang="postcss" scoped>
 .widget-frame {
+    position: relative;
     height: 29rem;
 
     @apply border rounded-lg bg-white;
@@ -232,22 +272,34 @@ const handleDeleteModalConfirm = () => {
     flex-direction: column;
 
     .widget-header {
-        @apply flex justify-between items-center;
+        @apply flex items-center;
         .title {
+            @apply truncate;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: -webkit-box;
+            display: block;
             -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
             font-size: 1rem;
             font-weight: 700;
             color: theme('colors.gray.900');
             line-height: 1.25;
             margin: 0.25rem 0;
+            padding-right: 1rem;
         }
-        padding: 0.75rem 1.5rem 1rem 1.5rem;
+        padding: 0.75rem 2.5rem 1rem 1.5rem;
         border-color: inherit;
         flex: 0 0;
+    }
+    .view-mode-button {
+        position: absolute;
+        display: none;
+        right: 0.25rem;
+        top: 0.25rem;
+    }
+    &:hover {
+        .view-mode-button {
+            display: flex;
+        }
     }
     .body {
         height: auto;
@@ -301,6 +353,9 @@ const handleDeleteModalConfirm = () => {
                     &.vertical {
                         height: 1rem;
                     }
+                }
+                .widget-non-inherit-tooltip {
+                    @apply text-gray-700;
                 }
             }
             .footer-right {

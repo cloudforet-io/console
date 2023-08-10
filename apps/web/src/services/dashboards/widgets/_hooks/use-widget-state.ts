@@ -9,6 +9,8 @@ import { flattenDeep, isEmpty, merge } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import { i18n } from '@/translations';
+
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -29,6 +31,7 @@ import type {
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
@@ -155,6 +158,7 @@ export interface WidgetState<Data = any> {
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
     optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
+    nonInheritOptionsTooltipText?: ComputedRef<string|undefined>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -167,11 +171,11 @@ export function useWidgetState<Data = any>(
             state.widgetConfig.options,
             props.options,
             props.inheritOptions,
-            props.dashboardVariables,
+            dashboardDetailState.variables,
             state.optionsErrorMap,
         )),
         currency: computed(() => {
-            if (state.widgetConfig.labels?.includes('Cost')) return state.settings?.currency?.value ?? CURRENCY.USD;
+            if (state.widgetConfig.labels?.includes('Cost')) return dashboardDetailStore.dashboardCurrency ?? CURRENCY.USD;
             return undefined;
         }),
         groupBy: computed(() => {
@@ -187,13 +191,13 @@ export function useWidgetState<Data = any>(
         }),
         loading: true,
         settings: computed<DashboardSettings>(() => ({
-            ...props.dashboardSettings,
-            date_range: props.dashboardSettings.date_range?.enabled ? props.dashboardSettings.date_range : {
+            ...dashboardDetailState.settings,
+            date_range: dashboardDetailState.settings.date_range?.enabled ? dashboardDetailState.settings.date_range : {
                 enabled: false,
                 start: dayjs.utc().format('YYYY-MM'),
                 end: dayjs.utc().format('YYYY-MM'),
             },
-            currency: props.dashboardSettings.currency?.enabled ? props.dashboardSettings.currency : {
+            currency: dashboardDetailState.settings.currency?.enabled ? dashboardDetailState.settings.currency : {
                 enabled: false,
                 value: CURRENCY.USD,
             },
@@ -234,8 +238,18 @@ export function useWidgetState<Data = any>(
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
             props.inheritOptions,
             state.widgetConfig?.options_schema?.schema,
-            props.dashboardVariablesSchema,
+            dashboardDetailState.variablesSchema,
         )),
+        nonInheritOptionsTooltipText: computed<string|undefined>(() => {
+            const nonInheritOptions = getNonInheritedWidgetOptions(state.widgetInfo?.inherit_options);
+            if (!nonInheritOptions.length) return undefined;
+
+            // TODO: widget option name must be changed to readable name.
+            // const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
+            const tooltipText = nonInheritOptions.map((d) => `<p>• ${d}</p>`).join('\n');
+            return `${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
+            ${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
+        }),
     }) as UnwrapRef<WidgetState<Data>>;
 
     return state;
