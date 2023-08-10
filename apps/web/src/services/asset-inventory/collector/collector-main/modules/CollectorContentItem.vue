@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
 import CollectorItemSchedule
     from '@/services/asset-inventory/collector/collector-main/modules/collector-item-info/CollectorItemSchedule.vue';
 import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
-import type { JobStatus } from '@/services/asset-inventory/collector/model';
+import type { JobStatus, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/CollectorCurrentStatus.vue';
 import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/RecentCollectorJobList.vue';
 
@@ -27,6 +32,7 @@ const props = defineProps<Props>();
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
+const collectorFormStore = useCollectorFormStore();
 
 const state = reactive({
     plugin: computed<{name?: string; version: string}|null>(() => {
@@ -38,7 +44,25 @@ const state = reactive({
         if (!props.item) return undefined;
         return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.recentJobForAllAccounts?.job_id)[0];
     }),
+    isScheduleActivated: false,
 });
+
+const handleChangeToggle = async () => {
+    try {
+        state.isScheduleActivated = !state.isScheduleActivated;
+        const params: CollectorUpdateParameter = {
+            collector_id: props.item.collectorId,
+            schedule: {
+                ...props.item.schedule,
+                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
+            },
+        };
+        const response = await collectorPageStore.updateCollectorSchedule(params);
+        await collectorFormStore.setOriginCollector(response);
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
+    }
+};
 
 /* API */
 const handleClickCollectData = async () => {
@@ -54,6 +78,13 @@ const handleClickCollectData = async () => {
         _state.selectedCollector = collectorPageState.selectedCollector;
     });
 };
+
+/* Watcher */
+watch(() => props.item.schedule, (schedule) => {
+    if (schedule) {
+        state.isScheduleActivated = schedule.state === 'ENABLED';
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -81,13 +112,15 @@ const handleClickCollectData = async () => {
                     >
                         <collector-current-status :schedule="props.item.schedule"
                                                   :recent-job="state.recentJob"
+                                                  :is-schedule-activated="state.isScheduleActivated"
                         />
                         <recent-collector-job-list :recent-jobs="props.item.recentJobAnalyze"
                                                    :history-link="props.item.historyLink"
                         />
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
-                                             :schedule="props.item.schedule"
+                                             :is-schedule-activated="state.isScheduleActivated"
+                                             @change-toggle="handleChangeToggle"
                     />
                 </div>
             </div>
