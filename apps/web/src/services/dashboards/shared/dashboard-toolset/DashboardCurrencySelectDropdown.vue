@@ -82,6 +82,10 @@ const handleSelectCurrency = (currency: DashboardCurrency) => {
 </script>
 
 <style lang="postcss" scoped>
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    min-width: auto;
+}
 .p-badge {
     margin-left: 0.25rem;
 }
