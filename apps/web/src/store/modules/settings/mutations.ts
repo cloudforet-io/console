@@ -1,8 +1,10 @@
+import { CURRENCY } from '@/store/modules/settings/config';
+
 import type { SettingsState } from './type';
 
 export const initUserSettings = (state: SettingsState, item: SettingsState): void => {
     state.currencyRates = item.currencyRates;
-    state.currency = item.currency;
+    state.currency = item.currency ?? CURRENCY.USD;
     state.currencyUpdateTime = item.currencyUpdateTime;
     state.gnbNotificationLastReadTime = item.gnbNotificationLastReadTime;
 };
