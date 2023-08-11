@@ -76,7 +76,7 @@ test.describe('Collector List', () => {
     });
 
     test('Exporting to an Excel file.', async () => {
-        const excelButton = page.locator('.tool > .p-button')
+        const excelButton = page.locator('.right-tool-group > div.tool').nth(0).locator('.p-button');
         await excelButton.first().click();
 
         try {
@@ -90,8 +90,8 @@ test.describe('Collector List', () => {
     });
 
     test('Refresh list.', async () => {
-        const refreshButton = page.locator('.right-tool-group > div:nth-child(2) > .p-button')
-        await refreshButton.click();
+        const refreshButton = page.locator('.right-tool-group > div.tool').nth(1).locator('.p-button');
+        await refreshButton.first().click();
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
@@ -101,4 +101,4 @@ test.describe('Collector List', () => {
             console.error('Error occurred:', error);
         }
     });
-})
+});

@@ -25,8 +25,8 @@ test.describe('Edit Schedule', () => {
             const toggleLabel = page.locator('.collector-lists>div:last-child .p-toggle-button .state-text');
 
             await toggleButton.waitFor({ state: 'visible', timeout: 5000 });
-            const classAttribute = await toggleButton.getAttribute('class');
-            const hasActiveClass = classAttribute.includes('toggle-active');
+            const toggleClassAttribute = await toggleButton.getAttribute('class');
+            const hasActiveClass = toggleClassAttribute.includes('toggle-active');
 
             if (hasActiveClass) {
                 await expect(toggleLabel).toContainText('ON');
@@ -68,4 +68,4 @@ test.describe('Edit Schedule', () => {
             await expect(hasSetScheduleClass).toBeTruthy();
         });
     });
-})
+});

@@ -34,7 +34,7 @@ test.describe('Collector Data', () => {
         const classAttribute = await currentStatus.getAttribute('class');
         const hasSpinClass = classAttribute.includes('spin');
         await expect(hasSpinClass).toBeTruthy();
-    }
+    };
 
     /* Test */
     test('Collect data in collect main page', async () => {
@@ -54,7 +54,7 @@ test.describe('Collector Data', () => {
 
                 await test.step('4. Check duplication collect data API', async () => {
                     await handleApiResponse();
-                    await checkInProgressStatus()
+                    await checkInProgressStatus();
                 });
 
                 await test.step('5. go to history page', async () => {
@@ -66,25 +66,20 @@ test.describe('Collector Data', () => {
                 });
 
                 await test.step('6. Check history job status', async () => {
-                    const inProgressRow = page.locator('table tbody tr:nth-child(1) .p-status');
-                    const canceledRow = page.locator('table tbody tr:nth-child(2) .p-status');
+                    const inProgressRow = page.locator('table tbody tr').nth(0).locator('.p-status');
+                    const canceledRow = page.locator('table tbody tr').nth(1).locator('.p-status');
 
-                    const hasInProgressClass = await page.$eval(inProgressRow, (el) => {
-                        return el.classList.contains('in-progress');
-                    });
-                    const hasCanceledClass = await page.$eval(canceledRow, (element) => {
-                        return element.classList.contains('canceled');
-                    });
+                    const hasInProgressClass = await page.$eval(inProgressRow, (el) => el.classList.contains('in-progress'));
+                    const hasCanceledClass = await page.$eval(canceledRow, (element) => element.classList.contains('canceled'));
                     await expect(hasInProgressClass).toBeTruthy();
                     await expect(hasCanceledClass).toBeTruthy();
                 });
-            } catch (error) {
+            } catch {
                 await test.step('3. Check collect data API', async () => {
                     await handleApiResponse();
                     await checkInProgressStatus();
                 });
-
             }
         });
     });
-})
+});
