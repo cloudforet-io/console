@@ -10,7 +10,7 @@ const goToCollectorMainPage = async (page) => {
     await page.waitForResponse(`${process.env.APIURL_V2 as string}/inventory/job/analyze`);
     // check if the page is loaded
     await expect(await page.getByRole('heading', { name: 'Collector' })).toBeVisible();
-}
+};
 
 const selectCollectorAndGoToDetailsPage = async (page) => {
     // get the name of the first collector
@@ -18,13 +18,13 @@ const selectCollectorAndGoToDetailsPage = async (page) => {
 
     // click on the first collector and wait for navigation to the collector details page
     const navigationPromise = page.waitForNavigation();
-    const items = await page.locator('.collector-content-item').nth(COLLECTOR_INDEX).click();
+    await page.locator('.collector-content-item').nth(COLLECTOR_INDEX).click();
     await navigationPromise;
 
     // check if the url is correct and the collector name is visible
     await expect(page).toHaveURL(/asset-inventory\/collector\/collector-*/);
     await expect(await page.getByRole('heading', { name: collectorName })).toBeVisible();
-}
+};
 
 const checkIfApiResponsesAreCorrect = async (page) => {
     // wait for collect api to be called
@@ -38,7 +38,7 @@ const checkIfApiResponsesAreCorrect = async (page) => {
     // check if the last job data's status is 'in progress'
     const { results } = await jobListResponse.json();
     await expect(results[0].status).toBe('IN_PROGRESS');
-}
+};
 
 const checkIfStatusIsInProgress = async (page) => {
     // click on the status button
@@ -46,7 +46,7 @@ const checkIfStatusIsInProgress = async (page) => {
 
     // check if the status is in progress
     await expect(await page.locator(IN_PROGRESS_SELECTOR)).toBeVisible();
-}
+};
 
 const restartAndCheckStatusInCollectDataModal = async (page, doNotCheckCurrentStatus = false) => {
     // wait for the re-start modal to be visible
@@ -63,7 +63,7 @@ const restartAndCheckStatusInCollectDataModal = async (page, doNotCheckCurrentSt
 
     // check if the last job icon shows 'canceled' status
     await expect(await page.locator('.recent-collector-job-list .collector-job-status-icon .icon').last()).toHaveClass(/canceled/);
-}
+};
 
 test.describe('Collector Details > Collect Data', () => {
     test('Collect data (2) in details page - for all accounts', async ({ page }) => {
@@ -80,9 +80,9 @@ test.describe('Collector Details > Collect Data', () => {
             // click on the status button
             await page.locator('button.status-button').click();
 
-            const inProgressLocator = await page.locator(IN_PROGRESS_SELECTOR)
-            const scheduledLocator = await page.locator('.popper .label-description .scheduled')
-            const  noScheduleLocator = await page.locator('.popper .label-description .no-schedule')
+            const inProgressLocator = await page.locator(IN_PROGRESS_SELECTOR);
+            const scheduledLocator = await page.locator('.popper .label-description .scheduled');
+            const noScheduleLocator = await page.locator('.popper .label-description .no-schedule');
 
             // check if one of the status is visible
             await expect(inProgressLocator.or(scheduledLocator).or(noScheduleLocator)).toBeVisible();
@@ -99,9 +99,8 @@ test.describe('Collector Details > Collect Data', () => {
             await test.step('2-4. Click on the [Re-Start] button and check the changed status is applied', async () => {
                 await restartAndCheckStatusInCollectDataModal(page);
             });
-        }
         // if the status is scheduled or no schedule
-        else {
+        } else {
             await test.step('2-5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
                 // wait for the collect-now modal to be visible
                 await page.getByText('Do you want to collect data now?').waitFor();
@@ -130,7 +129,6 @@ test.describe('Collector Details > Collect Data', () => {
             // check if the status is in progress
             const currentStatus = await page.locator('.collector-content-item .collector-current-status').nth(COLLECTOR_INDEX).textContent();
             await expect(currentStatus).toContain('In-Progress');
-
         });
     });
 
@@ -144,7 +142,7 @@ test.describe('Collector Details > Collect Data', () => {
             await selectCollectorAndGoToDetailsPage(page);
         });
 
-        let isInProgress = false;
+        const isInProgress = false;
         await test.step('3-3.  Attached Service Accounts section > Click [Collect Data] for a specific service account, then verify the reflection based on the status.', async () => {
             // click the [Collect Data] button for a specific service account
             await page.locator('.service-account-collect-data-button').nth(SERVICE_ACCOUNT_INDEX).click();
@@ -157,9 +155,8 @@ test.describe('Collector Details > Collect Data', () => {
             await test.step('3-4. Click on the [Re-Start] button and check the changed status is applied', async () => {
                 await restartAndCheckStatusInCollectDataModal(page, true);
             });
-        }
         // if the status is scheduled or no schedule
-        else {
+        } else {
             await test.step('3-5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
                 // wait for the collect-now modal to be visible
                 await page.getByText('Do you want to collect data now?').waitFor();
