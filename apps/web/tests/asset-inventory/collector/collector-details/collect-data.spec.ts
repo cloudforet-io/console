@@ -67,16 +67,16 @@ const restartAndCheckStatusInCollectDataModal = async (page, doNotCheckCurrentSt
 
 test.describe('Collector Details > Collect Data', () => {
     test('Collect data (2) in details page - for all accounts', async ({ page }) => {
-        await test.step('2-1. Go to collector main page', async () => {
+        await test.step('1. Go to collector main page', async () => {
             await goToCollectorMainPage(page);
         });
 
-        await test.step('2-2. Click on the specific collector and go to the details page', async () => {
+        await test.step('2. Click on the specific collector and go to the details page', async () => {
             await selectCollectorAndGoToDetailsPage(page);
         });
 
         let isInProgress = false;
-        await test.step('2-3. Click on the collect data status button and check the status', async () => {
+        await test.step('3. Click on the collect data status button and check the status', async () => {
             // click on the status button
             await page.locator('button.status-button').click();
 
@@ -96,12 +96,12 @@ test.describe('Collector Details > Collect Data', () => {
 
         // if the status is in progress
         if (isInProgress) {
-            await test.step('2-4. Click on the [Re-Start] button and check the changed status is applied', async () => {
+            await test.step('4. Click on the [Re-Start] button and check the changed status is applied', async () => {
                 await restartAndCheckStatusInCollectDataModal(page);
             });
         // if the status is scheduled or no schedule
         } else {
-            await test.step('2-5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
+            await test.step('5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
                 // wait for the collect-now modal to be visible
                 await page.getByText('Do you want to collect data now?').waitFor();
 
@@ -119,7 +119,7 @@ test.describe('Collector Details > Collect Data', () => {
         }
 
 
-        await test.step('2-6. Go to the collector main page and check the status', async () => {
+        await test.step('6. Go to the collector main page and check the status', async () => {
             // go to the collector main page
             await page.locator('.back-button').click();
 
@@ -133,16 +133,16 @@ test.describe('Collector Details > Collect Data', () => {
     });
 
     test('Collect data (3) in details page - for one account', async ({ page }) => {
-        await test.step('3-1. Go to collector main page', async () => {
+        await test.step('1. Go to collector main page', async () => {
             await goToCollectorMainPage(page);
         });
 
-        await test.step('3-2. Click on the specific collector and go to the details page', async () => {
+        await test.step('2. Click on the specific collector and go to the details page', async () => {
             await selectCollectorAndGoToDetailsPage(page);
         });
 
         let isInProgress = false;
-        await test.step('3-3.  Attached Service Accounts section > Click [Collect Data] for a specific service account, then verify the reflection based on the status.', async () => {
+        await test.step('3.  Attached Service Accounts section > Click [Collect Data] for a specific service account, then verify the reflection based on the status.', async () => {
             // click the [Collect Data] button for a specific service account
             await page.locator('.service-account-collect-data-button').nth(SERVICE_ACCOUNT_INDEX).click();
 
@@ -157,14 +157,14 @@ test.describe('Collector Details > Collect Data', () => {
 
         // if the status is in progress
         if (isInProgress) {
-            await test.step('3-4. Click on the [Re-Start] button and check the changed status is applied', async () => {
+            await test.step('4. Click on the [Re-Start] button and check the changed status is applied', async () => {
                 // wait for the collect-now modal to be visible
                 await page.getByText('Collecting is still in progress. Do you want to cancel and re-start it?').waitFor();
                 await restartAndCheckStatusInCollectDataModal(page, true);
             });
         // if the status is scheduled or no schedule
         } else {
-            await test.step('3-5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
+            await test.step('5. Click on the [Collect-Now] button and check the changed status is applied', async () => {
                 // wait for the collect-now modal to be visible
                 await page.getByText('Do you want to collect data now?').waitFor();
 

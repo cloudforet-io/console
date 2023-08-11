@@ -49,23 +49,31 @@ test.describe('Custom Dashboard Variables', () => {
 
         await test.step('4. Set custom variable to widget option', async () => {
             const widgetElements = page.locator('.widget-frame');
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await widgetElements.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const widgetTitle = await widgetElement.locator('.widget-header').innerText();
                 if (widgetTitle === 'Monthly Cost Overview' || widgetTitle === 'Cost Trend By Product') {
                     // open edit modal
+                    // eslint-disable-next-line no-await-in-loop
                     const buttonCount = await widgetElement.locator('.edit-mode-cover button').count();
                     const editButton = widgetElement.locator(`.edit-mode-cover button:nth-child(${buttonCount - 1})`);
+                    // eslint-disable-next-line no-await-in-loop
                     await editButton.click();
+                    // eslint-disable-next-line no-await-in-loop
                     await page.waitForTimeout(1000);
 
                     // set custom variable to widget option
                     const projectDropdown = page.locator('.dashboard-widget-edit-modal').getByRole('button', { name: /Project/ });
+                    // eslint-disable-next-line no-await-in-loop
                     await projectDropdown.click();
                     const customVariableContextMenu = page.locator('.dashboard-widget-edit-modal .p-context-menu:visible .p-context-menu-item')
                         .getByText(/Custom Variable for test/);
+                    // eslint-disable-next-line no-await-in-loop
                     await customVariableContextMenu.click();
 
                     // save widget option
+                    // eslint-disable-next-line no-await-in-loop
                     await page.getByRole('button', { name: 'Confirm' }).click();
                 }
             }
@@ -93,15 +101,21 @@ test.describe('Custom Dashboard Variables', () => {
 
         await test.step('6. Check if options have been removed from the widget', async () => {
             const widgetElements = page.locator('.widget-frame');
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await widgetElements.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const widgetTitle = await widgetElement.locator('.widget-header').innerText();
                 if (widgetTitle === 'Monthly Cost Overview' || widgetTitle === 'Cost Trend By Product') {
                     // open edit modal
+                    // eslint-disable-next-line no-await-in-loop
                     const buttonCount = await widgetElement.locator('.edit-mode-cover button').count();
+                    // eslint-disable-next-line no-await-in-loop
                     await widgetElement.locator(`.edit-mode-cover button:nth-child(${buttonCount - 1})`).click();
+                    // eslint-disable-next-line no-await-in-loop
                     await expect(page.locator('.dashboard-widget-edit-modal .widget-options-form')).not.toHaveText('Project');
 
                     // close edit modal
+                    // eslint-disable-next-line no-await-in-loop
                     await page.locator('.dashboard-widget-edit-modal').getByRole('button', { name: 'Cancel' }).click();
                 }
             }
