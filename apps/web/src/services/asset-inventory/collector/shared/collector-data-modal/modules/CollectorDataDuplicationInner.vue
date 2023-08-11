@@ -170,21 +170,6 @@ const apiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true);
 
 /* API */
-// TODO: This part is temporarily enabled for screen verification purposes and will be removed after the API is updated.
-const getJobProgress = async () => {
-    const recentJob = collectorDataModalState.recentJob;
-    if (!recentJob) return;
-
-    try {
-        const response = await SpaceConnector.client.inventory.job.getJobProgress({
-            job_id: recentJob.jobId,
-        });
-        state.jobTaskStatus = response.job_task_status;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
 const getJobLists = async () => {
     try {
         const response = await SpaceConnector.client.inventory.job.list({ query: apiQueryHelper.data });
@@ -192,12 +177,11 @@ const getJobLists = async () => {
 
         state.duration = durationFormatter(item.created_at, dayjs(), storeState.timezone) || '--';
 
-        // TODO: will be active after the API is updated and check.
-        // state.jobTaskStatus = {
-        //     succeeded: item.success_tasks,
-        //     failed: item.failure_tasks,
-        //     total: item.total_tasks,
-        // };
+        state.jobTaskStatus = {
+            succeeded: item.success_tasks,
+            failed: item.failure_tasks,
+            total: item.total_tasks,
+        };
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -206,9 +190,6 @@ const getJobLists = async () => {
 /* Init */
 (async () => {
     await getJobLists();
-
-    // TODO: This part is temporarily enabled for screen verification purposes and will be removed after the API is updated.
-    await getJobProgress();
 })();
 </script>
 
