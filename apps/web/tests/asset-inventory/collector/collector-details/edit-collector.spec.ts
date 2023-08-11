@@ -102,7 +102,7 @@ test.describe('Edit Schedule', () => {
         });
 
         await test.step('5. Add tags and Save changes for base information', async () => {
-            // Delete last tag for test.
+            // To prevent the repetition of the 'test' tag, delete the previous test content.
             const addTagsGroup = page.locator('.tags-group:last-child');
             await addTagsGroup.locator('.p-button').first().click();
 
@@ -166,12 +166,19 @@ test.describe('Edit Schedule', () => {
                 }
 
                 // Check if the schedule is set.
-                const classAttribute = await firstTimeBlock.getAttribute('class');
-                const hasSetScheduleClass = classAttribute.includes('active');
-                if (hasSetScheduleClass) {
-                    await expect(hasSetScheduleClass).toBeTruthy();
+                const firstClassAttribute = await firstTimeBlock.getAttribute('class');
+                const hasSetFirstScheduleClass = firstClassAttribute.includes('active');
+                if (hasSetFirstScheduleClass) {
+                    await expect(hasSetFirstScheduleClass).toBeTruthy();
                 } else {
-                    console.log('Test skipped due to no selected schedule.');
+                    console.log('Test skipped due to no selected first schedule.');
+                }
+                const secondClassAttribute = await secondTimeBlock.getAttribute('class');
+                const hasSetSecondScheduleClass = secondClassAttribute.includes('active');
+                if (hasSetSecondScheduleClass) {
+                    await expect(hasSetSecondScheduleClass).toBeTruthy();
+                } else {
+                    console.log('Test skipped due to no selected second schedule.');
                 }
             } else {
                 await expect(toggleLabel).toContainText('OFF');
