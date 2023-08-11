@@ -191,11 +191,12 @@ test.describe('Edit Schedule', () => {
                 await emptyElement.waitFor({ state: 'visible', timeout: 5000 });
 
                 // Click edit button.
-                const editButton = page.locator('.collector-detail-page .section').nth(2).locator('.extra .p-button');
+                const additionalOptions = page.locator('.collector-detail-page .section').nth(2);
+                const editButton = additionalOptions.locator('.extra .p-button');
                 await editButton.first().click();
 
                 // Select the dropdown item for edit.
-                const secondDropdown = page.locator('.p-json-schema-form .input-form-wrapper').nth(1).locator('.field-group-default-wrapper');
+                const secondDropdown = additionalOptions.locator('.p-json-schema-form .input-form-wrapper').nth(1).locator('.field-group-default-wrapper');
                 await secondDropdown.first().click();
 
                 await dropdownItem.first().click();
