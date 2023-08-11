@@ -132,7 +132,6 @@ test.describe('Collector Details > Collect Data', () => {
         });
     });
 
-
     test('Collect data (3) in details page - for one account', async ({ page }) => {
         await test.step('3-1. Go to collector main page', async () => {
             await goToCollectorMainPage(page);
@@ -142,17 +141,25 @@ test.describe('Collector Details > Collect Data', () => {
             await selectCollectorAndGoToDetailsPage(page);
         });
 
-        const isInProgress = false;
+        let isInProgress = false;
         await test.step('3-3.  Attached Service Accounts section > Click [Collect Data] for a specific service account, then verify the reflection based on the status.', async () => {
             // click the [Collect Data] button for a specific service account
             await page.locator('.service-account-collect-data-button').nth(SERVICE_ACCOUNT_INDEX).click();
 
-            // TODO: set the isInProgress flag by checking api response
+            const isDuplicationInner = await page.locator('.collector-data-duplication-inner').isVisible();
+            if (isDuplicationInner) {
+                const checkInProgress = await page.locator('.collector-data-duplication-inner .p-definition').nth(2).locator('.value .in-progress-title span');
+                isInProgress = await checkInProgress.textContent() === 'In-Progress';
+            } else {
+                isInProgress = false;
+            }
         });
 
         // if the status is in progress
         if (isInProgress) {
             await test.step('3-4. Click on the [Re-Start] button and check the changed status is applied', async () => {
+                // wait for the collect-now modal to be visible
+                await page.getByText('Collecting is still in progress. Do you want to cancel and re-start it?').waitFor();
                 await restartAndCheckStatusInCollectDataModal(page, true);
             });
         // if the status is scheduled or no schedule
