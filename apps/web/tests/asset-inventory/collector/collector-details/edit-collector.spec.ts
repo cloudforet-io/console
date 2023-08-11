@@ -62,7 +62,7 @@ test.describe('Edit Schedule', () => {
             const dropdownButton = baseInformation.locator('.dropdown-button');
             const dropdownItem = baseInformation.locator('.p-context-menu-item').nth(1);
 
-            const handleSelectVersion = async () => {
+            const checkVersionSelection = async () => {
                 // Change the version.
                 await dropdownButton.first().click();
                 await dropdownItem.first().click();
@@ -91,10 +91,10 @@ test.describe('Edit Schedule', () => {
                 if (hasToggleActiveClass) {
                     // If the toggle is in the active state, deactivate it and then change the version.
                     await versionToggleButton.first().click();
-                    await handleSelectVersion();
+                    await checkVersionSelection();
                 } else {
                     // Change the version directly.
-                    await handleSelectVersion();
+                    await checkVersionSelection();
                 }
             } catch (error) {
                 console.error('Error occurred:', error);
