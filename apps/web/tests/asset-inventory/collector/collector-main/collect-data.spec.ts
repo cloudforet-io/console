@@ -20,7 +20,6 @@ test.describe('Collector Data', () => {
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/collect`);
-            await page.waitForLoadState('networkidle');
             expect(apiResponse.status()).toBe(200);
         } catch (error) {
             console.error('Error occurred:', error);

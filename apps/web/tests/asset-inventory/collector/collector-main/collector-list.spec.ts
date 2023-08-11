@@ -29,7 +29,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -41,7 +40,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -53,7 +51,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -68,7 +65,6 @@ test.describe('Collector List', () => {
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-            await page.waitForLoadState('networkidle');
             expect(apiResponse.status()).toBe(200);
         } catch (error) {
             console.error('Error occurred:', error);
@@ -80,7 +76,6 @@ test.describe('Collector List', () => {
         await excelButton.first().click();
 
         try {
-            await page.waitForLoadState('networkidle');
             const downloads = await page.context().downloads();
             expect(downloads.length).toBe(1);
             expect(downloads[0].suggestedFilename()).toContain('.xlsx');
@@ -95,7 +90,6 @@ test.describe('Collector List', () => {
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-            await page.waitForLoadState('networkidle');
             expect(apiResponse.status()).toBe(200);
         } catch (error) {
             console.error('Error occurred:', error);

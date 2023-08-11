@@ -82,7 +82,6 @@ test.describe('Edit Schedule', () => {
             // Wait for the API response and then change the version.
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/repository/plugin/get-versions`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
 
                 // Check if the toggle is in the active state
@@ -122,7 +121,6 @@ test.describe('Edit Schedule', () => {
             await saveChanges(0);
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/update`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -162,7 +160,6 @@ test.describe('Edit Schedule', () => {
                 await saveChanges(1);
                 try {
                     const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/update`);
-                    await page.waitForLoadState('networkidle');
                     expect(apiResponse.status()).toBe(200);
                 } catch (error) {
                     console.error('Error occurred:', error);
@@ -206,7 +203,6 @@ test.describe('Edit Schedule', () => {
                     await saveChanges(2);
                     try {
                         const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/update`);
-                        await page.waitForLoadState('networkidle');
                         expect(apiResponse.status()).toBe(200);
                     } catch (error) {
                         console.error('Error occurred:', error);
@@ -247,7 +243,6 @@ test.describe('Edit Schedule', () => {
                 await saveChanges(3);
                 try {
                     const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/update`);
-                    await page.waitForLoadState('networkidle');
                     expect(apiResponse.status()).toBe(200);
                 } catch (error) {
                     console.error('Error occurred:', error);
