@@ -856,7 +856,9 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "Failed to Update Language",
 				"ALT_S_UPDATE": "Language successfully changed ",
+				"ALT_S_UPDATE_CURRENCY": "Successfully Updated Currency",
 				"GO_TO_MYPAGE": "Go to My Page",
+				"LABEL_CURRENCY": "Currency",
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
@@ -1370,10 +1372,22 @@
 			"LABEL_PUBLIC": "Public (Anyone who has 'View' access to this dashboard scope)",
 			"LABEL_VIEWERS": "Viewers",
 			"REQUIRED": "Required Field",
+			"RETURN_TO_INITIAL_SETTINGS": "Return to Initial Settings",
 			"UPDATE_TITLE": "Edit Dashboard Name",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "Please enter dashboard name.",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "The dashboard name cannot be longer than 100 characters.",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "A dashboard with this name already exists."
+		},
+		"FULL_SCREEN_VIEW": {
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "This widget will be saved with non-inherited options which won't be affected by dashboard's filters.",
+			"BACK_TO_DASHBOARD": "Back to dashboard",
+			"CANCEL": "Cancel",
+			"EDIT_OPTION": "Edit Option",
+			"EDIT_WIDGET_OPTION": "Edit Widget Option",
+			"FULL_SCREEN_VIEW": "Full Screen View",
+			"NON_INHERITED_OPTIONS_INCLUDED": "Non-inherited Options Included",
+			"NON_INHERIT_OPTION_APPLIED": "Non-inherited option applied",
+			"SAVE": "Save"
 		},
 		"LNB": {
 			"ONLY_FAVORITE": "Show favorites only"
@@ -1467,6 +1481,8 @@
 			"EDIT_WIDGET": "Edit Widget Option",
 			"ERROR_MSG": "There is an error from an incompatibility dashboard's variables and widget options.",
 			"ERROR_TITLE": "Unable to load",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "This widget includes non-inherited options which are not affected by the dashboard.",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "List of non-inherited options:",
 			"MONTHLY_COST": {
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
 				"TOTAL_SPENT_IN": "Total spent in {period}"

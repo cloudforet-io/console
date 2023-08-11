@@ -856,7 +856,9 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "言語編集に失敗",
 				"ALT_S_UPDATE": "言語編集完了",
+				"ALT_S_UPDATE_CURRENCY": "通貨の更新が正常に完了しました",
 				"GO_TO_MYPAGE": "マイページ",
+				"LABEL_CURRENCY": "通貨",
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
@@ -1370,10 +1372,22 @@
 			"LABEL_PUBLIC": "公開（選択したダッシュボードの範囲に対して「View」アクセス権を持つすべてのユーザー）",
 			"LABEL_VIEWERS": "公開可否",
 			"REQUIRED": "必須入力項目です",
+			"RETURN_TO_INITIAL_SETTINGS": "初期設定に戻る",
 			"UPDATE_TITLE": "ダッシュボード名の編集",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "ダッシュボードの名を入力してください。",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "この名前のダッシュボードはすでに存在します。"
+		},
+		"FULL_SCREEN_VIEW": {
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "このウィジェットは、ダッシュボードのフィルターの影響を受けない非継承オプションで保存されます。",
+			"BACK_TO_DASHBOARD": "ダッシュボードに戻る",
+			"CANCEL": "取消",
+			"EDIT_OPTION": "オプション編集",
+			"EDIT_WIDGET_OPTION": "ウィジェット編集",
+			"FULL_SCREEN_VIEW": "フルスクリーン表示",
+			"NON_INHERITED_OPTIONS_INCLUDED": "非継承オプションが含まれています",
+			"NON_INHERIT_OPTION_APPLIED": "非継承オプションが含まれています",
+			"SAVE": "保存"
 		},
 		"LNB": {
 			"ONLY_FAVORITE": "お気に入りだけを表示する"
@@ -1467,6 +1481,8 @@
 			"EDIT_WIDGET": "ウィジェットオプションの修正",
 			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "このウィジェットには、ダッシュボードの影響を受けない非継承オプションが含まれています。",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "非継承オプションのリスト:",
 			"MONTHLY_COST": {
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
 				"TOTAL_SPENT_IN": "{period}の総支出額"

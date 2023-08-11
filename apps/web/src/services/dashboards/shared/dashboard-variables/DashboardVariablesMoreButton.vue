@@ -6,6 +6,7 @@
         <p-button ref="targetRef"
                   icon-left="ic_plus_bold"
                   style-type="highlight"
+                  :disabled="props.disabled"
                   @click="handleClickButton"
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
@@ -83,6 +84,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 
 interface Props {
     isManageable: boolean;
+    disabled?: boolean;
 }
 
 const props = defineProps<Props>();

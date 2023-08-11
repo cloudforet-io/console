@@ -17,9 +17,6 @@
                            :size="widget.size"
                            :width="widget.width"
                            :theme="widget.theme"
-                           :dashboard-variables="dashboardDetailState.variables"
-                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
-                           :dashboard-settings="dashboardDetailState.settings"
                            :currency-rates="currencyRates"
                            :edit-mode="editMode"
                            :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
@@ -28,6 +25,9 @@
                 />
             </template>
         </template>
+        <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"
+                                @refresh-widget="handleRefreshWidget"
+        />
     </div>
 </template>
 
@@ -56,6 +56,7 @@ import {
     useWidgetValidator,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-validator';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -68,6 +69,7 @@ interface Props {
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
+    components: { WidgetViewModeModal },
     directives: {
         intersectionObserver: vIntersectionObserver as DirectiveFunction,
     },
@@ -158,6 +160,10 @@ export default defineComponent<Props>({
                 refreshAllWidget();
             }
         });
+        const handleRefreshWidget = (widgetKey: string) => {
+            const targetWidgetRef = state.widgetRef.find((d) => d?.$el?.id === widgetKey);
+            targetWidgetRef?.refreshWidget();
+        };
         const refreshAllWidget = debounce(async () => {
             dashboardDetailStore.$patch({ loadingWidgets: true });
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
@@ -200,6 +206,7 @@ export default defineComponent<Props>({
             containerRef,
             reformedWidgetInfoList,
             handleIntersectionObserver,
+            handleRefreshWidget,
         };
     },
 });
