@@ -7,10 +7,9 @@
                                  :date-range="dashboardDetailState.settings.date_range"
                                  @update:date-range="handleUpdateDateRange"
         />
-        <currency-select-dropdown v-show="dashboardDetailState.settings.currency.enabled"
-                                  default-currency-mode
-                                  :currency="dashboardDetailState.settings.currency.value"
-                                  @update:currency="handleUpdateCurrency"
+        <dashboard-currency-select-dropdown v-show="dashboardDetailState.settings.currency.enabled"
+                                            :currency="dashboardDetailState.settings.currency.value"
+                                            @update:currency="handleUpdateCurrency"
         />
     </div>
 </template>
@@ -18,9 +17,9 @@
 <script setup lang="ts">
 import type { Currency } from '@/store/modules/settings/type';
 
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
-
 import type { DashboardSettings } from '@/services/dashboards/config';
+import DashboardCurrencySelectDropdown
+    from '@/services/dashboards/shared/dashboard-toolset/DashboardCurrencySelectDropdown.vue';
 import DashboardDateDropdown from '@/services/dashboards/shared/dashboard-toolset/DashboardDateDropdown.vue';
 import DashboardDateRangeBadge from '@/services/dashboards/shared/dashboard-toolset/DashboardDateRangeBadge.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';

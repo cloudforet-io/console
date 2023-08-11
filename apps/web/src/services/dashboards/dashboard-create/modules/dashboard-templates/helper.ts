@@ -5,7 +5,7 @@ import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-confi
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { DashboardVariablesSchema, DashboardLabel } from '@/services/dashboards/config';
+import type { DashboardLabel, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
@@ -13,6 +13,24 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_c
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getWidgetDefaultInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
+
+export const getDefaultWidgetFormData = (widgetId: string): Record<string, string> => {
+    const widgetConfig = getWidgetConfig(widgetId);
+    const fixedProperties: string[] = widgetConfig.options_schema?.fixed_properties ?? [];
+    const defaultProperties: string[] = widgetConfig.options_schema?.default_properties?.filter((d) => !fixedProperties.includes(d)) ?? [];
+    const schemaFormData = {};
+
+    // set default value to fixed properties
+    fixedProperties.forEach((propertyName) => {
+        schemaFormData[propertyName] = widgetConfig?.options?.[propertyName];
+    });
+    // set default value to default properties
+    defaultProperties.forEach((propertyName) => {
+        schemaFormData[propertyName] = propertyName.replace('filters.', '');
+    });
+
+    return schemaFormData;
+};
 
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<DashboardLayoutWidgetInfo>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(

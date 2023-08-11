@@ -57,6 +57,33 @@
                          height="1rem"
                     />
                 </div>
+                <div v-click-outside="handleClickOutsideCurrencyMenu"
+                     class="info-menu currency"
+                     @click.stop="handleCurrencyDropdownClick"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
+                    <div class="value">
+                        <span>{{ currency }}</span>
+                        <div v-if="currencyMenuVisible"
+                             class="currency-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in currencyMenuItems"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleCurrencyClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
                 <div class="info-menu">
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ timezone }}</span>
@@ -140,11 +167,13 @@ import type { Vue } from 'vue/types/vue';
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import ejs from 'ejs';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -191,6 +220,7 @@ export default defineComponent<Props>({
                 return roleArray.join(', ');
             }),
             language: computed(() => store.getters['user/languageLabel']),
+            currency: computed(() => store.state.settings.currency),
             timezone: computed(() => store.state.user.timezone),
             domainId: computed(() => store.state.domain.domainId),
             userId: computed(() => store.state.user.userId),
@@ -198,6 +228,7 @@ export default defineComponent<Props>({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
             languageMenuVisible: false,
+            currencyMenuVisible: false,
             supportedMenu: computed(() => {
                 const docsList = config.get('DOCS') ?? [];
                 const data = { lang: store.state.user.language };
@@ -208,6 +239,10 @@ export default defineComponent<Props>({
             }),
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
+            }))),
+            currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+                name: currency,
+                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
             }))),
             profileMenuRef: null as null|HTMLElement,
         });
@@ -225,6 +260,9 @@ export default defineComponent<Props>({
         const setLanguageMenuVisible = (visible: boolean) => {
             state.languageMenuVisible = visible;
         };
+        const setCurrencyMenuVisible = (visible: boolean) => {
+            state.currencyMenuVisible = visible;
+        };
         const handleProfileButtonClick = () => {
             setVisible(!props.visible);
         };
@@ -240,9 +278,18 @@ export default defineComponent<Props>({
              */
             if (!profileMenuRef.contains(target)) hideProfileMenu();
         };
-
+        const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
+            const profileMenuRef = state.profileMenuRef;
+            if (!profileMenuRef) return;
+            const target = e.target as HTMLElement;
+            setCurrencyMenuVisible(false);
+            if (!profileMenuRef.contains(target)) hideProfileMenu();
+        };
         const handleLanguageDropdownClick = () => {
             setLanguageMenuVisible(!state.languageMenuVisible);
+        };
+        const handleCurrencyDropdownClick = () => {
+            setCurrencyMenuVisible(!state.currencyMenuVisible);
         };
 
         const handleLanguageClick = async (language) => {
@@ -259,6 +306,11 @@ export default defineComponent<Props>({
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
             }
+        };
+        const handleCurrencyClick = async (currency) => {
+            store.commit('settings/setCurrency', currency);
+            setCurrencyMenuVisible(false);
+            showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
         };
         const handleClickGoToMyPage = () => {
             hideProfileMenu();
@@ -278,8 +330,11 @@ export default defineComponent<Props>({
             hideProfileMenu,
             handleProfileButtonClick,
             handleClickOutsideLanguageMenu,
+            handleClickOutsideCurrencyMenu,
             handleLanguageDropdownClick,
+            handleCurrencyDropdownClick,
             handleClickGoToMyPage,
+            handleCurrencyClick,
             handleLanguageClick,
             handleClickSignOut,
             MY_PAGE_ROUTE,
@@ -369,7 +424,7 @@ export default defineComponent<Props>({
                     margin-bottom: 0.5rem;
                 }
 
-                &.language {
+                &.language, &.currency {
                     display: inline-flex;
                     cursor: pointer;
                     &:hover, &:focus {
@@ -381,7 +436,7 @@ export default defineComponent<Props>({
                     }
                     .value {
                         position: relative;
-                        .language-menu-wrapper {
+                        .language-menu-wrapper, .currency-menu-wrapper {
                             @mixin menu-dropdown;
                             left: -1rem;
                             min-width: 9.25rem;

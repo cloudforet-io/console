@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="dashboard-date-dropdown">
         <p-select-dropdown
             style-type="transparent"
             :items="monthMenuItems"
@@ -175,3 +175,11 @@ export default defineComponent({
     },
 });
 </script>
+<style lang="postcss" scoped>
+.dashboard-date-dropdown {
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        min-width: auto;
+    }
+}
+</style>
