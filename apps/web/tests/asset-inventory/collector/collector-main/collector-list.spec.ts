@@ -29,7 +29,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -41,7 +40,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -53,7 +51,6 @@ test.describe('Collector List', () => {
 
             try {
                 const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-                await page.waitForLoadState('networkidle');
                 expect(apiResponse.status()).toBe(200);
             } catch (error) {
                 console.error('Error occurred:', error);
@@ -68,7 +65,6 @@ test.describe('Collector List', () => {
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-            await page.waitForLoadState('networkidle');
             expect(apiResponse.status()).toBe(200);
         } catch (error) {
             console.error('Error occurred:', error);
@@ -76,11 +72,10 @@ test.describe('Collector List', () => {
     });
 
     test('Exporting to an Excel file.', async () => {
-        const excelButton = page.locator('.tool > .p-button')
+        const excelButton = page.locator('.right-tool-group > div.tool').nth(0).locator('.p-button');
         await excelButton.first().click();
 
         try {
-            await page.waitForLoadState('networkidle');
             const downloads = await page.context().downloads();
             expect(downloads.length).toBe(1);
             expect(downloads[0].suggestedFilename()).toContain('.xlsx');
@@ -90,15 +85,14 @@ test.describe('Collector List', () => {
     });
 
     test('Refresh list.', async () => {
-        const refreshButton = page.locator('.right-tool-group > div:nth-child(2) > .p-button')
-        await refreshButton.click();
+        const refreshButton = page.locator('.right-tool-group > div.tool').nth(1).locator('.p-button');
+        await refreshButton.first().click();
 
         try {
             const apiResponse = await page.waitForResponse(`${process.env.APIURL as string}/inventory/collector/list`);
-            await page.waitForLoadState('networkidle');
             expect(apiResponse.status()).toBe(200);
         } catch (error) {
             console.error('Error occurred:', error);
         }
     });
-})
+});
