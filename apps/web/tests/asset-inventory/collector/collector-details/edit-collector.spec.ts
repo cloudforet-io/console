@@ -17,8 +17,8 @@ test.describe('Edit Schedule', () => {
     const randomKey = `Key-${random()}`;
     const randomValue = `Value-${random()}`;
 
-    const ORIGIN_COLLECTOR_NAME = 'for_testcode';
-    const NEW_COLLECTOR_NAME = 'for_testEdit';
+    const COLLECTOR_NAME_1 = 'for_testCode';
+    const COLLECTOR_NAME_2 = 'for_testEdit';
     let currentCollectorName: '';
 
     const goToCollectorPage = async () => {
@@ -40,7 +40,7 @@ test.describe('Edit Schedule', () => {
 
         await test.step('2. Click on the first collector and go to the details page', async () => {
             // Click collector.
-            const collector = await page.locator(`.collector-lists>div .collector-item-name:text('${ORIGIN_COLLECTOR_NAME || NEW_COLLECTOR_NAME}')`);
+            const collector = await page.locator(`.collector-lists>div .collector-item-name:text('${COLLECTOR_NAME_1 || COLLECTOR_NAME_2}')`);
             currentCollectorName = await collector.textContent();
             await collector.click();
 
@@ -49,7 +49,7 @@ test.describe('Edit Schedule', () => {
 
             // Verify if the selected collector's name matches.
             await expect(page).toHaveURL(/asset-inventory\/collector\/collector-*/);
-            await expect(await page.getByRole('heading', { name: ORIGIN_COLLECTOR_NAME || NEW_COLLECTOR_NAME })).toBeVisible();
+            await expect(await page.getByRole('heading', { name: COLLECTOR_NAME_1 || COLLECTOR_NAME_2 })).toBeVisible();
         });
 
         await test.step('3-4. Edit base information', async () => {
@@ -266,10 +266,10 @@ test.describe('Edit Schedule', () => {
             await deleteTextButton.first().click();
 
             let newName = '';
-            if (textInput.textContent() === ORIGIN_COLLECTOR_NAME) {
-                newName = NEW_COLLECTOR_NAME;
+            if (textInput.textContent() === COLLECTOR_NAME_1) {
+                newName = COLLECTOR_NAME_2;
             } else {
-                newName = ORIGIN_COLLECTOR_NAME;
+                newName = COLLECTOR_NAME_1;
             }
             await textInput.locator('input').fill(`${newName}`);
             await page.getByRole('button', { name: 'Confirm' }).click();
@@ -283,7 +283,7 @@ test.describe('Edit Schedule', () => {
         });
 
         await test.step('18. Check Edit data', async () => {
-            const collector = await page.locator(`.collector-lists>div .collector-item-name:text('${ORIGIN_COLLECTOR_NAME || NEW_COLLECTOR_NAME}')`);
+            const collector = await page.locator(`.collector-lists>div .collector-item-name:text('${COLLECTOR_NAME_1 || COLLECTOR_NAME_2}')`);
             await expect(collector).toContainText(currentCollectorName);
         });
     });
