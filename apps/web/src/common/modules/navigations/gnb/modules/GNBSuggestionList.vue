@@ -180,7 +180,7 @@ onUnmounted(() => {
 
             &:focus {
                 @apply border border-blue-400 rounded-xs;
-                box-shadow: 0 0 0 0.125rem rgb(73 167 247 / 20%);
+                box-shadow: 0 0 0 0.125rem rgba(73, 167, 247, 20%);
                 outline: none;
 
                 &:not(:hover):not(.disabled):not(.empty) {

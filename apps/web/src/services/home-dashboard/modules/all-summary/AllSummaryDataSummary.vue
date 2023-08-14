@@ -243,7 +243,7 @@ watch(() => props.activeTab, (type) => {
                     </div>
                     <span class="count">{{ count }} {{ activeTab === DATA_TYPE.STORAGE ? storageSuffix : '' }}</span>
                 </router-link>
-                <router-link v-for="(data, idx) of summaryData"
+                <router-link v-for="(data, idx) of state.summaryData"
                              :key="idx"
                              :to="data.to"
                              class="summary-row"

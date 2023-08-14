@@ -149,7 +149,7 @@ onClickOutside(containerRef as MaybeRef, hideSiteMap);
         max-height: calc(100vh - 4rem);
         width: 15rem;
         font-size: 0.875rem;
-        box-shadow: 0 0 14px rgb(0 0 0 / 10%);
+        box-shadow: 0 0 14px rgba(0, 0, 0, 10%);
         overflow-y: auto;
         z-index: 999;
         padding: 1.5rem 0;

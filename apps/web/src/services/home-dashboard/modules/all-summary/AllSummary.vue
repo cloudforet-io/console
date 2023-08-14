@@ -11,7 +11,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
@@ -59,9 +59,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const { t } = useI18n();
 
+const chartRef = ref<HTMLElement | null>(null);
 const state = reactive({
     chart: null as any,
-    chartRef: null as HTMLElement | null,
     //
     period: computed<Period>(() => {
         if (state.selectedDateType === 'MONTHLY') {
@@ -366,7 +366,7 @@ const getTrend = async (type) => {
 
 /* Event */
 const handleChangeTab = (name) => {
-    if (state.activeTab !== name) disposeChart(state.chartRef);
+    if (state.activeTab !== name) disposeChart(chartRef.value);
     state.activeTab = name;
 };
 const handleChangeDateType = (type) => {
@@ -391,18 +391,18 @@ init();
 chartInit();
 
 /* Watcher */
-watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
+watch([() => chartState.loading, () => chartRef.value], async ([loading, chartContext]) => {
     if (!loading && chartContext) {
         requestIdleCallback(() => drawChart(chartContext));
     }
 }, { immediate: false });
 watch(() => state.activeTab, async (type) => {
     await getTrend(type);
-    drawChart(state.chartRef);
+    drawChart(chartRef.value);
 }, { immediate: false });
 watch(() => state.selectedDateType, async () => {
     await getTrend(state.activeTab);
-    drawChart(state.chartRef);
+    drawChart(chartRef.value);
 }, { immediate: false });
 
 onUnmounted(() => {

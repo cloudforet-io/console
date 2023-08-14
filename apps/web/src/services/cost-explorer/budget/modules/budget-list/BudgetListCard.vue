@@ -9,8 +9,8 @@ import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
@@ -242,7 +242,7 @@ const state = reactive({
 }
 .budget-list-card {
     @apply rounded-lg border border-solid border-gray-200 rounded-lg bg-white;
-    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 6%);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 6%);
     &:hover {
         @apply bg-secondary-2;
     }

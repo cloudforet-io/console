@@ -13,7 +13,7 @@
     position: absolute;
     width: 40px;
     height: 26px;
-    background: linear-gradient(90deg, rgb(102 56 182 / 80%) 0%, rgb(0 128 251 / 80%) 100%);
+    background: linear-gradient(90deg, rgba(102, 56, 182, 80%) 0%, rgba(0, 128, 251, 80%) 100%);
     top: 100%;
     left: -0.5rem;
 }
@@ -22,7 +22,7 @@
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-bottom: 8px solid #6372d6;
-    background: linear-gradient(90deg, rgb(102 56 182 / 80%) 0%, rgb(0 128 251 / 80%) 100%);
+    background: linear-gradient(90deg, rgba(102, 56, 182, 80%) 0%, rgba(0, 128, 251, 80%) 100%);
     content: "";
     position: absolute;
     top: -0.5rem;

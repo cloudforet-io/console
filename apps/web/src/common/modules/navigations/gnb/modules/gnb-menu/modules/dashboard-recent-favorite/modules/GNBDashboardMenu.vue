@@ -141,7 +141,7 @@ const handleOverflown = (isOverflown: boolean) => {
         width: 22.5rem;
         min-height: auto;
         right: 0;
-        box-shadow: 0 0 0.5rem rgb(0 0 0 / 8%);
+        box-shadow: 0 0 0.5rem rgba(0, 0, 0, 8%);
         .tab-pane {
             padding-bottom: 0;
         }
@@ -157,7 +157,7 @@ const handleOverflown = (isOverflown: boolean) => {
             top: -3rem;
             width: 100%;
             height: 3rem;
-            background: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, #fff 100%);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0%) 0%, #fff 100%);
         }
     }
 

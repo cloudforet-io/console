@@ -133,7 +133,7 @@ onMounted(() => {
     right: 0;
     line-height: 1.5;
     box-sizing: border-box;
-    box-shadow: 0 0 0.5rem rgb(theme('colors.black') 0.08);
+    box-shadow: 0 0 0.5rem rgba(theme('colors.black'), 0.08);
     pointer-events: none;
     z-index: 1;
     padding: 0.5rem;

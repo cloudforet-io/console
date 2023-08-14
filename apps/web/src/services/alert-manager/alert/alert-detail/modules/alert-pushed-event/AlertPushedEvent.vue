@@ -242,7 +242,7 @@ const onCopyClick = () => {
 }
 .copy-button-alert {
     @apply inline-flex text-white rounded-md;
-    background-color: rgb(theme('colors.gray.900') 0.88);
+    background-color: rgba(theme('colors.gray.900'), 0.88);
     font-weight: 400;
     font-size: 0.75rem;
     line-height: 1.3;

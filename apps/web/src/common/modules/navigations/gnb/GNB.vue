@@ -113,7 +113,7 @@ onMounted(() => {
 .gnb {
     @apply bg-white items-center;
     display: flex !important;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 12%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 12%);
     .left-part {
         padding-left: 1.5rem;
 

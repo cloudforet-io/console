@@ -8,7 +8,7 @@ import {
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
 import {
-    computed, reactive, watch, onUnmounted,
+    computed, reactive, watch, onUnmounted, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
@@ -50,12 +50,12 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n();
 const store = useStore();
 
+const loaderRef = ref(null);
+const chartRef = ref<HTMLElement | null>(null);
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     skeletons: range(4),
     loading: true,
-    loaderRef: null,
-    chartRef: null as HTMLElement | null,
     data: [] as Data[],
     chart: null as null | any,
     chartRegistry: {},
@@ -162,7 +162,7 @@ const getData = async () => {
 watch(() => state.providers, (providers) => {
     if (!isEmpty(providers)) getData();
 }, { immediate: true });
-watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
+watch([() => state.loading, () => loaderRef.value, () => chartRef.value], ([loading, loaderCtx, chartCtx]) => {
     if (loading && loaderCtx) {
         drawChart(loaderCtx, true);
     }
@@ -221,7 +221,7 @@ onUnmounted(() => {
                         <p-data-table v-else
                                       :loading="state.loading"
                                       :fields="state.fields"
-                                      :items="data"
+                                      :items="state.data"
                                       :bordered="false"
                         >
                             <template #col-provider-format="{ item }">

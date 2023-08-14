@@ -54,7 +54,7 @@ const handleLogin = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 10%);
     height: 2.5rem;
     width: 100%;
     font-family: Roboto, sans-serif;
@@ -64,7 +64,7 @@ const handleLogin = async () => {
 
 .google-signin-button:hover {
     @apply bg-blue-100 border-gray-400;
-    box-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 20%);
 }
 
 .google-signin-button:focus {

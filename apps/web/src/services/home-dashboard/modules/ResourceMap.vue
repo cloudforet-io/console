@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 
-import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import type { MapChart } from '@amcharts/amcharts4/maps';
+import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PProgressBar, PEmpty } from '@spaceone/design-system';
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
@@ -60,8 +60,8 @@ withDefaults(defineProps<Props>(), {
 const store = useStore();
 const { t } = useI18n();
 
+const chartRef = ref<HTMLElement | null>(null);
 const state = reactive({
-    chartRef: null as HTMLElement | null,
     chartRegistry: {},
     chart: null as MapChart|null,
     data: [] as Resource[],
@@ -269,7 +269,7 @@ const goToCloudService = (item) => {
     return res;
 };
 
-watch([() => state.chartRef, () => state.loading], ([chartCtx, loading]) => {
+watch([() => chartRef.value, () => state.loading], ([chartCtx, loading]) => {
     if (chartCtx && !loading) {
         requestIdleCallback(() => drawChart(chartCtx));
     }

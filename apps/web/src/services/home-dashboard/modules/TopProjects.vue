@@ -10,7 +10,7 @@ import {
 import bytes from 'bytes';
 import { range } from 'lodash';
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
@@ -58,12 +58,12 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n();
 const store = useStore();
 
+const chartRef = ref<HTMLElement | null>(null);
 const state = reactive({
     projectItems: computed(() => store.state.reference.project.items),
     loading: true,
     items: [] as TableItem[],
     chartData: [] as ChartData[],
-    chartRef: null as HTMLElement | null,
     chart: null as null | any,
     colors: {
         server: SERVER_COLOR,
@@ -237,7 +237,7 @@ const init = async () => {
 };
 init();
 
-watch([() => state.chartRef, () => state.chartData], ([chartContext, data]) => {
+watch([() => chartRef.value, () => state.chartData], ([chartContext, data]) => {
     if (chartContext && data) {
         drawChart(chartContext);
     }

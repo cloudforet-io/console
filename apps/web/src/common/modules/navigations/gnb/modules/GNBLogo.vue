@@ -45,10 +45,10 @@ const state = reactive({
                      :src="state.ciTextImage"
                      alt="logo-text"
                 >
-                <!--                <img v-else-->
-                <!--                     class="logo-text"-->
-                <!--                     src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg"-->
-                <!--                >-->
+                <img v-else
+                     class="logo-text"
+                     src="@/assets/images/brand/SpaceONE_logoTypeA_v1.9.svg"
+                >
             </div>
         </component>
     </span>

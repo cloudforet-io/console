@@ -174,7 +174,7 @@ watch(() => collectorFormState.provider, async (provider) => {
 
         .error-box {
             @apply flex flex-col items-center justify-center w-full;
-            background-color: rgb(theme('colors.white') 0.5);
+            background-color: rgba(theme('colors.white'), 0.5);
             padding: 1.125rem;
 
             .error-message {

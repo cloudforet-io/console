@@ -198,7 +198,7 @@ watch(() => store.state.reference.project.items, (projects) => {
         </template>
         <p-data-loader
             :loading="state.loading"
-            :data="projectSummaryData"
+            :data="state.projectSummaryData"
         >
             <div class="content-wrapper">
                 <trusted-advisor-overall :extra-params="extraParams" />
@@ -235,17 +235,17 @@ watch(() => store.state.reference.project.items, (projects) => {
                                      class="col-wrapper col-span-2"
                                 >
                                     <template v-if="rowNum === -1">
-                                        <span v-if="projectSummaryData[colNum * state.thisPage - 1]"
-                                              v-tooltip.top="projectSummaryData[colNum * state.thisPage - 1].tooltipText"
+                                        <span v-if="state.projectSummaryData[colNum * state.thisPage - 1]"
+                                              v-tooltip.top="state.projectSummaryData[colNum * state.thisPage - 1].tooltipText"
                                               class="project-name"
                                         >
-                                            <p-i v-if="projectSummaryData[colNum * state.thisPage - 1].isFavorite"
+                                            <p-i v-if="state.projectSummaryData[colNum * state.thisPage - 1].isFavorite"
                                                  name="ic_favorite"
                                                  class="favorite-icon"
                                                  width="0.625rem"
                                                  height="0.625rem"
                                             />
-                                            <span>{{ projectSummaryData[colNum * state.thisPage - 1].projectName }}</span>
+                                            <span>{{ state.projectSummaryData[colNum * state.thisPage - 1].projectName }}</span>
                                         </span>
                                     </template>
                                     <template v-else>

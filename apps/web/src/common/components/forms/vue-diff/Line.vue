@@ -164,10 +164,10 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-removed {
-        background-color: rgb(255 0 0 / 10%);
+        background-color: rgba(255, 0, 0, 10%);
 
         span.modified {
-            background-color: rgb(255 0 0 / 15%);
+            background-color: rgba(255, 0, 0, 15%);
         }
 
         code::before {
@@ -176,10 +176,10 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-added {
-        background-color: rgb(0 255 128 / 10%);
+        background-color: rgba(0, 255, 128, 10%);
 
         span.modified {
-            background-color: rgb(0 255 128 / 15%);
+            background-color: rgba(0, 255, 128, 15%);
         }
 
         code::before {
@@ -188,10 +188,10 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-disabled {
-        background-color: rgb(128 128 128 / 10%);
+        background-color: rgba(128, 128, 128, 10%);
     }
 
-    .vue-diff-cell-fold {
+    .vue-diff-cell-fold {,
         &.lineNum {
             opacity: 0.8;
             font-size: 0.8em;

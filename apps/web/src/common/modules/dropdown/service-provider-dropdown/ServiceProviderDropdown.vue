@@ -83,7 +83,7 @@ const handleSelect = (provider: string) => {
     :deep(.dropdown-button) {
         @apply rounded-2xl border-gray-200 bg-gray-100;
         width: unset;
-        box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 6%);
         .text {
             @apply flex items-center;
         }
