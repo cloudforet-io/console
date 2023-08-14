@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => ({
         viteCommonjs(),
         vue(),
         svgicon({
-            include: ['**/svg-icon/**/*.svg'],
+            include: ['**/icon-assets/**/*.svg'],
         }),
         stylelint({
             include: ['src/**/*.{css,vue,pcss,scss}'],

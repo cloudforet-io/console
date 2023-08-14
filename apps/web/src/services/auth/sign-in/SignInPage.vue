@@ -1,7 +1,7 @@
 <script lang="ts">
 import { isEmpty } from 'lodash';
 import {
-    toRefs, reactive, computed, watch,
+    toRefs, reactive, computed, watch, defineAsyncComponent,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -63,8 +63,9 @@ export default {
                 let component;
                 const auth = state.authType;
                 if (auth) {
+                    const path = `./external/${auth}/template/${auth}.vue`;
                     try {
-                        component = () => import(`./external/${auth}/template/${auth}.vue`);
+                        component = defineAsyncComponent(() => import(path));
                     } catch (e) {
                         ErrorHandler.handleError(e);
                     }

@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 interface Props {
-    styleType: string;
+    styleType?: string;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -30,7 +30,7 @@ const handleClose = () => {
     <portal to="top-notification"
             class="top-notification"
     >
-        <p slot-scope="{hasDefaultMessage}">
+        <p :v-slot="{hasDefaultMessage}">
             <p-notification-bar v-model:visible="state.visible"
                                 :style-type="styleType"
                                 @close="handleClose"

@@ -4,6 +4,7 @@ import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import {
     computed, nextTick, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 import { useStore } from 'vuex';
 
@@ -30,6 +31,7 @@ const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:is-overflown', value: boolean): void;
 }>();
 const store = useStore();
+const { t } = useI18n();
 
 const state = reactive({
     loading: true,

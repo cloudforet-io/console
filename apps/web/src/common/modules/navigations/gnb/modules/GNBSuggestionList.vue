@@ -20,7 +20,7 @@ interface Props {
     inputText: string;
     isFocused: boolean;
     focusingDirection: FocusingDirection;
-    useFavorite: boolean;
+    useFavorite?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

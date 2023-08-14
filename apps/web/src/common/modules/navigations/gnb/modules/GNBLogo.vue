@@ -32,15 +32,18 @@ const state = reactive({
                 <img v-if="state.ciLogoImage"
                      class="logo-character"
                      :src="state.ciLogoImage"
+                     alt="logo-image"
                 >
                 <img v-else
                      class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
+                     alt="brand-logo-image"
                 >
 
                 <img v-if="state.ciTextImage"
                      class="logo-text"
                      :src="state.ciTextImage"
+                     alt="logo-text"
                 >
                 <!--                <img v-else-->
                 <!--                     class="logo-text"-->

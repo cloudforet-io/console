@@ -9,7 +9,7 @@ type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 abstract class Authenticator {
     static async signIn(credentials: Record<string, any>, userId?: string, userType?: UserType): Promise<void> {
         await store.dispatch('user/signIn', {
-            domainId: store.state['domain/domainId'],
+            domainId: store.state.domain.domainId,
             credentials,
             userType: userType || 'USER',
             userId,
@@ -18,7 +18,7 @@ abstract class Authenticator {
             store.dispatch('domain/setBillingEnabled'),
             // INIT REFERENCE STORE
             store.dispatch('reference/loadAll', { force: true }),
-            setI18nLocale(store.state['user/language']),
+            setI18nLocale(store.state.user.language),
         ]);
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');

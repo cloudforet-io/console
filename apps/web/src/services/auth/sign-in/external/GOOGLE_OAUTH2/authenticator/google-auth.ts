@@ -51,7 +51,7 @@ class GoogleAuth extends Authenticator {
     static signIn = async (onSignInCallback?) => {
         await GoogleAuth.loadGapi();
         const tokenClient = await google.accounts.oauth2.initTokenClient({
-            client_id: store.state['domain/authOptions'].client_id,
+            client_id: store.state.domain.authOptions.client_id,
             scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
             include_granted_scopes: false,
             callback: async (res) => {
