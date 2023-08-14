@@ -275,15 +275,4 @@ watch(() => state.proxyVisible, (value) => {
     }
 }
 
-/* custom design-system component - p-button-modal */
-.p-button-modal::v-deep {
-    .modal-wrapper {
-        max-width: 30rem;
-        margin: auto;
-    }
-    .modal-footer {
-        @apply justify-end;
-        padding-top: 2.625rem;
-    }
-}
 </style>

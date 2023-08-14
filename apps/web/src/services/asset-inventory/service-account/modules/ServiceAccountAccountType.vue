@@ -83,7 +83,7 @@ watch(() => props.accountType, (accountType: AccountType) => {
 <style lang="postcss" scoped>
 .service-account-account-type {
     .content-wrapper {
-        padding: 0.5rem 1rem 1.5rem 1rem;
+        padding: 0.5rem 1rem 1.5rem;
 
         .create-mode-wrapper {
             @apply w-1/2;

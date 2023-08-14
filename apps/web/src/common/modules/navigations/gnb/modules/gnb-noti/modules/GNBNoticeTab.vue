@@ -211,7 +211,7 @@ const init = async () => {
     .content-wrapper {
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
         overflow-y: scroll;
-        padding: 0.25rem 0.5rem 3.5rem 0.5rem;
+        padding: 0.25rem 0.5rem 3.5rem;
         .pinned-header-wrapper {
             @apply text-gray-500 flex items-center;
             font-size: 0.75rem;

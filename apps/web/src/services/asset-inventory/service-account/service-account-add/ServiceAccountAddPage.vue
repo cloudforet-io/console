@@ -299,13 +299,13 @@ const handleChangeProjectForm = (projectForm) => {
 
         .form-wrapper {
             .service-account-project-form {
-                padding: 0.5rem 1rem 2.5rem 1rem;
+                padding: 0.5rem 1rem 2.5rem;
             }
             .service-account-credentials-form {
-                padding: 0.5rem 1rem 2.5rem 1rem;
+                padding: 0.5rem 1rem 2.5rem;
             }
             .service-account-base-information-form {
-                padding: 0.5rem 1rem 2.5rem 1rem;
+                padding: 0.5rem 1rem 2.5rem;
             }
         }
     }

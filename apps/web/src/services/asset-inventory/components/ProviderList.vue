@@ -91,7 +91,7 @@ const handleSelectProvider = (providerName) => {
             height: 2.625rem;
             padding: 0.75rem 0.875rem;
             gap: 0.375rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
 
             &:hover {
                 background-color: transparent;

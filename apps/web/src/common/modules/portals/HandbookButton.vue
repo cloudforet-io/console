@@ -141,7 +141,7 @@ onUnmounted(() => {
         bottom: 0.5rem;
         left: 0.589375rem;
         opacity: 0.5;
-        border-radius: 0 0 1.25rem 0;
+        border-radius: 0 0 1.25rem;
         transform: matrix(1, 0.05, -0.02, 1, 0, 0);
         content: '';
     }
@@ -151,7 +151,7 @@ onUnmounted(() => {
         @apply overflow-auto relative flex-grow border-0;
         z-index: 1;
         margin-bottom: 1rem;
-        border-radius: 0 0 1.25rem 0;
+        border-radius: 0 0 1.25rem;
         background-color: theme('colors.white');
         min-height: auto;
 

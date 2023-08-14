@@ -254,7 +254,7 @@ const handleConfirm = () => {
         }
     }
 
-    padding: 1.5rem 1rem 1rem 1rem;
+    padding: 1.5rem 1rem 1rem;
     .step-head {
         @apply flex w-full border-b border-gray-200 pb-3;
         margin-top: 2.375rem;

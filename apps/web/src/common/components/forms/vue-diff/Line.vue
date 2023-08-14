@@ -98,7 +98,7 @@ if (props.scrollOptions) {
                         <div class="code"
                              :class="`vue-diff-cell-${line.type}`"
                         >
-                            <vueDiffCode
+                            <vue-diff-code
                                 :language="language"
                                 :code="setCode(line, render, index)"
                                 :scroll-options="scrollOptions"
@@ -125,7 +125,7 @@ if (props.scrollOptions) {
                 <div class="code"
                      :class="`vue-diff-cell-${render[0].type}`"
                 >
-                    <vueDiffCode
+                    <vue-diff-code
                         :language="language"
                         :code="setCode(render[0])"
                         :scroll-options="scrollOptions"
@@ -164,10 +164,10 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-removed {
-        background-color: rgba(255, 0, 0, 0.1);
+        background-color: rgb(255 0 0 / 10%);
 
         span.modified {
-            background-color: rgba(255, 0, 0, 0.15);
+            background-color: rgb(255 0 0 / 15%);
         }
 
         code::before {
@@ -176,10 +176,10 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-added {
-        background-color: rgba(0, 255, 128, 0.1);
+        background-color: rgb(0 255 128 / 10%);
 
         span.modified {
-            background-color: rgba(0, 255, 128, 0.15);
+            background-color: rgb(0 255 128 / 15%);
         }
 
         code::before {
@@ -188,7 +188,7 @@ if (props.scrollOptions) {
     }
 
     .vue-diff-cell-disabled {
-        background-color: rgba(128, 128, 128, 0.1);
+        background-color: rgb(128 128 128 / 10%);
     }
 
     .vue-diff-cell-fold {

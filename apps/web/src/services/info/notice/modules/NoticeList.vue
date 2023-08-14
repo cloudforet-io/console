@@ -229,7 +229,7 @@ const handlePageChange = (page: number) => {
     }
     .pagination-wrapper {
         @apply flex justify-center border-t border-gray-200;
-        padding: 0.75rem 0 1rem 0;
+        padding: 0.75rem 0 1rem;
     }
 
     /* custom design-system component - p-data-loader */

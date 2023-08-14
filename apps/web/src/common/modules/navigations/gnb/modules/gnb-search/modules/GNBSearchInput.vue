@@ -98,7 +98,7 @@ watch(() => props.isFocused, (isFocused) => {
 
     &:focus-within {
         @apply border-secondary-1 bg-secondary-2;
-        box-shadow: 0 0 0 2px rgba(73, 167, 247, 0.2);
+        box-shadow: 0 0 0 2px rgb(73 167 247 / 20%);
     }
 
     input {

@@ -181,7 +181,7 @@ export default defineComponent({
                     border-radius: 0.25rem;
                 }
                 .menu-container {
-                    padding: 0.75rem 0.875rem 0 0.875rem;
+                    padding: 0.75rem 0.875rem 0;
                 }
             }
 

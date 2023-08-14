@@ -81,7 +81,7 @@ const {
         width: 20rem;
         max-width: 27.5rem;
         min-height: auto;
-        box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+        box-shadow: 0 0 0.5rem rgb(0 0 0 / 8%);
         .tab-pane {
             padding-bottom: 0;
         }

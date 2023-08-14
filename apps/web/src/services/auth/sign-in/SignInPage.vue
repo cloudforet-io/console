@@ -129,17 +129,21 @@ export default {
             <template v-if="images">
                 <img class="logo-character"
                      :src="images.ciLogo"
+                     alt="logo-character-image"
                 >
                 <img class="logo-text"
                      :src="images.ciTextWithType"
+                     alt="logo-text-image"
                 >
             </template>
             <template v-else>
                 <img class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
+                     alt="logo-character-image"
                 >
                 <img class="logo-text"
                      src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+                     alt="logo-text-image"
                 >
             </template>
         </div>

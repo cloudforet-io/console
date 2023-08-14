@@ -182,7 +182,7 @@ onClickOutside(containerRef as MaybeRef, hideMenu);
         margin-top: -0.5rem;
         left: -1.125rem;
         min-width: 10rem;
-        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0.875rem rgb(0 0 0 / 10%);
         padding: 0.5rem;
     }
     .custom-menu-wrapper {
@@ -193,7 +193,7 @@ onClickOutside(containerRef as MaybeRef, hideMenu);
         margin-top: -0.5rem;
         left: -1.125rem;
         min-width: 10rem;
-        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0.875rem rgb(0 0 0 / 10%);
     }
 }
 

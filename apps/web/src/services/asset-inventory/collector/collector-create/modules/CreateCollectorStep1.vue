@@ -191,7 +191,7 @@ onMounted(() => {
 
                     .plugin-card-item {
                         border-radius: 0.375rem;
-                        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+                        box-shadow: 0 2px 4px 0 rgb(0 0 0 / 6%);
                         width: 100%;
                         min-height: unset;
                         padding: 1.5rem;

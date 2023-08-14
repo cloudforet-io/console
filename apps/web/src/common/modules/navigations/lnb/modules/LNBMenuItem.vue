@@ -194,7 +194,7 @@ const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem 
         }
         &:focus, &:focus-within, &:active {
             @apply bg-white border-secondary1;
-            box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);
+            box-shadow: 0 0 0 2px rgb(theme('colors.secondary1') 0.2);
         }
         &.selected {
             @apply bg-blue-200;

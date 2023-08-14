@@ -24,6 +24,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     item: () => ({}),
+    period: undefined,
 });
 const store = useStore();
 
@@ -119,7 +120,7 @@ const getCloudServiceDetailLink = (item) => {
 <style scoped lang="postcss">
 .cloud-service-type-item {
     @apply bg-white border border-gray-200 rounded-lg;
-    box-shadow: 0 0.02rem 0.04rem rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0.02rem 0.04rem rgb(0 0 0 / 6%);
 
     &:hover {
         @apply border-l border-secondary border-gray-200 bg-blue-100;

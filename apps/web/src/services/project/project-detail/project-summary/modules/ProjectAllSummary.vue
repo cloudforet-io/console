@@ -619,7 +619,7 @@ onUnmounted(() => {
                 &.no-data-wrapper {
                     display: grid;
                     .empty-image {
-                        margin: 0 auto 0.5rem auto;
+                        margin: 0 auto 0.5rem;
                     }
 
                     .text {

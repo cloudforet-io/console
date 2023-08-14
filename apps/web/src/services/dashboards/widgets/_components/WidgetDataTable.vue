@@ -444,7 +444,7 @@ const handleClickRow = (rowData) => {
                 @apply bg-gray-100;
             }
             &:hover {
-                background-color: rgba(theme('colors.gray.200'), 0.7);
+                background-color: rgb(theme('colors.gray.200') 0.7);
             }
         }
     }

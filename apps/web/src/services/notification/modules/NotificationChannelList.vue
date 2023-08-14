@@ -266,7 +266,7 @@ onActivated(async () => {
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    padding: 2rem 1rem 0.375rem 1rem;
+    padding: 2rem 1rem 0.375rem;
 }
 .sub-title {
     font-size: 1.375rem;

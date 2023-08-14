@@ -113,7 +113,7 @@ const state = reactive({
     height: 100%;
     min-height: 12.8125rem;
     padding: 1rem 1.25rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 6%);
     &:hover:not(.inactive) {
         @apply bg-blue-100 cursor-pointer;
     }

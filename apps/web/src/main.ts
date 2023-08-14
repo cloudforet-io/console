@@ -2,7 +2,6 @@
 // import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import Notifications from '@kyvg/vue3-notification';
 import SpaceDesignSystem from '@spaceone/design-system';
-import type { MirinaeOptions } from '@spaceone/design-system/types/install';
 import FloatingVue from 'floating-vue';
 import { createPinia } from 'pinia';
 import PortalVue from 'portal-vue';

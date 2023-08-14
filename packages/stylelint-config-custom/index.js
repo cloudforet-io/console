@@ -1,5 +1,8 @@
 module.exports = {
-    extends: ['stylelint-config-standard'],
+    extends: [
+        'stylelint-config-standard',
+        'stylelint-config-recommended-vue',
+    ],
     rules: {
         'selector-pseudo-element-no-unknown': [true, { ignorePseudoElements: ['v-deep', 'deep'] }],
         'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['deep'] }],
@@ -8,8 +11,16 @@ module.exports = {
         'at-rule-no-unknown': [true, { ignoreAtRules: ['define-mixin', 'mixin', 'at', 'screen', 'tailwind'] }],
         'rule-empty-line-before': null,
         'selector-list-comma-newline-after': null,
-        'function-calc-no-invalid': null,
         'no-descending-specificity': null,
+        'declaration-block-no-redundant-longhand-properties': null,
+        'font-family-name-quotes': null,
+        'value-keyword-case': null,
+        'function-no-unknown': null,
+        'import-notation': 'string',
+        'selector-not-notation': 'simple',
+        'selector-class-pattern': null,
+        'property-no-vendor-prefix': null,
+        'number-max-precision': null,
         'property-no-unknown': [true, { ignoreProperties: [/\$(.+?)/] }],
     },
 };

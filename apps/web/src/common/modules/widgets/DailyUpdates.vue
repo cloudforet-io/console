@@ -392,7 +392,7 @@ init();
             }
         }
         &:nth-of-type(odd) {
-            background-color: rgba(theme('colors.primary4'), 0.5);
+            background-color: rgb(theme('colors.primary4') 0.5);
         }
     }
 }
@@ -411,8 +411,8 @@ init();
     @apply flex items-center w-full content-between border rounded-md;
     flex-wrap: wrap;
     overflow: hidden;
-    border-color: rgba(theme('colors.yellow.500'), 0.75);
-    background: linear-gradient(90deg, rgba(theme('colors.yellow.100'), 0.75) 23.96%, rgba(theme('colors.yellow.300'), 0.75) 49.48%, rgba(theme('colors.yellow.100'), 0.75) 74.48%);
+    border-color: rgb(theme('colors.yellow.500') 0.75);
+    background: linear-gradient(90deg, rgb(theme('colors.yellow.100') 0.75) 23.96%, rgb(theme('colors.yellow.300') 0.75) 49.48%, rgb(theme('colors.yellow.100') 0.75) 74.48%);
     background-size: 200% 200%;
     animation: gradient 3s ease infinite;
 
@@ -426,7 +426,7 @@ init();
     }
 
     .daily-update-card {
-        background-color: rgba(theme('colors.yellow.100'), 0.75);
+        background-color: rgb(theme('colors.yellow.100') 0.75);
     }
 }
 </style>

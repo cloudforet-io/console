@@ -193,7 +193,7 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
             @apply col-span-6 bg-white border border-gray-200 rounded-md;
             height: 20rem;
             box-sizing: border-box;
-            box-shadow: 0 0.125rem 0.25rem rgba(theme('colors.black'), 0.06);
+            box-shadow: 0 0.125rem 0.25rem rgb(theme('colors.black') 0.06);
             cursor: pointer;
             padding: 1rem;
 

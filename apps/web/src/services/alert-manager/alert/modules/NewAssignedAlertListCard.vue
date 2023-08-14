@@ -110,7 +110,7 @@ const onClickListItem = (idx) => {
             <p-i name="ic_megaphone-filled"
                  width="1.25rem"
                  height="1.25rem"
-                 class="ic_notification"
+                 class="ic-notification"
                  color="white"
             />
             {{ t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
@@ -138,7 +138,7 @@ const onClickListItem = (idx) => {
     header {
         @apply flex items-center;
 
-        .ic_notification {
+        .ic-notification {
             @apply inline-block;
             margin-right: 0.25rem;
         }

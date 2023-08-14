@@ -68,7 +68,7 @@ const state = reactive({
     height: 100%;
 
     &.admin {
-        background-color: rgba(theme('colors.primary3'), 0.3);
+        background-color: rgb(theme('colors.primary3') 0.3);
     }
 
     .lottie-wrapper {

@@ -371,7 +371,7 @@ onMounted(() => {
         max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
         position: relative;
         overflow-y: scroll;
-        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+        padding: 0.25rem 0.5rem 0.5rem;
 
         .clear-all-button {
             position: absolute;

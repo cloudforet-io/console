@@ -223,7 +223,7 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
 
 <style lang="postcss" scoped>
 .alert-responder {
-    padding: 0 1rem 2.5rem 1rem;
+    padding: 0 1rem 2.5rem;
 }
 .panel-title {
     margin-left: 0;

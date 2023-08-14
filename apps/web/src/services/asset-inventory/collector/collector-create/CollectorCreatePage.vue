@@ -20,8 +20,8 @@ export default defineComponent({
 <script lang="ts" setup>
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates
-import { computed, reactive, defineExpose } from 'vue';
 import { PHeading, PIconButton } from '@spaceone/design-system';
+import { computed, reactive, defineExpose } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
@@ -120,7 +120,7 @@ defineExpose({ setPathFrom });
 }
 
 .collector-creator-page {
-    margin: 2rem 2.5rem 0 2.5rem;
+    margin: 2rem 2.5rem 0;
     max-height: calc(100% - 2rem);
 
     .header {

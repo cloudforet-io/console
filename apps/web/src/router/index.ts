@@ -56,7 +56,6 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            console.log('beforeEach', store.getters['user/pagePermissionList']);
             const userPagePermissions = store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to.name as string, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);

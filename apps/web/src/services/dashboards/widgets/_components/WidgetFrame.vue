@@ -221,7 +221,7 @@ const handleRefresh = () => {
             line-height: 1.25;
             margin: 0.25rem 0;
         }
-        padding: 0.75rem 1.5rem 1rem 1.5rem;
+        padding: 0.75rem 1.5rem 1rem;
         border-color: inherit;
         flex: 0 0;
     }

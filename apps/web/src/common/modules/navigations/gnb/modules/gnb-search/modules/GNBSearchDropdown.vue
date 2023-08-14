@@ -197,7 +197,7 @@ watch(() => props.isFocused, (isFocused) => {
     top: 100%;
     right: 0;
     margin-top: 0.25rem;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0.5rem rgb(0 0 0 / 8%);
 
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
@@ -219,7 +219,7 @@ watch(() => props.isFocused, (isFocused) => {
 
         .dim-wrapper {
             position: relative;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, white 100%);
+            background: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, white 100%);
             height: 2rem;
             pointer-events: none;
             margin-top: -3rem;

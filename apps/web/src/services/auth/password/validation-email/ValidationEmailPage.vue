@@ -41,7 +41,7 @@ watch(() => route.query.status, (res) => {
                  class="face-icon"
             />
         </div>
-        <div class="contents_wrapper">
+        <div class="contents-wrapper">
             <div v-if="state.status === 'done'"
                  class="done"
             >
@@ -54,7 +54,7 @@ watch(() => route.query.status, (res) => {
                     <h1 class="status-title">
                         {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.TITLE') }}
                     </h1>
-                    <div class="desc_wrapper">
+                    <div class="desc-wrapper">
                         <p>
                             {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.DESC_1') }}
                             <span class="emphasis">{{ state.userId }}</span>
@@ -71,7 +71,7 @@ watch(() => route.query.status, (res) => {
                 <p class="status-title">
                     {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.TITLE') }}
                 </p>
-                <p class="desc_wrapper">
+                <p class="desc-wrapper">
                     <span class="emphasis font-bold">
                         {{ t('AUTH.PASSWORD.RESET.EMAIL.FAIL.DESC_1') }}
                     </span>
@@ -132,13 +132,13 @@ watch(() => route.query.status, (res) => {
             @apply text-red-200;
         }
     }
-    .contents_wrapper {
+    .contents-wrapper {
         @apply flex flex-col items-center justify-center text-center;
         .done {
             .status-title {
                 @apply text-display-lg text-violet-800;
             }
-            .desc_wrapper {
+            .desc-wrapper {
                 @apply text-gray-700 text-paragraph-md text-center;
                 margin-top: 0.75rem;
                 .emphasis {
@@ -150,7 +150,7 @@ watch(() => route.query.status, (res) => {
             .status-title {
                 @apply text-display-md text-red-500;
             }
-            .desc_wrapper {
+            .desc-wrapper {
                 @apply text-paragraph-md text-gray-500;
                 padding-top: 0.75rem;
                 white-space: pre-line;

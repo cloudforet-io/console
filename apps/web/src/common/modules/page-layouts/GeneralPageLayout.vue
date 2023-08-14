@@ -66,7 +66,7 @@ const state = reactive({
 
     .header {
         @apply flex justify-between;
-        padding: 1.5rem 1.5rem 0.25rem 1.5rem;
+        padding: 1.5rem 1.5rem 0.25rem;
         &.without-breadcrumbs {
             padding: 0;
         }
@@ -74,9 +74,9 @@ const state = reactive({
     .page-contents {
         width: 100%;
         flex-grow: 1;
-        padding: 0 1.5rem 2rem 1.5rem;
+        padding: 0 1.5rem 2rem;
         &.without-breadcrumbs {
-            padding: 1.5rem 1.5rem 2rem 1.5rem;
+            padding: 1.5rem 1.5rem 2rem;
         }
     }
     .fnb {

@@ -226,7 +226,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
         .service-account-account-type {
             @apply col-span-6;
             .badge-wrapper {
-                padding: 0 1rem 2.5rem 1rem;
+                padding: 0 1rem 2.5rem;
             }
         }
         .service-account-project {

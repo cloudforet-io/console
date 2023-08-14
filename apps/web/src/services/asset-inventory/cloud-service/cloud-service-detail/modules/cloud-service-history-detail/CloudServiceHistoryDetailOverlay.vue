@@ -1,112 +1,15 @@
-<template>
-    <div class="cloud-service-history-detail-overlay">
-        <p-pane-layout class="page-wrapper">
-            <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
-                       show-back-button
-                       @click-back-button="$router.go(-1)"
-            >
-                <template #title-right-extra>
-                    <div class="title-right-extra">
-                        <template v-if="cloudServiceItem.name">
-                            <span class="label-text">Name: </span>
-                            {{ cloudServiceItem.name }}
-                            <p-divider :vertical="true" />
-                        </template>
-                        <span class="label-text">Resource ID: </span>
-                        <p-copy-button>
-                            {{ resourceId }}
-                        </p-copy-button>
-                    </div>
-                </template>
-            </p-heading>
-            <div class="content-wrapper">
-                <div class="left-part">
-                    <div class="title-wrapper">
-                        <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY') }}</span>
-                        <span class="total-count">({{ totalCount }})</span>
-                    </div>
-                    <div ref="timelineWrapperRef"
-                         class="timeline-wrapper"
-                    >
-                        <vertical-timeline v-for="(item, idx) in historyItems"
-                                           :ref="`timelineRef_${item.recordId}`"
-                                           :key="`timeline-${item.recordId}-${idx}`"
-                                           :date="item.date"
-                                           :title="item.title"
-                                           :count="item.diffCount"
-                                           :color="getTimelineColor(item.action)"
-                                           :selected="item.recordId === selectedHistoryRecordId"
-                                           :is-last-item="idx === historyItems.length-1"
-                                           is-title-vertical
-                                           @click-timeline="handleClickTimeline({cur: item, prev: historyItems[idx+1]})"
-                        >
-                            <template #additional-title>
-                                <div v-if="item.noteItemMap.length">
-                                    <span class="additional-title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
-                                    <p-badge badge-type="subtle"
-                                             style-type="gray200"
-                                    >
-                                        {{ item.noteItemMap.length }}
-                                    </p-badge>
-                                </div>
-                            </template>
-                        </vertical-timeline>
-                        <p-spinner v-if="loading"
-                                   size="xl"
-                        />
-                    </div>
-                </div>
-                <div class="right-part">
-                    <div class="info-wrapper">
-                        <div class="circle"
-                             :class="getTimelineColor(proxySelectedHistoryItem.action)"
-                        />
-                        <span class="action-text">{{ HISTORY_ACTION_MAP[proxySelectedHistoryItem.action].label }}</span>
-                        <span class="date-text">({{ iso8601Formatter(selectedHistoryRecordDate, 'UTC') }})</span>
-                    </div>
-                    <p-tab :tabs="tabs"
-                           :active-tab.sync="activeTab"
-                    >
-                        <template #changed>
-                            <cloud-service-history-changes-tab
-                                :selected-history-item="proxySelectedHistoryItem"
-                                :selected-key-name="selectedKeyName"
-                            />
-                        </template>
-                        <template #log>
-                            <cloud-service-log-tab :provider="provider"
-                                                   :cloud-service-id="cloudServiceId"
-                                                   :date="selectedHistoryRecordDate"
-                            />
-                        </template>
-                        <template #note>
-                            <cloud-service-history-detail-note :record-id="selectedHistoryRecordId"
-                                                               @refresh-note-count="handleRefreshNoteCount"
-                            />
-                        </template>
-                    </p-tab>
-                </div>
-            </div>
-        </p-pane-layout>
-    </div>
-</template>
-
-<script lang="ts">
-import { useInfiniteScroll } from '@vueuse/core';
-import {
-    computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
-} from 'vue';
-import type { PropType } from 'vue';
-import type { Vue } from 'vue/types/vue';
-
+<script lang="ts" setup>
+import { iso8601Formatter } from '@cloudforet/core-lib';
 import {
     PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-
-import { i18n } from '@/translations';
+import { useInfiniteScroll } from '@vueuse/core';
+import {
+    computed, onMounted, reactive, ref, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -137,110 +40,162 @@ interface SelectedCloudServiceHistoryItem {
     prev: CloudServiceHistoryItem | undefined;
 }
 
-export default defineComponent<Props>({
-    name: 'CloudServiceHistoryDetailOverlay',
-    components: {
-        CloudServiceHistoryChangesTab,
-        CloudServiceLogTab,
-        VerticalTimeline,
-        PPaneLayout,
-        PHeading,
-        PTab,
-        CloudServiceHistoryDetailNote,
-        PCopyButton,
-        PBadge,
-        PDivider,
-        PSpinner,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        historyItems: {
-            type: Array,
-            default: () => [] as PropType<CloudServiceHistoryItem[]>,
-        },
-        selectedHistoryItem: {
-            type: Object,
-            default: () => ({}) as PropType<CloudServiceHistoryItem>,
-        },
-        selectedKeyName: {
-            type: String,
-            default: undefined,
-        },
-        totalCount: {
-            type: Number,
-            default: 0,
-        },
-        provider: {
-            type: String,
-            default: '',
-        },
-        cloudServiceItem: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            resourceId: computed(() => props.cloudServiceItem.reference.resource_id),
-            cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),
-            timelineWrapperRef: null as null | HTMLElement,
-            selectedHistoryRecordId: '',
-            selectedHistoryRecordDate: '',
-            proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
-            tabs: computed(() => ([
-                { name: 'changed', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES') },
-                { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG') },
-                { name: 'note', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') },
-            ] as TabItem[])),
-            activeTab: 'changed',
-        });
-
-        /* Util */
-        const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
-
-        /* Event */
-        const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {
-            state.proxySelectedHistoryItem = selectedItem.cur;
-        };
-        const handleRefreshNoteCount = () => {
-            emit('refresh-note-count');
-        };
-
-        /* Watcher */
-        watch(() => props.selectedHistoryItem, (selectedTimelineItem: CloudServiceHistoryItem) => {
-            state.selectedHistoryRecordId = selectedTimelineItem?.recordId;
-            state.selectedHistoryRecordDate = selectedTimelineItem?.date;
-        }, { immediate: true });
-
-        onMounted(() => {
-            const selectedRef = vm.$refs[`timelineRef_${props.selectedHistoryItem.recordId}`] as any;
-            if (selectedRef) {
-                const selectedEl: HTMLElement = selectedRef[0].$el;
-                selectedEl.scrollIntoView();
-            }
-            if (props.historyItems.length === TIMELINE_ITEM_LIMIT) {
-                emit('load-more');
-            }
-            useInfiniteScroll(state.timelineWrapperRef, () => {
-                emit('load-more');
-            });
-        });
-
-        return {
-            ...toRefs(state),
-            HISTORY_ACTION_MAP,
-            getTimelineColor,
-            handleClickTimeline,
-            handleRefreshNoteCount,
-            iso8601Formatter,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+    historyItems: () => [],
+    selectedHistoryItem: () => ({}) as CloudServiceHistoryItem,
+    selectedKeyName: undefined,
+    totalCount: 0,
+    provider: '',
+    cloudServiceItem: () => ({}),
 });
+const emit = defineEmits<{(e: 'update:selectedHistoryItem', value: CloudServiceHistoryItem): void;
+    (e: 'refresh-note-count'): void;
+    (e: 'load-more'): void;
+}>();
+const { t } = useI18n();
+const router = useRouter();
+
+const state = reactive({
+    resourceId: computed(() => props.cloudServiceItem.reference.resource_id),
+    cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),
+    timelineWrapperRef: null as null | HTMLElement,
+    selectedHistoryRecordId: '',
+    selectedHistoryRecordDate: '',
+    proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
+    tabs: computed(() => ([
+        { name: 'changed', label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES') },
+        { name: 'log', label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG') },
+        { name: 'note', label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') },
+    ] as TabItem[])),
+    activeTab: 'changed',
+});
+
+/* Util */
+const getTimelineColor = (action: string) => HISTORY_ACTION_MAP[action].color;
+
+/* Event */
+const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {
+    state.proxySelectedHistoryItem = selectedItem.cur;
+};
+const handleRefreshNoteCount = () => {
+    emit('refresh-note-count');
+};
+
+/* Watcher */
+watch(() => props.selectedHistoryItem, (selectedTimelineItem: CloudServiceHistoryItem) => {
+    state.selectedHistoryRecordId = selectedTimelineItem?.recordId;
+    state.selectedHistoryRecordDate = selectedTimelineItem?.date;
+}, { immediate: true });
+
+onMounted(() => {
+    const selectedRef = ref([`timelineRef_${props.selectedHistoryItem.recordId}`]) as any;
+    if (selectedRef) {
+        const selectedEl: HTMLElement = selectedRef[0].$el;
+        selectedEl.scrollIntoView();
+    }
+    if (props.historyItems.length === TIMELINE_ITEM_LIMIT) {
+        emit('load-more');
+    }
+    useInfiniteScroll(state.timelineWrapperRef, () => {
+        emit('load-more');
+    });
+});
+
 </script>
+
+<template>
+    <div class="cloud-service-history-detail-overlay">
+        <p-pane-layout class="page-wrapper">
+            <p-heading :title="t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
+                       show-back-button
+                       @click-back-button="router.go(-1)"
+            >
+                <template #title-right-extra>
+                    <div class="title-right-extra">
+                        <template v-if="cloudServiceItem.name">
+                            <span class="label-text">Name: </span>
+                            {{ cloudServiceItem.name }}
+                            <p-divider vertical />
+                        </template>
+                        <span class="label-text">Resource ID: </span>
+                        <p-copy-button>
+                            {{ state.resourceId }}
+                        </p-copy-button>
+                    </div>
+                </template>
+            </p-heading>
+            <div class="content-wrapper">
+                <div class="left-part">
+                    <div class="title-wrapper">
+                        <span class="title">{{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY') }}</span>
+                        <span class="total-count">({{ totalCount }})</span>
+                    </div>
+                    <div ref="timelineWrapperRef"
+                         class="timeline-wrapper"
+                    >
+                        <vertical-timeline v-for="(item, idx) in historyItems"
+                                           :ref="`timelineRef_${item.recordId}`"
+                                           :key="`timeline-${item.recordId}-${idx}`"
+                                           :date="item.date"
+                                           :title="item.title"
+                                           :count="item.diffCount"
+                                           :color="getTimelineColor(item.action)"
+                                           :selected="item.recordId === state.selectedHistoryRecordId"
+                                           :is-last-item="idx === historyItems.length-1"
+                                           is-title-vertical
+                                           @click-timeline="handleClickTimeline({cur: item, prev: historyItems[idx+1]})"
+                        >
+                            <template #additional-title>
+                                <div v-if="item.noteItemMap.length">
+                                    <span class="additional-title">{{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
+                                    <p-badge badge-type="subtle"
+                                             style-type="gray200"
+                                    >
+                                        {{ item.noteItemMap.length }}
+                                    </p-badge>
+                                </div>
+                            </template>
+                        </vertical-timeline>
+                        <p-spinner v-if="loading"
+                                   size="xl"
+                        />
+                    </div>
+                </div>
+                <div class="right-part">
+                    <div class="info-wrapper">
+                        <div class="circle"
+                             :class="getTimelineColor(state.proxySelectedHistoryItem.action)"
+                        />
+                        <span class="action-text">{{ HISTORY_ACTION_MAP[state.proxySelectedHistoryItem.action].label }}</span>
+                        <span class="date-text">({{ iso8601Formatter(state.selectedHistoryRecordDate, 'UTC') }})</span>
+                    </div>
+                    <p-tab v-model:active-tab="state.activeTab"
+                           :tabs="state.tabs"
+                    >
+                        <template #changed>
+                            <cloud-service-history-changes-tab
+                                :selected-history-item="state.proxySelectedHistoryItem"
+                                :selected-key-name="selectedKeyName"
+                            />
+                        </template>
+                        <template #log>
+                            <cloud-service-log-tab :provider="provider"
+                                                   :cloud-service-id="state.cloudServiceId"
+                                                   :date="state.selectedHistoryRecordDate"
+                            />
+                        </template>
+                        <template #note>
+                            <cloud-service-history-detail-note :record-id="state.selectedHistoryRecordId"
+                                                               @refresh-note-count="handleRefreshNoteCount"
+                            />
+                        </template>
+                    </p-tab>
+                </div>
+            </div>
+        </p-pane-layout>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .cloud-service-history-detail-overlay {
@@ -269,7 +224,7 @@ export default defineComponent<Props>({
         :deep(.p-heading) {
             min-height: 3.5rem;
             height: auto;
-            padding: 1.5rem 1.5rem 0 1.5rem;
+            padding: 1.5rem 1.5rem 0;
             margin: 0;
             .title-right-extra {
                 display: flex;
@@ -300,7 +255,7 @@ export default defineComponent<Props>({
                 flex-direction: column;
                 min-width: 17.75rem;
                 height: 100%;
-                padding: 1.5rem 1rem 0 1rem;
+                padding: 1.5rem 1rem 0;
                 .title-wrapper {
                     font-size: 1rem;
                     padding-bottom: 0.75rem;

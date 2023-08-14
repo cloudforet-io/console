@@ -427,7 +427,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
     grid-auto-rows: 11.25rem;
     .project-card-container {
         @apply bg-white border border-gray-200 overflow-visible rounded-lg cursor-pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
         &:hover {
             @apply border-l border-gray-200 bg-blue-100;
         }
@@ -457,7 +457,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
 
 .card-top-wrapper {
     @apply flex-grow flex flex-col;
-    margin: 1rem 1rem 0.5rem 1rem;
+    margin: 1rem 1rem 0.5rem;
     .group-name-wrapper {
         @apply flex justify-between items-center;
         .group-name {
@@ -495,7 +495,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
                 background-position: center;
                 line-height: 1.25rem;
                 &:hover {
-                    opacity: 50%;
+                    opacity: 0.5;
                 }
             }
         }

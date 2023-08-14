@@ -190,7 +190,7 @@ watch([
 
     .chart-section {
         @apply col-span-9 bg-white rounded-md border border-gray-200;
-        padding: 1rem 1rem 1.5rem 1rem;
+        padding: 1rem 1rem 1.5rem;
         min-height: 480px;
     }
 

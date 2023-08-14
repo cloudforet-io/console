@@ -259,7 +259,7 @@ watch(() => props.initialPagePermissions, (initialPagePermissions) => {
         font-size: 0.875rem;
         line-height: 1.25;
         max-width: 43.5rem;
-        margin: 0 1rem 2.5rem 1rem;
+        margin: 0 1rem 2.5rem;
 
         .header-wrapper {
             @apply text-gray-500 border-b border-gray-200;

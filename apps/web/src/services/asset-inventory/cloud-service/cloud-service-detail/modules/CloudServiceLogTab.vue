@@ -354,7 +354,7 @@ watch([() => state.selectedPeriod, () => props.cloudServiceId, () => state.activ
 }
 .filter {
     @apply flex items-center items-end flex-wrap gap-4;
-    margin: 0.75rem 1rem 1rem 1rem;
+    margin: 0.75rem 1rem 1rem;
     .filter-label {
         @apply text-gray-400;
         font-size: 0.875rem;

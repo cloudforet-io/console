@@ -239,7 +239,7 @@ onUnmounted(() => {
 .p-metric-chart {
     @apply bg-white rounded-lg;
     position: relative;
-    box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.06);
+    box-shadow: 0 2px 4px rgb(theme('colors.black') 0.06);
     padding: 1.25rem;
 
     .chart-title-wrapper {
@@ -303,7 +303,7 @@ onUnmounted(() => {
 
         .date {
             font-weight: bold;
-            padding: 0 1rem 0.375rem 1rem;
+            padding: 0 1rem 0.375rem;
         }
         .legend-table {
             width: 100%;

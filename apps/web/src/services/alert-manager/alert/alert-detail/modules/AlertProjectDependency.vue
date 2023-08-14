@@ -64,7 +64,7 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .project-dependency {
-    padding: 0 1rem 2.5rem 1rem;
+    padding: 0 1rem 2.5rem;
 }
 .p-heading {
     @apply -ml-1;

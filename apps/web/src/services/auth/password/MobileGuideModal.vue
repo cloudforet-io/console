@@ -40,7 +40,7 @@ const handleCloseModal = () => {
     </p-button-modal>
 </template>
 
-<style scoped>
+<style lang="postcss" scoped>
 .mobile-guide-modal {
     .description {
         padding: 1rem 0;

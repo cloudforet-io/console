@@ -242,7 +242,7 @@ const state = reactive({
 }
 .budget-list-card {
     @apply rounded-lg border border-solid border-gray-200 rounded-lg bg-white;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 6%);
     &:hover {
         @apply bg-secondary-2;
     }

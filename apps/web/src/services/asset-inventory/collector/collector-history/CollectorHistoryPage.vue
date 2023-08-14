@@ -289,7 +289,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     />
                 </template>
                 <template #col-remained_tasks-format="{value}">
-                    <div class="col-remained_tasks-format">
+                    <div class="col-remainedTasks-format">
                         <p-progress-bar
                             :percentage="value"
                             :color="PROGRESS_BAR_COLOR"
@@ -350,7 +350,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                 }
             }
             .p-data-table {
-                .col-remained_tasks-format {
+                .col-remainedTasks-format {
                     display: flex;
                     align-items: center;
                     .progress-bar {

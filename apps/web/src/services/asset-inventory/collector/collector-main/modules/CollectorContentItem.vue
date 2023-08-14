@@ -102,7 +102,7 @@ const handleClickCollectData = async () => {
 
 <style lang="postcss" scoped>
 .collector-content-item {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
 
     /* custom design-system component - p-card */
     :deep(.p-card) {

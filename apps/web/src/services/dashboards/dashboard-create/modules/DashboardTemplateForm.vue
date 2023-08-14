@@ -271,7 +271,7 @@ watch(() => state.searchValue, async () => {
                 height: 2.5rem;
                 content: '';
                 bottom: 0;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+                background: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, #fff 100%);
             }
         }
         .card-container {
@@ -306,7 +306,7 @@ watch(() => state.searchValue, async () => {
         }
         .text-pagination {
             @apply flex justify-center;
-            margin: 0.75rem auto 0 auto;
+            margin: 0.75rem auto 0;
         }
 
         .default-dashboard-board {

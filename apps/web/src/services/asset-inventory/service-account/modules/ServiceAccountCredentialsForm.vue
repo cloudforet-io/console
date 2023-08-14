@@ -416,7 +416,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
         }
     }
     .custom-schema-box {
-        padding: 2rem 2rem 0 2rem;
+        padding: 2rem 2rem 0;
         width: 66%;
 
         /* custom design-system component - p-text-input */

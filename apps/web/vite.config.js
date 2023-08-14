@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv } from 'vite';
 import stylelint from 'vite-plugin-stylelint';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(async ({ command, mode }) => {
     process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
@@ -33,6 +34,7 @@ export default defineConfig(async ({ command, mode }) => {
                 emitFile: true,
                 filename: 'stats.html',
             })]),
+            tsconfigPaths(),
         ],
         build: {
             rollupOptions: {
@@ -48,8 +50,7 @@ export default defineConfig(async ({ command, mode }) => {
         },
         resolve: {
             alias: {
-                '@': path.resolve(__dirname, './src'),
-                // '@spaceone/design-system': path.resolve(__dirname, '../../packages/mirinae/dist/'),
+                '@/': path.resolve(__dirname, './src/'),
                 '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
                 '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
             },

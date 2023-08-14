@@ -240,7 +240,7 @@ const {
         height: 2rem;
         padding: 0 0.25rem 0 0.75rem;
 
-        &[disabled=disabled] {
+        &[disabled="disabled"] {
             @apply bg-gray-100;
             cursor: not-allowed;
         }
@@ -284,11 +284,11 @@ const {
             @apply flex-shrink-0;
         }
 
-        &:hover:not([disabled=disabled]) {
+        &:hover:not([disabled="disabled"]) {
             @apply border-blue-600 bg-blue-100;
         }
 
-        &.filled-value:not([disabled=disabled]) {
+        &.filled-value:not([disabled="disabled"]) {
             @apply border-blue-400 bg-blue-200;
 
             &.is-visible {

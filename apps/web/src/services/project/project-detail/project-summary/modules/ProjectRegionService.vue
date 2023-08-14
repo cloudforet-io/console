@@ -263,7 +263,7 @@ onUnmounted(() => {
     .no-data-wrapper {
         height: 13rem;
         .empty-image {
-            margin: 0 auto 0.5rem auto;
+            margin: 0 auto 0.5rem;
         }
 
         .text {

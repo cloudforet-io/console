@@ -149,7 +149,7 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
     .summary-card {
         width: 33%;
         min-height: 4.875rem;
-        padding: 1rem 1rem;
+        padding: 1rem;
     }
     .summary-title {
         @apply text-gray-500 font-bold;

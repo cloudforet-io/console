@@ -296,7 +296,7 @@ onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
         right: -0.5rem;
         left: auto;
         margin-top: -0.5rem;
-        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0.875rem rgb(0 0 0 / 10%);
     }
     .profile-menu-wrapper {
         @mixin menu-dropdown;
