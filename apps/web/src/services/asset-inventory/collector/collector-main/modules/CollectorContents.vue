@@ -181,7 +181,7 @@ const fetchCollectorList = async () => {
 watch(() => collectorPageState.collectors, async () => {
     const ids = state.items?.map((item) => item.collectorId) || [];
     if (ids.length > 0) {
-        await collectorPageStore.setCollectorJobs(ids);
+        await collectorPageStore.getCollectorJobs(ids);
     }
 });
 watch(() => collectorPageState.selectedProvider, async () => {
