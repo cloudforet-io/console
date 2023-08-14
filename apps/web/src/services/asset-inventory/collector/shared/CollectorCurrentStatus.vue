@@ -5,47 +5,49 @@
                 {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
             </p>
             <div class="label-description">
-                <div v-if="props.isScheduleActivated"
-                     class="description-view"
+                <div v-if="state.status === JOB_STATE.IN_PROGRESS"
+                     class="current-status-progress"
                 >
-                    <div v-if="state.status === JOB_STATE.IN_PROGRESS"
-                         class="current-status-progress"
+                    <p-i
+                        name="ic_peacock-gradient-circle"
+                        height="1rem"
+                        width="1rem"
+                        animation="spin"
+                    />
+                    <span>
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
+                    </span>
+                </div>
+                <div v-else>
+                    <div v-if="props.isScheduleActivated"
+                         class="description-view"
                     >
-                        <p-i
-                            name="ic_peacock-gradient-circle"
-                            height="1rem"
-                            width="1rem"
-                            animation="spin"
-                        />
-                        <span>
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
+                        <div v-if="props.schedule && props.schedule.hours && props.schedule.hours.length > 0"
+                             class="scheduled"
+                        >
+                            <p-i
+                                name="ic_alarm-clock"
+                                class="alarm-icon"
+                                height="1.25rem"
+                                width="1.25rem"
+                                color="inherit"
+                            />
+                            <p class="description">
+                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                            </p>
+                        </div>
+                        <span v-else
+                              class="no-schedule"
+                        >
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                         </span>
                     </div>
-                    <div v-else-if="props.schedule && props.schedule.hours && props.schedule.hours.length > 0"
-                         class="scheduled"
-                    >
-                        <p-i
-                            name="ic_alarm-clock"
-                            class="alarm-icon"
-                            height="1.25rem"
-                            width="1.25rem"
-                            color="inherit"
-                        />
-                        <p class="description">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
-                        </p>
-                    </div>
                     <span v-else
-                          class="no-schedule"
+                          class="no-schedule description-view"
                     >
                         {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                     </span>
                 </div>
-                <span v-else
-                      class="no-schedule description-view"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-                </span>
             </div>
         </div>
         <p-progress-bar :percentage="state.remainedTasksPercentage"
