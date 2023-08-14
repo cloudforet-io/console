@@ -227,12 +227,7 @@ const handleUpdateEditModalVisible = (value: boolean) => {
 };
 const handleCollectData = () => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobStore.recentJobForAllAccounts;
         _state.visible = true;
-        _state.recentJob = recentJob ? {
-            status: recentJob.status,
-            jobId: recentJob.job_id,
-        } : null;
         _state.collectDataType = COLLECT_DATA_TYPE.ENTIRE;
         _state.selectedCollector = collectorFormState.originCollector;
         _state.selectedSecret = undefined;
