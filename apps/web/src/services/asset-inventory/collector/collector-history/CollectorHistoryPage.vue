@@ -249,12 +249,14 @@ watch(() => state.selectedStatus, (selectedStatus) => {
             >
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
-                        <p-lazy-img :src="value.icon || ''"
-                                    width="1rem"
-                                    height="1rem"
-                                    class="mr-2"
-                        />
-                        {{ value.label || '' }}
+                        <div class="col-plugin-info">
+                            <p-lazy-img :src="value.icon || ''"
+                                        width="1rem"
+                                        height="1rem"
+                                        class="mr-2"
+                            />
+                            {{ value.label || '' }}
+                        </div>
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
@@ -358,6 +360,9 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     @apply bg-gray-400;
                 }
             }
+        }
+        .col-plugin-info {
+            @apply flex items-center;
         }
         .succeeded-text {
             @apply text-gray-700;

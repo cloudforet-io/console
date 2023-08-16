@@ -64,11 +64,11 @@ const state = reactive({
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TASK') }}</span>
                 <template v-if="props.job.success_tasks > 0">
                     <p-status :icon-color="green[500]" />
-                    <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }} <strong>{{ props.job.success_tasks }}</strong></span>
+                    <span>{{ $t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') }} <strong>{{ props.job.success_tasks }}</strong></span>
                 </template>
                 <template v-if="props.job.failure_tasks > 0">
                     <p-status :icon-color="red[400]" />
-                    <span :style="{'color': red[400]}">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }} <strong>{{ props.job.failure_tasks }}</strong></span>
+                    <span :style="{'color': red[400]}">{{ $t('INVENTORY.COLLECTOR.HISTORY.FAILURE') }} <strong>{{ props.job.failure_tasks }}</strong></span>
                 </template>
                 <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ props.job.total_tasks }}</strong></span>
             </div>
@@ -139,11 +139,11 @@ const state = reactive({
             margin-top: 0.5rem;
 
             .succeeded-bar {
-                @apply bg-green-400;
+                @apply bg-green-500;
                 height: 100%;
             }
             .failed-bar {
-                @apply bg-coral-400;
+                @apply bg-red-400;
                 height: 100%;
             }
         }
