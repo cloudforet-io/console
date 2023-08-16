@@ -145,6 +145,14 @@ const collectorJobState = collectorJobStore.$state;
 
 const collectorDataModalStore = useCollectorDataModalStore();
 
+watch(() => collectorFormState.originCollector, async (collector) => {
+    if (collector) {
+        collectorJobStore.$patch({
+            collector,
+        });
+    }
+});
+
 const queryHelper = new QueryHelper();
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
@@ -260,9 +268,6 @@ onMounted(async () => {
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
     const collector = await getCollector();
-    collectorJobStore.$patch((_state) => {
-        _state.collector = collector;
-    });
     if (collector) {
         collectorFormStore.setOriginCollector(collector);
         resume();

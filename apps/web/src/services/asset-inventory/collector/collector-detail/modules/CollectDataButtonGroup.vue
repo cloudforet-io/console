@@ -54,8 +54,9 @@ const handleClickCollectDataButton = () => {
             <template #content>
                 <div class="collect-status-wrapper">
                     <collector-current-status
-                        :schedule="collectorJobStore.schedule"
+                        :hours="collectorJobStore.schedule?.hours"
                         :recent-job="state.recentJob"
+                        :is-schedule-activated="collectorJobStore.schedule?.state === 'ENABLED'"
                     />
                 </div>
             </template>

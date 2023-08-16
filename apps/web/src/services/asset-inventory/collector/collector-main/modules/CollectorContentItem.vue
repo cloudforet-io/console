@@ -106,7 +106,7 @@ watch(() => props.item.schedule, (schedule) => {
                     <div v-if="props.item"
                          class="collector-info-view"
                     >
-                        <collector-current-status :schedule="props.item.schedule"
+                        <collector-current-status :hours="props.item.schedule?.hours"
                                                   :recent-job="state.recentJob"
                                                   :is-schedule-activated="state.isScheduleActivated"
                         />

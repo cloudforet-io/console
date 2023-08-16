@@ -19,28 +19,19 @@
                     </span>
                 </div>
                 <div v-else>
-                    <div v-if="props.isScheduleActivated"
-                         class="description-view"
+                    <div v-if="props.isScheduleActivated && !!props.hours?.length"
+                         class="scheduled"
                     >
-                        <div v-if="props.schedule && props.schedule.hours && props.schedule.hours.length > 0"
-                             class="scheduled"
-                        >
-                            <p-i
-                                name="ic_alarm-clock"
-                                class="alarm-icon"
-                                height="1.25rem"
-                                width="1.25rem"
-                                color="inherit"
-                            />
-                            <p class="description">
-                                {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
-                            </p>
-                        </div>
-                        <span v-else
-                              class="no-schedule"
-                        >
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
-                        </span>
+                        <p-i
+                            name="ic_alarm-clock"
+                            class="alarm-icon"
+                            height="1.25rem"
+                            width="1.25rem"
+                            color="inherit"
+                        />
+                        <p class="description">
+                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                        </p>
                     </div>
                     <span v-else
                           class="no-schedule description-view"
@@ -69,13 +60,12 @@ import { numberFormatter } from '@cloudforet/core-lib';
 import { peacock } from '@/styles/colors';
 
 import type { JobAnalyzeStatus } from '@/services/asset-inventory/collector/collector-main/type';
-import type { Schedule } from '@/services/asset-inventory/collector/model';
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
 const PROGRESS_BAR_COLOR = peacock[500];
 
 interface Props {
-    schedule?: Schedule;
+    hours?: number[];
     recentJob?: JobAnalyzeStatus|null;
     isScheduleActivated?: boolean;
 }
@@ -85,10 +75,10 @@ const props = defineProps<Props>();
 const state = reactive({
     status: computed<string|undefined>(() => props.recentJob?.status),
     diffSchedule: computed(() => {
-        if (props.schedule) {
+        if (props.hours) {
             const current = dayjs.utc();
 
-            const hours = props.schedule.hours ?? [];
+            const hours = props.hours ?? [];
             const sortedHours = hours.sort((a, b) => a - b);
             const nextScheduledHour = sortedHours.find((num) => num > current.hour());
 

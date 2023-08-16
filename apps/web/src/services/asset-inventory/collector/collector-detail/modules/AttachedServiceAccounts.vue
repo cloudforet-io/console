@@ -46,7 +46,7 @@ const collectorDataModalStore = useCollectorDataModalStore();
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
-    { name: 'project_id', label: 'Project ID' },
+    { name: 'project_id', label: 'Project' },
     { name: 'provider', label: 'Provider' },
     { name: 'created_at', label: 'Created' },
     { name: 'collect', label: ' ' },
