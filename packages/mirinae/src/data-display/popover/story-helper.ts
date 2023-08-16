@@ -99,6 +99,24 @@ export const getPopoverArgTypes = () => {
                 type: 'boolean',
             },
         },
+        ignoreOutsideClick: {
+            name: 'ignoreOutsideClick',
+            type: { name: 'boolean' },
+            description: 'If the value is true, do not close the popover even if user click outside the popover.',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: true,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         // model
         'v-model': {
             name: 'v-model',
