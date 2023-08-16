@@ -144,8 +144,6 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
         collectorPageStore.$patch((_state) => {
             _state.searchFilters = searchQueryHelper.filters;
         });
-        // set filters to apiQueryHelper
-        collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
     }
 
     fetchCollectorList();
