@@ -71,7 +71,7 @@ const handleClick = () => {
     height: 100%;
     padding: 0.5rem;
 
-    &:hover {
+    &:not(.selected):hover {
         @apply bg-blue-100 text-gray-700;
     }
 
