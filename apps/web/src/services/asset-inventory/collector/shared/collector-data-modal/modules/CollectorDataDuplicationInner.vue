@@ -49,7 +49,7 @@
                 <div class="label-wrapper">
                     <div v-if="state.recentJob.success_tasks >= 0">
                         <p-status :icon-color="SUCCEEDED_COLOR" />
-                        <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
+                        <span>{{ $t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') }}
                             <strong>{{ state.recentJob.success_tasks }}</strong>
                         </span>
                     </div>
@@ -58,7 +58,7 @@
                     >
                         <p-status :icon-color="FAILED_COLOR" />
                         <span :style="{'color': FAILED_COLOR}">
-                            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
+                            {{ $t('INVENTORY.COLLECTOR.HISTORY.FAILURE') }}
                             <strong>{{ state.recentJob.failure_tasks }}</strong>
                         </span>
                     </div>
