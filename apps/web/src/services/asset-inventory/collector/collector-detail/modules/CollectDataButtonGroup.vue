@@ -32,25 +32,28 @@ const handleClickCollectDataButton = () => {
 
 <template>
     <div class="collect-data-button-group">
-        <p-button style-type="tertiary"
-                  size="md"
-                  icon-left="ic_collect"
-                  class="collect-data-button"
-                  :class="{dependent: state.showStatus}"
-                  @click="handleClickCollectDataButton"
+        <p-popover :is-visible.sync="state.isPopoverOpen"
+                   :ignore-target-click="false"
         >
-            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
-        </p-button>
-        <p-popover v-if="state.showStatus"
-                   :is-visible.sync="state.isPopoverOpen"
-        >
-            <p-icon-button :name="state.isPopoverOpen ? 'ic_chevron-up' : 'ic_chevron-down'"
-                           style-type="tertiary"
-                           shape="square"
-                           size="md"
-                           color="inherit"
-                           class="status-button"
-            />
+            <div class="buttons-wrapper">
+                <p-button style-type="tertiary"
+                          size="md"
+                          icon-left="ic_collect"
+                          class="collect-data-button"
+                          :class="{dependent: state.showStatus}"
+                          @click="handleClickCollectDataButton"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+                </p-button>
+                <p-icon-button v-if="state.showStatus"
+                               :name="state.isPopoverOpen ? 'ic_chevron-up' : 'ic_chevron-down'"
+                               style-type="tertiary"
+                               shape="square"
+                               size="md"
+                               color="inherit"
+                               class="status-button"
+                />
+            </div>
             <template #content>
                 <div class="collect-status-wrapper">
                     <collector-current-status
@@ -66,8 +69,10 @@ const handleClickCollectDataButton = () => {
 
 <style scoped lang="postcss">
 .collect-data-button-group {
-    display: flex;
-    flex-wrap: wrap;
+    .buttons-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+    }
     .collect-data-button {
         &.dependent {
             border-top-right-radius: 0;
