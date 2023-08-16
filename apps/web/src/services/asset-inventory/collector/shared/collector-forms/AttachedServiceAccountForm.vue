@@ -226,6 +226,7 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
 };
 
 const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOption) => {
+    if (!selectedValue) return;
     collectorFormStore.$patch({
         selectedServiceAccountFilterOption: selectedValue,
     });
