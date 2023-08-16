@@ -1,6 +1,7 @@
 <template>
     <div class="plugin-data-contents">
         <p-lazy-img :src="state.icon"
+                    :loading="!props.plugin"
                     class="plugin-icon"
                     width="3rem"
                     height="3rem"
