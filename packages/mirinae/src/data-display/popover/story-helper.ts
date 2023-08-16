@@ -103,14 +103,14 @@ export const getPopoverArgTypes = () => {
             name: 'ignoreOutsideClick',
             type: { name: 'boolean' },
             description: 'If the value is true, do not close the popover even if user click outside the popover.',
-            defaultValue: true,
+            defaultValue: false,
             table: {
                 type: {
                     summary: 'boolean',
                 },
                 category: 'props',
                 defaultValue: {
-                    summary: true,
+                    summary: false,
                 },
             },
             control: {
