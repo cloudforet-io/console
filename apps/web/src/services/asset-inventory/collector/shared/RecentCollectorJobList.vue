@@ -7,10 +7,12 @@ import {
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/collector/shared/CollectorJobStatusIcon.vue';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface MinimalJobInfo {
@@ -37,7 +39,7 @@ const state = reactive({
     loading: true,
     completedJobs: computed<MinimalJobInfo[]|undefined>(() => {
         if (Array.isArray(props.recentJobs) && props.recentJobs.length > 0) {
-            return props.recentJobs.filter((job) => job.status !== 'IN_PROGRESS')
+            return props.recentJobs.filter((job) => job.status !== JOB_STATE.IN_PROGRESS)
                 .sort((a, b) => dayjs(b.finished_at).unix() - dayjs(a.finished_at).unix())
                 .slice(0, 5)
                 .reverse();
@@ -45,6 +47,15 @@ const state = reactive({
         return undefined;
     }),
 });
+
+const handleTooltipContent = (job: MinimalJobInfo) => {
+    const { status, finished_at } = job;
+    let content = '';
+    if (status === JOB_STATE.SUCCESS) content = 'INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS';
+    if (status === JOB_STATE.CANCELED) content = 'INVENTORY.COLLECTOR.MAIN.JOB_CANCELED';
+    if (status === JOB_STATE.FAILURE) content = 'INVENTORY.COLLECTOR.MAIN.JOB_FAILURE';
+    return i18n.t(content, { date: dayjs.utc(finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss') });
+};
 
 watch(() => props.recentJobs, () => {
     state.loading = !Array.isArray(props.recentJobs);
@@ -92,7 +103,7 @@ watch(() => props.recentJobs, () => {
                                                :key="`job-item-${index}`"
                                                class="collector-job-status-icon-wrapper"
                                                :status="job.status"
-                                               :contents="$t('INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS', {date: dayjs.utc(job.finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss')})"
+                                               :contents="handleTooltipContent(job)"
                                                :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
                                                :style-type="props.fullMode ? 'white' : 'gray'"
                     />

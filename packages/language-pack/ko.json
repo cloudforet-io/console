@@ -2230,7 +2230,7 @@
 				"HISTORY": "컬렉터 히스토리",
 				"IN_PROGRESS": "진행중",
 				"JOB_CANCELED": "취소됨: {date}",
-				"JOB_ERROR": "상태: {date}에 수집 실패",
+				"JOB_FAILURE": "상태: {date}에 수집 실패",
 				"JOB_NONE": "수집 기록 없음",
 				"JOB_PROGRESS": "상태: 수집중",
 				"JOB_SUCCESS": "상태: {date}에 수집 완료 ",

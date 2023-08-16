@@ -39747,7 +39747,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>JOB_ERROR</name>
+                                        <name>JOB_FAILURE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
