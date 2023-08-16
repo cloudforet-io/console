@@ -2102,7 +2102,7 @@
 			}
 		},
 		"COLLECTOR": {
-			"ACCOUNT": "계",
+			"ACCOUNT": "계정",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
