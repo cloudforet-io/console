@@ -65,7 +65,7 @@ const state = reactive({
         }
         return '';
     }),
-    isVersionValid: computed(() => !state.versionInvalidText),
+    isVersionValid: computed(() => !state.versionInvalidText || collectorFormState.autoUpgrade),
 });
 
 const initSelectedVersion = () => {
