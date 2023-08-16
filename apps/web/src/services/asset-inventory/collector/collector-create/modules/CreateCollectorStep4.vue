@@ -191,9 +191,6 @@ const goToCollectorDetailPage = () => {
 
         .right-area {
             @apply flex items-center;
-            :first-child {
-                margin-right: 1rem;
-            }
         }
     }
 }
