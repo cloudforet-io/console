@@ -26,7 +26,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
 import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
@@ -44,8 +43,6 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const collectorDataModalStore = useCollectorDataModalStore();
-
-const collectorJobStore = useCollectorJobStore();
 
 const fields: DefinitionField[] = [
     { name: 'service_account_id', label: 'Account Name' },
@@ -165,13 +162,7 @@ const handleToolboxTableRefresh = async () => {
 };
 const handleClickCollect = async (secret: SecretModel) => {
     collectorDataModalStore.$patch((_state) => {
-        const recentJob = collectorJobStore.recentJobForSingleAccounts;
         _state.visible = true;
-        _state.recentJob = recentJob ? {
-            status: recentJob.status,
-            jobId: recentJob.job_id,
-            secretId: recentJob.secret_id,
-        } : null;
         _state.selectedCollector = collectorFormState.originCollector;
         _state.collectDataType = COLLECT_DATA_TYPE.SINGLE;
         _state.selectedSecret = secret;

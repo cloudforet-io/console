@@ -18,7 +18,7 @@
                 <collector-data-default-inner v-else
                                               :name="state.accountName"
                                               :icon="state.provider.icon"
-                                              :secrets-count="state.secrets.length"
+                                              :secrets-count="state.secretsCount"
                 />
             </template>
             <template #confirm-button>
@@ -49,7 +49,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -70,16 +69,16 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    secrets: [] as SecretModel[],
+    secretsCount: 0,
     headerTitle: computed(() => (state.isDuplicateJobs
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
-    isDuplicateJobs: computed(() => {
+    isDuplicateJobs: computed<boolean>(() => {
         const recentJob = collectorDataModalState.recentJob;
         const selectedSecret = collectorDataModalState.selectedSecret;
         if (!recentJob) return false;
         if (selectedSecret) {
-            return recentJob.secretId === selectedSecret.secret_id && recentJob.status === JOB_STATE.IN_PROGRESS;
+            return recentJob.secret_id === selectedSecret.secret_id && recentJob.status === JOB_STATE.IN_PROGRESS;
         }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
@@ -98,6 +97,13 @@ const state = reactive({
         const id = selectedSecret.service_account_id;
         const fullName = selectedSecret.name;
         return fullName.split(id)[0] ?? '';
+    }),
+    secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
+    isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
+    serviceAccountsFilter: computed<string[]>(() => {
+        if (!state.secretFilter) return [];
+        if (state.secretFilter.state === 'DISABLED') return [];
+        return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
     }),
 });
 
@@ -129,24 +135,29 @@ const handleClickConfirm = async () => {
 };
 
 /* API */
-const apiQueryHelper = new ApiQueryHelper();
-const fetchSecrets = async (provider: string) => {
-    try {
-        apiQueryHelper.setFilters([{ k: 'provider', v: provider, o: '=' }]);
+const apiQueryHelper = new ApiQueryHelper().setCountOnly();
+const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
+    apiQueryHelper.setFilters([{ k: 'provider', v: provider, o: '=' }]);
 
-        const results = await SpaceConnector.client.secret.secret.list({
+    if (serviceAccounts.length > 0) {
+        if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '!=' });
+        else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
+    }
+    try {
+        const { total_count } = await SpaceConnector.client.secret.secret.list({
             query: apiQueryHelper.data,
         });
-        state.secrets = results.results;
+        state.secretsCount = total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.secrets = [];
+        state.secretsCount = 0;
     }
 };
 
 watch([() => collectorDataModalState.selectedCollector, () => collectorDataModalState.visible], async ([selectedCollector, visible]) => {
     if (!selectedCollector || !visible) return;
-    await fetchSecrets(selectedCollector.provider);
+    await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
+    await collectorDataModalStore.getJobs(selectedCollector.collector_id);
 }, { immediate: true });
 
 onMounted(() => {

@@ -47,23 +47,23 @@
             </span>
             <div class="chart-wrapper">
                 <div class="label-wrapper">
-                    <div v-if="state.jobTaskStatus.succeeded >= 0">
+                    <div v-if="state.recentJob.success_tasks >= 0">
                         <p-status :icon-color="SUCCEEDED_COLOR" />
                         <span>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED') }}
-                            <strong>{{ state.jobTaskStatus.succeeded }}</strong>
+                            <strong>{{ state.recentJob.success_tasks }}</strong>
                         </span>
                     </div>
-                    <div v-if="state.jobTaskStatus.failed >= 0"
+                    <div v-if="state.recentJob.failure_tasks >= 0"
                          class="label"
                     >
                         <p-status :icon-color="FAILED_COLOR" />
                         <span :style="{'color': FAILED_COLOR}">
                             {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED') }}
-                            <strong>{{ state.jobTaskStatus.failed }}</strong>
+                            <strong>{{ state.recentJob.failure_tasks }}</strong>
                         </span>
                     </div>
                     <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
-                        <strong>{{ state.jobTaskStatus.total }}</strong>
+                        <strong>{{ state.recentJob.total_tasks }}</strong>
                     </span>
                 </div>
                 <div class="progress-bar">
@@ -88,12 +88,8 @@ import {
 import dayjs from 'dayjs';
 
 import { durationFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
 
@@ -134,63 +130,24 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
 const state = reactive({
-    jobTaskStatus: {
-        succeeded: 0,
-        failed: 0,
-        total: 0,
-    },
-    duration: 0,
+    recentJob: computed(() => collectorDataModalState.recentJob),
+    duration: computed(() => durationFormatter(state.recentJob?.created_at, dayjs(), storeState.timezone) || '--'),
     succeededPercentage: computed(() => {
-        if (state.jobTaskStatus.total > 0) {
-            return (state.jobTaskStatus.succeeded / state.jobTaskStatus.total) * 100;
+        if (state.recentJob.total_tasks > 0) {
+            return (state.recentJob.success_tasks / state.recentJob.total_tasks) * 100;
         }
         return 0;
     }),
     failedPercentage: computed(() => {
-        if (state.jobTaskStatus.total > 0) {
-            const recentJob = collectorDataModalState.recentJob;
-            if (!recentJob) return 0;
-            if (recentJob.status === JOB_STATE.SUCCESS) {
+        if (state.recentJob.total_tasks > 0) {
+            if (state.recentJob.status === JOB_STATE.SUCCESS) {
                 return 100 - state.succeededPercentage;
             }
-            return (state.jobTaskStatus.failed / state.jobTaskStatus.total) * 100;
+            return (state.recentJob.failure_tasks / state.recentJob.total_tasks) * 100;
         }
         return 0;
     }),
-    status: computed<string>(() => {
-        const recentJob = collectorDataModalState.recentJob;
-        if (!recentJob) return '';
-        return recentJob.status;
-    }),
 });
-
-/* Query helper */
-const apiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('created_at', true);
-
-/* API */
-const getJobLists = async () => {
-    try {
-        const response = await SpaceConnector.client.inventory.job.list({ query: apiQueryHelper.data });
-        const item = response.results[0];
-
-        state.duration = durationFormatter(item.created_at, dayjs(), storeState.timezone) || '--';
-
-        state.jobTaskStatus = {
-            succeeded: item.success_tasks,
-            failed: item.failure_tasks,
-            total: item.total_tasks,
-        };
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-/* Init */
-(async () => {
-    await getJobLists();
-})();
 </script>
 
 <style lang="postcss" scoped>

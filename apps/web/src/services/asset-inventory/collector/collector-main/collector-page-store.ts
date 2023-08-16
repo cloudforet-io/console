@@ -69,7 +69,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 this.loading.collectorList = false;
             }
         },
-        async setCollectorJobs(ids) {
+        async getCollectorJobs(ids) {
             try {
                 const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
                     query: {

@@ -29,13 +29,6 @@ export const useCollectorJobStore = defineStore('collector-job', {
             }
             return null;
         },
-        recentJobForSingleAccounts(): JobModel|null {
-            if (Array.isArray(this.recentJobs) && this.recentJobs.length > 0) {
-                const filteredJobs = this.recentJobs.filter((job) => job.secret_id);
-                return filteredJobs[0] ?? null;
-            }
-            return null;
-        },
     },
     actions: {
         async getRecentJob() {
