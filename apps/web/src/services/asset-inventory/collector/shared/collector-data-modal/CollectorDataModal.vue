@@ -98,12 +98,11 @@ const state = reactive({
         const fullName = selectedSecret.name;
         return fullName.split(id)[0] ?? '';
     }),
-    secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
-    isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
     serviceAccountsFilter: computed<string[]>(() => {
-        if (!state.secretFilter) return [];
-        if (state.secretFilter.state === 'DISABLED') return [];
-        return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
+        const secretFilter = collectorDataModalState.selectedCollector?.secret_filter;
+        if (!secretFilter) return [];
+        if (secretFilter.state === 'DISABLED') return [];
+        return secretFilter.service_accounts ?? [];
     }),
 });
 
@@ -140,8 +139,7 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
     apiQueryHelper.setFilters([{ k: 'provider', v: provider, o: '=' }]);
 
     if (serviceAccounts.length > 0) {
-        if (state.isExcludeFilter) apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '!=' });
-        else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
+        apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
     }
     try {
         const { total_count } = await SpaceConnector.client.secret.secret.list({

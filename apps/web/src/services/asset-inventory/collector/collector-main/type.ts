@@ -16,6 +16,7 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     PLUGIN_INFO: 'plugin_info',
     STATE: 'state',
     SCHEDULE: 'schedule',
+    SECRET_FILTER: 'secret_filter',
 } as const;
 
 interface CollectorPlugin {

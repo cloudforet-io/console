@@ -124,6 +124,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
         COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
         COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
         COLLECTOR_QUERY_HELPER_SET.PROVIDER,
+        COLLECTOR_QUERY_HELPER_SET.SECRET_FILTER,
     )
     .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
     .setSort(collectorPageState.sortBy, true);
