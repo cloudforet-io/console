@@ -5,7 +5,6 @@
             searchable
             selectable
             sortable
-            exportable
             :loading="userPageState.loading"
             :items="userPageState.users"
             :select-index="userPageState.selectedIndices"
@@ -20,7 +19,6 @@
             @select="handleSelect"
             @change="handleChange"
             @refresh="handleChange()"
-            @export="handleExport"
         >
             <template #toolbox-left>
                 <p-button style-type="primary"
@@ -109,10 +107,8 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -247,18 +243,6 @@ export default {
             await userPageStore.listUsers(userListApiQuery);
         };
 
-        const handleExport = async () => {
-            await store.dispatch('file/downloadExcel', {
-                url: '/identity/user/list',
-                param: {
-                    query: userListApiQuery,
-                    include_role_binding: true,
-                },
-                fields: state.excelFields,
-                file_name_prefix: FILE_NAME_PREFIX.user,
-            });
-        };
-
         /* Modal */
         const clickAdd = () => {
             userFormState.updateMode = false;
@@ -390,7 +374,6 @@ export default {
             handleUserFormConfirm,
             handleSelect,
             handleChange,
-            handleExport,
         };
     },
 
