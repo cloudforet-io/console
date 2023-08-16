@@ -29,7 +29,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         totalCount: 0,
         pageStart: 1,
         pageLimit: 24,
-        sortBy: '',
+        sortBy: 'name',
         searchFilters: [] as ConsoleFilter[],
 
         visible: {

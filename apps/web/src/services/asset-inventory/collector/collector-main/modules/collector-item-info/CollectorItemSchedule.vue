@@ -80,7 +80,6 @@ const handleClickSchedule = () => {
             }
             .icon-schedule {
                 @apply text-blue-700;
-                margin-top: 0.15rem;
             }
         }
     }
