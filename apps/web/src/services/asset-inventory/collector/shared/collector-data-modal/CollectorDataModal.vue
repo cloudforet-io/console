@@ -100,11 +100,6 @@ const state = reactive({
     }),
     secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),
-    serviceAccountsFilter: computed<string[]>(() => {
-        if (!state.secretFilter) return [];
-        if (state.secretFilter.state === 'DISABLED') return [];
-        return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
-    }),
 });
 
 const emit = defineEmits<{(e: 'click-confirm'): void}>();

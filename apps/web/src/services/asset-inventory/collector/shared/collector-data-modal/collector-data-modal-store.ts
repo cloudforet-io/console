@@ -36,7 +36,6 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
             }
         },
     },
