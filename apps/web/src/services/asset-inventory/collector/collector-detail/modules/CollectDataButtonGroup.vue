@@ -34,6 +34,7 @@ const handleClickCollectDataButton = () => {
     <div class="collect-data-button-group">
         <p-popover :is-visible.sync="state.isPopoverOpen"
                    :ignore-target-click="false"
+                   ignore-outside-click
         >
             <div class="buttons-wrapper">
                 <p-button style-type="tertiary"
