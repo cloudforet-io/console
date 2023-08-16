@@ -146,7 +146,7 @@ const handleClickHour = (hour: number) => {
     updateSelectedHours();
 };
 
-watch(() => collectorFormStore.collectorId, (collectorId) => {
+watch([() => collectorFormStore.collectorId, () => props.enableHoursEdit], ([collectorId]) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetSchedule();
     selectedUtcHoursSet.clear();
