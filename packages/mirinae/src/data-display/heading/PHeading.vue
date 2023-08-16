@@ -14,7 +14,8 @@
             <h2 :class="{'has-left': !!$slots['title-left-extra'], 'has-right': useTotalCount || !!$slots['title-right-extra']}">
                 <slot>
                     <slot name="title">
-                        <span class="title">{{ title }}&zwnj;</span>
+                        <!--&zwnj: Added to prevent style bugs if title does not exist-->
+                        <span class="title">{{ title.length ? title : '&zwnj' }}</span>
                     </slot>
                 </slot>
             </h2>
