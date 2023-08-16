@@ -195,7 +195,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     state.thisPage = 1;
     state.pageStart = 1;
     getJobs();
-}, { immediate: true });
+});
 
 /* Init */
 (async () => {

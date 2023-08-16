@@ -2230,7 +2230,7 @@
 				"HISTORY": "Collector History",
 				"IN_PROGRESS": "In-Progress",
 				"JOB_CANCELED": "Canceled: {date}",
-				"JOB_ERROR": "Status: Failed,\nCollected: {date}",
+				"JOB_FAILURE": "Status: Failure,\nCollected: {date}",
 				"JOB_NONE": "No collector job",
 				"JOB_PROGRESS": "Status: In-Progress",
 				"JOB_SUCCESS": "Status: Completed,\nCollected: {date}",
