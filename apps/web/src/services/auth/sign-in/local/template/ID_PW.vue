@@ -96,7 +96,7 @@ export default defineComponent({
         const state = reactive({
             userId: '' as string | undefined,
             password: '',
-            loading: false,
+            loading: computed(() => store.state.user.isSignInLoading),
         });
 
         const validationState = reactive({
@@ -131,11 +131,9 @@ export default defineComponent({
         };
 
         const signIn = async () => {
-            state.loading = true;
             checkUserId();
             await checkPassword();
             if (!validationState.isIdValid || !validationState.isPasswordValid) {
-                state.loading = false;
                 return;
             }
             const credentials = {
@@ -153,8 +151,6 @@ export default defineComponent({
                 ErrorHandler.handleError(e);
                 state.password = '';
                 await store.dispatch('display/showSignInErrorMessage');
-            } finally {
-                state.loading = false;
             }
         };
 

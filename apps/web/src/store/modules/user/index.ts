@@ -29,6 +29,7 @@ const state: UserState = {
     roles: storedUserState.roles,
     requiredActions: storedUserState.requiredActions,
     emailVerified: storedUserState.emailVerified,
+    isSignInLoading: false,
 };
 
 export default {
