@@ -18,7 +18,7 @@
                 <collector-data-default-inner v-else
                                               :name="state.accountName"
                                               :icon="state.provider.icon"
-                                              :secrets-count="state.secrets.length"
+                                              :secrets-count="state.secretsCount"
                 />
             </template>
             <template #confirm-button>
@@ -49,7 +49,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { SecretModel } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/collector/shared/collector-data-modal/collector-data-modal-store';
@@ -70,7 +69,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    secrets: [] as SecretModel[],
+    secretsCount: 0,
     headerTitle: computed(() => (state.isDuplicateJobs
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
@@ -136,8 +135,8 @@ const handleClickConfirm = async () => {
 };
 
 /* API */
-const apiQueryHelper = new ApiQueryHelper();
-const fetchSecrets = async (provider: string, serviceAccounts?: string[]) => {
+const apiQueryHelper = new ApiQueryHelper().setCountOnly();
+const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
     apiQueryHelper.setFilters([{ k: 'provider', v: provider, o: '=' }]);
 
     if (serviceAccounts?.length) {
@@ -145,19 +144,19 @@ const fetchSecrets = async (provider: string, serviceAccounts?: string[]) => {
         else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
     }
     try {
-        const results = await SpaceConnector.client.secret.secret.list({
+        const { total_count } = await SpaceConnector.client.secret.secret.list({
             query: apiQueryHelper.data,
         });
-        state.secrets = results.results;
+        state.secretsCount = total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.secrets = [];
+        state.secretsCount = 0;
     }
 };
 
 watch([() => collectorDataModalState.selectedCollector, () => collectorDataModalState.visible], async ([selectedCollector, visible]) => {
     if (!selectedCollector || !visible) return;
-    await fetchSecrets(selectedCollector.provider);
+    await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
     await collectorDataModalStore.getJobs(selectedCollector.collector_id);
 }, { immediate: true });
 
