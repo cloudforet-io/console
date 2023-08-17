@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { PTag, PFieldTitle, PEmpty } from '@spaceone/design-system';
 
 import { isNotEmpty } from '@cloudforet/core-lib';
@@ -9,6 +11,11 @@ const props = withDefaults(defineProps<{
     tags: Tags;
 }>(), {
     tags: () => ({}),
+});
+
+const sortedTags = computed<[key: string, value: any][]>(() => {
+    const tags = props.tags;
+    return Object.entries(tags).sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
 });
 </script>
 
@@ -23,7 +30,7 @@ const props = withDefaults(defineProps<{
         </p-field-title>
         <div class="tags-wrapper">
             <template v-if="isNotEmpty(props.tags)">
-                <p-tag v-for="(value, key) in props.tags"
+                <p-tag v-for="([key, value]) in sortedTags"
                        :key="`${key}-${value}`"
                        :key-item="{name: key}"
                        :value-item="{name: value}"
