@@ -53,13 +53,13 @@ const fields = [
     { label: 'Duration', name: 'duration', sortable: false },
 ];
 
-const statusList = [
+const statusList = computed(() => [
     { name: JOB_SELECTED_STATUS.ALL, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.ALL') },
     { name: JOB_SELECTED_STATUS.PROGRESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS') },
     { name: JOB_SELECTED_STATUS.SUCCESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') },
     { name: JOB_SELECTED_STATUS.FAILURE, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE') },
     { name: JOB_SELECTED_STATUS.PENDING, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.PENDING') },
-];
+]);
 
 const emit = defineEmits<{(e: 'select', array): void}>();
 
