@@ -94,13 +94,6 @@ const state = reactive({
     isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
-    statusList: [
-        { name: JOB_SELECTED_STATUS.ALL, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.ALL') },
-        { name: JOB_SELECTED_STATUS.PROGRESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS') },
-        { name: JOB_SELECTED_STATUS.SUCCESS, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') },
-        { name: JOB_SELECTED_STATUS.FAILURE, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE') },
-        { name: JOB_SELECTED_STATUS.CANCELED, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED') },
-    ],
 });
 
 const queryTagsHelper = useQueryTags({
