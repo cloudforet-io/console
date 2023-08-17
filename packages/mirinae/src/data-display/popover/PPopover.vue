@@ -50,7 +50,8 @@ interface PopoverProps {
     tag: string;
     position?: PopoverPlacement;
     trigger?: PopoverTrigger;
-    ignoreTargetClick: boolean;
+    ignoreTargetClick?: boolean;
+    ignoreOutsideClick?: boolean;
 }
 
 export default defineComponent<PopoverProps>({
@@ -94,6 +95,10 @@ export default defineComponent<PopoverProps>({
             type: Boolean,
             default: true,
         },
+        ignoreOutsideClick: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -121,9 +126,9 @@ export default defineComponent<PopoverProps>({
             hidePopover();
         };
         const handleClickOutside = () => {
-            hidePopover();
+            if (!props.ignoreOutsideClick) hidePopover();
         };
-        const bindEventToTargetRef = (eventType: keyof HTMLElementEventMap, handler, useCature = false) => state.targetRef?.addEventListener(eventType, handler, useCature);
+        const bindEventToTargetRef = (eventType, handler, useCature = false) => state.targetRef?.addEventListener(eventType, handler, useCature);
         const addEvent = () => {
             if (props.trigger === POPOVER_TRIGGER.CLICK) {
                 bindEventToTargetRef('click', handleClickTargetRef, true);

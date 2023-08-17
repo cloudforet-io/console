@@ -268,6 +268,9 @@ onMounted(async () => {
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
     const collector = await getCollector();
+    collectorJobStore.$patch((_state) => {
+        _state.collector = collector;
+    });
     if (collector) {
         collectorFormStore.setOriginCollector(collector);
         resume();

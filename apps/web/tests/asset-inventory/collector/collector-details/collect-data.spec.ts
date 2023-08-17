@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const COLLECTOR_INDEX = 0;
+const COLLECTOR_INDEX = 1;
 const IN_PROGRESS_SELECTOR = '.popper .label-description .current-status-progress';
 const SERVICE_ACCOUNT_INDEX = 0;
 
@@ -41,9 +41,6 @@ const checkIfApiResponsesAreCorrect = async (page) => {
 };
 
 const checkIfStatusIsInProgress = async (page) => {
-    // click on the status button
-    await page.locator('button.status-button').click();
-
     // check if the status is in progress
     await expect(await page.locator(IN_PROGRESS_SELECTOR)).toBeVisible();
 };

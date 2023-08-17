@@ -25,6 +25,7 @@ const state = reactive({
     showStatus: computed(() => width.value > screens.mobile.max),
 });
 const handleClickCollectDataButton = () => {
+    state.isPopoverOpen = true;
     emit('collect');
 };
 
@@ -43,6 +44,7 @@ const handleClickCollectDataButton = () => {
         </p-button>
         <p-popover v-if="state.showStatus"
                    :is-visible.sync="state.isPopoverOpen"
+                   ignore-outside-click
         >
             <p-icon-button :name="state.isPopoverOpen ? 'ic_chevron-up' : 'ic_chevron-down'"
                            style-type="tertiary"
