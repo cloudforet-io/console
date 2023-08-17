@@ -117,43 +117,41 @@ export default defineComponent<PopoverProps>({
                 ],
             })),
         });
-        const updateIsVisible = (visible: boolean) => {
+        const updateIsVisible = (visible: boolean, emitEvent = true) => {
             state.proxyIsVisible = visible;
-            emit('update:is-visible', visible);
+            if (emitEvent) emit('update:is-visible', visible);
         };
-        const hidePopover = () => {
+        const hidePopover = (emitEvent = true) => {
             state.contentRef?.removeAttribute('data-show');
             popperObject?.setOptions({ placement: props.position });
             popperObject?.update();
+            updateIsVisible(false, emitEvent);
         };
-        const showPopover = () => {
+        const showPopover = (emitEvent = true) => {
             state.contentRef?.setAttribute('data-show', '');
             popperObject?.setOptions({ placement: props.position });
             popperObject?.update();
+            updateIsVisible(true, emitEvent);
         };
         const handleClickTargetRef = (e) => {
-            updateIsVisible(!state.proxyIsVisible);
             if (props.ignoreTargetClick) e.stopPropagation();
-            if (state.proxyIsVisible) showPopover();
+            const value = !state.proxyIsVisible;
+            if (value) showPopover();
             else hidePopover();
         };
         const handleClickCloseIcon = () => {
             hidePopover();
-            updateIsVisible(false);
         };
         const handleClickOutside = () => {
             if (!props.ignoreOutsideClick) {
                 hidePopover();
-                updateIsVisible(false);
             }
         };
         const handleTargetShowEvent = () => {
             showPopover();
-            updateIsVisible(true);
         };
         const handleTargetHideEvent = () => {
             hidePopover();
-            updateIsVisible(false);
         };
         const bindEventToTargetRef = (eventType, handler, useCapture = false) => state.targetRef?.addEventListener(eventType, handler, useCapture);
         const addEvent = () => {
@@ -176,8 +174,8 @@ export default defineComponent<PopoverProps>({
                 watch(() => props.isVisible, (value) => {
                     if (state.proxyIsVisible === value) return;
                     state.proxyIsVisible = value;
-                    if (value) showPopover();
-                    else hidePopover();
+                    if (value) showPopover(false);
+                    else hidePopover(false);
                 }, { immediate: true });
             }
         });
