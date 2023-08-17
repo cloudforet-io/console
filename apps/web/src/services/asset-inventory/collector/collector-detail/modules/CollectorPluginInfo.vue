@@ -73,6 +73,7 @@ const state = reactive({
 <style scoped lang="postcss">
 .collector-plugin-info {
     margin-bottom: 1.5rem;
+    max-width: 1048px;
     .collector-contents-wrapper {
         display: flex;
         flex-wrap: wrap;
