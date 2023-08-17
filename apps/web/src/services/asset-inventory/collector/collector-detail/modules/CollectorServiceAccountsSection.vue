@@ -29,7 +29,7 @@
                 <p-button style-type="primary"
                           size="lg"
                           class="save-changes-button"
-                          :disalbed="state.updateLoading"
+                          :disabled="state.updateLoading || !state.isServiceAccountValid"
                           @click="handleClickSave"
                 >
                     {{ $t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
@@ -96,8 +96,10 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     };
     const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
         service_accounts: collectorFormStore.serviceAccounts,
+        exclude_service_accounts: [],
     } : {
         exclude_service_accounts: collectorFormStore.serviceAccounts,
+        service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
     return SpaceConnector.client.inventory.collector.update(params);
