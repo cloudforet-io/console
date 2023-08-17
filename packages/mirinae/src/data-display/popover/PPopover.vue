@@ -18,8 +18,8 @@
                 <p-icon-button name="ic_close"
                                color="inherit"
                                size="sm"
-                               class="delete-icon"
-                               @click="handleClickDeleteIcon"
+                               class="close-icon"
+                               @click="handleClickCloseIcon"
                 />
             </div>
             <div class="arrow"
@@ -33,7 +33,7 @@
 import type { PropType } from 'vue';
 import {
     defineComponent,
-    onMounted, onUnmounted, reactive, toRefs, watch,
+    onMounted, onUnmounted, reactive, toRefs, watch, computed,
 } from 'vue';
 
 import type { Instance } from '@popperjs/core';
@@ -102,92 +102,94 @@ export default defineComponent<PopoverProps>({
     setup(props, { emit }) {
         let popperObject: Instance|undefined;
         const state = reactive({
-            proxyIsVisible: props.isVisible,
+            proxyIsVisible: false,
             contentRef: null as null|HTMLElement,
             targetRef: null as null|HTMLElement,
+            popperOptions: computed(() => ({
+                placement: props.position,
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [0, 21],
+                        },
+                    },
+                ],
+            })),
         });
         const updateIsVisible = (visible: boolean) => {
             state.proxyIsVisible = visible;
             emit('update:is-visible', visible);
         };
         const hidePopover = () => {
-            updateIsVisible(false);
-            return state.contentRef?.removeAttribute('data-show');
+            state.contentRef?.removeAttribute('data-show');
+            popperObject?.setOptions({ placement: props.position });
+            popperObject?.update();
         };
         const showPopover = () => {
             state.contentRef?.setAttribute('data-show', '');
+            popperObject?.setOptions({ placement: props.position });
             popperObject?.update();
-            return popperObject?.setOptions({ placement: props.position });
         };
         const handleClickTargetRef = (e) => {
             updateIsVisible(!state.proxyIsVisible);
             if (props.ignoreTargetClick) e.stopPropagation();
-            return popperObject?.setOptions({ placement: props.position });
+            if (state.proxyIsVisible) showPopover();
+            else hidePopover();
         };
-        const handleClickDeleteIcon = () => {
+        const handleClickCloseIcon = () => {
             hidePopover();
+            updateIsVisible(false);
         };
         const handleClickOutside = () => {
-            if (!props.ignoreOutsideClick) hidePopover();
+            if (!props.ignoreOutsideClick) {
+                hidePopover();
+                updateIsVisible(false);
+            }
         };
-        const bindEventToTargetRef = (eventType, handler, useCature = false) => state.targetRef?.addEventListener(eventType, handler, useCature);
+        const handleTargetShowEvent = () => {
+            showPopover();
+            updateIsVisible(true);
+        };
+        const handleTargetHideEvent = () => {
+            hidePopover();
+            updateIsVisible(false);
+        };
+        const bindEventToTargetRef = (eventType, handler, useCapture = false) => state.targetRef?.addEventListener(eventType, handler, useCapture);
         const addEvent = () => {
             if (props.trigger === POPOVER_TRIGGER.CLICK) {
                 bindEventToTargetRef('click', handleClickTargetRef, true);
             } else if (props.trigger === POPOVER_TRIGGER.HOVER) {
-                bindEventToTargetRef('mouseenter', showPopover);
-                bindEventToTargetRef('mouseleave', hidePopover);
+                bindEventToTargetRef('mouseenter', handleTargetShowEvent);
+                bindEventToTargetRef('mouseleave', handleTargetHideEvent);
             } else if (props.trigger === POPOVER_TRIGGER.FOCUS) {
-                bindEventToTargetRef('focus', showPopover, true);
-                bindEventToTargetRef('blur', hidePopover, true);
-            }
-        };
-        const triggerTargetEvent = (target: HTMLElement, visible: boolean) => {
-            if (props.trigger === POPOVER_TRIGGER.CLICK && !props.ignoreTargetClick) {
-                target.click();
-            } else if (props.trigger === POPOVER_TRIGGER.HOVER) {
-                if (visible) target.dispatchEvent(new Event('mouseenter'));
-                else target.dispatchEvent(new Event('mouseleave'));
-            } else if (props.trigger === POPOVER_TRIGGER.FOCUS) {
-                if (visible) target.focus();
-                else target.blur();
+                bindEventToTargetRef('focus', handleTargetShowEvent, true);
+                bindEventToTargetRef('blur', handleTargetHideEvent, true);
             }
         };
 
         onMounted(() => {
             if (state.targetRef && state.contentRef) {
-                popperObject = createPopper(state.targetRef, state.contentRef, {
-                    placement: props.position,
-                    modifiers: [
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [0, 21],
-                            },
-                        },
-                    ],
-                });
+                popperObject = createPopper(state.targetRef, state.contentRef, state.popperOptions);
                 addEvent();
+
+                watch(() => props.isVisible, (value) => {
+                    if (state.proxyIsVisible === value) return;
+                    state.proxyIsVisible = value;
+                    if (value) showPopover();
+                    else hidePopover();
+                }, { immediate: true });
             }
         });
 
         onUnmounted(() => popperObject?.destroy());
 
-        watch(() => props.isVisible, (value) => {
-            if (state.proxyIsVisible === value) return;
-            if (state.targetRef) {
-                // NOTE: If the state is changed without triggering event, the popper position will be wrong.
-                triggerTargetEvent(state.targetRef, value);
-                return;
-            }
-            updateIsVisible(value);
-        }, { immediate: true });
 
         return {
             ...toRefs(state),
             handleClickTargetRef,
             handleClickOutside,
-            handleClickDeleteIcon,
+            handleClickCloseIcon,
         };
     },
 });
@@ -208,7 +210,7 @@ export default defineComponent<PopoverProps>({
         > .popper-content-wrapper {
             @apply flex w-full;
 
-            .delete-icon {
+            .close-icon {
                 margin: 0.5rem;
             }
         }
