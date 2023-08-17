@@ -51,7 +51,7 @@ interface ProviderLegend {
 }
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 withDefaults(defineProps<Props>(), {

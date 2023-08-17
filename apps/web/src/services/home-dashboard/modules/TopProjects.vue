@@ -49,7 +49,7 @@ const SERVER_COLOR = secondary;
 const DATABASE_COLOR = peacock[200];
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 const props = withDefaults(defineProps<Props>(), {

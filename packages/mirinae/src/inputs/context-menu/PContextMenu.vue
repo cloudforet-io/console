@@ -194,7 +194,7 @@ interface ContextMenuEmits {
     (e: 'blur'): void,
     (e: 'keyup:up:end'): void,
     (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index?: number, event?: Event): void,
+    (e: 'select', item: MenuItem, index?: number): void,
     (e: 'update:search-text', searchText: string): void,
     (e: 'keyup:esc', mouseEvent: KeyboardEvent): void,
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
@@ -277,7 +277,7 @@ const onKeyDown = (idx?: number) => {
     const focusedIdx = handleMoveDown(idx);
     if (focusedIdx === undefined) emit('keyup:down:end');
 };
-const onClickMenu = (item: MenuItem, index: number, event) => {
+const onClickMenu = (item: MenuItem, index: number) => {
     if (item.disabled) return;
     if (props.readonly) return;
 
@@ -293,8 +293,8 @@ const onClickMenu = (item: MenuItem, index: number, event) => {
     } else {
         state.proxySelected = [item];
     }
-
-    emit('select', item, index, event);
+    console.debug('context', item, index);
+    emit('select', item, index);
 };
 const onClickEsc = (e: KeyboardEvent) => {
     emit('keyup:esc', e);
@@ -367,7 +367,7 @@ defineExpose({
             padding: 0.5rem;
         }
         > .clear-all-wrapper {
-            padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+            padding: 0.5rem 0.5rem 0.25rem;
         }
         > .context-header {
             @apply text-gray-500;

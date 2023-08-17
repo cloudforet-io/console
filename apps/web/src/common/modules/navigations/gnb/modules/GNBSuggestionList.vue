@@ -17,9 +17,9 @@ import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules
 
 interface Props {
     items: SuggestionItem[];
-    inputText: string;
-    isFocused: boolean;
-    focusingDirection: FocusingDirection;
+    inputText?: string;
+    isFocused?: boolean;
+    focusingDirection?: FocusingDirection;
     useFavorite?: boolean;
 }
 

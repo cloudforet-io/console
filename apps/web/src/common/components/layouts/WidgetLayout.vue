@@ -2,8 +2,8 @@
 import { PPaneLayout } from '@spaceone/design-system';
 
 interface Props {
-    title: string;
-    overflow: string;
+    title?: string;
+    overflow?: string;
 }
 
 withDefaults(defineProps<Props>(), {

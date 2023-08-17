@@ -26,7 +26,7 @@ import type { ExtraParams } from '@/services/home-dashboard/modules/type';
 const EVENT_PERIOD = 7;
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 const props = withDefaults(defineProps<Props>(), {

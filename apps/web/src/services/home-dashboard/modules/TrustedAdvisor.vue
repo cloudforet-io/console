@@ -52,7 +52,7 @@ const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
 const CLOUD_SERVICE_NAME = 'Check';
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 const props = withDefaults(defineProps<Props>(), {

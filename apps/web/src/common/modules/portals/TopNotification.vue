@@ -27,10 +27,11 @@ const handleClose = () => {
 </script>
 
 <template>
-    <portal to="top-notification"
+    <portal v-slot="{ hasDefaultMessage }"
+            to="top-notification"
             class="top-notification"
     >
-        <p :v-slot="{hasDefaultMessage}">
+        <p>
             <p-notification-bar v-model:visible="state.visible"
                                 :style-type="styleType"
                                 @close="handleClose"

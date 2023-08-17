@@ -51,12 +51,11 @@ const handleClickAnchor = (navigateFn, event: Event) => {
                :contents="isEllipsisActive() ? label : undefined"
                position="bottom"
     >
-        <router-link class="gnb-sub-menu"
-                     :to="href ? {} : to"
+        <router-link :to="href ? {} : to"
                      custom
         >
             <template #default="{href: toHref, navigate}">
-                <span>
+                <span class="gnb-sub-menu">
                     <a class="gnb-sub-contents"
                        :href="href ? href : toHref"
                        :target="href ? '_blank' : undefined"

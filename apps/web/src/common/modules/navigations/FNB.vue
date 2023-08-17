@@ -3,7 +3,7 @@ import { PI } from '@spaceone/design-system';
 import { useI18n } from 'vue-i18n';
 
 interface Props {
-    width: string;
+    width?: string;
 }
 
 withDefaults(defineProps<Props>(), {

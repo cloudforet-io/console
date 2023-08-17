@@ -36,8 +36,8 @@
                 >
                     {{
                         state.selectedItem ?
-                            (state.selectedItem.label || state.selectedItem.name || '') :
-                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
+                            (state.selectedItem?.label || state.selectedItem?.name || '') :
+                            (placeholder || t('COMPONENT.SELECT_DROPDOWN.SELECT'))
                     }}
                 </slot>
             </span>
@@ -81,6 +81,7 @@ import {
     computed, ref, reactive,
     nextTick, toRef, useSlots,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
@@ -133,6 +134,7 @@ const props = withDefaults(defineProps<Props>(), {
     isFixedWidth: false,
 });
 const emit = defineEmits(['update:selected', 'select', 'update:visibleMenu', 'focus-menu']);
+const { t } = useI18n();
 const slots = useSlots();
 
 const state = reactive({
@@ -171,12 +173,13 @@ const {
 });
 
 /* Event Handlers */
-const onSelectMenu = (item: MenuItem, index, event) => {
+const onSelectMenu = (item: MenuItem, index) => {
+    console.debug('onSelectMenu', item, index);
     if (props.indexMode) {
-        emit('select', index, event);
+        emit('select', index);
         state.proxySelected = index;
     } else {
-        emit('select', item.name, event);
+        emit('select', item.name);
         state.proxySelected = item.name;
     }
     state.proxyVisibleMenu = false;

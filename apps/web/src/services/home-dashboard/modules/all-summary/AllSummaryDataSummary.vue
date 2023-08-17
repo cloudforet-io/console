@@ -230,7 +230,7 @@ watch(() => props.activeTab, (type) => {
             {{ state.title }}
         </div>
         <p-data-loader :loading="state.loading"
-                       :data="summaryData"
+                       :data="state.summaryData"
                        loader-type="skeleton"
         >
             <div class="summary-content-wrapper">

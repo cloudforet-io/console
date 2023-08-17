@@ -18,8 +18,8 @@ import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';

@@ -12,9 +12,9 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 interface Props {
-    printMode: boolean;
-    defaultCurrencyMode: boolean;
-    currency: Currency;
+    printMode?: boolean;
+    defaultCurrencyMode?: boolean;
+    currency?: Currency;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,7 +46,7 @@ const handleSelectCurrency = (currency: Currency) => {
 
 <template>
     <p-select-dropdown :items="state.currencyItems"
-                       :selected="currency"
+                       :selected="state.currency"
                        style-type="transparent"
                        :read-only="printMode"
                        class="currency-select-dropdown"

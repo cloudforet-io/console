@@ -55,7 +55,7 @@ interface JobModel {
 }
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -168,7 +168,7 @@ onUnmounted(() => {
             />
         </div>
         <div class="legend-wrapper">
-            <template v-for="([k, v]) of Object.entries(legendData)"
+            <template v-for="([k, v]) of Object.entries(state.legendData)"
                       :key="k"
             >
                 <router-link

@@ -41,7 +41,7 @@ const CATEGORY_KEY = 'name';
 const VALUE_KEY = 'service_account_count';
 
 interface Props {
-    extraParams: ExtraParams;
+    extraParams?: ExtraParams;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -197,7 +197,7 @@ onUnmounted(() => {
         </template>
         <div class="chart-container">
             <p-data-loader :loading="state.loading"
-                           :data="data"
+                           :data="state.data"
                            class="chart"
             >
                 <template #loader>

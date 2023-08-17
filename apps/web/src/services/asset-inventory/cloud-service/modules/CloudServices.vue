@@ -29,7 +29,7 @@ interface Value {
 const DATA_LENGTH = 8;
 
 interface Props {
-    providers: Record<string, any>;
+    providers?: Record<string, any>;
     moreInfo: boolean;
     projectId?: string;
 }
