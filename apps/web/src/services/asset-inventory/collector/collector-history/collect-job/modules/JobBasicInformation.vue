@@ -55,9 +55,8 @@ import { store } from '@/store';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 import type { JobModel } from '@/services/asset-inventory/collector/model';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 interface Props {
     job: JobModel;
@@ -78,7 +77,12 @@ const state = reactive({
         return {
             id,
             label: storeState.collectors[id]?.label || id,
-            linkLocation: referenceRouter(id, { resource_type: 'inventory.Collector' }),
+            linkLocation: {
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                params: {
+                    collectorId: id,
+                },
+            },
         };
     }),
     plugin: computed(() => {
