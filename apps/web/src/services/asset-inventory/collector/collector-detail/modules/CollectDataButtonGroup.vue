@@ -30,8 +30,9 @@ const handleClickCollectDataButton = () => {
 const handleUpdatePopoverVisible = (visible: boolean) => {
     state.isPopoverOpen = visible;
 };
-watch(() => state.recentJob, (recentJob) => {
+watch(() => state.recentJob, (recentJob, prevJob) => {
     if (recentJob?.status === 'IN_PROGRESS') {
+        if (prevJob && recentJob.job_id === prevJob.job_id && recentJob.status === prevJob.status) return;
         state.isPopoverOpen = true;
     }
 }, { immediate: true });
