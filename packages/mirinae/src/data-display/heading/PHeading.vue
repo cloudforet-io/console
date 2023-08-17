@@ -15,7 +15,7 @@
                 <slot>
                     <slot name="title">
                         <!--&zwnj: Added to prevent style bugs if title does not exist-->
-                        <span class="title">{{ title.length ? title : '&zwnj' }}</span>
+                        <span class="title">{{ title.length ? title : '&zwnj;' }}</span>
                     </slot>
                 </slot>
             </h2>
