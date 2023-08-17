@@ -157,7 +157,6 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
 watch([() => collectorDataModalState.selectedCollector, () => collectorDataModalState.visible], async ([selectedCollector, visible]) => {
     if (!selectedCollector || !visible) {
         collectorDataModalStore.$reset();
-        collectorDataModalStore.$dispose();
         return;
     }
     await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
@@ -169,7 +168,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    collectorDataModalStore.$reset();
     collectorDataModalStore.$dispose();
 });
 </script>
