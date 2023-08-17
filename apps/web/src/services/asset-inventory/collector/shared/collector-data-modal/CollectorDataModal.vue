@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="collectorDataModalState.visible"
+        <p-button-modal :visible="collectorDataModalState.visible && !!collectorDataModalState.recentJob"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
@@ -73,10 +73,10 @@ const state = reactive({
     headerTitle: computed(() => (state.isDuplicateJobs
         ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
         : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
-    isDuplicateJobs: computed<boolean>(() => {
+    isDuplicateJobs: computed<boolean | undefined>(() => {
         const recentJob = collectorDataModalState.recentJob;
         const selectedSecret = collectorDataModalState.selectedSecret;
-        if (!recentJob) return false;
+        if (!recentJob) return undefined;
         if (selectedSecret) {
             return recentJob.secret_id === selectedSecret.secret_id && recentJob.status === JOB_STATE.IN_PROGRESS;
         }
@@ -155,7 +155,10 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
 };
 
 watch([() => collectorDataModalState.selectedCollector, () => collectorDataModalState.visible], async ([selectedCollector, visible]) => {
-    if (!selectedCollector || !visible) return;
+    if (!selectedCollector || !visible) {
+        collectorDataModalStore.$reset();
+        return;
+    }
     await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
     await collectorDataModalStore.getJobs(selectedCollector.collector_id);
 }, { immediate: true });
@@ -165,7 +168,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    collectorDataModalStore.$reset();
     collectorDataModalStore.$dispose();
 });
 </script>
