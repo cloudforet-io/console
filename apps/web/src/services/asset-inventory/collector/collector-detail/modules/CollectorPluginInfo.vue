@@ -35,7 +35,7 @@ const state = reactive({
                             {{ $t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE') }}
                         </p-field-title>
                         <div class="value">
-                            {{ props.collector?.upgrade_mode === 'AUTO' ? 'ON' : 'OFF' }}
+                            {{ props.collector?.plugin_info?.upgrade_mode === 'AUTO' ? 'ON' : 'OFF' }}
                         </div>
                     </div>
                     <div class="collector-contents">
