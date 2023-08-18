@@ -1,3 +1,24 @@
+<template>
+    <div class="dashboard-refresh-dropdown">
+        <p-icon-button class="left-icon-button"
+                       name="ic_renew"
+                       style-type="tertiary"
+                       shape="square"
+                       :disabled="refreshDisabled || loading"
+                       :animation="loading ? 'reserve-spin' : undefined"
+                       @click="handleRefresh"
+        />
+        <p-select-dropdown class="currency-select-dropdown"
+                           :items="state.intervalOptionItems"
+                           :selected="dashboardDetailState.settings.refresh_interval_option"
+                           :read-only="loading"
+                           :class="{ loading }"
+                           menu-position="right"
+                           @select="handleSelectRefreshIntervalOption"
+        />
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { PIconButton, PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -122,27 +143,6 @@ const handleRefresh = () => {
 };
 
 </script>
-
-<template>
-    <div class="dashboard-refresh-dropdown">
-        <p-icon-button class="left-icon-button"
-                       name="ic_renew"
-                       style-type="tertiary"
-                       shape="square"
-                       :disabled="refreshDisabled || loading"
-                       :animation="loading ? 'reserve-spin' : undefined"
-                       @click="handleRefresh"
-        />
-        <p-select-dropdown class="currency-select-dropdown"
-                           :items="state.intervalOptionItems"
-                           :selected="dashboardDetailState.settings.refresh_interval_option"
-                           :read-only="loading"
-                           :class="{ loading }"
-                           menu-position="right"
-                           @select="handleSelectRefreshIntervalOption"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-refresh-dropdown {

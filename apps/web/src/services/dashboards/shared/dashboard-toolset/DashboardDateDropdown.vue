@@ -1,3 +1,46 @@
+<template>
+    <div>
+        <p-select-dropdown
+            style-type="transparent"
+            :items="state.monthMenuItems"
+            :selected="state.selectedMonthMenuIndex"
+            index-mode
+            menu-position="right"
+            @select="handleSelectMonthMenuItem"
+        >
+            <div>
+                <span>{{ state.selectedMonthLabel }}</span>
+                <p-badge
+                    v-if="state.selectedMonthBadge"
+                    style-type="indigo100"
+                    badge-type="subtle"
+                    class="ml-1"
+                >
+                    {{ state.selectedMonthBadge }}
+                </p-badge>
+            </div>
+            <template #menu-item--format="{ item }">
+                <div>
+                    <span>{{ item.label }}</span>
+                    <p-badge
+                        v-if="item.badge"
+                        style-type="indigo100"
+                        badge-type="subtle"
+                        class="ml-1"
+                    >
+                        {{ item.badge }}
+                    </p-badge>
+                </div>
+            </template>
+        </p-select-dropdown>
+        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
+                                 granularity="MONTHLY"
+                                 :selected-date-range="dateRange"
+                                 @confirm="handleCustomRangeModalConfirm"
+        />
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -116,46 +159,3 @@ watch(() => props.dateRange, () => {
 }, { immediate: true });
 
 </script>
-
-<template>
-    <div>
-        <p-select-dropdown
-            style-type="transparent"
-            :items="state.monthMenuItems"
-            :selected="state.selectedMonthMenuIndex"
-            index-mode
-            menu-position="right"
-            @select="handleSelectMonthMenuItem"
-        >
-            <div>
-                <span>{{ state.selectedMonthLabel }}</span>
-                <p-badge
-                    v-if="state.selectedMonthBadge"
-                    style-type="indigo100"
-                    badge-type="subtle"
-                    class="ml-1"
-                >
-                    {{ state.selectedMonthBadge }}
-                </p-badge>
-            </div>
-            <template #menu-item--format="{ item }">
-                <div>
-                    <span>{{ item.label }}</span>
-                    <p-badge
-                        v-if="item.badge"
-                        style-type="indigo100"
-                        badge-type="subtle"
-                        class="ml-1"
-                    >
-                        {{ item.badge }}
-                    </p-badge>
-                </div>
-            </template>
-        </p-select-dropdown>
-        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
-                                 granularity="MONTHLY"
-                                 :selected-date-range="dateRange"
-                                 @confirm="handleCustomRangeModalConfirm"
-        />
-    </div>
-</template>

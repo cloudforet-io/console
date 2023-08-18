@@ -1,3 +1,45 @@
+<template>
+    <p-button-modal
+        v-model:visible="state.proxyVisible"
+        :header-title="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
+        centered
+        size="sm"
+        fade
+        backdrop
+        :disabled="state.invalid"
+        @confirm="handleConfirm"
+    >
+        <template #body>
+            <p-field-group class="period-select"
+                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
+                           :help-text="state.settingsByGranularity.helpTextFrom"
+                           required
+            >
+                <p-datetime-picker class="datetime-picker"
+                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
+                                   :selected-dates="state.startDates"
+                                   :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
+                                   @update:selected-dates="handleUpdateSelectedDates('start', $event)"
+                />
+            </p-field-group>
+            <p-field-group class="period-select"
+                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
+                           :help-text="state.settingsByGranularity.helpTextTo"
+                           required
+            >
+                <p-datetime-picker class="datetime-picker"
+                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
+                                   :selected-dates="state.endDates"
+                                   :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
+                                   :min-date="state.endDateSetting.minDate"
+                                   :max-date="state.endDateSetting.maxDate"
+                                   @update:selected-dates="handleUpdateSelectedDates('end', $event)"
+                />
+            </p-field-group>
+        </template>
+    </p-button-modal>
+</template>
+
 <script lang="ts" setup>
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
@@ -134,48 +176,6 @@ watch(() => props.visible, (visible) => {
 });
 
 </script>
-
-<template>
-    <p-button-modal
-        v-model:visible="state.proxyVisible"
-        :header-title="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
-        centered
-        size="sm"
-        fade
-        backdrop
-        :disabled="state.invalid"
-        @confirm="handleConfirm"
-    >
-        <template #body>
-            <p-field-group class="period-select"
-                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
-                           :help-text="state.settingsByGranularity.helpTextFrom"
-                           required
-            >
-                <p-datetime-picker class="datetime-picker"
-                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
-                                   :selected-dates="state.startDates"
-                                   :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                   @update:selected-dates="handleUpdateSelectedDates('start', $event)"
-                />
-            </p-field-group>
-            <p-field-group class="period-select"
-                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
-                           :help-text="state.settingsByGranularity.helpTextTo"
-                           required
-            >
-                <p-datetime-picker class="datetime-picker"
-                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
-                                   :selected-dates="state.endDates"
-                                   :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                   :min-date="state.endDateSetting.minDate"
-                                   :max-date="state.endDateSetting.maxDate"
-                                   @update:selected-dates="handleUpdateSelectedDates('end', $event)"
-                />
-            </p-field-group>
-        </template>
-    </p-button-modal>
-</template>
 
 <style scoped lang="postcss">
 .period-select {
