@@ -10,7 +10,7 @@
                     @confirm="handleConfirm"
     >
         <template #body>
-            <collector-schedule-form :enable-hours-edit="collectorFormState.schedulePower" />
+            <collector-schedule-form />
         </template>
     </p-button-modal>
 </template>
