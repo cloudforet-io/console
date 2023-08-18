@@ -8,7 +8,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader, PProgressBar, PEmpty } from '@spaceone/design-system';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
@@ -62,7 +62,6 @@ const { t } = useI18n();
 
 const chartRef = ref<HTMLElement | null>(null);
 const state = reactive({
-    chartRegistry: {},
     chart: null as MapChart|null,
     data: [] as Resource[],
     loading: true,
@@ -74,6 +73,8 @@ const state = reactive({
     selectedProvider: '',
     maxValue: 0,
 });
+
+const chartRegistry = {} as Record<string, any>;
 
 const chartState = reactive({
     marker: null,
@@ -128,9 +129,9 @@ const initResourceInfo = () => {
 };
 
 const disposeChart = (element) => {
-    if (state.chartRegistry[element]) {
-        state.chartRegistry[element].dispose();
-        delete state.chartRegistry[element];
+    if (chartRegistry[element]) {
+        chartRegistry[element].dispose();
+        delete chartRegistry[element];
     }
 };
 
@@ -176,8 +177,8 @@ const drawChart = async (chartContext) => {
     /* draw map */
     const createChart = () => {
         disposeChart(chartContext);
-        state.chartRegistry[chartContext] = am4core.create(chartContext, am4maps.MapChart);
-        return state.chartRegistry[chartContext];
+        chartRegistry[chartContext] = am4core.create(chartContext, am4maps.MapChart);
+        return chartRegistry[chartContext];
     };
     const chart = createChart();
 
@@ -275,8 +276,10 @@ watch([() => chartRef.value, () => state.loading], ([chartCtx, loading]) => {
     }
 }, { immediate: false });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
 });
 
 (async () => {

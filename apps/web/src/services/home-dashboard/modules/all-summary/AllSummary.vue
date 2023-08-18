@@ -11,7 +11,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
@@ -112,22 +112,23 @@ const state = reactive({
 });
 const chartState = reactive({
     loading: true,
-    registry: {},
     data: [] as ChartData[],
 });
 
+const chartRegistry = {} as Record<string, any>;
+
 /* Util */
 const disposeChart = (chartContext) => {
-    if (chartState.registry[chartContext]) {
-        chartState.registry[chartContext].dispose();
-        delete chartState.registry[chartContext];
+    if (chartRegistry[chartContext]) {
+        chartRegistry[chartContext].dispose();
+        delete chartRegistry[chartContext];
     }
 };
 const drawChart = (chartContext) => {
     const createChart = () => {
         disposeChart(chartContext);
-        chartState.registry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
-        return chartState.registry[chartContext];
+        chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+        return chartRegistry[chartContext];
     };
     const chart = createChart();
     state.chart = chart;
@@ -405,8 +406,10 @@ watch(() => state.selectedDateType, async () => {
     drawChart(chartRef.value);
 }, { immediate: false });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
 });
 
 </script>

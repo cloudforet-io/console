@@ -1,3 +1,58 @@
+<template>
+    <div class="local-wrapper">
+        <form class="form"
+              onsubmit="return false"
+        >
+            <p-field-group :label="isDomainOwner ? t('COMMON.SIGN_IN.ADMIN_ID') : t('COMMON.SIGN_IN.USER_ID')"
+                           :invalid="validationState.isIdValid === false"
+                           required
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="state.userId"
+                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                  :invalid="invalid"
+                                  block
+                                  @update:value="handleUpdateUserId"
+                    />
+                </template>
+            </p-field-group>
+            <p-field-group :label="t('COMMON.SIGN_IN.PASSWORD')"
+                           required
+                           :invalid="validationState.isPasswordValid === false"
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="state.password"
+                                  type="password"
+                                  placeholder="Password"
+                                  :invalid="invalid"
+                                  block
+                                  @update:value="handleUpdatePassword"
+                                  @keyup.enter="signIn"
+                    />
+                </template>
+            </p-field-group>
+        </form>
+        <div class="util-wrapper">
+            <p class="reset-pw-button">
+                <router-link id="reset-pw-button"
+                             :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
+                >
+                    {{ t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
+                </router-link>
+            </p>
+            <p-button :style-type="buttonStyleType"
+                      type="submit"
+                      size="lg"
+                      class="sign-in-btn"
+                      :loading="state.loading"
+                      @click="signIn"
+            >
+                {{ t('COMMON.SIGN_IN.SIGN_IN') }}
+            </p-button>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 /* eslint-disable camelcase */
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
@@ -66,6 +121,15 @@ const checkPassword = async () => {
     }
 };
 
+const handleUpdateUserId = (userId: string) => {
+    state.userId = userId;
+    checkUserId();
+};
+const handleUpdatePassword = async (password: string) => {
+    state.password = password;
+    await checkPassword();
+};
+
 const signIn = async () => {
     state.loading = true;
     checkUserId();
@@ -97,61 +161,6 @@ const signIn = async () => {
 const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'substitutive'));
 
 </script>
-
-<template>
-    <div class="local-wrapper">
-        <form class="form"
-              onsubmit="return false"
-        >
-            <p-field-group :label="isDomainOwner ? t('COMMON.SIGN_IN.ADMIN_ID') : t('COMMON.SIGN_IN.USER_ID')"
-                           :invalid="validationState.isIdValid === false"
-                           required
-            >
-                <template #default="{invalid}">
-                    <p-text-input v-model="state.userId"
-                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
-                                  :invalid="invalid"
-                                  block
-                                  @update:value="checkUserId"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group :label="t('COMMON.SIGN_IN.PASSWORD')"
-                           required
-                           :invalid="validationState.isPasswordValid === false"
-            >
-                <template #default="{invalid}">
-                    <p-text-input v-model="state.password"
-                                  type="password"
-                                  placeholder="Password"
-                                  :invalid="invalid"
-                                  block
-                                  @update:value="checkPassword"
-                                  @keyup.enter="signIn"
-                    />
-                </template>
-            </p-field-group>
-        </form>
-        <div class="util-wrapper">
-            <p class="reset-pw-button">
-                <router-link id="reset-pw-button"
-                             :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
-                >
-                    {{ t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
-                </router-link>
-            </p>
-            <p-button :style-type="buttonStyleType"
-                      type="submit"
-                      size="lg"
-                      class="sign-in-btn"
-                      :loading="state.loading"
-                      @click="signIn"
-            >
-                {{ t('COMMON.SIGN_IN.SIGN_IN') }}
-            </p-button>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-text-input */

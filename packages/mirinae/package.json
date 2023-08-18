@@ -50,7 +50,7 @@
     "icon": "node ./cli/svg-gen.js -s ./src/foundation/icons/icon-assets -t src/foundation/icons/p-icons"
   },
   "dependencies": {
-    "@amcharts/amcharts4": "^4.10.32",
+    "@amcharts/amcharts4": "^4.10.37",
     "@egjs/vue-flicking": "^3.7.4",
     "@faker-js/faker": "^7.3.0",
     "@juggle/resize-observer": "^3.3.1",

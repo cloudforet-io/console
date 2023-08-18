@@ -21,8 +21,8 @@
   },
   "main": "dist/cloudforet-component.common.js",
   "dependencies": {
-    "@amcharts/amcharts4": "^4.10.32",
-    "@amcharts/amcharts4-geodata": "^4.1.18",
+    "@amcharts/amcharts4": "^4.10.37",
+    "@amcharts/amcharts4-geodata": "^4.1.27",
     "@amcharts/amcharts5": "^5.2.31",
     "@amcharts/amcharts5-geodata": "^5.0.6",
     "@cloudforet/core-lib": "*",

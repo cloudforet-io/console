@@ -10,7 +10,7 @@ import {
 import bytes from 'bytes';
 import { range } from 'lodash';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
@@ -81,6 +81,10 @@ const state = reactive({
 
 /* Util */
 const drawChart = (chartContext) => {
+    if (state.chart) {
+        state.chart.dispose();
+        state.chart = null;
+    }
     const chart = am4core.create(chartContext, am4charts.XYChart);
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingRight = 10;
@@ -243,7 +247,7 @@ watch([() => chartRef.value, () => state.chartData], ([chartContext, data]) => {
     }
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
     if (state.chart) state.chart.dispose();
 });
 
