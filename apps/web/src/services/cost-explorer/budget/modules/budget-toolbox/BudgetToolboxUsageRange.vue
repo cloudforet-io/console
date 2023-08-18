@@ -84,7 +84,7 @@ const handleClick = (name: UsageRange) => {
         <div v-for="({name, label, color}) in state.items"
              :key="name"
              class="range"
-             :class="{disabled: !selectedMap[name]}"
+             :class="{disabled: !state.selectedMap[name]}"
              @click="handleClick(name)"
         >
             <span class="mark"

@@ -93,8 +93,6 @@ const handleConfirmDelete = () => {
                                 :currency-rates="state.currencyRates"
             />
             <budget-summary :budget-loading="state.loading"
-                            :currency="state.currency"
-                            :currency-rates="state.currencyRates"
                             class="summary"
             />
             <budget-notifications class="alert"

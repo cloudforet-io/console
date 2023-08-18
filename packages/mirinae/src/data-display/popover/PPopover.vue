@@ -75,7 +75,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:isVisible']);
+const emit = defineEmits<{(e: 'update:is-visible', value: boolean): void}>();
 const attrs = useAttrs();
 
 const listeners = {
@@ -83,19 +83,19 @@ const listeners = {
 };
 
 const popoverRef = ref<HTMLElement|null>(null);
+const contentRef = ref<HTMLElement|null>(null);
+const targetRef = ref<HTMLElement|null>(null);
 const state = reactive({
     proxyIsVisible: useProxyValue('isVisible', props, emit),
-    contentRef: null as null|HTMLElement,
-    targetRef: null as null|HTMLElement,
     popperObject: {} as Instance,
 });
 const hidePopover = () => {
     state.proxyIsVisible = false;
-    return state.contentRef?.removeAttribute('data-show');
+    return contentRef.value?.removeAttribute('data-show');
 };
 const showPopover = () => {
     // eslint-disable-next-line no-unused-expressions
-    state.contentRef?.setAttribute('data-show', '');
+    contentRef.value?.setAttribute('data-show', '');
     state.popperObject.update();
     return state.popperObject?.setOptions({ placement: props.position });
 };
@@ -113,7 +113,7 @@ const handleClickOutside = () => {
 
 
 // eslint-disable-next-line no-undef
-const bindEventToTargetRef = (eventType: keyof HTMLElementEventMap, handler, useCature = false) => state.targetRef?.addEventListener(eventType, handler, useCature);
+const bindEventToTargetRef = (eventType: keyof HTMLElementEventMap, handler, useCature = false) => targetRef.value?.addEventListener(eventType, handler, useCature);
 const addEvent = () => {
     if (props.trigger === POPOVER_TRIGGER.CLICK) {
         bindEventToTargetRef('click', handleClickTargetRef, true);
@@ -127,8 +127,8 @@ const addEvent = () => {
 };
 
 onMounted(() => {
-    if (state.targetRef && state.contentRef) {
-        const popperObject = createPopper(state.targetRef, state.contentRef, {
+    if (targetRef.value && contentRef.value) {
+        const popperObject = createPopper(targetRef.value, contentRef.value, {
             placement: props.position,
             modifiers: [
                 {
@@ -154,7 +154,7 @@ onClickOutside(popoverRef, handleClickOutside);
     > .popper {
         @apply bg-white border rounded-md border-gray-300 py-3 pl-4 pr-2;
         display: none;
-        filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.08));
+        filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 8%));
         z-index: 99;
 
         &[data-show] {

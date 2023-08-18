@@ -235,10 +235,10 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                     />
                     <p-button class="sort-box"
                               style-type="tertiary"
-                              :icon-left="sort.desc ? 'ic_arrow-down-bold' : 'ic_arrow-up-bold'"
+                              :icon-left="state.sort.desc ? 'ic_arrow-down-bold' : 'ic_arrow-up-bold'"
                               @click="handleSortType"
                     >
-                        <span>{{ sort.desc ? t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
+                        <span>{{ state.sort.desc ? t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
                     </p-button>
                 </div>
             </template>

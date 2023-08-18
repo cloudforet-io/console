@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import {
     computed,
     onUnmounted,
-    reactive, watch,
+    reactive, ref, watch,
 } from 'vue';
 
 import config from '@/lib/config';
@@ -31,8 +31,8 @@ const columnChartValueName = 'usd_cost';
 const budgetPageStore = useBudgetPageStore();
 const budgetPageState = budgetPageStore.$state;
 
+const chartRef = ref<HTMLElement|null>(null);
 const state = reactive({
-    chartRef: null as HTMLElement | null,
     chart: null as XYChart | null,
     chartRegistry: {},
     limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
@@ -161,7 +161,7 @@ const drawChart = (chartContext) => {
     chart.data = getChartData();
 };
 
-watch([() => state.chartRef], ([chartContext]) => {
+watch([() => chartRef.value], ([chartContext]) => {
     if (chartContext) {
         drawChart(chartContext);
     }
