@@ -63,9 +63,12 @@ export default {
                 let component;
                 const auth = state.authType;
                 if (auth) {
-                    const path = `./external/${auth}/template/${auth}.vue`;
                     try {
-                        component = defineAsyncComponent(() => import(path));
+                        /*
+                         NOTE: See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations for supported dynamic import formats.
+                         If this is intended to be left as-is, you can use the @vite-ignore comment inside the import() call to suppress this warning.
+                        */
+                        component = defineAsyncComponent(() => import(`./external/${auth}/template/${auth}.vue`));
                     } catch (e) {
                         ErrorHandler.handleError(e);
                     }
