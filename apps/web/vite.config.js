@@ -1,5 +1,5 @@
-import path from 'path';
 import process from 'process';
+import { fileURLToPath, URL } from 'url';
 
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -49,11 +49,14 @@ export default defineConfig(async ({ command, mode }) => {
             include: ['./src/**/__tests__/**/*.+(ts|js)'],
         },
         resolve: {
-            alias: {
-                '@/': path.resolve(__dirname, './src/'),
-                '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
-                '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
-            },
+            alias: [
+                // '@/': path.resolve(__dirname, './src/'),
+                // '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
+                // '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
+                { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+                { find: '@cloudforet/core-lib', replacement: fileURLToPath(new URL('../../packages/core-lib/dist', import.meta.url)) },
+                { find: '@cloudforet/language-pack', replacement: fileURLToPath(new URL('../../packages/language-pack', import.meta.url)) },
+            ],
         },
         define: {
             VITE_APP_VER: JSON.stringify(process.env.npm_package_version),
