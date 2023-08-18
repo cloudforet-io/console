@@ -8,7 +8,7 @@ import {
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
 import {
-    computed, reactive, watch, onUnmounted, ref,
+    computed, reactive, watch, onBeforeUnmount, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
@@ -58,25 +58,26 @@ const state = reactive({
     loading: true,
     data: [] as Data[],
     chart: null as null | any,
-    chartRegistry: {},
     fields: computed(() => [
         { name: 'provider', label: t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
         { name: 'service_account_count', label: t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
     ]),
 });
 
+const chartRegistry = {} as Record<string, any>;
+
 /* Util */
 const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
+    if (chartRegistry[ctx]) {
+        chartRegistry[ctx].dispose();
+        delete chartRegistry[ctx];
     }
 };
 const drawChart = (ctx, isLoading = false) => {
     const createChart = () => {
         disposeChart(ctx);
-        state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
-        return state.chartRegistry[ctx];
+        chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
+        return chartRegistry[ctx];
     };
     const chart = createChart();
     state.chart = chart;
@@ -171,8 +172,10 @@ watch([() => state.loading, () => loaderRef.value, () => chartRef.value], ([load
     }
 }, { immediate: true });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
 });
 
 </script>
