@@ -12,6 +12,7 @@ import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/collector/shared/c
 
 export const useCollectorDataModalStore = defineStore('collector-data-modal', {
     state: () => ({
+        initLoading: true,
         recentJob: undefined as JobModel|null|undefined,
         // Required
         visible: false, // Determine the visibility of the collector-data-modal.
@@ -23,6 +24,7 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
     }),
     actions: {
         async getJobs(collectorId: string) {
+            this.initLoading = true;
             try {
                 const res = await SpaceConnector.client.inventory.job.list({ collector_id: collectorId });
                 if (res.results.length > 0) {
@@ -36,6 +38,8 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                this.initLoading = false;
             }
         },
     },
