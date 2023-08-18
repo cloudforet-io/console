@@ -2,10 +2,10 @@
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { commaFormatter, commaFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { commaFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';

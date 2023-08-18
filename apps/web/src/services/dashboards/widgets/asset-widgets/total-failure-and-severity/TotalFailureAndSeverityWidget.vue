@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
-    getRGBFromHex, commaFormatter, getRGBFromHex, commaFormatter,
+    getRGBFromHex, commaFormatter,
 } from '@cloudforet/core-lib';
-import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
