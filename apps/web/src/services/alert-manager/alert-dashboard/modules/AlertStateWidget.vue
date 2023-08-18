@@ -217,7 +217,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
         </p>
         <div class="content-wrapper">
             <!--tabs-->
-            <p-balloon-tab v-model="tabState.activeTab"
+            <p-balloon-tab v-model:activeTab="tabState.activeTab"
                            class="desktop-balloon-tab"
                            :tabs="tabState.tabs"
                            size="lg"
@@ -231,7 +231,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                     </div>
                 </template>
             </p-balloon-tab>
-            <p-balloon-tab v-model="tabState.activeTab"
+            <p-balloon-tab v-model:activeTab="tabState.activeTab"
                            class="tablet-balloon-tab"
                            :tabs="tabState.tabs"
                            size="sm"
@@ -248,7 +248,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                     <div class="left-part">
                         <p-select-status v-for="(status, idx) in state.urgencyList"
                                          :key="idx"
-                                         v-model="state.selectedUrgency"
+                                         v-model:selected="state.selectedUrgency"
                                          :value="status.name"
                                          :icon="status.icon"
                                          :disable-check-icon="true"
@@ -260,7 +260,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                     <div class="right-part">
                         <p-select-button v-for="(assignedState, idx) in state.assignedStateList"
                                          :key="`assigned-${idx}`"
-                                         v-model="state.selectedAssignedState"
+                                         v-model:selected="state.selectedAssignedState"
                                          :value="assignedState.name"
                                          size="sm"
                                          style-type="gray"

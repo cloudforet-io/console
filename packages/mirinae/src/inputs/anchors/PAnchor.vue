@@ -1,44 +1,44 @@
 <template>
-    <router-link :to="props.to || {}"
-                 class="p-anchor"
-                 custom
-    >
-        <template #default="{href: toHref, navigate}">
-            <span>
-                <a ref="anchorRef"
-                   class="p-anchor"
-                   :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
-                   :target="validateTarget()"
-                   :href="props.to ? (toHref || props.href ): props.href"
-                   @click.stop="navigate"
-                >
-                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.left"
-                         :name="props.iconName"
-                         height="1.1em"
-                         width="1.1em"
-                         color="inherit"
-                         class="icon"
-                    />
-                    <span class="text">
-                        <slot v-bind="{...$props}">
-                            {{ props.text }}
-                        </slot>
-                    </span>
-                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.right"
-                         :name="props.iconName"
-                         height="1.1em"
-                         width="1.1em"
-                         color="inherit"
-                         class="icon"
-                    />
-                </a>
-            </span>
-        </template>
-    </router-link>
+    <span class="p-anchor">
+        <router-link v-slot="{href: toHref, navigate}"
+                     :to="props.to || {}"
+                     custom
+        >
+            <a ref="anchorRef"
+               class="p-anchor"
+               :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
+               :target="validateTarget()"
+               :href="props.to ? (toHref || props.href ): props.href"
+               @click.stop="navigate"
+            >
+                <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.left"
+                     :name="props.iconName"
+                     height="1.1em"
+                     width="1.1em"
+                     color="inherit"
+                     class="icon"
+                />
+                <span class="text">
+                    <slot v-bind="{...$props}">
+                        {{ props.text }}
+                    </slot>
+                </span>
+                <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.right"
+                     :name="props.iconName"
+                     height="1.1em"
+                     width="1.1em"
+                     color="inherit"
+                     class="icon"
+                />
+            </a>
+        </router-link>
+    </span>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import {
+    computed, ref,
+} from 'vue';
 import type { RouteLocation } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -73,6 +73,7 @@ const validateTarget = () => {
 };
 const anchorRef = ref<HTMLElement|null>(null);
 const hasText = computed(() => !!anchorRef.value?.textContent);
+
 </script>
 
 <style lang="postcss">

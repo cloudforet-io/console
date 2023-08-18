@@ -109,7 +109,7 @@ import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import type { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 
 const props = withDefaults(defineProps<ToolboxProps>(), {
-    pagenationVisible: true,
+    paginationVisible: true,
     pageSizeChangeable: true,
     settingsVisible: false,
     sortable: false,

@@ -3,6 +3,7 @@
 import Notifications from '@kyvg/vue3-notification';
 import SpaceDesignSystem from '@spaceone/design-system';
 import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
 import { createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
 import { createApp } from 'vue';
@@ -15,6 +16,7 @@ import { resetStore } from '@/lib/reset-pinia-store';
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';
+
 
 import '@/styles/style.pcss';
 // eslint-disable-next-line

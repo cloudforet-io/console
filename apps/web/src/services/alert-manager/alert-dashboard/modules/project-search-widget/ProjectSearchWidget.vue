@@ -145,10 +145,10 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
                      @click="onClickProjectBox(item)"
                 >
                     <p class="sub-title">
-                        {{ projectGroupNameFormatter(item.project_id, projects) }}
+                        {{ projectGroupNameFormatter(item.project_id, state.projects) }}
                     </p>
                     <p class="title">
-                        {{ projectNameFormatter(item.project_id, projects) }}
+                        {{ projectNameFormatter(item.project_id, state.projects) }}
                     </p>
                     <div class="content-wrapper"
                          :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}"

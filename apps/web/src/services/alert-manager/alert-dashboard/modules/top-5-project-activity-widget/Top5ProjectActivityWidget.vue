@@ -54,7 +54,7 @@ interface Activity {
 }
 
 interface Props {
-    projectsWithAlert: string[];
+    projectsWithAlert?: string[];
 }
 
 withDefaults(defineProps<Props>(), {
@@ -198,7 +198,7 @@ watch(() => state.selectedPeriod, async () => {
             <div class="period-wrapper">
                 <p-select-status v-for="(period, idx) in state.periods"
                                  :key="`period-${idx}`"
-                                 v-model="state.selectedPeriod"
+                                 v-model:selected="state.selectedPeriod"
                                  :value="period.name"
                                  :disable-check-icon="true"
                 >
@@ -227,7 +227,7 @@ watch(() => state.selectedPeriod, async () => {
                         <span class="tablet-text">{{ projectNameFormatter(projectId, state.projects) }}</span>
                     </p-anchor>
                     <div class="col-activity">
-                        <div v-for="(activity, aIdx) in activity[projectId]"
+                        <div v-for="(activity, aIdx) in state.activity[projectId]"
                              :key="`activity-${aIdx}`"
                              class="box-wrapper"
                              :class="activity.status ? activity.status : 'empty'"
