@@ -8,6 +8,7 @@
              'read-only': readOnly,
              active: state.proxyVisibleMenu && !readOnly,
              [size] : true,
+             'is-fixed-width': isFixedWidth,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -23,6 +24,7 @@
         <button v-else
                 ref="targetRef"
                 class="dropdown-button"
+                :class="{'text-only': (styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)}"
                 @click="handleClick"
                 @keydown.down="handlePressDownKey"
         >
@@ -158,6 +160,11 @@ const props = defineProps({
         default: SELECT_DROPDOWN_SIZE.md,
         validator(size: SelectDropdownSize) {
             return Object.values(SELECT_DROPDOWN_SIZE).includes(size);
+        },
+        /* fixed width props */
+        isFixedWidth: {
+            type: Boolean,
+            default: false,
         },
     },
 });
@@ -306,7 +313,6 @@ onClickOutside(containerRef, hideMenu);
         }
     }
     &.transparent {
-        min-width: unset;
         .dropdown-button {
             @apply border-transparent bg-transparent text-gray-900;
             padding-left: 0;
@@ -329,6 +335,21 @@ onClickOutside(containerRef, hideMenu);
         }
         &.secondary-button {
             @mixin read-only-style;
+        }
+    }
+
+    /* is-fixed-width */
+    &.is-fixed-width {
+        .dropdown-button {
+            .text {
+                @apply truncate;
+                width: calc(100% - 1.5rem);
+            }
+            &.text-only {
+                .text {
+                    width: 100%;
+                }
+            }
         }
     }
 

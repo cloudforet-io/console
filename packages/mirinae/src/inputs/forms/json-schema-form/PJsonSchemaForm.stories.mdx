@@ -144,8 +144,8 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="grid gap-4 grid-cols-12">
-    <div class="col-span-6 bg-blue-100 p-4">
+<div class="flex gap-4">
+    <div class="bg-blue-100 p-4">
         <p-heading>Json Schema Form</p-heading>
         <p-json-schema-form :schema="schema"
                             :form-data.sync="formData"
@@ -153,7 +153,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
                             :reference-handler="handler"
         />
     </div>
-    <div class="col-span-6 bg-coral-100 p-4">
+    <div class="bg-coral-100 p-4">
         <p-heading>Schema</p-heading>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
                        mode="readOnly"
@@ -192,14 +192,13 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         {{
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
             template: `
-<div class="grid grid-cols-12">
+<div class="flex gap-4">
     <p-json-schema-form
-        class="col-span-6"
         :schema="schema"
         :form-data="formData"
         :language="language"
     />
-    <div class="col-span-6">
+    <div>
         <p-select-dropdown class="mb-4"
                            :selected.sync="language" :items="languages" />
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
@@ -236,14 +235,13 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PButton },
             i18n: I18nConnector.i18n,
             template: `
-<div class="grid grid-cols-12">
+<div class="flex gap-4">
     <p-json-schema-form
-        class="col-span-6"
         :schema="schema"
         :form-data="formData"
         :language="$i18n.locale"
     />
-    <div class="col-span-6">
+    <div>
         <p-button class="mb-4"
                   @click="resetSchema">Reset Schema</p-button>
         <p-button style-type="highlight"
@@ -288,15 +286,14 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="grid grid-cols-12">
+<div class="flex gap-4">
     <p-json-schema-form
-        class="col-span-6"
         :schema="schema"
         :form-data.sync="formData"
         :validation-mode="validationMode"
         :language="$i18n.locale"
     />
-    <div class="col-span-6">
+    <div>
         <span class="font-lg font-bold mb-2">Validation Mode: </span>
         <p-select-dropdown class="mb-4"
             :selected.sync="validationMode" :items="validationModes" />
@@ -387,8 +384,8 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="grid gap-4 grid-cols-12">
-    <div class="col-span-6 bg-blue-100 p-4">
+<div class="flex gap-4">
+    <div class="bg-blue-100 p-4">
         <p-heading>Json Schema Form</p-heading>
         <p-json-schema-form :schema="schema"
                             :form-data.sync="formData"
