@@ -112,6 +112,7 @@ watch(() => props.item.schedule, (schedule) => {
                         />
                         <recent-collector-job-list :recent-jobs="props.item.recentJobAnalyze"
                                                    :history-link="props.item.historyLink"
+                                                   class="collector-info-view-recent-collector"
                         />
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
@@ -209,6 +210,9 @@ watch(() => props.item.schedule, (schedule) => {
                 }
                 .collector-info-view {
                     @apply flex justify-between;
+                    .collector-info-view-recent-collector {
+                        @apply flex flex-col items-end;
+                    }
                     .info-item {
                         @apply relative flex flex-col flex-wrap;
                         gap: 0.5rem;
