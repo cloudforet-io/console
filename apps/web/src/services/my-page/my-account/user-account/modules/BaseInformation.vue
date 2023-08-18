@@ -1,3 +1,67 @@
+<template>
+    <user-account-module-container
+        :title="t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+        class="base-information-wrapper"
+    >
+        <p-field-group required
+                       :label="t('COMMON.PROFILE.ID')"
+                       class="input-form"
+        >
+            <p-text-input v-model="state.userId"
+                          disabled
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="t('COMMON.PROFILE.NAME')"
+                       class="input-form"
+        >
+            <p-text-input v-model="formState.userName"
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="t('COMMON.PROFILE.ROLE')"
+                       class="input-form"
+        >
+            <p-text-input v-model="state.userRole"
+                          disabled
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="t('COMMON.PROFILE.TIMEZONE')"
+                       class="input-form"
+                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
+                       :invalid-text="validationState.timezoneInvalidText"
+        >
+            <template #default="{invalid}">
+                <p-filterable-dropdown v-model:selected="formState.timezone"
+                                       :menu="state.timezones"
+                                       :invalid="invalid"
+                                       :placeholder="t('COMMON.PROFILE.TIMEZONE')"
+                                       :page-size="10"
+                />
+            </template>
+        </p-field-group>
+        <p-field-group required
+                       :label="t('COMMON.PROFILE.LANGUAGE')"
+                       class="input-form"
+        >
+            <p-select-dropdown v-model="formState.language"
+                               :items="state.languages"
+            />
+        </p-field-group>
+        <div class="save-button">
+            <p-button style-type="primary"
+                      @click="handleClickProfileConfirm"
+            >
+                {{ t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+            </p-button>
+        </div>
+    </user-account-module-container>
+</template>
+
 <script setup lang="ts">
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, PFilterableDropdown,
@@ -92,70 +156,6 @@ watch(() => store.state.user.language, (language) => {
     await getProfile();
 })();
 </script>
-
-<template>
-    <user-account-module-container
-        :title="t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
-        class="base-information-wrapper"
-    >
-        <p-field-group required
-                       :label="t('COMMON.PROFILE.ID')"
-                       class="input-form"
-        >
-            <p-text-input v-model="state.userId"
-                          disabled
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="t('COMMON.PROFILE.NAME')"
-                       class="input-form"
-        >
-            <p-text-input v-model="formState.userName"
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="t('COMMON.PROFILE.ROLE')"
-                       class="input-form"
-        >
-            <p-text-input v-model="state.userRole"
-                          disabled
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="t('COMMON.PROFILE.TIMEZONE')"
-                       class="input-form"
-                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
-                       :invalid-text="validationState.timezoneInvalidText"
-        >
-            <template #default="{invalid}">
-                <p-filterable-dropdown v-model:selected="formState.timezone"
-                                       :menu="state.timezones"
-                                       :invalid="invalid"
-                                       :placeholder="t('COMMON.PROFILE.TIMEZONE')"
-                                       :page-size="10"
-                />
-            </template>
-        </p-field-group>
-        <p-field-group required
-                       :label="t('COMMON.PROFILE.LANGUAGE')"
-                       class="input-form"
-        >
-            <p-select-dropdown v-model="formState.language"
-                               :items="state.languages"
-            />
-        </p-field-group>
-        <div class="save-button">
-            <p-button style-type="primary"
-                      @click="handleClickProfileConfirm"
-            >
-                {{ t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
-            </p-button>
-        </div>
-    </user-account-module-container>
-</template>
 
 <style lang="postcss" scoped>
 .base-information-wrapper {
