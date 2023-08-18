@@ -69,7 +69,7 @@ const state = reactive({
     loading: true,
     projects: computed(() => store.getters['reference/projectItems']),
     top5Projects: [] as string[],
-    activity: {},
+    activity: {} as Record<string, Activity[]>,
     periods: [
         {
             name: PERIOD['14D'],
@@ -97,7 +97,7 @@ const state = reactive({
 });
 
 /* util */
-const activityFormatter = (results, unit, start, end) => {
+const activityFormatter = (results, unit, start, end): Activity[] => {
     const dateFormat = unit === 'day' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH';
     let now = start.clone();
     const activities: Activity[] = [];
@@ -238,7 +238,7 @@ watch(() => state.selectedPeriod, async () => {
                             >
                                 <top5-project-activity-tooltip
                                     :project-id="projectId"
-                                    :status="activity.status"
+                                    :status="activity.status || ''"
                                     :date="activity.date"
                                     :period="state.selectedPeriod"
                                 />

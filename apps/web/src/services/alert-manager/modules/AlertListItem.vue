@@ -26,10 +26,10 @@ const ALERT_URGENCY = Object.freeze({
 
 interface Props {
     item: AlertDataModel;
-    showProjectLink: boolean;
-    showMemberName: boolean;
-    showStatusMessage: boolean;
-    projectReference: ReferenceItem;
+    showProjectLink?: boolean;
+    showMemberName?: boolean;
+    showStatusMessage?: boolean;
+    projectReference?: ReferenceItem;
     userReference: ReferenceItem;
 }
 
