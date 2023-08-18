@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    reactive, defineEmits, computed,
+    reactive, defineEmits, computed, watch,
 } from 'vue';
 
 import {
@@ -25,9 +25,17 @@ const state = reactive({
     showStatus: computed(() => width.value > screens.mobile.max),
 });
 const handleClickCollectDataButton = () => {
-    state.isPopoverOpen = true;
     emit('collect');
 };
+const handleUpdatePopoverVisible = (visible: boolean) => {
+    state.isPopoverOpen = visible;
+};
+watch(() => state.recentJob, (recentJob, prevJob) => {
+    if (recentJob?.status === 'IN_PROGRESS') {
+        if (prevJob && recentJob.job_id === prevJob.job_id && recentJob.status === prevJob.status) return;
+        state.isPopoverOpen = true;
+    }
+}, { immediate: true });
 
 </script>
 
@@ -43,8 +51,9 @@ const handleClickCollectDataButton = () => {
             {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
         </p-button>
         <p-popover v-if="state.showStatus"
-                   :is-visible.sync="state.isPopoverOpen"
+                   :is-visible="state.isPopoverOpen"
                    ignore-outside-click
+                   @update:is-visible="handleUpdatePopoverVisible"
         >
             <p-icon-button :name="state.isPopoverOpen ? 'ic_chevron-up' : 'ic_chevron-down'"
                            style-type="tertiary"

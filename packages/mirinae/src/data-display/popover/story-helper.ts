@@ -219,7 +219,7 @@ export const getPopoverArgTypes = () => {
                 category: 'events',
             },
         },
-        'onUpdate:isVisible': {
+        'onUpdate:is-visible': {
             name: 'update:is-visible',
             description: 'Emitted when the popover visibility is updated. Event parameter - `visible: boolean`',
             table: {
