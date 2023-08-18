@@ -111,6 +111,7 @@ watch(() => state.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .collector-version-form {
     margin: 1.5rem 0;
+    max-width: 728px;
 
     .label-row {
         @apply flex justify-between;

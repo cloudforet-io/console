@@ -212,7 +212,7 @@ watch(() => state.collectorPluginInfo, async (pluginInfo) => {
     padding: 1rem 1rem 2.5rem 1rem;
 }
 .collector-base-info-edit {
-    padding: 0 1rem 1rem;
+    padding: 1rem 1rem 1rem;
     .button-group {
         margin-bottom: 1.5rem;
         .save-changes-button {
