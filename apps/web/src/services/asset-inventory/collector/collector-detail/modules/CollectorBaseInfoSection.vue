@@ -13,7 +13,7 @@
             />
             <plugin-summary-cards :collector="collectorFormState.originCollector"
                                   :recent-jobs="state.recentJobs"
-                                  :history-link="props.historyLink"
+                                  :history-link="collectorJobStore.hasJobs ? props.historyLink : undefined"
             />
             <collector-tags :tags="collectorFormState.originCollector?.tags" />
         </div>
