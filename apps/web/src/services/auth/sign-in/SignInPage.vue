@@ -148,14 +148,12 @@ export default {
                 >
             </template>
         </div>
-        <sign-in-left-container
-            :is-admin="false"
-            :images="images"
+        <sign-in-left-container :is-admin="false"
+                                :images="images"
         />
-        <sign-in-right-container
-            :is-admin="false"
-            :images="images"
-            :show-error-message="showErrorMessage"
+        <sign-in-right-container :is-admin="false"
+                                 :images="images"
+                                 :show-error-message="showErrorMessage"
         >
             <template #input>
                 <i-d-p-w-sign-in class="id-pw-wrapper"

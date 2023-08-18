@@ -22,32 +22,30 @@ const handbookState = reactive({
 </script>
 
 <template>
-    <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
-                              :breadcrumbs="breadcrumbs"
+    <vertical-page-layout v-if="$route.meta.lnbVisible"
+                          :breadcrumbs="breadcrumbs"
+    >
+        <template #sidebar>
+            <administration-l-n-b />
+        </template>
+        <router-view />
+    </vertical-page-layout>
+    <general-page-layout v-else
+                         :breadcrumbs="breadcrumbs"
+    >
+        <template v-if="handbookState.isVisible"
+                  #handbook
         >
-            <template #sidebar>
-                <administration-l-n-b />
-            </template>
-            <router-view />
-        </vertical-page-layout>
-        <general-page-layout v-else
-                             :breadcrumbs="breadcrumbs"
-        >
-            <template v-if="handbookState.isVisible"
-                      #handbook
-            >
-                <div class="flex">
-                    <handbook-button type="administration/iam/role/create-edit"
-                                     class="flex-shrink-0"
-                    >
-                        <keep-alive>
-                            <role-create-edit-handbook />
-                        </keep-alive>
-                    </handbook-button>
-                </div>
-            </template>
-            <router-view />
-        </general-page-layout>
-    </fragment>
+            <div class="flex">
+                <handbook-button type="administration/iam/role/create-edit"
+                                 class="flex-shrink-0"
+                >
+                    <keep-alive>
+                        <role-create-edit-handbook />
+                    </keep-alive>
+                </handbook-button>
+            </div>
+        </template>
+        <router-view />
+    </general-page-layout>
 </template>

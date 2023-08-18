@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n';
 import config from '@/lib/config';
 
 interface Props {
-    isDomainOwner: boolean;
+    isDomainOwner?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {

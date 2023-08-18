@@ -31,7 +31,7 @@ import ic_chevronDown from '../icon-assets/ic_chevron-down.svg';
 import ic_chevronLeft from '../icon-assets/ic_chevron-left.svg';
 import ic_chevronRightCircleFilled from '../icon-assets/ic_chevron-right-circle-filled.svg';
 import ic_chevronRightCircle from '../icon-assets/ic_chevron-right-circle.svg';
-import ic_chevronLeftThin from '../icon-assets/ic_chevron-right-thin.svg';
+import ic_chevronRightThin from '../icon-assets/ic_chevron-right-thin.svg';
 import ic_chevronRight from '../icon-assets/ic_chevron-right.svg';
 import ic_chevronSmallDown from '../icon-assets/ic_chevron-small-down.svg';
 import ic_chevronSmallLeft from '../icon-assets/ic_chevron-small-left.svg';
@@ -190,7 +190,7 @@ export default {
     'ic_checkbox-selected': ic_checkboxSelected,
     ic_checkbox,
     'ic_chevron-down': ic_chevronDown,
-    'ic_chevron-left-thin': ic_chevronLeftThin,
+    'ic_chevron-right-thin': ic_chevronRightThin,
     'ic_chevron-left': ic_chevronLeft,
     'ic_chevron-right-circle-filled': ic_chevronRightCircleFilled,
     'ic_chevron-right-circle': ic_chevronRightCircle,

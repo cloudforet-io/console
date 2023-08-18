@@ -20,8 +20,8 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
     header: string;
-    backLink: BackLink;
-    topTitle: TopTitle;
+    backLink?: BackLink;
+    topTitle?: TopTitle;
     menuSet: LNBMenu[];
     showFavoriteOnly?: boolean | undefined;
 }

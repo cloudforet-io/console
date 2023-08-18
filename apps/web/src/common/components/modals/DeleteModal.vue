@@ -50,14 +50,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     visible: boolean;
-    disabled: boolean;
+    disabled?: boolean;
     headerTitle: string;
-    contents: string;
-    confirmText: string;
-    loading: boolean;
+    contents?: string;
+    confirmText?: string;
+    loading?: boolean;
     size: Size;
     hideFooter: boolean;
-    enableScroll: boolean;
+    enableScroll?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

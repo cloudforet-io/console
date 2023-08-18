@@ -223,7 +223,7 @@ watch(() => rolePageState.selectedIndices, (after) => {
                 </p-button>
             </template>
         </p-toolbox-table>
-        <role-delete-modal v-model:visible="deleteModalVisible"
+        <role-delete-modal v-model:visible="state.deleteModalVisible"
                            @refresh="handleChange"
         />
     </section>

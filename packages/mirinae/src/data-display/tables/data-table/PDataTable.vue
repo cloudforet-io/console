@@ -25,7 +25,7 @@
                                     class="all-select"
                                 >
                                     <p-checkbox v-if="multiSelect"
-                                                v-model="state.allState"
+                                                v-model:value="state.allState"
                                                 @change="onSelectAllToggle"
                                     />
                                 </th>

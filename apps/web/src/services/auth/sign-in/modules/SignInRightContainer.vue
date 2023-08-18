@@ -14,7 +14,7 @@ import config from '@/lib/config';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 interface Props {
-    isDomainOwner: boolean;
+    isDomainOwner?: boolean;
     showErrorMessage: boolean;
 }
 

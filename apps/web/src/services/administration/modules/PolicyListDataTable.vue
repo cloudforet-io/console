@@ -5,8 +5,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import { filter, capitalize } from 'lodash';
 import {
     computed, reactive, watch,
@@ -224,7 +224,7 @@ watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
                     <p-select-status
                         v-for="(item, index) in state.policyTypeList"
                         :key="index"
-                        v-model="state.selectedType"
+                        v-model:selected="state.selectedType"
                         :value="item.name"
                         @change="handleChangePolicyType"
                     >

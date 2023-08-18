@@ -164,7 +164,7 @@ watch(() => state.proxyVisible, async (after) => {
 </script>
 
 <template>
-    <delete-modal v-model:visible="proxyVisible"
+    <delete-modal v-model:visible="state.proxyVisible"
                   size="lg"
                   :header-title="state.headerTitle"
                   :hide-footer="!state.isDeletable"

@@ -18,7 +18,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 
 interface Props {
-    isDomainOwner: boolean;
+    isDomainOwner?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
