@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { color } from '@amcharts/amcharts5';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     computed, defineExpose,
@@ -12,6 +11,7 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -141,17 +141,12 @@ const [totalSpentPeriod] = useDateRangeFormatter({
 });
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data[]> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { status, response } = await fetchBudgetUsageAnalyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -171,13 +166,12 @@ const fetchData = async (): Promise<Data[]> => {
                 },
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
 /* Util */

@@ -1,3 +1,46 @@
+<template>
+    <div>
+        <p-field-group
+            :label="t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
+            required
+            :invalid-text="state.nameInvalidText"
+            :invalid="state.isNameInvalid"
+            class="base-info-input"
+        >
+            <template #default>
+                <p-text-input v-model:value="state.channelName"
+                              class="block w-full"
+                              :invalid="state.isNameInvalid"
+                              :placeholder="t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
+                              @update:value="onChangeChannelName"
+                />
+            </template>
+        </p-field-group>
+        <add-notification-level v-if="projectId"
+                                @change="onChangeLevel"
+        />
+        <p-json-schema-form v-if="state.isJsonSchema"
+                            :key="protocolId"
+                            :form-data="state.schemaForm"
+                            :schema="state.schema"
+                            :language="store.state.user.language"
+                            class="schema-form"
+                            @change="handleSchemaFormChange"
+        />
+        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER && protocolType === PROTOCOL_TYPE.INTERNAL">
+            <p-field-group :label="t('MENU.ADMINISTRATION_USER')"
+                           required
+            >
+                <template #default>
+                    <add-notification-member-group :project-id="projectId"
+                                                   @change="onChangeMember"
+                    />
+                </template>
+            </p-field-group>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -39,12 +82,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'change', value: {
-        channelName: string;
-        notificationLevel: string;
-        schemaForm: object;
-        selectedMember: string[];
-    }): void;
+const emit = defineEmits<{(e: 'change', value: any): void;
 }>();
 const route = useRoute();
 const { t } = useI18n();
@@ -137,49 +175,6 @@ watch([() => props.protocolId, () => props.supportedSchema, () => props.protocol
 }, { immediate: true });
 
 </script>
-
-<template>
-    <div>
-        <p-field-group
-            :label="t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
-            required
-            :invalid-text="state.nameInvalidText"
-            :invalid="state.isNameInvalid"
-            class="base-info-input"
-        >
-            <template #default>
-                <p-text-input v-model:value="state.channelName"
-                              class="block w-full"
-                              :invalid="state.isNameInvalid"
-                              :placeholder="t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
-                              @update:value="onChangeChannelName"
-                />
-            </template>
-        </p-field-group>
-        <add-notification-level v-if="projectId"
-                                @change="onChangeLevel"
-        />
-        <p-json-schema-form v-if="state.isJsonSchema"
-                            :key="protocolId"
-                            :form-data="state.schemaForm"
-                            :schema="state.schema"
-                            :language="store.state.user.language"
-                            class="schema-form"
-                            @change="handleSchemaFormChange"
-        />
-        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
-            <p-field-group :label="t('MENU.ADMINISTRATION_USER')"
-                           required
-            >
-                <template #default>
-                    <add-notification-member-group :project-id="projectId"
-                                                   @change="onChangeMember"
-                    />
-                </template>
-            </p-field-group>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .base-info-input {

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getPageStart, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
@@ -14,6 +13,7 @@ import {
 import type { ComputedRef } from 'vue';
 import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
+
 
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -135,15 +135,10 @@ const getRefinedCircleData = (results?: Data): CircleData[] => {
 };
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
             { k: 'usage_type', v: ['data-transfer.out', 'data-transfer.in', 'data-transfer.etc'], o: '' },
             { k: 'product', v: 'AWSDataTransfer', o: '=' },
@@ -151,7 +146,7 @@ const fetchData = async (): Promise<FullData> => {
         ]);
         apiQueryHelper.addFilter(...state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.TYPE],
@@ -171,13 +166,17 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: '_total_usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results: sortTableData(results, COST_GROUP_BY.TYPE), more };
+        });
+        if (status === 'succeed') {
+            return {
+                results: sortTableData(response.results, COST_GROUP_BY.TYPE),
+                more: response.more,
+            };
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
 const drawChart = (chartData: CircleData[]) => {

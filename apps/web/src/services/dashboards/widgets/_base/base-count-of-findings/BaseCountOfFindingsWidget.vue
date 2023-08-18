@@ -2,18 +2,18 @@
 
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getPageStart, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PTextPagination } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 import type { ComputedRef } from 'vue';
+
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
@@ -84,15 +84,10 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
@@ -103,7 +98,7 @@ const fetchData = async (): Promise<Data[]> => {
         } else {
             apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         }
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.end,
@@ -119,13 +114,12 @@ const fetchData = async (): Promise<Data[]> => {
                 sort: [{ key: 'value', desc: false }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
 /* Util */

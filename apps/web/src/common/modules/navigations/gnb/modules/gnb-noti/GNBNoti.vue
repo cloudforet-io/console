@@ -1,3 +1,45 @@
+<template>
+    <div ref="containerRef"
+         class="gnb-notifications-notice"
+         @click.stop
+         @keydown.esc="hideNotiMenu"
+    >
+        <span class="menu-button"
+              tabindex="0"
+              role="button"
+              @click.stop="handleNotiButtonClick"
+              @keydown.enter="showNotiMenu"
+        >
+            <p-i class="menu-icon"
+                 :class="{ disabled: state.isNoRoleUser }"
+                 :name="state.hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
+                 :color="state.hasNotifications ? undefined : 'inherit'"
+            />
+        </span>
+        <p-tab v-show="visible"
+               v-model:active-tab="state.activeTab"
+               :tabs="state.tabs"
+        >
+            <template #extra="tab">
+                <p-badge v-if="state.count[tab.name] !== 0"
+                         :style-type="tab.name === state.activeTab ? 'primary3' : 'gray200'"
+                         badge-type="subtle"
+                >
+                    {{ commaFormatter(state.count[tab.name]) }}
+                </p-badge>
+            </template>
+            <template #notifications>
+                <g-n-b-notifications-tab v-model:count="state.notificationCount"
+                                         :visible="visible && state.activeTab === 'notifications'"
+                />
+            </template>
+            <template #notice>
+                <g-n-b-notice-tab @close="hideNotiMenu" />
+            </template>
+        </p-tab>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import { commaFormatter } from '@cloudforet/core-lib';
@@ -6,7 +48,7 @@ import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, useDocumentVisibility } from '@vueuse/core';
 import type { MaybeRef } from 'vue';
 import {
     computed, onMounted, onUnmounted, reactive, ref, watch,
@@ -77,13 +119,14 @@ const {
     userId: computed(() => store.state.user.userId),
 });
 
-const handleBrowserVisibilityChange = () => {
-    if (document.hidden) {
+const documentVisibility = useDocumentVisibility();
+watch(documentVisibility, (visibility) => {
+    if (visibility === 'hidden') {
         store.dispatch('display/stopCheckNotification');
     } else {
         store.dispatch('display/startCheckNotification');
     }
-};
+}, { immediate: true });
 
 /* Event */
 const handleNotiButtonClick = () => {
@@ -93,13 +136,11 @@ const handleNotiButtonClick = () => {
 
 onMounted(() => {
     store.dispatch('display/startCheckNotification');
-    document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
     fetchNoticeReadState();
     fetchNoticeCount();
 });
 onUnmounted(() => {
     store.dispatch('display/stopCheckNotification');
-    document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
 });
 
 watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
@@ -109,48 +150,6 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
 onClickOutside(containerRef as MaybeRef, hideNotiMenu);
 
 </script>
-
-<template>
-    <div ref="containerRef"
-         class="gnb-notifications-notice"
-         @click.stop
-         @keydown.esc="hideNotiMenu"
-    >
-        <span class="menu-button"
-              tabindex="0"
-              role="button"
-              @click.stop="handleNotiButtonClick"
-              @keydown.enter="showNotiMenu"
-        >
-            <p-i class="menu-icon"
-                 :class="{ disabled: state.isNoRoleUser }"
-                 :name="state.hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
-                 :color="state.hasNotifications ? undefined : 'inherit'"
-            />
-        </span>
-        <p-tab v-show="visible"
-               v-model:active-tab="state.activeTab"
-               :tabs="state.tabs"
-        >
-            <template #extra="tab">
-                <p-badge v-if="state.count[tab.name] !== 0"
-                         :style-type="tab.name === state.activeTab ? 'primary3' : 'gray200'"
-                         badge-type="subtle"
-                >
-                    {{ commaFormatter(state.count[tab.name]) }}
-                </p-badge>
-            </template>
-            <template #notifications>
-                <g-n-b-notifications-tab v-model:count="state.notificationCount"
-                                         :visible="visible && state.activeTab === 'notifications'"
-                />
-            </template>
-            <template #notice>
-                <g-n-b-notice-tab @close="hideNotiMenu" />
-            </template>
-        </p-tab>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .gnb-notifications-notice {

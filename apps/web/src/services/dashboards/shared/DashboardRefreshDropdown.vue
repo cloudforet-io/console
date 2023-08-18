@@ -22,8 +22,9 @@
 <script lang="ts" setup>
 import { PIconButton, PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { useDocumentVisibility } from '@vueuse/core';
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
@@ -120,22 +121,15 @@ watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], p
     }
 });
 
-const handleBrowserVisibilityChange = () => {
-    if (document.hidden) {
+const documentVisibility = useDocumentVisibility();
+watch(documentVisibility, (visibility) => {
+    if (visibility === 'hidden') {
         clearRefreshInterval();
-    } else {
-        executeRefreshInterval();
-    }
-};
+    } else if (!props.refreshDisabled) executeRefreshInterval();
+}, { immediate: true });
 
-onMounted(() => {
-    if (props.refreshDisabled) return;
-    executeRefreshInterval();
-    document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
-});
 onUnmounted(() => {
     clearRefreshInterval();
-    document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
 });
 
 const handleRefresh = () => {

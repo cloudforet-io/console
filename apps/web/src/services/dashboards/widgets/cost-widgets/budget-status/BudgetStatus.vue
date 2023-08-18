@@ -1,11 +1,10 @@
 <script setup lang="ts">
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { QueryHelper, QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 import {
@@ -14,6 +13,7 @@ import {
 import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -84,17 +84,12 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 };
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchBudgetUsageAnalyze = getCancellableFetcher<BudgetDataModel>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { status, response } = await fetchBudgetUsageAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, 'name'],
@@ -130,13 +125,12 @@ const fetchData = async (): Promise<Data> => {
                 page: { limit: 200 },
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
 const initWidget = async (data?: Data): Promise<Data> => {

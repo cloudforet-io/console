@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PDivider, PDataLoader, PBadge, PI, PSkeleton,
 } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
@@ -93,17 +92,12 @@ const [formattedPreviousMonth] = useDateRangeFormatter({
 });
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Data> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
+    apiQueryHelper.setFilters(state.consoleFilters);
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -117,13 +111,12 @@ const fetchData = async (): Promise<Data> => {
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
 /* Util */

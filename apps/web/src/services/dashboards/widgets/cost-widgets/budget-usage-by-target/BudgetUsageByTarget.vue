@@ -1,14 +1,13 @@
 <script setup lang="ts">
 
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getPageStart, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { QueryHelper, QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PProgressBar,
 } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, toRefs,
@@ -16,6 +15,7 @@ import {
 import type { ComputedRef } from 'vue';
 import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
+
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -37,19 +37,14 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
-
-type Data = BudgetDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
+type Data = BudgetDataModel;
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const store = useStore();
 
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     tableFields: computed<Field[]>(() => [
         { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
         {
@@ -95,18 +90,13 @@ const targetTextFormatter = (value: string): string => {
 };
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
-const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
+const apiQueryHelper = new ApiQueryHelper();
+const fetchBudgetUsageAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchData = async (): Promise<Data> => {
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.budgetConsoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { status, response } = await fetchBudgetUsageAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
@@ -142,22 +132,21 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'budget_usage', desc: true }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results, more };
+        });
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (thisPage = 1): Promise<Data> => {
     await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
@@ -186,7 +175,7 @@ useWidgetLifecycle({
     state,
 });
 
-defineExpose<WidgetExpose<FullData>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });

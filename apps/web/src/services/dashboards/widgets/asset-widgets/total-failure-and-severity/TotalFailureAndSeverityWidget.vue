@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { getRGBFromHex, commaFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    getRGBFromHex, commaFormatter, getRGBFromHex, commaFormatter,
+} from '@cloudforet/core-lib';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 import {
@@ -15,6 +16,7 @@ import {
 import type { ComputedRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
+
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -139,21 +141,17 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* API */
-const apiQueryHelper = new ApiQueryHelper();
-let trendAnalyzeRequest: CancelTokenSource | undefined;
-let realtimeAnalyzeRequest: CancelTokenSource | undefined;
+const trendDataApiQueryHelper = new ApiQueryHelper();
+const realtimeDataApiQueryHelper = new ApiQueryHelper();
+const fetchTrendDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchRealtimeDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchTrendData = async (): Promise<Data[]> => {
-    if (trendAnalyzeRequest) {
-        trendAnalyzeRequest.cancel('Next request has been called.');
-        trendAnalyzeRequest = undefined;
-    }
-    trendAnalyzeRequest = axios.CancelToken.source();
     try {
-        apiQueryHelper
+        trendDataApiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const { status, response } = await fetchTrendDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: state.dateRange.start,
@@ -169,29 +167,23 @@ const fetchTrendData = async (): Promise<Data[]> => {
                     key: 'date',
                     desc: false,
                 }],
-                ...apiQueryHelper.data,
+                ...trendDataApiQueryHelper.data,
             },
-        }, { cancelToken: trendAnalyzeRequest.token });
-        trendAnalyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 const fetchRealtimeData = async (): Promise<Data[]> => {
-    if (realtimeAnalyzeRequest) {
-        realtimeAnalyzeRequest.cancel('Next request has been called.');
-        realtimeAnalyzeRequest = undefined;
-    }
-    realtimeAnalyzeRequest = axios.CancelToken.source();
     try {
-        apiQueryHelper
+        realtimeDataApiQueryHelper
             .setFilters(state.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
-        const { results } = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        const { status, response } = await fetchRealtimeDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
@@ -203,15 +195,14 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
                         operator: 'sum',
                     },
                 },
-                ...apiQueryHelper.data,
+                ...realtimeDataApiQueryHelper.data,
             },
-        }, { cancelToken: realtimeAnalyzeRequest.token });
-        realtimeAnalyzeRequest = undefined;
-        return results;
+        });
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
 /* Util */

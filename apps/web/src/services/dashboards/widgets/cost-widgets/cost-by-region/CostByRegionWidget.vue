@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getPageStart, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector, SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper, ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     groupBy, isEqual, sum, uniqWith,
@@ -15,6 +14,7 @@ import {
 import type { ComputedRef } from 'vue';
 import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
+
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -42,12 +42,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
-
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
+type FullData = CostAnalyzeDataModel;
 interface CostDataByProvider {
     [continent: string]: {
         [provider: string]: number;
@@ -119,7 +114,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 /* Util */
-const getCostDataByProvider = (results: Data): CostDataByProvider => {
+const getCostDataByProvider = (results: FullData['results']): CostDataByProvider => {
     const data = results.map((d) => ({
         ...d,
         continent_code: storeState.regions[d.region_code]?.continent?.continent_code,
@@ -138,7 +133,7 @@ const getCostDataByProvider = (results: Data): CostDataByProvider => {
     });
     return result;
 };
-const getRefinedMapChartData = (results?: Data): MapChartData[] => {
+const getRefinedMapChartData = (results?: FullData['results']): MapChartData[] => {
     if (!results?.length) return [];
     const costDataByProvider = getCostDataByProvider(results);
     return Object.keys(costDataByProvider).map((continent) => ({
@@ -162,18 +157,13 @@ const getRefinedMapChartData = (results?: Data): MapChartData[] => {
 };
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
@@ -188,13 +178,12 @@ const fetchData = async (): Promise<FullData> => {
                 sort: [{ key: 'usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results, more };
+        });
+        if (status === 'succeed') return response;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return { results: [], more: false };
     }
+    return { results: [], more: false };
 };
 
 const drawChart = (chartData: MapChartData[]) => {
