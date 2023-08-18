@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-modal">
-        <p-button-modal :visible="collectorDataModalState.visible && !!collectorDataModalState.recentJob"
+        <p-button-modal :visible="collectorDataModalState.visible"
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"

@@ -14,7 +14,7 @@ import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/
 const props = defineProps<{
     collector?: CollectorModel|null;
     recentJobs?: JobModel[]|null;
-    historyLink: Location
+    historyLink?: Location
 }>();
 
 const state = reactive({

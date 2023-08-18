@@ -28,11 +28,11 @@
                 </span>
             </template>
             <template #extra>
-                <div v-if="collectorJobStore.isRecentJobLoaded"
+                <div v-if="collectorJobStore.AllJobsInfoLoaded"
                      class="collector-button-box"
                 >
                     <collect-data-button-group @collect="handleCollectData" />
-                    <router-link v-if="state.hasJobs"
+                    <router-link v-if="collectorJobStore.hasJobs"
                                  :to="state.collectorHistoryLink"
                     >
                         <p-button style-type="tertiary"
@@ -159,7 +159,6 @@ const state = reactive({
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
-    hasJobs: computed(() => !!collectorJobState.recentJobs?.length),
     collectorHistoryLink: computed<Location>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
@@ -250,7 +249,7 @@ const handleClickCollectDataConfirm = () => {
 /* Api polling */
 const fetchRecentJob = async () => {
     if (!collectorJobState.collector) return;
-    await collectorJobStore.getRecentJob();
+    await collectorJobStore.getRecentJobs();
 };
 const { pause, resume } = useTimeoutPoll(fetchRecentJob, 5000);
 const documentVisibility = useDocumentVisibility();
@@ -272,6 +271,7 @@ onMounted(async () => {
         _state.collector = collector;
     });
     if (collector) {
+        collectorJobStore.getAllJobsCount();
         collectorFormStore.setOriginCollector(collector);
         resume();
     }
