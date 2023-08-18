@@ -1,9 +1,7 @@
 /* eslint-disable camelcase */
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { concat } from 'lodash';
-import type { RouteLocation } from 'vue-router';
-
-
+import type { RouteLocationRaw, LocationQueryRaw } from 'vue-router';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
@@ -11,13 +9,13 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 interface LinkFormatter {
-    (baseUrl: string, data: string, reference: Reference, query: RouteLocation['query']): RouteLocation;
+    (baseUrl: string, data: string, reference: Reference, query?: LocationQueryRaw): RouteLocationRaw;
 }
 
 const queryHelper = new QueryHelper();
 
-const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query } as RouteLocation;
+const serverLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
+    const location = { name, query };
     let filters: any[] = [];
     if (data) {
         queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
@@ -30,29 +28,29 @@ const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     return location;
 };
 
-const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const projectLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
     if (data) {
         return {
             name,
             query,
-            params: (data ? { id: data } : undefined) as RouteLocation['params'],
-        } as RouteLocation;
-    } return {} as RouteLocation;
+            params: (data ? { id: data } : undefined),
+        };
+    } return {};
 };
 
-const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
     const location = {
         name,
         query: {
             ...query,
             select_pg: data,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return location;
 };
 
-const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query } as RouteLocation;
+const collectorLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
+    const location = { name, query };
     let filters: any[] = [];
     if (data) {
         queryHelper.setFilters([{ k: 'collector_id', v: data, o: '=' }]);
@@ -65,33 +63,33 @@ const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => 
     return location;
 };
 
-const serviceAccountLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const serviceAccountLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
     const location = {
         name,
         query,
-        params: { serviceAccountId: data } as RouteLocation['params'],
-    } as RouteLocation;
+        params: { serviceAccountId: data },
+    };
     return location;
 };
 
-const cloudServiceLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const cloudServiceLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
     const location = {
         name,
         query,
         params: {
             searchKey: reference.reference_key || 'reference.resource_id',
             id: data,
-        } as RouteLocation['params'],
-    } as RouteLocation;
+        },
+    };
     return location;
 };
 
-const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, query): RouteLocationRaw => {
     const location = {
         name,
         query,
-        params: { id: data } as RouteLocation['params'],
-    } as RouteLocation;
+        params: { id: data },
+    };
     return location;
 };
 
@@ -135,13 +133,13 @@ const routerMap: RouterMap = {
         },
 };
 
-export const referenceRouter = (data: string, reference: Reference, query?: RouteLocation['query']): RouteLocation => {
+export const referenceRouter = (data: string, reference: Reference, query?: LocationQueryRaw): RouteLocationRaw => {
     if (routerMap[reference.resource_type]) {
         const { name, formatter } = routerMap[reference.resource_type];
-        return formatter(name, data, reference, query as RouteLocation['query']);
+        return formatter(name, data, reference, query);
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
-    return {} as RouteLocation;
+    return {};
 };
 
 export default referenceRouter;

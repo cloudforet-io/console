@@ -1,10 +1,10 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { CONSOLE_ERROR_CODE } from '@/common/composables/error/type';
 
 export class ConsoleError extends Error {
-    redirectUrl?: string | Location;
+    redirectUrl?: RouteLocationRaw;
 
     constructor() {
 	    super();
@@ -13,9 +13,9 @@ export class ConsoleError extends Error {
 }
 
 export class NoSearchResourceError extends Error {
-    redirectUrl: string | RouteLocation;
+    redirectUrl: RouteLocationRaw;
 
-    constructor(redirectUrl: string | RouteLocation) {
+    constructor(redirectUrl: RouteLocationRaw) {
     	super();
     	this.name = CONSOLE_ERROR_CODE.NO_SEARCH_RESOURCE_ERROR;
     	this.redirectUrl = redirectUrl;
@@ -23,9 +23,9 @@ export class NoSearchResourceError extends Error {
 }
 
 export class NoResourceError extends Error {
-    redirectUrl: string | RouteLocation;
+    redirectUrl: RouteLocationRaw;
 
-    constructor(redirectUrl: string | RouteLocation) {
+    constructor(redirectUrl: RouteLocationRaw) {
     	super();
 	    this.name = CONSOLE_ERROR_CODE.NO_RESOURCE_ERROR;
 	    this.redirectUrl = redirectUrl;

@@ -9,7 +9,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -86,16 +86,16 @@ const state = reactive({
         return { start, end };
     }),
     legends: [] as Legend[],
-    widgetLocation: computed<RouteLocation>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {} as RouteLocation['params'],
+        params: {},
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
-        } as RouteLocation['query'],
-    } as RouteLocation)),
+        },
+    })),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 

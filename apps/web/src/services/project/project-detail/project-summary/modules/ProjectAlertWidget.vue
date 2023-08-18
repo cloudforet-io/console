@@ -12,7 +12,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -82,12 +82,12 @@ const state = reactive({
 });
 
 /* util */
-const alertLinkFormatter = (alertState): RouteLocation => ({
+const alertLinkFormatter = (alertState): RouteLocationRaw => ({
     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
     query: {
         state: alertState,
-    } as RouteLocation['query'],
-} as RouteLocation);
+    },
+});
 
 /* api */
 const apiQuery = new ApiQueryHelper();

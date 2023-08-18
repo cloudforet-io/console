@@ -12,7 +12,7 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -45,8 +45,8 @@ interface Item {
     totalCount: number;
     createdCount: number;
     deletedCount: number;
-    createdHref?: RouteLocation;
-    deletedHref?: RouteLocation;
+    createdHref?: RouteLocationRaw;
+    deletedHref?: RouteLocationRaw;
 }
 
 interface Props {
@@ -109,29 +109,29 @@ const getConvertedCloudServiceData = (rawData: CloudServiceData[]): Item[] => {
                     provider: d.provider,
                     group: d.cloud_service_group,
                     name: d.cloud_service_type,
-                } as RouteLocation['params'],
+                },
                 query: {
                     filters: queryHelper.setFilters([
                         ...filters,
                         { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                     ]).rawQueryStrings,
-                } as RouteLocation['query'],
-            } as RouteLocation,
+                },
+            },
             deletedHref: {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: d.provider,
                     group: d.cloud_service_group,
                     name: d.cloud_service_type,
-                } as RouteLocation['params'],
+                },
                 query: {
                     filters: queryHelper.setFilters([
                         ...filters,
                         { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                         { k: 'state', v: 'DELETED', o: '=' },
                     ]).rawQueryStrings,
-                } as RouteLocation['query'],
-            } as RouteLocation,
+                },
+            },
         };
         results.push(result);
     });

@@ -7,7 +7,6 @@ import {
     computed, reactive, toRefs, type ComponentPublicInstance,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -173,7 +172,7 @@ export default {
 
         const { setPathFrom, handleClickBackButton } = useGoBack({
             name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
-        } as RouteLocation);
+        });
 
         return {
             ...toRefs(state),

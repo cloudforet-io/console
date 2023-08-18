@@ -92,7 +92,6 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -146,8 +145,8 @@ export default defineComponent({
         const goToSignIn = () => {
             const res = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
-                query: { nextPath: route.fullPath } as RouteLocation['query'],
-            } as RouteLocation;
+                query: { nextPath: route.fullPath },
+            };
             store.commit('error/setVisibleSessionExpiredError', false);
             router.push(res);
         };

@@ -1,4 +1,4 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { FavoriteType } from '@/store/modules/favorite/type';
 
@@ -18,7 +18,7 @@ export interface LNBItem {
     label?: string;
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
-    to?: RouteLocation;
+    to?: RouteLocationRaw;
     isNew?: boolean;
     isBeta?: boolean;
     hideFavorite?: boolean;
@@ -30,12 +30,12 @@ export type LNBMenu = LNBItem[]|LNBItem;
 
 export interface BackLink {
     label: string;
-    to: RouteLocation;
+    to: RouteLocationRaw;
 }
 
 export interface TopTitle {
     icon?: string;
     label: string;
     visibleAddButton?: boolean;
-    addButtonLink?: RouteLocation;
+    addButtonLink?: RouteLocationRaw;
 }

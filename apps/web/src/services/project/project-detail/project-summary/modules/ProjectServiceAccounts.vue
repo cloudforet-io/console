@@ -9,7 +9,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocation, RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -72,14 +72,14 @@ const getLocation = (type, provider, serviceAccountId) => {
         { k: 'project_id', o: '=', v: props.projectId },
     ]);
 
-    const location: RouteLocation = {
+    const location: RouteLocationRaw = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query: {
             provider: primitiveToQueryString(provider) ?? '',
             service: CLOUD_SERVICE_LABEL[type],
             filters: queryHelper.rawQueryStrings,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return location;
 };
 const getConvertedData = (rawData): Item[] => rawData.map((item) => ({

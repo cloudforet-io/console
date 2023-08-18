@@ -11,7 +11,7 @@ import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -252,20 +252,20 @@ const initLegends = () => {
 };
 
 const queryHelper = new QueryHelper();
-const goToCloudService = (item) => {
-    const res: RouteLocation = {
+const goToCloudService = (item): RouteLocationRaw => {
+    const res = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: state.selectedProvider,
             group: item.cloud_service_group,
             name: item.cloud_service_type,
-        } as RouteLocation['params'],
+        },
         query: {
             filters: queryHelper.setFilters([
                 { k: 'region_code', v: state.selectedRegionCode, o: '=' },
             ]).rawQueryStrings,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return res;
 };
 

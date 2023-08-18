@@ -10,7 +10,7 @@ import {
     computed, reactive, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -120,10 +120,10 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
-    const res: RouteLocation = {
+    const res = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath } as RouteLocation['query'],
-    } as RouteLocation;
+        query: { nextPath: route.fullPath },
+    } as RouteLocationRaw;
     await router.push(res);
 };
 

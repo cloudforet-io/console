@@ -12,7 +12,6 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -88,7 +87,7 @@ const getProject = async (id) => {
         state.item = resp;
     } catch (e) {
         state.item = null;
-        ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME } as RouteLocation));
+        ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
         // forceRouteToProjectPage();
     } finally {
         state.loading = false;

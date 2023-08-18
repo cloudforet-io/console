@@ -4,7 +4,6 @@ import {
     reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
@@ -28,7 +27,7 @@ const state = reactive({
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.INFO_NOTICE].translationId),
                 id: MENU_ID.INFO_NOTICE,
-                to: { name: INFO_ROUTE.NOTICE._NAME } as RouteLocation,
+                to: { name: INFO_ROUTE.NOTICE._NAME },
             },
         ];
         return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);

@@ -18,7 +18,7 @@ import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -45,7 +45,7 @@ interface SummaryData {
     provider: string;
     label: string;
     count: number | string;
-    to: string | RouteLocation;
+    to: RouteLocationRaw;
     color?: string;
 }
 
@@ -168,8 +168,8 @@ const drawChart = (chartContext) => {
     chart.cursor.lineY.strokeOpacity = 0;
     chart.cursor.behavior = 'none';
 };
-const getLocation = (type: ServiceCategory) => {
-    const query: RouteLocation['query'] = {};
+const getLocation = (type: ServiceCategory): RouteLocationRaw => {
+    const query: LocationQueryRaw = {};
     if (type !== SERVICE_CATEGORY.ALL) {
         query.service = type;
     }
@@ -177,13 +177,13 @@ const getLocation = (type: ServiceCategory) => {
     // set filters
     queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
-    const location: RouteLocation = {
+    const location = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query: {
             filters: queryHelper.rawQueryStrings,
             ...query,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return location;
 };
 
@@ -326,11 +326,11 @@ const getSummaryInfo = async (type) => {
                         provider: d.provider,
                         group: d.cloud_service_group,
                         name: d.cloud_service_type,
-                    } as RouteLocation['params'],
+                    },
                     query: {
                         filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                    } as RouteLocation['query'],
-                } as RouteLocation,
+                    },
+                },
                 color: storeState.providers[d.provider]?.color,
             });
         });

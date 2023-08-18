@@ -1,7 +1,7 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 export interface Breadcrumb {
     name: string;
-    to: RouteLocation;
+    to: RouteLocationRaw;
     copiable?: boolean;
 }

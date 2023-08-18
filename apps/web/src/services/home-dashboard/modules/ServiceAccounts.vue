@@ -11,7 +11,7 @@ import {
     computed, reactive, watch, onUnmounted, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -122,12 +122,12 @@ const drawChart = (ctx, isLoading = false) => {
     }
 };
 
-const getLink = (data): RouteLocation => ({
+const getLink = (data): RouteLocationRaw => ({
     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
     query: {
         provider: data.provider,
-    } as RouteLocation['query'],
-} as RouteLocation);
+    },
+});
 
 /* Api */
 const getData = async () => {

@@ -14,7 +14,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { ComputedRef } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
@@ -99,9 +99,9 @@ const state = reactive({
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
-    widgetLocation: computed<RouteLocation>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {} as RouteLocation['params'],
+        params: {},
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
@@ -111,8 +111,8 @@ const state = reactive({
                 provider: ['aws'],
                 product: ['AmazonCloudFront'],
             }),
-        } as RouteLocation['query'],
-    } as RouteLocation)),
+        },
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);

@@ -12,7 +12,7 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -48,13 +48,13 @@ const state = reactive({
         start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
-    widgetLocation: computed<RouteLocation>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {} as RouteLocation['params'],
+        params: {},
         query: {
             filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        } as RouteLocation['query'],
-    } as RouteLocation)),
+        },
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);

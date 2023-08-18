@@ -4,7 +4,7 @@ import { PAnchor } from '@spaceone/design-system';
 import {
     computed, reactive,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 
 
@@ -34,28 +34,28 @@ const state = reactive({
     webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
     userLabel: computed<string|undefined>(() => props.userReference?.label),
     label: computed(() => state.webhookLabel || state.userLabel || props.value),
-    link: computed<RouteLocation|undefined>(() => {
+    link: computed<RouteLocationRaw|undefined>(() => {
         if (props.disableLink) return undefined;
         if (props.webhookReference) {
             return {
                 name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
                 params: {
                     id: props.projectId,
-                } as RouteLocation['params'],
+                },
                 query: {
                     filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value, o: '=' }]).rawQueryStrings,
-                } as RouteLocation['query'],
-            } as RouteLocation;
+                },
+            };
         } if (state.userReference) {
             return {
                 name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                 params: {
                     id: props.projectId,
-                } as RouteLocation['params'],
+                },
                 query: {
                     filters: queryHelper.setFilters([{ v: props.value }]).rawQueryStrings,
-                } as RouteLocation['query'],
-            } as RouteLocation;
+                },
+            };
         }
         return undefined;
     }),

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
@@ -27,7 +26,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.ITEM,
                 id,
                 label: t(menuInfo.translationId),
-                to: { name: id } as RouteLocation,
+                to: { name: id },
             });
         });
         return filterLNBMenuByPermission(_menuSet, store.getters['user/pagePermissionList']);

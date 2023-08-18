@@ -1,4 +1,4 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { SidebarType } from '@/store/modules/display/config';
 
@@ -10,7 +10,7 @@ export interface DisplayMenu extends Menu {
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;
-    to: RouteLocation;
+    to: RouteLocationRaw;
     subMenuList?: DisplayMenu[];
 }
 

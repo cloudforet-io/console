@@ -1,10 +1,10 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 
-export const useGoBack = (mainRoute: RouteLocation) => {
+export const useGoBack = (mainRoute: { name: string }) => {
     let pathFrom;
-    const setPathFrom = (path: RouteLocation) => {
+    const setPathFrom = (path: RouteLocationNormalized) => {
         pathFrom = path;
     };
 

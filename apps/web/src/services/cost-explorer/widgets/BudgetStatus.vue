@@ -11,7 +11,7 @@ import {
     computed, nextTick, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -33,7 +33,7 @@ interface ChartData {
     usage: number;
     limit: number;
     usdCost: number;
-    linkLocation: RouteLocation;
+    linkLocation: RouteLocationRaw;
 }
 
 const props = withDefaults(defineProps<WidgetProps>(), {
@@ -97,8 +97,8 @@ const getConvertedChartData = (rawData): ChartData[] => {
                 name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                 params: {
                     budgetId: d.budget_id,
-                } as RouteLocation['params'],
-            } as RouteLocation,
+                },
+            },
         });
     });
     return chartData;

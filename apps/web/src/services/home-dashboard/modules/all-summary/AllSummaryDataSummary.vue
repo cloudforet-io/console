@@ -10,7 +10,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -30,7 +30,7 @@ interface SummaryData {
     type: string;
     provider: string;
     count: number | string;
-    to: string | RouteLocation;
+    to: RouteLocationRaw;
 }
 
 interface Props {
@@ -91,7 +91,7 @@ const getBillingServiceLocation = (serviceCode?: string, disableFilter = false) 
     }
     return location;
 };
-const getAllServiceLocation = (): RouteLocation => {
+const getAllServiceLocation = (): RouteLocationRaw => {
     if (props.activeTab === DATA_TYPE.BILLING) {
         return getBillingServiceLocation(undefined, true);
     }
@@ -99,10 +99,10 @@ const getAllServiceLocation = (): RouteLocation => {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query: {
             service: props.activeTab,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
 };
-const getServiceLocation = (data): RouteLocation => {
+const getServiceLocation = (data): RouteLocationRaw => {
     if (props.activeTab === DATA_TYPE.BILLING) {
         return getBillingServiceLocation(data.service_code, false);
     }
@@ -112,8 +112,8 @@ const getServiceLocation = (data): RouteLocation => {
             provider: data.provider,
             group: data.cloud_service_group,
             name: data.cloud_service_type,
-        } as RouteLocation['params'],
-    } as RouteLocation;
+        },
+    };
 };
 
 /* Api */
@@ -154,14 +154,14 @@ const getSummaryInfo = async (type) => {
         const summaryData: SummaryData[] = [];
 
         results.forEach((d) => {
-            const detailLocation: RouteLocation = {
+            const detailLocation: RouteLocationRaw = {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: d.provider,
                     group: d.cloud_service_group,
                     name: d.cloud_service_type,
-                } as RouteLocation['params'],
-            } as RouteLocation;
+                },
+            };
             summaryData.push({
                 provider: d.provider,
                 type: d.display_name || d.cloud_service_group,

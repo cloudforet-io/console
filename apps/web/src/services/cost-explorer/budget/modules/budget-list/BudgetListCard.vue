@@ -6,7 +6,7 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -57,12 +57,12 @@ const storeState = reactive({
     currencyRates: computed(() => store.state.settings.currencyRates),
 });
 const state = reactive({
-    linkLocation: computed<RouteLocation>(() => ({
+    linkLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {
             budgetId: props.budgetUsage.budget_id,
-        } as RouteLocation['params'],
-    } as RouteLocation)),
+        },
+    })),
     isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
     projects: computed(() => {
         const projects: string[] = [];

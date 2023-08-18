@@ -4,7 +4,6 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
@@ -50,19 +49,19 @@ const state = reactive({
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT_PROFILE].translationId),
                 id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE,
-                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME } as RouteLocation,
+                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
             },
             {
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].translationId),
                 id: MENU_ID.MY_PAGE_API_KEY,
-                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME } as RouteLocation,
+                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
             },
             {
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId),
                 id: MENU_ID.MY_PAGE_NOTIFICATIONS,
-                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME } as RouteLocation,
+                to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
                 isBeta: true,
             },
         ];

@@ -12,7 +12,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, toRefs,
 } from 'vue';
 import type { ComputedRef } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -67,13 +67,13 @@ const state = reactive({
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     thisPage: 1,
-    widgetLocation: computed<RouteLocation>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {} as RouteLocation['params'],
+        params: {},
         query: {
             filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        } as RouteLocation['query'],
-    } as RouteLocation)),
+        },
+    })),
 });
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),

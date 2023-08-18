@@ -3,7 +3,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { PLazyImg, PDivider } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -48,19 +48,19 @@ const getCloudServiceDetailLink = (item) => {
     }
 
     // TODO: need to edit type assertion
-    const res: RouteLocation = {
+    const res: RouteLocationRaw = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
         params: {
             provider: item.provider,
             group: item.cloud_service_group,
             name: item.cloudServiceTypeName ?? item.resources[0].cloud_service_type,
-        } as RouteLocation['params'],
+        },
         query: {
             filters: cloudServiceDetailQueryHelper.rawQueryStrings,
             // TODO: need to edit type assertion, RouteQueryString type should be refactored
             period: objectToQueryString(cloudServicePageState.period) as string | null,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return res;
 };
 

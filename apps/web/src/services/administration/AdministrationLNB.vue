@@ -4,7 +4,6 @@ import {
     reactive, toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 
 import { store } from '@/store';
 
@@ -32,19 +31,19 @@ const state = reactive({
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].translationId),
                 id: MENU_ID.ADMINISTRATION_USER,
-                to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } as RouteLocation,
+                to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
             },
             {
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].translationId),
                 id: MENU_ID.ADMINISTRATION_ROLE,
-                to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME } as RouteLocation,
+                to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
             },
             {
                 type: 'item',
                 label: t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId),
                 id: MENU_ID.ADMINISTRATION_POLICY,
-                to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME } as RouteLocation,
+                to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
             },
         ], store.getters['user/pagePermissionList']),
     ]),

@@ -3,7 +3,6 @@ import { isEqual } from 'lodash';
 import {
     onUnmounted, watch,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
 import { useRouter } from 'vue-router';
 
 import {
@@ -56,9 +55,9 @@ const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (c
 watch(() => costAnalysisPageState.selectedQueryId, (selectedQueryId) => {
     if (props.querySetId !== selectedQueryId) {
         const location = {
-            params: { querySetId: selectedQueryId as string } as RouteLocation['params'],
-            query: {} as RouteLocation['query'],
-        } as RouteLocation;
+            params: { querySetId: selectedQueryId as string },
+            query: {},
+        };
 
         router.replace(location);
     }

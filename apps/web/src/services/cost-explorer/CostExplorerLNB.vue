@@ -4,7 +4,6 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
@@ -56,8 +55,8 @@ const state = reactive({
                         id: list.public_dashboard_id,
                         to: {
                             name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: list.public_dashboard_id } as RouteLocation['params'],
-                        } as RouteLocation,
+                            params: { dashboardId: list.public_dashboard_id },
+                        },
                         hideFavorite: true,
                     })) as LNBItem[],
                 ],
@@ -71,8 +70,8 @@ const state = reactive({
                         id: list.user_dashboard_id,
                         to: {
                             name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: list.user_dashboard_id } as RouteLocation['params'],
-                        } as RouteLocation,
+                            params: { dashboardId: list.user_dashboard_id },
+                        },
                         hideFavorite: true,
                     })) as LNBItem[],
                 ],
@@ -88,13 +87,13 @@ const state = reactive({
                 type: 'item',
                 id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
                 label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
-                to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME } as RouteLocation,
+                to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
             },
             {
                 type: 'item',
                 id: MENU_ID.COST_EXPLORER_BUDGET,
                 label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
-                to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME } as RouteLocation,
+                to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
             },
         ], store.getters['user/pagePermissionList']),
     ]),

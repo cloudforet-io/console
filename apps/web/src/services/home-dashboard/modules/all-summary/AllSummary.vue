@@ -14,7 +14,7 @@ import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import config from '@/lib/config';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -270,7 +270,7 @@ const setChartData = (data) => {
         };
     });
 };
-const getAllSummaryTabLocation = (type: DataType): RouteLocation => {
+const getAllSummaryTabLocation = (type: DataType): RouteLocationRaw => {
     if (type === DATA_TYPE.BILLING) {
         const _period = {
             start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
@@ -281,15 +281,15 @@ const getAllSummaryTabLocation = (type: DataType): RouteLocation => {
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED) as string,
                 period: objectToQueryString(_period) as string,
-            } as RouteLocation['query'],
-        } as RouteLocation;
+            },
+        };
     }
     return {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query: {
             service: type,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
 };
 
 /* Api */

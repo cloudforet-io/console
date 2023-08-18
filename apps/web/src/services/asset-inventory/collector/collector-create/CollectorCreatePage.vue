@@ -23,7 +23,6 @@ export default defineComponent({
 import { PHeading, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, defineExpose } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useStore } from 'vuex';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -53,7 +52,7 @@ const state = reactive({
         4: t('INVENTORY.COLLECTOR.CREATE.STEP_DESC4'),
     })),
 });
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } as RouteLocation);
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 
 const handleClickClose = () => {
     state.deleteModalVisible = true;

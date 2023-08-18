@@ -6,7 +6,6 @@ import {
     watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -44,7 +43,7 @@ const state = reactive({
     header: computed(() => t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId)),
     backLink: computed<BackLink|undefined>(() => {
         if (!state.isCloudServiceDetailPage) return undefined;
-        return { label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } as RouteLocation };
+        return { label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
     }),
     topTitle: computed<TopTitle|undefined>(() => {
         if (!state.detailPageParams) return undefined;
@@ -57,7 +56,7 @@ const state = reactive({
                 type: 'item',
                 label: d.name,
                 id: d.cloud_service_type_key,
-                to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } } as RouteLocation,
+                to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
                 favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
             });
         });
@@ -69,7 +68,7 @@ const state = reactive({
             type: 'item',
             id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
             label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
-            to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } as RouteLocation,
+            to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
         }]);
         return [
             (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
@@ -79,19 +78,19 @@ const state = reactive({
                     type: 'item',
                     id: MENU_ID.ASSET_INVENTORY_SERVER,
                     label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
-                    to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME } as RouteLocation,
+                    to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
                 },
                 {
                     type: 'item',
                     id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
                     label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
-                    to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } as RouteLocation,
+                    to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
                 },
                 {
                     type: 'item',
                     id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
                     label: t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
-                    to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } as RouteLocation,
+                    to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
                 },
             ]), store.getters['user/pagePermissionList']),
         ];

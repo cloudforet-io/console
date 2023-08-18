@@ -26,7 +26,7 @@ import {
     PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
 } from '@spaceone/design-system';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -67,7 +67,7 @@ const state = reactive({
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     hasJobs: false,
     // TODO: need to edit type assertion
-    collectorHistoryLink: computed<RouteLocation>(() => ({
+    collectorHistoryLink: computed<RouteLocationRaw>(() => ({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         query: {
             filters: queryHelper.setFilters([
@@ -77,14 +77,14 @@ const state = reactive({
                     o: '=',
                 },
             ]).rawQueryStrings,
-        } as RouteLocation['query'],
-    } as RouteLocation)),
+        },
+    })),
     deleteModalVisible: false,
     deleteLoading: false,
     editModalVisible: false,
 });
 
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME } as RouteLocation);
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
 
 defineExpose({ setPathFrom });
 

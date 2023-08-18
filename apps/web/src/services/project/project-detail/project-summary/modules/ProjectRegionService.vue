@@ -14,7 +14,7 @@ import {
     reactive, watch, onUnmounted, computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -127,8 +127,8 @@ const drawChart = (ctx, isLoading) => {
     state.chart = chart;
 };
 
-const getLocation = (provider: string, region: string, projectId: string, label: string) => {
-    const query: RouteLocation['query'] = {
+const getLocation = (provider: string, region: string, projectId: string, label: string): RouteLocationRaw => {
+    const query: LocationQueryRaw = {
         provider: primitiveToQueryString(provider) ?? '',
         region: arrayToQueryString([region]) ?? '',
     };
@@ -137,13 +137,13 @@ const getLocation = (provider: string, region: string, projectId: string, label:
     // set filters
     queryHelper.setFilters([{ k: 'project_id', o: '=', v: projectId }]);
 
-    const location: RouteLocation = {
+    const location = {
         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         query: {
             filters: queryHelper.rawQueryStrings,
             ...query,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
     return location;
 };
 

@@ -13,7 +13,7 @@ import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { LocationQueryRaw, RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import config from '@/lib/config';
@@ -38,7 +38,7 @@ interface ChartData {
 interface TableColumnData {
     label?: string;
     count?: number;
-    to: RouteLocation;
+    to: RouteLocationRaw;
 }
 interface TableItem {
     [key: string]: TableColumnData;
@@ -159,8 +159,8 @@ const drawChart = (chartContext) => {
 };
 //
 const queryHelper = new QueryHelper();
-const getLocation = (type: string, projectId: string) => {
-    const query: RouteLocation['query'] = {};
+const getLocation = (type: string, projectId: string): RouteLocationRaw => {
+    const query: LocationQueryRaw = {};
     query.service = arrayToQueryString([type]) as string;
 
     return {
@@ -170,8 +170,8 @@ const getLocation = (type: string, projectId: string) => {
                 { k: 'project_id', v: projectId, o: '=' },
             ]).rawQueryStrings,
             ...query,
-        } as RouteLocation['query'],
-    } as RouteLocation;
+        },
+    };
 };
 //
 const getConvertedData = (rawData): TableItem[] => rawData.map((d) => ({

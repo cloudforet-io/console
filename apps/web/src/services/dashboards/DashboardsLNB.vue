@@ -4,7 +4,6 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -70,7 +69,7 @@ const state = reactive({
             label: t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
             id: MENU_ID.DASHBOARDS,
             foldable: false,
-            to: { name: DASHBOARDS_ROUTE.ALL._NAME } as RouteLocation,
+            to: { name: DASHBOARDS_ROUTE.ALL._NAME },
             hideFavorite: true,
         },
         { type: 'divider' },
@@ -127,8 +126,8 @@ const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMen
                     name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
                     params: {
                         dashboardId: board.project_dashboard_id,
-                    } as RouteLocation['params'],
-                } as RouteLocation,
+                    },
+                },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
                 icon: board.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
             })),

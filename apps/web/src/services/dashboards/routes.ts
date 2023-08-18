@@ -1,4 +1,4 @@
-import type { RouteLocation, RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -74,7 +74,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                             name: i18n.global.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                                            } as RouteLocation,
+                                            },
                                         },
                                     ];
                                     if (params.dashboardId) {
@@ -85,7 +85,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
-                                            } as unknown as RouteLocation,
+                                            },
                                             copiable: true,
                                         });
                                     }
@@ -123,7 +123,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                             name: i18n.global.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                                            } as RouteLocation,
+                                            },
                                         },
                                     ];
                                     if (params.dashboardId) {
@@ -134,7 +134,7 @@ const dashboardsRoute: RouteRecordRaw = {
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
-                                            } as unknown as RouteLocation,
+                                            },
                                             copiable: true,
                                         });
                                     }

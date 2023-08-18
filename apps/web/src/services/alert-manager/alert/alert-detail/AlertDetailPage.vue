@@ -5,7 +5,6 @@ import {
     reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
 import { useRouter } from 'vue-router';
 
 
@@ -85,7 +84,7 @@ const alertTitleEditConfirm = async () => {
     try {
         await alertPageStore.getAlertData(props.id);
     } catch (e) {
-        ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME } as RouteLocation));
+        ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
     } finally {
         state.loading = false;
     }

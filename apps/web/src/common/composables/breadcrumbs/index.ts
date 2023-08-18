@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -19,7 +19,7 @@ export const useBreadcrumbs = () => ({
             const location = {
                 path: d.path,
                 params: route.params,
-            } as RouteLocation;
+            } as RouteLocationRaw;
 
             if (d.meta.breadcrumbs && typeof d.meta.breadcrumbs === 'function') {
                 const breadcrumbsFunctionResults = d.meta.breadcrumbs(route);
