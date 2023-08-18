@@ -1,3 +1,42 @@
+<template>
+    <div>
+        <div class="toolbox-top-wrapper">
+            <span class="title">{{ t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
+            <div v-if="cloudServicePageState.period"
+                 class="period-wrapper"
+            >
+                <cloud-service-period-filter />
+                <p-divider vertical />
+            </div>
+            <div class="filter-wrapper">
+                <span class="filters-count">{{ state.selectedFiltersCount }}</span>
+                <p-button style-type="tertiary"
+                          icon-left="ic_settings-filled"
+                          size="sm"
+                          @click="handleClickSet"
+                >
+                    {{ t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
+                </p-button>
+            </div>
+            <div class="total-result-wrapper">
+                <span class="total-result">{{ t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ totalCount }}</span>
+            </div>
+        </div>
+        <p-toolbox filters-visible
+                   exportable
+                   search-type="query"
+                   :total-count="totalCount"
+                   :query-tags="queryTags"
+                   :key-item-sets="state.keyItemSets"
+                   :value-handler-map="state.valueHandlerMap"
+                   @change="handleChange"
+                   @refresh="handleChange()"
+                   @export="handleExport"
+        />
+        <cloud-service-filter-modal v-model:visible="state.visibleSetFilterModal" />
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -238,45 +277,6 @@ const handleExport = async () => {
 })();
 
 </script>
-
-<template>
-    <div>
-        <div class="toolbox-top-wrapper">
-            <span class="title">{{ t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
-            <div v-if="cloudServicePageState.period"
-                 class="period-wrapper"
-            >
-                <cloud-service-period-filter />
-                <p-divider vertical />
-            </div>
-            <div class="filter-wrapper">
-                <span class="filters-count">{{ state.selectedFiltersCount }}</span>
-                <p-button style-type="tertiary"
-                          icon-left="ic_settings-filled"
-                          size="sm"
-                          @click="handleClickSet"
-                >
-                    {{ t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
-                </p-button>
-            </div>
-            <div class="total-result-wrapper">
-                <span class="total-result">{{ t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ totalCount }}</span>
-            </div>
-        </div>
-        <p-toolbox filters-visible
-                   exportable
-                   search-type="query"
-                   :total-count="totalCount"
-                   :query-tags="queryTags"
-                   :key-item-sets="state.keyItemSets"
-                   :value-handler-map="state.valueHandlerMap"
-                   @change="handleChange"
-                   @refresh="handleChange()"
-                   @export="handleExport"
-        />
-        <cloud-service-filter-modal v-model:visible="state.visibleSetFilterModal" />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .toolbox-top-wrapper {
