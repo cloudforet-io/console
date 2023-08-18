@@ -9,7 +9,7 @@ import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 interface Props {
-    printMode: boolean;
+    printMode?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {

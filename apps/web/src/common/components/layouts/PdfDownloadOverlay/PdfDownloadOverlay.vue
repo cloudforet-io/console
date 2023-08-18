@@ -38,9 +38,9 @@ const paperSizeInfoMap: Record<PaperSize, PaperSizeInfo> = Object.freeze({
 
 interface Props {
     visible: boolean;
-    mode: Mode;
+    mode?: Mode;
     items: Array<Item>;
-    paperSize: PaperSize;
+    paperSize?: PaperSize;
     orientation: Orientation;
     fileName: string;
     fontLanguage?: Language;

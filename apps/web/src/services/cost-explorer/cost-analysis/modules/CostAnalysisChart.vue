@@ -43,7 +43,7 @@ import type {
 } from '@/services/cost-explorer/widgets/type';
 
 interface Props {
-    printMode: boolean;
+    printMode?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {

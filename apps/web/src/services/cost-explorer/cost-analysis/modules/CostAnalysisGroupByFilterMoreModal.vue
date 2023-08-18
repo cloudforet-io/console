@@ -22,7 +22,7 @@ import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
 interface Props {
     visible: boolean;
-    headerTitle: string;
+    headerTitle?: string;
     prevMoreGroupByItems: MoreGroupByItem[];
 }
 

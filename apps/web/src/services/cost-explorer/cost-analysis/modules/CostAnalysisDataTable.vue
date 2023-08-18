@@ -21,8 +21,8 @@ import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
@@ -60,7 +60,7 @@ interface PrintModeFieldSet {
 const PRINT_MODE_MAX_COL = 10;
 
 interface Props {
-    printMode: boolean;
+    printMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

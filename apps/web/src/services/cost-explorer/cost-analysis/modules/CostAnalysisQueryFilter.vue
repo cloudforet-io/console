@@ -18,7 +18,7 @@ import type { Granularity } from '@/services/cost-explorer/type';
 const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
 interface Props {
-    printMode: boolean;
+    printMode?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {

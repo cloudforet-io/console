@@ -6,7 +6,7 @@ import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 interface Props {
     iconOnly?: boolean;
-    title: string;
+    title?: string;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -43,8 +43,8 @@ const handleClick = (event) => {
                 {{ title }}
             </p-button>
             <template #content>
-                <i18n class="popover-content"
-                      path="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
+                <i18n-t class="popover-content"
+                        keypath="COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.SUPPORT_PDF_HELP_TEXT"
                 >
                     <template #desktop>
                         <span class="font-bold">{{ t('COMMON.BUTTONS.PDF_DOWNLOAD_BUTTON.DESKTOP') }}</span>
@@ -55,7 +55,7 @@ const handleClick = (event) => {
                     <template #edge>
                         <span class="font-bold">{{ t('APP.MODAL.RECOMMEND_BROWSER.EDGE') }}</span>
                     </template>
-                </i18n>
+                </i18n-t>
             </template>
         </p-popover>
         <template v-if="isBrowserSupported">

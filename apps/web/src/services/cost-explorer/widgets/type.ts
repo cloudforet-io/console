@@ -43,9 +43,9 @@ export interface CostAnalyzeModel {
 export interface WidgetProps<Options = any> {
     widgetId?: string;
     name?: string;
-    options: Options;
-    period: Period;
-    filters: CostFiltersMap;
+    options?: Options;
+    period?: Period;
+    filters?: CostFiltersMap;
     currency: Currency;
     currencyRates: CurrencyRates;
     printMode?: boolean;

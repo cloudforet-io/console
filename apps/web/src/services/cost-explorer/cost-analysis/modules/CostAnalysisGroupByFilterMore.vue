@@ -14,7 +14,7 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
 interface Props {
-    printMode: boolean;
+    printMode?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -95,7 +95,7 @@ const handleDeleteItem = (item: MoreGroupByItem) => {
                 {{ moreGroupByItem.key }}
             </p-select-button>
         </template>
-        <p-popover v-model:is-visible="popoverVisible"
+        <p-popover v-model:is-visible="state.popoverVisible"
                    position="bottom-end"
         >
             <p-icon-button name="ic_settings-filled"
@@ -105,7 +105,7 @@ const handleDeleteItem = (item: MoreGroupByItem) => {
             />
             <template #content>
                 <div class="popover-content-wrapper">
-                    <div v-for="(popoverItem, idx) in popoverItems"
+                    <div v-for="(popoverItem, idx) in state.popoverItems"
                          :key="`popover-row-${idx}-${popoverItem.title}`"
                          class="group-by-wrapper"
                     >
@@ -137,7 +137,7 @@ const handleDeleteItem = (item: MoreGroupByItem) => {
                 </div>
             </template>
         </p-popover>
-        <cost-analysis-group-by-filter-more-modal v-model:visible="addMoreModalVisible"
+        <cost-analysis-group-by-filter-more-modal v-model:visible="state.addMoreModalVisible"
                                                   :prev-more-group-by-items="costAnalysisPageStore.orderedMoreGroupByItems"
         />
     </div>

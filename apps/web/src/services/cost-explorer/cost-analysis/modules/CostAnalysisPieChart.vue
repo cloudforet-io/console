@@ -21,7 +21,7 @@ import type {
 
 interface Props extends WidgetProps {
     loading: boolean;
-    chart: PieChart;
+    chart?: PieChart;
     chartData: PieChartData[];
     legends: Legend[];
 }
