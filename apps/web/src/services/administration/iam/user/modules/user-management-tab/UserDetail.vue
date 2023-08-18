@@ -182,7 +182,6 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
     }
     &.block {
         .extra {
-            width: 11.375rem;
             height: 1.5rem;
             margin-top: -0.125rem;
             margin-left: 0;

@@ -20,6 +20,7 @@
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
                               :block="block || item.block"
+                              :custom-key-width="customKeyWidth || undefined"
                               :copy-value="item.copyValue"
                               :copy-value-formatter="item.copyValueFormatter"
                 >
@@ -109,6 +110,10 @@ const props = defineProps({
         default: DEFINITION_TABLE_STYLE_TYPE.primary,
         validator(styleType: any) {
             return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
+        },
+        customKeyWidth: {
+            type: String,
+            default: undefined,
         },
     },
     block: {
