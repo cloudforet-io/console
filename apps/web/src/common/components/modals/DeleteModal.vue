@@ -55,8 +55,8 @@ interface Props {
     contents?: string;
     confirmText?: string;
     loading?: boolean;
-    size: Size;
-    hideFooter: boolean;
+    size?: Size;
+    hideFooter?: boolean;
     enableScroll?: boolean;
 }
 

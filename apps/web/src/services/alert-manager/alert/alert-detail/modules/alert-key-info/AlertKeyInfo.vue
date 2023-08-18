@@ -104,11 +104,10 @@ const handleUpdate = (e) => {
                             block
         >
             <template #data-description>
-                <alert-info-description
-                    :id="id"
-                    :alert-data="state.data"
-                    :manage-disabled="manageDisabled"
-                    @update="handleUpdate"
+                <alert-info-description :id="id"
+                                        :alert-data="state.data"
+                                        :manage-disabled="manageDisabled"
+                                        @update="handleUpdate"
                 />
             </template>
             <template #data-rule="{value}">

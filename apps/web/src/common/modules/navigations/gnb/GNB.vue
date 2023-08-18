@@ -3,7 +3,7 @@ import { includes } from 'lodash';
 import {
     reactive, computed, onMounted,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -49,7 +49,7 @@ const state = reactive({
                 show: true,
                 id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
                 label: extraMenu.title,
-                to: {} as RouteLocation,
+                to: {} as RouteLocationRaw,
             };
         }
         return undefined;

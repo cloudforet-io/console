@@ -51,39 +51,38 @@ const handleClickAnchor = (navigateFn, event: Event) => {
                :contents="isEllipsisActive() ? label : undefined"
                position="bottom"
     >
-        <router-link :to="href ? {} : to"
+        <router-link v-slot="{ href: toHref, navigate }"
+                     :to="href ? {} : to"
                      custom
         >
-            <template #default="{href: toHref, navigate}">
-                <span class="gnb-sub-menu">
-                    <a class="gnb-sub-contents"
-                       :href="href ? href : toHref"
-                       :target="href ? '_blank' : undefined"
-                       @click.stop="handleClickAnchor(navigate, $event)"
+            <span class="gnb-sub-menu">
+                <a class="gnb-sub-contents"
+                   :href="href ? href : toHref"
+                   :target="href ? '_blank' : undefined"
+                   @click.stop="handleClickAnchor(navigate, $event)"
+                >
+                    <div class="contents-left"
+                         :class="{ 'is-exist-extra-mark': slots['extra-mark'] }"
                     >
-                        <div class="contents-left"
-                             :class="{ 'is-exist-extra-mark': slots['extra-mark'] }"
+                        <p-i v-if="isDraggable"
+                             name="ic_drag-handle"
+                             width="1rem"
+                             height="1rem"
+                             class="drag-icon"
+                        />
+                        <div ref="labelRef"
+                             class="label"
                         >
-                            <p-i v-if="isDraggable"
-                                 name="ic_drag-handle"
-                                 width="1rem"
-                                 height="1rem"
-                                 class="drag-icon"
-                            />
-                            <div ref="labelRef"
-                                 class="label"
-                            >
-                                {{ label }}
-                            </div>
-                            <beta-mark v-if="isBeta" />
-                            <new-mark v-if="isNew" />
+                            {{ label }}
                         </div>
-                        <div class="contents-right">
-                            <slot name="extra-mark" />
-                        </div>
-                    </a>
-                </span>
-            </template>
+                        <beta-mark v-if="isBeta" />
+                        <new-mark v-if="isNew" />
+                    </div>
+                    <div class="contents-right">
+                        <slot name="extra-mark" />
+                    </div>
+                </a>
+            </span>
         </router-link>
     </p-tooltip>
 </template>

@@ -109,7 +109,7 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
                     @select="changeAlertState"
                 >
                     <span :class="{'text-alert': state.alertState === ALERT_STATE.TRIGGERED}">
-                        {{ state.alertStateList.find(d => d.name === alertState).label }}
+                        {{ state.alertStateList.find(d => d.name === state.alertState).label }}
                     </span>
                 </p-select-dropdown>
             </template>
@@ -165,10 +165,9 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
             <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>
             <span class="time">{{ state.duration }}</span>
         </p>
-        <alert-assign-modal
-            v-model:visible="state.reassignModalVisible"
-            :project-id="alertPageState.alertData?.project_id"
-            :alert-id="id"
+        <alert-assign-modal v-model:visible="state.reassignModalVisible"
+                            :project-id="alertPageState.alertData?.project_id"
+                            :alert-id="id"
         />
     </p-pane-layout>
 </template>

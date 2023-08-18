@@ -62,7 +62,9 @@ const state = reactive({
     hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
     isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
 });
-const hideMenu = () => { emit('hide-menu'); };
+const hideMenu = () => {
+    emit('hide-menu');
+};
 
 const handleMenu = () => {
     if (state.isMenuWithAdditionalMenu) {

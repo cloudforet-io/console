@@ -155,12 +155,12 @@ watch(() => state.proxyVisible, (visible) => {
             <p-field-group :label="t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_URGENCY')"
                            required
             >
-                <p-radio v-model="state.urgency"
+                <p-radio v-model:selected="state.urgency"
                          :value="ALERT_URGENCY.HIGH"
                 >
                     {{ t('MONITORING.ALERT.ALERT_LIST.FORM.HIGH') }}
                 </p-radio>
-                <p-radio v-model="state.urgency"
+                <p-radio v-model:selected="state.urgency"
                          :value="ALERT_URGENCY.LOW"
                 >
                     {{ t('MONITORING.ALERT.ALERT_LIST.FORM.LOW') }}
@@ -170,13 +170,13 @@ watch(() => state.proxyVisible, (visible) => {
                            class="project-field-group"
                            :label="t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_PROJECT')"
                            required
-                           :invalid="projectInvalid"
+                           :invalid="state.projectInvalid"
                            :invalid-text="state.projectInvalidText"
             >
                 <template #label-extra>
                     <p-anchor class="go-project"
                               highlight
-                              :to="{name: PROJECT_ROUTE._NAME }"
+                              :to="{ name: PROJECT_ROUTE._NAME }"
                     >
                         {{ t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
                     </p-anchor>

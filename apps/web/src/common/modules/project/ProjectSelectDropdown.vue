@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 
-import { SpaceConnector } from '@cloudforet/core-lib/src/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PCheckbox, PI, PRadio, PFilterableDropdown, PTree, PButton,
 } from '@spaceone/design-system';

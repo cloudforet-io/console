@@ -79,16 +79,15 @@ onActivated(() => {
 
 <template>
     <div class="project-alert">
-        <alert-data-table
-            :project-id="id"
-            :alert-state="state.alertState"
-            :urgency="state.urgency"
-            :assigned="state.assigned"
-            :filters="state.filters"
-            :manage-disabled="!state.hasManagePermission"
-            keep-alive
-            @update="onUpdateTable"
-            @change-list="onChangeList"
+        <alert-data-table :project-id="id"
+                          :alert-state="state.alertState"
+                          :urgency="state.urgency"
+                          :assigned="state.assigned"
+                          :filters="state.filters"
+                          :manage-disabled="!state.hasManagePermission"
+                          keep-alive
+                          @update="onUpdateTable"
+                          @change-list="onChangeList"
         />
     </div>
 </template>

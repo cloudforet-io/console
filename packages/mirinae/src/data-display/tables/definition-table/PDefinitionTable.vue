@@ -111,10 +111,10 @@ const props = defineProps({
         validator(styleType: any) {
             return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
         },
-        customKeyWidth: {
-            type: String,
-            default: undefined,
-        },
+    },
+    customKeyWidth: {
+        type: String,
+        default: undefined,
     },
     block: {
         type: Boolean,

@@ -48,12 +48,12 @@ import type {
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 interface Props {
-    projectId: string;
+    projectId?: string;
     alertState: AlertStateFilter;
     urgency: AlertUrgency;
     assigned: AssignedState;
     filters: ConsoleFilter[];
-    keepAlive: boolean;
+    keepAlive?: boolean;
     manageDisabled: boolean;
 }
 
@@ -310,127 +310,124 @@ if (!props.keepAlive) {
 </script>
 
 <template>
-    <fragment>
-        <div class="alert-data-table">
-            <p-toolbox-table
-                v-model:select-index="state.selectIndex"
-                searchable
-                selectable
-                sortable
-                exportable
-                search-type="query"
-                sort-by="created_at"
-                :sort-desc="true"
-                :loading="state.loading"
-                :fields="state.fields"
-                :items="state.items"
-                :total-count="state.totalCount"
-                :query-tags="state.tags"
-                :key-item-sets="querySearchHandlerState.keyItemSets"
-                :value-handler-map="querySearchHandlerState.valueHandlerMap"
-                @change="onChange"
-                @refresh="getAlerts()"
-                @export="onExportToExcel"
-            >
-                <template #toolbox-top>
-                    <div class="panel-top-wrapper">
-                        <p-heading heading-type="sub"
-                                   use-total-count
-                                   :total-count="state.totalCount"
-                                   :title="t('MONITORING.ALERT.ALERT_LIST.ALERT')"
-                        >
-                            <template #extra>
-                                <alert-actions :selected-items="state.selectedItems"
-                                               :manage-disabled="manageDisabled"
-                                               @refresh="getAlerts()"
-                                />
-                            </template>
-                        </p-heading>
-                    </div>
-                </template>
-                <template #toolbox-left>
-                    <p-button class="mr-4"
-                              style-type="primary"
-                              icon-left="ic_plus_bold"
-                              :disabled="manageDisabled"
-                              @click="state.visibleAlertFormModal = true"
+    <div class="alert-data-table">
+        <p-toolbox-table v-model:select-index="state.selectIndex"
+                         searchable
+                         selectable
+                         sortable
+                         exportable
+                         search-type="query"
+                         sort-by="created_at"
+                         :sort-desc="true"
+                         :loading="state.loading"
+                         :fields="state.fields"
+                         :items="state.items"
+                         :total-count="state.totalCount"
+                         :query-tags="state.tags"
+                         :key-item-sets="querySearchHandlerState.keyItemSets"
+                         :value-handler-map="querySearchHandlerState.valueHandlerMap"
+                         @change="onChange"
+                         @refresh="getAlerts()"
+                         @export="onExportToExcel"
+        >
+            <template #toolbox-top>
+                <div class="panel-top-wrapper">
+                    <p-heading heading-type="sub"
+                               use-total-count
+                               :total-count="state.totalCount"
+                               :title="t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                     >
-                        {{ t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
-                    </p-button>
-                </template>
-                <template #toolbox-bottom>
-                    <alert-table-bottom-filters
-                        :alert-state="alertState"
-                        :urgency="urgency"
-                        :assigned="assigned"
-                        @update="onUpdateBottomFilters"
-                    />
-                </template>
-                <template #col-title-format="{ value, item }">
-                    <template v-if="value">
-                        <p-anchor hide-icon
-                                  highlight
-                                  :to="{
-                                      name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                                      params: { id: item.alert_id }
-                                  }"
-                        >
-                            {{ value }}
-                        </p-anchor>
-                    </template>
-                </template>
-                <template #col-state-format="{ value }">
-                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                             :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
+                        <template #extra>
+                            <alert-actions :selected-items="state.selectedItems"
+                                           :manage-disabled="manageDisabled"
+                                           @refresh="getAlerts()"
+                            />
+                        </template>
+                    </p-heading>
+                </div>
+            </template>
+            <template #toolbox-left>
+                <p-button class="mr-4"
+                          style-type="primary"
+                          icon-left="ic_plus_bold"
+                          :disabled="manageDisabled"
+                          @click="state.visibleAlertFormModal = true"
+                >
+                    {{ t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
+                </p-button>
+            </template>
+            <template #toolbox-bottom>
+                <alert-table-bottom-filters
+                    :alert-state="alertState"
+                    :urgency="urgency"
+                    :assigned="assigned"
+                    @update="onUpdateBottomFilters"
+                />
+            </template>
+            <template #col-title-format="{ value, item }">
+                <template v-if="value">
+                    <p-anchor hide-icon
+                              highlight
+                              :to="{
+                                  name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                  params: { id: item.alert_id }
+                              }"
                     >
-                        {{ state.alertStateLabels[value] }}
-                    </p-badge>
+                        {{ value }}
+                    </p-anchor>
                 </template>
-                <template #col-urgency-format="{ value }">
-                    <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
-                         width="1em"
-                         height="1em"
-                         class="mr-1"
-                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[300]"
-                    />
-                    <span>{{ state.urgencyLabels[value] }}</span>
+            </template>
+            <template #col-state-format="{ value }">
+                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                         :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
+                >
+                    {{ state.alertStateLabels[value] }}
+                </p-badge>
+            </template>
+            <template #col-urgency-format="{ value }">
+                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                     width="1em"
+                     height="1em"
+                     class="mr-1"
+                     :color="value === ALERT_URGENCY.HIGH ? red[400] : red[300]"
+                />
+                <span>{{ state.urgencyLabels[value] }}</span>
+            </template>
+            <template #col-resource-format="{ value }">
+                {{ value ? value.name : '' }}
+            </template>
+            <template #col-project_id-format="{ value }">
+                <template v-if="value">
+                    <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
+                        {{ storeState.projects[value] ? storeState.projects[value].label : value }}
+                    </p-anchor>
                 </template>
-                <template #col-resource-format="{ value }">
-                    {{ value ? value.name : '' }}
+            </template>
+            <template #col-created_at-format="{value, field}">
+                <template v-if="field.label === 'Created'">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
                 </template>
-                <template #col-project_id-format="{ value }">
-                    <template v-if="value">
-                        <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
-                            {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                        </p-anchor>
-                    </template>
+                <template v-else>
+                    {{ alertDurationFormatter(value) }}
                 </template>
-                <template #col-created_at-format="{value, field}">
-                    <template v-if="field.label === 'Created'">
-                        {{ iso8601Formatter(value, storeState.timezone) }}
-                    </template>
-                    <template v-else>
-                        {{ alertDurationFormatter(value) }}
-                    </template>
-                </template>
-                <template #col-webhook_id-format="{ value }">
-                    {{ value ? (storeState.webhooks[value] ? storeState.webhooks[value].label : value) : ' ' }}
-                </template>
-                <template #col-triggered_by-format="{ value, item }">
-                    <alert-triggered-by :value="value"
-                                        :project-id="item.project_id"
-                                        :webhook-reference="storeState.webhooks[value]"
-                                        :user-reference="storeState.users[value]"
-                                        disable-link
-                    />
-                </template>
-            </p-toolbox-table>
-        </div>
-        <alert-form-modal v-model:visible="state.visibleAlertFormModal"
-                          :project-id="projectId"
-                          @confirm="onAlertFormConfirm"
-        />
-    </fragment>
+            </template>
+            <template #col-webhook_id-format="{ value }">
+                {{ value ? (storeState.webhooks[value] ? storeState.webhooks[value].label : value) : ' ' }}
+            </template>
+            <template #col-triggered_by-format="{ value, item }">
+                <alert-triggered-by :value="value"
+                                    :project-id="item.project_id"
+                                    :webhook-reference="storeState.webhooks[value]"
+                                    :user-reference="storeState.users[value]"
+                                    disable-link
+                />
+            </template>
+        </p-toolbox-table>
+    </div>
+    <alert-form-modal v-model:visible="state.visibleAlertFormModal"
+                      :project-id="projectId"
+                      @confirm="onAlertFormConfirm"
+    />
 </template>
 
 <style lang="postcss" scoped>
