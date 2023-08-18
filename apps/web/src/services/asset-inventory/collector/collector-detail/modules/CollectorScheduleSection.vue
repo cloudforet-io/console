@@ -2,16 +2,15 @@
     <p-pane-layout>
         <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                         :edit-mode="state.isEditMode"
+                        :hide-edit-button="!collectorFormState.schedulePower"
                         :total-count="state.totalCount"
                         @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
-            <collector-schedule-form :enable-hours-edit="state.isEditMode"
-                                     :disabled="state.updateLoading"
+            <collector-schedule-form :hours-readonly="!state.isEditMode"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
-                                     @update:enableHoursEdit="handleUpdateEditMode"
             />
 
             <div class="button-group">
@@ -82,10 +81,6 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 
 const handleClickEdit = () => {
     state.isEditMode = true;
-};
-
-const handleUpdateEditMode = (value: boolean) => {
-    state.isEditMode = value;
 };
 
 const handleClickCancel = () => {

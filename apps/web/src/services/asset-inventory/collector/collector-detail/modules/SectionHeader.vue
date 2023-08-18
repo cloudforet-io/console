@@ -29,7 +29,7 @@ const handleClickEdit = () => {
                :use-total-count="props.totalCount !== undefined"
                :total-count="props.totalCount"
     >
-        <template v-if="!props.editMode || props.hideEditButton"
+        <template v-if="!props.editMode && !props.hideEditButton"
                   #extra
         >
             <p-button v-if="width > screens.mobile.max"

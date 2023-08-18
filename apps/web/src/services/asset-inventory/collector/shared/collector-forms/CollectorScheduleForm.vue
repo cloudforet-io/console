@@ -9,25 +9,23 @@
                        class="schedule-desc"
         />
         <p-toggle-button :value="collectorFormState.schedulePower"
-                         :disabled="props.disabled"
                          show-state-text
                          @change-toggle="handleChangeToggle"
         />
-        <p-field-group v-if="collectorFormState.schedulePower || props.enableHoursEdit"
+        <p-field-group v-if="collectorFormState.schedulePower"
                        class="hourly-schedule-field-group"
-                       :required="!props.enableHoursEdit"
+                       :required="props.hoursReadonly"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
                        :help-text="$t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
             <div class="hourly-schedule-wrapper"
-                 :class="{'is-set-mode': !props.enableHoursEdit}"
+                 :class="{'is-read-mode': props.hoursReadonly}"
             >
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
                       class="time-block"
                       :class="{
-                          active: !!state.timezoneAppliedHours.includes(hour),
-                          disabled: props.disabled,
+                          active: !!state.timezoneAppliedHours.includes(hour)
                       }"
                       @click="handleClickHour(hour)"
                 >
@@ -62,9 +60,8 @@ import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 const props = defineProps<{
-    enableHoursEdit?: boolean;
+    hoursReadonly?: boolean;
     disableLoading?: boolean;
-    disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
     callApiOnPowerChange?: boolean;
 }>();
@@ -127,8 +124,7 @@ const handleChangeToggle = async (value: boolean) => {
 };
 
 const handleClickHour = (hour: number) => {
-    if (props.disabled) return;
-    if (!props.enableHoursEdit) return;
+    if (props.hoursReadonly) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
@@ -146,7 +142,7 @@ const handleClickHour = (hour: number) => {
     updateSelectedHours();
 };
 
-watch([() => collectorFormStore.collectorId, () => props.enableHoursEdit], ([collectorId]) => {
+watch([() => collectorFormStore.collectorId, () => props.hoursReadonly], ([collectorId]) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetSchedule();
     selectedUtcHoursSet.clear();
@@ -185,7 +181,7 @@ watch([() => collectorFormStore.collectorId, () => props.enableHoursEdit], ([col
         grid-template-columns: repeat(4, 2rem);
     }
 
-    &.is-set-mode {
+    &.is-read-mode {
         gap: 0.25rem;
         .time-block {
             @apply bg-gray-100 text-gray-100 border-none cursor-default;
@@ -201,9 +197,6 @@ watch([() => collectorFormStore.collectorId, () => props.enableHoursEdit], ([col
         font-size: 0.875rem;
         &.active {
             @apply bg-blue-600 text-white;
-        }
-        &.disabled {
-            @apply cursor-not-allowed;
         }
     }
 }
