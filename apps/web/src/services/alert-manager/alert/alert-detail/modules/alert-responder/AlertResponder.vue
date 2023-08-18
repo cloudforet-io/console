@@ -9,7 +9,7 @@ import { differenceBy } from 'lodash';
 import {
     computed, reactive,
 } from 'vue';
-import VueI18n, { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -21,7 +21,6 @@ import type {
     AlertDataModel,
 } from '@/services/alert-manager/type';
 
-import TranslateResult = VueI18n.TranslateResult;
 
 interface Props {
     id?: string;
@@ -29,7 +28,7 @@ interface Props {
     manageDisabled: boolean;
 }
 interface Rule {
-    title: TranslateResult;
+    title: string;
     data: Record<string, string | number>;
 }
 

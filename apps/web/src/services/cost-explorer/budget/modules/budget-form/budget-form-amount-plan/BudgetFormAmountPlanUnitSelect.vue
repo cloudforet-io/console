@@ -5,14 +5,13 @@ import {
     computed,
     reactive,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import type { BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
 
 interface Plan {
-    title: TranslateResult;
-    desc: TranslateResult;
+    title: string;
+    desc: string;
     unit: Extract<BudgetTimeUnit, 'MONTHLY'|'TOTAL'>;
 }
 

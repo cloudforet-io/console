@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { TimeStamp } from '@/models';
 
 import type { FileInfo } from '@/lib/file-manager/type';
@@ -30,6 +28,6 @@ export interface NoticePostModel {
 }
 
 export interface NoticePostBadgeInfo {
-    label: TranslateResult;
+    label: string;
     style: string;
 }

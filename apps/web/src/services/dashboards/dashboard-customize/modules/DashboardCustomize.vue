@@ -35,7 +35,6 @@ import { PDivider } from '@spaceone/design-system';
 import {
     computed, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 
 import { SpaceRouter } from '@/router';
@@ -60,7 +59,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 interface Props {
     dashboardId?: string;
     loading?: boolean;
-    saveButtonText?: TranslateResult;
+    saveButtonText?: string;
     hideCancelButton?: boolean;
 }
 

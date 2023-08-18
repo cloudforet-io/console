@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { Currency } from '@/store/modules/settings/type';
 
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
@@ -69,7 +67,7 @@ export interface DashboardConfig {
     description?: {
         preview_image?: string;
         icon?: string;
-        text?: string | TranslateResult;
+        text?: string;
     }
 }
 
@@ -120,7 +118,7 @@ export interface DashboardVariableSchemaProperty {
     variable_type: VariableType;
     use: boolean;
     selection_type: VariableSelectionType;
-    description?: string | TranslateResult;
+    description?: string;
     disabled?: boolean;
     options?: VariableOptions;
 }

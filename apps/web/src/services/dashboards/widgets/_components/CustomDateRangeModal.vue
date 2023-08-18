@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
@@ -14,8 +13,8 @@ import type { Period } from '@/services/cost-explorer/type';
 import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
 
 interface CustomRangeModalSettings {
-    helpTextFrom?: TranslateResult | undefined;
-    helpTextTo?: TranslateResult | undefined;
+    helpTextFrom?: string | undefined;
+    helpTextTo?: string | undefined;
     dateType?: DATA_TYPE;
 }
 

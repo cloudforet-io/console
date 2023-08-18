@@ -3,15 +3,14 @@ import { PI } from '@spaceone/design-system';
 import {
     computed, reactive,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import {
     convertCloudServiceConfigToReferenceData,
@@ -19,7 +18,7 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>;
+type Item = Record<string, {label: string; favorites: FavoriteItem[]}>;
 
 const LIMIT_COUNT = 5;
 

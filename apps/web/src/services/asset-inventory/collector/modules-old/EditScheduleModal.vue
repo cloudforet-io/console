@@ -13,7 +13,6 @@ import {
 import {
     reactive, computed, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -30,8 +29,8 @@ interface ScheduleHours {
 }
 
 interface ScheduleType {
-    hourly: string | TranslateResult;
-    interval?: string | TranslateResult;
+    hourly: string;
+    interval?: string;
 }
 
 const INTERVAL_MAX_SECONDS = 3600;

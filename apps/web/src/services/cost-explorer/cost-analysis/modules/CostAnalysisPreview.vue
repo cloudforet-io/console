@@ -2,7 +2,6 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/type';
@@ -21,7 +20,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const topContainerRef = ref<HTMLElement|null>(null);
 const state = reactive({
-    defaultTitle: computed<TranslateResult>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
+    defaultTitle: computed<string>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
     chartElements: [] as HTMLElement[],
     tableItems: [] as Item[],

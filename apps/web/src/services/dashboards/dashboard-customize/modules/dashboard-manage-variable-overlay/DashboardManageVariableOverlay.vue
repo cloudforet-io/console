@@ -6,7 +6,6 @@ import { cloneDeep } from 'lodash';
 import {
     computed, reactive, toRefs,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
@@ -39,7 +38,7 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     contentType: 'LIST' as OverlayStatus,
-    titleSet: computed<Record<OverlayStatus, TranslateResult>>(() => ({
+    titleSet: computed<Record<OverlayStatus, string>>(() => ({
         LIST: t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE'),
         ADD: t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         CLONE: t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
@@ -55,11 +54,11 @@ const state = reactive({
 
 const deleteModalState = reactive({
     type: 'DELETE' as 'DELETE' | 'ESCAPE' | 'CANCEL',
-    headerTitle: computed<TranslateResult>(() => {
+    headerTitle: computed<string>(() => {
         if (deleteModalState.type === 'DELETE') return t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
         return t('DASHBOARDS.CUSTOMIZE.VARIABLES.CHECK_MODAL_DELETE_TITLE');
     }),
-    contents: computed<TranslateResult>(() => {
+    contents: computed<string>(() => {
         if (deleteModalState.type === 'DELETE') return '';
         return t('DASHBOARDS.CUSTOMIZE.VARIABLES.CHECK_MODAL_CONTENTS');
     }),

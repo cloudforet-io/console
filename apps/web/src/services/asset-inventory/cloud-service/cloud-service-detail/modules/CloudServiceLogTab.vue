@@ -15,7 +15,6 @@ import { debounce, isEmpty } from 'lodash';
 import {
     reactive, computed, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -32,7 +31,7 @@ interface Props {
 type PeriodType = 'last1day' | 'last3days' | 'last1week' | 'last2weeks' | 'last1month' | 'last3months' | 'last1year';
 interface PeriodItem {
     name: PeriodType;
-    label: TranslateResult;
+    label: string;
     start: Dayjs;
     end: Dayjs;
 }

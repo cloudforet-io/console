@@ -12,7 +12,6 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { ComputedRef } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -103,7 +102,7 @@ const state = reactive({
         const targetDataList = state.data.realtimeData.filter((d) => d.date === state.dateRange.end && d.key === 'fail_finding_count') ?? [];
         return sum(targetDataList.map((d) => d.value));
     }),
-    totalFailureComparingMessage: computed<TranslateResult|undefined>(() => {
+    totalFailureComparingMessage: computed<string|undefined>(() => {
         if (state.totalFailureCount === undefined
             || state.prevTotalFailureCount === undefined
             || state.totalFailureCount === state.prevTotalFailureCount
@@ -124,7 +123,7 @@ const state = reactive({
         const targetDataList = state.data.realtimeData.filter((d) => d.date === state.dateRange.end) ?? [];
         return getFailureRate(targetDataList);
     }),
-    failureRateComparingMessage: computed<TranslateResult|undefined>(() => {
+    failureRateComparingMessage: computed<string|undefined>(() => {
         if (state.failureRate === undefined
             || state.prevFailureRate === undefined
             || state.failureRate === state.prevFailureRate

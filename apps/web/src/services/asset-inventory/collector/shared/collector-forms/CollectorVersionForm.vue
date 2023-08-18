@@ -5,7 +5,6 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
@@ -27,7 +26,7 @@ const state = reactive({
         if (index === 0) return { type: 'item', label: `${value} (latest)`, name: value };
         return { type: 'item', label: value, name: value };
     })),
-    versionInvalidText: computed<TranslateResult>(() => {
+    versionInvalidText: computed<string>(() => {
         const value = collectorFormState.version;
         if (!value?.length) {
             return t('INVENTORY.COLLECTOR.CREATE.VERSION_INVALID_REQUIRED');

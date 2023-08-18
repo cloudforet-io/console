@@ -6,7 +6,6 @@ import { sum } from 'lodash';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -27,7 +26,7 @@ import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud
 
 interface FilterItem {
     name: string;
-    title: TranslateResult;
+    title: string;
 }
 
 interface CategoryMenuItem { name: string; label: string }
@@ -58,7 +57,7 @@ const storeState = reactive({
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    filterLabels: computed<Record<CloudServiceFilterKey, TranslateResult>>(() => ({
+    filterLabels: computed<Record<CloudServiceFilterKey, string>>(() => ({
         [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY'),
         [CLOUD_SERVICE_FILTER_KEY.REGION]: t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION'),
     })),

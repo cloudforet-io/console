@@ -3,7 +3,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -59,7 +58,7 @@ const {
 });
 const validationState = reactive({
     isCurrentPasswordValid: undefined as undefined | boolean,
-    currentPasswordInvalidText: '' as TranslateResult,
+    currentPasswordInvalidText: '' as string,
 });
 
 /*  Components */

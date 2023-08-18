@@ -15,10 +15,9 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import {
     reactive, computed, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
+import type { Component } from 'vue/types/umd';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { Component } from 'vue/types/umd';
 import { useStore } from 'vuex';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -139,8 +138,8 @@ const state = reactive({
 const checkModalState = reactive({
     visible: false,
     mode: '',
-    title: '' as TranslateResult,
-    subTitle: '' as TranslateResult,
+    title: '' as string,
+    subTitle: '' as string,
     themeColor: undefined as string | undefined,
     tableCheckFields: [
         { name: 'name', label: 'Name' },

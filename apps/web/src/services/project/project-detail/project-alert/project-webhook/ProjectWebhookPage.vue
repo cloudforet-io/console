@@ -21,7 +21,6 @@ import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/que
 import {
     reactive, computed, onActivated,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
@@ -134,8 +133,8 @@ const formState = reactive({
 });
 const checkModalState = reactive({
     mode: '' as WebhookState,
-    title: '' as TranslateResult,
-    subTitle: '' as TranslateResult,
+    title: '' as string,
+    subTitle: '' as string,
     themeColor: undefined as string | undefined,
     visible: false,
 });

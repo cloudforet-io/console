@@ -8,7 +8,6 @@ import dayjs from 'dayjs';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -49,7 +48,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    defaultTitle: computed<TranslateResult>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
+    defaultTitle: computed<string>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     costQueryMenuItems: computed<MenuItem[]>(() => ([
         { name: 'header', label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
         { name: undefined, label: 'Cost Analysis', type: 'item' },
@@ -75,7 +74,7 @@ const state = reactive({
 
 const saveQueryFormState = reactive({
     visible: false,
-    title: '' as string | TranslateResult,
+    title: '' as string,
     selectedQuery: {},
     requestType: REQUEST_TYPE.SAVE as RequestType,
 });

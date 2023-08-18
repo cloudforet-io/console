@@ -6,7 +6,6 @@ import {
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,7 +21,7 @@ import {
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 
 interface Props {
-    title?: TranslateResult;
+    title?: string;
     marginOnSpecific?: boolean;
     resetOnCollectorIdChange?: boolean;
 }

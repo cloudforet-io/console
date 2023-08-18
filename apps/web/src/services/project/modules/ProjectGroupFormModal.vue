@@ -6,7 +6,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
     computed, reactive, watch,
 } from 'vue';
-import VueI18n, { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -14,8 +14,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useProjectPageStore } from '@/services/project/store/project-page-store';
-
-import TranslateResult = VueI18n.TranslateResult;
 
 
 const store = useStore();
@@ -31,7 +29,7 @@ const state = reactive({
     projectGroupNames: [] as string[],
     projectGroupName: undefined as undefined | string,
     projectGroupNameInvalidText: computed(() => {
-        let invalidText = '' as TranslateResult;
+        let invalidText = '' as string;
         if (typeof state.projectGroupName === 'string') {
             if (state.projectGroupName.length === 0) {
                 invalidText = t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');

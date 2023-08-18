@@ -3,7 +3,6 @@ import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
 } from '@cloudforet/core-lib/space-connector/error';
-import type { TranslateResult } from 'vue-i18n';
 
 import { SpaceRouter } from '@/router';
 
@@ -19,8 +18,8 @@ interface GlobalErrorHandlers {
 }
 
 interface ErrorInfo {
-    title: TranslateResult;
-    description?: TranslateResult;
+    title: string;
+    description?: string;
 }
 
 export default class ErrorHandler {
@@ -57,7 +56,7 @@ export default class ErrorHandler {
         }
     }
 
-    static handleRequestError(error: unknown, errorMessage: TranslateResult) {
+    static handleRequestError(error: unknown, errorMessage: string) {
         if (!isInstanceOfAuthorizationError(error)) {
             if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
             else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);

@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import { i18n } from '@/translations';
@@ -7,7 +6,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 interface ValidationInfo {
     isValid: boolean;
-    invalidText: string | TranslateResult;
+    invalidText: string;
 }
 
 export const getPasswordValidationInfo = (password): ValidationInfo => {

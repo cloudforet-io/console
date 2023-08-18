@@ -9,7 +9,6 @@ import {
     computed, nextTick,
     reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -40,7 +39,7 @@ const UNIT = Object.freeze({
 type Unit = typeof UNIT[keyof typeof UNIT];
 
 interface Card {
-    title: TranslateResult;
+    title: string;
     data: number;
     unit: Unit;
 }

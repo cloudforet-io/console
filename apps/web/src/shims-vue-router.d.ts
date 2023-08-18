@@ -3,7 +3,6 @@ import type { _RouteLocationBase } from 'vue-router';
 import type { AccessInfo } from '@/lib/access-control/config';
 
 declare module 'vue-router' {
-    import type { TranslateResult } from 'vue-i18n';
     import type {
         RouteRecordMultipleViews as OriginRouteRecordMultipleViews,
         RouteRecordSingleView as OriginRouteRecordSingleView,
@@ -23,7 +22,7 @@ declare module 'vue-router' {
     import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
     interface RouteLabelFormatter {
-        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): TranslateResult|TranslateResult[];
+        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string|string[];
     }
     interface RouteTranslationIdFormatter {
         (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string|string[];

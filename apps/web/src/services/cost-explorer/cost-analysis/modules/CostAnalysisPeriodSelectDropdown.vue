@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -22,7 +21,7 @@ import CustomDateRangeModal from '@/services/dashboards/widgets/_components/Cust
 const today = dayjs.utc();
 interface PeriodItem {
     name: string;
-    label: TranslateResult;
+    label: string;
     start: Dayjs;
     end: Dayjs;
     enabled: Granularity[];

@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 
 export const FAVORITE_TYPE = {
     MENU: 'MENU',
@@ -16,10 +15,10 @@ export interface FavoriteConfig {
 
 export interface FavoriteItem extends FavoriteConfig {
     name?: string;
-    label?: TranslateResult;
+    label?: string;
     icon?: string;
     provider?: string;
-    parents?: { name?: string; label?: TranslateResult }[];
+    parents?: { name?: string; label?: string }[];
 }
 
 export interface FavoriteHasLoaded {

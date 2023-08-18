@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import {
     reactive, computed,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 
@@ -46,7 +45,7 @@ const { t } = useI18n();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    dateLabel: computed<TranslateResult|undefined>(() => {
+    dateLabel: computed<string|undefined>(() => {
         const start = props.dateRange?.start;
         const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
         if (endDayjs) {

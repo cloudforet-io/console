@@ -8,7 +8,6 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import {
     computed, reactive, useAttrs, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -28,7 +27,7 @@ import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 type DataTableTranslationField = DataTableField | {
-    label?: TranslateResult | string;
+    label?: string;
 };
 
 interface Props {

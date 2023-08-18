@@ -14,7 +14,6 @@ import dayjs from 'dayjs';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -34,7 +33,7 @@ import type { Period } from '@/services/cost-explorer/type';
 
 
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
-    label: string | TranslateResult;
+    label: string;
 };
 
 type Sort = BudgetUsageAnalyzeRequestParam['sort'];

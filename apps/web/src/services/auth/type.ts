@@ -1,5 +1,4 @@
 import type { ComputedRef } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 export interface PasswordFormState {
     userIdInput: ComputedRef<string>,
@@ -9,7 +8,7 @@ export interface PasswordFormState {
 
 export interface PasswordFormValidation {
     isIdValid?: boolean,
-    idInvalidText: TranslateResult,
+    idInvalidText: string,
 }
 
 export interface PasswordFormExpose {

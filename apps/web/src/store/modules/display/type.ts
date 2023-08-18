@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
 import type { SidebarType } from '@/store/modules/display/config';
@@ -7,7 +6,7 @@ import type { Menu } from '@/lib/menu/config';
 
 export interface DisplayMenu extends Menu {
     show?: boolean;
-    label: TranslateResult;
+    label: string;
     icon?: string;
     isNew?: boolean;
     isBeta?: boolean;

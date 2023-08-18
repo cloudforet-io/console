@@ -1,10 +1,9 @@
-import type { TranslateResult } from 'vue-i18n';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
 export interface SuggestionMenu {
     id: string;
-    label: TranslateResult;
+    label: string;
     parents?: SuggestionMenu[];
     icon?: string;
 }

@@ -5,7 +5,6 @@ import { useDocumentVisibility } from '@vueuse/core';
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import type { RefreshIntervalOption } from '@/services/dashboards/config';
@@ -32,7 +31,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
-    intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
+    intervalOptionList: computed<{label: string; value: RefreshIntervalOption}[]>(() => [
         { label: t('DASHBOARDS.CUSTOMIZE.REFRESH_OFF'), value: 'off' },
         { label: t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_15S'), value: '15s' },
         { label: t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_30S'), value: '30s' },

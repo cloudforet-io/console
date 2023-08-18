@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
@@ -71,7 +70,7 @@ export interface WidgetTableData {
 }
 
 export interface WidgetFrameProps {
-    title: TranslateResult;
+    title: string;
     size: WidgetSize;
     width?: number;
     widgetLink?: string;

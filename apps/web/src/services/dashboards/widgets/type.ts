@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 
 export interface CostAnalyzeDataModel {
     more?: boolean;
@@ -54,7 +53,7 @@ export interface XYChartData {
 
 export interface Legend {
     name: string;
-    label?: TranslateResult;
+    label?: string;
     color?: string;
     disabled?: boolean;
 }

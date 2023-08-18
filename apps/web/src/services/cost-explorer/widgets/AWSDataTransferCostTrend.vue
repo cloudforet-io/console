@@ -14,7 +14,6 @@ import { range } from 'lodash';
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { CURRENCY } from '@/store/modules/settings/config';
@@ -55,7 +54,7 @@ interface Data extends CostAnalyzeModel {
     usage_type: 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc';
 }
 interface Field extends DataTableFieldType {
-     tooltipText?: TranslateResult;
+     tooltipText?: string;
 }
 interface TableData extends TrafficWidgetTableData {
     month?: string;

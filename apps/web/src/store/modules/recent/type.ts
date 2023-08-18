@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 
 export const RECENT_TYPE = Object.freeze({
     MENU: 'MENU',
@@ -17,10 +16,10 @@ export interface RecentConfig {
 
 export interface RecentItem extends RecentConfig {
     name?: string;
-    label?: TranslateResult | string;
+    label?: string;
     icon?: string;
     provider?: string;
-    parents?: { name?: string; label?: TranslateResult }[];
+    parents?: { name?: string; label?: string }[];
 }
 
 export interface RecentState {

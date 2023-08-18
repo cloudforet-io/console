@@ -21,7 +21,6 @@ import { isEmpty, get } from 'lodash';
 import {
     reactive, computed, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -143,8 +142,8 @@ const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSea
 const checkTableModalState = reactive({
     visible: false,
     item: null,
-    title: '' as TranslateResult,
-    subTitle: '' as TranslateResult,
+    title: '' as string,
+    subTitle: '' as string,
     themeColor: undefined as string | undefined,
     api: null as any,
     params: null as any,
