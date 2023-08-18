@@ -156,7 +156,19 @@ const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[])
         state.endDates = selectedDates;
     }
 };
+const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
+    if (!selectedDates.length) return;
 
+    const originDates = type === 'start' ? state.startDates : state.endDates;
+    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+
+    if (type === 'start') {
+        state.startDates = selectedDates;
+        state.endDates = [];
+    } else {
+        state.endDates = selectedDates;
+    }
+};
 watch(() => props.visible, (visible) => {
     if (visible) {
         if (props.selectedDateRange?.start) {
