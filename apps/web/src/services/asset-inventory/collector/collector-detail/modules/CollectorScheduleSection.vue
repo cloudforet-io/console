@@ -1,7 +1,8 @@
 <template>
     <p-pane-layout>
         <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
-                        :edit-mode="state.isEditMode || !collectorFormState.schedulePower"
+                        :edit-mode="state.isEditMode"
+                        :hide-edit-button="!collectorFormState.schedulePower"
                         :total-count="state.totalCount"
                         @click-edit="handleClickEdit"
         />
