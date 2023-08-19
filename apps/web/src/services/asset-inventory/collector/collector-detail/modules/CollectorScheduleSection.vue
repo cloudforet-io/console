@@ -1,26 +1,16 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
+        <section-header :title="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
+                        :edit-mode="state.isEditMode"
+                        :hide-edit-button="!collectorFormState.schedulePower"
+                        :total-count="state.totalCount"
+                        @click-edit="handleClickEdit"
+        />
 
         <div class="schedule-wrapper">
-            <collector-schedule-form :enable-hours-edit="state.isEditMode"
-                                     :disabled="state.updateLoading"
+            <collector-schedule-form :hours-readonly="!state.isEditMode"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
-                                     @update:enable-hours-edit="handleUpdateEditMode"
             />
 
             <div class="button-group">
@@ -49,15 +39,16 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PButton, PPaneLayout,
+    PButton, PPaneLayout,
 } from '@spaceone/design-system';
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import SectionHeader from '@/services/asset-inventory/collector/collector-detail/modules/SectionHeader.vue';
 import type { CollectorModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
 import {
     useCollectorFormStore,
@@ -91,10 +82,6 @@ const handleClickEdit = () => {
     state.isEditMode = true;
 };
 
-const handleUpdateEditMode = (value: boolean) => {
-    state.isEditMode = value;
-};
-
 const handleClickCancel = () => {
     state.isEditMode = false;
     collectorFormStore.resetSchedule(true);
@@ -114,6 +101,12 @@ const handleClickSave = async () => {
         state.updateLoading = false;
     }
 };
+
+watch(() => collectorFormState.schedulePower, (schedulePower) => {
+    if (!schedulePower) {
+        state.isEditMode = false;
+    }
+});
 
 </script>
 

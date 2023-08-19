@@ -14,6 +14,7 @@
         <p-i v-if="icon"
              class="left-icon"
              :name="icon"
+             :color="iconColor"
              width="1rem"
              height="1rem"
         />
@@ -80,6 +81,7 @@ interface Props {
     highlightTerm: string;
     readonly: boolean;
     icon?: string;
+    iconColor?: string;
     imageUrl?: string;
 }
 
@@ -95,6 +97,7 @@ const props = withDefaults(defineProps<Props>(), {
     highlightTerm: '',
     readonly: false,
     icon: undefined,
+    iconColor: undefined,
     imageUrl: undefined,
 });
 const attrs = useAttrs();

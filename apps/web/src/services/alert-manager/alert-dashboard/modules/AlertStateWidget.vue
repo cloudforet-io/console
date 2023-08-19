@@ -40,6 +40,7 @@
                                          :value="status.name"
                                          :icon="status.icon"
                                          :disable-check-icon="true"
+                                         :icon-color="status.name === ALERT_URGENCY.HIGH ? red[400] : undefined"
                                          @change="listAlerts"
                         >
                             {{ status.label }}
@@ -93,7 +94,7 @@
                     <template #no-data>
                         <div>
                             <p-i name="ic_error-filled"
-                                 color="inherit transparent"
+                                 :color="red[400]"
                             />
                             <p class="text">
                                 {{ t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
@@ -126,6 +127,8 @@ import { useStore } from 'vuex';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';

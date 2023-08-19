@@ -6,7 +6,7 @@
         <p-button ref="targetRef"
                   icon-left="ic_plus_bold"
                   style-type="highlight"
-                  :disabled="disabled"
+                  :disabled="props.disabled"
                   @click="handleClickButton"
         >
             {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}

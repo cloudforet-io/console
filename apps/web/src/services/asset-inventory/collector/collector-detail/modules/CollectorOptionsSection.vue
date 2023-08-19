@@ -1,19 +1,10 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode && !state.isCollectorOptionsSchemaEmpty"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
+        <section-header :title="t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
+                        :edit-mode="state.isEditMode"
+                        :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
+                        @click-edit="handleClickEdit"
+        />
         <p-definition-table v-if="!state.isEditMode"
                             :fields="state.fields"
                             :loading="state.loading"
@@ -69,7 +60,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PButton, PPaneLayout, PDefinitionTable, PEmpty,
+    PButton, PPaneLayout, PDefinitionTable, PEmpty,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
@@ -80,6 +71,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import SectionHeader from '@/services/asset-inventory/collector/collector-detail/modules/SectionHeader.vue';
 import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorOptionsForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorOptionsForm.vue';

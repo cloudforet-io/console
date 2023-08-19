@@ -11,6 +11,7 @@
              @keyup.enter.capture.stop="toggleMenu"
              @click="toggleMenu"
         >
+            <slot name="input-left-area" />
             <div class="selection-display-wrapper">
                 <span v-if="displayValueOnDropdownButton === undefined"
                       class="placeholder"
@@ -85,6 +86,9 @@
                         @update:selected="handleUpdateSelected"
                         @update:search-text="handleUpdateSearchText"
         >
+            <template #header>
+                <slot name="context-menu-header" />
+            </template>
             <template v-for="(_, slot) of menuSlots"
                       #[slot]="scope"
             >
@@ -310,7 +314,7 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
     @apply w-full;
     position: relative;
     > .dropdown-button {
-        @apply bg-white border rounded-md border-gray-300;
+        @apply bg-white border rounded-md border-gray-300 items-center;
         display: flex;
         width: 100%;
         min-height: 2rem;

@@ -1,5 +1,7 @@
 <template>
-    <div class="collector-page-1">
+    <div ref="containerRef"
+         class="create-collector-step-1"
+    >
         <p-search v-model="state.searchValue"
                   @search="handleSearch"
         />
@@ -14,11 +16,11 @@
                                :loading="state.loading"
                                :loader-backdrop-color="BACKGROUND_COLOR"
                 >
-                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
+                    <div ref="pluginListContainerRef"
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
-                                      :key="item.name"
+                                      :key="getPluginKey(item)"
                                       class="plugin-card-item"
                         >
                             <template #content>
@@ -71,13 +73,14 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
-import { vInfiniteScroll } from '@vueuse/components';
 import {
-    onMounted, reactive, watch,
+    onMounted, reactive, watch, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useLastItemObserver } from '@/common/composables/last-item-observer';
+
 
 import { gray } from '@/styles/colors';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -106,9 +109,10 @@ const state = reactive({
 
 
 const pluginApiQuery = new ApiQueryHelper();
+const getPluginKey = (item) => `${item.name}-${item.repository_info.repository_id}`;
 const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
-    state.loading = true;
     try {
+        state.loading = true;
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
             .setFilters([{ v: state.searchValue }]);
 
@@ -131,16 +135,22 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
 
 const loadMorePlugin = async () => {
     if (state.totalCount <= state.pluginList.length) {
+        disconnectObserver();
         return;
     }
+
+    disconnectObserver();
     state.currentPage += 1;
     const additionalPlugin = await getPlugins();
     state.pluginList = state.pluginList.concat(additionalPlugin);
+    connectObserver();
 };
 
 const handleSearch = async (value) => {
+    disconnectObserver();
     state.searchValue = value;
     state.pluginList = await getPlugins();
+    connectObserver();
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
     emit('update:current-step', 2);
@@ -150,10 +160,19 @@ const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
 };
 
+const pluginListContainerRef = ref<HTMLElement|null>(null);
+const { connectObserver, disconnectObserver } = useLastItemObserver({
+    containerRef: pluginListContainerRef,
+    onAppeared: loadMorePlugin,
+});
+
 watch([() => collectorFormState.provider, () => state.selectedRepository], async () => {
+    disconnectObserver();
     state.currentPage = 1;
     state.pluginList = await getPlugins();
+    connectObserver();
 }, { immediate: true });
+
 
 onMounted(() => {
     collectorFormStore.$reset();
@@ -161,17 +180,17 @@ onMounted(() => {
 </script>
 
 <style lang="postcss" scoped>
-.collector-page-1 {
+.create-collector-step-1 {
     @apply flex flex-col;
     min-width: 59.5625rem;
-    height: calc(100vh - 11.75rem);
     width: 100%;
+    overflow: visible;
     .contents-container {
         @apply flex justify-between;
         margin-top: 1.5rem;
 
         .contents-title {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .right-area {
@@ -180,7 +199,6 @@ onMounted(() => {
             .right-area-contents {
                 .plugin-card-list {
                     @apply flex flex-col gap-2;
-                    height: calc(100vh - 17rem);
                     overflow-y: auto;
                     :deep(.p-board-item) {
                         .content-area .content {
@@ -219,15 +237,13 @@ onMounted(() => {
 }
 
 @screen tablet {
-    .collector-page-1 {
+    .create-collector-step-1 {
         min-width: 43rem;
-        height: calc(100vh - 15.375rem);
         .contents-container {
             @apply flex-col;
             .right-area {
                 .right-area-contents {
                     .plugin-card-list {
-                        height: calc(100vh - 20.625rem);
                         .plugin-card-item {
                             .plugin-card-content {
                                 @apply flex items-center;
@@ -249,7 +265,7 @@ onMounted(() => {
 }
 
 @screen mobile {
-    .collector-page-1 {
+    .create-collector-step-1 {
         min-width: unset;
         max-width: 100vw;
     }

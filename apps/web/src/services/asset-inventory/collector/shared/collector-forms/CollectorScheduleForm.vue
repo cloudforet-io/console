@@ -9,53 +9,28 @@
                        class="schedule-desc"
         />
         <p-toggle-button :value="collectorFormState.schedulePower"
-                         :disabled="props.disabled"
+                         show-state-text
                          @change-toggle="handleChangeToggle"
         />
-        <div v-if="!props.enableHoursEdit && collectorFormState.schedulePower"
-             class="collect-data-desc"
-        >
-            <i18n-t v-if="state.timezoneAppliedHours.length > 0"
-                    keypath="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
-                    tag="p"
-            >
-                <template #times>
-                    <span class="times">{{ state.timezoneAppliedHoursDisplayText }}</span>
-                </template>
-            </i18n-t>
-            <template v-else>
-                {{ t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_NOT_SELECTED_YET') }}
-                <p-button style-type="tertiary"
-                          size="sm"
-                          @click="handleClickSelect"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.SELECT') }}
-                </p-button>
-            </template>
-        </div>
-        <p-field-group v-if="props.enableHoursEdit"
+        <p-field-group v-if="collectorFormState.schedulePower"
                        class="hourly-schedule-field-group"
+                       :required="props.hoursReadonly"
                        :label="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
                        :help-text="t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
-            <div class="hourly-schedule-wrapper">
+            <div class="hourly-schedule-wrapper"
+                 :class="{'is-read-mode': props.hoursReadonly}"
+            >
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
                       class="time-block"
                       :class="{
-                          active: !!state.timezoneAppliedHours.includes(hour),
-                          disabled: props.disabled
+                          active: !!state.timezoneAppliedHours.includes(hour)
                       }"
                       @click="handleClickHour(hour)"
                 >
                     {{ hour }}
                 </span>
-                <p-button style-type="tertiary"
-                          :disabled="props.disabled"
-                          @click="handleClickAllHours"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
-                </p-button>
             </div>
         </p-field-group>
     </p-data-loader>
@@ -64,12 +39,12 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PButton, PFieldTitle, PToggleButton, PDataLoader,
+    PFieldGroup, PFieldTitle, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range, size } from 'lodash';
 import {
-    defineProps, defineEmits, reactive, computed, watch,
+    defineProps, reactive, computed, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -83,15 +58,12 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 
 const props = defineProps<{
-    enableHoursEdit?: boolean;
+    hoursReadonly?: boolean;
     disableLoading?: boolean;
-    disabled?: boolean;
     resetOnCollectorIdChange?: boolean;
     callApiOnPowerChange?: boolean;
 }>();
 
-const emits = defineEmits<{(event: 'update:enableHoursEdit', value: boolean): void;
-}>();
 const store = useStore();
 const { t } = useI18n();
 
@@ -152,12 +124,8 @@ const handleChangeToggle = async (value: boolean) => {
     }
 };
 
-const handleClickSelect = () => {
-    emits('update:enableHoursEdit', true);
-};
-
 const handleClickHour = (hour: number) => {
-    if (props.disabled) return;
+    if (props.hoursReadonly) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
@@ -174,18 +142,8 @@ const handleClickHour = (hour: number) => {
 
     updateSelectedHours();
 };
-const handleClickAllHours = () => {
-    if (state.isAllHoursSelected) selectedUtcHoursSet.clear();
-    else {
-        hoursMatrix.forEach((hour) => {
-            selectedUtcHoursSet.add(hour);
-        });
-    }
 
-    updateSelectedHours();
-};
-
-watch(() => collectorFormStore.collectorId, (collectorId) => {
+watch([() => collectorFormStore.collectorId, () => props.hoursReadonly], ([collectorId]) => {
     if (props.resetOnCollectorIdChange && !collectorId) return;
     collectorFormStore.resetSchedule();
     selectedUtcHoursSet.clear();
@@ -224,22 +182,22 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
         grid-template-columns: repeat(4, 2rem);
     }
 
+    &.is-read-mode {
+        gap: 0.25rem;
+        .time-block {
+            @apply bg-gray-100 text-gray-100 border-none cursor-default;
+            &.active {
+                @apply bg-blue-200 text-blue-600;
+            }
+        }
+    }
+
     .time-block {
-        @apply bg-white border border-gray-300 rounded-xs;
-        display: inline-block;
+        @apply flex items-center justify-center bg-white border border-gray-300 rounded-xs box-border cursor-pointer;
         height: 2rem;
-        line-height: 2rem;
-        text-align: center;
         font-size: 0.875rem;
-        cursor: pointer;
-        &:hover:not(.disabled) {
-            @apply bg-secondary2 border-secondary text-secondary;
-        }
         &.active {
-            @apply bg-safe text-white;
-        }
-        &.disabled {
-            cursor: not-allowed;
+            @apply bg-blue-600 text-white;
         }
     }
 }

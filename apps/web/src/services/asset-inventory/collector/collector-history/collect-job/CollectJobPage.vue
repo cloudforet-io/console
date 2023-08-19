@@ -1,4 +1,6 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHorizontalLayout, PHeading,
 } from '@spaceone/design-system';
@@ -6,51 +8,82 @@ import {
     reactive, onActivated,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+
+
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
 import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
 import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
 import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
+import type { JobModel } from '@/services/asset-inventory/collector/model';
 
 interface Props {
     jobId: string;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    jobId: '',
+});
+
 const router = useRouter();
+const store = useStore();
 
 const state = reactive({
+    job: {} as JobModel,
     selectedItem: null as null|JobTaskData,
 });
 
-const handleSelect = (item: JobTaskData) => {
-    state.selectedItem = item;
+/* API */
+const apiQuery = new ApiQueryHelper();
+const getJob = async () => {
+    try {
+        apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
+        const { results } = await SpaceConnector.client.inventory.job.list({
+            query: apiQuery.data,
+        });
+        state.job = results[0] || {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
+/* Init */
 onActivated(() => {
     state.selectedItem = null;
+    getJob();
 });
 
+// reference store
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/collector/load'),
+        store.dispatch('reference/plugin/load'),
+    ]);
+})();
 </script>
 
 <template>
     <div>
-        <p-heading :title="jobId"
+        <p-heading :title="props.jobId"
                    show-back-button
                    @click-back-button="router.go(-1)"
         />
         <div class="top-wrapper">
-            <job-status-chart :job-id="jobId" />
-            <job-basic-information :job-id="jobId" />
+            <job-status-chart :job="state.job" />
+            <job-basic-information :job="state.job" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper"
                              :min-height="350"
         >
             <template #container="{ height }">
                 <job-table :style="{height: `${height}px`}"
-                           :job-id="jobId"
-                           @select="handleSelect"
+                           :job-id="props.jobId"
+                           @select="state.selectedItem = $event"
                 />
             </template>
         </p-horizontal-layout>

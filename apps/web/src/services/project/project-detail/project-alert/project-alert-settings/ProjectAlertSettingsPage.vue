@@ -14,6 +14,7 @@
             <div class="content-wrapper">
                 <p-i v-if="state.notificationUrgency"
                      :name="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
+                     :color="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? undefined : red[400]"
                 />
                 <span class="text">{{ notificationOptionFormatter(state.notificationUrgency) }}</span>
             </div>
@@ -119,6 +120,8 @@ import { useRouter } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
+import { red } from '@/styles/colors';
 
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';

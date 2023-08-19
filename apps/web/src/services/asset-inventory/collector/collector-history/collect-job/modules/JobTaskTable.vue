@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
@@ -7,7 +7,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PAnchor, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { capitalize } from 'lodash';
 import {
     computed, onActivated, onDeactivated, reactive, watch,
 } from 'vue';
@@ -21,77 +20,58 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { green, primaryDark, red } from '@/styles/colors';
-
-import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-
-
-const COMPLETED_ICON_COLOR = green[500];
-const FAILED_ICON_COLOR = red[400];
-const PENDING_ICON_COLOR = primaryDark;
-
-const statusTextFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.progress) return 'In-Progress';
-    if (status === JOB_TASK_STATUS.success) return 'Succeeded';
-    return capitalize(status);
-};
-const statusTextColorFormatter = (status) => {
-    if ([JOB_TASK_STATUS.failure, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled].includes(status)) return FAILED_ICON_COLOR;
-    return undefined;
-};
-const statusIconFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.success) return 'ic_check';
-    if (status === JOB_TASK_STATUS.pending) return 'ic_clock';
-    if (status === JOB_TASK_STATUS.progress) return 'ic_gear-filled';
-    return 'ic_error-filled';
-};
-const statusIconColorFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.success) return COMPLETED_ICON_COLOR;
-    if (status === JOB_TASK_STATUS.pending) return PENDING_ICON_COLOR;
-    if (status === JOB_TASK_STATUS.progress) return undefined;
-    return FAILED_ICON_COLOR;
-};
+import {
+    statusIconColorFormatter,
+    statusIconFormatter,
+    statusTextColorFormatter,
+    statusTextFormatter,
+} from '@/services/asset-inventory/collector/collector-history/lib/formatter-helper';
+import { JOB_SELECTED_STATUS, JOB_TASK_STATE } from '@/services/asset-inventory/collector/collector-history/type';
 
 interface Props {
     jobId: string;
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'select', value: any): void}>();
+const props = withDefaults(defineProps<Props>(), {
+    jobId: '',
+});
+
+const fields = [
+    { label: 'Service Account', name: 'service_account_id', sortable: false },
+    { label: 'Project', name: 'project_id', sortable: false },
+    { label: 'Status', name: 'status' },
+    { label: 'Errors', name: 'errors' },
+    { label: 'Created Count', name: 'created_count' },
+    { label: 'Updated Count', name: 'updated_count' },
+    { label: 'Failure Count', name: 'failure_count' },
+    { label: 'Disconnected Count', name: 'disconnected_count' },
+    { label: 'Deleted Count', name: 'deleted_count' },
+    { label: 'Started', name: 'started_at' },
+    { label: 'Duration', name: 'duration', sortable: false },
+];
+
+const statusList = computed(() => [
+    { name: JOB_SELECTED_STATUS.ALL, label: t('INVENTORY.COLLECTOR.HISTORY.ALL') },
+    { name: JOB_SELECTED_STATUS.PROGRESS, label: t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS') },
+    { name: JOB_SELECTED_STATUS.SUCCESS, label: t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') },
+    { name: JOB_SELECTED_STATUS.FAILURE, label: t('INVENTORY.COLLECTOR.HISTORY.FAILURE') },
+    { name: JOB_SELECTED_STATUS.PENDING, label: t('INVENTORY.COLLECTOR.HISTORY.PENDING') },
+]);
 const store = useStore();
 const { t } = useI18n();
+
+const emit = defineEmits<{(e: 'select', array): void}>();
+
+const storeState = reactive({
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+});
 
 const state = reactive({
     loading: false,
     timezone: computed(() => store.state.user.timezone),
     items: [],
-    fields: [
-        { label: 'Service Account', name: 'service_account_id', sortable: false },
-        { label: 'Project', name: 'project_id', sortable: false },
-        { label: 'Status', name: 'status' },
-        { label: 'Errors', name: 'errors' },
-        { label: 'Created Count', name: 'created_count' },
-        { label: 'Updated Count', name: 'updated_count' },
-        { label: 'Disconnected Count', name: 'disconnected_count' },
-        { label: 'Deleted Count', name: 'deleted_count' },
-        { label: 'Started', name: 'started_at' },
-        { label: 'Duration', name: 'duration', sortable: false },
-    ],
-    statusList: computed(() => ([
-        {
-            name: 'all', label: t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ALL'),
-        },
-        {
-            name: 'inProgress', label: t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS'),
-        },
-        {
-            name: 'succeeded', label: t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED'),
-        },
-        {
-            name: 'failed', label: t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED'),
-        },
-    ])),
-    selectedStatus: 'all',
+    selectedStatus: 'ALL',
     //
     selectIndex: [],
     pageLimit: 15,
@@ -100,9 +80,6 @@ const state = reactive({
     sortDesc: true,
     totalCount: 0,
     searchTags: [],
-    // references
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
 });
 
 const querySearchHandlers = reactive({
@@ -112,12 +89,12 @@ const querySearchHandlers = reactive({
             {
                 name: 'service_account_id',
                 label: 'Service Account',
-                valueSet: state.serviceAccounts,
+                valueSet: storeState.serviceAccounts,
             },
             {
                 name: 'project_id',
                 label: 'Project',
-                valueSet: state.projects,
+                valueSet: storeState.projects,
             },
             {
                 name: 'status',
@@ -128,34 +105,52 @@ const querySearchHandlers = reactive({
     valueHandlerMap: {
         service_account_id: makeReferenceValueHandler('identity.ServiceAccount'),
         project_id: makeReferenceValueHandler('identity.Project'),
-        status: makeEnumValueHandler(JOB_TASK_STATUS),
+        status: makeEnumValueHandler(JOB_SELECTED_STATUS),
     },
 });
 
-/* api */
-const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
+const apiQueryHelper = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
 const getQuery = () => {
-    apiQuery.setSort(state.sortBy, state.sortDesc)
-        .setPage(
-            state.pageStart,
-            state.pageLimit,
-        )
+    apiQueryHelper.setSort(state.sortBy, state.sortDesc)
+        .setPage(state.pageStart, state.pageLimit)
         .setFiltersAsQueryTag(state.searchTags);
 
-    let statusValues: JOB_TASK_STATUS[] = [];
-    if (state.selectedStatus === 'inProgress') {
-        statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
-    } else if (state.selectedStatus === 'succeeded') {
-        statusValues = [JOB_TASK_STATUS.success];
-    } else if (state.selectedStatus === 'failed') {
-        statusValues = [JOB_TASK_STATUS.failure, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled];
-    }
-    if (statusValues.length > 0) {
-        apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
+    let statusValues: string[] = [];
+    if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
+        statusValues = [JOB_TASK_STATE.IN_PROGRESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
+        statusValues = [JOB_TASK_STATE.SUCCESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
+        statusValues = [JOB_TASK_STATE.FAILURE];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.PENDING) {
+        statusValues = [JOB_TASK_STATE.PENDING];
     }
 
-    return apiQuery.data;
+    if (statusValues.length > 0) {
+        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
+    }
+
+    return apiQueryHelper.data;
 };
+
+
+/* Components */
+const handleSelect = (selectedIndexes: number) => {
+    emit('select', state.items[selectedIndexes[0]]);
+};
+const handleChange = async (options: any = {}) => {
+    if (options.sortBy !== undefined) {
+        state.sortBy = options.sortBy;
+        state.sortDesc = options.sortDesc;
+    }
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.queryTags !== undefined) state.searchTags = options.queryTags;
+
+    await getJobTasks();
+};
+
+/* API */
 const getJobTasks = async () => {
     state.loading = true;
     try {
@@ -166,8 +161,8 @@ const getJobTasks = async () => {
         state.totalCount = res.total_count;
         state.items = res.results.map((jobTask) => ({
             ...jobTask,
-            started_at: iso8601Formatter(jobTask.started_at, state.timezone),
-            duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone),
+            started_at: iso8601Formatter(jobTask.started_at, state.timezone) || '--',
+            duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone) || '--',
         }));
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -175,22 +170,6 @@ const getJobTasks = async () => {
         state.totalCount = 0;
     }
     state.loading = false;
-};
-
-/* event */
-const onSelect = (selectedIndexes) => {
-    emit('select', state.items[selectedIndexes[0]]);
-};
-const onChange = async (options: any = {}) => {
-    if (options.sortBy !== undefined) {
-        state.sortBy = options.sortBy;
-        state.sortDesc = options.sortDesc;
-    }
-    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
-    if (options.queryTags !== undefined) state.searchTags = options.queryTags;
-
-    await getJobTasks();
 };
 
 /* Init */
@@ -204,7 +183,7 @@ const initStates = () => {
     state.totalCount = 0;
     state.searchTags = [];
     state.selectIndex = [];
-    state.selectedStatus = 'all';
+    state.selectedStatus = 'ALL';
 };
 
 let stopSelectStatusWatch;
@@ -230,7 +209,6 @@ onDeactivated(() => {
         store.dispatch('reference/project/load'),
     ]);
 })();
-
 </script>
 
 <template>
@@ -239,7 +217,7 @@ onDeactivated(() => {
                      sortable
                      search-type="query"
                      :loading="state.loading"
-                     :fields="state.fields"
+                     :fields="fields"
                      :items="state.items"
                      :sort-by="state.sortBy"
                      :sort-desc="state.sortDesc"
@@ -251,37 +229,39 @@ onDeactivated(() => {
                      :multi-select="false"
                      :excel-visible="false"
                      :timezone="state.timezone"
-                     @change="onChange"
-                     @refresh="onChange()"
-                     @select="onSelect"
+                     @change="handleChange"
+                     @refresh="handleChange()"
+                     @select="handleSelect"
     >
         <template #toolbox-top>
             <div class="status-wrapper">
                 <span class="label">{{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
                 <p-select-button-group v-model:selected="state.selectedStatus"
                                        class="select-button-group"
-                                       :buttons="state.statusList"
+                                       :buttons="statusList"
                                        theme="text"
                 />
             </div>
         </template>
         <template #col-service_account_id-format="{ value }">
-            <p-anchor :to="referenceRouter(
-                value,
-                { resource_type: 'identity.ServiceAccount' })"
+            <p-anchor v-if="storeState.serviceAccounts[value]"
+                      :to="referenceRouter(
+                          value,
+                          { resource_type: 'identity.ServiceAccount' })"
             >
-                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
+                {{ storeState.serviceAccounts[value].label }}
             </p-anchor>
+            <span v-else>--</span>
         </template>
         <template #col-project_id-format="{ value }">
-            <template v-if="value">
-                <p-anchor :to="referenceRouter(
-                    value,
-                    { resource_type: 'identity.Project' })"
-                >
-                    {{ state.projects[value] ? state.projects[value].label : value }}
-                </p-anchor>
-            </template>
+            <p-anchor v-if="storeState.projects[value]"
+                      :to="referenceRouter(
+                          value,
+                          { resource_type: 'identity.Project' })"
+            >
+                {{ storeState.projects[value].label }}
+            </p-anchor>
+            <span v-else>--</span>
         </template>
         <template #col-status-format="{ value }">
             <p-status
@@ -289,7 +269,7 @@ onDeactivated(() => {
                 :text-color="statusTextColorFormatter(value)"
                 :icon="statusIconFormatter(value)"
                 :icon-color="statusIconColorFormatter(value)"
-                :icon-animation="value === JOB_TASK_STATUS.progress ? 'spin' : undefined"
+                :icon-animation="value === JOB_TASK_STATE.IN_PROGRESS ? 'spin' : undefined"
             />
         </template>
         <template #col-errors-format="{ value }">

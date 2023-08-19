@@ -5,6 +5,7 @@
                 <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                      width="1em"
                      height="1em"
+                     :color="item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
                 />
                 <p-anchor class="title"
                           hide-icon
@@ -64,6 +65,8 @@ import { useStore } from 'vuex';
 import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { red } from '@/styles/colors';
 
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';

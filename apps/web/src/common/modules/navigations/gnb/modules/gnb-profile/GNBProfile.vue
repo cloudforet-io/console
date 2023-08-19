@@ -56,6 +56,33 @@
                          height="1rem"
                     />
                 </div>
+                <div v-click-outside="handleClickOutsideCurrencyMenu"
+                     class="info-menu currency"
+                     @click.stop="handleCurrencyDropdownClick"
+                >
+                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
+                    <div class="value">
+                        <span>{{ state.currency }}</span>
+                        <div v-if="state.currencyMenuVisible"
+                             class="currency-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.currencyMenuItems"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleCurrencyClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
                 <div ref="currencyInfoMenuRef"
                      class="info-menu currency"
                      @click.stop="handleCurrencyDropdownClick"
@@ -153,7 +180,6 @@
 </template>
 
 <script lang="ts" setup>
-
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';

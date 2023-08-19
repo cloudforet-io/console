@@ -38,6 +38,7 @@
                      width="1em"
                      height="1em"
                      class="mr-1"
+                     :color="value === ALERT_URGENCY.HIGH ? red[400] : undefined"
                 />
                 <span>{{ state.urgencyI18n[value] }}</span>
             </template>
@@ -95,6 +96,8 @@ import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
 
 import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertAcknowledgeModal.vue';
 import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResolveModal.vue';

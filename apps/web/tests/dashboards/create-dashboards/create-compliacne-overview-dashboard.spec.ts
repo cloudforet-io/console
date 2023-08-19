@@ -45,7 +45,9 @@ test.describe('Create Compliance Overview Dashboard', () => {
         await test.step('4. Check default variables', async () => {
             const variables = await page.locator('.dashboard-variables-select-dropdown .dashboard-variable-dropdown');
             const labelList: string[] = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await variables.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const variableName = await widgetElement.locator('.variable-label').innerText();
                 labelList.push(variableName);
             }
@@ -57,7 +59,9 @@ test.describe('Create Compliance Overview Dashboard', () => {
         await test.step('5. Check default widget list', async () => {
             const widgetList = await page.locator('.draggable-wrapper .draggable-item');
             const widgetNameList: string[] = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await widgetList.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const widgetName = await widgetElement.locator('.text').innerText();
                 widgetNameList.push(widgetName);
             }

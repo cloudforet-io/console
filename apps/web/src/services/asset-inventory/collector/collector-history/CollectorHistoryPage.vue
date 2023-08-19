@@ -1,19 +1,19 @@
-<script lang="ts" setup>
-import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
+<script setup lang="ts">
+import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PHeading, PPagination, PLazyImg,
-    PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
+    PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import { capitalize } from 'lodash';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -30,47 +30,39 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { peacock, green, red } from '@/styles/colors';
-
-import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
+import {
+    statusClassFormatter,
+    statusIconColorFormatter,
+    statusIconFormatter,
+    statusTextColorFormatter,
+    statusTextFormatter,
+} from '@/services/asset-inventory/collector/collector-history/lib/formatter-helper';
 import NoCollectorModal from '@/services/asset-inventory/collector/collector-history/modules/NoCollectorModal.vue';
+import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/collector/collector-history/type';
+import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-
-const PROGRESS_BAR_COLOR = peacock[500];
-const COMPLETED_ICON_COLOR = green[500];
-const FAILED_ICON_COLOR = red[400];
-
-const statusTextFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'Completed';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'In-Progress';
-    return capitalize(status);
-};
-const statusTextColorFormatter = (status) => {
-    if ([JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(status)) return FAILED_ICON_COLOR;
-    return undefined;
-};
-const statusIconFormatter = (status) => {
-    if (status === JOB_STATUS.success) return 'ic_check';
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'ic_gear-filled';
-    return 'ic_error-filled';
-};
-const statusIconColorFormatter = (status) => {
-    if (status === JOB_STATUS.success) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return undefined;
-    return FAILED_ICON_COLOR;
-};
 
 const store = useStore();
 const { t } = useI18n();
 const router = useRouter();
 
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-});
+const fields: DataTableField[] = [
+    { label: 'Job ID', name: 'job_id' },
+    { label: 'Collector', name: 'collector_info.label', sortable: false },
+    { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
+    { label: 'Status', name: 'status', sortable: false },
+    { label: 'Job Progress', name: 'progress' },
+    { label: 'Created', name: 'created_at' },
+    { label: 'Duration', name: 'duration', sortable: false },
+];
+const statusList = computed(() => [
+    { name: JOB_SELECTED_STATUS.ALL, label: t('INVENTORY.COLLECTOR.HISTORY.ALL') },
+    { name: JOB_SELECTED_STATUS.PROGRESS, label: t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS') },
+    { name: JOB_SELECTED_STATUS.SUCCESS, label: t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') },
+    { name: JOB_SELECTED_STATUS.FAILURE, label: t('INVENTORY.COLLECTOR.HISTORY.FAILURE') },
+    { name: JOB_SELECTED_STATUS.CANCELED, label: t('INVENTORY.COLLECTOR.HISTORY.CANCELED') },
+]);
+
 const handlers = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
@@ -83,9 +75,26 @@ const handlers = reactive({
     }]),
     valueHandlerMap: {
         job_id: makeDistinctValueHandler('inventory.Job', 'job_id'),
-        status: makeEnumValueHandler(JOB_STATUS),
+        status: makeEnumValueHandler(JOB_STATE),
         collector_id: makeReferenceValueHandler('inventory.Collector'),
-    } as ValueHandlerMap,
+    },
+});
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+const state = reactive({
+    loading: true,
+    modalVisible: false,
+    pageStart: 1,
+    pageSize: 30,
+    thisPage: 1,
+    totalCount: 0,
+    hasManagePermission: useManagePermissionState(),
+    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
+    selectedStatus: 'ALL',
+    items: [] as any[],
 });
 
 const queryTagsHelper = useQueryTags({
@@ -95,59 +104,23 @@ const queryTagsHelper = useQueryTags({
     },
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    loading: true,
-    modalVisible: false,
-    isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-    fields: computed(() => [
-        { label: 'Job ID', name: 'job_id' },
-        { label: 'Collector', name: 'collector_info.name', sortable: false },
-        { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
-        { label: 'Status', name: 'status', sortable: false },
-        { label: 'Job Progress', name: 'remained_tasks' },
-        { label: 'Created', name: 'created_at' },
-        { label: 'Duration', name: 'duration', sortable: false },
-    ]),
-    statusList: computed(() => ([
-        {
-            name: 'all', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
-        },
-        {
-            name: 'inProgress', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
-        },
-        {
-            name: 'completed', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
-        },
-        {
-            name: 'failed', label: t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
-        },
-    ])),
-    selectedStatus: 'all',
-    items: [] as any[],
-    //
-    pageStart: 1,
-    pageSize: 15,
-    thisPage: 1,
-    totalCount: 0,
-});
 
-/* api */
-const apiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('created_at', true);
+const apiQueryHelper = new ApiQueryHelper();
 const getQuery = () => {
     apiQueryHelper
-        .setPageStart(state.pageStart).setPageLimit(state.pageSize)
+        .setPage(state.pageStart, state.pageSize)
+        .setSort('created_at', true)
         .setFilters(searchFilters.value);
 
-    let statusValues: JOB_STATUS[] = [];
-    if (state.selectedStatus === 'inProgress') {
-        statusValues = [JOB_STATUS.progress];
-    } else if (state.selectedStatus === 'completed') {
-        statusValues = [JOB_STATUS.created, JOB_STATUS.success];
-    } else if (state.selectedStatus === 'failed') {
-        statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
+    let statusValues: string[] = [];
+    if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
+        statusValues = [JOB_STATE.IN_PROGRESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.SUCCESS) {
+        statusValues = [JOB_STATE.SUCCESS];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.FAILURE) {
+        statusValues = [JOB_STATE.FAILURE];
+    } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
+        statusValues = [JOB_STATE.CANCELED];
     }
 
     if (statusValues.length > 0) {
@@ -156,26 +129,9 @@ const getQuery = () => {
 
     return apiQueryHelper.data;
 };
-const getJobs = async () => {
-    state.loading = true;
-    try {
-        const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
-        state.totalCount = res.total_count;
-        state.items = res.results.map((job) => ({
-            ...job,
-            remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
-            created_at: iso8601Formatter(job.created_at, storeState.timezone),
-            duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
 
-/* event */
-const onSelect = (item) => {
+/* Components */
+const handleSelect = (item) => {
     router.push({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
         params: { jobId: item.job_id },
@@ -185,7 +141,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
     if (options.queryTags) {
         queryTagsHelper.setQueryTags(options.queryTags);
-        replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
+        await replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
     }
     if (options?.pageStart !== undefined) state.pageStart = options.pageStart;
     if (options?.pageLimit !== undefined) {
@@ -199,28 +155,42 @@ const handleChangePagination = () => {
     state.pageStart = getPageStart(state.thisPage, state.pageSize);
     getJobs();
 };
-const handleClickDate = async (data) => {
-    state.selectedStatus = data.type;
-    queryTagsHelper.setFilters([
-        ...searchFilters.value,
-        { k: 'created_at', v: data.date, o: '=' },
-    ]);
+
+/* API */
+const getJobs = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
+        state.totalCount = res.total_count;
+        state.items = res.results.map((job) => {
+            const collector = storeState.collectors[job.collector_id];
+            const plugin = storeState.plugins[job.plugin_id];
+            return {
+                ...job,
+                collector_info: {
+                    label: collector?.name,
+                    plugin_info: {
+                        label: plugin?.label,
+                        icon: plugin?.icon,
+                    },
+                },
+                progress: job.total_tasks === 0 ? { succeededPercentage: 100, failedPercentage: 0 } : {
+                    succeededPercentage: (job.success_tasks / job.total_tasks) * 100,
+                    failedPercentage: (job.failure_tasks / job.total_tasks) * 100,
+                    isCanceled: job.status === JOB_STATE.CANCELED,
+                },
+                created_at: iso8601Formatter(job.created_at, storeState.timezone),
+                duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
+            };
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
 };
 
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/plugin/load'),
-        store.dispatch('reference/collector/load'),
-    ]);
-
-    const currentQuery = router.currentRoute.value.query;
-    // TODO: need to implement about type assertion
-    queryTagsHelper.setURLQueryStringFilters(currentQuery.filters as undefined|string|(string|null)[]);
-
-    await getJobs();
-    if (state.totalCount === 0) state.modalVisible = true;
-})();
-
+/* Watcher */
 watch(() => state.selectedStatus, (selectedStatus) => {
     state.selectedStatus = selectedStatus;
     state.thisPage = 1;
@@ -228,6 +198,19 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     getJobs();
 });
 
+/* Init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/plugin/load'),
+        store.dispatch('reference/collector/load'),
+    ]);
+
+    const currentQuery = router.currentRoute.value.query;
+    queryTagsHelper.setURLQueryStringFilters(currentQuery.filters ?? undefined);
+
+    await getJobs();
+    if (state.totalCount === 0) state.modalVisible = true;
+})();
 </script>
 
 <template>
@@ -236,26 +219,26 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                    show-back-button
                    @click-back-button="router.go(-1)"
         />
-        <p-collector-history-chart @click-date="handleClickDate" />
         <div class="collector-history-table">
             <div class="status-wrapper">
                 <span class="label">{{ t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
                 <p-select-button-group v-model:selected="state.selectedStatus"
                                        class="select-button-group"
-                                       :buttons="state.statusList"
+                                       :buttons="statusList"
                                        theme="text"
                 />
             </div>
-            <p-toolbox-table v-model:this-page="state.thisPage"
-                             v-model:page-size="state.pageSize"
-                             search-type="query"
-                             :fields="state.fields"
+            <!-- eslint-disable -->
+            <p-toolbox-table search-type="query"
+                             :fields="fields"
                              :items="state.items"
                              :query-tags="queryTags"
                              :key-item-sets="handlers.keyItemSets"
                              :value-handler-map="handlers.valueHandlerMap"
                              :loading="state.loading"
                              :total-count="state.totalCount"
+                             v-model:this-page="state.thisPage"
+                             v-model:page-size="state.pageSize"
                              row-cursor-pointer
                              sortable
                              :selectable="false"
@@ -264,46 +247,48 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
                              @refresh="handleChange()"
-                             @row-left-click="onSelect"
+                             @rowLeftClick="handleSelect"
             >
-                <template #th-task-format="{ field }">
-                    <span>{{ field.label }}</span>
-                    <span class="th-additional-info-text"> (completed / total)</span>
-                </template>
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
-                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
-                                    width="1rem"
-                                    height="1rem"
-                                    class="mr-2"
-                        />
-                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
+                        <div class="col-plugin-info">
+                            <p-lazy-img :src="value.icon || ''"
+                                        width="1rem"
+                                        height="1rem"
+                                        class="mr-2"
+                            />
+                            {{ value.label || '' }}
+                        </div>
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
-                    <p-status :text="statusTextFormatter(value)"
-                              :text-color="statusTextColorFormatter(value)"
-                              :icon="statusIconFormatter(value)"
-                              :icon-color="statusIconColorFormatter(value)"
-                              :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
+                    <p-status
+                        :text="statusTextFormatter(value)"
+                        :text-color="statusTextColorFormatter(value)"
+                        :icon="statusIconFormatter(value)"
+                        :icon-color="statusIconColorFormatter(value)"
+                        :icon-animation="value === JOB_STATE.IN_PROGRESS ? 'spin' : undefined"
+                        :class="statusClassFormatter(value)"
                     />
                 </template>
-                <template #col-remained_tasks-format="{value}">
-                    <div class="col-remainedTasks-format">
-                        <p-progress-bar
-                            :percentage="value"
-                            :color="PROGRESS_BAR_COLOR"
+                <template #col-progress-format="{ value }">
+                    <div :class="['col-progress-format', {'is-canceled': value.isCanceled}]">
+                        <span class="succeeded-bar"
+                              :style="{ width: `${value.succeededPercentage}%` }"
                         />
-                        <span class="text">{{ value }}%</span>
+                        <span class="failed-bar"
+                              :style="{ width: `${value.failedPercentage}%` }"
+                        />
                     </div>
+                    <span class="succeeded-text">{{ Math.floor(value.succeededPercentage) }}%</span>
                 </template>
             </p-toolbox-table>
             <div v-if="state.items.length > 0"
                  class="pagination"
             >
-                <p-pagination v-model:this-page="state.thisPage"
+                <p-pagination :total-count="state.totalCount"
+                              v-model:this-page="state.thisPage"
                               v-model:page-size="state.pageSize"
-                              :total-count="state.totalCount"
                               @change="handleChangePagination"
                 />
             </div>
@@ -320,13 +305,11 @@ watch(() => state.selectedStatus, (selectedStatus) => {
     .collector-history-table {
         @apply bg-white border border-gray-200 rounded-lg;
         margin-top: 1rem;
-
         .status-wrapper {
             display: flex;
             align-items: center;
             margin-left: 1rem;
             margin-top: 1.5rem;
-
             .label {
                 font-size: 0.875rem;
                 font-weight: bold;
@@ -349,21 +332,43 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                     min-height: 18.75rem;
                 }
             }
-            .p-data-table {
-                .col-remainedTasks-format {
-                    display: flex;
-                    align-items: center;
-                    .progress-bar {
-                        width: 6.25rem;
-                        margin-right: 0.125rem;
-                    }
-                    .text {
-                        @apply text-gray-700;
-                    }
+        }
+        .col-progress-format {
+            @apply inline-flex items-center bg-gray-200;
+            width: 6rem;
+            height: 0.5rem;
+            margin-right: 0.25rem;
+            border-radius: 0.125rem;
+            > span {
+                &:first-child {
+                    border-top-left-radius: 0.125rem;
+                    border-bottom-left-radius: 0.125rem;
+                }
+                &:last-child {
+                    border-top-right-radius: 0.125rem;
+                    border-bottom-right-radius: 0.125rem;
+                }
+            }
+            .succeeded-bar {
+                @apply bg-green-500;
+                height: 100%;
+            }
+            .failed-bar {
+                @apply bg-red-400;
+                height: 100%;
+            }
+            &.is-canceled {
+                .succeeded-bar, .failed-bar {
+                    @apply bg-gray-400;
                 }
             }
         }
-
+        .col-plugin-info {
+            @apply flex items-center;
+        }
+        .succeeded-text {
+            @apply text-gray-700;
+        }
         .pagination {
             text-align: center;
             padding-top: 1.5rem;

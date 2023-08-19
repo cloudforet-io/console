@@ -1,63 +1,35 @@
 <script setup lang="ts">
 import { PToggleButton, PI } from '@spaceone/design-system';
-import { reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
-import type { CollectorItemInfo } from '@/services/asset-inventory/collector/collector-main/type';
-import type { CollectorUpdateParameter } from '@/services/asset-inventory/collector/model';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 interface Props {
-    item?: CollectorItemInfo;
+    collectorId?: string;
+    isScheduleActivated?: boolean;
 }
-
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    collectorId: '',
+    isScheduleActivated: false,
 });
 
 const { t } = useI18n();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorFormStore = useCollectorFormStore();
 
-const state = reactive({
-    isScheduleActivated: false,
-});
+const emit = defineEmits<{(e: 'change-toggle', boolean): void}>();
 
 /* Components */
 const handleChangeToggle = async (value) => {
     if (Object.keys(value).length > 0) return;
-    try {
-        state.isScheduleActivated = !state.isScheduleActivated;
-        const params: CollectorUpdateParameter = {
-            collector_id: props.item?.collectorId ?? '',
-            schedule: {
-                ...props.item?.schedule,
-                state: state.isScheduleActivated ? 'ENABLED' : 'DISABLED',
-            },
-        };
-        const response = await collectorPageStore.updateCollectorSchedule(params);
-        await collectorFormStore.setOriginCollector(response);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
-    }
+    emit('change-toggle', value);
 };
 const handleClickSchedule = () => {
-    collectorPageStore.setSelectedCollector(props.item?.collectorId);
-    collectorPageStore.$patch({
-        visibleScheduleModal: true,
+    collectorPageStore.setSelectedCollector(props.collectorId);
+    collectorPageStore.$patch((_state) => {
+        _state.visible.scheduleModal = true;
     });
 };
-
-/* Watcher */
-watch(() => props.item, (item) => {
-    if (item && item.schedule) {
-        state.isScheduleActivated = item.schedule.state === 'ENABLED';
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -69,28 +41,21 @@ watch(() => props.item, (item) => {
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
             >
-                <p-i v-if="state.isScheduleActivated"
-                     name="ic_edit"
+                <p-i name="ic_edit"
                      height="0.75rem"
                      width="0.75rem"
                      color="inherit"
                      class="icon-schedule"
                 />
-                <p-i v-else
-                     name="ic_settings-filled"
-                     height="0.75rem"
-                     width="0.75rem"
-                     color="inherit"
-                     class="icon-schedule"
-                />
-                {{ t('INVENTORY.COLLECTOR.MAIN.SET_SCHEDULE') }}
+                {{ t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
             <p-toggle-button
-                :value="state.isScheduleActivated"
-                :class="state.isScheduleActivated ? 'toggle-active' : ''"
+                :value="props.isScheduleActivated"
+                :class="props.isScheduleActivated ? 'toggle-active' : ''"
                 show-state-text
+                position="left"
                 @change-toggle="handleChangeToggle"
             />
         </div>
@@ -99,14 +64,14 @@ watch(() => props.item, (item) => {
 
 <style lang="postcss" scoped>
 .info-item {
+    @apply flex justify-between;
+    margin-top: 2.125rem;
     .info-label-wrapper {
-        @apply flex;
+        @apply flex items-center;
         gap: 0.375rem;
-
         .info-label {
             @apply text-label-sm text-gray-500;
         }
-
         .schedule-button {
             @apply flex items-center text-label-sm text-blue-700 font-normal;
             gap: 0.125rem;

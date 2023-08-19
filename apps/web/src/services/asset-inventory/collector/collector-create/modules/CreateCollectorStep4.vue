@@ -1,8 +1,6 @@
 <template>
     <div class="collector-page-4">
-        <collector-schedule-form enable-hours-edit
-                                 disable-loading
-        />
+        <collector-schedule-form disable-loading />
         <div class="step-footer">
             <p-text-button icon-left="ic_chevron-left"
                            style-type="highlight"
@@ -113,7 +111,6 @@ const handleClickCreateButton = async () => {
             },
             secret_filter: {
                 state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
-                service_accounts: collectorFormStore.serviceAccounts,
             },
             schedule: {
                 state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
@@ -121,6 +118,12 @@ const handleClickCreateButton = async () => {
             },
             tags: collectorFormState.tags,
         };
+        const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
+            service_accounts: collectorFormStore.serviceAccounts,
+        } : {
+            exclude_service_accounts: collectorFormStore.serviceAccounts,
+        };
+        Object.assign(params.secret_filter ?? {}, serviceAccountParams);
         const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
@@ -181,7 +184,7 @@ const goToCollectorDetailPage = () => {
 
         .right-area {
             @apply flex items-center;
-            :first-child {
+            & > :first-child {
                 margin-right: 1rem;
             }
         }

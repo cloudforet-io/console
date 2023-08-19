@@ -37,6 +37,7 @@
                      width="1em"
                      height="1em"
                      class="mr-2"
+                     :color="red[400]"
                 />
                 <p-i v-if="state.alertUrgency === ALERT_URGENCY.LOW"
                      name="ic_warning-filled"
@@ -89,6 +90,8 @@ import { useI18n } from 'vue-i18n';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
 
 import AlertAssignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertAssignModal.vue';
 import type { AlertState, AlertUrgency } from '@/services/alert-manager/lib/config';

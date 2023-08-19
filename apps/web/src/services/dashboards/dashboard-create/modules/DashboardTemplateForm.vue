@@ -3,9 +3,9 @@
         <p-search v-model:value="state.searchValue"
                   @update:value="handleInputSearch"
         />
-        <div ref="templateContainerRef"
-             class="dashboard-template-container"
-             :class="{ 'overflow-blur':!state.hideBlur }"
+        <div
+            ref="templateContainerRef"
+            class="dashboard-template-container"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -120,10 +120,8 @@
 import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
 } from '@spaceone/design-system';
-import { useEventListener } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
 import {
-    computed, nextTick, reactive, ref, watch,
+    computed, nextTick, reactive, ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -158,7 +156,6 @@ const templateContainerRef = ref<HTMLElement | null>(null);
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
-    hideBlur: false,
 });
 
 const defaultTemplateState = reactive({
@@ -234,20 +231,6 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
-// NOTE: This is to remove the blur effect when there's no scroll.
-useEventListener(templateContainerRef as MaybeRef, 'scroll', (e) => {
-    const eventTarget = (
-        e.target === document ? (e.target as Document).documentElement : e.target
-    ) as HTMLElement;
-    state.hideBlur = eventTarget.scrollTop + eventTarget.clientHeight >= eventTarget.scrollHeight - 1;
-});
-watch(() => state.searchValue, async () => {
-    if (templateContainerRef.value) {
-        await nextTick();
-        state.hideBlur = templateContainerRef.value.clientHeight >= templateContainerRef.value.scrollHeight;
-    }
-});
-
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
@@ -263,17 +246,6 @@ watch(() => state.searchValue, async () => {
     @apply relative;
     .dashboard-template-container {
         @apply overflow-auto;
-        max-height: calc(100vh - 22.85rem);
-        min-height: 40vh;
-        &.overflow-blur {
-            &::after {
-                @apply w-full absolute;
-                height: 2.5rem;
-                content: '';
-                bottom: 0;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0%) 0%, #fff 100%);
-            }
-        }
         .card-container {
             @apply mt-6;
         }
@@ -316,21 +288,6 @@ watch(() => state.searchValue, async () => {
             .dashboard-name {
                 margin: 0.375rem 0;
             }
-
-            @screen tablet {
-                .content-layout {
-                    @apply relative items-start;
-                    padding-left: 3.25rem;
-                    min-height: 2.5rem;
-                    .p-i-icon {
-                        @apply absolute;
-                        left: 0;
-                    }
-                }
-                .dashboard-name {
-                    margin: 0;
-                }
-            }
         }
 
         .existing-dashboard-board {
@@ -341,6 +298,27 @@ watch(() => state.searchValue, async () => {
             }
             .p-board {
                 min-height: 4.125rem;
+            }
+        }
+    }
+
+    @screen tablet {
+        .dashboard-template-container {
+            .default-dashboard-board {
+                .content-layout {
+                    @apply relative items-start;
+                    padding-left: 3.25rem;
+                    min-height: 2.5rem;
+
+                    .p-i-icon {
+                        @apply absolute;
+                        left: 0;
+                    }
+                }
+
+                .dashboard-name {
+                    margin: 0;
+                }
             }
         }
     }

@@ -39,7 +39,6 @@ const { t } = useI18n();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
-
 const state = reactive({
     initLoading: true,
     hasCollectorList: false,
@@ -53,11 +52,15 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.value.query;
     // set provider
-    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    collectorPageStore.$patch({
+        selectedProvider: queryStringToString(query.provider) ?? 'all',
+    });
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.setSearchFilters(filters);
+        collectorPageStore.$patch({
+            searchFilters: filters,
+        });
     }
 };
 
@@ -79,7 +82,9 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
+    collectorPageStore.$patch({
+        selectedProvider: providerName,
+    });
 };
 
 
@@ -126,6 +131,7 @@ onMounted(async () => {
                 >
                     <p-button style-type="tertiary"
                               class="history-button"
+                              icon-left="ic_history"
                     >
                         {{ t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
                     </p-button>
@@ -161,10 +167,8 @@ onMounted(async () => {
     width: 100%;
     padding: 0.375rem 0.75rem;
 }
-
 .collector-loader-wrapper {
     min-height: 16.875rem;
-
     .collector-contents-wrapper {
         @apply flex flex-col;
         gap: 1.5rem;

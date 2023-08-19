@@ -159,6 +159,14 @@ watch(() => props.dateRange, () => {
 }, { immediate: true });
 
 </script>
+<style lang="postcss" scoped>
+.dashboard-date-dropdown {
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        min-width: auto;
+    }
+}
+</style>
 
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {

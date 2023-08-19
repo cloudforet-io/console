@@ -41,6 +41,15 @@ interface Capability {
     supported_providers?: string[];
     [key: string]: any;
 }
+
+export interface RepositoryInfo {
+    created_at: string;
+    endpoint: string;
+    name: string;
+    repository_id: string;
+    repository_type: string;
+}
+
 export interface RepositoryPluginModel {
     plugin_id: string;
     name: string;
@@ -56,7 +65,7 @@ export interface RepositoryPluginModel {
             schema: JsonSchema;
         }
     };
-    repository_info: object;
+    repository_info: RepositoryInfo;
     project_id: string;
     labels: string[];
     version: string;
@@ -80,6 +89,9 @@ interface SecretFilter {
     secrets?: string[];
     service_accounts?: string[];
     schemas?: string[];
+    exclude_secrets?: string[];
+    exclude_service_accounts?: string[];
+    exclude_schemas?: string[];
 }
 export const COLLECTOR_SCHEDULE_STATE = {
     ENABLED: 'ENABLED',
@@ -110,6 +122,7 @@ export interface SecretModel {
     service_account_id: string;
     project_id: string;
     created_at: string;
+    name: string;
 }
 
 // collector api parameters
@@ -138,15 +151,23 @@ export interface CollectorDeleteParameter {
     collectors: [string, ...string[]];
 }
 
-// JobAnalyzeModel
-export interface JobStatus {
+export type JobStatus = |
+    'IN_PROGRESS'| // One or more JobTasks are running
+    'FAILURE'| // When one or more JobTasks are FAILURE or TIMEOUT
+    'CANCELED'| // When a Job is Canceled
+    'SUCCESS'; // When all JobTasks succeed
+
+export interface JobModel {
     job_id: string;
-    status: string;
-    finished_at: string;
+    status: JobStatus;
     remained_tasks: number;
     total_tasks: number;
-}
-export interface JobAnalyzeModel {
+    failure_tasks: number;
+    success_tasks: number;
     collector_id: string;
-    job_status: JobStatus[]
+    plugin_id: string;
+    created_at: string;
+    finished_at: string;
+    updated_at: string;
+    secret_id?: string;
 }

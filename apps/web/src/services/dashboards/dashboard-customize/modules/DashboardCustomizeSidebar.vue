@@ -58,7 +58,7 @@
                                 <p-i name="ic_error-filled"
                                      height="1rem"
                                      width="1rem"
-                                     color="inherit"
+                                     :color="red[400]"
                                 />
                             </span>
                         </div>
@@ -102,6 +102,8 @@ import {
 import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
 import { useStore } from 'vuex';
+
+import { red } from '@/styles/colors';
 
 import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';

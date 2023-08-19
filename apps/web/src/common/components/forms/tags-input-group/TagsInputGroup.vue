@@ -150,7 +150,7 @@ const state = reactive({
 
 /* Event */
 const handleAddPair = () => {
-    state.items = [...state.items, { key: '', value: '' }];
+    state.items.push({ key: '', value: '' });
 };
 const handleDeletePair = (idx: number) => {
     const _items = [...state.items];

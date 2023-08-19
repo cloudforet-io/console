@@ -1,3 +1,20 @@
+<template>
+    <p-button-modal class="collector-schedule-modal"
+                    :header-title="t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
+                    size="md"
+                    fade
+                    backdrop
+                    :visible="collectorPageState.visible.scheduleModal"
+                    @close="handleCloseModal"
+                    @cancel="handleCloseModal"
+                    @confirm="handleConfirm"
+    >
+        <template #body>
+            <collector-schedule-form />
+        </template>
+    </p-button-modal>
+</template>
+
 <script setup lang="ts">
 import { PButtonModal } from '@spaceone/design-system';
 import { watch } from 'vue';
@@ -13,7 +30,6 @@ import CollectorScheduleForm
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
@@ -22,8 +38,8 @@ const { t } = useI18n();
 
 /* Components */
 const handleCloseModal = () => {
-    collectorPageStore.$patch({
-        visibleScheduleModal: false,
+    collectorPageStore.$patch((_state) => {
+        _state.visible.scheduleModal = false;
     });
 };
 const handleConfirm = async () => {

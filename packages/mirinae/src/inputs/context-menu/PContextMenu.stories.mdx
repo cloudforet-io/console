@@ -190,6 +190,32 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 
 <br/>
 
+### Header Slot
+
+<Canvas>
+    <Story name="Header Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+                <div class="flex h-full flex-col">
+                <div class="mt-4">
+                    <h2 class="mb-4">This is <strong>header</strong> slot</h2>
+                    <p-context-menu :menu="menu">
+                        <template #header>
+                            <div class="p-4 bg-blue-100">header slot area</div>
+                        </template>
+                    </p-context-menu>
+                </div>
+                </div>
+                    <!--<div>-->
+            `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ### No Data Slot
 

@@ -28,7 +28,7 @@
                         <p-i name="ic_error-filled"
                              height="1.5rem"
                              width="1.5rem"
-                             color="inherit"
+                             :color="red[400]"
                         />
                     </span>
                     <span>{{ t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
@@ -119,20 +119,53 @@ import {
     reactive, computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-
+import type { TranslateResult } from 'vue-i18n';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { red } from '@/styles/colors';
+
+import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/type';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+
+interface WidgetFrameProps {
+    title: TranslateResult;
+    size: WidgetSize;
+    width?: number;
+    widgetLink?: string;
+    widgetLocation?: Location;
+    widgetConfigId?: string;
+    dateRange?: DateRange;
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
+    currency?: Currency;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
+    disableViewMode?: boolean;
+    isOnlyFullSize?: boolean;
+    widgetKey: string;
+    overflowY?: string;
+    refreshOnResize?: boolean;
+    theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
+}
 
 interface IconConfig {
     isAvailable: boolean;
@@ -216,9 +249,6 @@ const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
-};
-const handleRefresh = () => {
-    emit('refresh');
 };
 const handleClickViewModeButton = () => {
     widgetFormStore.$patch({

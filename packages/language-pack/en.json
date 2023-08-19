@@ -2102,6 +2102,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
@@ -2136,10 +2137,12 @@
 				"CREATE_EXIT_MODAL_CONTENT": "You cannot undo this action.",
 				"CREATE_EXIT_MODAL_TITLE": "Are you sure you want to quit?",
 				"CREATE_NEW_COLLECTOR": "Create New Collector",
+				"EXCLUDE": "Exclude",
 				"FORM_LOAD_FAILED": "Failed to load additional options.",
+				"INCLUDE": "Include",
 				"LEARN_MORE": "learn more",
-				"LOADING_DESC1": "Loading additional options...",
-				"LOADING_DESC2": "(Please wait, this may take about 1-2 minutes)",
+				"LOADING_DESC1": "Initializing associated options...",
+				"LOADING_DESC2": "(Please wait, this may take about 1~2 minutes)",
 				"NAME": "Name",
 				"NAME_INVALID_DUPLICATED": "Name already registered.",
 				"NAME_INVALID_MIN": "Must be longer than 2 characters",
@@ -2179,6 +2182,7 @@
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",
 				"NAME": "Name",
+				"NO_TAG": "No Tags",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
 				"REGION": "Region",
@@ -2196,25 +2200,46 @@
 				"TAG": "Tag",
 				"VERSION": "Version"
 			},
+			"HISTORY": {
+				"ALL": "All",
+				"CANCELED": "Canceled",
+				"FAILURE": "Failure",
+				"IN_PROGRESS": "In-Progress",
+				"PENDING": "Pending",
+				"SUCCESS": "Success"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "Failed to edit schedule.",
 				"ALT_S_EDIT_SCHEDULE": "Schedule successfully edited",
 				"COLLECTOR_SCHEDULE": "Collector Schedule",
 				"COLLECT_DATA": "Collect Data",
+				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "Account",
+					"CONFIRM_BUTTON": "Collect Now",
+					"DESCRIPTION": "Collect data from the following associated accounts.",
+					"DUPLICATION_DESCRIPTION": "Check the ongoing data collection information.",
+					"DUPLICATION_TITLE": "Collecting is still in progress. Do you want to cancel and re-start it?",
+					"DURATION": "Duration",
+					"TITLE": "Do you want to collect data now?"
+				},
 				"CREATE": "Create",
 				"CREATE_COLLECTOR": "Create Collector",
 				"CURRENT_STATUS": "Current Status",
 				"EDIT_MODAL_TITLE": "Edit Schedule",
+				"EDIT_SCHEDULE": "Edit",
 				"HISTORY": "Collector History",
 				"IN_PROGRESS": "In-Progress",
-				"JOB_ERROR": "Status: Failed,\nCollected: {date}",
+				"JOB_CANCELED": "Canceled: {date}",
+				"JOB_FAILURE": "Failure: {date}",
 				"JOB_NONE": "No collector job",
 				"JOB_PROGRESS": "Status: In-Progress",
-				"JOB_SUCCESS": "Status: Completed,\nCollected: {date}",
+				"JOB_SUCCESS": "Completed: {date}",
 				"NO_DATA": "There’s no collector created yet.",
-				"NO_SCHEDULE": "No Scheduled",
+				"NO_JOB": "No recent jobs",
+				"NO_SCHEDULE": "No scheduled",
 				"PLUGIN": "Plugin",
-				"RECENT_JOBS": "Recent data collection results within the past 5 days",
+				"RECENT_JOBS": "Recent Collector Jobs",
+				"RECENT_JOBS_TOOLTIP": "Recent data collection results\nwithin the past 5 days",
 				"RESTART": "Re-Start",
 				"RESTART_COLLECT": "Collecting is still in progress. Do you want to re-start it?",
 				"SCHEDULED": "Scheduled",
@@ -2225,7 +2250,8 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_OPTIONS": "No Options"
+			"NO_JOB": "No Job",
+			"NO_OPTIONS": "No Selectable Options"
 		},
 		"SERVER": {
 			"MAIN": {
