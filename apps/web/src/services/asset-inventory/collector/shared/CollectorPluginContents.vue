@@ -1,3 +1,42 @@
+<template>
+    <div class="plugin-data-contents">
+        <p-lazy-img :src="state.icon"
+                    class="plugin-icon"
+                    :class="{ 'sm': props.size === 'sm' }"
+                    :width="state.iconSize"
+                    :height="state.iconSize"
+        />
+        <div class="contents">
+            <p class="plugin-name">
+                {{ state.name }} <span v-if="state.isBeta"
+                                       class="beta"
+                >{{ t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
+            </p>
+            <div class="plugin-description">
+                <span class="plugin-description-text"
+                      :class="{ 'sm': props.size === 'sm' }"
+                >
+                    {{ state.description }}
+                </span>
+                <p-anchor v-if="state.pluginDetailLink"
+                          :href="state.pluginDetailLink"
+                          size="sm"
+                          :highlight="true"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
+                </p-anchor>
+            </div>
+            <div class="label-container">
+                <p-label v-for="(label, idx) in state.labels"
+                         :key="`${label}-${idx}`"
+                         class="mb-1"
+                         :text="label"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 import {
     PAnchor, PLazyImg, PLabel,
@@ -56,45 +95,6 @@ const state = reactive({
 })();
 
 </script>
-
-<template>
-    <div class="plugin-data-contents">
-        <p-lazy-img :src="state.icon"
-                    class="plugin-icon"
-                    :class="{ 'sm': props.size === 'sm' }"
-                    :width="state.iconSize"
-                    :height="state.iconSize"
-        />
-        <div class="contents">
-            <p class="plugin-name">
-                {{ state.name }} <span v-if="state.isBeta"
-                                       class="beta"
-                >{{ t('INVENTORY.COLLECTOR.CREATE.BETA') }}</span>
-            </p>
-            <div class="plugin-description">
-                <span class="plugin-description-text"
-                      :class="{ 'sm': props.size === 'sm' }"
-                >
-                    {{ state.description }}
-                </span>
-                <p-anchor v-if="state.pluginDetailLink"
-                          :href="state.pluginDetailLink"
-                          size="sm"
-                          :highlight="true"
-                >
-                    {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-                </p-anchor>
-            </div>
-            <div class="label-container">
-                <p-label v-for="(label, idx) in state.labels"
-                         :key="`${label}-${idx}`"
-                         class="mb-1"
-                         :text="label"
-                />
-            </div>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .plugin-data-contents {

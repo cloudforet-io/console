@@ -1,3 +1,43 @@
+<template>
+    <p-icon-button name="ic_close"
+                   color="inherit"
+                   class="close-button"
+                   @click="handleClickClose"
+    />
+    <div class="collector-creator-page">
+        <div class="header">
+            <p class="step">
+                Step {{ state.step }}<span>/4</span>
+            </p>
+            <p-heading :title="t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')" />
+            <p class="description">
+                {{ state.descriptionByStep[state.step] }}
+            </p>
+        </div>
+        <create-collector-step1 v-if="state.step===1"
+                                @update:current-step="handleChangeStep"
+        />
+        <div v-if="state.step !== 1">
+            <keep-alive>
+                <create-collector-step2 v-if="state.step===2"
+                                        @update:current-step="handleChangeStep"
+                />
+                <create-collector-step3 v-if="state.step===3"
+                                        @update:current-step="handleChangeStep"
+                />
+                <create-collector-step4 v-if="state.step===4"
+                                        @update:current-step="handleChangeStep"
+                />
+            </keep-alive>
+        </div>
+    </div>
+    <delete-modal v-model:visible="state.deleteModalVisible"
+                  :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
+                  :contents="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
+                  @confirm="handleClickBackButton"
+    />
+</template>
+
 <script lang="ts">
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
@@ -19,7 +59,7 @@ export default defineComponent({
 
 <script lang="ts" setup>
 /* eslint-disable import/first */
-// eslint-disable-next-line import/no-duplicates
+// eslint-disable-next-line import/order
 import { PHeading, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, defineExpose } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -70,46 +110,6 @@ defineExpose({ setPathFrom });
     store.dispatch('reference/provider/load');
 })();
 </script>
-
-<template>
-    <p-icon-button name="ic_close"
-                   color="inherit"
-                   class="close-button"
-                   @click="handleClickClose"
-    />
-    <div class="collector-creator-page">
-        <div class="header">
-            <p class="step">
-                Step {{ state.step }}<span>/4</span>
-            </p>
-            <p-heading :title="t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')" />
-            <p class="description">
-                {{ state.descriptionByStep[state.step] }}
-            </p>
-        </div>
-        <create-collector-step1 v-if="state.step===1"
-                                @update:current-step="handleChangeStep"
-        />
-        <div v-if="state.step !== 1">
-            <keep-alive>
-                <create-collector-step2 v-if="state.step===2"
-                                        @update:current-step="handleChangeStep"
-                />
-                <create-collector-step3 v-if="state.step===3"
-                                        @update:current-step="handleChangeStep"
-                />
-                <create-collector-step4 v-if="state.step===4"
-                                        @update:current-step="handleChangeStep"
-                />
-            </keep-alive>
-        </div>
-    </div>
-    <delete-modal v-model:visible="state.deleteModalVisible"
-                  :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
-                  :contents="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
-                  @confirm="handleClickBackButton"
-    />
-</template>
 
 <style lang="postcss" scoped>
 .close-button {

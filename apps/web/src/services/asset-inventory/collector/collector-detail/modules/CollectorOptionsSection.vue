@@ -1,3 +1,71 @@
+<template>
+    <p-pane-layout>
+        <p-heading :title="t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <p-button v-if="!state.isEditMode && !state.isCollectorOptionsSchemaEmpty"
+                          size="md"
+                          icon-left="ic_edit"
+                          style-type="secondary"
+                          @click="handleClickEdit"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                </p-button>
+            </template>
+        </p-heading>
+        <p-definition-table v-if="!state.isEditMode"
+                            :fields="state.fields"
+                            :loading="state.loading"
+                            :data="state.collectorOptions"
+                            style-type="white"
+        >
+            <template #data="{value}">
+                {{ value ? value : '--' }}
+            </template>
+            <template #no-data>
+                <div class="no-data-box">
+                    <p-empty image-size="sm"
+                             show-image
+                             :title="t('INVENTORY.COLLECTOR.NO_OPTIONS')"
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_circle_boy.svg"
+                                 alt="empty-options"
+                                 class="empty-options-image"
+                            >
+                        </template>
+                    </p-empty>
+                </div>
+            </template>
+        </p-definition-table>
+        <collector-options-form v-else
+                                has-metadata
+                                reset-on-collector-id-change
+                                @update:is-valid="handleUpdateIsOptionsValid"
+        />
+        <div class="button-group">
+            <p-button v-if="state.isEditMode"
+                      style-type="tertiary"
+                      size="lg"
+                      :disabled="state.isUpdating"
+                      @click="handleClickCancel"
+            >
+                {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+            </p-button>
+            <p-button v-if="state.isEditMode"
+                      style-type="primary"
+                      size="lg"
+                      :loading="state.isUpdating"
+                      class="save-changes-button"
+                      @click="handleClickSave"
+            >
+                {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+            </p-button>
+        </div>
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -86,74 +154,6 @@ const handleClickSave = async () => {
 };
 
 </script>
-
-<template>
-    <p-pane-layout>
-        <p-heading :title="t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode && !state.isCollectorOptionsSchemaEmpty"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
-        <p-definition-table v-if="!state.isEditMode"
-                            :fields="state.fields"
-                            :loading="state.loading"
-                            :data="state.collectorOptions"
-                            style-type="white"
-        >
-            <template #data="{value}">
-                {{ value ? value : '--' }}
-            </template>
-            <template #no-data>
-                <div class="no-data-box">
-                    <p-empty image-size="sm"
-                             show-image
-                             :title="t('INVENTORY.COLLECTOR.NO_OPTIONS')"
-                    >
-                        <template #image>
-                            <img src="@/assets/images/illust_circle_boy.svg"
-                                 alt="empty-options"
-                                 class="empty-options-image"
-                            >
-                        </template>
-                    </p-empty>
-                </div>
-            </template>
-        </p-definition-table>
-        <collector-options-form v-else
-                                has-metadata
-                                reset-on-collector-id-change
-                                @update:is-valid="handleUpdateIsOptionsValid"
-        />
-        <div class="button-group">
-            <p-button v-if="state.isEditMode"
-                      style-type="tertiary"
-                      size="lg"
-                      :disabled="state.isUpdating"
-                      @click="handleClickCancel"
-            >
-                {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-            </p-button>
-            <p-button v-if="state.isEditMode"
-                      style-type="primary"
-                      size="lg"
-                      :loading="state.isUpdating"
-                      class="save-changes-button"
-                      @click="handleClickSave"
-            >
-                {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-            </p-button>
-        </div>
-    </p-pane-layout>
-</template>
 
 <style lang="postcss" scoped>
 .p-definition-table {

@@ -1,3 +1,50 @@
+<template>
+    <div class="dashboard-variables-select-dropdown">
+        <template v-for="(propertyName, idx) in state.order"
+                  :key="`${propertyName}-${idx}`"
+        >
+            <div v-if="state.variableProperties[propertyName]?.use"
+                 class="variable-selector-box"
+            >
+                <dashboard-variables-dropdown :property-name="propertyName"
+                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
+                                              :disabled="state.saveLoading"
+                />
+                <span class="circle-mark"
+                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
+                />
+            </div>
+        </template>
+        <dashboard-variables-more-button :is-manageable="props.isManageable"
+                                         :disabled="state.saveLoading"
+        />
+        <p-text-button style-type="highlight"
+                       class="reset-button"
+                       :disabled="state.saveLoading"
+                       @click="dashboardDetailStore.resetVariables(props.originVariables, props.originVariablesSchema)"
+        >
+            <p-i name="ic_refresh"
+                 width="1rem"
+                 height="1rem"
+                 color="inherit"
+            />
+            <span>{{ t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
+        </p-text-button>
+        <p-divider v-if="state.modifiedVariablesSchemaProperties.length"
+                   :vertical="true"
+        />
+        <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
+                       style-type="highlight"
+                       :loading="state.saveLoading"
+                       :disabled="state.saveLoading"
+                       @click.stop="handleClickSaveButton"
+        >
+            {{ t('DASHBOARDS.CUSTOMIZE.SAVE') }}
+        </p-text-button>
+        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -97,53 +144,6 @@ const handleClickSaveButton = () => {
 };
 
 </script>
-
-<template>
-    <div class="dashboard-variables-select-dropdown">
-        <template v-for="(propertyName, idx) in state.order"
-                  :key="`${propertyName}-${idx}`"
-        >
-            <div v-if="state.variableProperties[propertyName]?.use"
-                 class="variable-selector-box"
-            >
-                <dashboard-variables-dropdown :property-name="propertyName"
-                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
-                                              :disabled="state.saveLoading"
-                />
-                <span class="circle-mark"
-                      :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
-                />
-            </div>
-        </template>
-        <dashboard-variables-more-button :is-manageable="props.isManageable"
-                                         :disabled="state.saveLoading"
-        />
-        <p-text-button style-type="highlight"
-                       class="reset-button"
-                       :disabled="state.saveLoading"
-                       @click="dashboardDetailStore.resetVariables(props.originVariables, props.originVariablesSchema)"
-        >
-            <p-i name="ic_refresh"
-                 width="1rem"
-                 height="1rem"
-                 color="inherit"
-            />
-            <span>{{ t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
-        </p-text-button>
-        <p-divider v-if="state.modifiedVariablesSchemaProperties.length"
-                   :vertical="true"
-        />
-        <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
-                       style-type="highlight"
-                       :loading="state.saveLoading"
-                       :disabled="state.saveLoading"
-                       @click.stop="handleClickSaveButton"
-        >
-            {{ t('DASHBOARDS.CUSTOMIZE.SAVE') }}
-        </p-text-button>
-        <dashboard-manage-variable-overlay :visible="state.showOverlay" />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-variables-select-dropdown {

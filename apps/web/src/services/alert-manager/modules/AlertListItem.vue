@@ -1,3 +1,55 @@
+<template>
+    <div class="alert-list-item">
+        <div class="content-wrapper">
+            <div class="left-part">
+                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                     width="1em"
+                     height="1em"
+                />
+                <p-anchor class="title"
+                          hide-icon
+                          :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
+                >
+                    <span v-tooltip.bottom="item.title">{{ item.title }}</span>
+                </p-anchor>
+                <p-badge v-if="showMemberName && item.assignee"
+                         style-type="primary1"
+                         badge-type="solid-outline"
+                         class="member-name"
+                >
+                    {{ userReference.name || item.assignee }}
+                </p-badge>
+            </div>
+            <div class="right-part">
+                <p-anchor v-if="showProjectLink"
+                          v-tooltip.bottom="projectNameFormatter(item.project_id)"
+                          class="project-link"
+                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+                          hide-icon
+                >
+                    {{ projectNameFormatter(item.project_id) }}
+                </p-anchor>
+                <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
+                         badge-type="subtle"
+                         class="badge"
+                >
+                    {{ state.alertStateI18n[item.state] }}
+                </p-badge>
+                <span class="date">{{ dateFormatter(item.created_at) }}</span>
+            </div>
+        </div>
+        <div v-if="showStatusMessage && item.status_message"
+             class="status-message"
+        >
+            <p-i name="ic_subdirectory-arrow-right"
+                 width="1rem"
+                 height="1rem"
+            />
+            <span>{{ item.status_message }}</span>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -62,58 +114,6 @@ const dateFormatter = (date) => {
 const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
 
 </script>
-
-<template>
-    <div class="alert-list-item">
-        <div class="content-wrapper">
-            <div class="left-part">
-                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
-                     width="1em"
-                     height="1em"
-                />
-                <p-anchor class="title"
-                          hide-icon
-                          :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
-                >
-                    <span v-tooltip.bottom="item.title">{{ item.title }}</span>
-                </p-anchor>
-                <p-badge v-if="showMemberName && item.assignee"
-                         style-type="primary1"
-                         badge-type="solid-outline"
-                         class="member-name"
-                >
-                    {{ userReference.name || item.assignee }}
-                </p-badge>
-            </div>
-            <div class="right-part">
-                <p-anchor v-if="showProjectLink"
-                          v-tooltip.bottom="projectNameFormatter(item.project_id)"
-                          class="project-link"
-                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                          hide-icon
-                >
-                    {{ projectNameFormatter(item.project_id) }}
-                </p-anchor>
-                <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
-                         badge-type="subtle"
-                         class="badge"
-                >
-                    {{ state.alertStateI18n[item.state] }}
-                </p-badge>
-                <span class="date">{{ dateFormatter(item.created_at) }}</span>
-            </div>
-        </div>
-        <div v-if="showStatusMessage && item.status_message"
-             class="status-message"
-        >
-            <p-i name="ic_subdirectory-arrow-right"
-                 width="1rem"
-                 height="1rem"
-            />
-            <span>{{ item.status_message }}</span>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .alert-list-item {

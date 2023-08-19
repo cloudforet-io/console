@@ -1,3 +1,157 @@
+<template>
+    <div ref="profileMenuRef"
+         class="gnb-profile"
+         @keydown.esc="hideProfileMenu"
+    >
+        <span class="menu-button"
+              role="button"
+              tabindex="0"
+              @click.stop="handleProfileButtonClick"
+              @keydown.enter="openProfileMenu"
+        >
+            <p-i :name="state.userIcon"
+                 class="menu-icon"
+            />
+        </span>
+        <div v-if="visible"
+             class="profile-menu-wrapper"
+        >
+            <div class="user-info">
+                <p-i :name="state.userIcon" />
+                <span class="value">{{ state.userId }}</span>
+            </div>
+            <div class="info-wrapper">
+                <div class="info-menu">
+                    <span class="label">{{ t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
+                    <span class="value">{{ state.domainId }}</span>
+                </div>
+                <div class="info-menu">
+                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
+                    <span class="value">{{ state.role }}</span>
+                </div>
+                <div ref="languageInfoMenuRef"
+                     class="info-menu language"
+                     @click.stop="handleLanguageDropdownClick"
+                >
+                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
+                    <div class="value">
+                        <span>{{ state.language }}</span>
+                        <div v-if="state.languageMenuVisible"
+                             class="language-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.languageMenu"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleLanguageClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+                <div ref="currencyInfoMenuRef"
+                     class="info-menu currency"
+                     @click.stop="handleCurrencyDropdownClick"
+                >
+                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
+                    <div class="value">
+                        <span>{{ state.currency }}</span>
+                        <div v-if="state.currencyMenuVisible"
+                             class="currency-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.currencyMenuItems"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleCurrencyClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+                <div class="info-menu">
+                    <span class="label">{{ t('COMMON.PROFILE.TIMEZONE') }}</span>
+                    <span class="value">{{ state.timezone }}</span>
+                </div>
+                <div class="info-menu">
+                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
+                                 @click="hideProfileMenu"
+                    >
+                        <p-button style-type="secondary"
+                                  size="sm"
+                                  class="my-page-button"
+                        >
+                            {{ t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </div>
+            <template v-if="state.hasPermission">
+                <p-divider />
+                <div class="sub-menu-wrapper">
+                    <router-link class="sub-menu"
+                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 @click="hideProfileMenu"
+                    >
+                        {{ t('MENU.INFO_NOTICE') }}
+                    </router-link>
+                </div>
+            </template>
+            <template v-if="state.hasPermission && !state.isDomainOwner">
+                <p-divider />
+                <div class="sub-menu-wrapper">
+                    <router-link class="sub-menu"
+                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
+                                 @click="hideProfileMenu"
+                    >
+                        {{ t('MENU.MY_PAGE_API_KEY') }}
+                    </router-link>
+                </div>
+            </template>
+            <p-divider />
+            <div class="sub-menu-wrapper">
+                <a v-for="{ link, label } in state.supportedMenu"
+                   :key="label"
+                   class="sub-menu support-menu"
+                   :href="link"
+                   target="_blank"
+                   @click="hideProfileMenu"
+                >
+                    <span>{{ label }}</span>
+                    <p-i name="ic_external-link"
+                         height="1em"
+                         width="1em"
+                         color="inherit"
+                         class="external-icon"
+                    />
+                </a>
+            </div>
+            <p-divider />
+            <div class="sub-menu-wrapper">
+                <div class="sub-menu"
+                     @click="handleClickSignOut"
+                >
+                    {{ t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -158,160 +312,6 @@ onClickOutside(languageInfoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
 onClickOutside(currencyInfoMenuRef as MaybeRef, handleClickOutsideCurrencyMenu);
 
 </script>
-
-<template>
-    <div ref="profileMenuRef"
-         class="gnb-profile"
-         @keydown.esc="hideProfileMenu"
-    >
-        <span class="menu-button"
-              role="button"
-              tabindex="0"
-              @click.stop="handleProfileButtonClick"
-              @keydown.enter="openProfileMenu"
-        >
-            <p-i :name="state.userIcon"
-                 class="menu-icon"
-            />
-        </span>
-        <div v-if="visible"
-             class="profile-menu-wrapper"
-        >
-            <div class="user-info">
-                <p-i :name="state.userIcon" />
-                <span class="value">{{ state.userId }}</span>
-            </div>
-            <div class="info-wrapper">
-                <div class="info-menu">
-                    <span class="label">{{ t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
-                    <span class="value">{{ state.domainId }}</span>
-                </div>
-                <div class="info-menu">
-                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.role }}</span>
-                </div>
-                <div ref="languageInfoMenuRef"
-                     class="info-menu language"
-                     @click.stop="handleLanguageDropdownClick"
-                >
-                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
-                    <div class="value">
-                        <span>{{ state.language }}</span>
-                        <div v-if="state.languageMenuVisible"
-                             class="language-menu-wrapper"
-                        >
-                            <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in state.languageMenu"
-                                     :key="index"
-                                     class="sub-menu"
-                                     @click.stop="handleLanguageClick(item.name)"
-                                >
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p-i :name="state.languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         class="arrow-icon"
-                         width="1rem"
-                         height="1rem"
-                    />
-                </div>
-                <div ref="currencyInfoMenuRef"
-                     class="info-menu currency"
-                     @click.stop="handleCurrencyDropdownClick"
-                >
-                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
-                    <div class="value">
-                        <span>{{ state.currency }}</span>
-                        <div v-if="state.currencyMenuVisible"
-                             class="currency-menu-wrapper"
-                        >
-                            <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in state.currencyMenuItems"
-                                     :key="index"
-                                     class="sub-menu"
-                                     @click.stop="handleCurrencyClick(item.name)"
-                                >
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         class="arrow-icon"
-                         width="1rem"
-                         height="1rem"
-                    />
-                </div>
-                <div class="info-menu">
-                    <span class="label">{{ t('COMMON.PROFILE.TIMEZONE') }}</span>
-                    <span class="value">{{ state.timezone }}</span>
-                </div>
-                <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
-                                 @click="hideProfileMenu"
-                    >
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  class="my-page-button"
-                        >
-                            {{ t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
-                        </p-button>
-                    </router-link>
-                </div>
-            </div>
-            <template v-if="state.hasPermission">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
-                                 @click="hideProfileMenu"
-                    >
-                        {{ t('MENU.INFO_NOTICE') }}
-                    </router-link>
-                </div>
-            </template>
-            <template v-if="state.hasPermission && !state.isDomainOwner">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
-                                 @click="hideProfileMenu"
-                    >
-                        {{ t('MENU.MY_PAGE_API_KEY') }}
-                    </router-link>
-                </div>
-            </template>
-            <p-divider />
-            <div class="sub-menu-wrapper">
-                <a v-for="{ link, label } in state.supportedMenu"
-                   :key="label"
-                   class="sub-menu support-menu"
-                   :href="link"
-                   target="_blank"
-                   @click="hideProfileMenu"
-                >
-                    <span>{{ label }}</span>
-                    <p-i name="ic_external-link"
-                         height="1em"
-                         width="1em"
-                         color="inherit"
-                         class="external-icon"
-                    />
-                </a>
-            </div>
-            <p-divider />
-            <div class="sub-menu-wrapper">
-                <div class="sub-menu"
-                     @click="handleClickSignOut"
-                >
-                    {{ t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .gnb-profile {

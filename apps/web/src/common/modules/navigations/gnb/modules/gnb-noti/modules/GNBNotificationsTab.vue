@@ -1,3 +1,99 @@
+<template>
+    <div class="gnb-notifications-tab">
+        <p-data-loader :data="state.items"
+                       :loading="state.loading"
+                       :disable-empty-case="state.loading"
+        >
+            <div ref="notificationItemsRef"
+                 class="content-wrapper"
+                 :class="{ 'loading': state.loading }"
+            >
+                <p-button v-if="!state.loading"
+                          style-type="transparent"
+                          size="sm"
+                          class="clear-all-button"
+                          @click="handleClearAll"
+                >
+                    {{ t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
+                </p-button>
+                <g-n-b-noti-item v-for="(item, idx) in state.items"
+                                 :key="`${item.notificationId}-${idx}`"
+                                 :is-read="item.isRead"
+                                 :title="item.title"
+                                 :icon="item.icon"
+                                 :created-at="item ? item.createdAt : undefined"
+                                 :date-header="item.dateHeader"
+                                 :deletable="true"
+                                 @select="handleSelectNotification(item)"
+                                 @delete="handleDeleteNotification(item.notificationId)"
+                />
+            </div>
+            <template #no-data>
+                <p-empty
+                    show-image
+                    :title="t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION')"
+                >
+                    <template #image>
+                        <img alt="illust_astronaut_radio"
+                             src="@/assets/images/illust_astronaut_radio.svg"
+                        >
+                    </template>
+                    {{ t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}
+                </p-empty>
+            </template>
+        </p-data-loader>
+        <p-button-modal v-model:visible="state.modalVisible"
+                        class="notification-modal"
+                        size="md"
+                        hide-header-close-button
+                        hide-footer-close-button
+                        @confirm="handleCloseNotificationModal"
+        >
+            <template #header>
+                <div class="header-wrapper">
+                    <p-i v-if="state.selectedItem.icon"
+                         :name="state.selectedItem.icon"
+                         width="1.5rem"
+                         class="icon"
+                         :color="state.selectedItem.iconColor"
+                    />
+                    <span>{{ state.selectedItem.title }}</span>
+                </div>
+            </template>
+            <template #body>
+                <div class="meta-data-wrapper">
+                    <div>
+                        <b>{{ t('COMMON.GNB.NOTICE.OCCURED_TIME') }} </b>
+                        <span>{{ iso8601Formatter(state.selectedItem.createdAt, state.timezone) }}</span>
+                    </div>
+                    <div v-if="state.selectedItem.message.link">
+                        <b>{{ t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
+                        <p-anchor :href="state.selectedItem.message.link">
+                            {{ state.selectedItem.message.link }}
+                        </p-anchor>
+                    </div>
+                </div>
+                <div v-if="state.selectedItem.message.description"
+                     class="description-wrapper"
+                >
+                    {{ state.selectedItem.message.description }}
+                </div>
+                <div v-if="state.definitionData">
+                    <p-definition-table :fields="state.definitionFields"
+                                        :data="state.definitionData"
+                                        :skeleton-rows="4"
+                                        block
+                                        disable-copy
+                    />
+                </div>
+            </template>
+            <template #confirm-button>
+                {{ t('APP.MAIN.CLOSE') }}
+            </template>
+        </p-button-modal>
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -249,102 +345,6 @@ onMounted(() => {
 });
 
 </script>
-
-<template>
-    <div class="gnb-notifications-tab">
-        <p-data-loader :data="state.items"
-                       :loading="state.loading"
-                       :disable-empty-case="state.loading"
-        >
-            <div ref="notificationItemsRef"
-                 class="content-wrapper"
-                 :class="{ 'loading': state.loading }"
-            >
-                <p-button v-if="!state.loading"
-                          style-type="transparent"
-                          size="sm"
-                          class="clear-all-button"
-                          @click="handleClearAll"
-                >
-                    {{ t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
-                </p-button>
-                <g-n-b-noti-item v-for="(item, idx) in state.items"
-                                 :key="`${item.notificationId}-${idx}`"
-                                 :is-read="item.isRead"
-                                 :title="item.title"
-                                 :icon="item.icon"
-                                 :created-at="item ? item.createdAt : undefined"
-                                 :date-header="item.dateHeader"
-                                 :deletable="true"
-                                 @select="handleSelectNotification(item)"
-                                 @delete="handleDeleteNotification(item.notificationId)"
-                />
-            </div>
-            <template #no-data>
-                <p-empty
-                    show-image
-                    :title="t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION')"
-                >
-                    <template #image>
-                        <img alt="illust_astronaut_radio"
-                             src="@/assets/images/illust_astronaut_radio.svg"
-                        >
-                    </template>
-                    {{ t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}
-                </p-empty>
-            </template>
-        </p-data-loader>
-        <p-button-modal v-model:visible="state.modalVisible"
-                        class="notification-modal"
-                        size="md"
-                        hide-header-close-button
-                        hide-footer-close-button
-                        @confirm="handleCloseNotificationModal"
-        >
-            <template #header>
-                <div class="header-wrapper">
-                    <p-i v-if="state.selectedItem.icon"
-                         :name="state.selectedItem.icon"
-                         width="1.5rem"
-                         class="icon"
-                         :color="state.selectedItem.iconColor"
-                    />
-                    <span>{{ state.selectedItem.title }}</span>
-                </div>
-            </template>
-            <template #body>
-                <div class="meta-data-wrapper">
-                    <div>
-                        <b>{{ t('COMMON.GNB.NOTICE.OCCURED_TIME') }} </b>
-                        <span>{{ iso8601Formatter(state.selectedItem.createdAt, state.timezone) }}</span>
-                    </div>
-                    <div v-if="state.selectedItem.message.link">
-                        <b>{{ t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
-                        <p-anchor :href="state.selectedItem.message.link">
-                            {{ state.selectedItem.message.link }}
-                        </p-anchor>
-                    </div>
-                </div>
-                <div v-if="state.selectedItem.message.description"
-                     class="description-wrapper"
-                >
-                    {{ state.selectedItem.message.description }}
-                </div>
-                <div v-if="state.definitionData">
-                    <p-definition-table :fields="state.definitionFields"
-                                        :data="state.definitionData"
-                                        :skeleton-rows="4"
-                                        block
-                                        disable-copy
-                    />
-                </div>
-            </template>
-            <template #confirm-button>
-                {{ t('APP.MAIN.CLOSE') }}
-            </template>
-        </p-button-modal>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .gnb-notifications-tab {

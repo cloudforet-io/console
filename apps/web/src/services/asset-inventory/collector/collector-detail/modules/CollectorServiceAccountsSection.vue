@@ -1,3 +1,95 @@
+<template>
+    <p-pane-layout>
+        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <p-button v-if="!state.isEditMode"
+                          size="md"
+                          icon-left="ic_edit"
+                          style-type="secondary"
+                          @click="handleClickEdit"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                </p-button>
+            </template>
+        </p-heading>
+        <p-toolbox-table v-if="!state.isEditMode"
+                         v-model:sort-by="state.sortBy"
+                         v-model:sort-desc="state.sortDesc"
+                         v-model:page-size="state.pageLimit"
+                         :fields="fields"
+                         :items="state.secrets"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :query-tags="queryTags"
+                         :key-item-sets="querySearchHandlers.keyItemSets"
+                         :value-handler-map="querySearchHandlers.valueHandlerMap"
+                         search-type="query"
+                         searchable
+                         use-cursor-loading
+                         @change="handleToolboxTableChange"
+                         @refresh="handleToolboxTableRefresh"
+        >
+            <template #col-service_account_id-format="{value}">
+                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
+            </template>
+            <template #col-project_id-format="{value}">
+                <p-anchor v-if="state.projects[value]"
+                          :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                >
+                    {{ state.projects[value].label }}
+                </p-anchor>
+            </template>
+            <template #col-provider-format="{value}">
+                <p-badge v-if="state.providers[value]"
+                         :background-color="state.providers[value].color"
+                         text-color="white"
+                >
+                    {{ state.providers[value].label }}
+                </p-badge>
+            </template>
+            <template #col-collect-format="{item}">
+                <p-button size="sm"
+                          style-type="tertiary"
+                          :disabled="props.manageDisabled"
+                          @click.stop="handleClickCollect(item)"
+                >
+                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+                </p-button>
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, state.timezone) }}
+            </template>
+        </p-toolbox-table>
+        <div v-else
+             class="edit-form"
+        >
+            <attached-service-account-form :title="t('INVENTORY.COLLECTOR.DETAIL.SELECT_SERVICE_ACCOUNT')"
+                                           margin-on-specific
+                                           reset-on-collector-id-change
+                                           @update:is-attached-service-account-valid="handleChangeIsAttachedServiceAccountValid"
+            />
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          size="lg"
+                          @click="handleClickCancel"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          class="save-changes-button"
+                          :disalbed="state.updateLoading"
+                          @click="handleClickSave"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -219,99 +311,6 @@ onMounted(async () => {
 });
 
 </script>
-
-<template>
-    <p-pane-layout>
-        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
-        <p-toolbox-table v-if="!state.isEditMode"
-                         v-model:sort-by="state.sortBy"
-                         v-model:sort-desc="state.sortDesc"
-                         v-model:page-size="state.pageLimit"
-                         :fields="fields"
-                         :items="state.secrets"
-                         :loading="state.loading"
-                         :total-count="state.totalCount"
-                         :query-tags="queryTags"
-                         :key-item-sets="querySearchHandlers.keyItemSets"
-                         :value-handler-map="querySearchHandlers.valueHandlerMap"
-                         search-type="query"
-                         searchable
-                         use-cursor-loading
-                         @change="handleToolboxTableChange"
-                         @refresh="handleToolboxTableRefresh"
-        >
-            <template #col-service_account_id-format="{value}">
-                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
-            </template>
-            <template #col-project_id-format="{value}">
-                <p-anchor v-if="state.projects[value]"
-                          :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
-                >
-                    {{ state.projects[value].label }}
-                </p-anchor>
-            </template>
-            <template #col-provider-format="{value}">
-                <p-badge v-if="state.providers[value]"
-                         :background-color="state.providers[value].color"
-                         text-color="white"
-                >
-                    {{ state.providers[value].label }}
-                </p-badge>
-            </template>
-            <template #col-collect-format="{item}">
-                <p-button size="sm"
-                          style-type="tertiary"
-                          :disabled="props.manageDisabled"
-                          @click.stop="handleClickCollect(item)"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
-                </p-button>
-            </template>
-            <template #col-created_at-format="{value}">
-                {{ iso8601Formatter(value, state.timezone) }}
-            </template>
-        </p-toolbox-table>
-        <div v-else
-             class="edit-form"
-        >
-            <attached-service-account-form :title="t('INVENTORY.COLLECTOR.DETAIL.SELECT_SERVICE_ACCOUNT')"
-                                           margin-on-specific
-                                           reset-on-collector-id-change
-                                           @update:is-attached-service-account-valid="handleChangeIsAttachedServiceAccountValid"
-            />
-            <div class="button-group">
-                <p-button style-type="tertiary"
-                          size="lg"
-                          @click="handleClickCancel"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="lg"
-                          class="save-changes-button"
-                          :disalbed="state.updateLoading"
-                          @click="handleClickSave"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
-
 
 <style lang="postcss" scoped>
 .p-toolbox-table {

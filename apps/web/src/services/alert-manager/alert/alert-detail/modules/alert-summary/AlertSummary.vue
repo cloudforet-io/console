@@ -1,3 +1,79 @@
+<template>
+    <p-pane-layout class="alert-detail-header">
+        <p class="content-wrapper">
+            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
+            <template v-if="state.alertState !== ALERT_STATE.ERROR">
+                <p-select-dropdown
+                    :items="state.alertStateList"
+                    :selected="state.alertState"
+                    :disabled="manageDisabled"
+                    class="state-dropdown"
+                    @select="changeAlertState"
+                >
+                    <span :class="{'text-alert': state.alertState === ALERT_STATE.TRIGGERED}">
+                        {{ state.alertStateList.find(d => d.name === state.alertState).label }}
+                    </span>
+                </p-select-dropdown>
+            </template>
+            <template v-else>
+                <p-badge style-type="alert"
+                         badge-type="solid"
+                         shape="square"
+                >
+                    {{ ALERT_STATE.ERROR }}
+                </p-badge>
+            </template>
+        </p>
+        <p class="content-wrapper">
+            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
+            <p-select-dropdown :items="state.alertUrgencyList"
+                               :selected="state.alertUrgency"
+                               :disabled="state.alertState === ALERT_STATE.ERROR || manageDisabled"
+                               class="state-dropdown"
+                               @select="changeAlertUrgency"
+            >
+                <p-i v-if="state.alertUrgency === ALERT_URGENCY.HIGH"
+                     name="ic_error-filled"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
+                />
+                <p-i v-if="state.alertUrgency === ALERT_URGENCY.LOW"
+                     name="ic_warning-filled"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
+                />
+                <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency).label }}</span>
+            </p-select-dropdown>
+        </p>
+        <p class="content-wrapper">
+            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
+                <p-button style-type="tertiary"
+                          size="sm"
+                          class="ml-2"
+                          :disabled="manageDisabled"
+                          @click="onClickReassign"
+                >
+                    {{ t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
+                </p-button>
+            </span>
+            <span v-if="alertPageState.alertData?.assignee"
+                  class="email"
+            >{{ alertPageState.alertData?.assignee }}</span>
+            <span v-else>--</span>
+        </p>
+        <p class="content-wrapper">
+            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>
+            <span class="time">{{ state.duration }}</span>
+        </p>
+        <alert-assign-modal v-model:visible="state.reassignModalVisible"
+                            :project-id="alertPageState.alertData?.project_id"
+                            :alert-id="id"
+        />
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -95,82 +171,6 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
 };
 
 </script>
-
-<template>
-    <p-pane-layout class="alert-detail-header">
-        <p class="content-wrapper">
-            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
-            <template v-if="state.alertState !== ALERT_STATE.ERROR">
-                <p-select-dropdown
-                    :items="state.alertStateList"
-                    :selected="state.alertState"
-                    :disabled="manageDisabled"
-                    class="state-dropdown"
-                    @select="changeAlertState"
-                >
-                    <span :class="{'text-alert': state.alertState === ALERT_STATE.TRIGGERED}">
-                        {{ state.alertStateList.find(d => d.name === state.alertState).label }}
-                    </span>
-                </p-select-dropdown>
-            </template>
-            <template v-else>
-                <p-badge style-type="alert"
-                         badge-type="solid"
-                         shape="square"
-                >
-                    {{ ALERT_STATE.ERROR }}
-                </p-badge>
-            </template>
-        </p>
-        <p class="content-wrapper">
-            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown :items="state.alertUrgencyList"
-                               :selected="state.alertUrgency"
-                               :disabled="state.alertState === ALERT_STATE.ERROR || manageDisabled"
-                               class="state-dropdown"
-                               @select="changeAlertUrgency"
-            >
-                <p-i v-if="state.alertUrgency === ALERT_URGENCY.HIGH"
-                     name="ic_error-filled"
-                     width="1em"
-                     height="1em"
-                     class="mr-2"
-                />
-                <p-i v-if="state.alertUrgency === ALERT_URGENCY.LOW"
-                     name="ic_warning-filled"
-                     width="1em"
-                     height="1em"
-                     class="mr-2"
-                />
-                <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency).label }}</span>
-            </p-select-dropdown>
-        </p>
-        <p class="content-wrapper">
-            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
-                <p-button style-type="tertiary"
-                          size="sm"
-                          class="ml-2"
-                          :disabled="manageDisabled"
-                          @click="onClickReassign"
-                >
-                    {{ t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
-                </p-button>
-            </span>
-            <span v-if="alertPageState.alertData?.assignee"
-                  class="email"
-            >{{ alertPageState.alertData?.assignee }}</span>
-            <span v-else>--</span>
-        </p>
-        <p class="content-wrapper">
-            <span class="title">{{ t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>
-            <span class="time">{{ state.duration }}</span>
-        </p>
-        <alert-assign-modal v-model:visible="state.reassignModalVisible"
-                            :project-id="alertPageState.alertData?.project_id"
-                            :alert-id="id"
-        />
-    </p-pane-layout>
-</template>
 
 <style lang="postcss" scoped>
 .alert-detail-header {

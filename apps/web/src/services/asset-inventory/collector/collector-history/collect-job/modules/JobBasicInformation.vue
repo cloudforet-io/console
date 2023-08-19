@@ -1,3 +1,52 @@
+<template>
+    <p-pane-layout class="job-basic-information">
+        <header>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
+        <section class="items-container">
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
+                <p-anchor :to="state.collector.linkLocation"
+                          class="contents"
+                          size="sm"
+                >
+                    {{ state.collector.label }}
+                </p-anchor>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(state.job.created_at, state.timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
+                <span class="contents align-middle">
+                    <p-lazy-img :src="state.plugin.icon"
+                                error-icon="ic_cloud-filled"
+                                :loading="!state.plugin.id"
+                                :alt="state.plugin.label"
+                                width="1rem"
+                                height="1rem"
+                                class="mr-1"
+                    />
+                    {{ state.plugin.label }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(state.job.finished_at, state.timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
+                <span class="contents">
+                    {{ state.provider.label }}
+                </span>
+            </div>
+        </section>
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -91,55 +140,6 @@ onActivated(() => {
 })();
 
 </script>
-
-<template>
-    <p-pane-layout class="job-basic-information">
-        <header>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
-        <section class="items-container">
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="state.collector.linkLocation"
-                          class="contents"
-                          size="sm"
-                >
-                    {{ state.collector.label }}
-                </p-anchor>
-            </div>
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
-                <span class="contents">
-                    {{ iso8601Formatter(state.job.created_at, state.timezone) }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
-                <span class="contents align-middle">
-                    <p-lazy-img :src="state.plugin.icon"
-                                error-icon="ic_cloud-filled"
-                                :loading="!state.plugin.id"
-                                :alt="state.plugin.label"
-                                width="1rem"
-                                height="1rem"
-                                class="mr-1"
-                    />
-                    {{ state.plugin.label }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}</label>
-                <span class="contents">
-                    {{ iso8601Formatter(state.job.finished_at, state.timezone) }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
-                <span class="contents">
-                    {{ state.provider.label }}
-                </span>
-            </div>
-        </section>
-    </p-pane-layout>
-</template>
 
 <style lang="postcss" scoped>
 .job-basic-information {

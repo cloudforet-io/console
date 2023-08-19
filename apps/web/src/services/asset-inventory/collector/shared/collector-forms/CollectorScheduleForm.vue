@@ -1,3 +1,66 @@
+<template>
+    <p-data-loader :loading="state.loading"
+                   :data="true"
+                   show-data-from-scratch
+                   class="collector-schedule-edit-form"
+    >
+        <p-field-title :label="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_ON_OFF')"
+                       :description="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_TURN_ON_DESC')"
+                       class="schedule-desc"
+        />
+        <p-toggle-button :value="collectorFormState.schedulePower"
+                         :disabled="props.disabled"
+                         @change-toggle="handleChangeToggle"
+        />
+        <div v-if="!props.enableHoursEdit && collectorFormState.schedulePower"
+             class="collect-data-desc"
+        >
+            <i18n-t v-if="state.timezoneAppliedHours.length > 0"
+                    keypath="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
+                    tag="p"
+            >
+                <template #times>
+                    <span class="times">{{ state.timezoneAppliedHoursDisplayText }}</span>
+                </template>
+            </i18n-t>
+            <template v-else>
+                {{ t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_NOT_SELECTED_YET') }}
+                <p-button style-type="tertiary"
+                          size="sm"
+                          @click="handleClickSelect"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.SELECT') }}
+                </p-button>
+            </template>
+        </div>
+        <p-field-group v-if="props.enableHoursEdit"
+                       class="hourly-schedule-field-group"
+                       :label="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
+                       :help-text="t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
+        >
+            <div class="hourly-schedule-wrapper">
+                <span v-for="(hour) in hoursMatrix"
+                      :key="hour"
+                      class="time-block"
+                      :class="{
+                          active: !!state.timezoneAppliedHours.includes(hour),
+                          disabled: props.disabled
+                      }"
+                      @click="handleClickHour(hour)"
+                >
+                    {{ hour }}
+                </span>
+                <p-button style-type="tertiary"
+                          :disabled="props.disabled"
+                          @click="handleClickAllHours"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
+                </p-button>
+            </div>
+        </p-field-group>
+    </p-data-loader>
+</template>
+
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -132,69 +195,6 @@ watch(() => collectorFormStore.collectorId, (collectorId) => {
 }, { immediate: true });
 
 </script>
-
-<template>
-    <p-data-loader :loading="state.loading"
-                   :data="true"
-                   show-data-from-scratch
-                   class="collector-schedule-edit-form"
-    >
-        <p-field-title :label="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_ON_OFF')"
-                       :description="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_TURN_ON_DESC')"
-                       class="schedule-desc"
-        />
-        <p-toggle-button :value="collectorFormState.schedulePower"
-                         :disabled="props.disabled"
-                         @change-toggle="handleChangeToggle"
-        />
-        <div v-if="!props.enableHoursEdit && collectorFormState.schedulePower"
-             class="collect-data-desc"
-        >
-            <i18n-t v-if="state.timezoneAppliedHours.length > 0"
-                    keypath="INVENTORY.COLLECTOR.DETAIL.SCHEDULE_COLLECT_DESC"
-                    tag="p"
-            >
-                <template #times>
-                    <span class="times">{{ state.timezoneAppliedHoursDisplayText }}</span>
-                </template>
-            </i18n-t>
-            <template v-else>
-                {{ t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_NOT_SELECTED_YET') }}
-                <p-button style-type="tertiary"
-                          size="sm"
-                          @click="handleClickSelect"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.SELECT') }}
-                </p-button>
-            </template>
-        </div>
-        <p-field-group v-if="props.enableHoursEdit"
-                       class="hourly-schedule-field-group"
-                       :label="t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
-                       :help-text="t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
-        >
-            <div class="hourly-schedule-wrapper">
-                <span v-for="(hour) in hoursMatrix"
-                      :key="hour"
-                      class="time-block"
-                      :class="{
-                          active: !!state.timezoneAppliedHours.includes(hour),
-                          disabled: props.disabled
-                      }"
-                      @click="handleClickHour(hour)"
-                >
-                    {{ hour }}
-                </span>
-                <p-button style-type="tertiary"
-                          :disabled="props.disabled"
-                          @click="handleClickAllHours"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.ALL') }}
-                </p-button>
-            </div>
-        </p-field-group>
-    </p-data-loader>
-</template>
 
 <style lang="postcss" scoped>
 .collector-schedule-edit-form {

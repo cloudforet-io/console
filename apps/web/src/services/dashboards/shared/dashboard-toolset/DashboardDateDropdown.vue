@@ -1,3 +1,46 @@
+<template>
+    <div class="dashboard-date-dropdown">
+        <p-select-dropdown
+            style-type="transparent"
+            :items="state.monthMenuItems"
+            :selected="state.selectedMonthMenuIndex"
+            index-mode
+            menu-position="right"
+            @select="handleSelectMonthMenuItem"
+        >
+            <div>
+                <span>{{ state.selectedMonthLabel }}</span>
+                <p-badge
+                    v-if="state.selectedMonthBadge"
+                    style-type="indigo100"
+                    badge-type="subtle"
+                    class="ml-1"
+                >
+                    {{ state.selectedMonthBadge }}
+                </p-badge>
+            </div>
+            <template #menu-item--format="{ item }">
+                <div>
+                    <span>{{ item.label }}</span>
+                    <p-badge
+                        v-if="item.badge"
+                        style-type="indigo100"
+                        badge-type="subtle"
+                        class="ml-1"
+                    >
+                        {{ item.badge }}
+                    </p-badge>
+                </div>
+            </template>
+        </p-select-dropdown>
+        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
+                                 granularity="MONTHLY"
+                                 :selected-date-range="dateRange"
+                                 @confirm="handleCustomRangeModalConfirm"
+        />
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -90,17 +133,17 @@ const setInitialDateRange = () => {
     // Index 0 is 'Current' menu index
 
     if (!props.dateRange?.start
-                || !props.dateRange?.end
-                || (_start.isSame(_current.startOf('month'), 'day')
-                && _end.isSame(_current, 'day'))
+        || !props.dateRange?.end
+        || (_start.isSame(_current.startOf('month'), 'day')
+            && _end.isSame(_current, 'day'))
     ) {
         return 0;
     }
 
     // 2. some month => start is (month 'n' + day '1'), end is (month 'n' + day '{last day}')
     if (_start.isSame(_end, 'month')
-                && _start.isSame(_start.startOf('month'), 'day')
-                && _end.isSame(_end.endOf('month'), 'day')
+        && _start.isSame(_start.startOf('month'), 'day')
+        && _end.isSame(_end.endOf('month'), 'day')
     ) {
         const itemIndex = state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
         if (itemIndex > -1) return itemIndex;
@@ -116,49 +159,6 @@ watch(() => props.dateRange, () => {
 }, { immediate: true });
 
 </script>
-
-<template>
-    <div class="dashboard-date-dropdown">
-        <p-select-dropdown
-            style-type="transparent"
-            :items="state.monthMenuItems"
-            :selected="state.selectedMonthMenuIndex"
-            index-mode
-            menu-position="right"
-            @select="handleSelectMonthMenuItem"
-        >
-            <div>
-                <span>{{ state.selectedMonthLabel }}</span>
-                <p-badge
-                    v-if="state.selectedMonthBadge"
-                    style-type="indigo100"
-                    badge-type="subtle"
-                    class="ml-1"
-                >
-                    {{ state.selectedMonthBadge }}
-                </p-badge>
-            </div>
-            <template #menu-item--format="{ item }">
-                <div>
-                    <span>{{ item.label }}</span>
-                    <p-badge
-                        v-if="item.badge"
-                        style-type="indigo100"
-                        badge-type="subtle"
-                        class="ml-1"
-                    >
-                        {{ item.badge }}
-                    </p-badge>
-                </div>
-            </template>
-        </p-select-dropdown>
-        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
-                                 granularity="MONTHLY"
-                                 :selected-date-range="dateRange"
-                                 @confirm="handleCustomRangeModalConfirm"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {

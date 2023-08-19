@@ -1,3 +1,40 @@
+<template>
+    <div class="gnb-noti-item">
+        <p v-if="dateHeader"
+           class="date-header"
+        >
+            {{ dateHeader }}
+        </p>
+        <div class="item-wrapper"
+             @click="handleClickItem"
+        >
+            <span class="new-icon"
+                  :class="{ invisible: isRead }"
+            />
+            <div class="contents-wrapper">
+                <p class="title">
+                    <p-i v-if="icon"
+                         :name="icon"
+                         width="1rem"
+                         height="1rem"
+                         class="mr-1"
+                    />
+                    <span>{{ title }}</span>
+                </p>
+                <div class="additional-text">
+                    {{ state.occurred }} <span v-if="writer">· {{ writer }}</span>
+                </div>
+            </div>
+            <p-icon-button v-if="deletable"
+                           class="delete-button"
+                           name="ic_close"
+                           size="sm"
+                           @click="handleClickDeleteButton"
+            />
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -52,43 +89,6 @@ const handleClickDeleteButton = (event) => {
 };
 
 </script>
-
-<template>
-    <div class="gnb-noti-item">
-        <p v-if="dateHeader"
-           class="date-header"
-        >
-            {{ dateHeader }}
-        </p>
-        <div class="item-wrapper"
-             @click="handleClickItem"
-        >
-            <span class="new-icon"
-                  :class="{ invisible: isRead }"
-            />
-            <div class="contents-wrapper">
-                <p class="title">
-                    <p-i v-if="icon"
-                         :name="icon"
-                         width="1rem"
-                         height="1rem"
-                         class="mr-1"
-                    />
-                    <span>{{ title }}</span>
-                </p>
-                <div class="additional-text">
-                    {{ state.occurred }} <span v-if="writer">· {{ writer }}</span>
-                </div>
-            </div>
-            <p-icon-button v-if="deletable"
-                           class="delete-button"
-                           name="ic_close"
-                           size="sm"
-                           @click="handleClickDeleteButton"
-            />
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .gnb-noti-item {

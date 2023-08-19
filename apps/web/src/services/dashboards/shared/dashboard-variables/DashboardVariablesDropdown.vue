@@ -1,3 +1,67 @@
+<template>
+    <div ref="containerRef"
+         class="dashboard-variable-dropdown"
+         :class="{ 'open-menu': visibleMenu }"
+    >
+        <button ref="targetRef"
+                class="dropdown-box"
+                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
+                :disabled="state.variableProperty.disabled || props.disabled"
+                @click="toggleMenu"
+        >
+            <span class="variable-contents">
+                <span class="variable-label">{{ variableName }}</span>
+                <span v-if="state.selected.length"
+                      class="item-for-display"
+                >{{ state.selected[0].label }}</span>
+            </span>
+            <template v-if="state.selected.length">
+                <p-badge v-if="state.selected.length > 1"
+                         class="selected-count"
+                         style-type="blue300"
+                         badge-type="subtle"
+                >
+                    +{{ state.selected.length - 1 }}
+                </p-badge>
+                <button v-if="!state.variableProperty.disabled"
+                        :disabled="props.disabled"
+                        class="option-delete-button"
+                        :class="{'disabled': props.disabled}"
+                        @click.stop="handleClearSelected"
+                >
+                    <p-i name="ic_close"
+                         width="1rem"
+                         height="1rem"
+                         color="inherit"
+                    />
+                </button>
+            </template>
+
+            <p-i :name="visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                 :activated="visibleMenu"
+                 color="inherit"
+                 class="dropdown-icon"
+            />
+        </button>
+        <p-context-menu v-show="visibleMenu"
+                        ref="contextMenuRef"
+                        class="options-menu"
+                        searchable
+                        :search-text="state.searchText"
+                        :style="contextMenuStyle"
+                        :menu="refinedMenu"
+                        :selected="state.selected"
+                        :multi-selectable="variableProperty.selection_type === 'MULTI'"
+                        show-select-marker
+                        :show-clear-selection="variableProperty.selection_type === 'MULTI'"
+                        @click-show-more="showMoreMenu"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @update:selected="handleSelectOption"
+                        @update:search-text="handleUpdateSearchText"
+        />
+    </div>
+</template>
+
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -164,70 +228,6 @@ const {
 } = toRefs(state);
 
 </script>
-
-<template>
-    <div ref="containerRef"
-         class="dashboard-variable-dropdown"
-         :class="{ 'open-menu': visibleMenu }"
-    >
-        <button ref="targetRef"
-                class="dropdown-box"
-                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                :disabled="state.variableProperty.disabled || props.disabled"
-                @click="toggleMenu"
-        >
-            <span class="variable-contents">
-                <span class="variable-label">{{ variableName }}</span>
-                <span v-if="state.selected.length"
-                      class="item-for-display"
-                >{{ state.selected[0].label }}</span>
-            </span>
-            <template v-if="state.selected.length">
-                <p-badge v-if="state.selected.length > 1"
-                         class="selected-count"
-                         style-type="blue300"
-                         badge-type="subtle"
-                >
-                    +{{ state.selected.length - 1 }}
-                </p-badge>
-                <button v-if="!state.variableProperty.disabled"
-                        :disabled="props.disabled"
-                        class="option-delete-button"
-                        :class="{'disabled': props.disabled}"
-                        @click.stop="handleClearSelected"
-                >
-                    <p-i name="ic_close"
-                         width="1rem"
-                         height="1rem"
-                         color="inherit"
-                    />
-                </button>
-            </template>
-
-            <p-i :name="visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                 :activated="visibleMenu"
-                 color="inherit"
-                 class="dropdown-icon"
-            />
-        </button>
-        <p-context-menu v-show="visibleMenu"
-                        ref="contextMenuRef"
-                        class="options-menu"
-                        searchable
-                        :search-text="state.searchText"
-                        :style="contextMenuStyle"
-                        :menu="refinedMenu"
-                        :selected="state.selected"
-                        :multi-selectable="variableProperty.selection_type === 'MULTI'"
-                        show-select-marker
-                        :show-clear-selection="variableProperty.selection_type === 'MULTI'"
-                        @click-show-more="showMoreMenu"
-                        @keyup:down:end="focusOnContextMenu()"
-                        @update:selected="handleSelectOption"
-                        @update:search-text="handleUpdateSearchText"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {

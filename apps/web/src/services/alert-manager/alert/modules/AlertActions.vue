@@ -1,3 +1,80 @@
+<template>
+    <div class="alert-actions">
+        <p-button v-for="(button, index) in state.buttonGroup"
+                  :key="index"
+                  class="only-desktop action-button"
+                  :style-type="button.styleType"
+                  :disabled="button.disabled"
+                  @click="onSelectAction(button.name)"
+        >
+            {{ button.label }}
+        </p-button>
+        <p-select-dropdown :items="state.buttonGroup"
+                           class="only-mobile"
+                           @select="onSelectAction"
+        >
+            {{ t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
+        </p-select-dropdown>
+
+        <p-table-check-modal
+            v-model:visible="state.visibleDeleteModal"
+            theme-color="alert"
+            modal-size="md"
+            :header-title="t('MONITORING.ALERT.ALERT_LIST.DELETE_CHECK_MODAL.TITLE')"
+            :fields="TABLE_FIELDS"
+            :items="selectedItems"
+            :loading="state.deleteLoading"
+            @confirm="handleConfirmDelete"
+        >
+            <template #col-state-format="{ value }">
+                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                         :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
+                >
+                    {{ state.alertStateI18n[value] }}
+                </p-badge>
+            </template>
+            <template #col-urgency-format="{ value }">
+                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                     width="1em"
+                     height="1em"
+                     class="mr-1"
+                />
+                <span>{{ state.urgencyI18n[value] }}</span>
+            </template>
+            <template #col-resource-format="{ value }">
+                {{ value ? value.name : '' }}
+            </template>
+            <template #col-project_id-format="{ value }">
+                <template v-if="value">
+                    {{ state.projects[value] ? state.projects[value].label : value }}
+                </template>
+            </template>
+            <template #col-created_at-format="{value, field}">
+                <template v-if="field.label === 'Created'">
+                    {{ iso8601Formatter(value, timezone) }}
+                </template>
+                <template v-else>
+                    {{ alertDurationFormatter(value) }}
+                </template>
+            </template>
+            <template #col-webhook_id-format="{ value }">
+                {{ value ? (state.webhooks(value) ? state.webhooks(value).label : value) : ' ' }}
+            </template>
+        </p-table-check-modal>
+
+        <alert-acknowledge-modal
+            v-model:visible="state.visibleAcknowledgeModal"
+            :alerts="selectedItems"
+            @confirm="handleRefresh"
+        />
+        <alert-resolve-modal
+            v-model:visible="state.visibleResolveModal"
+            :alerts="selectedItems"
+            @confirm="onConfirmResolve"
+        />
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import { durationFormatter, iso8601Formatter } from '@cloudforet/core-lib';
@@ -142,83 +219,6 @@ const onConfirmResolve = () => {
 })();
 
 </script>
-
-<template>
-    <div class="alert-actions">
-        <p-button v-for="(button, index) in state.buttonGroup"
-                  :key="index"
-                  class="only-desktop action-button"
-                  :style-type="button.styleType"
-                  :disabled="button.disabled"
-                  @click="onSelectAction(button.name)"
-        >
-            {{ button.label }}
-        </p-button>
-        <p-select-dropdown :items="state.buttonGroup"
-                           class="only-mobile"
-                           @select="onSelectAction"
-        >
-            {{ t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
-        </p-select-dropdown>
-
-        <p-table-check-modal
-            v-model:visible="state.visibleDeleteModal"
-            theme-color="alert"
-            modal-size="md"
-            :header-title="t('MONITORING.ALERT.ALERT_LIST.DELETE_CHECK_MODAL.TITLE')"
-            :fields="TABLE_FIELDS"
-            :items="selectedItems"
-            :loading="state.deleteLoading"
-            @confirm="handleConfirmDelete"
-        >
-            <template #col-state-format="{ value }">
-                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                         :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
-                >
-                    {{ state.alertStateI18n[value] }}
-                </p-badge>
-            </template>
-            <template #col-urgency-format="{ value }">
-                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
-                     width="1em"
-                     height="1em"
-                     class="mr-1"
-                />
-                <span>{{ state.urgencyI18n[value] }}</span>
-            </template>
-            <template #col-resource-format="{ value }">
-                {{ value ? value.name : '' }}
-            </template>
-            <template #col-project_id-format="{ value }">
-                <template v-if="value">
-                    {{ state.projects[value] ? state.projects[value].label : value }}
-                </template>
-            </template>
-            <template #col-created_at-format="{value, field}">
-                <template v-if="field.label === 'Created'">
-                    {{ iso8601Formatter(value, timezone) }}
-                </template>
-                <template v-else>
-                    {{ alertDurationFormatter(value) }}
-                </template>
-            </template>
-            <template #col-webhook_id-format="{ value }">
-                {{ value ? (state.webhooks(value) ? state.webhooks(value).label : value) : ' ' }}
-            </template>
-        </p-table-check-modal>
-
-        <alert-acknowledge-modal
-            v-model:visible="state.visibleAcknowledgeModal"
-            :alerts="selectedItems"
-            @confirm="handleRefresh"
-        />
-        <alert-resolve-modal
-            v-model:visible="state.visibleResolveModal"
-            :alerts="selectedItems"
-            @confirm="onConfirmResolve"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .alert-actions {

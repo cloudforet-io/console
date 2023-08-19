@@ -1,3 +1,78 @@
+<template>
+    <p-pane-layout>
+        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                   heading-type="sub"
+        >
+            <template #extra>
+                <p-button v-if="!state.isEditMode"
+                          size="md"
+                          icon-left="ic_edit"
+                          style-type="secondary"
+                          @click="handleClickEdit"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                </p-button>
+            </template>
+        </p-heading>
+
+        <p-definition-table v-if="!state.isEditMode"
+                            :fields="fields"
+                            :loading="state.loading"
+                            :data="collectorFormState.originCollector"
+                            style-type="white"
+        >
+            <template #data-pluginName>
+                <p-lazy-img :src="state.pluginIcon"
+                            :loading="state.loading"
+                            width="1rem"
+                            height="1rem"
+                />
+                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
+            </template>
+            <template #data-plugin_info.version="{ value }">
+                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
+            </template>
+            <template #data-plugin_info.upgrade_mode="{ value }">
+                {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
+            </template>
+            <template #data-created_at="{ value }">
+                {{ value ? iso8601Formatter(value, timezone) : '' }}
+            </template>
+            <template #data-last_collected_at="{ value }">
+                {{ value ? iso8601Formatter(value, timezone) : '' }}
+            </template>
+        </p-definition-table>
+
+        <div v-if="state.isEditMode"
+             class="collector-base-info-edit"
+        >
+            <collector-plugin-contents :plugin="state.pluginInfo" />
+            <collector-version-form @update:is-version-valid="handleUpdateIsVersionValid" />
+            <collector-tag-form :service-name="t('MENU.ASSET_INVENTORY_COLLECTOR')"
+                                @update:is-tags-valid="handleUpdateIsTagsValid"
+            />
+            <div class="button-group">
+                <p-button style-type="tertiary"
+                          size="lg"
+                          :disabled="state.updateLoading"
+                          @click="handleClickCancel"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          class="save-changes-button"
+                          :disabled="!state.isAllValid"
+                          :loading="state.updateLoading"
+                          @click="handleClickSave"
+                >
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -148,81 +223,6 @@ watch(() => collectorFormStore.pluginId, async (pluginId) => {
     await store.dispatch('reference/plugin/load');
 })();
 </script>
-
-<template>
-    <p-pane-layout>
-        <p-heading :title="t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
-
-        <p-definition-table v-if="!state.isEditMode"
-                            :fields="fields"
-                            :loading="state.loading"
-                            :data="collectorFormState.originCollector"
-                            style-type="white"
-        >
-            <template #data-pluginName>
-                <p-lazy-img :src="state.pluginIcon"
-                            :loading="state.loading"
-                            width="1rem"
-                            height="1rem"
-                />
-                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
-            </template>
-            <template #data-plugin_info.version="{ value }">
-                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
-            </template>
-            <template #data-plugin_info.upgrade_mode="{ value }">
-                {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
-            </template>
-            <template #data-created_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-            <template #data-last_collected_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-        </p-definition-table>
-
-        <div v-if="state.isEditMode"
-             class="collector-base-info-edit"
-        >
-            <collector-plugin-contents :plugin="state.pluginInfo" />
-            <collector-version-form @update:is-version-valid="handleUpdateIsVersionValid" />
-            <collector-tag-form :service-name="t('MENU.ASSET_INVENTORY_COLLECTOR')"
-                                @update:is-tags-valid="handleUpdateIsTagsValid"
-            />
-            <div class="button-group">
-                <p-button style-type="tertiary"
-                          size="lg"
-                          :disabled="state.updateLoading"
-                          @click="handleClickCancel"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="lg"
-                          class="save-changes-button"
-                          :disabled="!state.isAllValid"
-                          :loading="state.updateLoading"
-                          @click="handleClickSave"
-                >
-                    {{ t('INVENTORY.COLLECTOR.DETAIL.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-    </p-pane-layout>
-</template>
 
 <style lang="postcss" scoped>
 .p-definition-table {

@@ -1,3 +1,108 @@
+<template>
+    <p-pane-layout class="project-settings">
+        <p class="sub-title">
+            {{ t('PROJECT.DETAIL.ALERT.SETTINGS') }}
+        </p>
+        <section class="section notification-policy-wrapper">
+            <div class="section-wrapper">
+                <span class="text">{{ t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
+                <p-icon-button name="ic_edit"
+                               :disabled="!state.hasManagePermission"
+                               @click="onClickUpdateNotificationPolicy"
+                />
+            </div>
+            <div class="content-wrapper">
+                <p-i v-if="state.notificationUrgency"
+                     :name="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
+                />
+                <span class="text">{{ notificationOptionFormatter(state.notificationUrgency) }}</span>
+            </div>
+        </section>
+        <section class="section auto-recovery-wrapper">
+            <div class="section-wrapper">
+                <span class="text">{{ t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
+                <p-icon-button name="ic_edit"
+                               :disabled="!state.hasManagePermission"
+                               @click="onClickUpdateAutoRecovery"
+                />
+            </div>
+            <div class="content-wrapper">
+                <p-i v-if="state.recoveryMode === RECOVERY_MODE.AUTO"
+                     name="ic_service_automation"
+                />
+                <span class="text">{{ state.recoveryMode === RECOVERY_MODE.AUTO ? t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
+            </div>
+        </section>
+        <section class="section event-rule-wrapper">
+            <div class="section-wrapper">
+                <span class="text">{{ t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
+                <p-icon-button name="ic_edit"
+                               :disabled="!state.hasManagePermission"
+                               @click="onClickEditEventRule"
+                />
+            </div>
+            <div class="content-wrapper">
+                <span class="text"><b>{{ state.eventRuleTotalCount }}</b> {{ t('PROJECT.DETAIL.ALERT.RULES_ON_THIS_PROJECT') }}</span>
+            </div>
+        </section>
+        <section class="section escalation-policy-wrapper">
+            <div class="section-wrapper">
+                <span class="text">{{ t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}</span>
+                <div class="text-button-group">
+                    <p-button class="text-button"
+                              style-type="tertiary"
+                              size="sm"
+                              :disabled="!state.hasManagePermission || state.escalationPolicy.scope === SCOPE.DOMAIN"
+                              @click="onClickUpdateEscalationPolicy"
+                    >
+                        {{ t('PROJECT.DETAIL.ALERT.UPDATE') }}
+                    </p-button>
+                    <p-button class="text-button"
+                              style-type="tertiary"
+                              size="sm"
+                              :disabled="!state.hasManagePermission"
+                              @click="onClickChangeEscalationPolicy"
+                    >
+                        {{ t('PROJECT.DETAIL.ALERT.CHANGE') }}
+                    </p-button>
+                </div>
+            </div>
+            <div class="content-wrapper">
+                <project-escalation-policy
+                    :project-id="id"
+                    :escalation-policy="state.escalationPolicy"
+                />
+            </div>
+        </section>
+        <!--modals-->
+        <project-notification-policy-update-modal
+            v-model:visible="state.updateNotificationPolicyModalVisible"
+            :project-id="id"
+            :select-options="state.notificationUrgencyList"
+            :selected-option="state.notificationUrgency"
+            @confirm="getProjectAlertConfig"
+        />
+        <project-auto-recovery-update-modal
+            v-model:visible="state.updateAutoRecoveryModalVisible"
+            :project-id="id"
+            :selected-option="state.recoveryMode"
+            @confirm="getProjectAlertConfig"
+        />
+        <project-escalation-policy-change-modal
+            v-model:visible="state.changeEscalationPolicyModalVisible"
+            :project-id="id"
+            :escalation-policy-id="state.escalationPolicyId"
+            @confirm="getProjectAlertConfig"
+        />
+        <escalation-policy-form-modal
+            v-model:visible="state.updateEscalationPolicyModalVisible"
+            :mode="ACTION.update"
+            :escalation-policy="state.escalationPolicy"
+            @confirm="getEscalationPolicy"
+        />
+    </p-pane-layout>
+</template>
+
 <script lang="ts" setup>
 /* eslint-disable camelcase */
 
@@ -140,111 +245,6 @@ onActivated(() => {
 });
 
 </script>
-
-<template>
-    <p-pane-layout class="project-settings">
-        <p class="sub-title">
-            {{ t('PROJECT.DETAIL.ALERT.SETTINGS') }}
-        </p>
-        <section class="section notification-policy-wrapper">
-            <div class="section-wrapper">
-                <span class="text">{{ t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
-                <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
-                               @click="onClickUpdateNotificationPolicy"
-                />
-            </div>
-            <div class="content-wrapper">
-                <p-i v-if="state.notificationUrgency"
-                     :name="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
-                />
-                <span class="text">{{ notificationOptionFormatter(state.notificationUrgency) }}</span>
-            </div>
-        </section>
-        <section class="section auto-recovery-wrapper">
-            <div class="section-wrapper">
-                <span class="text">{{ t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
-                <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
-                               @click="onClickUpdateAutoRecovery"
-                />
-            </div>
-            <div class="content-wrapper">
-                <p-i v-if="state.recoveryMode === RECOVERY_MODE.AUTO"
-                     name="ic_service_automation"
-                />
-                <span class="text">{{ state.recoveryMode === RECOVERY_MODE.AUTO ? t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
-            </div>
-        </section>
-        <section class="section event-rule-wrapper">
-            <div class="section-wrapper">
-                <span class="text">{{ t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
-                <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
-                               @click="onClickEditEventRule"
-                />
-            </div>
-            <div class="content-wrapper">
-                <span class="text"><b>{{ state.eventRuleTotalCount }}</b> {{ t('PROJECT.DETAIL.ALERT.RULES_ON_THIS_PROJECT') }}</span>
-            </div>
-        </section>
-        <section class="section escalation-policy-wrapper">
-            <div class="section-wrapper">
-                <span class="text">{{ t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}</span>
-                <div class="text-button-group">
-                    <p-button class="text-button"
-                              style-type="tertiary"
-                              size="sm"
-                              :disabled="!state.hasManagePermission || state.escalationPolicy.scope === SCOPE.DOMAIN"
-                              @click="onClickUpdateEscalationPolicy"
-                    >
-                        {{ t('PROJECT.DETAIL.ALERT.UPDATE') }}
-                    </p-button>
-                    <p-button class="text-button"
-                              style-type="tertiary"
-                              size="sm"
-                              :disabled="!state.hasManagePermission"
-                              @click="onClickChangeEscalationPolicy"
-                    >
-                        {{ t('PROJECT.DETAIL.ALERT.CHANGE') }}
-                    </p-button>
-                </div>
-            </div>
-            <div class="content-wrapper">
-                <project-escalation-policy
-                    :project-id="id"
-                    :escalation-policy="state.escalationPolicy"
-                />
-            </div>
-        </section>
-        <!--modals-->
-        <project-notification-policy-update-modal
-            v-model:visible="state.updateNotificationPolicyModalVisible"
-            :project-id="id"
-            :select-options="state.notificationUrgencyList"
-            :selected-option="state.notificationUrgency"
-            @confirm="getProjectAlertConfig"
-        />
-        <project-auto-recovery-update-modal
-            v-model:visible="state.updateAutoRecoveryModalVisible"
-            :project-id="id"
-            :selected-option="state.recoveryMode"
-            @confirm="getProjectAlertConfig"
-        />
-        <project-escalation-policy-change-modal
-            v-model:visible="state.changeEscalationPolicyModalVisible"
-            :project-id="id"
-            :escalation-policy-id="state.escalationPolicyId"
-            @confirm="getProjectAlertConfig"
-        />
-        <escalation-policy-form-modal
-            v-model:visible="state.updateEscalationPolicyModalVisible"
-            :mode="ACTION.update"
-            :escalation-policy="state.escalationPolicy"
-            @confirm="getEscalationPolicy"
-        />
-    </p-pane-layout>
-</template>
 
 <style lang="postcss" scoped>
 .project-settings {

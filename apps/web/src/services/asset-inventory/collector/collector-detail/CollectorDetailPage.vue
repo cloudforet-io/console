@@ -1,3 +1,67 @@
+<template>
+    <div class="collector-detail-page">
+        <p-heading :title="state.collectorName"
+                   show-back-button
+                   @click-back-button="handleClickBackButton"
+        >
+            <p-skeleton v-if="state.loading"
+                        width="20rem"
+                        height="1.5rem"
+            />
+            <template v-if="state.collectorName"
+                      #title-right-extra
+            >
+                <span class="title-right-button-wrapper">
+                    <p-icon-button name="ic_delete"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission"
+                                   class="delete-button"
+                                   @click="handleClickDeleteButton"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission"
+                                   @click="handleClickEditButton"
+                    />
+                </span>
+            </template>
+            <template #extra>
+                <div class="collector-button-box">
+                    <router-link v-if="state.hasJobs"
+                                 :to="state.collectorHistoryLink"
+                    >
+                        <p-button v-if="props.collectorId"
+                                  style-type="tertiary"
+                        >
+                            {{ t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </template>
+        </p-heading>
+
+        <collector-base-info-section class="section" />
+        <collector-schedule-section class="section" />
+        <collector-options-section class="section" />
+        <collector-service-accounts-section class="section"
+                                            :manage-disabled="!state.hasManagePermission"
+        />
+
+        <p-double-check-modal v-model:visible="state.deleteModalVisible"
+                              :header-title="t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
+                              :verification-text="state.collectorName"
+                              modal-size="sm"
+                              :loading="state.deleteLoading"
+                              @confirm="handleDeleteModalConfirm"
+        />
+        <collector-name-edit-modal :visible="state.editModalVisible"
+                                   @update:visible="handleUpdateEditModalVisible"
+        />
+    </div>
+</template>
+
 <script lang="ts">
 // eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent, type ComponentPublicInstance } from 'vue';
@@ -16,20 +80,21 @@ export default defineComponent({
 });
 </script>
 
+
 <script lang="ts" setup>
 /* eslint-disable import/first */
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
+} from '@spaceone/design-system';
 import {
     defineProps, defineExpose, reactive, onMounted, computed,
 // eslint-disable-next-line import/no-duplicates
 } from 'vue';
-import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
-} from '@spaceone/design-system';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { useRouter } from 'vue-router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -165,70 +230,6 @@ onMounted(async () => {
 });
 
 </script>
-
-<template>
-    <div class="collector-detail-page">
-        <p-heading :title="state.collectorName"
-                   show-back-button
-                   @click-back-button="handleClickBackButton"
-        >
-            <p-skeleton v-if="state.loading"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="state.collectorName"
-                      #title-right-extra
-            >
-                <span class="title-right-button-wrapper">
-                    <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
-                                   class="delete-button"
-                                   @click="handleClickDeleteButton"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
-                                   @click="handleClickEditButton"
-                    />
-                </span>
-            </template>
-            <template #extra>
-                <div class="collector-button-box">
-                    <router-link v-if="state.hasJobs"
-                                 :to="state.collectorHistoryLink"
-                    >
-                        <p-button v-if="props.collectorId"
-                                  style-type="tertiary"
-                        >
-                            {{ t('INVENTORY.COLLECTOR.DETAIL.COLLECTOR_HISTORY') }}
-                        </p-button>
-                    </router-link>
-                </div>
-            </template>
-        </p-heading>
-
-        <collector-base-info-section class="section" />
-        <collector-schedule-section class="section" />
-        <collector-options-section class="section" />
-        <collector-service-accounts-section class="section"
-                                            :manage-disabled="!state.hasManagePermission"
-        />
-
-        <p-double-check-modal v-model:visible="state.deleteModalVisible"
-                              :header-title="t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
-                              :verification-text="state.collectorName"
-                              modal-size="sm"
-                              :loading="state.deleteLoading"
-                              @confirm="handleDeleteModalConfirm"
-        />
-        <collector-name-edit-modal :visible="state.editModalVisible"
-                                   @update:visible="handleUpdateEditModalVisible"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .section {
