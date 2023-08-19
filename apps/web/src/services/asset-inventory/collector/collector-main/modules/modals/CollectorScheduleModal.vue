@@ -72,19 +72,4 @@ watch(() => collectorPageState.selectedCollector, async (value) => {
 }, { immediate: true });
 </script>
 
-<template>
-    <p-button-modal class="collector-schedule-modal"
-                    :header-title="t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
-                    size="md"
-                    fade
-                    backdrop
-                    :visible="collectorPageState.visibleScheduleModal"
-                    @close="handleCloseModal"
-                    @cancel="handleCloseModal"
-                    @confirm="handleConfirm"
-    >
-        <template #body>
-            <collector-schedule-form enable-hours-edit />
-        </template>
-    </p-button-modal>
-</template>
+
