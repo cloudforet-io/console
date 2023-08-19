@@ -5,7 +5,7 @@ import {
 } from '@spaceone/design-system';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { onClickOutside } from '@vueuse/core';
-import { isEmpty, isEqual, union } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import type { MaybeRef } from 'vue';
 import {
     computed, reactive, ref, watch,
@@ -32,7 +32,6 @@ const { t } = useI18n();
 
 const state = reactive({
     widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
-    requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
     defaultProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.default_properties ?? []),
     propertiesOrder: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.order ?? []),
     allProperties: computed<string[]>(() => Object.keys(state.widgetConfig?.options_schema?.schema.properties ?? {})),
@@ -79,9 +78,7 @@ const optionsMenuItems = computed<MenuItem[]>(() => {
     if (isEmpty(state.schemaProperties)) return [];
 
     Object.entries<JsonSchema>(state.schemaProperties).forEach(([key, val]) => {
-        if (!state.requiredProperties.includes(key)) {
-            menuItems.push({ name: key, label: val.title ?? key });
-        }
+        menuItems.push({ name: key, label: val.title ?? key });
     });
 
     return sortItems(menuItems);
@@ -105,9 +102,9 @@ const {
 });
 
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
-    const selectedProperties: string[] = union(state.requiredProperties, sortItems(selected).map((item) => item.name));
+    const selectedProperties: string[] = sortItems(selected).map((item) => item.name);
     emit('update:selected-properties', selectedProperties);
-    // hideContextMenu();
+    hideContextMenu();
 };
 const handleClickAddOptions = () => {
     initiateMenu();
@@ -121,8 +118,7 @@ watch(() => props.selectedProperties, (selectedProperties) => {
     const current = selectedOptions.value.map((item) => item.name);
     if (isEqual(current, selectedProperties)) return;
 
-    const refined: MenuItem[] = selectedProperties.filter((d) => !state.requiredProperties.includes(d))
-        .map((d) => ({ name: d, label: state.schemaProperties[d]?.title ?? d }));
+    const refined: MenuItem[] = selectedProperties.map((d) => ({ name: d, label: state.schemaProperties[d]?.title ?? d }));
     selectedOptions.value = refined;
 }, { immediate: true });
 
@@ -149,6 +145,7 @@ watch(() => props.selectedProperties, (selectedProperties) => {
                         multi-selectable
                         item-height-fixed
                         show-select-marker
+                        :reset-selected-on-unmounted="false"
                         @update:selected="handleUpdateSelectedOptions"
         />
     </div>

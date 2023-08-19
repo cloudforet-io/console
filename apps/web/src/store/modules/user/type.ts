@@ -27,6 +27,7 @@ export interface UserState {
     roles?: Array<UserRole>;
     requiredActions?: string[];
     emailVerified?: boolean;
+    isSignInLoading?: boolean;
 }
 
 export interface SignInRequest {

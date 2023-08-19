@@ -1,18 +1,20 @@
 <script lang="ts" setup>
+
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    cloneDeep, isEmpty, union, xor,
+    cloneDeep, isEmpty, isEqual, union, xor,
 } from 'lodash';
 import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import { getDefaultWidgetFormData } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
@@ -61,7 +63,6 @@ const state = reactive({
     widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
     widgetOptionsJsonSchema: {} as JsonSchema,
     schemaFormData: {},
-    //
     fixedProperties: computed<string[]>(() => state.widgetConfig.options_schema?.fixed_properties ?? []),
     inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
         .filter(([, inheritOption]) => !!inheritOption.enabled)
@@ -71,11 +72,13 @@ const state = reactive({
         state.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
     )),
+    isFocused: false,
+    //
+    defaultWidgetFormData: computed(() => (props.widgetConfigId ? getDefaultWidgetFormData(props.widgetConfigId) : {})),
+    isFormDataChanged: computed(() => !isEqual(state.schemaFormData, state.defaultWidgetFormData)),
     // validation
     isSchemaFormValid: undefined,
     isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
-
-    isFocused: false,
 });
 
 const referenceHandler = getReferenceHandler();
@@ -176,6 +179,9 @@ const getSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo
     return widgetInfo.schema_properties ?? [];
 };
 
+const handleReturnToInitialSettings = () => {
+    initStatesByWidgetConfig(props.widgetConfigId as string, true);
+};
 
 /* inherit */
 const handleChangeInheritToggle = (propertyName: string, value) => {
@@ -241,7 +247,7 @@ const resetStates = () => {
     state.schemaFormData = {};
     resetTitle();
 };
-const initStatesByWidgetConfig = (widgetConfigId: string) => {
+const initStatesByWidgetConfig = (widgetConfigId: string, forceInit = false) => {
     state.schemaFormData = {};
     const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
     // init widget form store states
@@ -250,7 +256,7 @@ const initStatesByWidgetConfig = (widgetConfigId: string) => {
         _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
         _state.inheritOptions = {};
     });
-    if (!props.widgetKey) {
+    if (!props.widgetKey || forceInit) {
         let _inheritOptions = widgetFormState.inheritOptions;
         // set default value to fixed properties
         widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
@@ -265,6 +271,7 @@ const initStatesByWidgetConfig = (widgetConfigId: string) => {
             _inheritOptions = {
                 ..._inheritOptions,
                 [propertyName]: { enabled: true },
+
             };
         });
         widgetFormStore.$patch((_state) => {
@@ -335,7 +342,10 @@ const handleFormValidate = (isValid) => {
 };
 
 /* sync to widget form store */
-watch(() => state.schemaFormData, (schemaFormData) => {
+watch(() => state.schemaFormData, (schemaFormData, before) => {
+    if (isEmpty(state.widgetOptionsJsonSchema)) return;
+    if (state.widgetOptionsJsonSchema.properties?.cost_group_by && !schemaFormData?.cost_group_by) return;
+    if (state.widgetOptionsJsonSchema.properties?.asset_group_by && !before?.asset_group_by) return;
     widgetFormStore.setFormData(schemaFormData);
 }, { immediate: true });
 watch(() => state.isAllValid, (_isAllValid) => {
@@ -349,6 +359,7 @@ watch(() => state.isAllValid, (_isAllValid) => {
         <p-field-group :label="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
                        :invalid="isTitleInvalid"
                        :invalid-text="titleInvalidText"
+                       class="name-field"
                        required
         >
             <p-text-input v-model:is-focused="state.isFocused"
@@ -367,6 +378,14 @@ watch(() => state.isAllValid, (_isAllValid) => {
         <p-data-loader :loading="referenceStoreState.loading"
                        class="widget-options-form-wrapper"
         >
+            <p-text-button icon-left="ic_refresh"
+                           style-type="highlight"
+                           :disabled="!isFormDataChanged"
+                           class="return-to-initial-settings-button"
+                           @click="handleReturnToInitialSettings"
+            >
+                {{ t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
+            </p-text-button>
             <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
                                 v-model:form-data="state.schemaFormData"
                                 :schema="state.widgetOptionsJsonSchema"
@@ -422,10 +441,23 @@ watch(() => state.isAllValid, (_isAllValid) => {
     height: 100%;
     gap: 1rem;
     overflow-y: auto;
-    .p-field-group {
-        margin: 0;
-        .input {
-            width: 100%;
+
+    /* custom design-system component - p-field-group */
+
+    /* custom design-system component - p-field-title */
+    :deep(.name-field) {
+        &.p-field-group {
+            margin: 0;
+            .p-field-title {
+                .title-wrapper .title {
+                    @apply text-label-md;
+                    display: flex;
+                    align-items: center;
+                }
+            }
+            .input {
+                width: 100%;
+            }
         }
     }
     .description-text {
@@ -438,6 +470,10 @@ watch(() => state.isAllValid, (_isAllValid) => {
     .widget-options-form-wrapper {
         height: 100%;
         min-height: 15rem;
+        .return-to-initial-settings-button {
+            float: right;
+            padding: 1rem 0;
+        }
         .delete-button {
             margin-left: 0.25rem;
         }
@@ -456,6 +492,7 @@ watch(() => state.isAllValid, (_isAllValid) => {
             .form-label {
                 width: 100%;
                 > .title-wrapper .title {
+                    @apply text-label-md;
                     display: flex;
                     width: 100%;
                     justify-content: space-between;

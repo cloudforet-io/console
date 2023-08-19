@@ -24,6 +24,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 interface Props {
     propertyName: string;
     referenceMap: ReferenceMap;
+    disabled?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -172,7 +173,7 @@ const {
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                :disabled="state.variableProperty.disabled"
+                :disabled="state.variableProperty.disabled || props.disabled"
                 @click="toggleMenu"
         >
             <span class="variable-contents">
@@ -190,7 +191,9 @@ const {
                     +{{ state.selected.length - 1 }}
                 </p-badge>
                 <button v-if="!state.variableProperty.disabled"
+                        :disabled="props.disabled"
                         class="option-delete-button"
+                        :class="{'disabled': props.disabled}"
                         @click.stop="handleClearSelected"
                 >
                     <p-i name="ic_close"
@@ -275,8 +278,11 @@ const {
             @apply flex items-center flex-shrink-0 justify-center text-gray-400 rounded-full;
             margin-left: 0.5rem;
 
-            &:hover {
+            &:hover:not(.disabled) {
                 @apply bg-gray-200 text-gray-900;
+            }
+            &.disabled {
+                @apply cursor-not-allowed;
             }
         }
 
@@ -299,6 +305,8 @@ const {
 
     /* custom design-system component - p-context-menu */
     :deep(.options-menu) {
+        z-index: 10;
+        margin-top: -1px;
         .label-wrapper {
             min-width: 7rem;
             width: max-content;

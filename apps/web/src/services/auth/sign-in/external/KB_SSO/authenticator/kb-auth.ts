@@ -11,6 +11,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 class KbAuth extends Authenticator {
     static async signIn(onSignInCallback, query) {
         try {
+            store.dispatch('user/startSignIn');
             const clientIP = await SpaceConnector.client.identity.user.getIp();
             const credentials = {
                 secureToken: query.secureToken,
@@ -25,6 +26,8 @@ class KbAuth extends Authenticator {
             if (onSignInCallback) onSignInCallback();
         } catch (e) {
             await KbAuth.onSignInFail();
+        } finally {
+            store.dispatch('user/finishSignIn');
         }
     }
 

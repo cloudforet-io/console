@@ -3,6 +3,7 @@
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { onClickOutside } from '@vueuse/core';
 import ejs from 'ejs';
 import type { MaybeRef } from 'vue';
@@ -14,6 +15,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -49,6 +51,7 @@ const state = reactive({
         return roleArray.join(', ');
     }),
     language: computed(() => store.getters['user/languageLabel']),
+    currency: computed(() => store.state.settings.currency),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
     userId: computed(() => store.state.user.userId),
@@ -56,6 +59,7 @@ const state = reactive({
     isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
     hasPermission: computed(() => store.getters['user/hasPermission']),
     languageMenuVisible: false,
+    currencyMenuVisible: false,
     supportedMenu: computed(() => {
         const docsList = config.get('DOCS') ?? [];
         const data = { lang: store.state.user.language };
@@ -67,9 +71,14 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
+    currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
 });
 const profileMenuRef = ref<HTMLElement|null>(null);
-const infoMenuRef = ref<HTMLElement|null>(null);
+const languageInfoMenuRef = ref<HTMLElement|null>(null);
+const currencyInfoMenuRef = ref<HTMLElement|null>(null);
 
 const setVisible = (visible: boolean) => {
     emit('update:visible', visible);
@@ -83,6 +92,9 @@ const hideProfileMenu = () => {
 };
 const setLanguageMenuVisible = (visible: boolean) => {
     state.languageMenuVisible = visible;
+};
+const setCurrencyMenuVisible = (visible: boolean) => {
+    state.currencyMenuVisible = visible;
 };
 const handleProfileButtonClick = () => {
     setVisible(!props.visible);
@@ -99,8 +111,18 @@ const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
     if (!profileMenuRef.value.contains(target)) hideProfileMenu();
 };
 
+const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
+    const _profileMenuRef = profileMenuRef.value;
+    if (!_profileMenuRef) return;
+    const target = e.target as HTMLElement;
+    setCurrencyMenuVisible(false);
+    if (!_profileMenuRef.contains(target)) hideProfileMenu();
+};
 const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
+};
+const handleCurrencyDropdownClick = () => {
+    setCurrencyMenuVisible(!state.currencyMenuVisible);
 };
 
 const handleLanguageClick = async (language) => {
@@ -118,7 +140,11 @@ const handleLanguageClick = async (language) => {
         ErrorHandler.handleRequestError(e, t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
     }
 };
-
+const handleCurrencyClick = async (currency) => {
+    store.commit('settings/setCurrency', currency);
+    setCurrencyMenuVisible(false);
+    showSuccessMessage(t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
+};
 const handleClickSignOut = async () => {
     const res = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
@@ -128,7 +154,8 @@ const handleClickSignOut = async () => {
 };
 
 onClickOutside(profileMenuRef as MaybeRef, hideProfileMenu);
-onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
+onClickOutside(languageInfoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
+onClickOutside(currencyInfoMenuRef as MaybeRef, handleClickOutsideCurrencyMenu);
 
 </script>
 
@@ -163,7 +190,7 @@ onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
                     <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
                     <span class="value">{{ state.role }}</span>
                 </div>
-                <div ref="infoMenuRef"
+                <div ref="languageInfoMenuRef"
                      class="info-menu language"
                      @click.stop="handleLanguageDropdownClick"
                 >
@@ -185,6 +212,33 @@ onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
                         </div>
                     </div>
                     <p-i :name="state.languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+                <div ref="currencyInfoMenuRef"
+                     class="info-menu currency"
+                     @click.stop="handleCurrencyDropdownClick"
+                >
+                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
+                    <div class="value">
+                        <span>{{ state.currency }}</span>
+                        <div v-if="state.currencyMenuVisible"
+                             class="currency-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.currencyMenuItems"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleCurrencyClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
                          class="arrow-icon"
                          width="1rem"
                          height="1rem"
@@ -339,7 +393,7 @@ onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
                     margin-bottom: 0.5rem;
                 }
 
-                &.language {
+                &.language, &.currency {
                     display: inline-flex;
                     cursor: pointer;
                     &:hover, &:focus {
@@ -351,7 +405,7 @@ onClickOutside(infoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
                     }
                     .value {
                         position: relative;
-                        .language-menu-wrapper {
+                        .language-menu-wrapper, .currency-menu-wrapper {
                             @mixin menu-dropdown;
                             left: -1rem;
                             min-width: 9.25rem;
