@@ -21,6 +21,7 @@ import {
     useWidgetValidator,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-validator';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -114,6 +115,10 @@ watch(() => dashboardDetailState.settings, (dashboardSettings, prevSettings) => 
         refreshAllWidget();
     }
 });
+const handleRefreshWidget = (widgetKey: string) => {
+    const targetWidgetRef = widgetRef.value?.find((d) => d?.$el?.id === widgetKey);
+    targetWidgetRef?.refreshWidget();
+};
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.$patch({ loadingWidgets: true });
     const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
@@ -172,9 +177,6 @@ onMounted(async () => {
                            :size="widget.size"
                            :width="widget.width"
                            :theme="widget.theme"
-                           :dashboard-variables="dashboardDetailState.variables"
-                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
-                           :dashboard-settings="dashboardDetailState.settings"
                            :currency-rates="state.currencyRates"
                            :edit-mode="editMode"
                            :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
@@ -183,6 +185,9 @@ onMounted(async () => {
                 />
             </template>
         </template>
+        <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"
+                                @refresh-widget="handleRefreshWidget"
+        />
     </div>
 </template>
 

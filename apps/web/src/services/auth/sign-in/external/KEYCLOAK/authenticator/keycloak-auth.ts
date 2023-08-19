@@ -40,15 +40,21 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async keycloakSignIn(auth) {
-        if (!auth) {
-            await KeycloakAuth.onSignInFail();
-            return;
-        }
-        if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken) {
-            // eslint-disable-next-line camelcase
-            await super.signIn(
-                { access_token: KeycloakAuth.keycloak.token },
-            );
+        try {
+            store.dispatch('user/startSignIn');
+            if (!auth) {
+                await KeycloakAuth.onSignInFail();
+                return;
+            }
+            if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken) {
+                // eslint-disable-next-line camelcase
+                await super.signIn(
+                    { access_token: KeycloakAuth.keycloak.token },
+                );
+            }
+        } catch (e) {
+            store.dispatch('user/finishSignIn');
+            throw e;
         }
     }
 

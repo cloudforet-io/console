@@ -118,7 +118,7 @@ watch(() => props.dateRange, () => {
 </script>
 
 <template>
-    <div>
+    <div class="dashboard-date-dropdown">
         <p-select-dropdown
             style-type="transparent"
             :items="state.monthMenuItems"
@@ -159,3 +159,12 @@ watch(() => props.dateRange, () => {
         />
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.dashboard-date-dropdown {
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        min-width: auto;
+    }
+}
+</style>

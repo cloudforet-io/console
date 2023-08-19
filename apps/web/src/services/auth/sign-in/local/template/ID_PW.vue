@@ -87,7 +87,7 @@ const { t } = useI18n();
 const state = reactive({
     userId: '' as string,
     password: '',
-    loading: false,
+    loading: computed(() => store.state.user.isSignInLoading),
 });
 
 const validationState = reactive({
@@ -131,11 +131,9 @@ const handleUpdatePassword = async (password: string) => {
 };
 
 const signIn = async () => {
-    state.loading = true;
     checkUserId();
     await checkPassword();
     if (!validationState.isIdValid || !validationState.isPasswordValid) {
-        state.loading = false;
         return;
     }
     const credentials = {
@@ -153,8 +151,6 @@ const signIn = async () => {
         ErrorHandler.handleError(e);
         state.password = '';
         await store.dispatch('display/showSignInErrorMessage');
-    } finally {
-        state.loading = false;
     }
 };
 

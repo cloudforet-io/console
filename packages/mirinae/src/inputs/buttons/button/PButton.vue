@@ -14,6 +14,7 @@
     >
         <p-spinner v-if="loading"
                    :size="state.loadingIconSize"
+                   :style-type="state.spinnerStyleType"
         />
         <p-i v-if="iconLeft"
              :name="iconLeft"
@@ -40,7 +41,8 @@ import {
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
+import type { SpinnerStyleType } from '@/feedbacks/loading/spinner/type';
+import { SPINNER_SIZE, SPINNER_STYLE_TYPE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
 import type { ButtonSize, ButtonStyle } from '@/inputs/buttons/button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
@@ -56,6 +58,8 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
     md: SPINNER_SIZE.sm,
     lg: SPINNER_SIZE.sm,
 };
+const WHITE_SPINNER_TYPES: string[] = [BUTTON_STYLE.primary, BUTTON_STYLE.substitutive, BUTTON_STYLE.highlight, BUTTON_STYLE.positive, BUTTON_STYLE['negative-primary']];
+
 
 const props = defineProps({
     styleType: {
@@ -108,6 +112,10 @@ const state = reactive({
     component: computed(() => (props.href ? 'a' : 'button')),
     iconSize: computed(() => ICON_SIZE[props.size ?? ''] ?? ICON_SIZE.md),
     loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+    spinnerStyleType: computed<SpinnerStyleType>(() => {
+        if (WHITE_SPINNER_TYPES.includes(props.styleType)) return SPINNER_STYLE_TYPE.white;
+        return SPINNER_STYLE_TYPE.gray;
+    }),
 });
 
 const listeners = {

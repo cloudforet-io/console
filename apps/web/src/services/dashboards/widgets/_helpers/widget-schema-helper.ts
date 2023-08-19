@@ -1,5 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type {
     WidgetConfig,
     WidgetFilterKey,
@@ -49,6 +51,20 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
 export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
 
+/** @function
+ * @name getWidgetOptionsSchemaPropertyName
+ * @example
+ * getWidgetOptionsSchemaPropertyName('filters.project_group') => 'Project Group'
+ * getWidgetOptionsSchemaPropertyName('group_by') => 'Group By'
+ */
+export const getWidgetOptionsSchemaPropertyName = (property: WidgetOptionsSchemaProperty): string => {
+    if (property.startsWith('filters.')) {
+        return REFERENCE_TYPE_INFO[property.replace('filters.', '')].name;
+    }
+    if (property === 'group_by') return 'Group By';
+    return property;
+};
+
 export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
     const inheritOptions: InheritOptions = {};
     const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
@@ -60,4 +76,14 @@ export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): Inhe
         };
     });
     return inheritOptions;
+};
+
+export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptions): string[] => {
+    if (!widgetInheritOptions) return [];
+    const enabledInheritedOptions: string[] = Object.entries(widgetInheritOptions).filter(([, v]) => v.enabled).map(([k]) => k);
+    const nonInheritedOptions: string[] = [];
+    Object.keys(widgetInheritOptions).forEach((property) => {
+        if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
+    });
+    return nonInheritedOptions;
 };

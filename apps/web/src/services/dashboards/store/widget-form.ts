@@ -3,9 +3,16 @@ import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
+/* Description
+    * This store is used to get/manage 'a' widget data.
+    * This store is used in
+    *   1) widget view modal (in dashboard detail page)
+    *   2) widget edit modal (in dashboard customize page)
+* */
 
 interface WidgetFormState {
     widgetConfigId?: string;
@@ -15,14 +22,17 @@ interface WidgetFormState {
     widgetOptions?: WidgetOptions;
     widgetInfo?: DashboardLayoutWidgetInfo;
     schemaProperties?: string[];
+    // view modal
+    widgetKey?: string;
+    theme?: WidgetTheme;
 }
 interface WidgetFormActions {
     setFormData: (formData: any) => void;
     initWidgetForm: (widgetKey: string) => DashboardLayoutWidgetInfo|undefined;
 }
 
-const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 export const useWidgetFormStore = defineStore<string, WidgetFormState, any, WidgetFormActions>('widget-form', {
     state: () => ({
@@ -67,7 +77,7 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
             this.inheritOptions = _inheritOptions;
         },
         initWidgetForm(widgetKey: string) {
-            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailInfoState.dashboardWidgetInfoList ?? []);
+            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
             this.widgetInfo = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
             if (this.widgetInfo) {
                 this.widgetConfigId = this.widgetInfo.widget_name;

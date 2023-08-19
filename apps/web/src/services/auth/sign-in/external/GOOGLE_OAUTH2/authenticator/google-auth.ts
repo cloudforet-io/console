@@ -36,6 +36,7 @@ class GoogleAuth extends Authenticator {
 
     static async onSuccess(accessToken) {
         try {
+            store.dispatch('user/startSignIn');
             GoogleAuth.accessToken = accessToken;
             const credentials = {
                 access_token: accessToken,
@@ -45,6 +46,8 @@ class GoogleAuth extends Authenticator {
             await GoogleAuth.signOut();
             await store.dispatch('display/showSignInErrorMessage');
             throw new Error(e);
+        } finally {
+            store.dispatch('user/finishSignIn');
         }
     }
 

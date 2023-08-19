@@ -1,10 +1,12 @@
-import type { Location } from 'vue-router/types/router';
+
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 import type { Currency } from '@/store/modules/settings/type';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 export const UNIT_MAP = {
     B: 'B',
@@ -74,7 +76,7 @@ export interface WidgetFrameProps {
     size: WidgetSize;
     width?: number;
     widgetLink?: string;
-    widgetLocation?: Location;
+    widgetLocation?: RouteLocationRaw;
     widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;
@@ -87,8 +89,11 @@ export interface WidgetFrameProps {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
+    disableViewMode?: boolean;
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
     refreshOnResize?: boolean;
+    theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
 }

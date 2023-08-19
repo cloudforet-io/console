@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PDivider, PI, PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
@@ -36,6 +37,7 @@ import DashboardCloneModal from '@/services/dashboards/shared/DashboardCloneModa
 import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/shared/DashboardRefreshDropdown.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -111,6 +113,24 @@ const handleVisibleCloneModal = () => {
 // else
 const handleRefresh = () => {
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+const handleUpdateLabels = async (labels: string[]) => {
+    try {
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                labels,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                labels,
+            });
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 /* init */
@@ -242,13 +262,16 @@ onMounted(() => {
             </template>
         </p-heading>
         <div class="filter-box">
-            <dashboard-labels />
+            <dashboard-labels :editable="state.hasManagePermission"
+                              @update-labels="handleUpdateLabels"
+            />
             <dashboard-toolset />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
             <dashboard-variables-select-dropdown class="variable-selector-wrapper"
                                                  :is-manageable="state.hasManagePermission"
+                                                 :dashboard-id="props.dashboardId"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"

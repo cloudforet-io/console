@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI,
+    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
@@ -17,6 +17,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/type';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -37,12 +38,15 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     selectedDates: () => [],
     currency: undefined,
     overflowY: undefined,
+    theme: undefined,
+    nonInheritOptionsTooltipText: undefined,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void}>();
 const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<string|undefined>(() => {
@@ -104,18 +108,35 @@ const handleDeleteModalConfirm = () => {
 const handleRefresh = () => {
     emit('refresh');
 };
+const handleClickViewModeButton = () => {
+    widgetFormStore.$patch({
+        widgetKey: props.widgetKey,
+        theme: props.theme,
+    });
+    dashboardDetailStore.$patch({
+        widgetViewModeModalVisible: true,
+    });
+};
 </script>
 
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
+         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
+        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
+                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
+                       class="view-mode-button"
+                       name="ic_arrows-expand-all"
+                       shape="square"
+                       style-type="tertiary"
+                       @click="handleClickViewModeButton"
+        />
         <div class="body"
              :style="{overflowY: props.overflowY}"
         >
@@ -154,6 +175,19 @@ const handleRefresh = () => {
                                :vertical="true"
                     />
                     <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <p-divider v-if="props.nonInheritOptionsTooltipText"
+                               :vertical="true"
+                    />
+                    <p-tooltip v-if="props.nonInheritOptionsTooltipText"
+                               class="widget-non-inherit-tooltip"
+                               :contents="props.nonInheritOptionsTooltipText"
+                    >
+                        <p-i name="ic_warning-filled"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
@@ -199,6 +233,7 @@ const handleRefresh = () => {
 
 <style lang="postcss" scoped>
 .widget-frame {
+    position: relative;
     height: 29rem;
 
     @apply border rounded-lg bg-white;
@@ -207,22 +242,34 @@ const handleRefresh = () => {
     flex-direction: column;
 
     .widget-header {
-        @apply flex justify-between items-center;
+        @apply flex items-center;
         .title {
+            @apply truncate;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: -webkit-box;
+            display: block;
             -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
             font-size: 1rem;
             font-weight: 700;
             color: theme('colors.gray.900');
             line-height: 1.25;
             margin: 0.25rem 0;
+            padding-right: 1rem;
         }
-        padding: 0.75rem 1.5rem 1rem;
+        padding: 0.75rem 2.5rem 1rem 1.5rem;
         border-color: inherit;
         flex: 0 0;
+    }
+    .view-mode-button {
+        position: absolute;
+        display: none;
+        right: 0.25rem;
+        top: 0.25rem;
+    }
+    &:hover {
+        .view-mode-button {
+            display: flex;
+        }
     }
     .body {
         height: auto;
@@ -276,6 +323,9 @@ const handleRefresh = () => {
                     &.vertical {
                         height: 1rem;
                     }
+                }
+                .widget-non-inherit-tooltip {
+                    @apply text-gray-700;
                 }
             }
             .footer-right {

@@ -177,3 +177,11 @@ export const getUser = async ({ commit, state }, userId): Promise<void> => {
         commit('setUser', userInfo);
     }
 };
+
+export const startSignIn = ({ commit }) => {
+    commit('setIsSignInLoading', true);
+};
+
+export const finishSignIn = ({ commit }) => {
+    commit('setIsSignInLoading', false);
+};
