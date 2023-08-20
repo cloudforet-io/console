@@ -33,11 +33,10 @@ const state = reactive({
                 v-if="state.signInImage"
                 :src="state.signInImage"
             >
-            <lottie-vue-player v-else
-                               autoplay
-                               loop
-                               :src="isDomainOwner ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
-                               :style="{ height: '100%', backgroundColor: 'transparent' }"
+            <lottie-player v-else
+                           autoplay
+                           loop
+                           :animation-link="isDomainOwner ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
             />
         </div>
         <div class="version">
