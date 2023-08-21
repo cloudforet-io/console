@@ -195,7 +195,7 @@ watch(() => state.proxyVisible, (value) => {
                 </p-field-group>
                 <div class="collapsible-wrapper">
                     <p-collapsible-toggle v-if="state.isCollapsed"
-                                          v-model:isCollapsed="state.isCollapsed"
+                                          v-model:is-collapsed="state.isCollapsed"
                     >
                         {{ t('COMMON.NOTIFICATION_MODAL.COLLAPSE_TITLE') }}
                     </p-collapsible-toggle>

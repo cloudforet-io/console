@@ -15,7 +15,7 @@
             </div>
         </div>
         <p-collapsible-toggle v-if="lineClamp === 0 || state.isOverflow"
-                              v-model="state.proxyIsCollapsed"
+                              v-model:is-collapsed="state.proxyIsCollapsed"
         />
     </div>
 </template>

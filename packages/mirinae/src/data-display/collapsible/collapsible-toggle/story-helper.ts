@@ -76,8 +76,8 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
     },
     /* event */
     onUpdateIsCollapsed: {
-        name: 'update:isCollapsed',
-        description: 'Event emitted when collapsed state changed. Works with `v-model` and `isCollapsed` props sync.',
+        name: 'update:is-collapsed',
+        description: 'Event emitted when collapsed state changed. Works with `v-model:is-collapsed`.',
         table: {
             type: {
                 summary: null,

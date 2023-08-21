@@ -24,7 +24,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-collapsible-toggle
             v-model="proxyIsCollapsed"
-            @update:isCollapsed="onUpdateIsCollapsed"
+            @update:is-collapsed="onUpdateIsCollapsed"
             :toggle-type="toggleType"
         >
             <span v-if="defaultSlot" v-html="defaultSlot"/>
@@ -56,7 +56,7 @@ export const Template = (args, { argTypes }) => ({
     i18n: I18nConnector.i18n,
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-collapsible-toggle v-model="isCollapsed" />
+        <p-collapsible-toggle v-model:is-collapsed="isCollapsed" />
         <div v-if="!isCollapsed">sample text</div>
     </div>
     `,
