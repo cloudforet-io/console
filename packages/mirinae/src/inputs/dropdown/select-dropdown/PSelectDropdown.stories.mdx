@@ -185,13 +185,13 @@ export const Template = (args, { argTypes }) => ({
                         <tr>
                             <th>md</th>
                             <th v-for="styleType in styleTypes" :key="styleType" >
-                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
+                                <p-select-dropdown size="md" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
                             </th>
                         </tr>
                         <tr>
                             <th>lg</th>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
+                                <p-select-dropdown size="lg" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
                             </th>
                         </tr>
                     </tbody>
