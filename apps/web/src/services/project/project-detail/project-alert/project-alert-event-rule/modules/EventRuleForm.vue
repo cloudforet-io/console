@@ -40,7 +40,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
-    mode: EDIT_MODE.CREATE,
+    mode: 'CREATE',
     eventRuleId: undefined,
 });
 const emit = defineEmits<{(e: 'confirm'): void;
