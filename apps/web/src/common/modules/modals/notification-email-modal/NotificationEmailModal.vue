@@ -188,7 +188,7 @@ watch(() => state.proxyVisible, (value) => {
                                required
                 >
                     <p-text-input id="verificationCode"
-                                  v-model="formState.verificationCode"
+                                  v-model:value="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                                   @keyup.enter="handleClickConfirmButton"
                     />

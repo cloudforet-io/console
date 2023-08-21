@@ -111,7 +111,7 @@ watch(() => store.state.user.language, (language) => {
                        :label="t('COMMON.PROFILE.NAME')"
                        class="input-form"
         >
-            <p-text-input v-model="formState.userName"
+            <p-text-input v-model:value="formState.userName"
                           class="text-input"
             />
         </p-field-group>
@@ -119,7 +119,7 @@ watch(() => store.state.user.language, (language) => {
                        :label="t('COMMON.PROFILE.ROLE')"
                        class="input-form"
         >
-            <p-text-input v-model="state.userRole"
+            <p-text-input v-model:value="state.userRole"
                           disabled
                           class="text-input"
             />

@@ -245,7 +245,7 @@ watch(() => state.searchText, (searchText) => {
         <p-field-group :label="t('IDENTITY.USER.FORM.NAME')"
                        class="input-form"
         >
-            <p-text-input v-model="formState.name"
+            <p-text-input v-model:value="formState.name"
                           class="text-input"
                           @update:value="handleChangeInput"
             />
