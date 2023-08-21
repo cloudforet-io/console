@@ -19,14 +19,14 @@ export const Template = (args, { argTypes }) => ({
     <div class="flex justify-center">
         <p-link
             :text="text"
-            :size="size"
-            :icon-position="iconPosition"
-            :hide-icon="hideIcon"
-            :icon-name="iconName"
-            :href="href"
-            :to="to"
             :disabled="disabled"
             :highlight="highlight"
+            :size="size"
+            :left-icon="leftIcon"
+            :action-icon="actionIcon"
+            :new-tab="newTab"
+            :href="href"
+            :to="to"
         >
             <span v-if="defaultSlot" v-html="defaultSlot"/>
         </p-link>
@@ -48,17 +48,25 @@ This component prevents the propagation of the click event by default.
 
 ## Basic Link
 
-Opens as a new tab only if you use the ic_external-link icon.
-
 <Canvas>
-    <Story name="Basic">
+    <Story name="Basic Link">
         {{
             components: { PLink },
             router,
             template: `
-            <div class="grid gap-6">
-                <p-link href="https://www.google.com">This is <strong>default</strong> link with default slot.</p-link>
-                <p-link text="This is a default link with text props." :hide-icon="true" href="https://www.google.com" />
+            <div>
+                <div class="text-center flex gap-12 mb-6">
+                    <p-link href="https://www.google.com" highlight>Link</p-link>
+                    <p-link text="Link" href="https://www.google.com" highlight action-icon="internal-link" />
+                    <p-link text="Link" href="https://www.google.com" highlight action-icon="internal-link" new-tab />
+                    <p-link text="Link" href="https://www.google.com" highlight action-icon="external-link" />
+                </div>
+                <div class="text-center flex gap-12">
+                    <p-link href="https://www.google.com">Link</p-link>
+                    <p-link text="Link" href="https://www.google.com" action-icon="internal-link" />
+                    <p-link text="Link" href="https://www.google.com" action-icon="internal-link" new-tab />
+                    <p-link text="Link" href="https://www.google.com" action-icon="external-link" />
+                </div>
             </div>
     `,
         }}
@@ -68,17 +76,92 @@ Opens as a new tab only if you use the ic_external-link icon.
 <br/>
 <br/>
 
-## Icon Position
+
+## Link Size
 
 <Canvas>
-    <Story name="No Icon">
+    <Story name="Link Size">
+        {{
+            components: { PLink },
+            router,
+            template: `
+            <div>
+                <div class="text-center flex gap-12 mb-6">
+                    <p-link href="https://www.google.com" size="sm" text="sm" />
+                    <p-link href="https://www.google.com" size="md" text="md" />
+                    <p-link href="https://www.google.com" size="lg" text="lg" />
+                </div>
+                <div class="text-center flex gap-12">
+                    <p-link href="https://www.google.com" action-icon="external-link" size="sm" text="sm" />
+                    <p-link href="https://www.google.com" action-icon="external-link" size="md" text="md" />
+                    <p-link href="https://www.google.com" action-icon="external-link" size="lg" text="lg" />
+                </div>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Left Icon
+
+<Canvas>
+    <Story name="Left Icon">
         {{
             components: { PLink },
             router,
             template: `
                 <div class="grid gap-6">
-                    <p-link icon-position="right" href="https://www.google.com" text="right"/>
-                    <p-link icon-position="left" href="https://www.google.com" text="left"/>
+                    <p-link left-icon="ic_service_plugin" href="https://www.google.com" text="left icon" />
+                </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Action Icon
+
+<Canvas>
+    <Story name="Action Icon">
+        {{
+            components: { PLink },
+            router,
+            template: `
+                <div>
+                    <p-link action-icon="none" href="https://www.google.com" text="none" />
+                    <br/><br/>
+                    <p-link action-icon="internal-link" href="https://www.google.com" text="internal link" />
+                    <br/><br/>
+                    <p-link action-icon="external-link" href="https://www.google.com" text="external link" />
+                </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## New Tab
+
+<Canvas>
+    <Story name="New Tab">
+        {{
+            components: { PLink },
+            router,
+            template: `
+                <div>
+                    <p-link action-icon="internal-link" href="https://www.google.com" text="internal link (new tab X)" />
+                    <br/><br/>
+                    <p-link action-icon="internal-link" new-tab href="https://www.google.com" text="internal link (new tab O)" />
                 </div>
     `,
         }}

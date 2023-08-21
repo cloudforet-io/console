@@ -8,14 +8,14 @@
                 <a ref="linkRef"
                    class="p-link"
                    :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
-                   :target="validateTarget()"
+                   :target="state.target"
                    :href="props.to ? (toHref || props.href ): props.href"
                    @click.stop="navigate"
                 >
-                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.left"
-                         :name="props.iconName"
-                         height="1.1em"
-                         width="1.1em"
+                    <p-i v-if="state.hasText && !!props.leftIcon"
+                         :name="props.leftIcon"
+                         height="1rem"
+                         width="1rem"
                          color="inherit"
                          class="icon"
                     />
@@ -24,10 +24,10 @@
                             {{ props.text }}
                         </slot>
                     </span>
-                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.right"
-                         :name="props.iconName"
-                         height="1.1em"
-                         width="1.1em"
+                    <p-i v-if="state.hasText && props.actionIcon !== ACTION_ICON.NONE"
+                         :name="state.actionIconName"
+                         :height="state.iconSize"
+                         :width="state.iconSize"
                          color="inherit"
                          class="icon"
                     />
@@ -38,42 +38,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 import type { Location } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
-import { LinkSize, IconPosition } from '@/inputs/link/type';
+import { ACTION_ICON, LinkSize } from '@/inputs/link/type';
+import type { ActionIcon } from '@/inputs/link/type';
 
 
 interface LinkProps {
-  text?: string;
-  size?: LinkSize;
-  iconPosition?: IconPosition;
-  hideIcon?: boolean;
-  iconName?: string;
-  href?: string;
-  to?: Location;
-  disabled?: boolean;
-  highlight?: boolean;
+    text?: string;
+    disabled?: boolean;
+    highlight?: boolean;
+    size?: LinkSize;
+    leftIcon?: string;
+    actionIcon?: ActionIcon;
+    newTab?: boolean;
+    href?: string;
+    to?: Location;
 }
 
 const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
     size: LinkSize.md,
-    iconPosition: IconPosition.right,
-    iconName: 'ic_external-link',
+    leftIcon: undefined,
+    actionIcon: ACTION_ICON.NONE,
     href: undefined,
     to: undefined,
 });
 
-const validateTarget = () => {
-    if (props.disabled) return '_self';
-    if (props.iconName === 'ic_external-link' && !props.hideIcon) return '_blank';
-    return '_self';
-};
 const linkRef = ref<HTMLElement|null>(null);
-const hasText = computed(() => !!linkRef.value?.textContent);
+const state = reactive({
+    hasText: computed(() => !!linkRef.value?.textContent),
+    target: computed(() => {
+        if (props.actionIcon === ACTION_ICON.EXTERNAL_LINK || props.newTab) return '_blank';
+        return '_self';
+    }),
+    actionIconName: computed(() => {
+        if (props.actionIcon === ACTION_ICON.INTERNAL_LINK) {
+            if (props.newTab) return 'ic_arrow-right-up';
+            return 'ic_arrow-right';
+        }
+        if (props.actionIcon === ACTION_ICON.EXTERNAL_LINK) return 'ic_external-link';
+        return undefined;
+    }),
+    iconSize: computed(() => {
+        if (props.size === LinkSize.sm) return '0.75rem';
+        if (props.size === LinkSize.md) return '0.875rem';
+        if (props.size === LinkSize.lg) return '1rem';
+        return '0.875rem';
+    }),
+});
 </script>
 
 <style lang="postcss">
@@ -82,7 +98,7 @@ const hasText = computed(() => !!linkRef.value?.textContent);
     @apply cursor-pointer inline-block items-end;
     font-size: inherit;
     vertical-align: baseline;
-    line-height: 1.25;
+    line-height: 100%;
     > .text {
         font-weight: inherit;
         font-size: inherit;
@@ -114,6 +130,12 @@ const hasText = computed(() => !!linkRef.value?.textContent);
         }
     }
 
+    &.md {
+        font-size: 0.875rem;
+        .icon {
+            margin-bottom: 0.125rem;
+        }
+    }
     &.sm {
         font-size: 0.75rem;
         .icon {
