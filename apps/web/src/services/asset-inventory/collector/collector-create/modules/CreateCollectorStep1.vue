@@ -2,7 +2,7 @@
     <div ref="containerRef"
          class="create-collector-step-1"
     >
-        <p-search v-model="state.searchValue"
+        <p-search v-model:value="state.searchValue"
                   @search="handleSearch"
         />
         <div class="contents-container">
