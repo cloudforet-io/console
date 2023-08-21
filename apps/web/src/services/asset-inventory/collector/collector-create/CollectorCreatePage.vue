@@ -1,33 +1,15 @@
 <template>
-    <fragment>
-        <div class="collector-creator-page">
-            <p-centered-layout-header :title="t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')"
-                                      :description="state.descriptionByStep[state.step]"
-                                      show-step
-                                      :current-step="state.step"
-                                      :total-steps="4"
-                                      :show-close-button="true"
-                                      @close="handleClickClose"
-            />
-            <create-collector-step1 v-if="state.step===1"
-                                    @update:current-step="handleChangeStep"
-            />
-            <div v-if="state.step !== 1">
-                <keep-alive>
-                    <create-collector-step2 v-if="state.step===2"
-                                            @update:current-step="handleChangeStep"
-                    />
-                    <create-collector-step3 v-if="state.step===3"
-                                            @update:current-step="handleChangeStep"
-                    />
-                    <create-collector-step4 v-if="state.step===4"
-                                            @update:current-step="handleChangeStep"
-                    />
-                </keep-alive>
-            </div>
-        </div>
-        <confirm-back-modal v-model:visible="state.deleteModalVisible"
-                            @confirm="handleClickBackButton"
+    <div class="collector-creator-page">
+        <p-centered-layout-header :title="t('INVENTORY.COLLECTOR.CREATE.PAGE_TITLE')"
+                                  :description="state.descriptionByStep[state.step]"
+                                  show-step
+                                  :current-step="state.step"
+                                  :total-steps="4"
+                                  :show-close-button="true"
+                                  @close="handleClickClose"
+        />
+        <create-collector-step1 v-if="state.step===1"
+                                @update:current-step="handleChangeStep"
         />
         <div v-if="state.step !== 1">
             <keep-alive>
@@ -42,12 +24,28 @@
                 />
             </keep-alive>
         </div>
-        <delete-modal v-model:visible="state.deleteModalVisible"
-                      :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
-                      :contents="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
-                      @confirm="handleClickBackButton"
-        />
-    </fragment>
+    </div>
+    <confirm-back-modal v-model:visible="state.deleteModalVisible"
+                        @confirm="handleClickBackButton"
+    />
+    <div v-if="state.step !== 1">
+        <keep-alive>
+            <create-collector-step2 v-if="state.step===2"
+                                    @update:current-step="handleChangeStep"
+            />
+            <create-collector-step3 v-if="state.step===3"
+                                    @update:current-step="handleChangeStep"
+            />
+            <create-collector-step4 v-if="state.step===4"
+                                    @update:current-step="handleChangeStep"
+            />
+        </keep-alive>
+    </div>
+    <delete-modal v-model:visible="state.deleteModalVisible"
+                  :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_TITLE')"
+                  :contents="t('INVENTORY.COLLECTOR.CREATE.CREATE_EXIT_MODAL_CONTENT')"
+                  @confirm="handleClickBackButton"
+    />
 </template>
 
 <script lang="ts">
