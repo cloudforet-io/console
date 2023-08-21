@@ -236,7 +236,7 @@ onMounted(async () => {
                           class="service-account-collect-data-button"
                           @click.stop="handleClickCollect(item)"
                 >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+                    {{ t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
                 </p-button>
             </template>
             <template #col-created_at-format="{value}">

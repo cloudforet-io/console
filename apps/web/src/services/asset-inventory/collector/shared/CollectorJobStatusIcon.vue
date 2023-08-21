@@ -12,7 +12,7 @@
                    :href="href"
                    @click.stop="navigate"
                 >
-                    <p-tooltip :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                    <p-tooltip :contents="t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                                :position="props.tooltipPosition"
                                class="job-tooltip"
                     >
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { PTooltip, PI } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
 import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 
@@ -74,6 +75,8 @@ interface Props {
     tooltipPosition?: string,
     styleType?: 'gray' | 'white',
 }
+
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     to: '',

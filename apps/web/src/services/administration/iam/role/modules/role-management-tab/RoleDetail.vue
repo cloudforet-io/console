@@ -185,7 +185,7 @@ watch(() => props.roleId, async () => {
             </p-definition-table>
         </div>
         <p-heading heading-type="sub">
-            {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
+            {{ t('IAM.ROLE.DETAIL.API_POLICY') }}
         </p-heading>
         <p-data-table :fields="policyState.fields"
                       :items="policyState.items"

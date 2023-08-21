@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PAnchor, PDivider, PFieldTitle } from '@spaceone/design-system';
 import { computed, defineProps, reactive } from 'vue';
-
+import { useI18n } from 'vue-i18n';
 
 import type { CollectorModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
@@ -11,6 +11,8 @@ const props = defineProps<{
     collector?: CollectorModel|null;
     showMinimal?: boolean;
 }>();
+
+const { t } = useI18n();
 
 const state = reactive({
     description: computed(() => props.plugin?.tags?.long_description),
@@ -32,7 +34,7 @@ const state = reactive({
                                        color="gray"
                                        font-weight="regular"
                         >
-                            {{ $t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE') }}
+                            {{ t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE') }}
                         </p-field-title>
                         <div class="value">
                             {{ props.collector?.plugin_info?.upgrade_mode === 'AUTO' ? 'ON' : 'OFF' }}
@@ -43,7 +45,7 @@ const state = reactive({
                                        color="gray"
                                        font-weight="regular"
                         >
-                            {{ $t('INVENTORY.COLLECTOR.DETAIL.VERSION') }}
+                            {{ t('INVENTORY.COLLECTOR.DETAIL.VERSION') }}
                         </p-field-title>
                         <div class="value">
                             {{ props.collector?.plugin_info?.version }}
@@ -64,7 +66,7 @@ const state = reactive({
                       highlight
                       class="plugin-link"
             >
-                {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
+                {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
             </p-anchor>
         </template>
     </div>

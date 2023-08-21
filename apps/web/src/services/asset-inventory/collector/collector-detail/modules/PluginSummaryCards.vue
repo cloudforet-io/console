@@ -2,11 +2,9 @@
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Location } from 'vue-router';
-
-
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { CollectorModel, JobModel } from '@/services/asset-inventory/collector/model';
 import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/RecentCollectorJobList.vue';
@@ -16,6 +14,9 @@ const props = defineProps<{
     recentJobs?: JobModel[]|null;
     historyLink?: Location
 }>();
+
+const store = useStore();
+const { t } = useI18n();
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -29,7 +30,7 @@ const state = reactive({
                            color="gray"
                            font-weight="regular"
             >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') }}
+                {{ t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') }}
             </p-field-title>
             <div class="contents">
                 <p-copy-button>
@@ -42,7 +43,7 @@ const state = reactive({
                            color="gray"
                            font-weight="regular"
             >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.CREATED') }}
+                {{ t('INVENTORY.COLLECTOR.DETAIL.CREATED') }}
             </p-field-title>
             <div class="contents">
                 {{ iso8601Formatter(props.collector?.created_at, state.timezone) }}

@@ -4,7 +4,7 @@ import {
 } from '@spaceone/design-system';
 import { useWindowSize } from '@vueuse/core';
 import type { TranslateResult } from 'vue-i18n';
-
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     title: TranslateResult;
@@ -15,6 +15,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{(e: 'click-edit'): void;
 }>();
+
+const { t } = useI18n();
 
 const { width } = useWindowSize();
 
@@ -38,7 +40,7 @@ const handleClickEdit = () => {
                       style-type="secondary"
                       @click="handleClickEdit"
             >
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
+                {{ t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
             </p-button>
             <p-icon-button v-else
                            name="ic_edit"

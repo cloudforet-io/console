@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-default-inner">
-        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DESCRIPTION') }}</span>
+        <span>{{ t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DESCRIPTION') }}</span>
         <div class="accounts-wrapper">
             <p-lazy-img :src="props.icon"
                         width="1rem"
@@ -8,7 +8,7 @@
                         class="plugin-icon"
             />
             <div v-if="collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE">
-                <span>{{ props.name }} {{ $t('INVENTORY.COLLECTOR.ACCOUNT') }}</span>
+                <span>{{ props.name }} {{ t('INVENTORY.COLLECTOR.ACCOUNT') }}</span>
                 <span v-if="props.secretsCount > 0">
                     ({{ props.secretsCount }})
                 </span>
@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { PLazyImg } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
 import {
     useCollectorDataModalStore,
@@ -40,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
     icon: '',
     secretsCount: 0,
 });
+
+const { t } = useI18n();
 </script>
 
 <style lang="postcss" scoped>

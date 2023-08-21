@@ -11,7 +11,7 @@
                 <slot />
             </main>
             <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
+                <span class="sidebar-title">{{ t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
@@ -25,19 +25,19 @@
                     <p-button style-type="transparent"
                               @click="handleCloseSidebar"
                     >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
+                        {{ t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
                               :disabled="!widgetFormState.isValid"
                               @click="handleClickSaveButton"
                     >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
+                        {{ t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
                     </p-button>
                 </div>
             </template>
         </p-sidebar>
         <p-button-modal v-model:visible="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
+                        :header-title="t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
                         size="sm"
                         @confirm="handleClickSaveButton"
         >
@@ -50,7 +50,7 @@
                              height="1rem"
                              class="warning-icon"
                         />
-                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
+                        <span>{{ t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
                     </p>
                 </div>
             </template>
@@ -67,6 +67,7 @@ import { cloneDeep } from 'lodash';
 import {
     computed, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -85,6 +86,8 @@ interface Props {
     widgetKey?: string;
     widgetConfigId?: string;
 }
+
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
@@ -119,7 +122,7 @@ const updateDashboardWidgetStore = () => {
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
 
     // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey);
+    widgetFormStore.initWidgetForm(props.widgetKey ?? '');
 };
 
 /* Api */
@@ -153,7 +156,7 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    widgetFormStore.initWidgetForm(props.widgetKey);
+    widgetFormStore.initWidgetForm(props.widgetKey ?? '');
     state.proxyVisible = false;
     emit('refresh');
 };

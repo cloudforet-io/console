@@ -2,7 +2,7 @@
     <div class="collector-current-status">
         <div class="info-item">
             <p class="info-label">
-                {{ $t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
+                {{ t('INVENTORY.COLLECTOR.MAIN.CURRENT_STATUS') }}
             </p>
             <div class="label-description">
                 <div v-if="state.status === JOB_STATE.IN_PROGRESS"
@@ -15,7 +15,7 @@
                         animation="spin"
                     />
                     <span>
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
+                        {{ t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
                     </span>
                 </div>
                 <div v-else>
@@ -30,13 +30,13 @@
                             color="inherit"
                         />
                         <p class="description">
-                            {{ $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + $t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
+                            {{ t('INVENTORY.COLLECTOR.MAIN.SCHEDULED') + " " + t('INVENTORY.COLLECTOR.MAIN.SCHEDULED_TIME', {hr: state.diffSchedule.diffHour, m: state.diffSchedule.diffMin }) }}
                         </p>
                     </div>
                     <span v-else
                           class="no-schedule description-view"
                     >
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
+                        {{ t('INVENTORY.COLLECTOR.MAIN.NO_SCHEDULE') }}
                     </span>
                 </div>
             </div>
@@ -54,7 +54,7 @@ import { numberFormatter } from '@cloudforet/core-lib';
 import { PI, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { computed, reactive } from 'vue';
-
+import { useI18n } from 'vue-i18n';
 
 import { peacock } from '@/styles/colors';
 
@@ -70,6 +70,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const { t } = useI18n();
 
 const state = reactive({
     status: computed<string|undefined>(() => props.recentJob?.status),
@@ -93,7 +95,7 @@ const state = reactive({
         }
         return { diffHour: 0, diffMin: 0 };
     }),
-    remainedTasksPercentage: computed<number>(() => {
+    remainedTasksPercentage: computed<number|string>(() => {
         if (state.status === JOB_STATE.IN_PROGRESS) {
             const remainedTasks = props.recentJob?.remained_tasks ?? 0;
             const totalTasks = props.recentJob?.total_tasks ?? 0;

@@ -17,7 +17,7 @@
         <div v-if="widgetConfig?.description?.translation_id"
              class="description-text"
         >
-            {{ $t(widgetConfig.description.translation_id) }}
+            {{ t(widgetConfig.description.translation_id) }}
         </div>
         <p-data-loader :loading="referenceStoreState.loading"
                        class="widget-options-form-wrapper"
@@ -45,7 +45,7 @@
                     <div class="inherit-toggle-button-wrapper">
                         <span class="text"
                               :class="{inherit: state.inheritableProperties.includes(propertyName)}"
-                        >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
+                        >{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
                                          :disabled="isInheritDisabled(propertyName)"
                                          @change-toggle="handleChangeInheritToggle(propertyName, $event)"

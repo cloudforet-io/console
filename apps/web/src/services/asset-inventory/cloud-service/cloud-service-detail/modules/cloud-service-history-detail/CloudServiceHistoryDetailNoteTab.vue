@@ -3,7 +3,7 @@
         <p-heading heading-type="sub"
                    use-total-count
                    :total-count="totalCount"
-                   :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE')"
+                   :title="t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE')"
         />
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList"
@@ -41,11 +41,11 @@
                       :disabled="(noteInput.trim()).length === 0 || manageDisabled"
                       @click="handleCreateNote"
             >
-                {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ADD_NOTE') }}
+                {{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ADD_NOTE') }}
             </p-button>
         </article>
-        <delete-modal :header-title="checkDeleteState.headerTitle"
-                      :visible.sync="checkDeleteState.visible"
+        <delete-modal v-model:visible="checkDeleteState.visible"
+                      :header-title="checkDeleteState.headerTitle"
                       :disabled="checkDeleteState.loading"
                       @confirm="handleDeleteNote"
         />
@@ -53,21 +53,17 @@
 </template>
 
 <script lang="ts">
-
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
-} from '@spaceone/design-system';
-
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -97,6 +93,9 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const store = useStore();
+        const { t } = useI18n();
+
         const state = reactive({
             id: '',
             noteInput: '',
@@ -106,7 +105,7 @@ export default {
             userId: computed(() => store.state.user.userId),
             menuItems: computed(() => [
                 {
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
+                    label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
                 },
             ]),
             selectedNoteIdForDelete: '',
@@ -153,12 +152,13 @@ export default {
             } finally {
                 state.noteInput = '';
                 await listNote();
+                // eslint-disable-next-line vue/require-explicit-emits
                 emit('refresh-note-count');
             }
         };
 
         const checkDeleteState = reactive({
-            headerTitle: computed(() => i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE_HELP_TEXT')),
+            headerTitle: computed(() => t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE_HELP_TEXT')),
             visible: false,
             loading: false,
         });
@@ -179,11 +179,12 @@ export default {
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ALT_E_DELETE_NOTE'));
+                ErrorHandler.handleRequestError(e, t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ALT_E_DELETE_NOTE'));
             } finally {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
                 await listNote();
+                // eslint-disable-next-line vue/require-explicit-emits
                 emit('refresh-note-count');
             }
         };
@@ -201,6 +202,7 @@ export default {
         })();
 
         return {
+            t,
             ...toRefs(state),
             checkDeleteState,
             iso8601Formatter,

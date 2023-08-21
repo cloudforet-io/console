@@ -1,6 +1,6 @@
 <template>
     <div class="collector-data-duplication-inner">
-        <span>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
+        <span>{{ t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_DESCRIPTION') }}</span>
         <p-definition-table :fields="definitionFields"
                             :data="state"
                             :class="['data-collection-information-table', { 'is-single-account': collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.SINGLE}]"
@@ -29,7 +29,7 @@
                          width="1rem"
                          animation="spin"
                     />
-                    <span>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
+                    <span>{{ t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</span>
                 </span>
             </template>
         </p-definition-table>
@@ -43,13 +43,13 @@
                      width="1rem"
                      animation="spin"
                 />
-                <b>{{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
+                <b>{{ t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }}</b>
             </span>
             <div class="chart-wrapper">
                 <div class="label-wrapper">
                     <div v-if="state.recentJob.success_tasks >= 0">
                         <p-status :icon-color="SUCCEEDED_COLOR" />
-                        <span>{{ $t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') }}
+                        <span>{{ t('INVENTORY.COLLECTOR.HISTORY.SUCCESS') }}
                             <strong>{{ state.recentJob.success_tasks }}</strong>
                         </span>
                     </div>
@@ -58,11 +58,11 @@
                     >
                         <p-status :icon-color="FAILED_COLOR" />
                         <span :style="{'color': FAILED_COLOR}">
-                            {{ $t('INVENTORY.COLLECTOR.HISTORY.FAILURE') }}
+                            {{ t('INVENTORY.COLLECTOR.HISTORY.FAILURE') }}
                             <strong>{{ state.recentJob.failure_tasks }}</strong>
                         </span>
                     </div>
-                    <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
+                    <span class="total-text">{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }}
                         <strong>{{ state.recentJob.total_tasks }}</strong>
                     </span>
                 </div>
@@ -86,9 +86,8 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { computed, reactive } from 'vue';
-
-
-import { store } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { red, green } from '@/styles/colors';
 
@@ -108,6 +107,9 @@ const props = withDefaults(defineProps<Props>(), {
     name: '',
     icon: '',
 });
+
+const store = useStore();
+const { t } = useI18n();
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;

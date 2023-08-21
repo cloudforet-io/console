@@ -61,7 +61,7 @@ const handleUpdateFilters = (filters: ConsoleFilter[]) => {
                 <!--                    class="create-budget-box"-->
                 <!--                    use-fixed-menu-style-->
                 <!--                    :items="createButtonItemList"-->
-                <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
+                <!--                    :placeholder="t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
                 <!--                    type="outline-button"-->
                 <!--                    @select="handleCreateBudgetSelect"-->
                 <!--                />-->
