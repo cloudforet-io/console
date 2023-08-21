@@ -100,7 +100,7 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
         <div class="filter filter-assigned">
             <p-select-button v-for="(item, idx) in state.assignedStateList"
                              :key="`assigned-${idx}`"
-                             v-model="state.selectedAssigned"
+                             v-model:selected="state.selectedAssigned"
                              :value="item.name"
                              size="sm"
                              style-type="gray"

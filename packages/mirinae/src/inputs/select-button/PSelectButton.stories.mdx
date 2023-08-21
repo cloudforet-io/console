@@ -23,7 +23,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <div class="h-full w-full overflow p-8">
         <p-select-button :value="value"
-            v-model="proxySelected"
+            v-model:selected="proxySelected"
             :predicate="predicate"
             :multi-selectable="multiSelectable"
             :style-type="styleType"
@@ -58,7 +58,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="w-full overflow p-8 flex flex-wrap">
         <p-select-button v-for="value in values" :key="value"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             class="mr-2"
         >
             {{value}}
@@ -92,7 +92,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-button v-for="value in values" :key="value"
             multi-selectable
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             class="mr-2"
         >
             {{value}}
@@ -132,7 +132,7 @@ export const Template = (args, { argTypes }) => ({
                         :size="size"
                         :style-type="styleType"
                         :value="value"
-                        v-model="selected"
+                        v-model:selected="selected"
                         class="mr-2"
                 >
                     {{value}}
@@ -170,7 +170,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <div class="w-full overflow p-8 grid gap-4 grid-cols-3">
         <p-select-button v-for="value in values" :key="value.key"
-            v-model="selected"
+            v-model:selected="selected"
             :value="value"
             :predicate="predicate"
             class="mb-4"

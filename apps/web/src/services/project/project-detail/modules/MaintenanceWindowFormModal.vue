@@ -308,7 +308,7 @@ watch(() => props.visible, async (visible) => {
                     <template v-if="state.selectedScheduleType === SCHEDULE_TYPE.startNow">
                         <p-select-button v-for="{name, label} in state.durationItems"
                                          :key="name"
-                                         v-model="state.selectedDuration"
+                                         v-model:selected="state.selectedDuration"
                                          :value="name"
                                          class="mr-2"
                         >
