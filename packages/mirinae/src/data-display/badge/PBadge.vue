@@ -18,7 +18,7 @@ import type { BadgeProps } from '@/data-display/badge/type';
 import { BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
 
-import colors from '@/styles/colors.cjs';
+import colors from '@/styles/colors';
 
 const props = withDefaults(defineProps<BadgeProps>(), {
     badgeType: BADGE_TYPE.SOLID,

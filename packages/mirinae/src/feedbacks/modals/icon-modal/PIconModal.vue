@@ -64,7 +64,7 @@ import '../modal.pcss';
 import type { ButtonStyle } from '@/inputs/buttons/button/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-import { primaryDark } from '@/styles/colors.cjs';
+import { primaryDark } from '@/styles/colors';
 
 const PI = () => import('@/foundation/icons/PI.vue');
 
@@ -81,6 +81,10 @@ interface IconModalProps {
 }
 const props = withDefaults(defineProps<IconModalProps>(), {
     size: 'sm',
+    iconName: '',
+    emoji: '',
+    headerTitle: '',
+    headerDesc: '',
     buttonText: 'close',
     buttonStyleType: BUTTON_STYLE.tertiary,
     backdrop: true,

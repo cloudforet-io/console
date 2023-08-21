@@ -27,7 +27,7 @@ import type {
 } from '@/data-display/dynamic/dynamic-chart/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { palette } from '@/styles/colors.cjs';
+import { palette } from '@/styles/colors';
 
 const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions: DynamicField): any[] => {
     const results: any[] = [];

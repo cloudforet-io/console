@@ -6,7 +6,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { palette } from '@/styles/colors.cjs';
+import { palette } from '@/styles/colors';
 
 
 const drawCategoryAxis = (chart: XYChart, nameOptions: DynamicField): CategoryAxis => {
