@@ -89,11 +89,11 @@ const handleQueryChange = (options: ToolboxOptions = {}) => {
 /* init */
 let urlQueryStringWatcherStop;
 const init = async () => {
-    const currentQuery = router.currentRoute.query;
+    const currentQuery = router.currentRoute.value.query;
     const useQueryValue = {
         viewers: queryStringToString(currentQuery.viewers) ?? 'ALL',
         scope: queryStringToString(currentQuery.scope) ?? 'ALL',
-        filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
+        filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters ?? undefined).filters,
     };
 
     /* TODO: init states from url query */
