@@ -208,6 +208,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
     height: 100%;
     z-index: 100;
     .content-wrapper {
+        height: 100%;
         overflow: auto;
         padding: 0 2rem 2rem 2rem;
     }
