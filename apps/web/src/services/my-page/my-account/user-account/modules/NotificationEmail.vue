@@ -94,7 +94,7 @@ watch(() => store.state.user.email, (value) => {
                 required
                 class="field-group"
             >
-                <p-text-input v-model="notificationEmail"
+                <p-text-input v-model:value="notificationEmail"
                               :placeholder="state.userId"
                               :disabled="state.verified"
                               :invalid="invalidState.notificationEmail"

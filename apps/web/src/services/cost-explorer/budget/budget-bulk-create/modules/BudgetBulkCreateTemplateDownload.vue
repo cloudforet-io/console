@@ -126,7 +126,7 @@ const handleClickTemplateDownload = async (includeValues: boolean) => {
         >
             <p-radio v-for="({type, name, description}) in state.budgetPlans"
                      :key="type"
-                     v-model="state.selectedPlan"
+                     v-model:selected="state.selectedPlan"
                      :value="type"
                      class="plan"
             >

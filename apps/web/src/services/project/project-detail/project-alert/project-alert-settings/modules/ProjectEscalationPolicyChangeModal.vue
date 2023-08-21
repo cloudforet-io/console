@@ -178,7 +178,7 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <p-box-tab v-model:avtiveTab="state.activeTab"
+                <p-box-tab v-model:avtive-tab="state.activeTab"
                            :tabs="state.tabs"
                 >
                     <template #select>

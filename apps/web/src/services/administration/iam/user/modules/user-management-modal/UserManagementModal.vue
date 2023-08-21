@@ -170,7 +170,7 @@ const initAuthTypeList = async () => {
     >
         <template #body>
             <p-box-tab v-if="userPageState.visibleCreateModal"
-                       v-model="formState.activeTab"
+                       v-model:active-tab="formState.activeTab"
                        :tabs="formState.tabs"
                        style-type="gray"
                        class="auth-type-tab"

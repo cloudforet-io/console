@@ -32,7 +32,7 @@
                 <p-radio-group direction="vertical">
                     <p-radio v-for="repo in state.repositoryList"
                              :key="repo.name"
-                             v-model="state.selectedRepository"
+                             v-model:selected="state.selectedRepository"
                              :value="repo.name"
                              class="repository-item"
                     >
@@ -83,7 +83,7 @@
                 </p-select-dropdown>
             </div>
             <div class="repository">
-                <p-select-dropdown v-model="state.selectedRepository"
+                <p-select-dropdown v-model:selected="state.selectedRepository"
                                    :items="state.repositoryList"
                                    class="select-dropdown"
                 >

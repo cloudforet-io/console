@@ -159,7 +159,7 @@ Please refer to the table below. <br/>
             template: `
 <div>
     <p class="py-2">Select dataType.</p>
-    <p-select-dropdown v-model="selectedDataType" :items="menu"/>
+    <p-select-dropdown v-model:selected="selectedDataType" :items="menu"/>
     <p class="py-2">Min Date = Today</p>
     <p-datetime-picker v-model="start" :min-date="now" :data-type="selectedDataType" />
     <p class="py-2">Max Date = Today</p>

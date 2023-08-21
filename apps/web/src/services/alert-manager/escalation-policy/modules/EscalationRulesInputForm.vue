@@ -170,12 +170,12 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 >{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
-                <p-select-dropdown v-model="rule.notification_level"
+                <p-select-dropdown v-model:selected="rule.notification_level"
                                    :items="NOTIFICATION_LEVELS"
                                    use-fixed-menu-style
                 >
                     <template #menu-item--format="{item}">
-                        <p-radio v-model="rule.notification_level"
+                        <p-radio v-model:selected="rule.notification_level"
                                  :value="item.name"
                         >
                             <p>{{ item.label }}</p>
@@ -215,12 +215,12 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     {{ t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
                 </span>
                 <span class="input">
-                    <p-select-dropdown v-model="rule.notification_level"
+                    <p-select-dropdown v-model:selected="rule.notification_level"
                                        :items="MINIFIED_NOTIFICATION_LEVELS"
                                        use-fixed-menu-style
                     >
                         <template #menu-item--format="{item}">
-                            <p-radio v-model="rule.notification_level"
+                            <p-radio v-model:selected="rule.notification_level"
                                      :value="item.name"
                             >
                                 <div class="item">

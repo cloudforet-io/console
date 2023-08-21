@@ -22,7 +22,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <div class="h-full w-full overflow p-8">
         <p-textarea
-            v-model="value"
+            v-model:value="value"
             :placeholder="placeholder"
             :autofocus="autofocus"
             :readonly="readonly"

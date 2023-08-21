@@ -39,7 +39,7 @@ export const Template = (args, {argTypes} ) => ({
                     <template #body>
                         <p-select-dropdown
                             :items="items"
-                            v-model="selectItem"
+                            v-model:selected="selectItem"
                             use-fixed-menu-style
                         >
                            select dropdown (default)

@@ -59,11 +59,11 @@ const state = reactive({
 
 <template>
     <div>
-        <p-select-dropdown v-model="state.proxySelectedMonth"
+        <p-select-dropdown v-model:selected="state.proxySelectedMonth"
                            class="month-select-dropdown"
                            :items="state.monthMenuItems"
         />
-        <p-select-dropdown v-model="state.proxySelectedYear"
+        <p-select-dropdown v-model:selected="state.proxySelectedYear"
                            class="year-select-dropdown"
                            :items="state.yearMenuItems"
         />

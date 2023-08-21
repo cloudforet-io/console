@@ -296,7 +296,7 @@ watch(() => props.visible, async (visible) => {
             >
                 <p-radio v-for="{name, label} in state.scheduleRadioItems"
                          :key="name"
-                         v-model:value="state.selectedScheduleType"
+                         v-model:selected="state.selectedScheduleType"
                          :value="name"
                          class="schedule-type-radio"
                 >

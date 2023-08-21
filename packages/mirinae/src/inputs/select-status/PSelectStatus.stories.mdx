@@ -27,7 +27,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-select-status
             :value="value"
-            v-model="proxySelected"
+            v-model:selected="proxySelected"
             :predicate="predicate"
             :multi-selectable="multiSelectable"
             :disable-check-icon="disableCheckIcon"

@@ -23,7 +23,7 @@ export const Template = (args, { argTypes }) => ({
                 <p-radio v-for="value in values"
                          :key="value"
                          :value="value"
-                         v-model="proxySelected"
+                         v-model:selected="proxySelected"
                 >
                     This is radio for {{value}}
                 </p-radio>
@@ -56,7 +56,7 @@ export const Template = (args, { argTypes }) => ({
                 <div>
                     <div class="flex flex-col">
                         <p-radio-group>
-                            <p-radio v-for="value in values" v-model="selected" :value="value" :key="value">
+                            <p-radio v-for="value in values" v-model:selected="selected" :value="value" :key="value">
                                 This is radio for {{value}}
                             </p-radio>
                         </p-radio-group>
@@ -91,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
                     <div class="flex flex-col row-gap-2">
                         <p>Horizontal (default)</p>
                         <p-radio-group direction="horizontal">
-                            <p-radio :key="value" v-for="value in horizontalValues" v-model="horizontalSelected" :value="value">
+                            <p-radio :key="value" v-for="value in horizontalValues" v-model:selected="horizontalSelected" :value="value">
                                 {{value}}
                             </p-radio>
                         </p-radio-group>
@@ -99,7 +99,7 @@ export const Template = (args, { argTypes }) => ({
                     <div class="flex flex-col row-gap-2">
                         <p>Vertical</p>
                         <p-radio-group direction="vertical">
-                            <p-radio :key="value" v-for="value in verticalValues" v-model="verticalSelected" :value="value">
+                            <p-radio :key="value" v-for="value in verticalValues" v-model:selected="verticalSelected" :value="value">
                                 {{value}}
                             </p-radio>
                         </p-radio-group>

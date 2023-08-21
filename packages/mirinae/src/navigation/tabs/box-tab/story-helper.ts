@@ -1,6 +1,6 @@
+import type { ArgTypes } from '@storybook/addons';
 import { reactive, toRefs } from 'vue';
 
-import type { ArgTypes } from '@storybook/addons';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
@@ -93,8 +93,8 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
     },
     /* events */
     onUpdateActiveTab: {
-        name: 'update:activeTab',
-        description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
+        name: 'update:active-tab',
+        description: 'Event emitted when activated tab changed. Works with `v-model:active-tab`.',
         table: {
             type: {
                 summary: null,

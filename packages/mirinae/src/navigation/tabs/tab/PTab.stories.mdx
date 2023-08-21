@@ -25,7 +25,7 @@ export const Template = (args, { argTypes }) => ({
             :tabs="tabs"
             v-model="proxyActiveTab"
             :stretch="stretch"
-            @update:activeTab="onUpdateActiveTab"
+            @update:active-tab="onUpdateActiveTab"
             @change="onChange"
         >
             <div v-if="defaultSlot" v-html="defaultSlot"/>
