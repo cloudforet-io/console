@@ -14,7 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'input', value: string): void;
-    (e: 'update:isFocused', value: boolean): void;
+    (e: 'update:is-focused', value: boolean): void;
     (e: 'esc'): void;
     (e: 'arrow-up'): void;
     (e: 'arrow-down'): void;
@@ -33,7 +33,7 @@ const handleInput = (value: string) => {
     emit('input', value);
 };
 const handleIsFocused = (isFocused: boolean) => {
-    emit('update:isFocused', isFocused);
+    emit('update:is-focused', isFocused);
 };
 const handleEsc = () => {
     emit('esc');
