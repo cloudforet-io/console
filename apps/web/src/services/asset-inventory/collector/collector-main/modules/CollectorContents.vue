@@ -175,7 +175,7 @@ const fetchCollectorList = async () => {
         await collectorPageStore.getJobs();
     } catch (e) {
         ErrorHandler.handleError(e);
-        await collectorPageStore.$reset();
+        collectorPageStore.$reset();
     }
 };
 

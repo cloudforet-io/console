@@ -5,6 +5,8 @@ import {
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
