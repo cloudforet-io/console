@@ -4,9 +4,9 @@ export const IconPosition = {
 } as const;
 export type IconPosition = typeof IconPosition[keyof typeof IconPosition];
 
-export const AnchorSize = {
+export const LinkSize = {
     sm: 'sm',
     md: 'md',
     lg: 'lg',
 } as const;
-export type AnchorSize = typeof AnchorSize[keyof typeof AnchorSize];
+export type LinkSize = typeof LinkSize[keyof typeof LinkSize];

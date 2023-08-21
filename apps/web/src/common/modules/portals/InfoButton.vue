@@ -37,12 +37,12 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PI, PAnchor } from '@spaceone/design-system';
+import { PI, PLink } from '@spaceone/design-system';
 
 export default {
     name: 'InfoButton',
     components: {
-        PI, PAnchor,
+        PI, PLink,
     },
     model: {
         prop: 'visible',
@@ -61,7 +61,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            tag: computed(() => (props.href ? PAnchor : 'span')),
+            tag: computed(() => (props.href ? PLink : 'span')),
             childProps: computed(() => {
                 const res: any = {};
                 if (props.href) {

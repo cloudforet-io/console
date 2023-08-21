@@ -70,14 +70,14 @@
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
-                                  :href="props.widgetLink"
-                                  :to="props.widgetLocation"
-                                  class="anchor-button"
-                                  icon-name="ic_chevron-right"
+                        <p-link v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
+                                :href="props.widgetLink"
+                                :to="props.widgetLocation"
+                                class="link-button"
+                                icon-name="ic_chevron-right"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        </p-anchor>
+                        </p-link>
                     </slot>
                 </div>
             </div>
@@ -118,7 +118,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
+    PLink, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -361,7 +361,7 @@ const handleClickViewModeButton = () => {
                 }
             }
             .footer-right {
-                .anchor-button {
+                .link-button {
                     @apply flex items-center flex-shrink-0 text-blue-700 font-normal cursor-pointer;
                     font-size: 0.75rem;
                     line-height: 150%;

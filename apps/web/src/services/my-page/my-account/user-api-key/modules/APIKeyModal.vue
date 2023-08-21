@@ -56,9 +56,9 @@
                         />
                         <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
-                                <p-anchor :href="githubLink">
+                                <p-link :href="githubLink">
                                     {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
-                                </p-anchor>
+                                </p-link>
                             </span>
                         </p>
                     </div>
@@ -95,7 +95,7 @@
 import { reactive, toRefs } from 'vue';
 
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
 } from '@spaceone/design-system';
 import yaml from 'js-yaml';
 
@@ -120,7 +120,7 @@ export default {
         PCollapsibleToggle,
         PTextEditor,
         PButton,
-        PAnchor,
+        PLink,
     },
     props: {
         visible: {

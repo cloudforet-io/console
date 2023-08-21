@@ -52,16 +52,16 @@
                             <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
                             <div class="desc-wrapper">
                                 <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
-                                <p-anchor v-if="budgetTargetId"
-                                          class="link-text"
-                                          :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                          :to="{
-                                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                                              params: {
-                                                  id: budgetTargetId
-                                              }
-                                          }"
-                                          highlight
+                                <p-link v-if="budgetTargetId"
+                                        class="link-text"
+                                        :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
+                                        :to="{
+                                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                            params: {
+                                                id: budgetTargetId
+                                            }
+                                        }"
+                                        highlight
                                 />
                             </div>
                             <budget-notifications-channel :project-id="budgetTargetId" />
@@ -102,7 +102,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PAnchor, PBadge, PButton, PCard, PIconButton, PSpinner,
+    PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@spaceone/design-system';
 
 import { commaFormatter } from '@cloudforet/core-lib';
@@ -130,7 +130,7 @@ export default {
         PCard,
         PIconButton,
         PButton,
-        PAnchor,
+        PLink,
         PBadge,
         DeleteModal,
         PSpinner,

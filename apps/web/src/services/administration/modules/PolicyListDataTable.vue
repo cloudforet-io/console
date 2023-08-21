@@ -44,8 +44,8 @@
             </template>
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
-                    <p-anchor
-                        :hide-icon="!!hideAnchorIcon"
+                    <p-link
+                        :hide-icon="!!hideLinkIcon"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
@@ -54,7 +54,7 @@
                         }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </template>
             <template #col-created_at-format="{ value }">
@@ -74,7 +74,7 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PAnchor, PBadge, PSelectStatus, PToolboxTable,
+    PLink, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
@@ -119,7 +119,7 @@ export default {
     components: {
         PToolboxTable,
         PSelectStatus,
-        PAnchor,
+        PLink,
         PBadge,
     },
     props: {
@@ -127,7 +127,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        hideAnchorIcon: {
+        hideLinkIcon: {
             type: Boolean,
             default: false,
         },

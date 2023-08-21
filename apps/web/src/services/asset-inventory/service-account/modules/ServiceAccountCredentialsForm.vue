@@ -26,9 +26,9 @@
             >
                 <template #help>
                     <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TRUSTED_ACCOUNT_HELP_TEXT') }}</span>
-                    <p-anchor class="see-more-text"
-                              :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
-                              :href="trustedAccountInfoLink"
+                    <p-link class="see-more-text"
+                            :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
+                            :href="trustedAccountInfoLink"
                     />
                 </template>
                 <div class="radio-wrapper">
@@ -125,7 +125,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor, PCopyButton, PI,
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
@@ -157,7 +157,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'ServiceAccountCredentialsForm',
     components: {
-        PAnchor,
+        PLink,
         PSelectDropdown,
         PFieldGroup,
         PRadio,

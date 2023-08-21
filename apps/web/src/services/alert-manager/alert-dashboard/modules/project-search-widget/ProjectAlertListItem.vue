@@ -15,10 +15,10 @@
             <div v-else
                  class="view-all-text"
             >
-                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
-                          :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
-                          hide-icon
-                          highlight
+                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
+                        :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
+                        hide-icon
+                        highlight
                 />
             </div>
         </template>
@@ -31,7 +31,7 @@ import {
 } from 'vue';
 
 import {
-    PListCard, PAnchor,
+    PListCard, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -51,7 +51,7 @@ export default {
     name: 'ProjectAlertListItem',
     components: {
         PListCard,
-        PAnchor,
+        PLink,
         AlertListItem,
     },
     props: {

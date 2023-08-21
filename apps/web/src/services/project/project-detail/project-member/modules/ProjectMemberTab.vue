@@ -39,9 +39,9 @@
                 {{ storeState.users[value] ? storeState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
-                <p-anchor :to="projectLinkFormatter(value)">
+                <p-link :to="projectLinkFormatter(value)">
                     {{ value }}
-                </p-anchor>
+                </p-link>
             </template>
             <template #col-labels-format="{ value }">
                 <p v-if="value.length === 0" />
@@ -90,7 +90,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor,
+    PLink,
     PBadge,
     PButton,
     PHeading,
@@ -131,7 +131,7 @@ interface MemberDataTableItem extends MemberItem {
 export default {
     name: 'ProjectMemberTab',
     components: {
-        PAnchor,
+        PLink,
         PToolboxTable,
         PHeading,
         PButton,

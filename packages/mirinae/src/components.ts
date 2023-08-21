@@ -49,7 +49,7 @@ export { default as PI } from './foundation/icons/PI.vue';
 
 
 /* Inputs */
-export { default as PAnchor } from './inputs/anchors/PAnchor.vue';
+export { default as PLink } from './inputs/link/PLink.vue';
 export { default as PButton } from './inputs/buttons/button/PButton.vue';
 export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton.vue';
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';

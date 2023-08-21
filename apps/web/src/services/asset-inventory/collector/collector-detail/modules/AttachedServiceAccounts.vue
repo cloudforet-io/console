@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
+    PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
@@ -215,11 +215,11 @@ onMounted(async () => {
                 {{ state.serviceAccounts[value] ? state.serviceAccounts[value].label : value }}
             </template>
             <template #col-project_id-format="{value}">
-                <p-anchor v-if="state.projects[value]"
-                          :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                <p-link v-if="state.projects[value]"
+                        :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
                 >
                     {{ state.projects[value].label }}
-                </p-anchor>
+                </p-link>
             </template>
             <template #col-provider-format="{value}">
                 <p-badge v-if="state.providers[value]"

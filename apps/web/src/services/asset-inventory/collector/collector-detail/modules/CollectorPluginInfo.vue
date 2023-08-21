@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineProps, reactive } from 'vue';
 
-import { PAnchor, PDivider, PFieldTitle } from '@spaceone/design-system';
+import { PLink, PDivider, PFieldTitle } from '@spaceone/design-system';
 
 import type { CollectorModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
@@ -59,13 +59,13 @@ const state = reactive({
             >
                 {{ state.description }}
             </p>
-            <p-anchor v-if="props.plugin?.tags?.link"
-                      size="sm"
-                      highlight
-                      class="plugin-link"
+            <p-link v-if="props.plugin?.tags?.link"
+                    size="sm"
+                    highlight
+                    class="plugin-link"
             >
                 {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-            </p-anchor>
+            </p-link>
         </template>
     </div>
 </template>

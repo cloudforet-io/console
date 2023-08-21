@@ -18,10 +18,10 @@
                 }) }}
             </span>
             <div>
-                <p-anchor v-for="resource in availableResources"
-                          :key="resource.id"
-                          class="legend"
-                          :href="resource.link"
+                <p-link v-for="resource in availableResources"
+                        :key="resource.id"
+                        class="legend"
+                        :href="resource.link"
                 >
                     <template #left-extra>
                         <span class="circle"
@@ -29,7 +29,7 @@
                         />
                     </template>
                     {{ legendFormatter(resource) }}
-                </p-anchor>
+                </p-link>
             </div>
         </section>
         <section class="toolbox-section">
@@ -110,7 +110,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PAnchor, PSpinner,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -152,7 +152,7 @@ export default {
         PSelectDropdown,
         PSelectButtonGroup,
         PIconButton,
-        PAnchor,
+        PLink,
         MetricChart,
         PSpinner,
     },
@@ -421,8 +421,8 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    /* custom design-system component - p-anchor */
-    :deep(.legend.p-anchor) {
+    /* custom design-system component - p-link */
+    :deep(.legend.p-link) {
         @apply text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;

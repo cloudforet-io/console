@@ -35,9 +35,9 @@
                 >
                     <span>{{ scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
                     <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
-                        (<p-anchor :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
-                                   :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
-                                   highlight
+                        (<p-link :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
+                                 :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                 highlight
                         />)
                     </span>
                 </span>
@@ -51,10 +51,10 @@
         >
             <template #label>
                 <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
-                <p-anchor class="link-text"
-                          :to="{ name: PROJECT_ROUTE._NAME }"
-                          :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
-                          highlight
+                <p-link class="link-text"
+                        :to="{ name: PROJECT_ROUTE._NAME }"
+                        :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
+                        highlight
                 />
             </template>
             <template #default="{invalid}">
@@ -99,7 +99,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PFieldGroup, PRadio, PTextInput,
+    PLink, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -125,7 +125,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
-        PAnchor,
+        PLink,
     },
     props: {
         mode: {
@@ -260,6 +260,13 @@ export default {
                     font-weight: normal;
                     font-size: 0.75rem;
                 }
+            }
+        }
+        .title-wrapper {
+            .title {
+                width: 100%;
+                justify-content: space-between;
+                display: flex;
             }
         }
     }

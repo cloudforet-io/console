@@ -57,15 +57,15 @@
                 </template>
                 <template #col-title-format="{ value, item }">
                     <template v-if="value">
-                        <p-anchor hide-icon
-                                  highlight
-                                  :to="{
-                                      name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                                      params: { id: item.alert_id }
-                                  }"
+                        <p-link hide-icon
+                                highlight
+                                :to="{
+                                    name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                    params: { id: item.alert_id }
+                                }"
                         >
                             {{ value }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
@@ -89,9 +89,9 @@
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
-                        <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
+                        <p-link :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
                             {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </template>
                 <template #col-created_at-format="{value, field}">
@@ -127,7 +127,7 @@ import {
 } from 'vue';
 
 import {
-    PToolboxTable, PButton, PHeading, PBadge, PI, PAnchor,
+    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -181,7 +181,7 @@ export default {
         PHeading,
         PBadge,
         PI,
-        PAnchor,
+        PLink,
     },
     props: {
         projectId: {

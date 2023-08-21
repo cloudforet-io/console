@@ -41,12 +41,12 @@
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value">
-                <p-anchor :to="referenceRouter(
+                <p-link :to="referenceRouter(
                     value,
                     { resource_type: 'identity.Project' })"
                 >
                     {{ projects[value] ? projects[value].label : value }}
-                </p-anchor>
+                </p-link>
             </template>
         </template>
     </p-data-table>
@@ -56,7 +56,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PDataTable, PAnchor, PBadge,
+    PDataTable, PLink, PBadge,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
@@ -75,7 +75,7 @@ export default {
     name: 'EscalationPolicyDataTable',
     components: {
         PDataTable,
-        PAnchor,
+        PLink,
         PBadge,
     },
     props: {

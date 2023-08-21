@@ -1,23 +1,23 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PAnchor from './PAnchor.vue';
-import { getAnchorsArgTypes, router } from '@/inputs/anchors/story-helper';
+import PLink from './PLink.vue';
+import { getLinkArgTypes, router } from '@/inputs/link/story-helper';
 
 
-<Meta title='Inputs / Anchor' parameters={{
+<Meta title='Inputs / Link' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7050%3A551812'
     }
-}} argTypes={getAnchorsArgTypes()}/>
+}} argTypes={getLinkArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    components: { PAnchor },
+    components: { PLink },
     router,
     template: `
     <div class="flex justify-center">
-        <p-anchor
+        <p-link
             :text="text"
             :size="size"
             :icon-position="iconPosition"
@@ -29,7 +29,7 @@ export const Template = (args, { argTypes }) => ({
             :highlight="highlight"
         >
             <span v-if="defaultSlot" v-html="defaultSlot"/>
-        </p-anchor>
+        </p-link>
     </div>
     `,
     setup() {
@@ -38,7 +38,7 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-# Anchor
+# Link
 <br/>
 
 This component prevents the propagation of the click event by default.
@@ -46,19 +46,19 @@ This component prevents the propagation of the click event by default.
 <br/>
 
 
-## Basic Anchor
+## Basic Link
 
 Opens as a new tab only if you use the ic_external-link icon.
 
 <Canvas>
     <Story name="Basic">
         {{
-            components: { PAnchor },
+            components: { PLink },
             router,
             template: `
             <div class="grid gap-6">
-                <p-anchor href="https://www.google.com">This is <strong>default</strong> anchor with default slot.</p-anchor>
-                <p-anchor text="This is a default anchor with text props." :hide-icon="true" href="https://www.google.com" />
+                <p-link href="https://www.google.com">This is <strong>default</strong> link with default slot.</p-link>
+                <p-link text="This is a default link with text props." :hide-icon="true" href="https://www.google.com" />
             </div>
     `,
         }}
@@ -73,12 +73,12 @@ Opens as a new tab only if you use the ic_external-link icon.
 <Canvas>
     <Story name="No Icon">
         {{
-            components: { PAnchor },
+            components: { PLink },
             router,
             template: `
                 <div class="grid gap-6">
-                    <p-anchor icon-position="right" href="https://www.google.com" text="right"/>
-                    <p-anchor icon-position="left" href="https://www.google.com" text="left"/>
+                    <p-link icon-position="right" href="https://www.google.com" text="right"/>
+                    <p-link icon-position="left" href="https://www.google.com" text="left"/>
                 </div>
     `,
         }}
@@ -93,10 +93,10 @@ Opens as a new tab only if you use the ic_external-link icon.
 <Canvas>
     <Story name="Disabled">
         {{
-            components: { PAnchor },
+            components: { PLink },
             router,
             template: `
-            <p-anchor disabled href="https://www.google.com">This is <strong>disabled</strong> anchor</p-anchor>
+            <p-link disabled href="https://www.google.com">This is <strong>disabled</strong> link</p-link>
     `,
         }}
     </Story>
@@ -111,10 +111,10 @@ Opens as a new tab only if you use the ic_external-link icon.
 <Canvas>
     <Story name="Highlight">
         {{
-            components: { PAnchor },
+            components: { PLink },
             router,
             template: `
-            <p-anchor highlight href="https://www.google.com">This is <strong>highlighted</strong> anchor</p-anchor>
+            <p-link highlight href="https://www.google.com">This is <strong>highlighted</strong> link</p-link>
     `,
         }}
     </Story>
@@ -128,10 +128,10 @@ Opens as a new tab only if you use the ic_external-link icon.
 <Canvas>
     <Story name="Using Vue Router Location">
         {{
-            components: { PAnchor },
+            components: { PLink },
             router,
             template: `
-            <p-anchor :to="{path: ''}" href="https://www.google.com">This is an anchor <strong>with vue router location</strong></p-anchor>
+            <p-link :to="{path: ''}" href="https://www.google.com">This is an link <strong>with vue router location</strong></p-link>
     `,
         }}
     </Story>

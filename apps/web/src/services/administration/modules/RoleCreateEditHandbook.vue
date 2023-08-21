@@ -50,26 +50,26 @@
         </p>
         <p class="desc4">
             {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
-            <p-anchor :highlight="true"
-                      :to="{
-                          name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
-                      }"
+            <p-link :highlight="true"
+                    :to="{
+                        name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
+                    }"
             >
                 {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_LINK') }}
-            </p-anchor>
+            </p-link>
         </p>
     </section>
 </template>
 
 <script lang="ts">
-import { PAnchor, PDivider } from '@spaceone/design-system';
+import { PLink, PDivider } from '@spaceone/design-system';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
 export default {
     name: 'RoleCreateEditHandbook',
     components: {
-        PAnchor,
+        PLink,
         PDivider,
     },
     setup() {
@@ -104,7 +104,7 @@ export default {
     font-size: 0.875rem;
     line-height: 1.3125rem;
     margin-bottom: 1.5rem;
-    .p-anchor {
+    .p-link {
         line-height: 1.3125;
     }
     &:last-child {

@@ -16,13 +16,13 @@
                 >
                     {{ dashboardData.name }}
                 </p-select-card>
-                <p-anchor
+                <p-link
                     target="_blank"
                     :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                             params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
-                </p-anchor>
+                </p-link>
             </div>
         </div>
         <p-text-pagination
@@ -37,7 +37,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PAnchor, PSelectCard, PDivider, PTextPagination,
+    PLink, PSelectCard, PDivider, PTextPagination,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -65,7 +65,7 @@ export default {
     name: 'CostDashboardCreateWithDashboard',
     components: {
         PSelectCard,
-        PAnchor,
+        PLink,
         PTextPagination,
         PDivider,
     },
@@ -152,7 +152,7 @@ export default {
                     @apply font-bold;
                 }
             }
-            .p-anchor {
+            .p-link {
                 @apply text-center text-blue-700;
             }
         }

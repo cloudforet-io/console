@@ -5,13 +5,13 @@
         >
             <span class="project">
                 <p-copy-button :value="alertData.project_id">
-                    <p-anchor :to="referenceRouter(
-                                  alertData.project_id,
-                                  { resource_type: 'identity.Project' })"
-                              highlight
+                    <p-link :to="referenceRouter(
+                                alertData.project_id,
+                                { resource_type: 'identity.Project' })"
+                            highlight
                     >
                         {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
-                    </p-anchor>
+                    </p-link>
                 </p-copy-button>
             </span>
             <p-button style-type="tertiary"
@@ -70,7 +70,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PButton, PAnchor, PButtonModal, PCopyButton,
+    PButton, PLink, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -86,7 +86,7 @@ export default {
     name: 'AlertInfoProject',
     components: {
         ProjectSelectDropdown,
-        PAnchor,
+        PLink,
         PButton,
         PButtonModal,
         PCopyButton,

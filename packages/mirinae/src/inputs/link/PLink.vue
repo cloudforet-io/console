@@ -1,12 +1,12 @@
 <template>
     <router-link :to="props.to || {}"
-                 class="p-anchor"
+                 class="p-link"
                  custom
     >
         <template #default="{href: toHref, navigate}">
             <span>
-                <a ref="anchorRef"
-                   class="p-anchor"
+                <a ref="linkRef"
+                   class="p-link"
                    :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
                    :target="validateTarget()"
                    :href="props.to ? (toHref || props.href ): props.href"
@@ -43,12 +43,12 @@ import { computed, ref } from 'vue';
 import type { Location } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
-import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
+import { LinkSize, IconPosition } from '@/inputs/link/type';
 
 
-interface AnchorProps {
+interface LinkProps {
   text?: string;
-  size?: AnchorSize;
+  size?: LinkSize;
   iconPosition?: IconPosition;
   hideIcon?: boolean;
   iconName?: string;
@@ -58,11 +58,13 @@ interface AnchorProps {
   highlight?: boolean;
 }
 
-const props = withDefaults(defineProps<AnchorProps>(), {
+const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
-    size: AnchorSize.md,
+    size: LinkSize.md,
     iconPosition: IconPosition.right,
     iconName: 'ic_external-link',
+    href: undefined,
+    to: undefined,
 });
 
 const validateTarget = () => {
@@ -70,12 +72,12 @@ const validateTarget = () => {
     if (props.iconName === 'ic_external-link' && !props.hideIcon) return '_blank';
     return '_self';
 };
-const anchorRef = ref<HTMLElement|null>(null);
-const hasText = computed(() => !!anchorRef.value?.textContent);
+const linkRef = ref<HTMLElement|null>(null);
+const hasText = computed(() => !!linkRef.value?.textContent);
 </script>
 
 <style lang="postcss">
-.p-anchor {
+.p-link {
     /* Do not change this to inline-flex style, because it must be used with inline texts. */
     @apply cursor-pointer inline-block items-end;
     font-size: inherit;
