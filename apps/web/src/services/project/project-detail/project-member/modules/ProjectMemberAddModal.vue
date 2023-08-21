@@ -332,7 +332,7 @@ watch(() => state.activeTab, () => {
     >
         <template #body>
             <p-box-tab v-if="state.authType && state.authType !== 'GOOGLE_OAUTH2'"
-                       v-model:activeTab="state.activeTab"
+                       v-model:active-tab="state.activeTab"
                        :tabs="state.tabs"
             />
             <div class="form-wrapper">

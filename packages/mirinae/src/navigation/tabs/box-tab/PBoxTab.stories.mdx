@@ -24,7 +24,7 @@ export const Template = (args, { argTypes }) => ({
             :tabs="tabs"
             v-model="proxyActiveTab"
             :style-type="styleType"
-            @update:activeTab="onUpdateActiveTab"
+            @update:active-tab="onUpdateActiveTab"
             @change="onChange"
         >
             <div v-if="defaultSlot" v-html="defaultSlot"/>
@@ -87,7 +87,7 @@ export const Template = (args, { argTypes }) => ({
     <div>
         <div class="flex w-full mb-8" v-for="styleType in styleTypes" :key="styleType">
             <p-box-tab :tabs="tabs"
-                v-model="activeTab"
+                v-model:active-tab="activeTab"
                 :style-type="styleType"
             >{{styleType}}</p-box-tab>
         </div>
