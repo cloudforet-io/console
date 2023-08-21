@@ -1,13 +1,13 @@
 import type { ArgTypes } from '@storybook/addons';
 import VueRouter from 'vue-router';
 
-import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
+import { LinkSize, IconPosition } from '@/inputs/link/type';
 
-export const getAnchorsArgTypes = (): ArgTypes => ({
+export const getLinkArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
         type: { name: 'string' },
-        description: 'Anchor text. It will be replaced by default slot if exists.',
+        description: 'Link text. It will be replaced by default slot if exists.',
         defaultValue: 'Hello World',
         table: {
             type: {
@@ -25,21 +25,21 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
     size: {
         name: 'size',
         type: { name: 'string' },
-        description: `Select anchor size. ${
-            [...Object.values(AnchorSize)].map((d) => `\`${d}\``)} are available.`,
-        defaultValue: AnchorSize.md,
+        description: `Select link size. ${
+            [...Object.values(LinkSize)].map((d) => `\`${d}\``)} are available.`,
+        defaultValue: LinkSize.md,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: AnchorSize.md,
+                summary: LinkSize.md,
             },
         },
         control: {
             type: 'select',
-            options: [...Object.values(AnchorSize)],
+            options: [...Object.values(LinkSize)],
         },
     },
     iconPosition: {
@@ -137,7 +137,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
     disabled: {
         name: 'disabled',
         type: { name: 'boolean' },
-        description: 'Disable anchor or not',
+        description: 'Disable link or not',
         defaultValue: false,
         table: {
             type: {
@@ -155,7 +155,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
     highlight: {
         name: 'highlight',
         type: { name: 'boolean' },
-        description: 'Fix anchor color for highlighting, not inherit parent\'s color.',
+        description: 'Fix link color for highlighting, not inherit parent\'s color.',
         defaultValue: false,
         table: {
             type: {
