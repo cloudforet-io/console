@@ -25,8 +25,8 @@ import { useSlots } from 'vue';
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
 interface Props {
-    header: string | boolean;
-    styleType: CARD_STYLE_TYPE;
+    header?: string | boolean;
+    styleType?: CARD_STYLE_TYPE;
     size: CARD_SIZE;
 }
 

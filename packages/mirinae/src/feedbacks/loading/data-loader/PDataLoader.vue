@@ -67,11 +67,11 @@ import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { getColor } from '@/utils/helpers';
 
 interface Props {
-    loading: boolean;
+    loading?: boolean;
     data?: any;
     loaderType: LoaderTypes;
     spinnerSize: SpinnerSize;
-    disableEmptyCase: boolean;
+    disableEmptyCase?: boolean;
     showDataFromScratch: boolean;
     minLoadingTime: number;
     lazyLoadingTime: number;
