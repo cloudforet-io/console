@@ -15,9 +15,9 @@ export { messages } from './translations';
 
 /* Styles */
 export { default as colors } from './styles/colors';
-export { default as screens } from './styles/screens.cjs';
-export { default as styleVariables } from './styles/variables.cjs';
-export { default as fonts } from './styles/web-fonts.cjs';
+export { default as screens } from './styles/screens';
+export { default as styleVariables } from './styles/variables';
+export { default as fonts } from './styles/web-fonts';
 
 /* Components */
 export * from './components';

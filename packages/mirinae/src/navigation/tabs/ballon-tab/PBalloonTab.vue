@@ -53,7 +53,7 @@ import {
 } from '@/navigation/tabs/ballon-tab/config';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
-import screens from '@/styles/screens.cjs';
+import screens from '@/styles/screens';
 
 const props = defineProps({
     /* tab item props */
