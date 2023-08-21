@@ -47,7 +47,7 @@ const state = reactive({
                 >
                 <img v-else
                      class="logo-text"
-                     src="@/assets/images/brand/SpaceONE_logoTypeA_v1.9.svg"
+                     src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
                 >
             </div>
         </component>
