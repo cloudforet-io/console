@@ -7,11 +7,11 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
+const store = useStore();
 const { t } = useI18n();
 const router = useRouter();
 

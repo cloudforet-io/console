@@ -2,8 +2,9 @@
     <div>Sign Out..</div>
 </template>
 <script lang="ts">
+import { useStore } from 'vuex';
+
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -15,6 +16,7 @@ export default {
     beforeRouteEnter(to) {
         (async () => {
             try {
+                const store = useStore();
                 const authType = store.state.domain.extendedAuthType;
                 await loadAuth(authType).signOut();
                 await store.dispatch('user/setIsSessionExpired', true);

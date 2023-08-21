@@ -37,14 +37,13 @@
 
 <script lang="ts">
 
-import {
-    reactive, toRefs,
-} from 'vue';
 
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
 import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
-
-import { store } from '@/store';
+import {
+    reactive, toRefs,
+} from 'vue';
+import { useStore } from 'vuex';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -82,6 +81,8 @@ export default {
         },
     },
     setup() {
+        const store = useStore();
+
         const state = reactive({
             contextId: getUUID(),
         });

@@ -4,8 +4,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -16,6 +15,7 @@ import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
+const store = useStore();
 const { t } = useI18n();
 const state = reactive({
     header: computed(() => t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION].translationId)),

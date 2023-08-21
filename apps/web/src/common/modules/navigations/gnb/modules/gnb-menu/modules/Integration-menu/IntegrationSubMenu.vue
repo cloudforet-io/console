@@ -5,13 +5,14 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import {
     computed, onMounted, reactive, toRefs,
 } from 'vue';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 
 
 const emit = defineEmits(['close']);
+
+const store = useStore();
 
 const state = reactive({
     integrationMenus: computed(() => store.getters['domain/domainExtraMenu']?.contents ?? []),

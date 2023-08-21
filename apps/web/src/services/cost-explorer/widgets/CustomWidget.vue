@@ -13,8 +13,6 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { i18n } from '@/translations';
-
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { CurrencyRates } from '@/store/modules/settings/type';
 
@@ -94,7 +92,7 @@ const state = reactive({
     filters: computed<CostFiltersMap>(() => convertFiltersInToNewType(props.options?.filters ?? {})),
     filterLabel: computed(() => {
         const label = getCostDashboardFilterLabel(state.filters);
-        return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
+        return label ?? t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
     }),
     widgetLink: computed(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
