@@ -26,13 +26,13 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-collapsible-list
             :items="items"
-            v-model="proxyUnfoldedIndices"
+            v-model:unfolded-indices="proxyUnfoldedIndices"
             :line-clamp="lineClamp"
             :multi-unfoldable="multiUnfoldable"
             :toggle-position="togglePosition"
             :toggle-type="toggleType"
             :theme="theme"
-            @update:unfoldedIndices="onUpdateUnfoldedIndices"
+            @update:unfolded-indices="onUpdateUnfoldedIndices"
         >
             <template v-if="titleSlot" #title>
                 <div v-html="titleSlot" />
@@ -65,7 +65,7 @@ export const Template = (args, { argTypes }) => ({
     i18n: I18nConnector.i18n,
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-collapsible-list :items="items" v-model="unfolded"></p-collapsible-list>
+        <p-collapsible-list :items="items" v-model:unfolded-indices="unfolded"></p-collapsible-list>
     </div>
     `,
     setup() {
@@ -93,7 +93,7 @@ export const Template = (args, { argTypes }) => ({
             i18n: I18nConnector.i18n,
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-collapsible-list :items="items" v-model="unfolded" multi-unfoldable></p-collapsible-list>
+        <p-collapsible-list :items="items" v-model:unfolded-indices="unfolded" multi-unfoldable></p-collapsible-list>
     </div>
     `,
             setup() {
