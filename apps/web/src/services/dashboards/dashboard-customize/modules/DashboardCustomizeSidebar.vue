@@ -44,15 +44,15 @@
                            class="draggable-wrapper"
                            ghost-class="ghost"
                 >
-                    <template #item="{widget}">
+                    <template #item="{element}">
                         <div class="draggable-item">
                             <span>
                                 <p-i name="ic_drag-handle"
                                      width="1rem"
                                      height="1rem"
                                 /></span>
-                            <span class="text">{{ widget.title }}</span>
-                            <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                            <span class="text">{{ element.title }}</span>
+                            <span v-if="dashboardDetailState.widgetValidMap[element.widget_key] === false"
                                   class="error-icon-wrapper"
                             >
                                 <p-i name="ic_error-filled"

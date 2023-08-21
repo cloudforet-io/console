@@ -290,9 +290,9 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                                        draggable=".draggable-item"
                                        ghost-class="ghost"
                             >
-                                <template #item="{column}">
+                                <template #item="{element}">
                                     <column-item :selected-keys="state.selectedAllColumnKeys"
-                                                 :item="column"
+                                                 :item="element"
                                                  :search-text="state.search"
                                                  @update:selected-keys="handleUpdateSelectedKeys"
                                     />

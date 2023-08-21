@@ -80,7 +80,7 @@ onUnmounted(() => {
                            class="widget-list"
                            ghost-class="ghost"
                 >
-                    <template #item="{widget}">
+                    <template #item="{element}">
                         <li class="widget-item">
                             <p-i name="ic_drag-handle-alt"
                                  width="1rem"
@@ -88,7 +88,7 @@ onUnmounted(() => {
                                  class="drag-icon"
                             />
                             <div class="widget-row">
-                                <span v-for="{ name, widget_id } in widget"
+                                <span v-for="{ name, widget_id } in element"
                                       :key="`${widget_id}-${getUUID()}`"
                                       class="widget-col"
                                 >
