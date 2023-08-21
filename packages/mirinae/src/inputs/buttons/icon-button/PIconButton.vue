@@ -1,10 +1,9 @@
 <template>
-    <p-button
-        class="p-icon-button"
-        :class="{ activated, [size]: true, loading, [shape]: true }"
-        :style-type="styleType"
-        :disabled="disabled || loading"
-        v-on="listeners"
+    <p-button class="p-icon-button"
+              :class="{ activated, [size]: true, loading, [shape]: true }"
+              :style-type="styleType"
+              :disabled="disabled || loading"
+              v-on="listeners"
     >
         <p-spinner v-if="loading"
                    :size="state.loadingSize"
@@ -21,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, reactive, useAttrs,
 } from 'vue';
@@ -29,7 +27,6 @@ import {
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import type { AnimationType } from '@/foundation/icons/config';
-import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import type { ButtonSize } from '@/inputs/buttons/button/type';
