@@ -33,7 +33,7 @@ test.describe('Edit Collector', () => {
         await collector.click();
 
         // Wait for navigation to the collector details page.
-        await page.waitForNavigation();
+        await page.waitForURL();
 
         // Verify if the selected collector's name matches.
         await expect(page).toHaveURL(/asset-inventory\/collector\/collector-*/);
