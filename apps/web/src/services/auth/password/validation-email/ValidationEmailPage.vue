@@ -28,10 +28,11 @@ watch(() => route.query.status, (res) => {
 <template>
     <div class="validation-email-page">
         <div class="status-wrapper">
-            <lottie-vue-player v-if="state.status === 'done'"
-                               autoplay
-                               src="/lottiefiles/lottie_done.json"
-                               :style="{ height: '5rem', width: '5rem', backgroundColor: 'transparent' }"
+            <lottie-player v-if="state.status === 'done'"
+                           autoplay
+                           animation-link="/lottiefiles/lottie_done.json"
+                           height="5rem"
+                           width="5rem"
             />
             <p-i v-else
                  name="ic_face-frown"

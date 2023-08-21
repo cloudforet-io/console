@@ -7,6 +7,7 @@ import 'floating-vue/dist/style.css';
 import { createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
 import { createApp } from 'vue';
+import Vue3Lottie from 'vue3-lottie';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -38,6 +39,7 @@ app.use(i18n);
 app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
 app.use(Notifications);
+app.use(Vue3Lottie, { name: 'LottiePlayer' });
 // app.use(LottieVuePlayer);
 app.use<any>(SpaceDesignSystem, { vueI18n: i18n });
 

@@ -33,10 +33,11 @@ const state = reactive({
     <div class="wrap">
         <div class="error">
             <div class="error-contents">
-                <lottie-vue-player autoplay
-                                   loop
-                                   src="/lottiefiles/lottie_floating-astronaut.json"
-                                   :style="{ height: '20rem', width: '20rem', backgroundColor: 'transparent' }"
+                <lottie-player autoplay
+                               loop
+                               animation-link="/lottiefiles/lottie_floating-astronaut.json"
+                               height="20rem"
+                               width="20rem"
                 />
                 <p class="error-message">
                     {{ t('COMMON.ERROR.NO_RESOURCE_MSG') }}
