@@ -42,6 +42,7 @@ import ic_clock from '../icon-assets/ic_clock.svg';
 import ic_close from '../icon-assets/ic_close.svg';
 import ic_cloudFilled from '../icon-assets/ic_cloud-filled.svg';
 import ic_coinFilled from '../icon-assets/ic_coin-filled.svg';
+import ic_collect from '../icon-assets/ic_collect.svg';
 import ic_copyFilled from '../icon-assets/ic_copy-filled.svg';
 import ic_copy from '../icon-assets/ic_copy.svg';
 import ic_dashboardCustomize from '../icon-assets/ic_dashboard-customize.svg';
@@ -83,6 +84,7 @@ import ic_gnb_bell from '../icon-assets/ic_gnb_bell.svg';
 import ic_gnb_menu from '../icon-assets/ic_gnb_menu.svg';
 import ic_gnb_recentFavorite from '../icon-assets/ic_gnb_recent-favorite.svg';
 import ic_gnb_search from '../icon-assets/ic_gnb_search.svg';
+import ic_history from '../icon-assets/ic_history.svg';
 import ic_homeFilled from '../icon-assets/ic_home-filled.svg';
 import ic_horizontalRule from '../icon-assets/ic_horizontal-rule.svg';
 import ic_image from '../icon-assets/ic_image.svg';
@@ -206,6 +208,7 @@ export default {
     'ic_coin-filled': ic_coinFilled,
     'ic_copy-filled': ic_copyFilled,
     ic_copy,
+    ic_collect,
     'ic_dashboard-customize': ic_dashboardCustomize,
     'ic_dashboard-template_alert-manager': ic_dashboardTemplate_alertManager,
     'ic_dashboard-template_blank': ic_dashboardTemplate_blank,
@@ -245,6 +248,7 @@ export default {
     ic_gnb_menu,
     'ic_gnb_recent-favorite': ic_gnb_recentFavorite,
     ic_gnb_search,
+    ic_history,
     'ic_home-filled': ic_homeFilled,
     'ic_horizontal-rule': ic_horizontalRule,
     ic_image,
