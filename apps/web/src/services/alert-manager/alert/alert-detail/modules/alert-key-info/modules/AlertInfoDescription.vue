@@ -48,7 +48,7 @@ const {
     <div v-else
          class="content-wrapper"
     >
-        <p-textarea v-model="alertDetailItemState.dataForUpdate"
+        <p-textarea v-model:value="alertDetailItemState.dataForUpdate"
                     class="textarea"
         />
         <div class="button-group">

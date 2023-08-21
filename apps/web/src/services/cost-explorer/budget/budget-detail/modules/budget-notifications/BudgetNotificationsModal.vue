@@ -173,7 +173,7 @@ const handleConfirm = async () => {
                                            use-fixed-menu-style
                         />
                         <span class="align-middle">&gt;</span>
-                        <p-text-input v-model="condition.threshold"
+                        <p-text-input v-model:value="condition.threshold"
                                       class="condition"
                                       type="number"
                                       :max="condition.unit === NOTIFICATION_UNIT.PERCENT ? 100 : undefined"

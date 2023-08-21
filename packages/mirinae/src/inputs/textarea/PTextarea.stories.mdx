@@ -163,7 +163,7 @@ export const Template = (args, { argTypes }) => ({
             help-text="The value must be between 2 and 50 characters."
             :invalid-text="invalidText"
         >
-            <p-textarea v-model="value" :invalid="!!invalidText" />
+            <p-textarea v-model:value="value" :invalid="!!invalidText" />
         </p-field-group>
     </div>
     `,

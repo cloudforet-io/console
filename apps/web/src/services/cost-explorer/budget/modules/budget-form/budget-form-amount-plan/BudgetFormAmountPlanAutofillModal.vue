@@ -92,7 +92,7 @@ watch(() => props.visible, (visible) => {
                                :invalid="invalidState.start"
                                :invalid-text="invalidTexts.start"
                 >
-                    <p-text-input v-model="state.formattedStartBudget"
+                    <p-text-input v-model:value="state.formattedStartBudget"
                                   placeholder="1,000"
                                   :invalid="invalidState.start"
                     >

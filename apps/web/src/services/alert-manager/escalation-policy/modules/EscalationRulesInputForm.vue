@@ -200,7 +200,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                                    class="rule-input-wrapper"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model.number="rule.escalate_minutes"
+                            <p-text-input v-model:value.number="rule.escalate_minutes"
                                           type="number"
                                           :min="0"
                                           :invalid="invalid"
@@ -242,7 +242,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                                        :invalid="rule.escalate_minutes < 0"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model.number="rule.escalate_minutes"
+                                <p-text-input v-model:value.number="rule.escalate_minutes"
                                               type="number"
                                               :min="0"
                                               :invalid="invalid"

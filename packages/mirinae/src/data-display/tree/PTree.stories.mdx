@@ -28,11 +28,11 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                 </p-button>
                 <p-button @click="find">Find node</p-button>
                 <div class="mt-4">
-                    <p-text-input v-model="target"/>
+                    <p-text-input v-model:value="target"/>
                     <p-button style-type="secondary" @click="fetchAndFind">Fetch and find node</p-button>
                 </div>
                 <div class="mt-4">
-                    <p-text-input v-model="editText"/>
+                    <p-text-input v-model:value="editText"/>
                     <p-button style-type="negative-primary" @click="updateData">Update selected node</p-button>
                 </div>
             </div>

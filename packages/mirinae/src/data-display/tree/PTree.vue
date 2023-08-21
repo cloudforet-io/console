@@ -50,7 +50,7 @@
                         </slot>
                     </span>
                     <p-text-input v-if="state.isEditing && getSelectState(path)"
-                                  v-model="state.editText"
+                                  v-model:value="state.editText"
                                   :is-focused="true"
                                   :invalid="state.invalid"
                                   @blur="finishEdit(node)"

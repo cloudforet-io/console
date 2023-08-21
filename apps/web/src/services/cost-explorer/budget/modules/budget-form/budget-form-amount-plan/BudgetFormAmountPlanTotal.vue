@@ -45,7 +45,7 @@ watch(() => amount.value, (value) => {
             <template #right-extra>
                 ($USD)
             </template>
-            <p-text-input v-model="state.formattedAmount"
+            <p-text-input v-model:value="state.formattedAmount"
                           placeholder="1,000"
                           :invalid="invalidState.amount"
             >

@@ -175,7 +175,7 @@ const getPolicyData = async () => {
                     :label="t('IAM.POLICY.FORM.DESCRIPTION')"
                 >
                     <p-text-input
-                        v-model="state.description"
+                        :value="state.description"
                         :disabled="!state.hasManagePermission"
                         @update:value="handleDescriptionUpdate"
                     />

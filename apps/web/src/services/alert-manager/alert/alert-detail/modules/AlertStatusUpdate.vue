@@ -92,7 +92,7 @@ const onClickConfirm = async () => {
                                required
                 >
                     <template #default>
-                        <p-textarea v-model="state.statusInput"
+                        <p-textarea v-model:value="state.statusInput"
                                     class="block w-full"
                         />
                     </template>

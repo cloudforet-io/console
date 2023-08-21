@@ -24,7 +24,7 @@
                         </i18n-t>
                     </template>
                     <template #default="{invalid}">
-                        <p-text-input v-model="state.inputText"
+                        <p-text-input v-model:value="state.inputText"
                                       :invalid="invalid"
                                       :disabled="loading"
                                       block
