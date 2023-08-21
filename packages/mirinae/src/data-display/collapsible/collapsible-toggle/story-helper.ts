@@ -8,7 +8,7 @@ export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
     'v-model': {
         name: 'v-model',
         type: { name: 'boolean' },
-        description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
+        description: 'Two way binding for `isCollapsed` props with `update:is-collapsed` event.',
         defaultValue: '',
         table: {
             type: {

@@ -24,7 +24,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <div class="h-full w-full overflow p-8">
         <p-collapsible-panel
-            v-model="proxyIsCollapsed"
+            v-model:is-collapsed="proxyIsCollapsed"
             @update:is-collapsed="onUpdateIsCollapsed"
             :line-clamp="lineClamp"
         >

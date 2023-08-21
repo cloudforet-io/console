@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<CollapsiblePanelProps>(), {
     lineClamp: 2,
 });
 
-const emit = defineEmits(['update:isCollapsed']);
+const emit = defineEmits(['update:is-collapsed']);
 
 
 const state = reactive({
