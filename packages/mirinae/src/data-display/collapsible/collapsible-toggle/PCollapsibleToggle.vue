@@ -48,7 +48,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:isCollapsed']);
+const emit = defineEmits(['update:is-collapsed']);
 
 const { t } = useI18n();
 
