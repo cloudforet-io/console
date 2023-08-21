@@ -23,8 +23,8 @@ interface Props {
     name: string;
     dir?: string;
     fill?: boolean;
-    width: string;
-    height: string;
+    width?: string;
+    height?: string;
     scale?: string;
     color?: string;
     original?: boolean;

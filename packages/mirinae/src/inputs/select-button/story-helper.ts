@@ -163,4 +163,17 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    onUpdateSelected: {
+        name: 'update:selected',
+        description: 'Event emitted when selected state is changed.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 });

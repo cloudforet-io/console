@@ -25,7 +25,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <div class="h-full w-full overflow p-8">
         <p-select-card :value="value"
-            v-model="proxySelected"
+            v-model:selected="proxySelected"
             :disabled="disabled"
             :predicate="predicate"
             :multi-selectable="multiSelectable"
@@ -67,7 +67,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-card v-for="(value, index) in values" :key="value"
             :tab-index="index"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             :icon="icons[value]"
             :label="icons[value]"
             style="min-width: 10rem; max-width: 10rem; min-height: 10rem; max-height: 10rem; margin: 1rem;"
@@ -102,7 +102,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-card v-for="(value, index) in values" :key="value"
             :tab-index="index"
             :value="value" block
-            v-model="selected"
+            v-model:selected="selected"
             :icon="icons[value]"
             :label="icons[value]"
             class="mb-4"
@@ -137,7 +137,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-card v-for="(value, index) in values" :key="value"
             :tab-index="index"
             :value="value" block
-            v-model="selected"
+            v-model:selected="selected"
             :label="icons[value]"
             class="mb-4"
         />
@@ -172,7 +172,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-card v-for="(value, index) in values" :key="value"
             :tab-index="index"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             :label="'label-' + value"
             :icon="true"
             style="min-width: 10rem; max-width: 10rem; min-height: 10rem; max-height: 10rem; margin: 1rem;"
@@ -208,7 +208,7 @@ export const Template = (args, { argTypes }) => ({
             :tab-index="index"
             multi-selectable
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             :icon="icons[value]"
             :label="icons[value]"
             style="min-width: 10rem; max-width: 10rem; min-height: 10rem; max-height: 10rem; margin: 1rem;"
@@ -243,7 +243,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="w-full overflow p-8 grid gap-4 grid-cols-3">
         <p-select-card v-for="(value, index) in values" :key="value.key"
             :tab-index="index"
-            v-model="selected"
+            v-model:selected="selected"
             :value="value"
             :label="value.name"
             :predicate="predicate"
@@ -286,7 +286,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-card v-for="(value, index) in values" :key="value"
             :tab-index="index"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             style="min-width: 8rem; min-height: 8rem; margin: 1rem;"
         >
             <strong :style="{color: value}">{{value}}</strong>
@@ -317,7 +317,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="w-full overflow p-8 flex flex-wrap">
         <p-select-card v-for="(value, index) in values" :key="value"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             :label="icons[index]"
             :icon="icons[index]"
             :tab-index="index"
