@@ -94,7 +94,7 @@ watch(() => state.manualOptionValidations, (updated) => {
             >
                 {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
             </p-button>
-            <draggable v-model="state.proxyOptions"
+            <draggable v-model:model-value="state.proxyOptions"
                        item-key="draggableItemId"
                        class="draggable-wrapper"
                        ghost-class="ghost"

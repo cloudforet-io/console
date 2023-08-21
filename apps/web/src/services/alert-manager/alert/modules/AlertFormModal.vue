@@ -146,7 +146,7 @@ watch(() => state.proxyVisible, (visible) => {
                            :invalid="state.titleInvalid"
                            :invalid-text="state.titleInvalidText"
             >
-                <p-text-input v-model="state.title"
+                <p-text-input v-model:value="state.title"
                               block
                               :placeholder="t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_ALERT_TITLE')"
                               :invalid="state.titleInvalid"
@@ -196,7 +196,7 @@ watch(() => state.proxyVisible, (visible) => {
             </p-button>
 
             <p-field-group :label="t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_DESCRIPTION')">
-                <p-textarea v-model="state.description" />
+                <p-textarea v-model:value="state.description" />
             </p-field-group>
         </template>
     </p-button-modal>

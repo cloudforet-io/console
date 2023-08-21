@@ -35,7 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
     disabled: false,
     invalid: false,
 });
-const emit = defineEmits(['update:value']);
+const emit = defineEmits<{(e: 'update:value', value: string | number): void;
+    (e: 'input', event: InputEvent): void;
+}>();
 const attrs = useAttrs();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),

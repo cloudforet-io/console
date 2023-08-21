@@ -62,7 +62,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" />
+                <p-text-input v-model:value="value" />
             `,
             setup() {
                 const state = reactive({
@@ -87,11 +87,11 @@ export const Template = (args, { argTypes }) => ({
             template: `
                 <div style="width: 90%">
                     <p class="text-label-lg font-bold my-3">With single input</p>
-                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete use-fixed-menu-style />
+                    <p-text-input :menu="menu" v-model:selected="selected" use-auto-complete use-fixed-menu-style />
                     <br/>
                     <br/>
                     <p class="text-label-lg font-bold my-3">With multi input</p>
-                    <p-text-input :menu="menu" :selected.sync="selected" multi-input use-auto-complete use-fixed-menu-style />
+                    <p-text-input :menu="menu" v-model:selected="selected" multi-input use-auto-complete use-fixed-menu-style />
                     <br/>
                     <br/>
                     <div class="flex mt-4">
@@ -136,7 +136,7 @@ If you want to get the result of duplicate check, use `update` event. <br/>
             components: { PTextInput },
             template: `
                 <div style="width: 80%">
-                    <p-text-input :selected.sync="selected" multi-input use-fixed-menu-style @update="handleUpdate" />
+                    <p-text-input v-model:selected="selected" multi-input use-fixed-menu-style @update="handleUpdate" />
                     <div class="flex mt-4">
                         <div class="p-4 w-full max-h-64 overflow-y-auto" :class="isValid ? 'bg-green-200' : 'bg-coral-200'">
                             <p class="font-lg font-bold">isValid: </p>
@@ -185,19 +185,19 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
             template: `
                 <div>
                     <p class="text-label-lg font-bold my-3">With page size 5</p>
-                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete :page-size="5" use-fixed-menu-style />
+                    <p-text-input :menu="menu" v-model:selected="selected" use-auto-complete :page-size="5" use-fixed-menu-style />
                     <br/>
                     <br/>
                     <p class="text-label-lg font-bold my-3">With multi input, page size 5</p>
-                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
+                    <p-text-input :menu="menu" v-model:selected="selected" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
                     <br/>
                     <br/>
                     <p class="text-label-lg font-bold my-3">With custom handler, page size 5</p>
-                    <p-text-input :selected.sync="selected" :handler="simpleHandler" use-auto-complete :page-size="5" use-fixed-menu-style />
+                    <p-text-input v-model:selected="selected" :handler="simpleHandler" use-auto-complete :page-size="5" use-fixed-menu-style />
                     <br/>
                     <br/>
                     <p class="text-label-lg font-bold my-3">With custom handler, multi input, page size 5</p>
-                    <p-text-input :selected.sync="selected" :handler="simpleHandler" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
+                    <p-text-input v-model:selected="selected" :handler="simpleHandler" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
                     <br/>
                     <br/>
                     <div class="p-4 bg-blue-200 w-full max-h-64 overflow-y-auto">
@@ -255,7 +255,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" class="test" placeholder="Placeholder" />
+                <p-text-input v-model:value="value" class="test" placeholder="Placeholder" />
             `,
             setup() {
                 const state = reactive({
@@ -279,7 +279,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" type="number" :min="0" :max="100" />
+                <p-text-input v-model:value="value" type="number" :min="0" :max="100" />
             `,
             setup() {
                 const state = reactive({
@@ -381,7 +381,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" disabled />
+                <p-text-input v-model:value="value" disabled />
             `,
             setup() {
                 const state = reactive({
@@ -406,7 +406,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
             components: { PTextInput },
             template: `
                 <div>
-                    <p-text-input :selected.sync="entered" block multi-input />
+                    <p-text-input v-model:selected="entered" block multi-input />
                     <p class="my-4 font-lg font-bold">selected: </p>
                     <pre>{{entered}}</pre>
                 </div>
@@ -439,7 +439,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" invalid />
+                <p-text-input v-model:value="value" invalid />
             `,
             setup() {
                 const state = reactive({
@@ -466,9 +466,9 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
                 <form>
                     <p>Save ID/PW to browser and check autocomplete case.</p>
                     <br/><br/>
-                    <p-text-input v-model="id" placeholder="ID" autocomplete="username" />
+                    <p-text-input v-model:value="id" placeholder="ID" autocomplete="username" />
                     <br/><br/>
-                    <p-text-input v-model="pw" type="password" placeholder="PW" autocomplete="current-password" />
+                    <p-text-input v-model:value="pw" type="password" placeholder="PW" autocomplete="current-password" />
                 </form>
             `,
             setup() {
@@ -499,15 +499,15 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
             template: `
 <div>
 <p class="text-lg font-bold mb-4">input-right slot</p>
-<p-text-input type="number" multi-input v-model="value" >
+<p-text-input type="number" multi-input v-model:value="value" >
     <template #input-right>%</template>
 </p-text-input>
 <p class="text-lg font-bold my-4">right-edge slot</p>
-<p-text-input multi-input v-model="value2" >
+<p-text-input multi-input v-model:value="value2" >
     <template #right-edge><p-button size="sm">Click me!</p-button></template>
 </p-text-input>
 <p class="text-lg font-bold my-4">default slot</p>
-<p-text-input multi-input v-model="value2" >
+<p-text-input multi-input v-model:value="value2" >
     <input style="background-color: lavenderblush; padding: 0 0.25rem;" v-model="value3" />
 </p-text-input>
 </div>
@@ -581,7 +581,7 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
             components: { PTextInput },
             template: `
                 <div  style="display:flex; flex-direction: column; row-gap: 1.5rem;">
-                    <p-text-input v-for="size in sizes" :key="size" :size="size" v-model="value" :placeholder="size" />
+                    <p-text-input v-for="size in sizes" :key="size" :size="size" v-model:value="value" :placeholder="size" />
                 </div>
             `,
             setup() {

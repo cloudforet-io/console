@@ -85,7 +85,7 @@ watch(() => alertPageState.alertData?.title, (alertTitle) => {
                            required
             >
                 <template #default>
-                    <p-text-input v-model="state.alertTitleInput"
+                    <p-text-input v-model:value="state.alertTitleInput"
                                   class="block w-full"
                                   :invalid="state.isNameInvalid"
                                   :placeholder="alertPageState.alertData?.title"

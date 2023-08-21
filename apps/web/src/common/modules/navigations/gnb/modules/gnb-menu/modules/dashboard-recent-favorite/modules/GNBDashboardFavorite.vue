@@ -140,7 +140,7 @@ const isOverflown = () => {
                        class="gnb-dashboard-favorite-context"
         >
             <div ref="listContainerRef">
-                <draggable v-model="state.sortedFavoriteList"
+                <draggable v-model:model-value="state.sortedFavoriteList"
                            item-key="itemId"
                 >
                     <template #item="{item}">

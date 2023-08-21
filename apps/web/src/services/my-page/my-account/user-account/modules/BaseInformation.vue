@@ -102,7 +102,7 @@ watch(() => store.state.user.language, (language) => {
                        :label="t('COMMON.PROFILE.ID')"
                        class="input-form"
         >
-            <p-text-input v-model="state.userId"
+            <p-text-input v-model:value="state.userId"
                           disabled
                           class="text-input"
             />

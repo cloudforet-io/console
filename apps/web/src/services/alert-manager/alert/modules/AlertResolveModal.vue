@@ -85,7 +85,7 @@ watch(() => props.visible, async (visible) => {
                 :label="t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.LABEL_NOTE')"
                 class="mt-4"
             >
-                <p-textarea v-model="state.noteInput" />
+                <p-textarea v-model:value="state.noteInput" />
             </p-field-group>
         </template>
     </p-button-modal>

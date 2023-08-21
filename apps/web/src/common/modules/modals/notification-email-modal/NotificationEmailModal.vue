@@ -143,7 +143,7 @@ watch(() => state.proxyVisible, (value) => {
                     <div class="notification-field-wrapper">
                         <p-text-input
                             id="newNotificationEmail"
-                            v-model="formState.newNotificationEmail"
+                            v-model:value="formState.newNotificationEmail"
                             :invalid="validationState.isEmailValid"
                             @keyup.enter="handleClickSendEmailButton"
                         />

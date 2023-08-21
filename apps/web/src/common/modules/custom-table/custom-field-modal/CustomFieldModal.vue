@@ -285,7 +285,7 @@ watch([() => props.visible, () => props.resourceType], ([visible, resourceType])
                         </header>
 
                         <div class="column-items-wrapper">
-                            <draggable v-model="state.allColumns"
+                            <draggable v-model:model-value="state.allColumns"
                                        item-key="key"
                                        draggable=".draggable-item"
                                        ghost-class="ghost"

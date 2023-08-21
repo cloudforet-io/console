@@ -75,7 +75,7 @@ onUnmounted(() => {
                     {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
                 <!-- TODO: draggable need item-key, should be refactored -->
-                <draggable v-model="state.editingCustomLayout"
+                <draggable v-model:model-value="state.editingCustomLayout"
                            tag="ul"
                            class="widget-list"
                            ghost-class="ghost"

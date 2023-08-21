@@ -97,7 +97,7 @@ const handleCreatePolicy = async () => {
             </div>
             <div class="policy-create-contents">
                 <p-field-group :label="t('IAM.POLICY.FORM.DESCRIPTION')">
-                    <p-text-input v-model="state.description" />
+                    <p-text-input v-model:value="state.description" />
                 </p-field-group>
             </div>
             <div class="policy-create-contents">

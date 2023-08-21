@@ -39,7 +39,7 @@
                 >
                     {{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD') }}
                 </p-button>
-                <draggable v-model="state.widgetInfoList"
+                <draggable v-model:model-value="state.widgetInfoList"
                            item-key="widget_key"
                            class="draggable-wrapper"
                            ghost-class="ghost"

@@ -280,7 +280,7 @@ export const Template = (args, { argTypes }) => ({
             </template>
             <template #default="{invalid}">
                 <div v-if="$props.default" v-html="$props.default"/>
-                <p-text-input v-else placeholder="Input" :invalid="invalid" v-model="value"/>
+                <p-text-input v-else placeholder="Input" :invalid="invalid" v-model:value="value"/>
             </template>
         </p-field-group>
     `,
