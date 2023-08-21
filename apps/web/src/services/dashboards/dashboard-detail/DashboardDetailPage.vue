@@ -92,6 +92,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -211,6 +212,7 @@ const handleUpdateLabels = async (labels: string[]) => {
                 labels,
             });
         }
+        await store.dispatch('dashboard/loadAllDashboard');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
