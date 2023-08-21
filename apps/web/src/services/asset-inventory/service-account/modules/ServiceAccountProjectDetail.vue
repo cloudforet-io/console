@@ -1,10 +1,10 @@
 <template>
     <div class="service-account-project-detail">
-        <p-anchor v-if="!!projectName"
-                  :href="projectLink"
+        <p-link v-if="!!projectName"
+                :href="projectLink"
         >
             {{ projectName }}
-        </p-anchor>
+        </p-link>
         <span v-if="!projectName && serviceAccountType === ACCOUNT_TYPE.TRUSTED">N/A</span>
         <div v-if="!projectName && serviceAccountType === ACCOUNT_TYPE.GENERAL">
             <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
@@ -26,7 +26,7 @@ import type { PropType } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PAnchor, PI, PTooltip,
+    PLink, PI, PTooltip,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -40,7 +40,7 @@ import type { AccountType } from '@/services/asset-inventory/service-account/typ
 export default {
     name: 'ServiceAccountProjectDetail',
     components: {
-        PAnchor,
+        PLink,
         PI,
         PTooltip,
     },

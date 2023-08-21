@@ -42,9 +42,9 @@
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
-                    <p-anchor :to="value ? getLink(item, field.name) : undefined"
-                              hide-icon
-                              class="!align-middle"
+                    <p-link :to="value ? getLink(item, field.name) : undefined"
+                            hide-icon
+                            class="!align-middle"
                     >
                         <template v-if="getIsRaised(item, field.name)">
                             <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
@@ -56,7 +56,7 @@
                         <template v-else>
                             {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
                         </template>
-                    </p-anchor>
+                    </p-link>
                 </span>
             </template>
         </p-toolbox-table>
@@ -84,7 +84,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PAnchor, PI, PToolboxTable, PDataTable, PButtonModal,
+    PLink, PI, PToolboxTable, PDataTable, PButtonModal,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
@@ -138,7 +138,7 @@ export default {
     name: 'CostAnalysisDataTable',
     components: {
         PButtonModal,
-        PAnchor,
+        PLink,
         PI,
         PToolboxTable,
     },

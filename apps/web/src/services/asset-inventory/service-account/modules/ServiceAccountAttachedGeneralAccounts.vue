@@ -13,14 +13,14 @@
                           @changeSort="handleChange"
             >
                 <template #col-name-format="{value, item}">
-                    <p-anchor
+                    <p-link
                         :to="{
                             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                             params: { serviceAccountId: item.service_account_id },
                         }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </p-data-table>
         </div>
@@ -37,7 +37,7 @@ import {
     PPaneLayout,
     PHeading,
     PDataTable,
-    PAnchor,
+    PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -54,7 +54,7 @@ export default defineComponent({
         PPaneLayout,
         PHeading,
         PDataTable,
-        PAnchor,
+        PLink,
     },
     props: {
         serviceAccountId: {

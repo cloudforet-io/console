@@ -27,9 +27,9 @@
                 <p-button style-type="tertiary"
                           class="link-button"
                 >
-                    <p-anchor :href="consoleLink">
+                    <p-link :href="consoleLink">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
-                    </p-anchor>
+                    </p-link>
                 </p-button>
             </template>
         </p-heading>
@@ -87,7 +87,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
+    PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 
@@ -125,7 +125,7 @@ export default defineComponent({
         PIconButton,
         PHeading,
         PButton,
-        PAnchor,
+        PLink,
         PLazyImg,
         PPaneLayout,
     },
@@ -236,8 +236,8 @@ export default defineComponent({
             display: inline-flex;
         }
         .link-button {
-            /* custom design-system component - p-anchor */
-            :deep(.p-anchor) {
+            /* custom design-system component - p-link */
+            :deep(.p-link) {
                 .text:hover {
                     text-decoration: none;
                 }

@@ -29,11 +29,11 @@
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>
-                <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
-                          highlight
+                <p-link :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
+                        highlight
                 >
                     {{ escalationPolicyName }}
-                </p-anchor>
+                </p-link>
             </template>
             <template #data-project_id>
                 <alert-info-project :id="id"
@@ -87,7 +87,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
+    PPaneLayout, PDefinitionTable, PLink, PBadge,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -120,7 +120,7 @@ export default {
         AlertInfoProject,
         PPaneLayout,
         PDefinitionTable,
-        PAnchor,
+        PLink,
         PBadge,
     },
     props: {

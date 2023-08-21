@@ -40,12 +40,12 @@
                            :invalid-text="projectInvalidText"
             >
                 <template #label-extra>
-                    <p-anchor class="go-project"
-                              highlight
-                              :to="{name: PROJECT_ROUTE._NAME }"
+                    <p-link class="go-project"
+                            highlight
+                            :to="{name: PROJECT_ROUTE._NAME }"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
-                    </p-anchor>
+                    </p-link>
                 </template>
                 <project-select-dropdown :invalid="projectInvalid"
                                          project-selectable
@@ -76,7 +76,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PButton,
+    PLink, PButton,
     PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
 } from '@spaceone/design-system';
 
@@ -102,7 +102,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
-        PAnchor,
+        PLink,
         PButton,
         PTextarea,
     },

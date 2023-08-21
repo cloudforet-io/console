@@ -13,13 +13,13 @@
            :key="`${item}-${index}`"
            class="project-name"
         >
-            <p-anchor :to="referenceRouter(
-                          item,
-                          { resource_type: 'identity.Project' })"
-                      highlight
+            <p-link :to="referenceRouter(
+                        item,
+                        { resource_type: 'identity.Project' })"
+                    highlight
             >
                 {{ projects[item] ? projects[item].label : item }}
-            </p-anchor>
+            </p-link>
         </p>
     </p-pane-layout>
 </template>
@@ -30,7 +30,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PEmpty, PPaneLayout, PHeading,
+    PLink, PEmpty, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -44,7 +44,7 @@ export default {
     components: {
         PPaneLayout,
         PHeading,
-        PAnchor,
+        PLink,
         PEmpty,
     },
     props: {

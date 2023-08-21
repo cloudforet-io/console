@@ -10,21 +10,21 @@
             :striped="false"
         >
             <template #col-project_group_info.project_group_id-format="{value}">
-                <p-anchor v-if="value"
-                          :href="getProjectLink(value, false)"
+                <p-link v-if="value"
+                        :href="getProjectLink(value, false)"
                 >
                     {{ projectGroups[value] ? projectGroups[value].label : value }}
-                </p-anchor>
+                </p-link>
                 <p v-if="!value">
                     -
                 </p>
             </template>
             <template #col-project_info.project_id-format="{value}">
-                <p-anchor v-if="value"
-                          :href="getProjectLink(value, true)"
+                <p-link v-if="value"
+                        :href="getProjectLink(value, true)"
                 >
                     {{ projects[value] ? projects[value].label : value }}
-                </p-anchor>
+                </p-link>
                 <p v-if="!value">
                     -
                 </p>
@@ -51,7 +51,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PHeading, PDataTable, PAnchor, PBadge,
+    PHeading, PDataTable, PLink, PBadge,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -85,7 +85,7 @@ export default {
     components: {
         PDataTable,
         PHeading,
-        PAnchor,
+        PLink,
         PBadge,
     },
     props: {

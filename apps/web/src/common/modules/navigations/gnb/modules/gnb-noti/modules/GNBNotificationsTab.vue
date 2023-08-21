@@ -68,9 +68,9 @@
                     </div>
                     <div v-if="selectedItem.message.link">
                         <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
-                        <p-anchor :href="selectedItem.message.link">
+                        <p-link :href="selectedItem.message.link">
                             {{ selectedItem.message.link }}
-                        </p-anchor>
+                        </p-link>
                     </div>
                 </div>
                 <div v-if="selectedItem.message.description"
@@ -104,7 +104,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton, PEmpty,
+    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -148,7 +148,7 @@ export default {
         PDataLoader,
         PButtonModal,
         PI,
-        PAnchor,
+        PLink,
         PDefinitionTable,
         PButton,
         PEmpty,

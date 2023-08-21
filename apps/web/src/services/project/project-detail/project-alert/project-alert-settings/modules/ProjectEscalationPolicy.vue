@@ -2,12 +2,12 @@
     <div class="project-escalation-policy">
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.NAME_LABEL') }}</span>
-            <p-anchor class="value"
-                      :to="escalationPolicyLink"
-                      highlight
+            <p-link class="value"
+                    :to="escalationPolicyLink"
+                    highlight
             >
                 {{ escalationPolicyName }}
-            </p-anchor>
+            </p-link>
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.FINISH_CONDITION_LABEL') }}</span>
@@ -68,7 +68,7 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PDivider, PI, PAnchor,
+    PBadge, PDivider, PI, PLink,
 } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
 
@@ -92,7 +92,7 @@ export default {
         PDivider,
         PBadge,
         PI,
-        PAnchor,
+        PLink,
     },
     props: {
         projectId: {

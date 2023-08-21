@@ -61,15 +61,15 @@
                 </p-badge>
             </template>
             <template #col-policy_id-format="{ value, item }">
-                <p-anchor :highlight="true"
-                          :to="{
-                              name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
-                              params: { id: value },
-                              query: { type: item.policy_type }
-                          }"
+                <p-link :highlight="true"
+                        :to="{
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
+                            params: { id: value },
+                            query: { type: item.policy_type }
+                        }"
                 >
                     {{ value }}
-                </p-anchor>
+                </p-link>
             </template>
         </p-data-table>
     </div>
@@ -82,7 +82,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PAnchor, PBadge, PDataTable, PDefinitionTable, PHeading,
+    PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
@@ -118,7 +118,7 @@ export default {
         PHeading,
         PBadge,
         PDataTable,
-        PAnchor,
+        PLink,
     },
     props: {
         roleId: {

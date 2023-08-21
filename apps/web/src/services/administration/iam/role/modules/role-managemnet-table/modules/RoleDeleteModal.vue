@@ -53,12 +53,12 @@
                     {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
                 </template>
                 <template #col-project-format="{ value }">
-                    <p-anchor v-if="value"
-                              :highlight="true"
-                              :href="getProjectLink(value)"
+                    <p-link v-if="value"
+                            :highlight="true"
+                            :href="getProjectLink(value)"
                     >
                         {{ projectFieldHandler(value, projects) }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </p-data-table>
         </template>
@@ -70,7 +70,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
+import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -112,7 +112,7 @@ export default {
         DeleteModal,
         PDataTable,
         PBadge,
-        PAnchor,
+        PLink,
     },
     props: {
         visible: {

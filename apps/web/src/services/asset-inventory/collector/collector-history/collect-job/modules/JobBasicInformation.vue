@@ -4,12 +4,12 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="state.collector.linkLocation"
-                          class="contents"
-                          size="sm"
+                <p-link :to="state.collector.linkLocation"
+                        class="contents"
+                        size="sm"
                 >
                     {{ state.collector.label }}
-                </p-anchor>
+                </p-link>
             </div>
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
@@ -46,7 +46,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import { PLink, PLazyImg, PPaneLayout } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 

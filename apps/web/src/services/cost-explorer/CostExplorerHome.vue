@@ -15,14 +15,14 @@
                     {{ SERVICE_CONTENTS.topic.button_text }}
                 </p-button>
                 <br>
-                <p-anchor text="More information"
-                          icon-position="right"
-                          icon-name="ic_external-link"
-                          :href="SERVICE_CONTENTS.topic.link"
-                          highlight
+                <p-link text="More information"
+                        icon-position="right"
+                        icon-name="ic_external-link"
+                        :href="SERVICE_CONTENTS.topic.link"
+                        highlight
                 >
                     {{ SERVICE_CONTENTS.topic.link_text }}
-                </p-anchor>
+                </p-link>
             </div>
             <div class="image-wrapper">
                 <img class="image"
@@ -41,11 +41,11 @@
                     <p class="description">
                         {{ submenu.description }}
                     </p>
-                    <p-anchor :text="submenu.link_text"
-                              icon-position="right"
-                              icon-name="ic_external-link"
-                              highlight
-                              :href="submenu.link"
+                    <p-link :text="submenu.link_text"
+                            icon-position="right"
+                            icon-name="ic_external-link"
+                            highlight
+                            :href="submenu.link"
                     />
                 </div>
                 <div class="image-wrapper">
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PButton, PPaneLayout } from '@spaceone/design-system';
+import { PLink, PButton, PPaneLayout } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -104,7 +104,7 @@ export default {
     name: 'CostExplorerHome',
     components: {
         PPaneLayout,
-        PAnchor,
+        PLink,
         PButton,
     },
     setup() {
@@ -170,7 +170,7 @@ export default {
                 max-width: 20rem;
                 margin: 0.5rem 0;
             }
-            .p-anchor {
+            .p-link {
                 @apply text-label-sm;
             }
         }

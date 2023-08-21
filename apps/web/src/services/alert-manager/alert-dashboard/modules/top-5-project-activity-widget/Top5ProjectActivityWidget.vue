@@ -34,16 +34,16 @@
                      :key="`table-row-${idx}`"
                      class="table-row"
                 >
-                    <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                              hide-icon
-                              size="sm"
-                              class="col-name"
+                    <p-link :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
+                            hide-icon
+                            size="sm"
+                            class="col-name"
                     >
                         <span v-tooltip.bottom="projectNameFormatter(projectId, projects)"
                               class="tablet:hidden"
                         >{{ projectNameFormatter(projectId, projects) }}</span>
                         <span class="tablet-text">{{ projectNameFormatter(projectId, projects) }}</span>
-                    </p-anchor>
+                    </p-link>
                     <div class="col-activity">
                         <div v-for="(activity, aIdx) in activity[projectId]"
                              :key="`activity-${aIdx}`"
@@ -77,7 +77,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PAnchor, PSelectStatus, PStatus, PSkeleton,
+    PLink, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
@@ -130,7 +130,7 @@ interface Activity {
 export default {
     name: 'Top5ProjectActivityWidget',
     components: {
-        PAnchor,
+        PLink,
         PStatus,
         PSelectStatus,
         PSkeleton,

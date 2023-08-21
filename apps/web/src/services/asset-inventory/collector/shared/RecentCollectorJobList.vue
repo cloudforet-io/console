@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PTooltip, PI, PEmpty, PAnchor, PDataLoader,
+    PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -81,14 +81,14 @@ watch(() => props.recentJobs, () => {
                     />
                 </p-tooltip>
             </p>
-            <p-anchor v-if="props.fullMode && props.historyLink"
-                      size="sm"
-                      highlight
-                      icon-name="ic_chevron-right"
-                      :to="props.historyLink"
+            <p-link v-if="props.fullMode && props.historyLink"
+                    size="sm"
+                    highlight
+                    icon-name="ic_chevron-right"
+                    :to="props.historyLink"
             >
                 View All
-            </p-anchor>
+            </p-link>
         </div>
         <p-data-loader :data="!!state.completedJobs?.length"
                        :loading="state.loading"
