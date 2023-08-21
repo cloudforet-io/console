@@ -166,5 +166,11 @@ module.exports = {
                 jest: true,
             },
         },
+        {
+            files: ['*.js'],
+            rules: {
+                'no-undef': 'error',
+            },
+        },
     ],
 };
