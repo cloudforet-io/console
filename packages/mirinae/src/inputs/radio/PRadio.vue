@@ -53,7 +53,9 @@ const props = withDefaults(defineProps<Props>(), {
     invalid: false,
     readonly: false,
 });
-const emit = defineEmits(['change']);
+const emit = defineEmits<{(e: 'change', selected: any, isSelected: boolean): void;
+    (e: 'update:selected', selected: any): void;
+}>();
 const attrs = useAttrs();
 const slots = useSlots();
 
@@ -78,6 +80,7 @@ const handleClick = () => {
     if (props.disabled || props.readonly) return;
     const newSelected = getSelected();
     emit('change', newSelected, true);
+    emit('update:selected', newSelected);
 };
 
 const listeners = {

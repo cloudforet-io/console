@@ -21,7 +21,7 @@ export const Template = (args, { argTypes }) => ({
             <p-radio v-for="value in values"
                      :key="value"
                      :value="value"
-                     v-model="proxySelected"
+                     v-model:selected="proxySelected"
                      :disabled="disabled"
                      :predicate="predicate"
                      :invalid="invalid"
@@ -63,7 +63,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-radio v-for="value in values" v-model="selected" :value="value" :key="value">
+                <p-radio v-for="value in values" v-model:selected="selected" :value="value" :key="value">
                     This is radio for {{value}}
                 </p-radio>
             </div>
@@ -95,10 +95,10 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-radio v-model="selected" :value="true">
+                <p-radio v-model:selected="selected" :value="true">
                     true
                 </p-radio>
-                <p-radio v-model="selected" :value="false">
+                <p-radio v-model:selected="selected" :value="false">
                     false
                 </p-radio>
             </div>
@@ -129,7 +129,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-radio v-model="selected" disabled>
+                <p-radio v-model:selected="selected" disabled>
                     (not selected) you can't select disabled radio.
                 </p-radio>
                 <p-radio :selected="true" disabled>
@@ -162,7 +162,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-radio v-model="selected" readonly>
+                <p-radio v-model:selected="selected" readonly>
                     (not selected) you can't select readonly radio.
                 </p-radio>
                 <p-radio :selected="true" readonly>
@@ -197,7 +197,7 @@ export const Template = (args, { argTypes }) => ({
             <div class="flex flex-col mb-8">
                 <p class="mb-4">One item must be selected.</p>
                 <p-radio v-for="value in values" :key="value"
-                            v-model="selected"
+                            v-model:selected="selected"
                             :value="value"
                             :invalid="selected.length === 0"
 >
@@ -233,7 +233,7 @@ export const Template = (args, { argTypes }) => ({
          <div>
             <div class="flex flex-col mb-8">
                 <p-radio v-for="value in values" :key="value.key"
-                            v-model="selected"
+                            v-model:selected="selected"
                             :value="value"
                             :predicate="predicate"
 >

@@ -129,7 +129,7 @@ const onClickDelete = (idx) => {
             <div class="radio-wrapper">
                 <p-radio v-for="policy in state.conditionsPolicies"
                          :key="policy.name"
-                         v-model:value="state.proxyConditionsPolicy"
+                         v-model:selected="state.proxyConditionsPolicy"
                          :value="policy.name"
                          class="mr-4"
                 >

@@ -175,7 +175,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                                    use-fixed-menu-style
                 >
                     <template #menu-item--format="{item}">
-                        <p-radio v-model="rule.notification_level"
+                        <p-radio v-model:selected="rule.notification_level"
                                  :value="item.name"
                         >
                             <p>{{ item.label }}</p>
@@ -220,7 +220,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                                        use-fixed-menu-style
                     >
                         <template #menu-item--format="{item}">
-                            <p-radio v-model="rule.notification_level"
+                            <p-radio v-model:selected="rule.notification_level"
                                      :value="item.name"
                             >
                                 <div class="item">

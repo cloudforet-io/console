@@ -271,7 +271,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
                        required
         >
             <div class="flex">
-                <p-radio v-model="formState.hasCredentialKey"
+                <p-radio v-model:selected="formState.hasCredentialKey"
                          :value="true"
                          class="radio-text"
                 >

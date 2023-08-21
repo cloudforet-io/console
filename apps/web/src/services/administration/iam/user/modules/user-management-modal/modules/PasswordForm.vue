@@ -137,7 +137,7 @@ const resetForm = () => {
                 <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
                     <p-radio v-for="(type, idx) in state.passwordTypeArr"
                              :key="type.name"
-                             v-model="state.passwordStatus"
+                             v-model:selected="state.passwordStatus"
                              :value="idx"
                              :disabled="type.disabled"
                              @change="handleClickRadio(idx)"

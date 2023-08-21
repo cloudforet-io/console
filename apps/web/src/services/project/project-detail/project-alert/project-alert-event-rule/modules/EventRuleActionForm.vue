@@ -192,7 +192,7 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                 <div>
                     <p-radio v-for="(urgency, uIdx) in state.urgencyList"
                              :key="`urgency-${uIdx}`"
-                             v-model:value="state.selectedUrgency"
+                             v-model:selected="state.selectedUrgency"
                              :value="urgency.name"
                              class="mr-4"
                     >
