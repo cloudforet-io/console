@@ -42,7 +42,7 @@
 				"EMAIL": "이메일",
 				"HELP_TEXT": "본 링크는 만료되었거나 더 이상 유효하지 않습니다.",
 				"SENT_BUTTON": "재발송",
-				"TITLE": "유효하지 않\u001e은 링크입니다"
+				"TITLE": "유효하지 않은 링크입니다"
 			},
 			"MOBILE": {
 				"MOBILE_GUIDE_MODAL_DESC_1": "데스크탑 또는 노트북 환경에서",
