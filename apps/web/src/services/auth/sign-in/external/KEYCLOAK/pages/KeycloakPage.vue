@@ -1,13 +1,9 @@
-<template>
-    <template />
-</template>
-
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
@@ -38,6 +34,8 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const store = useStore();
+
         const onSignIn = async () => {
             if (!props.nextPath) {
                 await router.push({ name: HOME_DASHBOARD_ROUTE._NAME });

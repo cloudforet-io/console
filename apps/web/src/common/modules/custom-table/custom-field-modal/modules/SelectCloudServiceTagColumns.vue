@@ -28,8 +28,7 @@ import {
     ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -50,6 +49,7 @@ const props = withDefaults(defineProps<{
     isServerPage: false,
 });
 const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void}>();
+const store = useStore();
 const { t } = useI18n();
 
 /* providers */

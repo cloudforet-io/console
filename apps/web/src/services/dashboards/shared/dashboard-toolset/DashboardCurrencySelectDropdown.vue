@@ -34,14 +34,13 @@
 </template>
 
 <script setup lang="ts">
-
 import { PSelectDropdown, PBadge } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     computed, defineProps, reactive,
 } from 'vue';
+import { useStore } from 'vuex';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -57,6 +56,9 @@ const props = withDefaults(defineProps<DashboardCurrencySelectDropdownProps>(), 
     currency: undefined,
 });
 const emit = defineEmits<{(e: 'update:currency', currency: DashboardCurrency): void}>();
+
+const store = useStore();
+
 const state = reactive({
     defaultCurrency: computed<Currency>(() => store.state.settings.currency),
     currency: computed(() => props.currency || store.state.settings.currency),

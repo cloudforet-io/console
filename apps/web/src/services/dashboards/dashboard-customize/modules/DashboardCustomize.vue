@@ -36,10 +36,9 @@ import { PDivider } from '@spaceone/design-system';
 import {
     computed, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
-
+import { useStore } from 'vuex';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -64,6 +63,7 @@ interface Props {
     hideCancelButton?: boolean;
 }
 
+const store = useStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'go-back'): void,
     (e: 'save'): void}>();
