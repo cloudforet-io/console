@@ -83,7 +83,7 @@
                 </p-select-dropdown>
             </div>
             <div class="repository">
-                <p-select-dropdown v-model="state.selectedRepository"
+                <p-select-dropdown v-model:selected="state.selectedRepository"
                                    :items="state.repositoryList"
                                    class="select-dropdown"
                 >

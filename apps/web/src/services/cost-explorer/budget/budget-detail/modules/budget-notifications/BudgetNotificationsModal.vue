@@ -167,7 +167,7 @@ const handleConfirm = async () => {
                           :key="`condition-${idx}`"
                 >
                     <div class="condition-input-wrapper">
-                        <p-select-dropdown v-model="condition.unit"
+                        <p-select-dropdown v-model:selected="condition.unit"
                                            class="condition"
                                            :items="state.units"
                                            use-fixed-menu-style
@@ -189,7 +189,7 @@ const handleConfirm = async () => {
                                 >%</span>
                             </template>
                         </p-text-input>
-                        <p-select-dropdown v-model="condition.notification_type"
+                        <p-select-dropdown v-model:selected="condition.notification_type"
                                            class="condition"
                                            :items="state.types"
                                            use-fixed-menu-style
