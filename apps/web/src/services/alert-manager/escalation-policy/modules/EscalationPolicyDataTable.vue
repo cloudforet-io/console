@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     selectIndex: () => [],
     tableCustomStyle: () => ({}),
 });
-const emit = defineEmits<{(e: 'update:selectIndex', value: number[]): void;
+const emit = defineEmits<{(e: 'update:select-index', value: number[]): void;
     (arg0: 'change', value: { sortBy: string; sortDesc: boolean }): void;
 }>();
 const store = useStore();

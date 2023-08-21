@@ -25,7 +25,7 @@ withDefaults(defineProps<Props>(), {
     dashboardProject: '',
 });
 const emit = defineEmits<{(e: 'set-project', value: ProjectItemResp): void;
-    (e: 'update:dashboardScope', value: DashboardScope): void;
+    (e: 'update:dashboard-scope', value: DashboardScope): void;
 }>();
 const { t } = useI18n();
 const store = useStore();
@@ -47,7 +47,7 @@ const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
 
 const updateScope = (scopeType: DashboardScope) => {
     state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
-    emit('update:dashboardScope', scopeType);
+    emit('update:dashboard-scope', scopeType);
 };
 
 // LOAD REFERENCE STORE

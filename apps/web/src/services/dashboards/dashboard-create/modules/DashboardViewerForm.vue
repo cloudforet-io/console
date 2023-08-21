@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer } from '@/services/dashboards/config';
 
-const emit = defineEmits<{(e: 'update:dashboardViewerType', value: DashboardViewer): void}>();
+const emit = defineEmits<{(e: 'update:dashboard-viewer-type', value: DashboardViewer): void}>();
 const { t } = useI18n();
 
 const state = reactive({
@@ -17,7 +17,7 @@ const state = reactive({
 
 const handleSelectViewer = (viewerType: DashboardViewer) => {
     state.isPublicViewer = viewerType === DASHBOARD_VIEWER.PUBLIC;
-    emit('update:dashboardViewerType', viewerType);
+    emit('update:dashboard-viewer-type', viewerType);
 };
 
 </script>

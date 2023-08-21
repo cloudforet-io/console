@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
     menuSet: () => [],
     showFavoriteOnly: undefined,
 });
-const emit = defineEmits<{(e: 'update:showFavoriteOnly', value: boolean| undefined): void}>();
+const emit = defineEmits<{(e: 'update:show-favorite-only', value: boolean| undefined): void}>();
 const { t } = useI18n();
 const slots = useSlots();
 const route = useRoute();
