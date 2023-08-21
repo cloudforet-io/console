@@ -39,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
     isValid: false,
     originForm: () => ({}),
 });
-const emit = defineEmits<{(e: 'update:isValid', value: boolean): void;
+const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
     (e: 'change', value: CredentialForm): void;
 }>();
 const store = useStore();
@@ -259,7 +259,7 @@ watch(() => formState.formData, (formData) => {
     emit('change', formData);
 });
 watch(() => formState.isAllValid, (isAllValid) => {
-    emit('update:isValid', isAllValid);
+    emit('update:is-valid', isAllValid);
 });
 
 </script>

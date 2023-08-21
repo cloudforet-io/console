@@ -24,8 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
     selectedYear: '',
     selectedMonth: '',
 });
-const emit = defineEmits<{(e: 'update:selectedYear'): void;
-    (e: 'update:selectedMonth'): void;
+const emit = defineEmits<{(e: 'update:selected-year'): void;
+    (e: 'update:selected-month'): void;
 }>();
 const { t } = useI18n();
 

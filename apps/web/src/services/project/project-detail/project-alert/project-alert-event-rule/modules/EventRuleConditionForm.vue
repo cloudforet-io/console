@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     conditionsPolicy: 'ALL',
     conditions: () => ([]),
 });
-const emit = defineEmits<{(e: 'update:conditionsPolicy', value: ConditionsPolicy): void;
+const emit = defineEmits<{(e: 'update:conditions-policy', value: ConditionsPolicy): void;
     (e: 'update:conditions', value: Condition[]): void;
 }>();
 const { t } = useI18n();

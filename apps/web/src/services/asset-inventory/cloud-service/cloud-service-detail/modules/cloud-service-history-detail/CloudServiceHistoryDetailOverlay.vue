@@ -49,7 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
     provider: '',
     cloudServiceItem: () => ({}),
 });
-const emit = defineEmits<{(e: 'update:selectedHistoryItem', value: CloudServiceHistoryItem): void;
+const emit = defineEmits<{(e: 'update:selected-history-item', value: CloudServiceHistoryItem): void;
     (e: 'refresh-note-count'): void;
     (e: 'load-more'): void;
 }>();

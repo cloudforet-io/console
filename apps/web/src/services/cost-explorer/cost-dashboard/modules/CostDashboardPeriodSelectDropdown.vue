@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
 });
 const emit = defineEmits<{(e: 'update:period', value: Period): void;
-    (e: 'update:periodType', value: string): void;
+    (e: 'update:period-type', value: string): void;
 }>();
 const { t } = useI18n();
 
@@ -144,7 +144,7 @@ const handleSelectedFixDate = async (isSelected: boolean) => {
         }
 
         state.isFixedTypeSelected = isSelected;
-        emit('update:periodType', periodType);
+        emit('update:period-type', periodType);
         emit('update:period', state.selectedPeriod);
     } catch (e) {
         ErrorHandler.handleError(e);
