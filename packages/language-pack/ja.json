@@ -38,7 +38,12 @@
 				"TITLE": "パスワードをお忘れですか？",
 				"USER_ID": "ユーザーID"
 			},
-			"INVALID_LINK": "無効なリンクです",
+			"INVALID_LINK": {
+				"EMAIL": "メールアドレス",
+				"HELP_TEXT": "リンクは期限切れか、もはや有効ではありません。\\",
+				"SENT_BUTTON": "再送信'",
+				"TITLE": "無効なリンクです"
+			},
 			"MOBILE": {
 				"MOBILE_GUIDE_MODAL_DESC_1": "デスクトップまたはノートパソコン環境で",
 				"MOBILE_GUIDE_MODAL_DESC_2": "初期パスワードを再設定した後",

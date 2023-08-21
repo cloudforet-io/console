@@ -2,14 +2,14 @@
     <div class="password-form">
         <div class="form">
             <div v-if="props.status !== PASSWORD_STATUS.RESET">
-                <p-field-group :label="$t('AUTH.PASSWORD.FIND.USER_ID')"
+                <p-field-group :label="state.inputLabel"
                                :invalid="validationState.isIdValid"
                                :invalid-text="validationState.idInvalidText"
                                required
                 >
                     <template #default="{invalid}">
                         <p-text-input :value="userIdInput"
-                                      :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                      :placeholder="props.status !== PASSWORD_STATUS.FIND ? 'E-mail Address' : 'User ID'"
                                       :invalid="invalid"
                                       block
                                       @update:value="handleChangeInput('userId', $event)"
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -69,8 +69,6 @@ import {
 
 import { i18n } from '@/translations';
 
-
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import {
     oneLowerCaseValidator,
     oneNumberValidator,
@@ -88,6 +86,13 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     status: '',
+});
+
+const state = reactive({
+    inputLabel: computed<string>(() => {
+        if (props.status === PASSWORD_STATUS.FIND) return i18n.t('AUTH.PASSWORD.FIND.USER_ID') as string;
+        return i18n.t('AUTH.PASSWORD.INVALID_LINK.EMAIL') as string;
+    }),
 });
 
 const emit = defineEmits(['change-input', 'click-button']);
