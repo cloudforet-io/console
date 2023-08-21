@@ -36,7 +36,7 @@ export default {
             component: ProjectPage,
         },
         {
-            path: ':id',
+            path: '/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
             meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
             redirect: (to) => `${to.params.id}/summary`,

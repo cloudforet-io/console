@@ -63,7 +63,7 @@ const myPageRoutes: RouteRecordRaw = {
                         //     props: true,
                         // },
                         {
-                            path: ':protocol/:protocolId/:userId',
+                            path: '/:protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                             meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
                             props: true,
