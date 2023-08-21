@@ -103,15 +103,15 @@ const props = withDefaults(defineProps<ToolboxTableProps>(), {
     striped: false,
     bordered: undefined,
     disableHover: false,
-    rowHeightFixed: false,
+    rowHeightFixed: true,
     rowCursorPointer: false,
     invalid: false,
 
     /* toolbox props */
     paginationVisible: true,
     pageSizeChangeable: true,
-    settingsVisible: true,
-    exportable: true,
+    settingsVisible: false,
+    exportable: false,
     refreshable: true,
     searchable: true,
     filtersVisible: true,
