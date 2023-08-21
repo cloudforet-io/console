@@ -46,7 +46,7 @@ const costExplorerRoutes: RouteRecordRaw = {
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: ':dashboardId',
+                            path: '/:dashboardId',
                             name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME,
                             meta: { label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
@@ -55,7 +55,7 @@ const costExplorerRoutes: RouteRecordRaw = {
                     ],
                 },
                 {
-                    path: ':dashboardId?',
+                    path: '/:dashboardId?',
                     name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
                     meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                     props: true,
@@ -69,7 +69,7 @@ const costExplorerRoutes: RouteRecordRaw = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: ':querySetId?',
+                    path: '/:querySetId?',
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     meta: {
                         lnbVisible: true, label: ({ params }) => params.querySetId, copiable: true,
@@ -110,7 +110,7 @@ const costExplorerRoutes: RouteRecordRaw = {
                     component: BudgetUpdatePage as any,
                 },
                 {
-                    path: ':budgetId',
+                    path: '/:budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
                     meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
