@@ -99,7 +99,7 @@ watch(() => state.manualOptionValidations, (updated) => {
                        class="draggable-wrapper"
                        ghost-class="ghost"
             >
-                <template #item="{option, index}">
+                <template #item="{element, index}">
                     <div class="draggable-item">
                         <div class="grab-area">
                             <p-i name="ic_drag-handle"
@@ -107,14 +107,14 @@ watch(() => state.manualOptionValidations, (updated) => {
                                  height="1rem"
                             />
                         </div>
-                        <p-text-input :value="option.key"
+                        <p-text-input :value="element.key"
                                       class="option-input"
                                       :placeholder="t('Key')"
                                       :invalid="state.manualOptionValidations[index]"
                                       @update:value="handleChangeOptionValue(index, $event)"
                         />
                         <span class="option-colon">:</span>
-                        <p-text-input :value="option.label"
+                        <p-text-input :value="element.label"
                                       class="option-input"
                                       :placeholder="t('Label name')"
                                       :invalid="state.manualOptionValidations[index]"
@@ -123,7 +123,7 @@ watch(() => state.manualOptionValidations, (updated) => {
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
                                            name="ic_delete"
-                                           @click="handleDeleteOption(option.draggableItemId)"
+                                           @click="handleDeleteOption(element.draggableItemId)"
                             />
                         </div>
                     </div>

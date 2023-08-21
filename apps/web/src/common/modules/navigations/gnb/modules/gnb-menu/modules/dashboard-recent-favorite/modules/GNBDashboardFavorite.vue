@@ -143,16 +143,16 @@ const isOverflown = () => {
                 <draggable v-model:model-value="state.sortedFavoriteList"
                            item-key="itemId"
                 >
-                    <template #item="{item}">
+                    <template #item="{element}">
                         <div>
-                            <g-n-b-sub-menu :label="item.label"
+                            <g-n-b-sub-menu :label="element.label"
                                             :is-draggable="true"
-                                            :to="dashboardRouteFormatter(item.itemId)"
+                                            :to="dashboardRouteFormatter(element.itemId)"
                                             @navigate="hideMenu"
                             >
                                 <template #extra-mark>
                                     <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                                     :item-id="item.itemId"
+                                                     :item-id="element.itemId"
                                                      scale="0.65"
                                     />
                                 </template>
