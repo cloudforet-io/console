@@ -46,7 +46,9 @@ const props = withDefaults(defineProps<CheckboxProps>(), {
     selected: () => [],
     disabled: false,
 });
-const emit = defineEmits(['change']);
+const emit = defineEmits<{(e: 'change', selected: any, isSelected: boolean): void;
+    (e: 'update:selected', selected: any): void;
+}>();
 const attrs = useAttrs();
 
 const {
@@ -73,6 +75,7 @@ const onClick = () => {
     if (!props.disabled) {
         const newSelected = getSelected();
         emit('change', newSelected, !isSelected.value);
+        emit('update:selected', newSelected);
     }
 };
 

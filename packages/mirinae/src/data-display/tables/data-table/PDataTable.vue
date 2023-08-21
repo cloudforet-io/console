@@ -25,7 +25,7 @@
                                     class="all-select"
                                 >
                                     <p-checkbox v-if="multiSelect"
-                                                v-model:value="state.allState"
+                                                v-model:selected="state.allState"
                                                 @change="onSelectAllToggle"
                                     />
                                 </th>
@@ -126,7 +126,7 @@
                                 @click.stop.prevent="onSelectClick"
                             >
                                 <p-checkbox v-if="multiSelect"
-                                            v-model="proxyState.proxySelectIndex"
+                                            v-model:selected="proxyState.proxySelectIndex"
                                             :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
                                             :value="rowIndex"
                                 />

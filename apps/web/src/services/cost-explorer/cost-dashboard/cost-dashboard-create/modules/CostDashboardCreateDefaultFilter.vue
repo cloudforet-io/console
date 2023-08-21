@@ -37,7 +37,7 @@ const handleClickFilterButton = () => {
 
 <template>
     <h3>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.FILTER') }}</h3>
-    <p-checkbox v-model="state.includesFilter"
+    <p-checkbox v-model:selected="state.includesFilter"
                 :disabled="!state.isDashboardTemplate"
     >
         {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}

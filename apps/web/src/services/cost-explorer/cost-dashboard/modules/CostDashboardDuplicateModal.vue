@@ -164,7 +164,7 @@ watch(() => props.visible, (visible) => {
                               @update:value="setForm('name', $event)"
                 />
             </p-field-group>
-            <p-checkbox v-model="state.includesFilter">
+            <p-checkbox v-model:selected="state.includesFilter">
                 {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
             </p-checkbox>
             <p-field-group :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_VISIBILITY')"

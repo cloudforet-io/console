@@ -73,7 +73,7 @@
                 >
                     <template #header>
                         <div class="mobile-header">
-                            <p-checkbox v-model="state.isAssignedToMe">
+                            <p-checkbox v-model:selected="state.isAssignedToMe">
                                 <span>{{ t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
                             </p-checkbox>
                             <p-text-pagination
