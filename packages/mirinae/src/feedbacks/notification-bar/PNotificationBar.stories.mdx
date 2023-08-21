@@ -107,7 +107,7 @@ export const Template = (args, { argTypes }) => ({
                       @click="visible = !visible;">
                 {{visible ? 'close' : 'open' }}
             </p-button>
-            <p-notification-bar v-model="visible"
+            <p-notification-bar v-model:visible="visible"
                                 :style-type="styleType"
                                 class="mt-4 flex-grow"
                                 @close="onClose"

@@ -92,7 +92,7 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(['update:selectedDates', 'close']);
+const emit = defineEmits(['update:selected-dates', 'close']);
 const { t, locale } = useI18n();
 
 const state = reactive({
@@ -277,7 +277,7 @@ watch([() => props.minDate, () => props.maxDate], () => {
     }
 
     /* style-type = text */
-    &.text:not(.open.time) {
+    &.text:not(.open) {
         @apply border-0 bg-transparent;
         width: auto;
         max-width: 18rem;
@@ -344,12 +344,12 @@ watch([() => props.minDate, () => props.maxDate], () => {
                 }
                 &.arrowUp::after {
                     border-style: solid;
-                    border-width: 0 0.125rem 0.25rem 0.125rem;
+                    border-width: 0 0.125rem 0.25rem;
                     top: 40%;
                 }
                 &.arrowDown::after {
                     border-style: solid;
-                    border-width: 0.25rem 0.125rem 0 0.125rem;
+                    border-width: 0.25rem 0.125rem 0;
                 }
             }
             &.noCalendar {

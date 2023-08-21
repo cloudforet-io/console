@@ -22,7 +22,7 @@ export const Template = (args, { argTypes }) => ({
     components: { PQuerySearch },
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-query-search v-model="proxyValue"
+        <p-query-search v-model:value="proxyValue"
             :keyItemSets="keyItemSets"
             :valueHandlerMap="valueHandlerMap"
         ></p-query-search>

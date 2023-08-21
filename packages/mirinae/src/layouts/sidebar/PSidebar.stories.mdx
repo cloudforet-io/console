@@ -29,7 +29,7 @@ export const Template = (args, {argTypes}) => {
                             :size="size"
                             :hide-close-button="hideCloseButton"
                             :is-fixed-size="isFixedSize"
-                            v-model="visible"
+                            v-model:visible="visible"
                             class="mt-4 flex-grow"
                             @close="onClose"
                 >

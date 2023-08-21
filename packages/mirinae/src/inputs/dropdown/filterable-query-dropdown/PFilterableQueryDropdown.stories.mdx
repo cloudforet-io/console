@@ -24,7 +24,7 @@ export const Template = (args, {argTypes}) => ({
     components: { PFilterableQueryDropdown },
     template: `
         <div class="h-full w-full overflow p-8">
-            <p-filterable-query-dropdown v-model="proxyValue"
+            <p-filterable-query-dropdown v-model:selected="proxyValue"
                             :keyItemSets="keyItemSets"
                             :valueHandlerMap="valueHandlerMap"
             ></p-filterable-query-dropdown>

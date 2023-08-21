@@ -309,7 +309,7 @@ watch(() => tableState.selectedAccountType, () => {
                 </div>
             </template>
         </p-dynamic-layout>
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+        <custom-field-modal v-model:visible="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
                             :options="{provider: state.selectedProvider}"
                             @complete="reloadTable"

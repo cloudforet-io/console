@@ -7,7 +7,7 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     'v-model': {
         name: 'v-model',
         type: { name: 'boolean' },
-        description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
+        description: 'Two way binding for `isCollapsed` props with `update:is-collapsed` event.',
         defaultValue: '',
         table: {
             type: {
@@ -74,8 +74,8 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     },
     /* event */
     onUpdateIsCollapsed: {
-        name: 'update:isCollapsed',
-        description: 'Event emitted when collapsed state changed. Works with `v-model` and `isCollapsed` props sync.',
+        name: 'update:is-collapsed',
+        description: 'Event emitted when collapsed state changed. Works with `v-model:is-collapsed`.',
         table: {
             type: {
                 summary: null,

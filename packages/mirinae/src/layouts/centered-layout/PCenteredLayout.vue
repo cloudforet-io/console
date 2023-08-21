@@ -1,6 +1,6 @@
 <template>
     <div class="p-centered-layout">
-        <div v-if="$slots['top-contents']"
+        <div v-if="slots['top-contents']"
              class="top-contents-wrapper"
         >
             <slot name="top-contents" />
@@ -19,7 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import {
+    ref, onMounted, onUnmounted, useSlots,
+} from 'vue';
+
+const slots = useSlots();
 
 const layoutWrapperRef = ref<HTMLElement|null>(null);
 const layoutContentsRef = ref<HTMLElement|null>(null);

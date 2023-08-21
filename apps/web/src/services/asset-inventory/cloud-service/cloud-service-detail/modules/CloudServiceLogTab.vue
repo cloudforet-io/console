@@ -306,7 +306,7 @@ watch([() => state.selectedPeriod, () => props.cloudServiceId, () => state.activ
                                 <p-select-status
                                     v-for="(item, index) in state.timeWithinList"
                                     :key="`${item.name}-${index}`"
-                                    v-model="state.selectedTimeWithin"
+                                    v-model:selected="state.selectedTimeWithin"
                                     :value="item.name"
                                 >
                                     {{ item.label }}

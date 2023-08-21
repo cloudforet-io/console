@@ -15,7 +15,7 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PSearch },
     template: `
-        <p-search v-model="proxyValue"
+        <p-search v-model:value="proxyValue"
                   v-bind="inputAttrs"
                   :placeholder="placeholder"
                   :disable-icon="disableIcon"
@@ -59,7 +59,7 @@ export const Template = (args, { argTypes }) => ({
 {{
     components: { PSearch },
     template: `
-        <p-search v-model="proxyValue"/>
+        <p-search v-model:value="proxyValue"/>
     `,
     setup(props) {
         const state = reactive({
@@ -107,7 +107,7 @@ Menu items are not filtered because there is no handler.
         <div>
             <div>Search Text : {{ searchText }}</div>
             <br />
-            <p-search v-model="proxyValue"
+            <p-search v-model:value="proxyValue"
                   use-fixed-menu-style
                   use-auto-complete
                   :menu="menu"
@@ -154,7 +154,7 @@ Menu items are not filtered because there is no handler.
         <div>
             <div>Search Text : {{ searchText }}</div>
             <br />
-            <p-search v-model="proxyValue"
+            <p-search v-model:value="proxyValue"
                   use-fixed-menu-style
                   use-auto-complete
                   :handler="handlePromise"
@@ -207,7 +207,7 @@ If `handler` is not defined, it is filtered through the built-in default `handle
         <div>
             <div>Search Text : {{ searchText }}</div>
             <br />
-            <p-search v-model="proxyValue"
+            <p-search v-model:value="proxyValue"
                   use-fixed-menu-style
                   use-auto-complete
                   :menu="menu"
@@ -247,7 +247,7 @@ If `handler` is not defined, it is filtered through the built-in default `handle
         {{
             components: { PSearch },
             template: `
-        <p-search v-model="proxyValue" invalid/>
+        <p-search v-model:value="proxyValue" invalid/>
     `,
             setup(props) {
                 const state = reactive({
@@ -271,7 +271,7 @@ If `handler` is not defined, it is filtered through the built-in default `handle
         {{
             components: { PSearch },
             template: `
-        <p-search v-model="proxyValue" disabled/>
+        <p-search v-model:value="proxyValue" disabled/>
     `,
             setup(props) {
                 const state = reactive({
@@ -295,7 +295,7 @@ If `handler` is not defined, it is filtered through the built-in default `handle
         {{
             components: { PSearch },
             template: `
-        <p-search v-model="proxyValue" readonly />
+        <p-search v-model:value="proxyValue" readonly />
     `,
             setup(props) {
                 const state = reactive({

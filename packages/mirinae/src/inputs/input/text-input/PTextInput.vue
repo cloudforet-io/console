@@ -88,7 +88,7 @@
                  @mousedown.prevent
                  @click.stop="handleDeleteAllTags"
             />
-            <span v-if="$slots['right-edge']"
+            <span v-if="slots['right-edge']"
                   class="right-edge"
             >
                 <slot name="right-edge"

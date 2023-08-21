@@ -4,7 +4,7 @@
             :style-type="styleType"
             :class="{'no-data': items.length === 0, hoverable}"
     >
-        <template v-if="$slots.header"
+        <template v-if="slots.header"
                   #header
         >
             <slot name="header" />
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 
 import {
-    reactive, watch,
+    reactive, watch, useSlots,
 } from 'vue';
 
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
@@ -66,6 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'click', index: number): void;}>();
+
+const slots = useSlots();
 
 const state = reactive({
     contextKey: Math.floor(Math.random() * Date.now()),

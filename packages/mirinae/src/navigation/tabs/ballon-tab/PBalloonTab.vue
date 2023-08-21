@@ -96,7 +96,7 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(['update:activeTab', 'change']);
+const emit = defineEmits(['update:active-tab', 'change']);
 
 const {
     tabItems,
@@ -148,7 +148,7 @@ const checkStyles = () => {
 /* event */
 const handleClickTab = (tab: TabItem, idx: number) => {
     if (props.activeTab !== tab.name) {
-        emit('update:activeTab', tab.name);
+        emit('update:active-tab', tab.name);
         emit('change', tab.name, idx);
     }
 };

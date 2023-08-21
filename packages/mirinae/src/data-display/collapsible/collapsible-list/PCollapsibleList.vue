@@ -100,7 +100,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:unfoldedIndices']);
+const emit = defineEmits(['update:unfolded-indices']);
 const state = reactive({
     proxyUnfoldedIndices: useProxyValue<number[]>('unfoldedIndices', props, emit),
     collapsibleItems: computed<CollapsibleItem[]>(() => props.items.map((d) => {
@@ -159,7 +159,7 @@ watch(() => props.items, (after, before) => {
         }
     }
     .p-collapsible-panel {
-        padding: 0 0 1rem 0;
+        padding: 0 0 1rem;
     }
 
     &.card {

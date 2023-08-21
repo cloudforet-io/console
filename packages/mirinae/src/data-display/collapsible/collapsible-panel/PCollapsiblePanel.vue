@@ -15,7 +15,7 @@
             </div>
         </div>
         <p-collapsible-toggle v-if="lineClamp === 0 || state.isOverflow"
-                              v-model="state.proxyIsCollapsed"
+                              v-model:is-collapsed="state.proxyIsCollapsed"
         />
     </div>
 </template>
@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<CollapsiblePanelProps>(), {
     lineClamp: 2,
 });
 
-const emit = defineEmits(['update:isCollapsed']);
+const emit = defineEmits(['update:is-collapsed']);
 
 
 const state = reactive({

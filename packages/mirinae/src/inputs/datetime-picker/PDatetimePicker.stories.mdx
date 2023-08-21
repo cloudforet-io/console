@@ -36,7 +36,7 @@ export const Template = (args, { argTypes }) => {
             :select-mode="selectMode"
             :data-type="dataType"
             :invalid="invalid"
-            @update:selectedDates="onUpdateSelectedDates"
+            @update:selected-dates="onUpdateSelectedDates"
             @close="onClose"
         />
         <br>
@@ -161,9 +161,9 @@ Please refer to the table below. <br/>
     <p class="py-2">Select dataType.</p>
     <p-select-dropdown v-model:selected="selectedDataType" :items="menu"/>
     <p class="py-2">Min Date = Today</p>
-    <p-datetime-picker v-model="start" :min-date="now" :data-type="selectedDataType" />
+    <p-datetime-picker v-model:selected-dates="start" :min-date="now" :data-type="selectedDataType" />
     <p class="py-2">Max Date = Today</p>
-    <p-datetime-picker v-model="end" :max-date="now" :data-type="selectedDataType" />
+    <p-datetime-picker v-model:selected-dates="end" :max-date="now" :data-type="selectedDataType" />
 </div>
 `,
     setup() {

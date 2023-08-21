@@ -139,7 +139,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
                                                  @update="handleUpdateMonthInput(month, $event)"
             />
         </div>
-        <budget-form-amount-plan-autofill-modal v-model="state.visibleAutofillModal"
+        <budget-form-amount-plan-autofill-modal v-model:visible="state.visibleAutofillModal"
                                                 @confirm="handleAutofillConfirm"
         />
     </div>

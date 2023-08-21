@@ -14,7 +14,7 @@ import type { MonthAmountInput } from '@/services/cost-explorer/budget/type';
 
 interface Props {
     amount: number|undefined;
-    month: string;
+    month: string|number;
     isMonthToDate: boolean;
 }
 
@@ -48,7 +48,10 @@ const state = reactive({
     formattedMonth: computed(() => i18nDayjs.value.utc(props.month).format('MMMM YYYY')),
     formattedAmount: computed<string>({
         get: () => commaFormatter(_amount.value),
-        set: (val: string) => { setAmount(getNumberFromString(val)); },
+        set: (val: string) => {
+            const num = getNumberFromString(val);
+            if (num) setAmount(num);
+        },
     }),
 });
 

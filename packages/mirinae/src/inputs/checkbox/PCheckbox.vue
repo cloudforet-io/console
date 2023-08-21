@@ -16,7 +16,7 @@
                  :name="iconName"
             />
         </slot>
-        <span v-if="$slots.default"
+        <span v-if="slots.default"
               class="text"
               @click.stop="onClick"
         >
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import {
-    computed, useAttrs,
+    computed, useAttrs, useSlots,
 } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -50,6 +50,7 @@ const emit = defineEmits<{(e: 'change', selected: any, isSelected: boolean): voi
     (e: 'update:selected', selected: any): void;
 }>();
 const attrs = useAttrs();
+const slots = useSlots();
 
 const {
     isSelected,
