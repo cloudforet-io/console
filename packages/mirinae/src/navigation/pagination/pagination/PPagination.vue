@@ -54,7 +54,7 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(['update:thisPage', 'update:pageSize', 'change', 'click-page', 'click-prev', 'click-next']);
+const emit = defineEmits(['update:this-page', 'update:page-size', 'change', 'click-page', 'click-prev', 'click-next']);
 
 // pagination logic
 const paginate = (

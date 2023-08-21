@@ -313,7 +313,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:selectIndex', 'update:sortBy', 'update:sortDesc', 'rowLeftClick', 'changeSort']);
+const emit = defineEmits(['update:select-index', 'update:sort-by', 'update:sort-desc', 'row-left-click', 'change-sort']);
 const { t } = useI18n();
 
 const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map((child) => ({ sortable: true, ...child }));
@@ -429,7 +429,7 @@ const checkboxToggle = (item, index) => {
 
 /* Event Handlers */
 const onRowLeftClick = (item, index, event) => {
-    emit('rowLeftClick', item, index, event);
+    emit('row-left-click', item, index, event);
     if (!props.selectable) return;
     if (props.multiSelect) {
         if (props.rowClickMultiSelectMode) {
@@ -461,7 +461,7 @@ const onTheadClick = (field) => {
         // set changed values
         proxyState.proxySortBy = sortBy;
         proxyState.proxySortDesc = sortDesc;
-        emit('changeSort', sortBy, sortDesc);
+        emit('change-sort', sortBy, sortDesc);
     }
 };
 

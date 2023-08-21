@@ -247,7 +247,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :style="{height: '100%', border: 'none'}"
                              @change="handleChange"
                              @refresh="handleChange()"
-                             @rowLeftClick="handleSelect"
+                             @row-left-click="handleSelect"
             >
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
