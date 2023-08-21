@@ -226,7 +226,7 @@ watch(() => state.searchText, (searchText) => {
                 >
                     <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
                     <p-text-input ref="inputRef"
-                                  v-model="formState.userId"
+                                  v-model:value="formState.userId"
                                   placeholder="user@spaceone.io"
                                   :invalid="invalid"
                                   :valid="validationState.isUserIdValid"

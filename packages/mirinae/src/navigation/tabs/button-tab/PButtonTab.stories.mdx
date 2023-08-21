@@ -20,7 +20,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <p-button-tab
         :tabs="tabs"
-        v-model="proxyActiveTab"
+        v-model:active-tab="proxyActiveTab"
         @update:active-tab="onUpdateActiveTab"
         @change="onChange"
     >
@@ -51,7 +51,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <p-button-tab
         :tabs="['Basic Information', 'EC2']"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
     >
     </p-button-tab>
     `,
@@ -79,7 +79,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <p-button-tab
         :tabs="tabs"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
     >
         <template #detail="slotProps">
             <div class="p-4">
@@ -134,7 +134,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <p-button-tab
         :tabs="tabs"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
     >
         <template #detail="{name}">
             <inner key="detail" name="Detail. this tab is keep alive."/>
