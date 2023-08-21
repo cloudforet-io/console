@@ -101,7 +101,7 @@ const emit = defineEmits([
     'search',
     'focus-menu',
     'delete',
-    'update:isFocused',
+    'update:is-focused',
 ]);
 const attrs = useAttrs();
 const { t } = useI18n();
@@ -242,7 +242,7 @@ watch(() => props.isFocused, (isFocused) => {
     if (typeof isFocused === 'boolean') focused.value = isFocused;
 }, { immediate: true });
 watch(focused, (_focused) => {
-    emit('update:isFocused', _focused);
+    emit('update:is-focused', _focused);
 });
 
 onClickOutside(containerRef, hideMenu);

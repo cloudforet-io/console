@@ -139,7 +139,7 @@ watch(() => props.isFocused, (isFocused) => {
             <g-n-b-suggestion-list v-show="state.cloudServiceSuggestionItems && state.cloudServiceSuggestionItems.length > 0"
                                    :items="state.cloudServiceSuggestionItems || []"
                                    :input-text="inputText"
-                                   :is-focused="state.ocusingType === SUGGESTION_TYPE.CLOUD_SERVICE ? isFocused : false"
+                                   :is-focused="state.focusingType === SUGGESTION_TYPE.CLOUD_SERVICE ? isFocused : false"
                                    :focusing-direction="focusingDirection"
                                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.CLOUD_SERVICE, $event)"
                                    @close="handleClose"

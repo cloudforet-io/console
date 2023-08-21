@@ -33,11 +33,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'select', value: SuggestionItem, index: number): void;
     (e: 'move-focus-end', value: FocusingDirection): void;
     (e: 'close'): void;
-    (e: 'update:isFocused', value: boolean): void;
+    (e: 'update:is-focused', value: boolean): void;
 }>();
 const slots = useSlots();
 
-const contextMenuRef = ref<PContextMenu|null>(null);
+const contextMenuRef = ref<typeof PContextMenu|null>(null);
 const state = reactive({
     refinedItems: computed(() => props.items.map((d) => ({ ...d, icon: undefined, itemIcon: d.icon }))),
 });
@@ -65,14 +65,14 @@ const handleEsc = () => {
     emit('close');
 };
 const handleFocus = () => {
-    emit('update:isFocused', true);
+    emit('update:is-focused', true);
 };
 const handleBlur = () => {
-    emit('update:isFocused', false);
+    emit('update:is-focused', false);
 };
 
 onUnmounted(() => {
-    emit('update:isFocused', false);
+    emit('update:is-focused', false);
 });
 
 </script>
