@@ -1,52 +1,30 @@
 <template>
     <p-pane-layout>
-        <p-heading :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                   heading-type="sub"
-        >
-            <template #extra>
-                <p-button v-if="!state.isEditMode"
-                          size="md"
-                          icon-left="ic_edit"
-                          style-type="secondary"
-                          @click="handleClickEdit"
-                >
-                    {{ $t('INVENTORY.COLLECTOR.DETAIL.EDIT') }}
-                </p-button>
-            </template>
-        </p-heading>
+        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                        :edit-mode="state.isEditMode"
+                        @click-edit="handleClickEdit"
+        />
 
-        <p-definition-table v-if="!state.isEditMode"
-                            :fields="fields"
-                            :loading="state.loading"
-                            :data="collectorFormState.originCollector"
-                            style-type="white"
+        <div v-if="!state.isEditMode"
+             class="contents-wrapper"
         >
-            <template #data-pluginName>
-                <p-lazy-img :src="state.pluginIcon"
-                            :loading="state.loading"
-                            width="1rem"
-                            height="1rem"
-                />
-                <span class="ml-2 leading-none">{{ state.pluginName }}</span>
-            </template>
-            <template #data-plugin_info.version="{ value }">
-                {{ state.isCollectorAutoUpgrade ? collectorFormState.versions[0] : value }} {{ state.isLatestVersion ? ' (latest)' : '' }}
-            </template>
-            <template #data-plugin_info.upgrade_mode="{ value }">
-                {{ value === UPGRADE_MODE.AUTO ? 'ON' : 'OFF' }}
-            </template>
-            <template #data-created_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-            <template #data-last_collected_at="{ value }">
-                {{ value ? iso8601Formatter(value, timezone) : '' }}
-            </template>
-        </p-definition-table>
+            <collector-plugin-info :plugin="state.repositoryPlugin"
+                                   :collector="collectorFormState.originCollector"
+            />
+            <plugin-summary-cards :collector="collectorFormState.originCollector"
+                                  :recent-jobs="state.recentJobs"
+                                  :history-link="collectorJobStore.hasJobs ? props.historyLink : undefined"
+            />
+            <collector-tags :tags="collectorFormState.originCollector?.tags" />
+        </div>
 
         <div v-if="state.isEditMode"
              class="collector-base-info-edit"
         >
-            <collector-plugin-contents :plugin="state.pluginInfo" />
+            <collector-plugin-info :plugin="state.repositoryPlugin"
+                                   :collector="collectorFormState.originCollector"
+                                   show-minimal
+            />
             <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
                                 @update:isTagsValid="handleUpdateIsTagsValid"
@@ -77,72 +55,67 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { Location } from 'vue-router';
 
 import {
-    PHeading, PButton, PPaneLayout, PDefinitionTable, PLazyImg,
+    PButton, PPaneLayout,
 } from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
+import CollectorPluginInfo from '@/services/asset-inventory/collector/collector-detail/modules/CollectorPluginInfo.vue';
+import CollectorTags from '@/services/asset-inventory/collector/collector-detail/modules/CollectorTags.vue';
+import PluginSummaryCards from '@/services/asset-inventory/collector/collector-detail/modules/PluginSummaryCards.vue';
+import SectionHeader from '@/services/asset-inventory/collector/collector-detail/modules/SectionHeader.vue';
 import type {
-    CollectorModel, CollectorPluginModel, CollectorUpdateParameter, CollectorUpdatePluginParameter,
+    CollectorModel,
+    CollectorPluginModel,
+    JobModel,
+    CollectorUpdateParameter,
+    CollectorUpdatePluginParameter,
+    RepositoryPluginModel,
 } from '@/services/asset-inventory/collector/model';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/model';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import CollectorTagForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorTagForm.vue';
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
-import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
+
+const props = defineProps<{
+    historyLink: Location
+}>();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const timezone = computed<string>(() => store.state.user.timezone);
-const fields = computed<DefinitionField[]>(() => [
-    { name: 'pluginName', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN') },
-    { name: 'plugin_info.plugin_id', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.PLUGIN_ID') },
-    { name: 'plugin_info.version', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.VERSION') },
-    { name: 'tags', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.TAG') },
-    { name: 'plugin_info.upgrade_mode', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.AUTO_UPGRADE'), disableCopy: true },
-    { name: 'last_collected_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.LAST_COLLECTED') },
-    { name: 'created_at', label: i18n.t('INVENTORY.COLLECTOR.DETAIL.CREATED') },
-]);
+const collectorJobStore = useCollectorJobStore();
+const collectorJobState = collectorJobStore.$state;
 
 const state = reactive({
-    loading: computed<boolean>(() => !collectorFormState.originCollector),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    pluginItem: computed<PluginReferenceItem|undefined>(() => {
-        if (!state.pluginInfo) return undefined;
-        return state.plugins[state.pluginInfo.plugin_id];
-    }),
-    pluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
-    pluginName: computed<string>(() => state.pluginItem?.label ?? ''),
-    pluginIcon: computed<string>(() => state.pluginItem?.icon ?? ''),
+    collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
+    repositoryPlugin: null as null|RepositoryPluginModel,
     isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {
-        const version = state.pluginInfo?.version;
+        const version = state.collectorPluginInfo?.version;
         if (!version) return false;
         const latestVersion = collectorFormState.versions[0];
         if (latestVersion) return latestVersion === version;
         return false;
     }),
+    recentJobs: computed<JobModel[]|null>(() => collectorJobState.recentJobs),
     isEditMode: false,
     isVersionValid: false,
     isTagsValid: false,
     isPluginUpdated: computed<boolean>(() => {
-        if (!state.pluginInfo) return false;
-        return state.pluginInfo.version !== collectorFormState.version
-            || (state.pluginInfo.upgrade_mode === UPGRADE_MODE.AUTO) !== collectorFormState.autoUpgrade;
+        if (!state.collectorPluginInfo) return false;
+        return state.collectorPluginInfo.version !== collectorFormState.version
+            || (state.collectorPluginInfo.upgrade_mode === UPGRADE_MODE.AUTO) !== collectorFormState.autoUpgrade;
     }),
     isTagsUpdated: computed<boolean>(() => {
         if (!collectorFormState.originCollector) return false;
@@ -169,6 +142,15 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         tags: collectorFormState.tags,
     };
     return SpaceConnector.client.inventory.collector.update(params);
+};
+const getRepositoryPlugin = async (pluginId: string) => {
+    try {
+        state.repositoryPlugin = await SpaceConnector.client.repository.plugin.get({
+            plugin_id: pluginId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 
@@ -218,23 +200,31 @@ watch(() => collectorFormStore.pluginId, async (pluginId) => {
     if (pluginId) await collectorFormStore.getVersions(pluginId);
 }, { immediate: true });
 
-// init reference data
-(async () => {
-    await store.dispatch('reference/plugin/load');
-})();
+watch(() => state.collectorPluginInfo, async (pluginInfo) => {
+    if (pluginInfo?.plugin_id) await getRepositoryPlugin(pluginInfo.plugin_id);
+}, { immediate: true });
+
 </script>
 
 <style lang="postcss" scoped>
-.p-definition-table {
-    border-color: transparent;
-    margin-bottom: 2.5rem;
+.contents-wrapper {
+    max-width: 65.5rem;
+    padding: 1rem 1rem 2.5rem 1rem;
 }
 .collector-base-info-edit {
-    padding: 1rem;
+    padding: 1rem 1rem 1rem;
     .button-group {
         margin-bottom: 1.5rem;
         .save-changes-button {
             margin-left: 1rem;
+        }
+    }
+}
+
+@screen mobile {
+    .contents-wrapper {
+        .plugin-summary-card-wrapper {
+            flex-direction: column;
         }
     }
 }

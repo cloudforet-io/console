@@ -19,6 +19,8 @@ export type AttachedServiceAccount = FilterableDropdownMenuItem[];
 
 export type AttachedServiceAccountType = 'all'|'specific';
 
+export type ServiceAccountFilterOption = 'include'|'exclude';
+
 export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
@@ -32,6 +34,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         schedulePower: false,
         attachedServiceAccount: [] as AttachedServiceAccount,
         attachedServiceAccountType: 'all' as AttachedServiceAccountType,
+        selectedServiceAccountFilterOption: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
         versions: [] as string[],
     }),
@@ -103,7 +106,9 @@ export const useCollectorFormStore = defineStore('collector-form', {
         async resetAttachedServiceAccount() {
             await store.dispatch('reference/serviceAccount/load');
             const accountItems = store.getters['reference/serviceAccountItems'];
-            this.attachedServiceAccount = this.originCollector?.secret_filter?.service_accounts?.map((d) => ({
+            const secretFilter = this.originCollector?.secret_filter;
+            const attachedServiceAccount = this.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
+            this.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({
                 label: accountItems[d]?.label ?? d,
                 name: d,
             })) ?? [];

@@ -110,6 +110,24 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    iconColor: {
+        name: 'iconColor',
+        type: { name: 'string' },
+        description: 'The icon color',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
     iconAnimation: {
         name: 'iconAnimation',
         type: { name: 'string' },

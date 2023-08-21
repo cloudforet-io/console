@@ -1,46 +1,3 @@
-<template>
-    <div class="collector-page">
-        <p-heading
-            use-total-count
-            use-selected-count
-            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
-            :total-count="collectorPageState.totalCount"
-        >
-            <template #extra>
-                <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
-                >
-                    <p-button style-type="tertiary"
-                              class="history-button"
-                    >
-                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
-                    </p-button>
-                </router-link>
-            </template>
-        </p-heading>
-        <p-data-loader
-            :data="state.hasCollectorList"
-            :loading="state.initLoading"
-            loader-backdrop-color="gray.100"
-            class="collector-loader-wrapper"
-        >
-            <div v-if="state.hasCollectorList"
-                 class="collector-contents-wrapper"
-            >
-                <provider-list
-                    :provider-list="state.providerList"
-                    :selected-provider="collectorPageState.selectedProvider"
-                    @change-provider="handleSelectedProvider"
-                />
-                <collector-contents />
-            </div>
-            <template #no-data>
-                <collector-no-data />
-            </template>
-        </p-data-loader>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core';
 import {
@@ -80,7 +37,6 @@ const collectorPageState = collectorPageStore.$state;
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
-
 const state = reactive({
     initLoading: true,
     hasCollectorList: false,
@@ -94,11 +50,15 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.setSelectedProvider(queryStringToString(query.provider) ?? 'all');
+    collectorPageStore.$patch({
+        selectedProvider: queryStringToString(query.provider) ?? 'all',
+    });
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.setSearchFilters(filters);
+        collectorPageStore.$patch({
+            searchFilters: filters,
+        });
     }
 };
 
@@ -120,7 +80,9 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.setSelectedProvider(providerName);
+    collectorPageStore.$patch({
+        selectedProvider: providerName,
+    });
 };
 
 
@@ -153,16 +115,58 @@ onMounted(async () => {
 });
 </script>
 
+<template>
+    <div class="collector-page">
+        <p-heading
+            use-total-count
+            use-selected-count
+            :title="$t('INVENTORY.COLLECTOR.MAIN.TITLE')"
+            :total-count="collectorPageState.totalCount"
+        >
+            <template #extra>
+                <router-link
+                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                >
+                    <p-button style-type="tertiary"
+                              class="history-button"
+                              icon-left="ic_history"
+                    >
+                        {{ $t("INVENTORY.COLLECTOR.MAIN.HISTORY") }}
+                    </p-button>
+                </router-link>
+            </template>
+        </p-heading>
+        <p-data-loader
+            :data="state.hasCollectorList"
+            :loading="state.initLoading"
+            loader-backdrop-color="gray.100"
+            class="collector-loader-wrapper"
+        >
+            <div v-if="state.hasCollectorList"
+                 class="collector-contents-wrapper"
+            >
+                <provider-list
+                    :provider-list="state.providerList"
+                    :selected-provider="collectorPageState.selectedProvider"
+                    @change-provider="handleSelectedProvider"
+                />
+                <collector-contents />
+            </div>
+            <template #no-data>
+                <collector-no-data />
+            </template>
+        </p-data-loader>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .history-button {
     @apply bg-white rounded border border-gray-300 text-label-md font-bold;
     width: 100%;
     padding: 0.375rem 0.75rem;
 }
-
 .collector-loader-wrapper {
     min-height: 16.875rem;
-
     .collector-contents-wrapper {
         @apply flex flex-col;
         gap: 1.5rem;

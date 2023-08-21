@@ -3,7 +3,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
-    CollectorPluginModel, Schedule, JobStatus,
+    CollectorPluginModel, Schedule,
+    JobStatus,
 } from '@/services/asset-inventory/collector/model';
 
 export const COLLECTOR_QUERY_HELPER_SET = {
@@ -15,23 +16,7 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     PLUGIN_INFO: 'plugin_info',
     STATE: 'state',
     SCHEDULE: 'schedule',
-} as const;
-
-export const COLLECTOR_ITEM_INFO_TYPE = {
-    PLUGIN: 'PLUGIN',
-    STATUS: 'STATUS',
-    JOBS: 'JOBS',
-    SCHEDULE: 'SCHEDULE',
-} as const;
-
-export const JOB_STATE = {
-    SUCCESS: 'SUCCESS',
-    ERROR: 'ERROR',
-    CREATED: 'CREATED',
-    IN_PROGRESS: 'IN_PROGRESS',
-    TIMEOUT: 'TIMEOUT',
-    CANCELED: 'CANCELED',
-    NONE: 'NONE',
+    SECRET_FILTER: 'secret_filter',
 } as const;
 
 interface CollectorPlugin {
@@ -40,10 +25,10 @@ interface CollectorPlugin {
     info: CollectorPluginModel;
 }
 
-interface CollectorLink {
+export interface CollectorLink {
     name: string;
     params: CollectorDetailLinkParameter;
-    query: CollectorDetailLinkQuery;
+    query?: CollectorDetailLinkQuery;
 }
 
 interface CollectorDetailLinkParameter {
@@ -61,8 +46,8 @@ export interface CollectorItemInfo {
     plugin: CollectorPlugin;
     historyLink: CollectorLink,
     detailLink: CollectorLink;
-    schedule: Schedule;
-    recentJobAnalyze: JobStatus[];
+    schedule?: Schedule;
+    recentJobAnalyze?: JobAnalyzeStatus[];
     hasJobList?: boolean
 }
 
@@ -71,4 +56,17 @@ export type CollectorMainPageQuery = Partial<Record<'filters'|'provider', RouteQ
 export interface CollectorMainPageQueryValue {
     provider?: string;
     filters?: ConsoleFilter[];
+}
+
+export interface JobAnalyzeStatus {
+    job_id: string;
+    status: JobStatus;
+    finished_at: string;
+    remained_tasks: number;
+    total_tasks: number;
+    secret_id?: string;
+}
+export interface JobAnalyzeInfo {
+    collector_id: string;
+    job_status: JobAnalyzeStatus[]
 }

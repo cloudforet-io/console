@@ -65,7 +65,7 @@ const state = reactive({
         }
         return '';
     }),
-    isVersionValid: computed(() => !state.versionInvalidText),
+    isVersionValid: computed(() => !state.versionInvalidText || collectorFormState.autoUpgrade),
 });
 
 const initSelectedVersion = () => {
@@ -111,6 +111,7 @@ watch(() => state.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .collector-version-form {
     margin: 1.5rem 0;
+    max-width: 728px;
 
     .label-row {
         @apply flex justify-between;

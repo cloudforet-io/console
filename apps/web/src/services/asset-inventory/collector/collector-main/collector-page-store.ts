@@ -10,24 +10,31 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, JobAnalyzeModel, Schedule } from '@/services/asset-inventory/collector/model';
+import type { JobAnalyzeInfo } from '@/services/asset-inventory/collector/collector-main/type';
+import type { CollectorModel, Schedule, JobModel } from '@/services/asset-inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
-        loading: true,
-        isRefreshList: false,
-        pageStart: 1,
-        pageLimit: 24,
-        sortBy: '',
+        loading: {
+            collectorList: false,
+        },
         selectedProvider: 'all',
+
         collectors: [] as CollectorModel[],
         selectedCollector: {} as CollectorModel,
-        collectorJobStatus: [] as JobAnalyzeModel[],
-        searchFilters: [] as ConsoleFilter[],
-        totalCount: 0,
+        collectorJobStatus: [] as JobAnalyzeInfo[],
         schedules: [] as Schedule[],
-        visibleScheduleModal: false,
-        visibleRestartModal: false,
+        recentJobs: null as JobModel[]|null, // if null, it means that the first request is not yet finished
+
+        totalCount: 0,
+        pageStart: 1,
+        pageLimit: 24,
+        sortBy: 'name',
+        searchFilters: [] as ConsoleFilter[],
+
+        visible: {
+            scheduleModal: false,
+        },
 
     }),
     getters: {
@@ -38,10 +45,17 @@ export const useCollectorPageStore = defineStore('collector-page', {
             }
             return filters.concat(state.searchFilters);
         },
+        recentJobForAllAccounts(): JobModel|null {
+            if (Array.isArray(this.recentJobs) && this.recentJobs.length > 0) {
+                const filteredJobs = this.recentJobs.filter((job) => !job.secret_id);
+                return filteredJobs[0] ?? null;
+            }
+            return null;
+        },
     },
     actions: {
         async getCollectorList(queryData: Query) {
-            this.loading = true;
+            this.loading.collectorList = true;
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({
                     query: queryData,
@@ -52,10 +66,10 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             } finally {
-                this.loading = false;
+                this.loading.collectorList = false;
             }
         },
-        async setCollectorJobs(ids) {
+        async getCollectorJobs(ids) {
             try {
                 const { results } = await SpaceConnector.clientV2.inventory.job.analyze({
                     query: {
@@ -92,6 +106,15 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 throw e;
             }
         },
+        async getJobs() {
+            try {
+                const res = await SpaceConnector.client.inventory.job.list();
+                this.recentJobs = res.results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
         async updateCollectorSchedule(params) {
             try {
                 const response = await SpaceConnector.client.inventory.collector.update(params);
@@ -103,23 +126,6 @@ export const useCollectorPageStore = defineStore('collector-page', {
                 ErrorHandler.handleError(e);
                 throw e;
             }
-        },
-        async restartCollector(collectorId: string) {
-            try {
-                await SpaceConnector.client.inventory.collector.collect({
-                    collector_id: collectorId,
-                });
-                showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
-                throw e;
-            }
-        },
-        setSelectedProvider(provider: string) {
-            this.selectedProvider = provider;
-        },
-        setSearchFilters(filters: ConsoleFilter[]) {
-            this.searchFilters = filters;
         },
         setSelectedCollector(id) {
             const itemIndex = this.collectors.findIndex(

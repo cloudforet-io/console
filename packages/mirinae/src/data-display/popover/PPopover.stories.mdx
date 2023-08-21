@@ -20,7 +20,9 @@ export const Template = (args, { argTypes }) => ({
     template: `
         <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
             <p-popover :position="proxyPosition" :isVisible="proxyIsVisible"
-                       :ignore-target-click="ignoreTargetClick" :trigger="trigger">
+                       :ignore-target-click="ignoreTargetClick" :trigger="trigger"
+                       :ignore-outside-click="ignoreOutsideClick"
+            >
                 <div v-if="defaultSlot" v-html="defaultSlot" />
                 <p-button v-else @click="handleClick">default</p-button>
                 <template #content>
@@ -90,6 +92,36 @@ export const Template = (args, { argTypes }) => ({
                 <p-text-input style-type="primary" :outline="true">default</p-text-input>
                 <template #content>
                     <p style="margin-top:12px">content slot</p>
+                </template>
+            </p-popover>
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+## Ignore Outside Click
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Ignore Outside Click">
+        {{
+            components: { PPopover, PTextInput, PButton },
+            template: `
+        <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
+            <p-popover ignore-outside-click>
+                <p-button>click me (ignore outside click)</p-button>
+                <template #content>
+                    <p style="margin-top:12px">This popover ignores outside click</p>
+                </template>
+            </p-popover>
+            <div style="height: 100px;"/>
+            <p-popover>
+                <p-button>click me (default)</p-button>
+                <template #content>
+                    <p style="margin-top:12px">This popover will be closed when you click outside</p>
                 </template>
             </p-popover>
         </div>

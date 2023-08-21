@@ -28,7 +28,7 @@
                         <p-i name="ic_error-filled"
                              height="1.5rem"
                              width="1.5rem"
-                             color="inherit"
+                             :color="red[400]"
                         />
                     </span>
                     <span>{{ $t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
@@ -131,6 +131,8 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
+import { red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';

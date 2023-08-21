@@ -28,6 +28,7 @@
                                     <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
                                          class="header-img"
+                                         color="inherit transparent"
                                     />
                                     {{ headerTitle }}
                                 </div>
@@ -295,6 +296,9 @@ export default defineComponent<ButtonModalProps>({
                 &.alert-header {
                     @apply relative;
                     text-indent: 2rem;
+                    .modal-alert {
+                        @apply text-red-400;
+                    }
                 }
             }
 

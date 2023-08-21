@@ -46,7 +46,7 @@ export const getButtonArgTypes = (): ArgTypes => ({
         name: 'href',
         type: { name: 'string' },
         description: 'Href of button',
-        defaultValue: 'https://www.google.com/',
+        defaultValue: 'https://cloudforet.io',
         table: {
             type: {
                 summary: 'string',
