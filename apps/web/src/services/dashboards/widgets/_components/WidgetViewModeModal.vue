@@ -10,7 +10,7 @@
                               size="lg"
                               @click="handleCloseModal"
                     >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
+                        {{ t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
                     </p-button>
                     <div class="right">
                         <template v-if="state.hasNonInheritedWidgetOptions">
@@ -24,7 +24,7 @@
                                      class="non-inherit-badge"
                             >
                                 <span class="text">
-                                    {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
+                                    {{ t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
                                 </span>
                             </p-badge>
                         </template>
@@ -35,7 +35,7 @@
                                   class="edit-button"
                                   @click="handleClickEditOption"
                         >
-                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
+                            {{ t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
                         </p-button>
                     </div>
                 </div>
@@ -87,13 +87,12 @@ import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
-import type { AsyncComponent, ComponentPublicInstance } from 'vue';
+import type { Component, ComponentPublicInstance } from 'vue';
 import {
     computed, reactive, toRef, watch,
 } from 'vue';
-
-
-import { store } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
@@ -125,6 +124,9 @@ const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
 });
 const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
 
+const store = useStore();
+const { t } = useI18n();
+
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
@@ -135,7 +137,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    component: null as AsyncComponent|null,
+    component: null as Component|null,
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
@@ -155,7 +157,7 @@ const initSnapshot = () => {
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: AsyncComponent|null = null;
+    let component: Component|null = null;
     try {
         component = getWidgetComponent(widget.widget_name);
     } catch (e) {

@@ -47,7 +47,7 @@ const handleClickCustomize = () => {
         >
             {{ t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
         </p-button>
-        <!--        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"-->
+        <!--        <pdf-download-button :title="t('DASHBOARDS.DETAIL.EXPORT')"-->
         <!--                             @click="handleVisiblePdfDownloadOverlay"-->
         <!--        />-->
         <p-button icon-left="ic_duplicate"

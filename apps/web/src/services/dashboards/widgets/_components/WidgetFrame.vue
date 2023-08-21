@@ -9,7 +9,7 @@
             </h3><slot name="header-right" />
         </div>
         <p-icon-button v-if="!props.editMode && !props.disableViewMode"
-                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
+                       v-tooltip.bottom="t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
                        class="view-mode-button"
                        name="ic_arrows-expand-all"
                        shape="square"

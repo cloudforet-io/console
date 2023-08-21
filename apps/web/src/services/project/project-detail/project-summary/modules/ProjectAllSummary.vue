@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -420,7 +419,7 @@ onUnmounted(() => {
             <div class="content-wrapper">
                 <div class="chart-wrapper">
                     <div class="sub-title">
-                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
+                        <span>{{ t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
                         <span v-if="state.activeTab === SERVICE_CATEGORY.STORAGE"
                               class="suffix"
                         >({{ state.storageTrendSuffix }})</span>

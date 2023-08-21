@@ -6,6 +6,7 @@ import { useWindowSize } from '@vueuse/core';
 import {
     reactive, defineEmits, computed, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 
 import { useCollectorJobStore } from '@/services/asset-inventory/collector/collector-detail/collector-job-store';
@@ -14,6 +15,8 @@ import CollectorCurrentStatus from '@/services/asset-inventory/collector/shared/
 
 const emit = defineEmits<{(e: 'collect'): void;
 }>();
+
+const { t } = useI18n();
 
 const collectorJobStore = useCollectorJobStore();
 
@@ -48,7 +51,7 @@ watch(() => state.recentJob, (recentJob, prevJob) => {
                   :class="{dependent: state.showStatus}"
                   @click="handleClickCollectDataButton"
         >
-            {{ $t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
+            {{ t('INVENTORY.COLLECTOR.DETAIL.COLLECT_DATA') }}
         </p-button>
         <p-popover v-if="state.showStatus"
                    :is-visible="state.isPopoverOpen"

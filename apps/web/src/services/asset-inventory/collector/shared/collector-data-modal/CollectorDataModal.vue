@@ -22,25 +22,22 @@
                 />
             </template>
             <template #confirm-button>
-                <span v-if="state.isDuplicateJobs">{{ $t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
-                <span v-else>{{ $t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
+                <span v-if="state.isDuplicateJobs">{{ t('INVENTORY.COLLECTOR.MAIN.RESTART') }}</span>
+                <span v-else>{{ t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.CONFIRM_BUTTON') }}</span>
             </template>
         </p-button-modal>
     </div>
 </template>
 
 <script setup lang="ts">
-
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PButtonModal } from '@spaceone/design-system';
 import {
     computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -62,6 +59,9 @@ import { JOB_STATE } from '@/services/asset-inventory/collector/type';
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
 
+const store = useStore();
+const { t } = useI18n();
+
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -71,8 +71,8 @@ const state = reactive({
     loading: false,
     secretsCount: 0,
     headerTitle: computed(() => (state.isDuplicateJobs
-        ? i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
-        : i18n.t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
+        ? t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.DUPLICATION_TITLE')
+        : t('INVENTORY.COLLECTOR.MAIN.COLLECT_DATA_MODAL.TITLE'))),
     isDuplicateJobs: computed<boolean | undefined>(() => {
         const recentJob = collectorDataModalState.recentJob;
         const selectedSecret = collectorDataModalState.selectedSecret;
@@ -123,10 +123,10 @@ const handleClickConfirm = async () => {
             collector_id: collectorDataModalState.selectedCollector.collector_id,
             secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });
-        showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
+        showSuccessMessage(t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         emit('click-confirm');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
+        ErrorHandler.handleRequestError(e, t('INVENTORY.COLLECTOR.CREATE.ALT_E_COLLECT_EXECUTION'));
         throw e;
     } finally {
         state.loading = false;

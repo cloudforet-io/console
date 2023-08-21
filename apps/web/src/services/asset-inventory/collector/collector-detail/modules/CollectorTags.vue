@@ -2,8 +2,7 @@
 import { isNotEmpty } from '@cloudforet/core-lib';
 import { PTag, PFieldTitle, PEmpty } from '@spaceone/design-system';
 import { computed } from 'vue';
-
-
+import { useI18n } from 'vue-i18n';
 
 import type { Tags } from '@/models';
 
@@ -12,6 +11,8 @@ const props = withDefaults(defineProps<{
 }>(), {
     tags: () => ({}),
 });
+
+const { t } = useI18n();
 
 const sortedTags = computed<[key: string, value: any][]>(() => {
     const tags = props.tags;
@@ -26,7 +27,7 @@ const sortedTags = computed<[key: string, value: any][]>(() => {
                        font-weight="regular"
                        inline
         >
-            {{ $t('INVENTORY.COLLECTOR.DETAIL.TAG') }}
+            {{ t('INVENTORY.COLLECTOR.DETAIL.TAG') }}
         </p-field-title>
         <div class="tags-wrapper">
             <template v-if="isNotEmpty(props.tags)">
@@ -40,7 +41,7 @@ const sortedTags = computed<[key: string, value: any][]>(() => {
                 />
             </template>
             <p-empty v-else>
-                {{ $t('INVENTORY.COLLECTOR.DETAIL.NO_TAG') }}
+                {{ t('INVENTORY.COLLECTOR.DETAIL.NO_TAG') }}
             </p-empty>
         </div>
     </div>

@@ -308,7 +308,7 @@ defineExpose<WidgetExpose<Data[]>>({
                 <div class="summary-wrapper">
                     <!--                    <div class="left-wrapper">-->
                     <!--                        <p class="title">-->
-                    <!--                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
+                    <!--                            {{ t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
                     <!--                        </p>-->
                     <!--                        <p class="value">-->
                     <!--                            {{ state.accountCount }}-->

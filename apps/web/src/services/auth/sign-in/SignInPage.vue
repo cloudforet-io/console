@@ -68,6 +68,8 @@ export default {
                          NOTE: See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations for supported dynamic import formats.
                          If this is intended to be left as-is, you can use the @vite-ignore comment inside the import() call to suppress this warning.
                         */
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         component = defineAsyncComponent(() => import(`./external/${auth}/template/${auth}.vue`));
                     } catch (e) {
                         ErrorHandler.handleError(e);
@@ -165,7 +167,7 @@ export default {
                 <div v-if="component"
                      class="btn-divider"
                 >
-                    <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
+                    <span>{{ t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
                 <component :is="component"
                            class="sign-in-template"

@@ -73,14 +73,14 @@ watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
 <template>
     <p-button-modal
         v-model:visible="state.proxyVisible"
-        :header-title="$t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_TITLE')"
+        :header-title="t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_TITLE')"
         size="sm"
         fade
         @confirm="onClickConfirm"
     >
         <template #body>
             <div class="content-wrapper">
-                <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
+                <p>{{ t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
                 <div class="select-card-wrapper">
                     <p-select-card v-for="(option, index) in state.selectOptions"
                                    :key="option.name"

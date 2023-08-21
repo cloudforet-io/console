@@ -5,9 +5,8 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { computed, reactive, watch } from 'vue';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { CollectorLink } from '@/services/asset-inventory/collector/collector-main/type';
 import CollectorJobStatusIcon
@@ -25,6 +24,9 @@ interface Props {
     historyLink?: CollectorLink;
     fullMode?: boolean;
 }
+
+const store = useStore();
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     recentJobs: undefined,
@@ -54,7 +56,7 @@ const handleTooltipContent = (job: MinimalJobInfo) => {
     if (status === JOB_STATE.SUCCESS) content = 'INVENTORY.COLLECTOR.MAIN.JOB_SUCCESS';
     if (status === JOB_STATE.CANCELED) content = 'INVENTORY.COLLECTOR.MAIN.JOB_CANCELED';
     if (status === JOB_STATE.FAILURE) content = 'INVENTORY.COLLECTOR.MAIN.JOB_FAILURE';
-    return i18n.t(content, { date: dayjs.utc(finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss') });
+    return t(content, { date: dayjs.utc(finished_at).tz(storeState.timezone).format('YYYY-MM-DD hh:mm:ss') });
 };
 
 watch(() => props.recentJobs, () => {
@@ -68,9 +70,9 @@ watch(() => props.recentJobs, () => {
     >
         <div class="header">
             <p class="info-label">
-                {{ $t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
+                {{ t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS') }}
                 <p-tooltip
-                    :contents="$t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS_TOOLTIP')"
+                    :contents="t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS_TOOLTIP')"
                     position="top-start"
                 >
                     <p-i name="ic_question-mark-circle"
@@ -112,12 +114,12 @@ watch(() => props.recentJobs, () => {
                                            is-arrow
                                            :to="props.historyLink"
                                            class="more-button"
-                                           :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
+                                           :contents="t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                 />
             </div>
             <template #no-data>
                 <p-empty class="empty-case">
-                    {{ $t('INVENTORY.COLLECTOR.NO_JOB') }}
+                    {{ t('INVENTORY.COLLECTOR.NO_JOB') }}
                 </p-empty>
             </template>
         </p-data-loader>

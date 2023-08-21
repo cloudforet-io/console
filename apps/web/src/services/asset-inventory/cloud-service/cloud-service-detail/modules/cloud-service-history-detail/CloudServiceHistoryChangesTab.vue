@@ -1,13 +1,13 @@
 <template>
     <div class="cloud-service-history-changes-tab">
         <p-heading heading-type="sub"
-                   :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
+                   :title="t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
                    use-total-count
                    :total-count="changesCount"
         />
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
-                <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED_KEYS')">
+                <p-card :header="t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED_KEYS')">
                     <p-context-menu :menu="keyMenus"
                                     :selected="[{name: selectedKeyMenu}]"
                                     @select="handleSelect"
@@ -55,8 +55,8 @@
                         </div>
                     </template>
                     <div class="secondary-header">
-                        <div>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.PREVIOUS') }}</div>
-                        <div>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED') }}</div>
+                        <div>{{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.PREVIOUS') }}</div>
+                        <div>{{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED') }}</div>
                     </div>
                     <div class="cloud-service-history-changes-code-area">
                         <vue-diff :prev="previousValue"
@@ -71,14 +71,14 @@
 </template>
 
 <script lang="ts">
+import {
+    PHeading, PCard, PContextMenu, PI,
+} from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
-
-import {
-    PHeading, PCard, PContextMenu, PI,
-} from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 
@@ -106,6 +106,8 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const { t } = useI18n();
+
         const state = reactive({
             keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map((data) => ({
                 label: data.key, name: data.key, updateType: data.type, path: data.path,
@@ -145,6 +147,7 @@ export default defineComponent({
         });
 
         return {
+            t,
             ...toRefs(state),
             handleCodeDisplayType,
             handleSelect,

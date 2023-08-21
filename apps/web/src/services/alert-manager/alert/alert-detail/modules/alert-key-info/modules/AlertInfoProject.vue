@@ -4,8 +4,7 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -25,6 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
     alertData: () => ({}) as AlertDataModel,
     manageDisabled: false,
 });
+
+const store = useStore();
 const { t } = useI18n();
 
 const {
@@ -103,7 +104,7 @@ const onSelectProject = (selected) => {
                       size="sm"
                       @click="openModal"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
+                {{ t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
             </p-button>
         </div>
     </div>
