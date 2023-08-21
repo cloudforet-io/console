@@ -80,7 +80,7 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
             <span class="filter-label">{{ t('MONITORING.ALERT.ALERT_LIST.STATE') }}</span>
             <p-select-status v-for="(status, idx) in state.statusList"
                              :key="idx"
-                             v-model="state.selectedAlertState"
+                             v-model:selected="state.selectedAlertState"
                              :value="status.name"
             >
                 {{ status.label }}
@@ -90,7 +90,7 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
             <span class="filter-label">{{ t('MONITORING.ALERT.ALERT_LIST.URGENCY') }}</span>
             <p-select-status v-for="(urgencyItem, idx) in state.urgencyList"
                              :key="idx"
-                             v-model="state.selectedUrgency"
+                             v-model:selected="state.selectedUrgency"
                              :value="urgencyItem.name"
                              class="mr-2"
             >

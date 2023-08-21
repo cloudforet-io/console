@@ -70,7 +70,9 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(['change']);
+const emit = defineEmits<{(e: 'change', selected: any, checked: boolean): void;
+    (e: 'update:selected', selected: any): void;
+}>();
 
 const {
     isSelected,
@@ -97,8 +99,10 @@ const onClick = () => {
     const newSelected = getSelected();
     if (props.multiSelectable) {
         emit('change', newSelected, !isSelected.value);
+        emit('update:selected', newSelected);
     } else {
         emit('change', newSelected, true);
+        emit('update:selected', newSelected);
     }
 };
 
