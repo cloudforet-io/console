@@ -2,10 +2,9 @@
 import {
     PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import {
     oneLowerCaseValidator,
     oneNumberValidator,
@@ -25,8 +24,16 @@ const props = withDefaults(defineProps<Props>(), {
     status: '',
 });
 
-const emit = defineEmits(['change-input', 'click-button']);
 const { t } = useI18n();
+
+const state = reactive({
+    inputLabel: computed<string>(() => {
+        if (props.status === PASSWORD_STATUS.FIND) return t('AUTH.PASSWORD.FIND.USER_ID') as string;
+        return t('AUTH.PASSWORD.INVALID_LINK.EMAIL') as string;
+    }),
+});
+
+const emit = defineEmits(['change-input', 'click-button']);
 
 const {
     forms: {
@@ -92,15 +99,15 @@ defineExpose<PasswordFormExpose>({
     <div class="password-form">
         <div class="form">
             <div v-if="props.status !== PASSWORD_STATUS.RESET">
-                <p-field-group :label="t('AUTH.PASSWORD.FIND.USER_ID')"
+                <p-field-group :label="state.inputLabel"
                                :invalid="validationState.isIdValid"
                                :invalid-text="validationState.idInvalidText"
                                required
                 >
                     <template #default="{invalid}">
                         <p-text-input :value="userIdInput"
-                                      :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
-                                      :invalid="invalid"
+                                      :placeholder="props.status !== PASSWORD_STATUS.FIND ? 'E-mail Address' : 'User ID'"
+                                      :invalid="invalid || false"
                                       block
                                       @update:value="handleChangeInput('userId', $event)"
                                       @keyup.enter="handleClickUtil('userId')"
@@ -110,7 +117,7 @@ defineExpose<PasswordFormExpose>({
             </div>
             <div v-else>
                 <p-field-group :label="t('COMMON.SIGN_IN.PASSWORD')"
-                               :invalid="invalidState.passwordInput"
+                               :invalid="invalidState.passwordInput || false"
                                :invalid-text="invalidTexts.passwordInput"
                                :help-text="t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 })"
                                required
@@ -119,7 +126,7 @@ defineExpose<PasswordFormExpose>({
                         <p-text-input :value="passwordInput"
                                       type="password"
                                       placeholder="Password"
-                                      :invalid="invalid"
+                                      :invalid="invalid || false"
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('password', $event)"
@@ -128,7 +135,7 @@ defineExpose<PasswordFormExpose>({
                     </template>
                 </p-field-group>
                 <p-field-group :label="t('AUTH.PASSWORD.RESET.CONFIRM_PASSWORD')"
-                               :invalid="invalidState.confirmPasswordInput"
+                               :invalid="invalidState.confirmPasswordInput || false"
                                :invalid-text="invalidTexts.confirmPasswordInput"
                                required
                 >
@@ -136,7 +143,7 @@ defineExpose<PasswordFormExpose>({
                         <p-text-input :value="confirmPasswordInput"
                                       type="password"
                                       placeholder="Confirm Password"
-                                      :invalid="invalid"
+                                      :invalid="invalid || false"
                                       block
                                       appearance-type="masking"
                                       @update:value="handleChangeInput('passwordConfirm', $event)"

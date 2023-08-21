@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 import type { ComponentPublicInstance } from 'vue';
@@ -11,6 +12,12 @@ import {
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+
+
+
+import { SpaceRouter } from '@/router';
+
+import { ERROR_ROUTE } from '@/router/error-routes';
 
 import type { UserState } from '@/store/modules/user/type';
 
@@ -47,7 +54,7 @@ const state = reactive({
             return t('AUTH.PASSWORD.FIND.TITLE');
         }
         if (props.status === PASSWORD_STATUS.INVALID) {
-            return t('AUTH.PASSWORD.INVALID_LINK');
+            return t('AUTH.PASSWORD.INVALID_LINK.TITLE');
         }
         return t('AUTH.PASSWORD.RESET.TITLE');
     }),
@@ -102,6 +109,12 @@ const getSSOTokenFromUrl = (): string|undefined => {
 const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     if (!ssoAccessToken) return undefined;
     const decodedToken = jwtDecode<JwtPayload>(ssoAccessToken);
+    const expireDate = dayjs((decodedToken.exp || 0) * 1000).utc();
+    if (expireDate.isBefore(dayjs().utc())) {
+        ErrorHandler.handleError('Expired token.');
+        SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+        return undefined;
+    }
     if (decodedToken) return decodedToken.aud as string;
     return undefined;
 };
@@ -160,9 +173,11 @@ const initStatesByUrlSSOToken = async () => {
         state.userInfo.email = userId;
 
         await store.commit('user/setUser', state.userInfo);
-    } catch (e) {
-        ErrorHandler.handleError('Invalid token.');
-        router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+    } catch (e: any) {
+        if (e.message.includes('Invalid token')) {
+            ErrorHandler.handleError('Invalid token.');
+            await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME, params: { statusCode: '401' } });
+        }
     }
 };
 (async () => {
