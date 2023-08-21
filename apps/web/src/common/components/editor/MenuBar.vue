@@ -237,7 +237,7 @@ const handleLinkClick = () => {
                        :class="{ 'selected': editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <p-popover v-model="state.imagePopoverVisible"
+        <p-popover v-model:is-visible="state.imagePopoverVisible"
                    position="bottom"
         >
             <p-icon-button class="menu-button"
