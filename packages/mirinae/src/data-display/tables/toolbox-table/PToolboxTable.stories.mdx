@@ -152,7 +152,7 @@ This component is merged component of [Toolbox component](?path=/docs/navigation
                 <div class="p-4">
                     <strong class="mr-4">Select: </strong>
                     <p-select-status v-for="val in fields" :key="val.name" class="mr-2"
-                        v-model="selected" :value="val.name" />
+                        v-model:selected="selected" :value="val.name" />
                 </div>
             </template>
             </p-toolbox-table>

@@ -64,7 +64,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="w-full overflow p-8 flex flex-wrap">
         <p-select-status v-for="(value, idx) in values" :key="idx"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             class="mr-4"
         >
             {{value}}
@@ -99,7 +99,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-status v-for="(value, idx) in values" :key="idx"
             :value="value"
             :icon="icons[idx]"
-            v-model="selected"
+            v-model:selected="selected"
             class="mr-4"
         >
             {{value}}
@@ -136,7 +136,7 @@ export const Template = (args, { argTypes }) => ({
         <p-select-status v-for="(value, idx) in values" :key="idx"
             :value="value"
             multi-selectable
-            v-model="selected"
+            v-model:selected="selected"
             class="mr-4"
         >
             {{value}}
@@ -170,7 +170,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="w-full overflow p-8 flex flex-wrap">
         <p-select-status v-for="(value, idx) in values" :key="idx"
             :value="value"
-            v-model="selected"
+            v-model:selected="selected"
             :disable-check-icon="true"
             class="mr-4"
         >
