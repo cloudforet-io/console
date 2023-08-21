@@ -89,6 +89,7 @@ import {
     reactive, ref, watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -127,6 +128,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const router = useRouter();
+const store = useStore();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -209,6 +211,7 @@ const handleUpdateLabels = async (labels: string[]) => {
                 labels,
             });
         }
+        await store.dispatch('dashboard/loadAllDashboard');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
