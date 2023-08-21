@@ -133,14 +133,18 @@ const props = withDefaults(defineProps<Props>(), {
     size: SELECT_DROPDOWN_SIZE.md,
     isFixedWidth: false,
 });
-const emit = defineEmits(['update:selected', 'select', 'update:visibleMenu', 'focus-menu']);
+const emit = defineEmits<{(e: 'update:selected', value?: string | number): void;
+    (e: 'select', value?: string | number): void;
+    (e: 'update:visible-menu', value?: boolean): void;
+    (e: 'focus-menu'): void;
+}>();
 const { t } = useI18n();
 const slots = useSlots();
 
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
     contextMenuRef: null as null|any,
-    proxySelected: useProxyValue('selected', props, emit),
+    proxySelected: useProxyValue<string|number|undefined>('selected', props, emit),
     selectedItem: computed<MenuItem|null>(() => {
         if (!Array.isArray(props.items)) return null;
 
@@ -192,9 +196,9 @@ const handleClick = (e: MouseEvent) => {
 const handlePressDownKey = () => {
     if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
     nextTick(() => {
-        if (state.contextMenuRef) {
+        if (contextMenuRef.value) {
             if (slots['menu-menu']) emit('focus-menu');
-            else state.contextMenuRef.focus();
+            else state.contextMenuRef.value.focus();
         }
     });
 };
