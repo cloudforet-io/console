@@ -245,7 +245,7 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                 </tags-input-group>
             </div>
         </div>
-        <p-checkbox v-model:value="state.proxyOptions.stop_processing"
+        <p-checkbox v-model:selected="state.proxyOptions.stop_processing"
                     :value="true"
                     class="stop-processing-input"
         >

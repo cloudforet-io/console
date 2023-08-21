@@ -19,7 +19,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
         <div class="h-full w-full overflow p-8">
             <p-checkbox :value="value"
-                        v-model="proxySelected"
+                        v-model:selected="proxySelected"
                         :disabled="disabled"
                         :predicate="predicate"
                         :invalid="invalid"
@@ -56,7 +56,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-checkbox v-for="value in values" v-model="selected" :value="value" :key="value">
+                <p-checkbox v-for="value in values" v-model:selected="selected" :value="value" :key="value">
                     This is checkbox for {{value}}
                 </p-checkbox>
             </div>
@@ -88,7 +88,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-checkbox v-model="selected">
+                <p-checkbox v-model:selected="selected">
                     simple boolean checkbox
                 </p-checkbox>
             </div>
@@ -119,10 +119,10 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-checkbox v-model="notSelected" disabled>
+                <p-checkbox v-model:selected="notSelected" disabled>
                     you can't select disabled checkbox.
                 </p-checkbox>
-                <p-checkbox v-model="selected" disabled>
+                <p-checkbox v-model:selected="selected" disabled>
                     checked disabled
                 </p-checkbox>
             </div>
@@ -155,7 +155,7 @@ export const Template = (args, { argTypes }) => ({
             <div class="flex flex-col mb-8">
                 <p class="mb-4">At least, one item must be selected.</p>
                 <p-checkbox v-for="value in values" :key="value"
-                            v-model="selected"
+                            v-model:selected="selected"
                             :value="value"
                             :invalid="selected.length === 0"
 >
@@ -191,7 +191,7 @@ export const Template = (args, { argTypes }) => ({
          <div>
             <div class="flex flex-col mb-8">
                 <p-checkbox v-for="value in values" :key="value.key"
-                            v-model="selected"
+                            v-model:selected="selected"
                             :value="value"
                             :predicate="predicate"
 >

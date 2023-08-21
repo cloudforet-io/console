@@ -103,7 +103,7 @@ onUnmounted(() => {
                 </template>
             </p-tab>
             <div class="no-more">
-                <p-checkbox v-model="state.noMore"
+                <p-checkbox v-model:selected="state.noMore"
                             :value="true"
                             @change="handleNoMore"
                 >

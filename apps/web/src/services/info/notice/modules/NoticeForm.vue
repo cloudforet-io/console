@@ -279,10 +279,10 @@ watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
             <div v-if="state.hasSystemRole || state.hasDomainRole"
                  class="notice-create-options-wrapper"
             >
-                <p-checkbox v-model:value="state.isPinned">
+                <p-checkbox v-model:selected="state.isPinned">
                     <span>{{ t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
                 </p-checkbox>
-                <p-checkbox v-model:value="state.isPopup">
+                <p-checkbox v-model:selected="state.isPopup">
                     <span>{{ t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
                 </p-checkbox>
             </div>

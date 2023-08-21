@@ -79,7 +79,7 @@ const onChangeTopic = (value) => {
                 </h5>
                 <p-checkbox v-for="item in TOPIC_LIST"
                             :key="item.value"
-                            v-model:value="state.selectedTopic"
+                            v-model:selected="state.selectedTopic"
                             :value="item.value"
                             :invalid="!state.isTopicValid"
                             @change="onChangeTopic"

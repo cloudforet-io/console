@@ -23,7 +23,7 @@ export const Template = (args, { argTypes }) => ({
                 <p-checkbox v-for="value in values"
                          :key="value"
                          :value="value"
-                         v-model="proxySelected"
+                         v-model:selected="proxySelected"
                 >
                     This is checkbox for {{value}}
                 </p-checkbox>
@@ -56,7 +56,7 @@ export const Template = (args, { argTypes }) => ({
                 <div>
                     <div class="flex flex-col">
                         <p-checkbox-group>
-                            <p-checkbox v-for="value in values" v-model="selected" :value="value" :key="value">
+                            <p-checkbox v-for="value in values" v-model:selected="selected" :value="value" :key="value">
                                 This is checkbox for {{value}}
                             </p-checkbox>
                         </p-checkbox-group>
@@ -91,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
                     <div class="flex flex-col row-gap-2">
                         <p>Horizontal (default)</p>
                         <p-checkbox-group direction="horizontal">
-                            <p-checkbox :key="value" v-for="value in horizontalValues" v-model="horizontalSelected" :value="value">
+                            <p-checkbox :key="value" v-for="value in horizontalValues" v-model:selected="horizontalSelected" :value="value">
                                 This is checkbox for {{value}}
                             </p-checkbox>
                         </p-checkbox-group>
@@ -99,7 +99,7 @@ export const Template = (args, { argTypes }) => ({
                     <div class="flex flex-col row-gap-2">
                         <p>Vertical</p>
                         <p-checkbox-group direction="vertical">
-                            <p-checkbox :key="value" v-for="value in verticalValues" v-model="verticalSelected" :value="value">
+                            <p-checkbox :key="value" v-for="value in verticalValues" v-model:selected="verticalSelected" :value="value">
                                 This is checkbox for {{value}}
                             </p-checkbox>
                         </p-checkbox-group>

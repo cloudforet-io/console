@@ -79,7 +79,7 @@ watch(() => props.visible, async (visible) => {
         <template #body>
             <div class="body-inner">
                 <p>{{ t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_YOU') }}</p>
-                <p-checkbox v-model="state.isAssignedToMe">
+                <p-checkbox v-model:selected="state.isAssignedToMe">
                     <span> {{ t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_ME_YES') }}</span>
                 </p-checkbox>
             </div>

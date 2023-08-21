@@ -4,7 +4,7 @@
           class="column-item"
           :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
     >
-        <p-checkbox v-model="proxySelectedKeys"
+        <p-checkbox v-model:selected="proxySelectedKeys"
                     :value="item.key"
         >
             <p-text-highlighting :text="item.name"
@@ -25,26 +25,26 @@
 </template>
 
 <script lang="ts">
+import {
+    PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
+} from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { PropType, SetupContext } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
 } from 'vue';
 
-import {
-    PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 
 interface Props {
-    item: DynamicField[];
+    item: DynamicField;
     selectedKeys: string[];
     searchText: string;
 }
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'ColumnItem',
     components: {
         PI,
@@ -72,7 +72,7 @@ export default defineComponent<Props>({
             default: '',
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props: Props, { emit }: SetupContext) {
         const state = reactive({
             regex: computed(() => getTextHighlightRegex(props.searchText)),
             proxySelectedKeys: useProxyValue('selectedKeys', props, emit),

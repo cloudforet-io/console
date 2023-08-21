@@ -1,5 +1,4 @@
 
-// import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import Notifications from '@kyvg/vue3-notification';
 import SpaceDesignSystem from '@spaceone/design-system';
 import FloatingVue from 'floating-vue';
