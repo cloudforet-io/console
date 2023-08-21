@@ -56,7 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
     paginationVisible: true,
     printMode: false,
 });
-const emit = defineEmits<{(e: 'update:thisPage', value: number): void;
+const emit = defineEmits<{(e: 'update:this-page', value: number): void;
     (e: 'toggle-legend', value: number): void;
 }>();
 

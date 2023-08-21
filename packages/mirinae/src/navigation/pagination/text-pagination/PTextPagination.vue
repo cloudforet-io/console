@@ -41,11 +41,11 @@ const props = withDefaults(defineProps<Props>(), {
     showPageNumber: true,
     disableNextPage: false,
 });
-const emit = defineEmits(['update:thisPage', 'pageChange']);
+const emit = defineEmits(['update:this-page', 'page-change']);
 
 const update = (page: number) => {
-    emit('update:thisPage', page);
-    emit('pageChange', page);
+    emit('update:this-page', page);
+    emit('page-change', page);
 };
 watch([() => props.allPage, () => props.thisPage], ([allPage, thisPage]) => {
     if (!allPage || !thisPage) return;

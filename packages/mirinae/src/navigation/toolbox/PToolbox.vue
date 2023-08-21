@@ -130,7 +130,7 @@ const props = withDefaults(defineProps<ToolboxProps>(), {
     searchText: '',
     timezone: 'UTC',
 });
-const emit = defineEmits(['update:thisPage', 'update:pageSize', 'update:sortBy', 'update:searchText', 'update:queryTags', 'export', 'refresh', 'click-settings', 'change']);
+const emit = defineEmits(['update:this-page', 'update:page-size', 'update:sort-by', 'update:search-text', 'update:query-tags', 'export', 'refresh', 'click-settings', 'change']);
 const slots = useSlots();
 
 const proxyState = reactive({

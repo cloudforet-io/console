@@ -557,7 +557,7 @@ export const getDataTableArgsType = (): ArgTypes => ({
         },
     },
     onUpdateSelectIndex: {
-        name: 'update:selectIndex',
+        name: 'update:select-index',
         description: 'Emitted when the `selectIndex` is updated.',
         table: {
             type: {
@@ -567,7 +567,7 @@ export const getDataTableArgsType = (): ArgTypes => ({
         },
     },
     onUpdateSortBy: {
-        name: 'update:sortBy',
+        name: 'update:sort-by',
         description: 'Emitted when the `sortBy` is updated.',
         table: {
             type: {
@@ -577,7 +577,7 @@ export const getDataTableArgsType = (): ArgTypes => ({
         },
     },
     onUpdateSortDesc: {
-        name: 'update:sortDesc',
+        name: 'update:sort-desc',
         description: 'Emitted when the `sortDesc` is updated.',
         table: {
             type: {
