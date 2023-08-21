@@ -3,6 +3,7 @@ import { isEmpty } from 'lodash';
 import {
     toRefs, reactive, computed, watch, defineAsyncComponent,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -54,6 +55,7 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const store = useStore();
+        const { t } = useI18n();
 
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
@@ -122,6 +124,7 @@ export default {
         }, { immediate: true });
 
         return {
+            t,
             ...toRefs(state),
             onSignIn,
         };
