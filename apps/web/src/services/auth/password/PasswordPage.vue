@@ -13,10 +13,6 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
-
-
-import { SpaceRouter } from '@/router';
-
 import { ERROR_ROUTE } from '@/router/error-routes';
 
 import type { UserState } from '@/store/modules/user/type';
@@ -112,7 +108,7 @@ const getUserIdFromToken = (ssoAccessToken: string): string | undefined => {
     const expireDate = dayjs((decodedToken.exp || 0) * 1000).utc();
     if (expireDate.isBefore(dayjs().utc())) {
         ErrorHandler.handleError('Expired token.');
-        SpaceRouter.router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
+        router.replace({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME, query: { status: 'invalid' } }).catch(() => {});
         return undefined;
     }
     if (decodedToken) return decodedToken.aud as string;
@@ -176,7 +172,7 @@ const initStatesByUrlSSOToken = async () => {
     } catch (e: any) {
         if (e.message.includes('Invalid token')) {
             ErrorHandler.handleError('Invalid token.');
-            await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME, params: { statusCode: '401' } });
+            await router.push({ name: ERROR_ROUTE._NAME, params: { statusCode: '401' } });
         }
     }
 };
