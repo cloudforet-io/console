@@ -61,7 +61,9 @@ const props = withDefaults(defineProps<Props>(), {
     label: '',
     tabIndex: undefined,
 });
-const emit = defineEmits(['change']);
+const emit = defineEmits<{(e: 'change', selected: any, checked: boolean): void;
+    (e: 'update:selected', selected: any): void;
+}>();
 const attrs = useAttrs();
 
 const {
@@ -98,8 +100,10 @@ const handleClick = () => {
     const newSelected = getSelected();
     if (props.multiSelectable) {
         emit('change', newSelected, !isSelected.value);
+        emit('update:selected', newSelected);
     } else {
         emit('change', newSelected, true);
+        emit('update:selected', newSelected);
     }
 };
 

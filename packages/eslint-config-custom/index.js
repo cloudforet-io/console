@@ -29,7 +29,7 @@ module.exports = {
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-unsafe-optional-chaining': 1,
-        'no-undef': 1,
+        'no-undef': 0,
         'no-unused-vars': ['off'],
         'no-mixed-operators': 0,
         'no-promise-executor-return': 1,

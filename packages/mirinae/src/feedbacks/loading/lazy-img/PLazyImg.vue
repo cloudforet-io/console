@@ -57,7 +57,7 @@ import PI from '@/foundation/icons/PI.vue';
 interface Props {
     height?: string;
     width?: string;
-    src: string;
+    src?: string;
     errorIcon?: string;
     errorIconColor?: string;
     loading?: boolean;

@@ -95,7 +95,7 @@ watch(() => props.initialFormData, (initialFormData) => {
                 :label="t('IAM.ROLE.DETAIL.DESCRIPTION')"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="state.roleDescription"
+                    <p-text-input v-model:value="state.roleDescription"
                                   class="role-description-input input"
                                   :invalid="invalid"
                     />
@@ -107,7 +107,7 @@ watch(() => props.initialFormData, (initialFormData) => {
             >
                 <p-select-card v-for="(roleType, index) in state.roleTypes"
                                :key="roleType.key"
-                               v-model="state.selectedRoleType"
+                               v-model:selected="state.selectedRoleType"
                                :tab-index="index"
                                class="card"
                                :value="roleType.key"
