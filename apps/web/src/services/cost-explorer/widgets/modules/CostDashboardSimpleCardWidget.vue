@@ -5,8 +5,6 @@ import {
 } from 'vue';
 import type { RouteLocation } from 'vue-router';
 
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { CurrencySymbol } from '@/store/modules/settings/type';
 
 const UNIT_TYPE = Object.freeze({
@@ -31,8 +29,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     title: '',
-    currencySymbol: CURRENCY_SYMBOL.USD,
-    unitType: UNIT_TYPE.CURRENCY,
+    currencySymbol: '$',
+    unitType: 'CURRENCY',
     value: 0,
     showDivider: true,
     description: '',

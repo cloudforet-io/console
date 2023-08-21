@@ -28,7 +28,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    conditionsPolicy: CONDITIONS_POLICY.ALL,
+    conditionsPolicy: 'ALL',
     conditions: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:conditionsPolicy', value: ConditionsPolicy): void;

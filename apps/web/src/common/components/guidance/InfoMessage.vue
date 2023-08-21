@@ -15,7 +15,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-    styleType: STYLE_TYPE.gray,
+    styleType: 'gray',
     message: '',
     block: false,
 });
