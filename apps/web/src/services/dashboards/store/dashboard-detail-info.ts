@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { store } from '@/store';
 
+
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 

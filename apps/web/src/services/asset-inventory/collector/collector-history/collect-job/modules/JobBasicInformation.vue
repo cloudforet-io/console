@@ -1,97 +1,3 @@
-<script lang="ts" setup>
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
-import {
-    computed, onActivated, reactive,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
-
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-interface Props {
-    jobId: string;
-}
-
-const props = defineProps<Props>();
-const store = useStore();
-const { t } = useI18n();
-
-const state = reactive({
-    loading: true,
-    job: {} as any,
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    timezone: computed(() => store.state.user.timezone),
-    collector: computed(() => {
-        const id = state.job.collector_info?.collector_id || '';
-        return {
-            id,
-            label: state.collectors[id]?.label || id,
-            linkLocation: referenceRouter(id, { resource_type: 'inventory.Collector' }),
-        };
-    }),
-    provider: computed(() => {
-        const id = state.job.collector_info?.provider || '';
-        return {
-            id,
-            label: state.providers[id]?.name || id,
-        };
-    }),
-    plugin: computed(() => {
-        const id = state.job.collector_info?.plugin_info?.plugin_id || '';
-        return {
-            id,
-            label: state.plugins[id]?.label || id,
-            icon: state.plugins[id]?.icon,
-        };
-    }),
-
-});
-
-const apiQuery = new ApiQueryHelper();
-const getJob = async () => {
-    state.loading = true;
-    state.job = {};
-    try {
-        apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
-        const { results } = await SpaceConnector.client.inventory.job.list({
-            query: apiQuery.data,
-        });
-        state.job = results[0] || {};
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
-
-/* Init */
-onActivated(() => {
-    getJob();
-});
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/collector/load'),
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/plugin/load'),
-    ]);
-})();
-
-</script>
-
 <template>
     <p-pane-layout class="job-basic-information">
         <header>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
@@ -108,7 +14,7 @@ onActivated(() => {
             <div class="item">
                 <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
                 <span class="contents">
-                    {{ iso8601Formatter(state.job.created_at, state.timezone) }}
+                    {{ iso8601Formatter(props.job.created_at, storeState.timezone) }}
                 </span>
             </div>
             <div class="item">
@@ -128,18 +34,78 @@ onActivated(() => {
             <div class="item">
                 <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}</label>
                 <span class="contents">
-                    {{ iso8601Formatter(state.job.finished_at, state.timezone) }}
-                </span>
-            </div>
-            <div class="item">
-                <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
-                <span class="contents">
-                    {{ state.provider.label }}
+                    {{ iso8601Formatter(props.job.finished_at, storeState.timezone) }}
                 </span>
             </div>
         </section>
     </p-pane-layout>
 </template>
+
+<script lang="ts" setup>
+
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import {
+    computed, reactive,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
+import type { JobModel } from '@/services/asset-inventory/collector/model';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+interface Props {
+    job: JobModel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    job: undefined,
+});
+const store = useStore();
+const { t } = useI18n();
+
+const storeState = reactive({
+    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    timezone: computed(() => store.state.user.timezone),
+});
+const state = reactive({
+    collector: computed(() => {
+        const id = props.job.collector_id || '';
+        return {
+            id,
+            label: storeState.collectors[id]?.label || id,
+            linkLocation: {
+                name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
+                params: {
+                    collectorId: id,
+                },
+            },
+        };
+    }),
+    plugin: computed(() => {
+        const id = props.job.plugin_id || '';
+        return {
+            id,
+            label: storeState.plugins[id]?.label || id,
+            icon: storeState.plugins[id]?.icon,
+        };
+    }),
+
+});
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/collector/load'),
+        store.dispatch('reference/plugin/load'),
+    ]);
+})();
+
+</script>
 
 <style lang="postcss" scoped>
 .job-basic-information {

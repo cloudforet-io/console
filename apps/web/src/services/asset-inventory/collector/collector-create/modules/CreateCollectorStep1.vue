@@ -1,102 +1,7 @@
-<script lang="ts" setup>
-
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import {
-    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
-} from '@spaceone/design-system';
-import { vInfiniteScroll } from '@vueuse/components';
-import {
-    onMounted, reactive, watch,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { gray } from '@/styles/colors';
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
-
-import Step1SearchFilter from '@/services/asset-inventory/collector/collector-create/modules/Step1SearchFilter.vue';
-import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
-import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
-import CollectPluginContents
-    from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
-
-const emit = defineEmits<{(e: 'update:current-step', value: number): void}>();
-const { t } = useI18n();
-
-const collectorFormStore = useCollectorFormStore();
-const collectorFormState = collectorFormStore.$state;
-
-
-const state = reactive({
-    searchValue: '',
-    pluginList: [] as RepositoryPluginModel[],
-    loading: false,
-    selectedRepository: '',
-    currentPage: 1,
-    totalCount: 0,
-});
-
-
-const pluginApiQuery = new ApiQueryHelper();
-const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
-    state.loading = true;
-    try {
-        pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
-            .setFilters([{ v: state.searchValue }]);
-
-        const params = {
-            service_type: 'inventory.Collector',
-            repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
-            provider: collectorFormState.provider === 'all' ? null : collectorFormState.provider,
-            query: pluginApiQuery.data,
-        };
-        const res = await SpaceConnector.client.repository.plugin.list(params);
-        state.totalCount = res.total_count;
-        return res.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    } finally {
-        state.loading = false;
-    }
-};
-
-const loadMorePlugin = async () => {
-    if (state.totalCount <= state.pluginList.length) {
-        return;
-    }
-    state.currentPage += 1;
-    const additionalPlugin = await getPlugins();
-    state.pluginList = state.pluginList.concat(additionalPlugin);
-};
-
-const handleSearch = async (value) => {
-    state.searchValue = value;
-    state.pluginList = await getPlugins();
-};
-const handleClickNextStep = (item: RepositoryPluginModel) => {
-    emit('update:current-step', 2);
-    collectorFormStore.setRepositoryPlugin(item);
-};
-const handleChangeRepository = (value:string) => {
-    state.selectedRepository = value;
-};
-
-watch([() => collectorFormState.provider, () => state.selectedRepository], async () => {
-    state.currentPage = 1;
-    state.pluginList = await getPlugins();
-}, { immediate: true });
-
-onMounted(() => {
-    collectorFormStore.$reset();
-});
-</script>
-
 <template>
-    <div class="collector-page-1">
+    <div ref="containerRef"
+         class="create-collector-step-1"
+    >
         <p-search v-model="state.searchValue"
                   @search="handleSearch"
         />
@@ -111,11 +16,11 @@ onMounted(() => {
                                :loading="state.loading"
                                :loader-backdrop-color="BACKGROUND_COLOR"
                 >
-                    <div v-infinite-scroll="[loadMorePlugin, { distance: 1}]"
+                    <div ref="pluginListContainerRef"
                          class="plugin-card-list"
                     >
                         <p-board-item v-for="item in state.pluginList"
-                                      :key="item.name"
+                                      :key="getPluginKey(item)"
                                       class="plugin-card-item"
                         >
                             <template #content>
@@ -160,18 +65,132 @@ onMounted(() => {
     </div>
 </template>
 
+<script lang="ts" setup>
+
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PSearch, PDataLoader, PBoardItem, PButton, PI, PFieldTitle, PEmpty,
+} from '@spaceone/design-system';
+import {
+    onMounted, reactive, watch, ref,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useLastItemObserver } from '@/common/composables/last-item-observer';
+
+
+import { gray } from '@/styles/colors';
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
+
+import Step1SearchFilter from '@/services/asset-inventory/collector/collector-create/modules/Step1SearchFilter.vue';
+import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
+import CollectPluginContents
+    from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
+
+const emit = defineEmits<{(e: 'update:current-step', value: number): void}>();
+const { t } = useI18n();
+
+const collectorFormStore = useCollectorFormStore();
+const collectorFormState = collectorFormStore.$state;
+
+
+const state = reactive({
+    searchValue: '',
+    pluginList: [] as RepositoryPluginModel[],
+    loading: false,
+    selectedRepository: '',
+    currentPage: 1,
+    totalCount: 0,
+});
+
+
+const pluginApiQuery = new ApiQueryHelper();
+const getPluginKey = (item) => `${item.name}-${item.repository_info.repository_id}`;
+const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
+    try {
+        state.loading = true;
+        pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
+            .setFilters([{ v: state.searchValue }]);
+
+        const params = {
+            service_type: 'inventory.Collector',
+            repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
+            provider: collectorFormState.provider === 'all' ? null : collectorFormState.provider,
+            query: pluginApiQuery.data,
+        };
+        const res = await SpaceConnector.client.repository.plugin.list(params);
+        state.totalCount = res.total_count;
+        return res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+const loadMorePlugin = async () => {
+    if (state.totalCount <= state.pluginList.length) {
+        disconnectObserver();
+        return;
+    }
+
+    disconnectObserver();
+    state.currentPage += 1;
+    const additionalPlugin = await getPlugins();
+    state.pluginList = state.pluginList.concat(additionalPlugin);
+    connectObserver();
+};
+
+const handleSearch = async (value) => {
+    disconnectObserver();
+    state.searchValue = value;
+    state.pluginList = await getPlugins();
+    connectObserver();
+};
+const handleClickNextStep = (item: RepositoryPluginModel) => {
+    emit('update:current-step', 2);
+    collectorFormStore.setRepositoryPlugin(item);
+};
+const handleChangeRepository = (value:string) => {
+    state.selectedRepository = value;
+};
+
+const pluginListContainerRef = ref<HTMLElement|null>(null);
+const { connectObserver, disconnectObserver } = useLastItemObserver({
+    containerRef: pluginListContainerRef,
+    onAppeared: loadMorePlugin,
+});
+
+watch([() => collectorFormState.provider, () => state.selectedRepository], async () => {
+    disconnectObserver();
+    state.currentPage = 1;
+    state.pluginList = await getPlugins();
+    connectObserver();
+}, { immediate: true });
+
+
+onMounted(() => {
+    collectorFormStore.$reset();
+});
+</script>
+
 <style lang="postcss" scoped>
-.collector-page-1 {
+.create-collector-step-1 {
     @apply flex flex-col;
     min-width: 59.5625rem;
-    height: calc(100vh - 11.75rem);
     width: 100%;
+    overflow: visible;
     .contents-container {
         @apply flex justify-between;
         margin-top: 1.5rem;
 
         .contents-title {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .right-area {
@@ -180,7 +199,6 @@ onMounted(() => {
             .right-area-contents {
                 .plugin-card-list {
                     @apply flex flex-col gap-2;
-                    height: calc(100vh - 17rem);
                     overflow-y: auto;
                     :deep(.p-board-item) {
                         .content-area .content {
@@ -219,15 +237,13 @@ onMounted(() => {
 }
 
 @screen tablet {
-    .collector-page-1 {
+    .create-collector-step-1 {
         min-width: 43rem;
-        height: calc(100vh - 15.375rem);
         .contents-container {
             @apply flex-col;
             .right-area {
                 .right-area-contents {
                     .plugin-card-list {
-                        height: calc(100vh - 20.625rem);
                         .plugin-card-item {
                             .plugin-card-content {
                                 @apply flex items-center;
@@ -249,7 +265,7 @@ onMounted(() => {
 }
 
 @screen mobile {
-    .collector-page-1 {
+    .create-collector-step-1 {
         min-width: unset;
         max-width: 100vw;
     }

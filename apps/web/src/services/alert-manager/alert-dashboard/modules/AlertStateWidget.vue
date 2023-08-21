@@ -1,3 +1,112 @@
+<template>
+    <div class="alert-state-widget">
+        <p class="title">
+            {{ t('MONITORING.ALERT.DASHBOARD.ALERT_STATE') }}
+        </p>
+        <div class="content-wrapper">
+            <!--tabs-->
+            <p-balloon-tab v-model:activeTab="tabState.activeTab"
+                           class="desktop-balloon-tab"
+                           :tabs="tabState.tabs"
+                           size="lg"
+                           position="left"
+                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
+                           tail
+            >
+                <template #tab="{label, name}">
+                    <div class="tab-button">
+                        {{ label }} <span class="count">{{ commaFormatter(tabState.tabItems[name].count) }}</span>
+                    </div>
+                </template>
+            </p-balloon-tab>
+            <p-balloon-tab v-model:activeTab="tabState.activeTab"
+                           class="tablet-balloon-tab"
+                           :tabs="tabState.tabs"
+                           size="sm"
+                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
+            >
+                <template #tab="{label, name}">
+                    <span>{{ label }} <strong>{{ commaFormatter(tabState.tabItems[name].count) }}</strong></span>
+                </template>
+            </p-balloon-tab>
+            <!--tab content-->
+            <div class="tab-content-wrapper">
+                <!--filter-->
+                <div class="filter-wrapper">
+                    <div class="left-part">
+                        <p-select-status v-for="(status, idx) in state.urgencyList"
+                                         :key="idx"
+                                         v-model:selected="state.selectedUrgency"
+                                         :value="status.name"
+                                         :icon="status.icon"
+                                         :disable-check-icon="true"
+                                         :icon-color="status.name === ALERT_URGENCY.HIGH ? red[400] : undefined"
+                                         @change="listAlerts"
+                        >
+                            {{ status.label }}
+                        </p-select-status>
+                    </div>
+                    <div class="right-part">
+                        <p-select-button v-for="(assignedState, idx) in state.assignedStateList"
+                                         :key="`assigned-${idx}`"
+                                         v-model:selected="state.selectedAssignedState"
+                                         :value="assignedState.name"
+                                         size="sm"
+                                         style-type="gray"
+                                         @change="onSelectAssignedState"
+                        >
+                            {{ assignedState.label }}
+                        </p-select-button>
+                        <p-text-pagination v-model:this-page="state.thisPage"
+                                           :all-page="state.allPage"
+                                           @page-change="onPageChange"
+                        />
+                        <p-icon-button name="ic_refresh"
+                                       @click="onClickRefresh"
+                        />
+                    </div>
+                </div>
+                <!--list-->
+                <p-list-card :items="state.items"
+                             :loading="state.loading"
+                             :hoverable="true"
+                >
+                    <template #header>
+                        <div class="mobile-header">
+                            <p-checkbox v-model="state.isAssignedToMe">
+                                <span>{{ t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
+                            </p-checkbox>
+                            <p-text-pagination
+                                v-model:this-page="state.thisPage"
+                                :all-page="state.allPage"
+                                :show-page-number="false"
+                                @page-change="onPageChange"
+                            />
+                        </div>
+                    </template>
+                    <template #item="{ item }">
+                        <alert-list-item :item="item"
+                                         :show-project-link="true"
+                                         :project-reference="state.projects[item.project_id]"
+                                         :user-reference="state.users[item.assignee]"
+                        />
+                    </template>
+                    <template #no-data>
+                        <div>
+                            <p-i name="ic_error-filled"
+                                 :color="red[400]"
+                            />
+                            <p class="text">
+                                {{ t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
+                            </p>
+                        </div>
+                    </template>
+                </p-list-card>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import { commaFormatter } from '@cloudforet/core-lib';
@@ -18,6 +127,8 @@ import { useStore } from 'vuex';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
@@ -209,114 +320,6 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
 });
 
 </script>
-
-<template>
-    <div class="alert-state-widget">
-        <p class="title">
-            {{ t('MONITORING.ALERT.DASHBOARD.ALERT_STATE') }}
-        </p>
-        <div class="content-wrapper">
-            <!--tabs-->
-            <p-balloon-tab v-model:activeTab="tabState.activeTab"
-                           class="desktop-balloon-tab"
-                           :tabs="tabState.tabs"
-                           size="lg"
-                           position="left"
-                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
-                           tail
-            >
-                <template #tab="{label, name}">
-                    <div class="tab-button">
-                        {{ label }} <span class="count">{{ commaFormatter(tabState.tabItems[name].count) }}</span>
-                    </div>
-                </template>
-            </p-balloon-tab>
-            <p-balloon-tab v-model:activeTab="tabState.activeTab"
-                           class="tablet-balloon-tab"
-                           :tabs="tabState.tabs"
-                           size="sm"
-                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
-            >
-                <template #tab="{label, name}">
-                    <span>{{ label }} <strong>{{ commaFormatter(tabState.tabItems[name].count) }}</strong></span>
-                </template>
-            </p-balloon-tab>
-            <!--tab content-->
-            <div class="tab-content-wrapper">
-                <!--filter-->
-                <div class="filter-wrapper">
-                    <div class="left-part">
-                        <p-select-status v-for="(status, idx) in state.urgencyList"
-                                         :key="idx"
-                                         v-model:selected="state.selectedUrgency"
-                                         :value="status.name"
-                                         :icon="status.icon"
-                                         :disable-check-icon="true"
-                                         @change="listAlerts"
-                        >
-                            {{ status.label }}
-                        </p-select-status>
-                    </div>
-                    <div class="right-part">
-                        <p-select-button v-for="(assignedState, idx) in state.assignedStateList"
-                                         :key="`assigned-${idx}`"
-                                         v-model:selected="state.selectedAssignedState"
-                                         :value="assignedState.name"
-                                         size="sm"
-                                         style-type="gray"
-                                         @change="onSelectAssignedState"
-                        >
-                            {{ assignedState.label }}
-                        </p-select-button>
-                        <p-text-pagination v-model:this-page="state.thisPage"
-                                           :all-page="state.allPage"
-                                           @page-change="onPageChange"
-                        />
-                        <p-icon-button name="ic_refresh"
-                                       @click="onClickRefresh"
-                        />
-                    </div>
-                </div>
-                <!--list-->
-                <p-list-card :items="state.items"
-                             :loading="state.loading"
-                             :hoverable="true"
-                >
-                    <template #header>
-                        <div class="mobile-header">
-                            <p-checkbox v-model="state.isAssignedToMe">
-                                <span>{{ t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
-                            </p-checkbox>
-                            <p-text-pagination
-                                v-model:this-page="state.thisPage"
-                                :all-page="state.allPage"
-                                :show-page-number="false"
-                                @page-change="onPageChange"
-                            />
-                        </div>
-                    </template>
-                    <template #item="{ item }">
-                        <alert-list-item :item="item"
-                                         :show-project-link="true"
-                                         :project-reference="state.projects[item.project_id]"
-                                         :user-reference="state.users[item.assignee]"
-                        />
-                    </template>
-                    <template #no-data>
-                        <div>
-                            <p-i name="ic_error-filled"
-                                 color="inherit transparent"
-                            />
-                            <p class="text">
-                                {{ t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
-                            </p>
-                        </div>
-                    </template>
-                </p-list-card>
-            </div>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .alert-state-widget {

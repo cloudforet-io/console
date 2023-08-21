@@ -260,6 +260,24 @@ const extraArgTypes: ArgTypes = {
             type: { summary: null },
         },
     },
+    contextMenuHeader: {
+        name: 'context-menu-header',
+        description: 'This is a slot for the header of the PContextMenu.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    inputLeftArea: {
+        name: 'input-left-area',
+        description: 'This is a slot for the left area of the input.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
     /* events */
     onUpdateVisibleMenu: {
         name: 'update:visible-menu',

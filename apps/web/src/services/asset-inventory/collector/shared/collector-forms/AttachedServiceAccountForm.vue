@@ -1,19 +1,97 @@
+<template>
+    <div class="attached-service-account-form">
+        <p-field-group :invalid="invalidState.selectedAttachedServiceAccount"
+                       :invalid-text="invalidTexts.selectedAttachedServiceAccount"
+                       :valid="state.isAttachedServiceAccountValid"
+                       :required="true"
+                       :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
+        >
+            <p-field-title :label="props.title || t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
+                           size="lg"
+                           class="mb-2"
+            />
+            <!-- NOTE: screen desktop size-->
+            <div class="contents-container">
+                <p-radio-group class="attached-service-account-radio-group">
+                    <p-radio v-for="(item) in attachedServiceAccountList"
+                             :key="`${item.name}`"
+                             :value="item.name"
+                             :selected="collectorFormState.attachedServiceAccountType"
+                             @change="handleChangeAttachedServiceAccountType"
+                    >
+                        {{ item.label }}
+                    </p-radio>
+                </p-radio-group>
+                <!-- NOTE: screen mobile size-->
+                <p-select-dropdown class="attached-service-account-dropdown"
+                                   :selected="collectorFormState.attachedServiceAccountType"
+                                   :items="attachedServiceAccountList"
+                                   @update:selected="handleChangeAttachedServiceAccountType"
+                />
+                <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
+                    <p-field-title class="specific-service-account-dropdown-label"
+                                   :label="t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
+                    />
+                    <p-filterable-dropdown class="specific-service-account-dropdown"
+                                           :selected="selectedAttachedServiceAccount"
+                                           multi-selectable
+                                           show-select-marker
+                                           :handler="serviceAccountHandler"
+                                           appearance-type="stack"
+                                           :reset-selected-on-unmounted="false"
+                                           @update:selected="handleSelectAttachedServiceAccount"
+                    >
+                        <template #input-left-area>
+                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
+                                 name="ic_minus_circle"
+                                 class="ml-2"
+                                 width="1.25rem"
+                                 heigth="1.25rem"
+                                 :color="red[300]"
+                            />
+                        </template>
+                        <template #context-menu-header>
+                            <div class="include-exclude-selector">
+                                <select-box v-for="item in state.includeExcludeOptionList"
+                                            :key="item.name"
+                                            :selected="collectorFormState.selectedServiceAccountFilterOption"
+                                            :value="item.name"
+                                            :icon="item.icon"
+                                            :icon-color="item.iconColor"
+                                            :multi-selectable="true"
+                                            @change="handleSelectIncludeExcludeOption"
+                                >
+                                    {{ item.label }}
+                                </select-box>
+                            </div>
+                        </template>
+                    </p-filterable-dropdown>
+                </div>
+            </div>
+        </p-field-group>
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle,
+    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle, PI,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import SelectBox from '@/common/components/select/SelectBox.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { red } from '@/styles/colors';
+
 import type {
     AttachedServiceAccount,
-    AttachedServiceAccountType,
+    AttachedServiceAccountType, ServiceAccountFilterOption,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import {
     useCollectorFormStore,
@@ -34,7 +112,7 @@ const { t } = useI18n();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const attachedServiceAccountList = [
+const attachedServiceAccountList = computed(() => [
     {
         label: t('INVENTORY.COLLECTOR.CREATE.ALL'),
         name: 'all',
@@ -43,7 +121,7 @@ const attachedServiceAccountList = [
         label: t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT'),
         name: 'specific',
     },
-];
+]);
 
 const queryHelper = new QueryHelper();
 const state = reactive({
@@ -73,6 +151,18 @@ const state = reactive({
             },
         };
     }),
+    includeExcludeOptionList: computed<MenuItem[]>(() => [
+        {
+            label: t('INVENTORY.COLLECTOR.CREATE.INCLUDE'),
+            name: 'include',
+        },
+        {
+            label: t('INVENTORY.COLLECTOR.CREATE.EXCLUDE'),
+            name: 'exclude',
+            icon: 'ic_minus_circle',
+            iconColor: red[300],
+        },
+    ]),
 });
 
 const serviceAccountHandler: AutocompleteHandler = async (keyword: string) => {
@@ -129,6 +219,13 @@ const handleSelectAttachedServiceAccount = (selectedValue: AttachedServiceAccoun
     });
 };
 
+const handleSelectIncludeExcludeOption = (selectedValue: ServiceAccountFilterOption) => {
+    if (!selectedValue) return;
+    collectorFormStore.$patch({
+        selectedServiceAccountFilterOption: selectedValue,
+    });
+};
+
 watch(() => isAllValid.value, (value) => {
     emit('update:is-attached-service-account-valid', value);
 }, { immediate: true });
@@ -145,51 +242,11 @@ watch(() => collectorFormState.provider, () => {
     });
 });
 
-</script>
+watch(() => collectorFormState.attachedServiceAccount, (value) => {
+    setForm('selectedAttachedServiceAccount', value);
+});
 
-<template>
-    <div class="attached-service-account-form">
-        <p-field-group :label="props.title || t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
-                       :invalid="invalidState.selectedAttachedServiceAccount"
-                       :invalid-text="invalidTexts.selectedAttachedServiceAccount"
-                       :valid="state.isAttachedServiceAccountValid"
-                       :required="true"
-                       :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
-        >
-            <!-- NOTE: screen desktop size-->
-            <p-radio-group class="attached-service-account-radio-group">
-                <p-radio v-for="(item) in attachedServiceAccountList"
-                         :key="`${item.name}`"
-                         :value="item.name"
-                         :selected="collectorFormState.attachedServiceAccountType"
-                         @change="handleChangeAttachedServiceAccountType"
-                >
-                    {{ item.label }}
-                </p-radio>
-            </p-radio-group>
-            <!-- NOTE: screen mobile size-->
-            <p-select-dropdown class="attached-service-account-dropdown"
-                               :selected="collectorFormState.attachedServiceAccountType"
-                               :items="attachedServiceAccountList"
-                               @update:selected="handleChangeAttachedServiceAccountType"
-            />
-            <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
-                <p-field-title class="specific-service-account-dropdown-label"
-                               :label="t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
-                />
-                <p-filterable-dropdown class="specific-service-account-dropdown"
-                                       :selected="selectedAttachedServiceAccount"
-                                       multi-selectable
-                                       show-select-marker
-                                       :handler="serviceAccountHandler"
-                                       appearance-type="stack"
-                                       :reset-selected-on-unmounted="false"
-                                       @update:selected="handleSelectAttachedServiceAccount"
-                />
-            </div>
-        </p-field-group>
-    </div>
-</template>
+</script>
 
 <style lang="postcss" scoped>
 .attached-service-account-form {
@@ -197,21 +254,32 @@ watch(() => collectorFormState.provider, () => {
         margin-bottom: 15rem;
     }
 
-    .attached-service-account-radio-group {
-        display: block;
-    }
-    .attached-service-account-dropdown {
-        width: 100%;
-        display: none;
-    }
+    .contents-container {
+        @apply border rounded-xl border-gray-200 p-4;
 
-    .specific-service-account-dropdown {
-        margin-top: 1rem;
-        width: 100%;
-    }
+        .attached-service-account-radio-group {
+            display: block;
+        }
+        .attached-service-account-dropdown {
+            width: 100%;
+            display: none;
+        }
 
-    .specific-service-account-dropdown-label {
-        display: none;
+        .specific-service-account-dropdown {
+            margin-top: 0.5rem;
+            width: 100%;
+
+            .include-exclude-selector {
+                @apply flex;
+                margin: 0.75rem 0.5rem;
+                border-radius: 0.25rem;
+                overflow: hidden;
+            }
+        }
+
+        .specific-service-account-dropdown-label {
+            display: none;
+        }
     }
 }
 
@@ -232,6 +300,21 @@ watch(() => collectorFormState.provider, () => {
         .specific-service-account-dropdown-label {
             display: block;
             margin-top: 1rem;
+        }
+
+        .contents-container {
+
+            .specific-service-account-dropdown {
+                margin-top: 0.5rem;
+                width: 100%;
+
+                .include-exclude-selector {
+                    @apply flex flex-col;
+                    margin: 0.75rem 0.5rem;
+                    border-radius: 0.25rem;
+                    overflow: hidden;
+                }
+            }
         }
     }
 }

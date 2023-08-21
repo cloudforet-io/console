@@ -16,6 +16,7 @@ export interface MenuItem {
     link?: string;
     target?: string;
     icon?: string;
+    iconColor?: string;
     error?: boolean;
     imageUrl?: string;
 }

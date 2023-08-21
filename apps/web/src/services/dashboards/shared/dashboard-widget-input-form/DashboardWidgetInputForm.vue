@@ -1,3 +1,84 @@
+<template>
+    <div class="dashboard-widget-input-form">
+        <p-field-group :label="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
+                       :invalid="isTitleInvalid"
+                       :invalid-text="titleInvalidText"
+                       class="name-field"
+                       required
+        >
+            <p-text-input v-model:is-focused="state.isFocused"
+                          :value="title"
+                          :invalid="isTitleInvalid"
+                          :placeholder="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
+                          class="input"
+                          @update:value="updateTitle"
+            />
+        </p-field-group>
+        <div v-if="widgetConfig?.description?.translation_id"
+             class="description-text"
+        >
+            {{ $t(widgetConfig.description.translation_id) }}
+        </div>
+        <p-data-loader :loading="referenceStoreState.loading"
+                       class="widget-options-form-wrapper"
+        >
+            <p-text-button icon-left="ic_refresh"
+                           style-type="highlight"
+                           :disabled="!isFormDataChanged"
+                           class="return-to-initial-settings-button"
+                           @click="handleReturnToInitialSettings"
+            >
+                {{ t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
+            </p-text-button>
+            <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
+                                v-model:form-data="state.schemaFormData"
+                                :schema="state.widgetOptionsJsonSchema"
+                                :custom-error-map="inheritOptionsErrorMap"
+                                :validation-mode="widgetKey ? 'all' : 'input'"
+                                use-fixed-menu-style
+                                uniform-width
+                                :reference-handler="referenceHandler"
+                                class="widget-options-form"
+                                @validate="handleFormValidate"
+            >
+                <template #label-extra="{ propertyName }">
+                    <div class="inherit-toggle-button-wrapper">
+                        <span class="text"
+                              :class="{inherit: state.inheritableProperties.includes(propertyName)}"
+                        >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
+                        <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
+                                         :disabled="isInheritDisabled(propertyName)"
+                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
+                        />
+                    </div>
+                </template>
+                <template #input-extra="{ propertyName }">
+                    <p-icon-button v-if="!state.fixedProperties.includes(propertyName)"
+                                   class="delete-button"
+                                   shape="square"
+                                   style-type="negative-secondary"
+                                   name="ic_delete"
+                                   @click="handleDeleteProperty(propertyName)"
+                    />
+                </template>
+                <template #dropdown-extra="{ propertyName, selectedItem }">
+                    <div v-if="isSelected(selectedItem) && state.inheritableProperties.includes(propertyName)"
+                         class="dropdown-inner"
+                    >
+                        <span class="item-label">{{ selectedItem.label }}</span>
+                        <span class="suffix-text">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
+                    </div>
+                </template>
+            </p-json-schema-form>
+        </p-data-loader>
+        <dashboard-widget-more-options class="more-option-container"
+                                       :widget-config-id="widgetConfigId"
+                                       :selected-properties="widgetFormState.schemaProperties"
+                                       @update:selected-properties="handleSelectWidgetOptions"
+        />
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -353,87 +434,6 @@ watch(() => state.isAllValid, (_isAllValid) => {
 }, { immediate: true });
 
 </script>
-
-<template>
-    <div class="dashboard-widget-input-form">
-        <p-field-group :label="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="isTitleInvalid"
-                       :invalid-text="titleInvalidText"
-                       class="name-field"
-                       required
-        >
-            <p-text-input v-model:is-focused="state.isFocused"
-                          :value="title"
-                          :invalid="isTitleInvalid"
-                          :placeholder="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
-                          class="input"
-                          @update:value="updateTitle"
-            />
-        </p-field-group>
-        <div v-if="widgetConfig?.description?.translation_id"
-             class="description-text"
-        >
-            {{ $t(widgetConfig.description.translation_id) }}
-        </div>
-        <p-data-loader :loading="referenceStoreState.loading"
-                       class="widget-options-form-wrapper"
-        >
-            <p-text-button icon-left="ic_refresh"
-                           style-type="highlight"
-                           :disabled="!isFormDataChanged"
-                           class="return-to-initial-settings-button"
-                           @click="handleReturnToInitialSettings"
-            >
-                {{ t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
-            </p-text-button>
-            <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
-                                v-model:form-data="state.schemaFormData"
-                                :schema="state.widgetOptionsJsonSchema"
-                                :custom-error-map="inheritOptionsErrorMap"
-                                :validation-mode="widgetKey ? 'all' : 'input'"
-                                use-fixed-menu-style
-                                uniform-width
-                                :reference-handler="referenceHandler"
-                                class="widget-options-form"
-                                @validate="handleFormValidate"
-            >
-                <template #label-extra="{ propertyName }">
-                    <div class="inherit-toggle-button-wrapper">
-                        <span class="text"
-                              :class="{inherit: state.inheritableProperties.includes(propertyName)}"
-                        >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
-                        <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
-                                         :disabled="isInheritDisabled(propertyName)"
-                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
-                        />
-                    </div>
-                </template>
-                <template #input-extra="{ propertyName }">
-                    <p-icon-button v-if="!state.fixedProperties.includes(propertyName)"
-                                   class="delete-button"
-                                   shape="square"
-                                   style-type="negative-secondary"
-                                   name="ic_delete"
-                                   @click="handleDeleteProperty(propertyName)"
-                    />
-                </template>
-                <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && state.inheritableProperties.includes(propertyName)"
-                         class="dropdown-inner"
-                    >
-                        <span class="item-label">{{ selectedItem.label }}</span>
-                        <span class="suffix-text">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
-                    </div>
-                </template>
-            </p-json-schema-form>
-        </p-data-loader>
-        <dashboard-widget-more-options class="more-option-container"
-                                       :widget-config-id="widgetConfigId"
-                                       :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleSelectWidgetOptions"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-widget-input-form {

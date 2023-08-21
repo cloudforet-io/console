@@ -27,6 +27,7 @@
                      class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
+                     color="inherit transparent"
                 />
                 <a class="title">{{ item.title }}</a>
                 <div class="contents">
@@ -82,7 +83,7 @@ const state = reactive({
 .p-notice-alert {
     @apply bg-white shadow-2xl box-border border border-gray-200 rounded-lg;
     min-height: 10rem;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 8%);
     padding: 1.5rem;
     .title {
         @apply text-gray-900;
@@ -110,6 +111,9 @@ const state = reactive({
     }
     &.alert {
         @mixin notice-color, theme('colors.alert');
+        .item-type-icon {
+            @apply text-red-400;
+        }
     }
     &.warning {
         @mixin notice-color, theme('colors.yellow.500');

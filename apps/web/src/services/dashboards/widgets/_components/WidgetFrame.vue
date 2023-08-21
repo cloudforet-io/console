@@ -1,3 +1,115 @@
+<template>
+    <div class="widget-frame"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
+         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
+    >
+        <div class="widget-header">
+            <h3 class="title">
+                {{ props.title }}
+            </h3><slot name="header-right" />
+        </div>
+        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
+                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
+                       class="view-mode-button"
+                       name="ic_arrows-expand-all"
+                       shape="square"
+                       style-type="tertiary"
+                       @click="handleClickViewModeButton"
+        />
+        <div class="body"
+             :style="{overflowY: props.overflowY}"
+        >
+            <slot v-if="!props.errorMode" />
+            <div v-else
+                 class="error-container"
+            >
+                <div class="error-title">
+                    <span class="error-icon-wrapper">
+                        <p-i name="ic_error-filled"
+                             height="1.5rem"
+                             width="1.5rem"
+                             :color="red[400]"
+                        />
+                    </span>
+                    <span>{{ t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
+                </div>
+                <span class="error-message">
+                    {{ t("DASHBOARDS.WIDGET.ERROR_MSG") }}
+                </span>
+                <p-button class="edit-button"
+                          style-type="tertiary"
+                          @click="handleEditButtonClick"
+                >
+                    {{ t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
+                </p-button>
+            </div>
+        </div>
+        <div class="widget-footer">
+            <div class="widget-footer-wrapper">
+                <div class="footer-left">
+                    <label v-if="state.dateLabel"
+                           class="widget-footer-label"
+                    >{{ state.dateLabel }}</label>
+                    <p-divider v-if="state.isDivided"
+                               :vertical="true"
+                    />
+                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <p-divider v-if="props.nonInheritOptionsTooltipText"
+                               :vertical="true"
+                    />
+                    <p-tooltip v-if="props.nonInheritOptionsTooltipText"
+                               class="widget-non-inherit-tooltip"
+                               :contents="props.nonInheritOptionsTooltipText"
+                    >
+                        <p-i name="ic_warning-filled"
+                             width="1rem"
+                             height="1rem"
+                             color="inherit"
+                        />
+                    </p-tooltip>
+                </div>
+                <div class="footer-right">
+                    <slot name="footer-right">
+                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
+                                  :href="props.widgetLink"
+                                  :to="props.widgetLocation"
+                                  class="anchor-button"
+                                  icon-name="ic_chevron-right"
+                        >
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
+                        </p-anchor>
+                    </slot>
+                </div>
+            </div>
+        </div>
+        <div v-if="props.editMode"
+             class="edit-mode-cover"
+        >
+            <div class="button-group">
+                <template v-for="icon in state.editModeIconButtonList">
+                    <p-icon-button v-if="icon.isAvailable"
+                                   :key="`${icon.name}-${getUUID()}`"
+                                   :name="icon.name"
+                                   shape="square"
+                                   style-type="tertiary"
+                                   @click="icon.handleClick"
+                    />
+                </template>
+            </div>
+        </div>
+        <delete-modal v-model:visible="state.visibleDeleteModal"
+                      :header-title="t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
+                      @confirm="handleDeleteModalConfirm"
+        />
+        <dashboard-widget-edit-modal v-model:visible="state.visibleEditModal"
+                                     :widget-config-id="props.widgetConfigId"
+                                     :widget-key="props.widgetKey"
+                                     @refresh="handleRefresh"
+        />
+    </div>
+</template>
+
 <script setup lang="ts">
 import {
     PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
@@ -7,20 +119,53 @@ import {
     reactive, computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-
+import type { TranslateResult } from 'vue-i18n';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { red } from '@/styles/colors';
+
+import type { DateRange } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/type';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+
+interface WidgetFrameProps {
+    title: TranslateResult;
+    size: WidgetSize;
+    width?: number;
+    widgetLink?: string;
+    widgetLocation?: Location;
+    widgetConfigId?: string;
+    dateRange?: DateRange;
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
+    currency?: Currency;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
+    disableViewMode?: boolean;
+    isOnlyFullSize?: boolean;
+    widgetKey: string;
+    overflowY?: string;
+    refreshOnResize?: boolean;
+    theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
+}
 
 interface IconConfig {
     isAvailable: boolean;
@@ -105,9 +250,6 @@ const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
 };
-const handleRefresh = () => {
-    emit('refresh');
-};
 const handleClickViewModeButton = () => {
     widgetFormStore.$patch({
         widgetKey: props.widgetKey,
@@ -118,118 +260,6 @@ const handleClickViewModeButton = () => {
     });
 };
 </script>
-
-<template>
-    <div class="widget-frame"
-         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
-    >
-        <div class="widget-header">
-            <h3 class="title">
-                {{ props.title }}
-            </h3><slot name="header-right" />
-        </div>
-        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
-                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
-                       class="view-mode-button"
-                       name="ic_arrows-expand-all"
-                       shape="square"
-                       style-type="tertiary"
-                       @click="handleClickViewModeButton"
-        />
-        <div class="body"
-             :style="{overflowY: props.overflowY}"
-        >
-            <slot v-if="!props.errorMode" />
-            <div v-else
-                 class="error-container"
-            >
-                <div class="error-title">
-                    <span class="error-icon-wrapper">
-                        <p-i name="ic_error-filled"
-                             height="1.5rem"
-                             width="1.5rem"
-                             color="inherit"
-                        />
-                    </span>
-                    <span>{{ t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
-                </div>
-                <span class="error-message">
-                    {{ t("DASHBOARDS.WIDGET.ERROR_MSG") }}
-                </span>
-                <p-button class="edit-button"
-                          style-type="tertiary"
-                          @click="handleEditButtonClick"
-                >
-                    {{ t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
-                </p-button>
-            </div>
-        </div>
-        <div class="widget-footer">
-            <div class="widget-footer-wrapper">
-                <div class="footer-left">
-                    <label v-if="state.dateLabel"
-                           class="widget-footer-label"
-                    >{{ state.dateLabel }}</label>
-                    <p-divider v-if="state.isDivided"
-                               :vertical="true"
-                    />
-                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
-                    <p-divider v-if="props.nonInheritOptionsTooltipText"
-                               :vertical="true"
-                    />
-                    <p-tooltip v-if="props.nonInheritOptionsTooltipText"
-                               class="widget-non-inherit-tooltip"
-                               :contents="props.nonInheritOptionsTooltipText"
-                    >
-                        <p-i name="ic_warning-filled"
-                             width="1rem"
-                             height="1rem"
-                             color="inherit"
-                        />
-                    </p-tooltip>
-                </div>
-                <div class="footer-right">
-                    <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
-                                  :href="props.widgetLink"
-                                  :to="props.widgetLocation"
-                                  class="anchor-button"
-                                  icon-name="ic_chevron-right"
-                        >
-                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        </p-anchor>
-                    </slot>
-                </div>
-            </div>
-        </div>
-        <div v-if="props.editMode"
-             class="edit-mode-cover"
-        >
-            <div class="button-group">
-                <template v-for="icon in state.editModeIconButtonList">
-                    <p-icon-button v-if="icon.isAvailable"
-                                   :key="`${icon.name}-${getUUID()}`"
-                                   :name="icon.name"
-                                   shape="square"
-                                   style-type="tertiary"
-                                   @click="icon.handleClick"
-                    />
-                </template>
-            </div>
-        </div>
-        <delete-modal v-model:visible="state.visibleDeleteModal"
-                      :header-title="t('DASHBOARDS.WIDGET.DELETE_TITLE')"
-                      :contents="t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
-                      @confirm="handleDeleteModalConfirm"
-        />
-        <dashboard-widget-edit-modal v-model:visible="state.visibleEditModal"
-                                     :widget-config-id="props.widgetConfigId"
-                                     :widget-key="props.widgetKey"
-                                     @refresh="handleRefresh"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .widget-frame {

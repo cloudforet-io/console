@@ -101,8 +101,6 @@ const handleClose = () => {
     min-width: 40rem;
 
     .input-form {
-        margin-top: 2rem;
-        min-height: calc(50vh - 5.625rem);
         .collector-options-form {
             margin-top: 2rem;
         }

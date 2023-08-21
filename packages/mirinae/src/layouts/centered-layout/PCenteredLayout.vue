@@ -5,11 +5,43 @@
         >
             <slot name="top-contents" />
         </div>
-        <div class="layout-contents-wrapper">
-            <slot />
+        <div ref="layoutWrapperRef"
+             class="layout-contents-wrapper"
+             :class="{ 'contents-over-wrapper': isContentsOverWrapper }"
+        >
+            <div ref="layoutContentsRef"
+                 class="layout-contents"
+            >
+                <slot />
+            </div>
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const layoutWrapperRef = ref<HTMLElement|null>(null);
+const layoutContentsRef = ref<HTMLElement|null>(null);
+const isContentsOverWrapper = ref(false);
+
+const observer = new ResizeObserver((entries) => {
+    if (!layoutWrapperRef.value) return;
+    const wrapperClientHeight = layoutWrapperRef.value.clientHeight;
+    if (entries[0].target.scrollHeight > wrapperClientHeight) {
+        isContentsOverWrapper.value = true;
+    } else {
+        isContentsOverWrapper.value = false;
+    }
+});
+
+onMounted(() => {
+    if (layoutContentsRef.value) observer.observe(layoutContentsRef.value);
+});
+onUnmounted(() => {
+    observer.disconnect();
+});
+</script>
 
 <style lang="postcss">
 .p-centered-layout {
@@ -44,6 +76,14 @@
         overflow-y: auto;
         min-width: 360px;
         padding: 2rem 2.5rem;
+        &.contents-over-wrapper {
+            justify-content: flex-start;
+        }
+        .layout-contents {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+        }
     }
 }
 </style>

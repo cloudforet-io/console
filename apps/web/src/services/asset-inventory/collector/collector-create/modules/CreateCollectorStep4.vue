@@ -1,3 +1,54 @@
+<template>
+    <div class="collector-page-4">
+        <collector-schedule-form disable-loading />
+        <div class="step-footer">
+            <p-text-button icon-left="ic_chevron-left"
+                           style-type="highlight"
+                           class="step-left-text-button"
+                           @click="handleClickOtherPluginButton"
+            >
+                {{ t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
+            </p-text-button>
+            <div class="right-area">
+                <p-button icon-left="ic_arrow-left"
+                          style-type="transparent"
+                          size="lg"
+                          @click="handleClickPrevButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
+                </p-button>
+                <p-button :disabled="!state.isAbleToCreateCollector"
+                          size="lg"
+                          :loading="state.createLoading"
+                          @click="handleClickCreateButton"
+                >
+                    {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
+                </p-button>
+            </div>
+        </div>
+        <delete-modal v-model:visible="state.deleteModalVisible"
+                      :header-title="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
+                      :contents="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
+                      size="sm"
+                      @confirm="handleClose"
+        />
+        <p-button-modal v-model:visible="state.visibleCreateCompleteModal"
+                        :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
+                        :loading="state.collectLoading"
+                        @confirm="handleConfirmCreateCollector"
+                        @cancel="goToCollectorDetailPage"
+                        @close="goToCollectorDetailPage"
+        >
+            <template #close-button>
+                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
+            </template>
+            <template #confirm-button>
+                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_COLLECT') }}
+            </template>
+        </p-button-modal>
+    </div>
+</template>
+
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -60,7 +111,6 @@ const handleClickCreateButton = async () => {
             },
             secret_filter: {
                 state: collectorFormState.attachedServiceAccountType === 'all' ? 'DISABLED' : 'ENABLED',
-                service_accounts: collectorFormStore.serviceAccounts,
             },
             schedule: {
                 state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
@@ -68,6 +118,12 @@ const handleClickCreateButton = async () => {
             },
             tags: collectorFormState.tags,
         };
+        const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
+            service_accounts: collectorFormStore.serviceAccounts,
+        } : {
+            exclude_service_accounts: collectorFormStore.serviceAccounts,
+        };
+        Object.assign(params.secret_filter ?? {}, serviceAccountParams);
         const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
@@ -116,62 +172,7 @@ const goToCollectorDetailPage = () => {
     }
 };
 
-(() => {
-})();
 </script>
-
-<template>
-    <div class="collector-page-4">
-        <collector-schedule-form enable-hours-edit
-                                 disable-loading
-        />
-        <div class="step-footer">
-            <p-text-button icon-left="ic_chevron-left"
-                           style-type="highlight"
-                           class="step-left-text-button"
-                           @click="handleClickOtherPluginButton"
-            >
-                {{ t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
-            </p-text-button>
-            <div class="right-area">
-                <p-button icon-left="ic_arrow-left"
-                          style-type="transparent"
-                          size="lg"
-                          @click="handleClickPrevButton"
-                >
-                    {{ t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
-                </p-button>
-                <p-button :disabled="!state.isAbleToCreateCollector"
-                          size="lg"
-                          :loading="state.createLoading"
-                          @click="handleClickCreateButton"
-                >
-                    {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_NEW_COLLECTOR') }}
-                </p-button>
-            </div>
-        </div>
-        <delete-modal v-model:visible="state.deleteModalVisible"
-                      :header-title="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_TITLE')"
-                      :contents="t('INVENTORY.COLLECTOR.CREATE.PREV_MODAL_CONTENT')"
-                      size="sm"
-                      @confirm="handleClose"
-        />
-        <p-button-modal v-model:visible="state.visibleCreateCompleteModal"
-                        :header-title="t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_TITLE')"
-                        :loading="state.collectLoading"
-                        @confirm="handleConfirmCreateCollector"
-                        @cancel="goToCollectorDetailPage"
-                        @close="goToCollectorDetailPage"
-        >
-            <template #close-button>
-                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
-            </template>
-            <template #confirm-button>
-                {{ t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_COLLECT') }}
-            </template>
-        </p-button-modal>
-    </div>
-</template>
 
 <style scoped lang="postcss">
 .collector-page-4 {
@@ -183,7 +184,7 @@ const goToCollectorDetailPage = () => {
 
         .right-area {
             @apply flex items-center;
-            :first-child {
+            & > :first-child {
                 margin-right: 1rem;
             }
         }

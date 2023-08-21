@@ -1,153 +1,11 @@
-<script setup lang="ts">
-import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
-} from '@spaceone/design-system';
-import { useEventListener } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
-import {
-    computed, nextTick, reactive, ref, watch,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
-
-import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/template-list';
-import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-
-const DOMAIN_SCOPE_NAME = 'Workspace';
-const emit = defineEmits(['set-template']);
-
-type DashboardTemplateBoardSet = DashboardConfig & { value: string };
-
-const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
-type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
-interface Props {
-    dashboardScope: DashboardScope;
-}
-
-const props = defineProps<Props>();
-const router = useRouter();
-const store = useStore();
-const { t } = useI18n();
-
-const templateContainerRef = ref<HTMLElement | null>(null);
-const state = reactive({
-    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
-    searchValue: '',
-    hideBlur: false,
-});
-
-const defaultTemplateState = reactive({
-    thisPage: 1,
-    allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
-        const regex = getTextHighlightRegex(state.searchValue);
-        return Object.values(DASHBOARD_TEMPLATES)
-            .map((d: DashboardConfig) => ({
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
-            }))
-            .filter((d) => regex.test(d.name))
-            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
-    }),
-});
-const existingTemplateState = reactive({
-    thisPage: 1,
-    allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
-        .map((d: DomainDashboardModel & ProjectDashboardModel) => {
-            const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
-            return {
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
-                groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
-            };
-        })
-        .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
-    projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    groupLabel: computed<string>(() => {
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return DOMAIN_SCOPE_NAME;
-        return '';
-    }),
-    dashboards: computed<DashboardModel[]>(() => {
-        let dashboardItems;
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) dashboardItems = store.state.dashboard.domainItems;
-        else dashboardItems = store.state.dashboard.projectItems;
-
-        return dashboardItems.filter((d) => d.name.includes(state.searchValue));
-    }),
-
-});
-
-const handleOpenDashboardNewTab = (board: DashboardModel) => {
-    const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
-    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    const { href } = router.resolve({
-        name: routeName,
-        params: {
-            dashboardId: isProjectDashboard
-                ? (board as ProjectDashboardModel).project_dashboard_id
-                : (board as DomainDashboardModel).domain_dashboard_id,
-        },
-    });
-    window.open(href, '_blank');
-};
-
-const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
-    state.selectedTemplateName = selectedTemplate.value;
-    const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
-    emit('set-template', _selectedTemplate as DashboardModel);
-};
-
-const handleChangePagination = (page: number, type: TemplateType): void => {
-    if (type === TEMPLATE_TYPE.DEFAULT) defaultTemplateState.thisPage = page;
-    if (type === TEMPLATE_TYPE.EXISTING) existingTemplateState.thisPage = page;
-};
-
-const handleInputSearch = () => {
-    existingTemplateState.thisPage = 1;
-};
-
-// NOTE: This is to remove the blur effect when there's no scroll.
-useEventListener(templateContainerRef as MaybeRef, 'scroll', (e) => {
-    const eventTarget = (
-        e.target === document ? (e.target as Document).documentElement : e.target
-    ) as HTMLElement;
-    state.hideBlur = eventTarget.scrollTop + eventTarget.clientHeight >= eventTarget.scrollHeight - 1;
-});
-watch(() => state.searchValue, async () => {
-    if (templateContainerRef.value) {
-        await nextTick();
-        state.hideBlur = templateContainerRef.value.clientHeight >= templateContainerRef.value.scrollHeight;
-    }
-});
-
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('dashboard/loadProjectDashboard'),
-        store.dispatch('dashboard/loadDomainDashboard'),
-    ]);
-    await nextTick();
-    handleSelectTemplate(defaultTemplateState.boardSets[0]);
-})();
-</script>
-
 <template>
     <div class="dashboard-template-wrapper">
         <p-search v-model:value="state.searchValue"
                   @update:value="handleInputSearch"
         />
-        <div ref="templateContainerRef"
-             class="dashboard-template-container"
-             :class="{ 'overflow-blur':!state.hideBlur }"
+        <div
+            ref="templateContainerRef"
+            class="dashboard-template-container"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -258,22 +116,136 @@ watch(() => state.searchValue, async () => {
     </div>
 </template>
 
+<script setup lang="ts">
+import {
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
+} from '@spaceone/design-system';
+import {
+    computed, nextTick, reactive, ref,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+
+
+import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/template-list';
+import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
+const DOMAIN_SCOPE_NAME = 'Workspace';
+const emit = defineEmits(['set-template']);
+
+type DashboardTemplateBoardSet = DashboardConfig & { value: string };
+
+const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
+type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
+interface Props {
+    dashboardScope: DashboardScope;
+}
+
+const props = defineProps<Props>();
+const router = useRouter();
+const store = useStore();
+const { t } = useI18n();
+
+const templateContainerRef = ref<HTMLElement | null>(null);
+const state = reactive({
+    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
+    searchValue: '',
+});
+
+const defaultTemplateState = reactive({
+    thisPage: 1,
+    allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
+        const regex = getTextHighlightRegex(state.searchValue);
+        return Object.values(DASHBOARD_TEMPLATES)
+            .map((d: DashboardConfig) => ({
+                ...d,
+                // below values are used only for render
+                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
+            }))
+            .filter((d) => regex.test(d.name))
+            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
+    }),
+});
+const existingTemplateState = reactive({
+    thisPage: 1,
+    allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
+        .map((d: DomainDashboardModel & ProjectDashboardModel) => {
+            const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
+            return {
+                ...d,
+                // below values are used only for render
+                value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
+                groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
+            };
+        })
+        .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
+    projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    groupLabel: computed<string>(() => {
+        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return DOMAIN_SCOPE_NAME;
+        return '';
+    }),
+    dashboards: computed<DashboardModel[]>(() => {
+        let dashboardItems;
+        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) dashboardItems = store.state.dashboard.domainItems;
+        else dashboardItems = store.state.dashboard.projectItems;
+
+        return dashboardItems.filter((d) => d.name.includes(state.searchValue));
+    }),
+
+});
+
+const handleOpenDashboardNewTab = (board: DashboardModel) => {
+    const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
+    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+    const { href } = router.resolve({
+        name: routeName,
+        params: {
+            dashboardId: isProjectDashboard
+                ? (board as ProjectDashboardModel).project_dashboard_id
+                : (board as DomainDashboardModel).domain_dashboard_id,
+        },
+    });
+    window.open(href, '_blank');
+};
+
+const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
+    state.selectedTemplateName = selectedTemplate.value;
+    const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
+    emit('set-template', _selectedTemplate as DashboardModel);
+};
+
+const handleChangePagination = (page: number, type: TemplateType): void => {
+    if (type === TEMPLATE_TYPE.DEFAULT) defaultTemplateState.thisPage = page;
+    if (type === TEMPLATE_TYPE.EXISTING) existingTemplateState.thisPage = page;
+};
+
+const handleInputSearch = () => {
+    existingTemplateState.thisPage = 1;
+};
+
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('dashboard/loadProjectDashboard'),
+        store.dispatch('dashboard/loadDomainDashboard'),
+    ]);
+    await nextTick();
+    handleSelectTemplate(defaultTemplateState.boardSets[0]);
+})();
+</script>
+
 <style lang="postcss" scoped>
 .dashboard-template-wrapper {
     @apply relative;
     .dashboard-template-container {
         @apply overflow-auto;
-        max-height: calc(100vh - 22.85rem);
-        min-height: 40vh;
-        &.overflow-blur {
-            &::after {
-                @apply w-full absolute;
-                height: 2.5rem;
-                content: '';
-                bottom: 0;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0%) 0%, #fff 100%);
-            }
-        }
         .card-container {
             @apply mt-6;
         }
@@ -316,21 +288,6 @@ watch(() => state.searchValue, async () => {
             .dashboard-name {
                 margin: 0.375rem 0;
             }
-
-            @screen tablet {
-                .content-layout {
-                    @apply relative items-start;
-                    padding-left: 3.25rem;
-                    min-height: 2.5rem;
-                    .p-i-icon {
-                        @apply absolute;
-                        left: 0;
-                    }
-                }
-                .dashboard-name {
-                    margin: 0;
-                }
-            }
         }
 
         .existing-dashboard-board {
@@ -341,6 +298,27 @@ watch(() => state.searchValue, async () => {
             }
             .p-board {
                 min-height: 4.125rem;
+            }
+        }
+    }
+
+    @screen tablet {
+        .dashboard-template-container {
+            .default-dashboard-board {
+                .content-layout {
+                    @apply relative items-start;
+                    padding-left: 3.25rem;
+                    min-height: 2.5rem;
+
+                    .p-i-icon {
+                        @apply absolute;
+                        left: 0;
+                    }
+                }
+
+                .dashboard-name {
+                    margin: 0;
+                }
             }
         }
     }

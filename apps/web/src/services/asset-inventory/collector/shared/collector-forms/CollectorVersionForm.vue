@@ -16,7 +16,7 @@ const props = defineProps<{
     getVersionsOnPluginIdChange?: boolean;
 }>();
 
-const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
+const emit = defineEmits<{(event: 'update:is-version-valid', value: boolean): void;
 }>();
 const { t } = useI18n();
 
@@ -33,7 +33,7 @@ const state = reactive({
         }
         return '';
     }),
-    isVersionValid: computed(() => !state.versionInvalidText),
+    isVersionValid: computed(() => !state.versionInvalidText || collectorFormState.autoUpgrade),
 });
 
 const initSelectedVersion = () => {
@@ -65,7 +65,7 @@ const handleClickAutoUpgrade = () => {
 };
 
 watch(() => state.isVersionValid, (value) => {
-    emit('update:isVersionValid', value);
+    emit('update:is-version-valid', value);
 }, { immediate: true });
 
 // get version list when pluginId changed and init selected version
@@ -109,6 +109,7 @@ watch(() => state.pluginId, async (pluginId) => {
 <style lang="postcss" scoped>
 .collector-version-form {
     margin: 1.5rem 0;
+    max-width: 728px;
 
     .label-row {
         @apply flex justify-between;

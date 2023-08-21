@@ -28,6 +28,7 @@
                                     <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
                                          class="header-img"
+                                         color="inherit transparent"
                                     />
                                     {{ headerTitle }}
                                 </div>
@@ -245,7 +246,7 @@ const onConfirmClick = () => {
         box-shadow: 0 0 0.5rem rgba(theme('colors.gray.900'), 0.32);
         transition: all 0.3s ease;
         justify-content: space-between;
-        padding: 2rem 2rem;
+        padding: 2rem;
 
         &.no-footer {
             padding-bottom: 2.5rem;
@@ -270,6 +271,9 @@ const onConfirmClick = () => {
                 &.alert-header {
                     @apply relative;
                     text-indent: 2rem;
+                    .modal-alert {
+                        @apply text-red-400;
+                    }
                 }
             }
 

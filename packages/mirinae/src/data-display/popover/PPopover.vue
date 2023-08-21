@@ -18,8 +18,8 @@
                 <p-icon-button name="ic_close"
                                color="inherit"
                                size="sm"
-                               class="delete-icon"
-                               @click="handleClickDeleteIcon"
+                               class="close-icon"
+                               @click="handleClickCloseIcon"
                 />
             </div>
             <div class="arrow"
@@ -30,49 +30,33 @@
 </template>
 
 <script setup lang="ts">
-
 import type { Instance } from '@popperjs/core';
 import { createPopper } from '@popperjs/core';
 import { onClickOutside } from '@vueuse/core';
 import {
-    onMounted, onUnmounted, reactive, ref, useAttrs,
+    onMounted, onUnmounted, reactive, ref, useAttrs, watch, computed,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import type { PopoverPlacement, PopoverTrigger } from '@/data-display/popover/type';
 import { POPOVER_PLACEMENT, POPOVER_TRIGGER } from '@/data-display/popover/type';
-import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-const props = defineProps({
-    isVisible: {
-        type: Boolean,
-        default: false,
-    },
-    tag: {
-        type: String,
-        default: 'span',
-    },
-    position: {
-        type: String as PropType<PopoverPlacement>,
-        validator(value?: PopoverPlacement) {
-            if (value === undefined) return true;
-            return Object.values(POPOVER_PLACEMENT).includes(value);
-        },
-        default: POPOVER_PLACEMENT.BOTTOM_END,
-    },
-    trigger: {
-        type: String as PropType<PopoverTrigger>,
-        validator(value?: PopoverTrigger) {
-            if (value === undefined) return true;
-            return Object.values(POPOVER_TRIGGER).includes(value);
-        },
-        default: POPOVER_TRIGGER.CLICK,
-    },
-    ignoreTargetClick: {
-        type: Boolean,
-        default: false,
-    },
+interface PopoverProps {
+    isVisible: boolean;
+    tag: string;
+    position?: PopoverPlacement;
+    trigger?: PopoverTrigger;
+    ignoreTargetClick?: boolean;
+    ignoreOutsideClick?: boolean;
+}
+
+const props = withDefaults(defineProps<PopoverProps>(), {
+    isVisible: false,
+    tag: 'span',
+    position: POPOVER_PLACEMENT.BOTTOM_END,
+    trigger: POPOVER_TRIGGER.CLICK,
+    ignoreTargetClick: false,
+    ignoreOutsideClick: false,
 });
 
 const emit = defineEmits<{(e: 'update:is-visible', value: boolean): void}>();
@@ -82,69 +66,91 @@ const listeners = {
     ...attrs,
 };
 
+let popperObject: Instance|undefined;
 const popoverRef = ref<HTMLElement|null>(null);
 const contentRef = ref<HTMLElement|null>(null);
 const targetRef = ref<HTMLElement|null>(null);
+
 const state = reactive({
-    proxyIsVisible: useProxyValue('isVisible', props, emit),
-    popperObject: {} as Instance,
+    proxyIsVisible: false,
+    popperOptions: computed(() => ({
+        placement: props.position,
+        modifiers: [
+            {
+                name: 'offset',
+                options: {
+                    offset: [0, 21],
+                },
+            },
+        ],
+    })),
 });
-const hidePopover = () => {
-    state.proxyIsVisible = false;
-    return contentRef.value?.removeAttribute('data-show');
+const updateIsVisible = (visible: boolean, emitEvent = true) => {
+    state.proxyIsVisible = visible;
+    if (emitEvent) emit('update:is-visible', visible);
 };
-const showPopover = () => {
-    // eslint-disable-next-line no-unused-expressions
+const hidePopover = (emitEvent = true) => {
+    contentRef.value?.removeAttribute('data-show');
+    popperObject?.setOptions({ placement: props.position });
+    popperObject?.update();
+    updateIsVisible(false, emitEvent);
+};
+const showPopover = (emitEvent = true) => {
     contentRef.value?.setAttribute('data-show', '');
-    state.popperObject.update();
-    return state.popperObject?.setOptions({ placement: props.position });
+    popperObject?.setOptions({ placement: props.position });
+    popperObject?.update();
+    updateIsVisible(true, emitEvent);
 };
 const handleClickTargetRef = (e) => {
-    state.proxyIsVisible = !state.proxyIsVisible;
     if (props.ignoreTargetClick) e.stopPropagation();
-    return state.popperObject?.setOptions({ placement: props.position });
+    const value = !state.proxyIsVisible;
+    if (value) showPopover();
+    else hidePopover();
 };
-const handleClickDeleteIcon = () => {
+const handleClickCloseIcon = () => {
     hidePopover();
 };
 const handleClickOutside = () => {
+    if (!props.ignoreOutsideClick) {
+        hidePopover();
+    }
+};
+const handleTargetShowEvent = () => {
+    showPopover();
+};
+const handleTargetHideEvent = () => {
     hidePopover();
 };
 
-
-// eslint-disable-next-line no-undef
-const bindEventToTargetRef = (eventType: keyof HTMLElementEventMap, handler, useCature = false) => targetRef.value?.addEventListener(eventType, handler, useCature);
+const bindEventToTargetRef = (eventType, handler, useCapture = false) => targetRef.value?.addEventListener(eventType, handler, useCapture);
 const addEvent = () => {
     if (props.trigger === POPOVER_TRIGGER.CLICK) {
         bindEventToTargetRef('click', handleClickTargetRef, true);
     } else if (props.trigger === POPOVER_TRIGGER.HOVER) {
-        bindEventToTargetRef('mouseenter', showPopover);
-        bindEventToTargetRef('mouseleave', hidePopover);
+        bindEventToTargetRef('mouseenter', handleTargetShowEvent);
+        bindEventToTargetRef('mouseleave', handleTargetHideEvent);
     } else if (props.trigger === POPOVER_TRIGGER.FOCUS) {
-        bindEventToTargetRef('focus', showPopover, true);
-        bindEventToTargetRef('blur', hidePopover, true);
+        bindEventToTargetRef('focus', handleTargetShowEvent, true);
+        bindEventToTargetRef('blur', handleTargetHideEvent, true);
     }
 };
 
 onMounted(() => {
     if (targetRef.value && contentRef.value) {
-        const popperObject = createPopper(targetRef.value, contentRef.value, {
-            placement: props.position,
-            modifiers: [
-                {
-                    name: 'offset',
-                    options: {
-                        offset: [0, 21],
-                    },
-                },
-            ],
-        });
-        if (popperObject) state.popperObject = popperObject;
+        popperObject = createPopper(targetRef.value, contentRef.value, state.popperOptions);
         addEvent();
+
+        watch(() => props.isVisible, (value) => {
+            if (state.proxyIsVisible === value) return;
+            state.proxyIsVisible = value;
+            if (value) showPopover(false);
+            else hidePopover(false);
+        }, { immediate: true });
     }
 });
 
-onUnmounted(() => state.popperObject?.destroy());
+onUnmounted(() => popperObject?.destroy());
+
 onClickOutside(popoverRef, handleClickOutside);
 
 </script>
@@ -163,7 +169,7 @@ onClickOutside(popoverRef, handleClickOutside);
         > .popper-content-wrapper {
             @apply flex w-full;
 
-            .delete-icon {
+            .close-icon {
                 margin: 0.5rem;
             }
         }

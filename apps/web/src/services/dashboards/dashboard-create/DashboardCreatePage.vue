@@ -1,3 +1,91 @@
+<template>
+    <div class="dashboard-create-page"
+         :class="`step-${currentStep}`"
+    >
+        <div v-if="currentStep === steps[0].step">
+            <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
+            />
+            <dashboard-scope-form v-model:dashboard-scope="dashboardScope"
+                                  @set-project="setForm('dashboardProject', $event)"
+            />
+            <dashboard-viewer-form v-model:dashboard-viewer-type="dashboardViewerType" />
+            <div class="button-area">
+                <p-button
+                    style-type="transparent"
+                    size="lg"
+                    @click="$router.go(-1)"
+                >
+                    {{ t('DASHBOARDS.CREATE.CANCEL') }}
+                </p-button>
+                <p-button
+                    style-type="primary"
+                    size="lg"
+                    :disabled="!isValid"
+                    @click="goStep('next')"
+                >
+                    {{ t('DASHBOARDS.CREATE.CONTINUE') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-if="currentStep === steps[1].step">
+            <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
+                                      :description="steps[currentStep - 1].description"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
+            />
+            <dashboard-template-form
+                :dashboard-scope="dashboardScope"
+                @set-template="setForm('dashboardTemplate', $event)"
+            />
+            <div class="button-area">
+                <p-button
+                    style-type="transparent"
+                    size="lg"
+                    icon-left="ic_arrow-left"
+                    @click="goStep('prev')"
+                >
+                    {{ t('DASHBOARDS.CREATE.GO_BACK') }}
+                </p-button>
+                <p-button
+                    style-type="primary"
+                    size="lg"
+                    :disabled="!isAllValid"
+                    @click="goStep('next')"
+                >
+                    {{ t('DASHBOARDS.CREATE.CONTINUE') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-if="currentStep === steps[2].step">
+            <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
+                                      :total-steps="steps.length"
+                                      :current-step="currentStep"
+                                      show-step
+                                      show-close-button
+                                      @close="handleClickClose"
+            />
+            <dashboard-customize :loading="loading"
+                                 :save-button-text="t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
+                                 hide-cancel-button
+                                 @go-back="goStep('prev')"
+                                 @save="createDashboard"
+            />
+        </div>
+        <confirm-back-modal v-model:visible="closeConfirmModalVisible"
+                            @confirm="handleClickBackButton"
+        />
+    </div>
+</template>
+
 <script lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -190,127 +278,16 @@ export default {
 };
 </script>
 
-<template>
-    <div class="dashboard-create-page"
-         :class="`step-${currentStep}`"
-    >
-        <template v-if="currentStep === steps[0].step">
-            <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="steps[currentStep - 1].description"
-                                      :total-steps="steps.length"
-                                      :current-step="currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-scope-form v-model:dashboard-scope="dashboardScope"
-                                  @set-project="setForm('dashboardProject', $event)"
-            />
-            <dashboard-viewer-form v-model:dashboard-viewer-type="dashboardViewerType" />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    @click="$router.go(-1)"
-                >
-                    {{ t('DASHBOARDS.CREATE.CANCEL') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!isValid"
-                    @click="goStep('next')"
-                >
-                    {{ t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </template>
-        <template v-if="currentStep === steps[1].step">
-            <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="steps[currentStep - 1].description"
-                                      :total-steps="steps.length"
-                                      :current-step="currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-template-form
-                :dashboard-scope="dashboardScope"
-                @set-template="setForm('dashboardTemplate', $event)"
-            />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    icon-left="ic_arrow-left"
-                    @click="goStep('prev')"
-                >
-                    {{ t('DASHBOARDS.CREATE.GO_BACK') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!isAllValid"
-                    @click="goStep('next')"
-                >
-                    {{ t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </template>
-        <template v-if="currentStep === steps[2].step">
-            <div class="dashboard-customize-wrapper">
-                <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                          :total-steps="steps.length"
-                                          :current-step="currentStep"
-                                          show-step
-                                          show-close-button
-                                          @close="handleClickClose"
-                />
-                <dashboard-customize :loading="loading"
-                                     :save-button-text="t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
-                                     hide-cancel-button
-                                     @go-back="goStep('prev')"
-                                     @save="createDashboard"
-                />
-            </div>
-        </template>
-        <confirm-back-modal v-model:visible="closeConfirmModalVisible"
-                            @confirm="handleClickBackButton"
-        />
-    </div>
-</template>
-
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    &.step-1 {
-        @apply w-full h-full;
-        max-width: 30rem;
-
-        @screen tablet {
-            @apply w-full;
-        }
-    }
     &.step-2 {
-        width: 62.5rem;
-
-        @screen tablet {
-            @apply w-full;
-
-            .button-area {
-                @apply flex-col w-full mt-4;
-            }
-        }
+        width: 100%;
+        max-width: 1000px;
     }
     &.step-3 {
-        .dashboard-customize-wrapper {
-            width: 100%;
-            height: 100%;
-        }
+        width: 100%;
+        height: 100%;
+        min-height: calc(100vh - 8rem);
     }
     .button-area {
         @apply flex justify-end mt-8 gap-4;

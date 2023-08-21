@@ -1,3 +1,68 @@
+<template>
+    <div class="tags-input-group">
+        <slot name="add-button"
+              :disabled="disabled"
+              :handle-add-pair="handleAddPair"
+        >
+            <p-button class="add-button"
+                      style-type="secondary"
+                      icon-left="ic_plus_bold"
+                      @click="handleAddPair"
+            >
+                <span>{{ isAdministration ? t('COMMON.TAGS.ADD') : t('COMMON.TAGS.ADD_TAG') }}</span>
+            </p-button>
+        </slot>
+        <div v-if="showHeader"
+             class="tag-header"
+        >
+            <div class="key">
+                <span>{{ t('COMMON.COMPONENTS.TAGS.KEY') }}</span>
+            </div>
+            <div class="value">
+                <span>{{ t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
+            </div>
+        </div>
+        <div :class="isAdministration && 'is-administration'">
+            <div v-for="(item, idx) in state.items"
+                 :key="idx"
+                 class="tags-group"
+            >
+                <p-field-group :invalid-text="state.keyValidations[idx].message"
+                               :invalid="showValidation && !state.keyValidations[idx].isValid"
+                               class="input-box key"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="item.key"
+                                      :invalid="invalid"
+                                      :placeholder="t('COMMON.COMPONENTS.TAGS.KEY')"
+                                      :disabled="disabled"
+                                      @update:value="handleInputKey(idx, ...arguments)"
+                        />
+                    </template>
+                </p-field-group>
+                <span class="split">:</span>
+                <p-field-group :invalid-text="state.valueValidations[idx].message"
+                               :invalid="showValidation && !state.valueValidations[idx].isValid"
+                               class="input-box value"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="item.value"
+                                      :invalid="invalid"
+                                      :placeholder="t('COMMON.COMPONENTS.TAGS.VALUE')"
+                                      :disabled="disabled"
+                                      @update:value="handleInputValue(idx, ...arguments)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-icon-button name="ic_close"
+                               :disabled="disabled"
+                               @click="handleDeletePair(idx)"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -85,7 +150,7 @@ const state = reactive({
 
 /* Event */
 const handleAddPair = () => {
-    state.items = [...state.items, { key: '', value: '' }];
+    state.items.push({ key: '', value: '' });
 };
 const handleDeletePair = (idx: number) => {
     const _items = [...state.items];
@@ -117,71 +182,6 @@ const stopTagInit = watch(() => props.tags, (tags) => {
 });
 
 </script>
-
-<template>
-    <div class="tags-input-group">
-        <slot name="add-button"
-              :disabled="disabled"
-              :handle-add-pair="handleAddPair"
-        >
-            <p-button class="add-button"
-                      style-type="secondary"
-                      icon-left="ic_plus_bold"
-                      @click="handleAddPair"
-            >
-                <span>{{ isAdministration ? t('COMMON.TAGS.ADD') : t('COMMON.TAGS.ADD_TAG') }}</span>
-            </p-button>
-        </slot>
-        <div v-if="showHeader"
-             class="tag-header"
-        >
-            <div class="key">
-                <span>{{ t('COMMON.COMPONENTS.TAGS.KEY') }}</span>
-            </div>
-            <div class="value">
-                <span>{{ t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
-            </div>
-        </div>
-        <div :class="isAdministration && 'is-administration'">
-            <div v-for="(item, idx) in state.items"
-                 :key="idx"
-                 class="tags-group"
-            >
-                <p-field-group :invalid-text="state.keyValidations[idx].message"
-                               :invalid="showValidation && !state.keyValidations[idx].isValid"
-                               class="input-box key"
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :value="item.key"
-                                      :invalid="invalid"
-                                      :placeholder="t('COMMON.COMPONENTS.TAGS.KEY')"
-                                      :disabled="disabled"
-                                      @update:value="handleInputKey(idx, ...arguments)"
-                        />
-                    </template>
-                </p-field-group>
-                <span class="split">:</span>
-                <p-field-group :invalid-text="state.valueValidations[idx].message"
-                               :invalid="showValidation && !state.valueValidations[idx].isValid"
-                               class="input-box value"
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :value="item.value"
-                                      :invalid="invalid"
-                                      :placeholder="t('COMMON.COMPONENTS.TAGS.VALUE')"
-                                      :disabled="disabled"
-                                      @update:value="handleInputValue(idx, ...arguments)"
-                        />
-                    </template>
-                </p-field-group>
-                <p-icon-button name="ic_close"
-                               :disabled="disabled"
-                               @click="handleDeletePair(idx)"
-                />
-            </div>
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .tags-input-group {

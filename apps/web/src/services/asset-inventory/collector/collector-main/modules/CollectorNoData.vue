@@ -7,6 +7,7 @@ import { SpaceRouter } from '@/router';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const { t } = useI18n();
+
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };

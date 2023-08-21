@@ -1,3 +1,41 @@
+<template>
+    <div class="gnb-noti-item">
+        <p v-if="dateHeader"
+           class="date-header"
+        >
+            {{ dateHeader }}
+        </p>
+        <div class="item-wrapper"
+             @click="handleClickItem"
+        >
+            <span class="new-icon"
+                  :class="{ invisible: isRead }"
+            />
+            <div class="contents-wrapper">
+                <p class="title">
+                    <p-i v-if="icon"
+                         :name="icon"
+                         :color="iconColor"
+                         width="1rem"
+                         height="1rem"
+                         class="mr-1"
+                    />
+                    <span>{{ title }}</span>
+                </p>
+                <div class="additional-text">
+                    {{ state.occurred }} <span v-if="writer">· {{ writer }}</span>
+                </div>
+            </div>
+            <p-icon-button v-if="deletable"
+                           class="delete-button"
+                           name="ic_close"
+                           size="sm"
+                           @click="handleClickDeleteButton"
+            />
+        </div>
+    </div>
+</template>
+
 <script lang="ts" setup>
 
 import {
@@ -9,6 +47,10 @@ import {
     reactive,
 } from 'vue';
 import { useStore } from 'vuex';
+
+import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/modules/gnb-noti/type';
+
+import { green, red, yellow } from '@/styles/colors';
 
 interface Props {
     isRead: boolean;
@@ -40,6 +82,19 @@ const state = reactive({
         if (!props.createdAt) return '';
         return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
     }),
+    iconColor: computed(() => {
+        if (props.icon === NOTIFICATION_TYPE_ICONS.SUCCESS) {
+            return green[500];
+        }
+        if (props.icon === NOTIFICATION_TYPE_ICONS.ERROR) {
+            return red[400];
+        }
+        if (props.icon === NOTIFICATION_TYPE_ICONS.WARNING) {
+            return yellow[500];
+        }
+        return undefined;
+    }),
+
 });
 
 /* Event */
@@ -52,43 +107,6 @@ const handleClickDeleteButton = (event) => {
 };
 
 </script>
-
-<template>
-    <div class="gnb-noti-item">
-        <p v-if="dateHeader"
-           class="date-header"
-        >
-            {{ dateHeader }}
-        </p>
-        <div class="item-wrapper"
-             @click="handleClickItem"
-        >
-            <span class="new-icon"
-                  :class="{ invisible: isRead }"
-            />
-            <div class="contents-wrapper">
-                <p class="title">
-                    <p-i v-if="icon"
-                         :name="icon"
-                         width="1rem"
-                         height="1rem"
-                         class="mr-1"
-                    />
-                    <span>{{ title }}</span>
-                </p>
-                <div class="additional-text">
-                    {{ state.occurred }} <span v-if="writer">· {{ writer }}</span>
-                </div>
-            </div>
-            <p-icon-button v-if="deletable"
-                           class="delete-button"
-                           name="ic_close"
-                           size="sm"
-                           @click="handleClickDeleteButton"
-            />
-        </div>
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .gnb-noti-item {
