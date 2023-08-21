@@ -25,7 +25,7 @@ const props = defineProps({
         },
     },
 });
-const emit = defineEmits<{(e: 'update:selectedUnit', value: BudgetTimeUnit): void}>();
+const emit = defineEmits<{(e: 'update:selected-unit', value: BudgetTimeUnit): void}>();
 const { t } = useI18n();
 
 const state = reactive({
@@ -45,7 +45,7 @@ const state = reactive({
 
 const handleUnitChange = (value?: BudgetTimeUnit) => {
     if (value && props.selectedUnit !== value) {
-        emit('update:selectedUnit', value);
+        emit('update:selected-unit', value);
     }
 };
 

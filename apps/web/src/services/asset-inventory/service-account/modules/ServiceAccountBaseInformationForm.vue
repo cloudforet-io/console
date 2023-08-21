@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     isValid: false,
     originForm: () => ({}) as BaseInformationForm,
 });
-const emit = defineEmits<{(e: 'update:isValid', value: boolean): void;
+const emit = defineEmits<{(e: 'update:is-valid', value: boolean): void;
     (e: 'change', value: BaseInformationForm): void;
 }>();
 const { t } = useI18n();
@@ -99,7 +99,7 @@ const handleAccountValidate = (isValid) => {
 
 /* Watcher */
 watch(() => state.isAllValid, (isAllValid) => {
-    emit('update:isValid', isAllValid);
+    emit('update:is-valid', isAllValid);
 });
 watch(() => state.formData, (formData) => {
     emit('change', formData);

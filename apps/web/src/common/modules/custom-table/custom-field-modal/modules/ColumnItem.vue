@@ -53,7 +53,7 @@ export default defineComponent({
     },
     model: {
         prop: 'selectedKeys',
-        event: 'update:selectedKeys',
+        event: 'update:selected-keys',
     },
     props: {
         item: {
