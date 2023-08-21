@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
     granularity: GRANULARITY.MONTHLY,
     printMode: false,
 });
-const emit = defineEmits<{(e: 'update:dateRange', value: DateRange): void;
+const emit = defineEmits<{(e: 'update:date-range', value: DateRange): void;
     (e: 'update', value: DateRange): void;
 }>();
 const { t } = useI18n();

@@ -14,7 +14,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/collector/shar
 
 
 
-const emits = defineEmits<{(event: 'update:isValid', value: boolean): void;
+const emits = defineEmits<{(event: 'update:is-valid', value: boolean): void;
 }>();
 const store = useStore();
 const { t } = useI18n();
@@ -54,7 +54,7 @@ watch(name, (value) => {
 });
 
 watch(isAllValid, (value) => {
-    emits('update:isValid', value);
+    emits('update:is-valid', value);
 }, { immediate: true });
 
 (async () => {

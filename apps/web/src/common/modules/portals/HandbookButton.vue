@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
     tabs: () => [],
     activeTab: '',
 });
-const emit = defineEmits<{(e: 'update:activeTab', value: (TabItem|string)[]): void}>();
+const emit = defineEmits<{(e: 'update:active-tab', value: (TabItem|string)[]): void}>();
 const { t } = useI18n();
 const store = useStore();
 const slots = useSlots();
