@@ -3,7 +3,7 @@ import { h, useAttrs, useSlots } from 'vue';
 
 import { getBindClass } from '@/utils/functional-helpers';
 
-import { gray } from '@/styles/colors.cjs';
+import { gray } from '@/styles/colors';
 
 const isEmptyVNode = (nodes) => {
     if (!nodes) return true;

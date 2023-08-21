@@ -29,7 +29,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';
 import type { SelectButtonType, ButtonType } from '@/inputs/buttons/select-button-group/type';
 
-import { secondary } from '@/styles/colors.cjs';
+import { secondary } from '@/styles/colors';
 
 const props = defineProps({
     buttons: {

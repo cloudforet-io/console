@@ -2,7 +2,7 @@ import {
     isEmpty, get, toString, sortBy,
 } from 'lodash';
 
-import colors from '@/styles/colors.cjs';
+import colors from '@/styles/colors';
 
 /** @function
  * @name copyTextToClipboard

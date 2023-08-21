@@ -1,8 +1,8 @@
-import colors from '@/styles/colors.cjs';
+import { palette } from '@/styles/colors';
 
 const {
     blue, coral, gray, green, indigo, peacock, red, violet, yellow,
-} = colors.palette;
+} = palette;
 
 export const MASSIVE_CHART_COLORS = [
     violet[400], violet[600], blue[400], blue[600], coral[400], coral[600],

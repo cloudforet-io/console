@@ -136,7 +136,7 @@ const hasText = computed(() => !!anchorRef.value?.textContent);
     }
 
     &:not(.disabled) {
-        &:focus, &:active, &focus-within {
+        &:focus, &:active, &:focus-within {
             > .text {
                 @apply underline;
             }

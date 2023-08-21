@@ -45,7 +45,7 @@ import type { NoticeGroup, NoticePosition } from '@/feedbacks/alert/notice-alert
 import { NOTICE_GROUP, NOTICE_GROUP_POSITION_MAP } from '@/feedbacks/alert/notice-alert/config';
 import PI from '@/foundation/icons/PI.vue';
 
-import { safe } from '@/styles/colors.cjs';
+import { safe } from '@/styles/colors';
 
 /**
  * Used library: vue-notification

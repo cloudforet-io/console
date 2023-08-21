@@ -52,7 +52,7 @@ import { getValueByPath } from '@/data-display/dynamic/helper';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
 import { getContextKey } from '@/utils/helpers';
 
-import { palette } from '@/styles/colors.cjs';
+import { palette } from '@/styles/colors';
 
 const themeColorMap: Record<DynamicChartTheme, string> = {
     VIOLET: palette.violet[400],

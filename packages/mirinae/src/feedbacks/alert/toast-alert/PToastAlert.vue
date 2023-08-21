@@ -69,7 +69,7 @@ import {
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 
-import { safe } from '@/styles/colors.cjs';
+import { safe } from '@/styles/colors';
 
 /**
  * Used library: vue-notification

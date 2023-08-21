@@ -7,7 +7,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { drawSeriesTooltip } from '@/data-display/dynamic/dynamic-chart/helper';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { palette } from '@/styles/colors.cjs';
+import { palette } from '@/styles/colors';
 
 const drawSeriesLabelBullet = (series: TreeMapSeries, nameOptions: DynamicField, totalValue: number): LabelBullet => {
     const labelBullet = series.bullets.push(new LabelBullet());
