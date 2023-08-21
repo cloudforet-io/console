@@ -67,7 +67,6 @@ import {
     computed, reactive, toRef, watch, useAttrs, ref, toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { TranslateResult } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
@@ -83,6 +82,7 @@ const PContextMenu = () => ({
 
 const props = withDefaults(defineProps<SearchProps>(), {
     value: '',
+    visibleMenu: undefined,
     disableIcon: false,
     invalid: false,
     disabled: false,
@@ -95,7 +95,7 @@ const props = withDefaults(defineProps<SearchProps>(), {
 });
 const emit = defineEmits([
     'update:value',
-    'update:visibleMenu',
+    'update:visible-menu',
     'show-menu',
     'hide-menu',
     'search',
@@ -110,7 +110,7 @@ const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
     inputRef: null as null|HTMLElement,
     handlerLoading: true,
-    placeholderText: computed<TranslateResult>(() => {
+    placeholderText: computed<string>(() => {
         if (props.placeholder === undefined) return t('COMPONENT.SEARCH.PLACEHOLDER');
         return props.placeholder;
     }),
@@ -268,7 +268,7 @@ onClickOutside(containerRef, hideMenu);
         &.focused, &:focus-within {
             @apply border-secondary bg-blue-100;
         }
-        &:hover:not(.invalid, .disabled) {
+        &:hover:not(.invalid):not(.disabled) {
             @apply border-secondary;
         }
         .input-wrapper {

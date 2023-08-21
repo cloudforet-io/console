@@ -188,7 +188,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'update:value', value?: string | number): void;
     (e: 'update:is-focused', value: boolean): void;
-    (e: 'update:visibleMenu', value: boolean): void;
+    (e: 'update:visible-menu', value: boolean): void;
     (e: 'update:selected', value: InputItem[]): void;
     (e: 'hide-menu'): void;
     (e: 'show-menu'): void;

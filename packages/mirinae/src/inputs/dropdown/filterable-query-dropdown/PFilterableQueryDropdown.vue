@@ -108,7 +108,7 @@ const props = withDefaults(defineProps<FilterableQueryDropdownProps>(), {
     selected: () => [],
     multiSelectable: false,
 });
-const emit = defineEmits(['update:selected', 'update:visibleMenu']);
+const emit = defineEmits(['update:selected', 'update:visible-menu']);
 
 const inputRef = ref<HTMLElement| null>(null);
 const { focused: isInputFocused } = useFocus(inputRef);
