@@ -89,8 +89,7 @@ import {
     reactive, ref, watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -129,6 +128,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const router = useRouter();
+const store = useStore();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
