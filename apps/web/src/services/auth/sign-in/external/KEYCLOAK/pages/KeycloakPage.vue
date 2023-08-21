@@ -3,14 +3,10 @@ import { defineComponent, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
-import { SpaceRouter } from '@/router';
-
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
-
-const router = useRouter();
 
 export default defineComponent({
     name: 'KeycloakPage',
@@ -35,6 +31,7 @@ export default defineComponent({
     },
     setup(props) {
         const store = useStore();
+        const router = useRouter();
 
         const onSignIn = async () => {
             if (!props.nextPath) {
@@ -42,8 +39,8 @@ export default defineComponent({
                 return;
             }
 
-            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            const resolvedRoute = router.resolve(props.nextPath);
+            const isAccessible = isUserAccessibleToRoute(resolvedRoute, store.getters['user/pagePermissionList']);
             if (isAccessible) {
                 await router.push(props.nextPath);
             } else {

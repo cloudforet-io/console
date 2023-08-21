@@ -1,13 +1,11 @@
 <script lang="ts">
 import { isEmpty } from 'lodash';
 import {
-    toRefs, reactive, computed, watch, defineAsyncComponent,
+    toRefs, reactive, computed, watch, defineAsyncComponent, defineComponent,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-
-import { SpaceRouter } from '@/router';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 import config from '@/lib/config';
@@ -21,7 +19,7 @@ import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightCon
 
 
 
-export default {
+export default defineComponent({
     name: 'SignInPage',
     components: {
         SignInRightContainer,
@@ -29,7 +27,7 @@ export default {
         IDPWSignIn,
     },
     beforeRouteEnter(to, from, next) {
-        if (from?.meta.isSignInPage) {
+        if (from?.meta?.isSignInPage) {
             next((vm) => {
                 vm.$router.replace({
                     query: { ...to.query, nextPath: from.query.nextPath },
@@ -102,7 +100,7 @@ export default {
                     return;
                 }
 
-                const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
+                const resolvedRoute = router.resolve(props.nextPath);
                 const isAccessible = isUserAccessibleToRoute(resolvedRoute, store.getters['user/pagePermissionList']);
                 if (isAccessible) {
                     await router.push(resolvedRoute);
@@ -129,7 +127,7 @@ export default {
             onSignIn,
         };
     },
-};
+});
 </script>
 
 <template>

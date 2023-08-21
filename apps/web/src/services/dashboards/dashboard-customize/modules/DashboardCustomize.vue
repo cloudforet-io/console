@@ -36,9 +36,8 @@ import { PDivider } from '@spaceone/design-system';
 import {
     computed, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-
-import { SpaceRouter } from '@/router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -64,6 +63,8 @@ interface Props {
 }
 
 const store = useStore();
+const router = useRouter();
+
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'go-back'): void,
     (e: 'save'): void}>();
@@ -90,7 +91,7 @@ const getDashboardData = async () => {
         await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 

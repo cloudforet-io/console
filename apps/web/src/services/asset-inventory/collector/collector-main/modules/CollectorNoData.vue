@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { PEmpty, PButton } from '@spaceone/design-system';
 import { useI18n } from 'vue-i18n';
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+const router = useRouter();
 const { t } = useI18n();
 
 const handleCreate = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+    router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
 };
 </script>
 
