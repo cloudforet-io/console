@@ -39,7 +39,7 @@ const props = withDefaults(defineProps<FileUploaderProps>(), {
     uploadedFiles: () => [],
     serverEndpoint: '',
 });
-const emit = defineEmits(['update:uploadedFiles']);
+const emit = defineEmits(['update:uploaded-files']);
 
 const state = reactive({
     proxyUploadedFiles: useProxyValue<File[]>('uploadedFiles', props, emit),

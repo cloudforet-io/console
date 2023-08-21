@@ -146,7 +146,7 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
     },
     /* events */
     onUpdateActiveTab: {
-        name: 'update:activeTab',
+        name: 'update:active-tab',
         description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
         table: {
             type: {
