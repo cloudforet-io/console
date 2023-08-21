@@ -90,6 +90,8 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { store } from '@/store';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
@@ -209,6 +211,7 @@ const handleUpdateLabels = async (labels: string[]) => {
                 labels,
             });
         }
+        await store.dispatch('dashboard/loadAllDashboard');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
