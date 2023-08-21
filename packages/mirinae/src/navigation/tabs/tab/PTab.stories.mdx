@@ -23,7 +23,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-tab
             :tabs="tabs"
-            v-model="proxyActiveTab"
+            v-model:active-tab="proxyActiveTab"
             :stretch="stretch"
             @update:active-tab="onUpdateActiveTab"
             @change="onChange"
@@ -57,7 +57,7 @@ export const Template = (args, { argTypes }) => ({
       <div class="h-full w-full overflow p-8">
           <p-tab
             :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
             ></p-tab>
       </div>
     `,
@@ -91,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
       <div class="h-full w-full overflow p-8">
           <p-tab
             :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
             stretch
             ></p-tab>
       </div>
@@ -126,7 +126,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-tab
             :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
         >
             <template #detail="slotProps">
                 <div class="p-4">
@@ -183,7 +183,7 @@ export const Template = (args, { argTypes }) => ({
     <div class="h-full w-full overflow p-8">
         <p-tab
             :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
         >
             <template #detail="{name}">
                 <inner key="detail" name="Detail. this tab is keep alive."/>
@@ -229,7 +229,7 @@ export const Template = (args, { argTypes }) => ({
     <p class="mb-6 font-bold text-xl">Slot Props: tab item (name, label, keepAlive)</p>
     <p-tab
         :tabs="tabs"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
     >
         <template #extra="tab">
             <p-badge v-if="tab.name === 'info'" style-type="gray200">18</p-badge>

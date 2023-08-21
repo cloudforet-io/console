@@ -127,7 +127,7 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
     'v-model': {
         name: 'v-model',
         type: { name: 'array' },
-        description: 'Two way binding for `selectedDates` props with `update:selectedDates` event.',
+        description: 'Two way binding for `selectedDates` props with `update:selected-dates` event.',
         defaultValue: [],
         table: {
             type: {
@@ -152,8 +152,8 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
         },
     },
     onUpdateSelectedDates: {
-        name: 'update:selectedDates',
-        description: 'Event emitted when date was selected. works with `selectedDates` props sync.',
+        name: 'update:selected-dates',
+        description: 'Event emitted when date was selected. works with `v-model:selected-dates`.',
         table: {
             type: {
                 summary: null,

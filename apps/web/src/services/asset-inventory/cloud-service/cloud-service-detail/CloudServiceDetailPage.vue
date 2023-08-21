@@ -556,7 +556,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                               :field-handler="fieldHandler"
             />
         </p-table-check-modal>
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+        <custom-field-modal v-model:visible="tableState.visibleCustomFieldModal"
                             resource-type="inventory.CloudService"
                             :options="{provider, cloudServiceGroup: group, cloudServiceType: name}"
                             :is-server-page="isServerPage"

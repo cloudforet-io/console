@@ -27,7 +27,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <p-balloon-tab
         :tabs="tabs"
-        v-model="proxyActiveTab"
+        v-model:active-tab="proxyActiveTab"
         :tail="tail"
         :size="size"
         :position="position"
@@ -60,7 +60,7 @@ export const Template = (args, { argTypes }) => ({
     template: `
     <p-balloon-tab
         :tabs="tabs"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
     ></p-balloon-tab>
     `,
     setup(props) {
@@ -92,7 +92,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <p-balloon-tab
         :tabs="tabs"
-        v-model="activeTab"
+        v-model:active-tab="activeTab"
         tail
     ></p-balloon-tab>
     `,
@@ -127,13 +127,13 @@ export const Template = (args, { argTypes }) => ({
         <p class="text-2xl my-4 font-bold">Short Case</p>
         <p-balloon-tab
             :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
             stretch
         ></p-balloon-tab>
         <p class="text-2xl my-4 font-bold">Long Case</p>
         <p-balloon-tab
             :tabs="longTabs"
-            v-model="longActiveTab"
+            v-model:active-tab="longActiveTab"
             stretch
         ></p-balloon-tab>
     </div>
@@ -170,7 +170,7 @@ export const Template = (args, { argTypes }) => ({
     <div>
         <div class="flex w-full mb-8" v-for="styleType in styleTypes" :key="styleType">
             <p-balloon-tab :tabs="tabs"
-                v-model="activeTab"
+                v-model:active-tab="activeTab"
                 :style-type="styleType"
             >{{styleType}}</p-balloon-tab>
         </div>
@@ -207,12 +207,12 @@ export const Template = (args, { argTypes }) => ({
     <div>
         <div class="flex flex-wrap mb-8" v-for="size in sizes" :key="size">
             <p-balloon-tab :tabs="tabs"
-                v-model="activeTab"
+                v-model:active-tab="activeTab"
                 :size="size"
                 class="mr-8"
             >{{size}}</p-balloon-tab>
             <p-balloon-tab :tabs="tabs"
-                v-model="activeTab"
+                v-model:active-tab="activeTab"
                 :size="size"
                 tail
                 class="mb-8"
@@ -252,7 +252,7 @@ export const Template = (args, { argTypes }) => ({
         <div class="mb-16" v-for="position in positions" :key="position">
             <p class="font-bold text-2xl mb-4">{{position}}</p>
             <p-balloon-tab :tabs="tabs"
-                v-model="activeTab"
+                v-model:active-tab="activeTab"
                 :position="position"
                 tail
             >
@@ -295,7 +295,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <div class="grid gap-8 grid-cols-1">
         <p-balloon-tab :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
             stretch
             tail
         >
@@ -317,7 +317,7 @@ export const Template = (args, { argTypes }) => ({
             </template>
         </p-balloon-tab>
         <p-balloon-tab :tabs="tabs"
-            v-model="activeTab"
+            v-model:active-tab="activeTab"
             position="left"
             :style-type="items[activeTab].styleType"
             tail

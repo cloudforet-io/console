@@ -210,12 +210,10 @@ const initStatesByUrlSSOToken = async () => {
                         </p>
                     </div>
                 </div>
-                <password-form
-                    ref="passwordFormEl"
-                    v-model="forms"
-                    :status="props.status"
-                    @change-input="handleChangeInput"
-                    @click-button="handleClickButton"
+                <password-form ref="passwordFormEl"
+                               :status="props.status"
+                               @change-input="handleChangeInput"
+                               @click-button="handleClickButton"
                 />
                 <div class="button-wrapper">
                     <p-button
