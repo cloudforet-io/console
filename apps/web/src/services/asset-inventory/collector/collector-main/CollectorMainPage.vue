@@ -71,8 +71,8 @@ const collectorMainPageQueryValue = computed<Required<CollectorMainPageQueryValu
 
 watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
     const newQuery: CollectorMainPageQuery = {
-        provider: primitiveToQueryString(queryValue.value.provider),
-        filters: urlFilterConverter.setFilters(queryValue.value.filters ?? []).rawQueryStrings,
+        provider: primitiveToQueryString(queryValue.provider),
+        filters: urlFilterConverter.setFilters(queryValue.filters ?? []).rawQueryStrings,
     };
     router.replace({ query: newQuery }).catch((e) => {
         if (e.name !== 'NavigationDuplicated') console.error(e);
