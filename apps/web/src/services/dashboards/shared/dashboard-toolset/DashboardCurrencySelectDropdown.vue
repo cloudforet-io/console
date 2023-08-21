@@ -39,9 +39,9 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import {
     computed, defineProps, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -58,6 +58,7 @@ const props = withDefaults(defineProps<DashboardCurrencySelectDropdownProps>(), 
 const emit = defineEmits<{(e: 'update:currency', currency: DashboardCurrency): void}>();
 
 const store = useStore();
+const { t } = useI18n();
 
 const state = reactive({
     defaultCurrency: computed<Currency>(() => store.state.settings.currency),
@@ -67,7 +68,7 @@ const state = reactive({
             type: 'item',
             name: 'DEFAULT',
             label: `${CURRENCY_SYMBOL[state.defaultCurrency]}${state.defaultCurrency}`,
-            badge: i18n.t('DASHBOARDS.DETAIL.DEFAULT'),
+            badge: t('DASHBOARDS.DETAIL.DEFAULT'),
         };
         const currencyMenuItems = Object.keys(store.state.settings.currencyRates).map((currency) => ({
             type: 'item',
