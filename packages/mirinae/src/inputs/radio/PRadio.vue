@@ -9,8 +9,7 @@
         <slot name="radio-left"
               v-bind="{isSelected}"
         />
-        <slot :slot-scope="props"
-              name="icon"
+        <slot name="icon"
               v-bind="{isSelected, iconName}"
         >
             <p-i class="radio-icon"

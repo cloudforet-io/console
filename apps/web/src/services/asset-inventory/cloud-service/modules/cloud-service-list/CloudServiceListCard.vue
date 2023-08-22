@@ -17,14 +17,16 @@ import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     item: any;
-    searchFilters: ConsoleFilter[];
-    selectedRegions: string[];
+    searchFilters?: ConsoleFilter[];
+    selectedRegions?: string[];
     period?: Period;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     item: () => ({}),
     period: undefined,
+    searchFilters: undefined,
+    selectedRegions: undefined,
 });
 const store = useStore();
 

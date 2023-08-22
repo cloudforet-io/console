@@ -69,12 +69,12 @@ const assetInventoryRoute: RouteRecordRaw = {
                     component: NoResourcePage as any,
                 },
                 {
-                    path: '/:provider/:group',
+                    path: ':provider/:group',
                     meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
                     component: { template: '<router-view />' },
                     children: [
                         {
-                            path: '/:name?',
+                            path: ':name?',
                             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.name },
                             props: true,
@@ -120,7 +120,7 @@ const assetInventoryRoute: RouteRecordRaw = {
                             component: CollectorHistoryPage as any,
                         },
                         {
-                            path: '/:jobId',
+                            path: ':jobId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
                             props: true,
@@ -129,7 +129,7 @@ const assetInventoryRoute: RouteRecordRaw = {
                     ],
                 },
                 {
-                    path: '/:collectorId',
+                    path: ':collectorId',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     props: true,
                     meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
@@ -147,10 +147,10 @@ const assetInventoryRoute: RouteRecordRaw = {
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
                     meta: { lnbVisible: true },
                     props: true,
-                    component: ServiceAccountPage as any,
+                    component: ServiceAccountPage,
                 },
                 {
-                    path: '/:serviceAccountId',
+                    path: ':serviceAccountId',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                     meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId },
                     props: true,
