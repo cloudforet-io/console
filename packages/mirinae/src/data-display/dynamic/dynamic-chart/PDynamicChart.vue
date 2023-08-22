@@ -35,15 +35,9 @@ import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 // TODO: this (any) must be refactored
 const componentMap: Record<DynamicChartType, any> = {
-    COLUMN: {
-        component: defineAsyncComponent(() => import('./templates/column/index.vue')),
-    },
-    DONUT: {
-        component: defineAsyncComponent(() => import('./templates/donut/index.vue')),
-    },
-    TREEMAP: {
-        component: defineAsyncComponent(() => import('./templates/treemap/index.vue')),
-    },
+    COLUMN: defineAsyncComponent(() => import('./templates/column/index.vue')),
+    DONUT: defineAsyncComponent(() => import('./templates/donut/index.vue')),
+    TREEMAP: defineAsyncComponent(() => import('./templates/treemap/index.vue')),
 };
 
 const props = withDefaults(defineProps<DynamicChartProps>(), {
