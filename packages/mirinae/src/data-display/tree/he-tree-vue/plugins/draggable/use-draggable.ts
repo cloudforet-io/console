@@ -1,37 +1,40 @@
-import { onMounted, watch } from 'vue';
+/* eslint-disable no-restricted-syntax */
+import type { Ref } from 'vue';
+import { onMounted, watch, nextTick } from 'vue';
 
 import {
     arrayLast,
     arrayWithoutEnd,
     findParent,
-    hasClass, iterateAll,
-    resolveValueOrGetter,
+    hasClass, iterateAll, joinFunctionsByNext,
 } from '@/data-display/tree/he-tree-vue/helpers';
+import type { TreeDraggableOptions } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable';
 import makeTreeDraggable from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable';
 import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
 import type { Node } from '@/data-display/tree/he-tree-vue/types';
 
+interface UseDraggableOptions {
+    treeRef: Ref<HTMLElement|null>;
+    rootNode: Ref<Node>;
+    treeData: Ref<Node[]>;
+    getAllNodesByPath: (path: number[]) => Node[];
+    getNodeByPath: (path: number[]) => Node|undefined;
+    getNodeByBranchEl: (branchEl: HTMLElement) => Node;
+    getBranchElByPath: (path: number[]) => Element|null;
+    iteratePath: (path: number[], opt?: { reverse?: boolean }) => IterableIterator<{ path: number[]; node: Node }>;
+    unfold: (node: Node, path: number[]) => void;
+}
 export const useDraggable = (props, emit, {
-    treeRef, rootNodeRef, getTreeVmByTreeEl, getAllNodesByPath,
-}) => {
+    treeRef, rootNode, treeData,
+    getAllNodesByPath, getNodeByPath, getNodeByBranchEl, getBranchElByPath, iteratePath, unfold,
+}: UseDraggableOptions) => {
     const treesStore = {} as {
         store: Store;
     };
-    const options = {
+    const options: TreeDraggableOptions = {
         indent: props.indent,
-        triggerClass: props.triggerClass,
-        triggerBySelf: props.triggerBySelf,
         unfoldWhenDragover: props.unfoldWhenDragover,
         unfoldWhenDragoverDelay: props.unfoldWhenDragoverDelay,
-        draggingNodePositionMode: props.draggingNodePositionMode,
-        edgeScroll: props.edgeScroll,
-        edgeScrollTriggerMargin: props.edgeScrollTriggerMargin,
-        edgeScrollSpeed: props.edgeScrollSpeed,
-        edgeScrollTriggerMode: props.edgeScrollTriggerMode,
-        edgeScrollSpecifiedContainerX: props.edgeScrollSpecifiedContainerX,
-        edgeScrollSpecifiedContainerY: props.edgeScrollSpecifiedContainerY,
-        rtl: props.rtl,
-        preventTextSelection: props.preventTextSelection,
         treeClass: 'he-tree',
         rootClass: 'tree-root',
         childrenClass: 'tree-children',
@@ -41,108 +44,107 @@ export const useDraggable = (props, emit, {
         placeholderClass: 'tree-placeholder',
         placeholderNodeBackClass: 'tree-placeholder-node-back',
         placeholderNodeClass: 'tree-placeholder-node',
-        draggingClass: 'dragging',
+        draggingClassName: 'dragging',
         placeholderId: 'he_tree_drag_placeholder',
-        ifNodeFolded: (branchEl, store) => {
-            const { targetTree } = store;
-            const node = targetTree.getNodeByBranchEl(branchEl);
+        draggingNodePositionMode: 'top_left_corner',
+        // draggable helper options
+        rtl: props.rtl,
+        triggerClassName: 'tree-node',
+        edgeScrollTriggerMargin: 50,
+        edgeScrollSpeed: 0.35,
+        edgeScrollTriggerMode: 'top_left_corner',
+        preventTextSelection: true,
+        ifNodeFolded: (branchEl: HTMLElement): boolean|undefined => {
+            const node = getNodeByBranchEl(branchEl);
             return node.$folded;
         },
-        isTargetTreeRootDroppable: (store) => {
-            const droppable = resolveValueOrGetter(store.targetTree.rootNode.$droppable, [store.targetTree, store]);
-            if (droppable !== undefined) {
-                return droppable;
-            }
-            return true;
+        isTargetTreeRootDroppable: (store:Store) => {
+            const droppableFunc = rootNode.value.$droppable;
+            const droppable = droppableFunc ? droppableFunc([], store) : false;
+            return droppable;
         },
-        unfoldTargetNodeByEl: (branchEl, store) => _Draggable_unfoldTargetNodeByEl(branchEl, store),
-        isNodeParentDroppable: (branchEl, treeEl) => {
-            const tree = getTreeVmByTreeEl(treeEl);
-            const path = tree.getPathByBranchEl(branchEl);
-            const parentPath = arrayWithoutEnd(path, 1);
-            const parent = tree.getNodeByPath(parentPath);
-            return tree.isNodeDroppable(parent, parentPath);
+        unfoldTargetNodeByEl: (branchEl: HTMLElement) => _Draggable_unfoldTargetNodeByEl(branchEl),
+        isNodeParentDroppable: (branchEl: HTMLElement) => {
+            const path = getPathByBranchEl(branchEl);
+            const parentPath = arrayWithoutEnd<number>(path, 1);
+            const parent = getNodeByPath(parentPath);
+            if (parent) return isNodeDroppable(parent, parentPath);
+            return undefined;
         },
-        isNodeDroppable: (branchEl, treeEl) => {
-            const tree = getTreeVmByTreeEl(treeEl);
-            const path = tree.getPathByBranchEl(branchEl);
-            const node = tree.getNodeByPath(path);
-            return tree.isNodeDroppable(node, path);
+        isNodeDroppable: (branchEl: HTMLElement) => {
+            const path = getPathByBranchEl(branchEl);
+            const node = getNodeByPath(path);
+            if (node) return isNodeDroppable(node, path);
+            return undefined;
         },
-        _findClosestDroppablePosition: (branchEl, treeEl) => {
-            const tree = getTreeVmByTreeEl(treeEl);
-            const path = tree.getPathByBranchEl(branchEl);
+        _findClosestDroppablePosition: (branchEl: HTMLElement) => {
+            const path = getPathByBranchEl(branchEl);
             const findPath = arrayWithoutEnd(path, 1);
             let cur = path;
-            // eslint-disable-next-line no-restricted-syntax
-            for (const { node, path: _path } of tree.iteratePath(findPath, { reverse: true })) {
-                if (tree.isNodeDroppable(node, _path)) {
-                    return tree.getBranchElByPath(cur);
+            const iteratePaths = iteratePath(findPath, { reverse: true });
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            for (const { node, path: _path } of iteratePaths) {
+                if (isNodeDroppable(node, _path)) {
+                    return getBranchElByPath(cur);
                 }
                 cur = _path;
             }
-            if (tree.isNodeDroppable(rootNodeRef.value, [])) {
-                return tree.getBranchElByPath(cur);
+            if (isNodeDroppable(rootNode.value, [])) {
+                return getBranchElByPath(cur);
             }
             return undefined;
         },
-        afterPlaceholderCreated: (store) => {
-            store.startTree.$emit('afterPlaceholderCreated', store);
-            store.startTree.$emit('after-placeholder-created', store);
+        afterPlaceholderCreated: (store: Store) => {
+            emit('after-placeholder-created', store);
         },
-        getPathByBranchEl: (branchEl) => getPathByBranchEl(branchEl),
-        beforeFirstMove: (store) => {
+        getPathByBranchEl: (branchEl: HTMLElement) => getPathByBranchEl(branchEl),
+        beforeFirstMove: (store: Store) => {
             treesStore.store = store;
-            store.startTree = getTreeVmByTreeEl(store.startTreeEl);
-            const draggable = store.startTree.draggable;
-            if (!draggable) return false;
-            const { startTree, startPath } = store;
-            store.dragNode = startTree.getNodeByPath(startPath);
-            if (!startTree.isNodeDraggable(store.dragNode, startPath)) {
+            if (!store.startTreeEl) return undefined;
+            if (!props.draggable) return false;
+            const { startPath } = store;
+            if (!startPath) return undefined;
+            store.dragNode = getNodeByPath(startPath);
+            if (store.dragNode && !isNodeDraggable(store.dragNode, startPath)) {
                 return false;
             }
-            if (startTree.hasHook('ondragstart') && startTree.executeHook('ondragstart', [store]) === false) {
+            if (props.ondragstart && joinFunctionsByNext([props.ondragstart])(store) === false) {
                 return false;
             }
-            store.startTree.$emit('before-first-move', store);
-            store.startTree.$emit('drag', store);
+            emit('before-first-move', store);
+            emit('drag', store);
             emit('he-tree-drag', store);
             return undefined;
         },
-        filterTargetTree: (targetTreeEl, store) => {
-            const targetTree = getTreeVmByTreeEl(targetTreeEl);
-            const { startTree } = store;
-            if (startTree !== targetTree) {
-                return false;
-            }
-            const targetTreeDroppable = resolveValueOrGetter(targetTree.droppable, [store]);
-            if (!targetTreeDroppable) {
-                return false;
-            }
-            store.targetTree = targetTree;
+        filterTargetTree: () => {
+            if (!props.droppable) return false;
             return undefined;
         },
-        afterMove: (store) => {
-            store.startTree.$emit('after-move', store);
+        afterMove: (store: Store) => {
+            emit('after-move', store);
         },
-        beforeDrop: (pathChanged, store) => {
-            const { targetTree } = store;
-            if (targetTree.hasHook('ondragend') && targetTree.executeHook('ondragend', [store]) === false) {
+        beforeDrop: (store: Store) => {
+            console.debug('beforeDrop', joinFunctionsByNext([props.ondragend])(store));
+            if (props.ondragend && joinFunctionsByNext([props.ondragend])(store) === false) {
                 return false;
             }
             emit('he-tree-before-drop', store);
             return undefined;
         },
-        afterDrop: (store) => {
+        afterDrop: (store: Store) => {
             if (store.pathChanged) {
                 const {
-                    startTree, targetTree, startPath, dragNode,
+                    startPath, dragNode,
                 } = store;
                 let { targetPath } = store;
+
+                if (!startPath || !targetPath) return undefined;
+
                 // remove from start position
                 const startParentPath = arrayWithoutEnd(startPath, 1);
-                const startParent = startTree.getNodeByPath(startParentPath);
-                const startSiblings = startParentPath.length === 0 ? startTree.treeData : startParent.children;
+                const startParent = getNodeByPath(startParentPath);
+                const startSiblings = startParentPath.length === 0 ? treeData.value : startParent?.children ?? [];
                 const startIndex = arrayLast(startPath);
                 startSiblings.splice(startIndex, 1);
                 // remove node from the starting position may affect the target path.
@@ -153,7 +155,7 @@ export const useDraggable = (props, emit, {
                 //  [3, 1]      [3, 3]
                 //  [3, 1]      [3, 3, 5]
                 // above targetPaths should be transformed to [0], [0, 0] [3, 2] [3, 2, 5]
-                if (startTree === targetTree) {
+                if (JSON.stringify(startPath) === JSON.stringify(targetPath)) {
                     if (startPath.length <= targetPath.length) {
                         const sw = startPath.slice(0, startPath.length - 1); // without end
                         const tw = targetPath.slice(0, sw.length); // same length with sw
@@ -170,10 +172,10 @@ export const useDraggable = (props, emit, {
                 }
                 // insert to target position
                 const targetParentPath = arrayWithoutEnd(targetPath, 1);
-                const targetParent = targetTree.getNodeByPath(targetParentPath);
-                let targetSiblings;
+                const targetParent = getNodeByPath(targetParentPath) ?? {};
+                let targetSiblings: any[]|undefined;
                 if (targetParentPath.length === 0) {
-                    targetSiblings = targetTree.treeData;
+                    targetSiblings = treeData.value;
                 } else {
                     if (!targetParent.children) {
                         targetParent.children = [];
@@ -181,23 +183,24 @@ export const useDraggable = (props, emit, {
                     targetSiblings = targetParent.children;
                 }
                 const targetIndex = arrayLast(targetPath);
-                targetSiblings.splice(targetIndex, 0, dragNode);
+                targetSiblings?.splice(targetIndex, 0, dragNode);
 
                 const rollback = () => {
+                    if (!targetPath) return;
                     // remove inserted node from target position
                     const _targetParentPath = arrayWithoutEnd(targetPath, 1);
-                    const _targetParent = targetTree.getNodeByPath(_targetParentPath);
-                    const _targetSiblings = _targetParentPath.length === 0 ? targetTree.treeData : _targetParent.children;
+                    const _targetParent = getNodeByPath(_targetParentPath);
+                    const _targetSiblings = _targetParentPath.length === 0 ? treeData.value : _targetParent?.children ?? [];
                     const _targetIndex = arrayLast(targetPath);
                     _targetSiblings.splice(_targetIndex, 1);
 
                     // add node to start position
                     const _startParentPath = arrayWithoutEnd(startPath, 1);
-                    const _startParent = startTree.getNodeByPath(_startParentPath);
+                    const _startParent = getNodeByPath(_startParentPath) ?? {};
                     // const startSiblings = _startParentPath.length === 0 ? startTree.treeData : _startParent.children;
-                    let _startSiblings;
+                    let _startSiblings: any[]|undefined;
                     if (_startParentPath.length === 0) {
-                        _startSiblings = startTree.treeData;
+                        _startSiblings = treeData.value;
                     } else {
                         if (!_startParent.children) {
                             _startParent.children = [];
@@ -205,20 +208,20 @@ export const useDraggable = (props, emit, {
                         _startSiblings = _startParent.children;
                     }
                     const _startIndex = arrayLast(startPath);
-                    _startSiblings.splice(_startIndex, 0, dragNode);
+                    _startSiblings?.splice(_startIndex, 0, dragNode);
                 };
 
                 // emit event
-                startTree.$emit('input', startTree.treeData);
-                startTree.$emit('change', store);
-                targetTree.$emit('drop', store, targetPath, rollback);
+                emit('input', treeData.value);
+                emit('change', store);
+                emit('drop', store, targetPath, rollback);
                 emit('he-tree-drop', store);
-                if (targetTree !== startTree) {
-                    targetTree.$emit('input', targetTree.treeData);
-                    targetTree.$emit('change', store);
-                }
+                // if (targetTree !== startTree) {
+                //     emit('input', treeData.value);
+                //     emit('change', store);
+                // }
                 return new Promise<void>((resolve) => {
-                    targetTree.$nextTick(() => {
+                    nextTick(() => {
                         resolve();
                     });
                 });
@@ -227,20 +230,19 @@ export const useDraggable = (props, emit, {
         },
     };
 
-    const _Draggable_unfoldTargetNodeByEl = (branchEl, store) => {
-        const { targetTree } = store;
-        const path = targetTree.getPathByBranchEl(branchEl);
-        const node = targetTree.getNodeByPath(path);
-        targetTree?.unfold(node, path);
+    const _Draggable_unfoldTargetNodeByEl = (branchEl: HTMLElement) => {
+        const path = getPathByBranchEl(branchEl);
+        const node = getNodeByPath(path);
+        if (node) unfold(node, path);
         return new Promise<void>((resolve) => {
-            targetTree.$nextTick(() => {
+            nextTick(() => {
                 resolve();
             });
         });
     };
 
-    const getPathByBranchEl = (branchEl) => {
-        const getAttrPath = (el) => {
+    const getPathByBranchEl = (branchEl: HTMLElement) => {
+        const getAttrPath = (el: Element) => {
             const pathStr = el.getAttribute('data-tree-node-path');
             if (pathStr) {
                 return pathStr.split(',').map((v) => parseInt(v));
@@ -252,14 +254,14 @@ export const useDraggable = (props, emit, {
             return path;
         }
         // placeholder path
-        let parentPath;
+        let parentPath: number[] = [];
         findParent(branchEl, (el) => {
             if (hasClass(el, 'tree-root')) {
                 parentPath = [];
                 return true;
             }
             if (hasClass(el, 'tree-branch')) {
-                parentPath = getAttrPath(el);
+                parentPath = getAttrPath(el) ?? [];
                 return true;
             }
             return false;
@@ -279,36 +281,33 @@ export const useDraggable = (props, emit, {
         return [...parentPath, index];
     };
 
-    const isNodeDraggable = (node, path) => {
+    const isNodeDraggable = (node: Node, path: number[]): boolean|undefined => {
         const { store } = treesStore;
         const allNodes = getAllNodesByPath(path);
-        allNodes.unshift(rootNodeRef.value);
+        allNodes.unshift(rootNode.value);
+        const iteratePaths = iterateAll<Node>(allNodes, { reverse: true });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { value: _node, index } of iterateAll<Node>(allNodes, { reverse: true })) {
+        for (const { value: _node, index } of iteratePaths) {
             const currentPath = path.slice(0, (index ?? 0) + 1);
             const draggableOpt = _node.$draggable !== undefined ? _node.$draggable : props.eachDraggable;
-            const draggable = resolveValueOrGetter(draggableOpt, [currentPath, store]);
-            if (draggable !== undefined) {
-                return draggable;
-            }
+            const draggable = draggableOpt ? draggableOpt(currentPath, store) : undefined;
+            if (draggable !== undefined) return draggable;
         }
         return true;
     };
-    const isNodeDroppable = (node, path) => {
+    const isNodeDroppable = (node: Node, path: number[]) => {
         const { store } = treesStore;
         const allNodes = getAllNodesByPath(path);
-        allNodes.unshift(rootNodeRef.value);
-        let droppableFinal; let
-            resolved;
+        allNodes.unshift(rootNode.value);
+        let droppableFinal: boolean|undefined;
+        let resolved: boolean|undefined;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        // eslint-disable-next-line no-restricted-syntax
         for (const { value: _node, index } of iterateAll<Node>(allNodes, { reverse: true })) {
             const currentPath = path.slice(0, (index ?? 0) + 1);
             const droppableOpt = _node.$droppable !== undefined ? _node.$droppable : props.eachDroppable;
-            const droppable = resolveValueOrGetter(droppableOpt, [currentPath, store]);
+            const droppable = droppableOpt ? droppableOpt(currentPath, store) : undefined;
             if (droppable !== undefined) {
                 droppableFinal = droppable;
                 resolved = true;
@@ -324,28 +323,20 @@ export const useDraggable = (props, emit, {
     const methods = {
         isNodeDraggable,
         isNodeDroppable,
-        // override
         getPathByBranchEl,
     };
 
     onMounted(() => {
-        const _makeTreeDraggable_obj = makeTreeDraggable(treeRef.value, options);
-        // watch props and update options
-        ['indent',
-            'triggerClass',
-            'triggerBySelf',
-            'unfoldWhenDragover',
-            'unfoldWhenDragoverDelay',
-            'draggingNodePositionMode',
-            'edgeScroll', 'edgeScrollTriggerMargin', 'edgeScrollSpeed', 'edgeScrollTriggerMode', 'edgeScrollSpecifiedContainerY', 'edgeScrollSpecifiedContainerY',
-            'rtl',
-            'preventTextSelection',
-        ].forEach((name) => {
-            watch(() => props[name], (value) => {
-                _makeTreeDraggable_obj.options[name] = value;
-                _makeTreeDraggable_obj.optionsUpdated();
+        if (treeRef.value) {
+            const _makeTreeDraggable_obj = makeTreeDraggable(treeRef.value, options);
+            // watch props and update options
+            ['indent', 'unfoldWhenDragover', 'unfoldWhenDragoverDelay', 'rtl'].forEach((name) => {
+                watch(() => props[name], (value) => {
+                    _makeTreeDraggable_obj.options[name] = value;
+                    _makeTreeDraggable_obj.optionsUpdated();
+                });
             });
-        });
+        }
     });
 
     return {

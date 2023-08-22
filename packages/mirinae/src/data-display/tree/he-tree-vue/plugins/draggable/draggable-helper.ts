@@ -7,45 +7,28 @@ import {
     toArrayIfNot,
 } from '@/data-display/tree/he-tree-vue/helpers';
 
-import DragEventService, { EventPosition, MouseOrTouchEvent } from './drag-event-service';
-import { Store } from './draggable-types';
+import type { EventPosition, MouseOrTouchEvent } from './drag-event-service';
+import DragEventService from './drag-event-service';
+import type { Store } from './draggable-types';
 
-/* Default export, a function.
-```js
-import draggableHelper from 'draggable-helper'
-draggableHelper(listenerElement, options)
-```
-Arguments:
-  listenerElement: HTMLElement. The element to bind mouse and touch event listener.
-  options: Options. Optional.
- */
-/* Default export, a method.
-```js
-import draggableHelper from 'draggable-helper'
-draggableHelper(listenerElement, options)
-```
-parameter:
-  listenerElement: HTMLElement. HTML elements to bind mouse and touch event listeners.
-  options: Options.
- */
 const _edgeScroll = {
     afterFirstMove: undefined,
     afterMove,
     afterDrop,
 };
-export default function (listenerElement: HTMLElement, opt: Options) {
+export default function draggableHelper(listenerElement: HTMLElement, opt: DraggableHelperOptions) {
     let store: Store;
     // set default value of options
     objectAssignIfKeyNull(opt, defaultOptions);
     // define the event listener of mousedown and touchstart
     const onMousedownOrTouchStart = (e:MouseOrTouchEvent, mouse: EventPosition) => {
-    // execute native event hooks
+        // execute native event hooks
         if (!DragEventService.isTouch(e)) {
             if (opt.onmousedown) opt.onmousedown(e as MouseEvent);
         } else if (opt.ontouchstart) opt.ontouchstart(e as TouchEvent);
         const target = e.target as HTMLElement;
         // check if triggered by ignore tags
-        if (opt.ingoreTags?.includes(target.tagName)) {
+        if (opt.ignoreTags?.includes(target.tagName)) {
             return;
         }
         // check if trigger element and its parent has undraggable class name
@@ -131,7 +114,7 @@ export default function (listenerElement: HTMLElement, opt: Options) {
 
     // define the event listener of mousemove and touchmove
     const onMousemoveOrTouchMove = (e: MouseOrTouchEvent, mouse: EventPosition) => {
-    // execute native event hooks
+        // execute native event hooks
         if (!DragEventService.isTouch(e)) {
             if (opt.onmousemove) opt.onmousemove(e as MouseEvent);
         } else if (opt.ontouchmove) opt.ontouchmove(e as TouchEvent);
@@ -252,7 +235,7 @@ export default function (listenerElement: HTMLElement, opt: Options) {
 
     // define the event listener of mouseup and touchend
     const onMouseupOrTouchEnd = async (e: MouseOrTouchEvent) => {
-    // execute native event hooks
+        // execute native event hooks
         if (!DragEventService.isTouch(e)) {
             if (opt.onmousedown) opt.onmousedown(e as MouseEvent);
         } else if (opt.ontouchend) opt.ontouchend(e as TouchEvent);
@@ -300,7 +283,7 @@ export default function (listenerElement: HTMLElement, opt: Options) {
 
 // available options and default options value
 export const defaultOptions = {
-    ingoreTags: ['INPUT', 'TEXTAREA', 'SELECT', 'OPTGROUP', 'OPTION'],
+    ignoreTags: ['INPUT', 'TEXTAREA', 'SELECT', 'OPTGROUP', 'OPTION'],
     undraggableClassName: 'undraggable',
     minDisplacement: 10, // The minimum displacement that triggers the drag.
     draggingClassName: 'dragging', // Be added to the dragged element.
@@ -311,17 +294,22 @@ export const defaultOptions = {
     edgeScrollSpeed: 0.35,
     edgeScrollTriggerMode: 'top_left_corner',
 };
-export interface Options extends Partial<typeof defaultOptions>{
+export interface DraggableHelperOptions {
+    ignoreTags?: string[];
+    undraggableClassName?: string;
+    minDisplacement?: number;
+    draggingClassName?: string;
+    updateMovedElementStyleManually?: boolean;
     triggerClassName?: string|string[] // triggerElement must have the class name.
     triggerBySelf?: boolean // directTriggerElement must be the triggerElement
     getTriggerElement?: (directTriggerElement: HTMLElement, store: Store) => HTMLElement|undefined // get triggerElement by directTriggerElement. override triggerClassName.
-    getMovedOrClonedElement?: (directTriggerElement: HTMLElement, store: Store, opt: Options) => HTMLElement
-    beforeFirstMove?: (store:Store, opt:Options) => boolean|undefined
-    afterFirstMove?: (store:Store, opt:Options) => void
-    beforeMove?: (store:Store, opt:Options) => boolean|undefined
-    afterMove?: (store:Store, opt:Options) => void
-    beforeDrop?: (store:Store, opt:Options) => boolean|undefined|Promise<boolean|void>
-    afterDrop?: (store:Store, opt:Options) => void|Promise<void>
+    getMovedOrClonedElement?: (directTriggerElement: HTMLElement, store: Store, opt: DraggableHelperOptions) => HTMLElement
+    beforeFirstMove?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined
+    afterFirstMove?: (store:Store, opt:DraggableHelperOptions) => void
+    beforeMove?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined
+    afterMove?: (store:Store, opt:DraggableHelperOptions) => void
+    beforeDrop?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined|Promise<boolean|void>
+    afterDrop?: (store:Store, opt:DraggableHelperOptions) => void|Promise<void>
     preventTextSelection?: boolean
     rtl?: boolean;
     // edge scroll
@@ -329,8 +317,8 @@ export interface Options extends Partial<typeof defaultOptions>{
     edgeScrollTriggerMargin?: number
     edgeScrollSpeed?: number
     edgeScrollTriggerMode?: 'top_left_corner'|'mouse'
-    edgeScrollSpecifiedContainerX?: HTMLElement|((store:Store, opt:Options) => HTMLElement)
-    edgeScrollSpecifiedContainerY?: HTMLElement|((store:Store, opt:Options) => HTMLElement)
+    edgeScrollSpecifiedContainerX?: HTMLElement|((store:Store, opt:DraggableHelperOptions) => HTMLElement)
+    edgeScrollSpecifiedContainerY?: HTMLElement|((store:Store, opt:DraggableHelperOptions) => HTMLElement)
     // native event hooks
     onmousedown?: (e: MouseEvent) => void
     onmousemove?: (e: MouseEvent) => void
@@ -339,7 +327,8 @@ export interface Options extends Partial<typeof defaultOptions>{
     ontouchmove?: (e: TouchEvent) => void
     ontouchend?: (e: TouchEvent) => void
     // clone
-    onClone?: (store: Store, opt: Options) => boolean; // control clone when drag start
+    clone?: boolean;
+    onClone?: (store: Store, opt: DraggableHelperOptions) => boolean; // control clone when drag start
 }
 // Info after event triggered. Created when mousedown or touchstart, destroied after mouseup or touchend.
 export const initialStore = {
@@ -347,9 +336,9 @@ export const initialStore = {
 };
 
 // edge scroll
-let stopHorizontalScroll; let
-    stopVerticalScroll;
-function afterMove(store: Store, opt: Options) {
+let stopHorizontalScroll;
+let stopVerticalScroll;
+function afterMove(store: Store, opt: DraggableHelperOptions) {
     if (!opt.edgeScroll) {
         return;
     }
@@ -527,7 +516,7 @@ function afterMove(store: Store, opt: Options) {
         return r;
     }
 }
-function afterDrop(store: Store, opt: Options) {
+function afterDrop(store: Store, opt: DraggableHelperOptions) {
     if (!opt.edgeScroll) {
         return;
     }

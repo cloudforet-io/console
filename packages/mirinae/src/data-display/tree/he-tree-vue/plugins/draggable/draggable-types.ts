@@ -1,14 +1,9 @@
-// eslint-disable-next-line import/no-cycle
-import { Node, Path } from '@/data-display/tree/he-tree-vue/types';
+import type { Node, Path } from '@/data-display/tree/he-tree-vue/types';
 
-import { EventPosition, MouseOrTouchEvent } from './drag-event-service';
+import type { EventPosition, MouseOrTouchEvent } from './drag-event-service';
 
-// export default function (listenerElement: HTMLElement, opt?: Options): {
-//     destroy: () => void;
-//     options: Options;
-// };
 interface DefaultOptions {
-    ingoreTags: string[];
+    ignoreTags: string[];
     undraggableClassName: string;
     minDisplacement: number;
     draggingClassName: string;
@@ -70,12 +65,10 @@ export interface Store extends InitialStore {
     _isMovingElementCloned: boolean;
     //
     startTreeEl?: HTMLElement;
-    startTree?: any;
     startPath?: Path;
     dragBranchEl?: HTMLElement;
     dragNode?: Node;
     targetTreeEl?: HTMLElement;
-    targetTree?: any;
     targetPath?: Path;
     targetPathNotEqualToStartPath?: boolean;
     placeholder?: HTMLElement;

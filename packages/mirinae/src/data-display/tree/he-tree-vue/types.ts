@@ -18,8 +18,8 @@ export interface Node {
     $childrenStyle?: any;
     $folded?: boolean;
     $checked?: boolean;
-    $draggable?(currentPath: Path, tree: any, store: Store): IsDraggableOrIsDroppable;
-    $droppable?(currentPath: Path, tree: any, store: Store): IsDraggableOrIsDroppable;
+    $draggable?(currentPath: Path, store: Store): IsDraggableOrIsDroppable;
+    $droppable?(currentPath: Path, store: Store): IsDraggableOrIsDroppable;
 }
 
 /* Utils */
@@ -48,3 +48,5 @@ export type WalkTreeDataOptions = {
 export interface UnfoldOptions {
     foldOthers?: boolean;
 }
+
+

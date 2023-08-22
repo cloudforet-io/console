@@ -323,11 +323,11 @@ export default defineComponent<Props>({
             let oldParent: TreeNode|null = null;
             if (e.startPath) {
                 try {
-                    oldParent = e.startTree?.getNodeParentByPath(e.startPath) as TreeNode;
+                    oldParent = state.treeRef.getNodeParentByPath(e.startPath) as TreeNode;
                 } catch (error) {}
             }
 
-            const parent = e.targetTree?.getNodeParentByPath(targetPath) as TreeNode;
+            const parent = state.treeRef.getNodeParentByPath(targetPath) as TreeNode;
 
             emit('drop', e.dragNode, oldParent, parent, rollback);
         };

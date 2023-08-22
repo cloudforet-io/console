@@ -191,7 +191,7 @@ export class TreeData<Node> {
             }
             if (opt.afterNodeCreated) {
                 opt.afterNodeCreated(newNode, {
-                    oldNode: node, index, parent, path,
+                    oldNode: node, index, parent: parent ?? undefined, path,
                 });
             }
             td.setPathNode(path, newNode);
@@ -199,5 +199,3 @@ export class TreeData<Node> {
         return td.data as Node[];
     }
 }
-
-

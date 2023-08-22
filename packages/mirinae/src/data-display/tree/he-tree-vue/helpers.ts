@@ -115,18 +115,6 @@ export function objectAssignIfKeyNull<T extends object>(obj1: T, obj2: object) {
 export function toArrayIfNot<T>(arrOrNot: T | T[]): T[] {
     return isArray(arrOrNot) ? arrOrNot : [arrOrNot];
 }
-/**
- * if it is function, return result, else return it directly.
- * @param valueOrGetter
- * @param args
- * @returns
- */
-export function resolveValueOrGetter(valueOrGetter, args: any[] = []) {
-    if (isFunction(valueOrGetter)) {
-        return valueOrGetter(...args);
-    }
-    return valueOrGetter;
-}
 
 
 /**
@@ -135,7 +123,7 @@ export function resolveValueOrGetter(valueOrGetter, args: any[] = []) {
  * @param n
  * @returns
  */
-export function arrayWithoutEnd<T>(arr: T[], n = 1) {
+export function arrayWithoutEnd<T>(arr: T[], n = 1): T[] {
     return arr.slice(0, arr.length - n);
 }
 
@@ -468,7 +456,7 @@ export function scrollTo(options: {
     const animateScroll = function animateScroll() {
         if (
             options.beforeEveryFrame
-                && options.beforeEveryFrame(count) === false
+            && options.beforeEveryFrame(count) === false
         ) {
             return;
         }
