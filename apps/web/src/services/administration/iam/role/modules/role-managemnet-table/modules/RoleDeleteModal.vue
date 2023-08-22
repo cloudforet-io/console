@@ -54,7 +54,9 @@
                 </template>
                 <template #col-project-format="{ value }">
                     <p-link v-if="value"
-                            :highlight="true"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            highlight
                             :href="getProjectLink(value)"
                     >
                         {{ projectFieldHandler(value, projects) }}
@@ -71,6 +73,7 @@ import {
 } from 'vue';
 
 import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -241,6 +244,7 @@ export default {
             projectFieldHandler,
             getProjectLink,
             ROLE_TYPE_BADGE_OPTION,
+            ACTION_ICON,
         };
     },
 };

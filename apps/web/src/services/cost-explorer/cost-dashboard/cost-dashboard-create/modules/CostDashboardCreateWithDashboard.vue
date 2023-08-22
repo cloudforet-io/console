@@ -16,10 +16,11 @@
                 >
                     {{ dashboardData.name }}
                 </p-select-card>
-                <p-link
-                    target="_blank"
-                    :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        size="sm"
+                        :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
+                                params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
                 </p-link>
@@ -39,6 +40,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PLink, PSelectCard, PDivider, PTextPagination,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -119,6 +121,7 @@ export default {
 
         return {
             COST_EXPLORER_ROUTE,
+            ACTION_ICON,
             ...toRefs(state),
             costDashboardPageState,
             defaultLayoutData,

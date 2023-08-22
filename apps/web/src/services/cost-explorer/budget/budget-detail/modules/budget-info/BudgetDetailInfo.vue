@@ -32,6 +32,8 @@
                class="summary-content"
             >
                 <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="referenceRouter(
                             (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
                             { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
@@ -65,6 +67,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import { PPaneLayout, PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 
@@ -161,6 +164,7 @@ export default {
             getTargetLabel,
             costTypeMap,
             BUDGET_TIME_UNIT,
+            ACTION_ICON,
         };
     },
 };

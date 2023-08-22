@@ -27,7 +27,9 @@
                 <p-button style-type="tertiary"
                           class="link-button"
                 >
-                    <p-link :href="consoleLink">
+                    <p-link :href="consoleLink"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-link>
                 </p-button>
@@ -89,6 +91,7 @@ import {
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { render } from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -221,6 +224,7 @@ export default defineComponent({
             ...toRefs(state),
             ...toRefs(storeState),
             ACCOUNT_TYPE,
+            ACTION_ICON,
             handleOpenDeleteModal,
             handleChangeProject,
             handleRefresh,

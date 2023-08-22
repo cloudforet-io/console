@@ -43,7 +43,6 @@
                       class="text-center"
                 >
                     <p-link :to="value ? getLink(item, field.name) : undefined"
-                            hide-icon
                             class="!align-middle"
                     >
                         <template v-if="getIsRaised(item, field.name)">

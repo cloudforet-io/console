@@ -8,7 +8,6 @@
                      :color="item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
                 />
                 <p-link class="title"
-                        hide-icon
                         :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
                 >
                     <span v-tooltip.bottom="item.title">{{ item.title }}</span>
@@ -25,6 +24,8 @@
                 <p-link v-if="showProjectLink"
                         v-tooltip.bottom="projectNameFormatter(item.project_id)"
                         class="project-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
                         hide-icon
                 >
@@ -61,6 +62,7 @@ import {
 import {
     PI, PBadge, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -138,6 +140,7 @@ export default {
             red,
             ALERT_URGENCY,
             ALERT_MANAGER_ROUTE,
+            ACTION_ICON,
             referenceRouter,
             badgeStyleTypeFormatter,
             dateFormatter,

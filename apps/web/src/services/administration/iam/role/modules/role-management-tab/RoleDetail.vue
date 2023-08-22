@@ -62,6 +62,8 @@
             </template>
             <template #col-policy_id-format="{ value, item }">
                 <p-link :highlight="true"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
                             params: { id: value },
@@ -84,6 +86,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -231,6 +234,7 @@ export default {
             convertPagePermissionLabel,
             policyTypeBadgeColorFormatter,
             ADMINISTRATION_ROUTE,
+            ACTION_ICON,
         };
     },
 };

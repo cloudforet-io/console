@@ -5,7 +5,9 @@
         >
             <span class="project">
                 <p-copy-button :value="alertData.project_id">
-                    <p-link :to="referenceRouter(
+                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :to="referenceRouter(
                                 alertData.project_id,
                                 { resource_type: 'identity.Project' })"
                             highlight
@@ -72,6 +74,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PButton, PLink, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 
@@ -138,6 +141,7 @@ export default {
 
         return {
             EDIT_MODE,
+            ACTION_ICON,
             ...toRefs(alertDetailItemState),
             ...toRefs(state),
             referenceRouter,

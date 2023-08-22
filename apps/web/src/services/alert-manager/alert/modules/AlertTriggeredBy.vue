@@ -1,6 +1,8 @@
 <template>
     <span>
         <p-link v-if="link"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
                 :to="link"
         >
             {{ label }}
@@ -19,6 +21,8 @@ import {
 import type { Location } from 'vue-router';
 
 import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
@@ -89,6 +93,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ACTION_ICON,
         };
     },
 };

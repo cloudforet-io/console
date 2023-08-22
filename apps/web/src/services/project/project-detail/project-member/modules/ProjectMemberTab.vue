@@ -39,7 +39,10 @@
                 {{ storeState.users[value] ? storeState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
-                <p-link :to="projectLinkFormatter(value)">
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="projectLinkFormatter(value)"
+                >
                     {{ value }}
                 </p-link>
             </template>
@@ -98,6 +101,7 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -342,6 +346,7 @@ export default {
             ...toRefs(state),
             storeState,
             checkMemberDeleteState,
+            ACTION_ICON,
             handleClickInviteMember,
             handleSelectDropdown,
             handleConfirmDeleteMember,

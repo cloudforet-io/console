@@ -51,6 +51,8 @@
         <p class="desc4">
             {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
             <p-link :highlight="true"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="{
                         name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
                     }"
@@ -63,6 +65,7 @@
 
 <script lang="ts">
 import { PLink, PDivider } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
@@ -75,6 +78,7 @@ export default {
     setup() {
         return {
             ADMINISTRATION_ROUTE,
+            ACTION_ICON,
         };
     },
 };

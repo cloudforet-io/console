@@ -28,6 +28,7 @@
                     <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TRUSTED_ACCOUNT_HELP_TEXT') }}</span>
                     <p-link class="see-more-text"
                             :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             :href="trustedAccountInfoLink"
                     />
                 </template>
@@ -127,6 +128,7 @@ import {
 import {
     PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -412,6 +414,7 @@ export default defineComponent<Props>({
             formState,
             tabState,
             ACCOUNT_TYPE,
+            ACTION_ICON,
             handleChangeSecretType,
             handleCredentialValidate,
             handleSelectNoCredentials,

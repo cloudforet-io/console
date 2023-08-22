@@ -20,6 +20,7 @@
             <div>
                 <p-link v-for="resource in availableResources"
                         :key="resource.id"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
                         class="legend"
                         :href="resource.link"
                 >
@@ -102,8 +103,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -112,6 +111,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -382,6 +382,7 @@ export default {
         return {
             ...toRefs(state),
             TIME_RANGE,
+            ACTION_ICON,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
             },

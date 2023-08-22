@@ -17,7 +17,6 @@
             >
                 <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
                         :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
-                        hide-icon
                         highlight
                 />
             </div>

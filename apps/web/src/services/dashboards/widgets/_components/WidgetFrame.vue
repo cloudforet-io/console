@@ -73,8 +73,8 @@
                         <p-link v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
                                 :href="props.widgetLink"
                                 :to="props.widgetLocation"
+                                :action-icon="ACTION_ICON.INTERNAL_LINK"
                                 class="link-button"
-                                icon-name="ic_chevron-right"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         </p-link>
@@ -120,6 +120,7 @@ import type { Location } from 'vue-router/types/router';
 import {
     PLink, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';

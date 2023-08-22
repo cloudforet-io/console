@@ -68,7 +68,9 @@
                     </div>
                     <div v-if="selectedItem.message.link">
                         <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
-                        <p-link :href="selectedItem.message.link">
+                        <p-link :href="selectedItem.message.link"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        >
                             {{ selectedItem.message.link }}
                         </p-link>
                     </div>
@@ -106,6 +108,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import type { Dayjs } from 'dayjs';
@@ -360,6 +363,7 @@ export default {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
             NOTIFICATION_TYPE_ICONS,
+            ACTION_ICON,
             handleSelectNotification,
             handleDeleteNotification,
             handleCloseNotificationModal,

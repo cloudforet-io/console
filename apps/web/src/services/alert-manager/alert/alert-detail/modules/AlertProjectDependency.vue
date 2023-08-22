@@ -13,7 +13,9 @@
            :key="`${item}-${index}`"
            class="project-name"
         >
-            <p-link :to="referenceRouter(
+            <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="referenceRouter(
                         item,
                         { resource_type: 'identity.Project' })"
                     highlight
@@ -32,6 +34,7 @@ import {
 import {
     PLink, PEmpty, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 
@@ -70,6 +73,7 @@ export default {
         return {
             referenceRouter,
             ...toRefs(state),
+            ACTION_ICON,
         };
     },
 };

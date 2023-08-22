@@ -14,6 +14,8 @@
             <div class="desc">
                 <p>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.BUDGET_NOTI_HELP_TEXT') }}</p>
                 <p-link :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="{
                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                             params: {
@@ -92,6 +94,7 @@ import {
 import {
     PButtonModal, PTextInput, PLink, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { i18n } from '@/translations';
 
@@ -225,6 +228,7 @@ export default {
             NOTIFICATION_UNIT,
             NOTIFICATION_TYPE,
             PROJECT_ROUTE,
+            ACTION_ICON,
         };
     },
 };

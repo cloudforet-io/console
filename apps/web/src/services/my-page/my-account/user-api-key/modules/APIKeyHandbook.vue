@@ -8,6 +8,7 @@
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
                         <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                 class="link"
                         >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
@@ -84,6 +85,7 @@
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
                         <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                 class="link"
                         >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
@@ -97,6 +99,7 @@
 
 <script lang="ts">
 import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 const githubLink = 'https://github.com/cloudforet-io/spacectl';
 const codeBlock = {
@@ -117,6 +120,7 @@ export default {
         return {
             githubLink,
             codeBlock,
+            ACTION_ICON,
         };
     },
 };
