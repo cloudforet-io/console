@@ -16,7 +16,6 @@
                      @click="tabState.activeTab = data.name"
                 >
                     <p-link :href="summaryLinkFormatter(data.name).href"
-                            hide-icon
                             class="count"
                             highlight
                     >
@@ -42,6 +41,7 @@
                 >
                     <template #col-event-format="{ value }">
                         <p-link :to="value.to"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                 highlight
                         >
                             {{ value.name }}
@@ -64,7 +64,9 @@
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-link :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                            new-tab
+                                            :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
                                             highlight
                                     >
                                         {{ resource.entity_value }}
@@ -92,6 +94,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PLink, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
 
@@ -303,6 +306,7 @@ export default {
         return {
             ...toRefs(state),
             tabState,
+            ACTION_ICON,
             regionFormatter,
             summaryLinkFormatter,
             getEvents,

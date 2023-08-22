@@ -4,6 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -81,11 +82,12 @@ watch(() => props.recentJobs, () => {
                     />
                 </p-tooltip>
             </p>
-            <p-link v-if="props.fullMode && props.historyLink"
-                    size="sm"
+            <p-link size="sm"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     highlight
-                    icon-name="ic_chevron-right"
                     :to="props.historyLink"
+                    class="view-all-link"
             >
                 View All
             </p-link>
@@ -140,6 +142,9 @@ watch(() => props.recentJobs, () => {
                     @apply text-blue-600;
                 }
             }
+        }
+        .view-all-link {
+            margin-left: 0.25rem;
         }
     }
     .data-loader {

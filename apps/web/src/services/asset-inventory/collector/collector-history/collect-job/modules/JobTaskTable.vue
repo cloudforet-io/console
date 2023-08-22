@@ -6,6 +6,7 @@ import {
 import {
     PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -246,6 +247,8 @@ onDeactivated(() => {
         </template>
         <template #col-service_account_id-format="{ value }">
             <p-link v-if="storeState.serviceAccounts[value]"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="referenceRouter(
                         value,
                         { resource_type: 'identity.ServiceAccount' })"
@@ -256,6 +259,8 @@ onDeactivated(() => {
         </template>
         <template #col-project_id-format="{ value }">
             <p-link v-if="storeState.projects[value]"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="referenceRouter(
                         value,
                         { resource_type: 'identity.Project' })"

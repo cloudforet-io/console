@@ -29,7 +29,9 @@
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>
-                <p-link :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
                         highlight
                 >
                     {{ escalationPolicyName }}
@@ -89,6 +91,7 @@ import {
 import {
     PPaneLayout, PDefinitionTable, PLink, PBadge,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -192,6 +195,7 @@ export default {
             ALERT_MANAGER_ROUTE,
             ALERT_SEVERITY,
             ALERT_SEVERITY_COLORS,
+            ACTION_ICON,
         };
     },
 };

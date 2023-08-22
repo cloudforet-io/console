@@ -41,9 +41,11 @@
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value">
-                <p-link :to="referenceRouter(
-                    value,
-                    { resource_type: 'identity.Project' })"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(
+                            value,
+                            { resource_type: 'identity.Project' })"
                 >
                     {{ projects[value] ? projects[value].label : value }}
                 </p-link>
@@ -58,6 +60,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PDataTable, PLink, PBadge,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
 
@@ -150,6 +153,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_STATE,
+            ACTION_ICON,
             referenceRouter,
             alertStateBadgeStyleTypeFormatter,
             alertScopeBadgeStyleTypeFormatter,

@@ -35,7 +35,9 @@
                 >
                     <span>{{ scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
                     <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
-                        (<p-link :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
+                        (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                 new-tab
+                                 :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
                                  :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                  highlight
                         />)
@@ -52,6 +54,9 @@
             <template #label>
                 <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
                 <p-link class="link-text"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        size="sm"
                         :to="{ name: PROJECT_ROUTE._NAME }"
                         :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
                         highlight
@@ -101,6 +106,7 @@ import {
 import {
     PLink, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -229,6 +235,7 @@ export default {
             referenceRouter,
             SCOPE,
             ACTION,
+            ACTION_ICON,
             PROJECT_ROUTE,
             handleChangeScope,
             handleChangeFinishCondition,
@@ -256,11 +263,10 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                .link-text {
-                    font-weight: normal;
-                    font-size: 0.75rem;
-                }
             }
+        }
+        .link-text {
+            font-weight: normal;
         }
         .title-wrapper {
             .title {

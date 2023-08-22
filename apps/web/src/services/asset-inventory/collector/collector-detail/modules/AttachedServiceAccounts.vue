@@ -6,6 +6,7 @@ import {
 import {
     PLink, PBadge, PButton, PRadio, PRadioGroup, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
 
@@ -216,6 +217,8 @@ onMounted(async () => {
             </template>
             <template #col-project_id-format="{value}">
                 <p-link v-if="state.projects[value]"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
                         :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
                 >
                     {{ state.projects[value].label }}

@@ -38,8 +38,10 @@
                     </span>
                     <p-link v-if="state.pluginDetailLink"
                             :href="state.pluginDetailLink"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
                             size="sm"
-                            :highlight="true"
+                            highlight
                     >
                         {{ $t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
                     </p-link>
@@ -66,6 +68,7 @@ import {
 import {
     PLink, PLazyImg, PLabel, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

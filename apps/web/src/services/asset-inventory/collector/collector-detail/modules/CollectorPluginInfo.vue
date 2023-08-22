@@ -2,6 +2,7 @@
 import { computed, defineProps, reactive } from 'vue';
 
 import { PLink, PDivider, PFieldTitle } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import type { CollectorModel, RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
 import CollectorPluginContents from '@/services/asset-inventory/collector/shared/CollectorPluginContents.vue';
@@ -61,6 +62,7 @@ const state = reactive({
             </p>
             <p-link v-if="props.plugin?.tags?.link"
                     size="sm"
+                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
                     highlight
                     class="plugin-link"
             >

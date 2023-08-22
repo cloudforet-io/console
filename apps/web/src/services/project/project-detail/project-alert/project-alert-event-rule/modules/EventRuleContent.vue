@@ -35,9 +35,11 @@
                                 <span class="text-secondary">{{ $t('PROJECT.EVENT_RULE.ON') }}</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
-                                <p-link :to="referenceRouter(
-                                    items[item.name],
-                                    { resource_type: 'identity.Project' })"
+                                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        new-tab
+                                        :to="referenceRouter(
+                                            items[item.name],
+                                            { resource_type: 'identity.Project' })"
                                 >
                                     {{ projects[items[item.name]] ? projects[items[item.name]].label : items[item.name] }}
                                 </p-link>
@@ -47,9 +49,11 @@
                                    :key="`${projectId}-${idx}`"
                                    class="project-name"
                                 >
-                                    <p-link :to="referenceRouter(
-                                        projectId,
-                                        { resource_type: 'identity.Project' })"
+                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                            new-tab
+                                            :to="referenceRouter(
+                                                projectId,
+                                                { resource_type: 'identity.Project' })"
                                     >
                                         {{ projects[projectId] ? projects[projectId].label : projectId }}
                                     </p-link>
@@ -92,6 +96,7 @@ import {
 } from 'vue';
 
 import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -145,6 +150,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ACTION_ICON,
             referenceRouter,
         };
     },

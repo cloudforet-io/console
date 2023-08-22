@@ -16,8 +16,7 @@
                 </p-button>
                 <br>
                 <p-link text="More information"
-                        icon-position="right"
-                        icon-name="ic_external-link"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
                         :href="SERVICE_CONTENTS.topic.link"
                         highlight
                 >
@@ -42,8 +41,7 @@
                         {{ submenu.description }}
                     </p>
                     <p-link :text="submenu.link_text"
-                            icon-position="right"
-                            icon-name="ic_external-link"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             highlight
                             :href="submenu.link"
                     />
@@ -61,6 +59,7 @@
 
 <script lang="ts">
 import { PLink, PButton, PPaneLayout } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { i18n } from '@/translations';
 
@@ -110,6 +109,7 @@ export default {
     setup() {
         return {
             SERVICE_CONTENTS,
+            ACTION_ICON,
         };
     },
 };

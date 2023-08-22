@@ -3,6 +3,8 @@
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.NAME_LABEL') }}</span>
             <p-link class="value"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="escalationPolicyLink"
                     highlight
             >
@@ -61,8 +63,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, onActivated, reactive, toRefs, watch,
 } from 'vue';
@@ -70,6 +70,7 @@ import {
 import {
     PBadge, PDivider, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { get, filter } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -172,6 +173,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_MANAGER_ROUTE,
+            ACTION_ICON,
             notificationLevelFormatter,
             channelFormatter,
         };

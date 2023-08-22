@@ -41,6 +41,8 @@
             >
                 <template #label-extra>
                     <p-link class="go-project"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
                             highlight
                             :to="{name: PROJECT_ROUTE._NAME }"
                     >
@@ -79,6 +81,7 @@ import {
     PLink, PButton,
     PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -221,6 +224,7 @@ export default {
             setProjectAlert,
             ALERT_URGENCY,
             PROJECT_ROUTE,
+            ACTION_ICON,
         };
     },
 };

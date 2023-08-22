@@ -54,6 +54,9 @@
                                 <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
                                 <p-link v-if="budgetTargetId"
                                         class="link-text"
+                                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        new-tab
+                                        size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
                                         :to="{
                                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
@@ -104,6 +107,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 
@@ -202,6 +206,7 @@ export default {
             BUDGET_NOTIFICATIONS_UNIT,
             BUDGET_NOTIFICATIONS_TYPE,
             PROJECT_ROUTE,
+            ACTION_ICON,
         };
     },
 };

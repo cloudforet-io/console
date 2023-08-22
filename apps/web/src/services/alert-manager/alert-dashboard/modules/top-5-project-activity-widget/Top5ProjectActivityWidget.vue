@@ -35,7 +35,6 @@
                      class="table-row"
                 >
                     <p-link :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                            hide-icon
                             size="sm"
                             class="col-name"
                     >

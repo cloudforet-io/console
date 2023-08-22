@@ -1,6 +1,8 @@
 <template>
     <div class="service-account-project-detail">
         <p-link v-if="!!projectName"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
                 :href="projectLink"
         >
             {{ projectName }}
@@ -28,6 +30,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PLink, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -83,6 +86,7 @@ export default {
         return {
             ...toRefs(state),
             ACCOUNT_TYPE,
+            ACTION_ICON,
         };
     },
 };

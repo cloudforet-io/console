@@ -57,8 +57,7 @@
                 </template>
                 <template #col-title-format="{ value, item }">
                     <template v-if="value">
-                        <p-link hide-icon
-                                highlight
+                        <p-link highlight
                                 :to="{
                                     name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
                                     params: { id: item.alert_id }
@@ -89,7 +88,10 @@
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
-                        <p-link :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
+                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                new-tab
+                                :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                        >
                             {{ storeState.projects[value] ? storeState.projects[value].label : value }}
                         </p-link>
                     </template>
@@ -129,6 +131,7 @@ import {
 import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@cloudforet/core-lib';
@@ -458,6 +461,7 @@ export default {
             ALERT_STATE_FILTER,
             ALERT_MANAGER_ROUTE,
             ASSIGNED_STATE,
+            ACTION_ICON,
             referenceRouter,
             alertStateBadgeStyleTypeFormatter,
             getAlerts,

@@ -1,6 +1,5 @@
 <template>
     <router-link :to="props.to || {}"
-                 class="p-link"
                  custom
     >
         <template #default="{href: toHref, navigate}">
@@ -61,9 +60,9 @@ interface LinkProps {
 
 const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
-    size: LinkSize.md,
+    size: undefined,
     leftIcon: undefined,
-    actionIcon: ACTION_ICON.NONE,
+    actionIcon: 'none',
     href: undefined,
     to: undefined,
 });
@@ -107,7 +106,7 @@ const state = reactive({
         vertical-align: baseline;
     }
     > .icon {
-        margin: 0 0.125em;
+        margin: 0 0.125rem 0 0;
         vertical-align: top;
     }
     &.disabled {
@@ -132,15 +131,9 @@ const state = reactive({
 
     &.md {
         font-size: 0.875rem;
-        .icon {
-            margin-bottom: 0.125rem;
-        }
     }
     &.sm {
         font-size: 0.75rem;
-        .icon {
-            margin-bottom: 0.125rem;
-        }
     }
     &.lg {
         font-size: 1rem;
