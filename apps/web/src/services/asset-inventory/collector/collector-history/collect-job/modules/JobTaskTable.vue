@@ -4,8 +4,9 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PSelectButtonGroup, PStatus, PToolboxTable,
+    PLink, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -245,23 +246,27 @@ onDeactivated(() => {
             </div>
         </template>
         <template #col-service_account_id-format="{ value }">
-            <p-anchor v-if="storeState.serviceAccounts[value]"
-                      :to="referenceRouter(
-                          value,
-                          { resource_type: 'identity.ServiceAccount' })"
+            <p-link v-if="storeState.serviceAccounts[value]"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="referenceRouter(
+                        value,
+                        { resource_type: 'identity.ServiceAccount' })"
             >
                 {{ storeState.serviceAccounts[value].label }}
-            </p-anchor>
+            </p-link>
             <span v-else>--</span>
         </template>
         <template #col-project_id-format="{ value }">
-            <p-anchor v-if="storeState.projects[value]"
-                      :to="referenceRouter(
-                          value,
-                          { resource_type: 'identity.Project' })"
+            <p-link v-if="storeState.projects[value]"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="referenceRouter(
+                        value,
+                        { resource_type: 'identity.Project' })"
             >
                 {{ storeState.projects[value].label }}
-            </p-anchor>
+            </p-link>
             <span v-else>--</span>
         </template>
         <template #col-status-format="{ value }">

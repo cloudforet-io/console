@@ -40,12 +40,14 @@
                            :invalid-text="projectInvalidText"
             >
                 <template #label-extra>
-                    <p-anchor class="go-project"
-                              highlight
-                              :to="{name: PROJECT_ROUTE._NAME }"
+                    <p-link class="go-project"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            highlight
+                            :to="{name: PROJECT_ROUTE._NAME }"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
-                    </p-anchor>
+                    </p-link>
                 </template>
                 <project-select-dropdown :invalid="projectInvalid"
                                          project-selectable
@@ -76,9 +78,10 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PButton,
+    PLink, PButton,
     PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -102,7 +105,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
-        PAnchor,
+        PLink,
         PButton,
         PTextarea,
     },
@@ -221,6 +224,7 @@ export default {
             setProjectAlert,
             ALERT_URGENCY,
             PROJECT_ROUTE,
+            ACTION_ICON,
         };
     },
 };

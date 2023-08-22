@@ -9,7 +9,7 @@ import utc from 'dayjs/plugin/utc';
 
 import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 
 
 dayjs.extend(utc);
@@ -17,7 +17,7 @@ dayjs.extend(tz);
 
 export default {
     name: 'PDynamicFieldDatetime',
-    components: { PAnchor },
+    components: { PLink },
     props: {
         options: {
             type: Object,
@@ -73,7 +73,7 @@ export default {
         let datetimeEl = h('span', { ...attrs }, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
 
         if (options.link) {
-            datetimeEl = h(PAnchor, {
+            datetimeEl = h(PLink, {
                 ...attrs,
                 attrs: { href: props.options.link, target: '_blank' },
             }, [datetimeEl]);

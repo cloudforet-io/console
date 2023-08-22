@@ -15,7 +15,7 @@
                 </p-button>
             </template>
         </p-heading>
-        <policy-list-data-table hide-anchor-icon />
+        <policy-list-data-table hide-link-icon />
     </section>
 </template>
 

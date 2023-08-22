@@ -56,9 +56,11 @@
                         />
                         <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
-                                <p-anchor :href="githubLink">
+                                <p-link :href="githubLink"
+                                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                >
                                     {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
-                                </p-anchor>
+                                </p-link>
                             </span>
                         </p>
                     </div>
@@ -95,8 +97,9 @@
 import { reactive, toRefs } from 'vue';
 
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import yaml from 'js-yaml';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -120,7 +123,7 @@ export default {
         PCollapsibleToggle,
         PTextEditor,
         PButton,
-        PAnchor,
+        PLink,
     },
     props: {
         visible: {
@@ -184,6 +187,7 @@ export default {
         return {
             FileType,
             ...toRefs(state),
+            ACTION_ICON,
             onClickDownloadFile,
             onClickConfirm,
         };

@@ -25,10 +25,9 @@
             <div v-else
                  class="view-all-text"
             >
-                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
-                          :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
-                          hide-icon
-                          highlight
+                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
+                        :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
+                        highlight
                 />
             </div>
         </template>
@@ -42,7 +41,7 @@ import {
 } from 'vue';
 
 import {
-    PListCard, PI, PAnchor,
+    PListCard, PI, PLink,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -58,7 +57,7 @@ export default {
     components: {
         PListCard,
         PI,
-        PAnchor,
+        PLink,
     },
     props: {
         projectId: {

@@ -10,11 +10,13 @@
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-anchor v-if="escalationPolicyFormState.scope === SCOPE.PROJECT && escalationPolicyFormState.projectId"
-                      class="link-text"
-                      :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                      :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } }"
-                      highlight
+            <p-link v-if="escalationPolicyFormState.scope === SCOPE.PROJECT && escalationPolicyFormState.projectId"
+                    class="link-text"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
+                    :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } }"
+                    highlight
             />
         </div>
         <div v-for="(rule, idx) in rules"
@@ -166,8 +168,9 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
+    PLink, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -205,7 +208,7 @@ export default {
     name: 'EscalationRulesInputForm',
     components: {
         ProjectChannelList,
-        PAnchor,
+        PLink,
         PBadge,
         PIconButton,
         PSelectDropdown,
@@ -322,6 +325,7 @@ export default {
             NOTIFICATION_LEVELS,
             MINIFIED_NOTIFICATION_LEVELS,
             SCOPE,
+            ACTION_ICON,
             //
             repeatCount,
             rules,

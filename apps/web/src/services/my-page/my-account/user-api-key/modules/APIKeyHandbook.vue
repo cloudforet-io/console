@@ -7,11 +7,12 @@
             <p class="desc">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
-                        <p-anchor :href="githubLink"
-                                  class="link"
+                        <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                class="link"
                         >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </i18n>
                 <br>
@@ -83,11 +84,12 @@
             <p class="desc last">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
-                        <p-anchor :href="githubLink"
-                                  class="link"
+                        <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                class="link"
                         >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </i18n>
             </p>
@@ -96,7 +98,8 @@
 </template>
 
 <script lang="ts">
-import { PAnchor } from '@spaceone/design-system';
+import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 const githubLink = 'https://github.com/cloudforet-io/spacectl';
 const codeBlock = {
@@ -111,12 +114,13 @@ const codeBlock = {
 export default {
     name: 'UserAPIKeyHandbook',
     components: {
-        PAnchor,
+        PLink,
     },
     setup() {
         return {
             githubLink,
             codeBlock,
+            ACTION_ICON,
         };
     },
 };

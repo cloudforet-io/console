@@ -15,13 +15,12 @@
                      :class="{active: tabState.activeTab === data.name}"
                      @click="tabState.activeTab = data.name"
                 >
-                    <p-anchor :href="summaryLinkFormatter(data.name).href"
-                              hide-icon
-                              class="count"
-                              highlight
+                    <p-link :href="summaryLinkFormatter(data.name).href"
+                            class="count"
+                            highlight
                     >
                         {{ data.count | summaryCount }}
-                    </p-anchor>
+                    </p-link>
                     <span class="label">{{ data.label }}</span>
                     <span class="date">{{ data.date }}</span>
                 </div>
@@ -41,11 +40,12 @@
                                  @change="onChange"
                 >
                     <template #col-event-format="{ value }">
-                        <p-anchor :to="value.to"
-                                  highlight
+                        <p-link :to="value.to"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                highlight
                         >
                             {{ value.name }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                     <template #col-region_code-format="{ value }">
                         <span>{{ regionFormatter(value) }}</span>
@@ -64,11 +64,13 @@
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-anchor :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                              highlight
+                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                            new-tab
+                                            :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                            highlight
                                     >
                                         {{ resource.entity_value }}
-                                    </p-anchor>
+                                    </p-link>
                                 </template>
                             </div>
                         </div>
@@ -90,8 +92,9 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PAnchor, PToolboxTable,
+    PLink, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
 
@@ -130,7 +133,7 @@ export default {
         },
     },
     components: {
-        PAnchor,
+        PLink,
         PToolboxTable,
         WidgetLayout,
     },
@@ -303,6 +306,7 @@ export default {
         return {
             ...toRefs(state),
             tabState,
+            ACTION_ICON,
             regionFormatter,
             summaryLinkFormatter,
             getEvents,

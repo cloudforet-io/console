@@ -27,9 +27,11 @@
                 <p-button style-type="tertiary"
                           class="link-button"
                 >
-                    <p-anchor :href="consoleLink">
+                    <p-link :href="consoleLink"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
-                    </p-anchor>
+                    </p-link>
                 </p-button>
             </template>
         </p-heading>
@@ -87,8 +89,9 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
+    PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { render } from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -125,7 +128,7 @@ export default defineComponent({
         PIconButton,
         PHeading,
         PButton,
-        PAnchor,
+        PLink,
         PLazyImg,
         PPaneLayout,
     },
@@ -221,6 +224,7 @@ export default defineComponent({
             ...toRefs(state),
             ...toRefs(storeState),
             ACCOUNT_TYPE,
+            ACTION_ICON,
             handleOpenDeleteModal,
             handleChangeProject,
             handleRefresh,
@@ -236,8 +240,8 @@ export default defineComponent({
             display: inline-flex;
         }
         .link-button {
-            /* custom design-system component - p-anchor */
-            :deep(.p-anchor) {
+            /* custom design-system component - p-link */
+            :deep(.p-link) {
                 .text:hover {
                     text-decoration: none;
                 }

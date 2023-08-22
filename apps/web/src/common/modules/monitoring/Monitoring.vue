@@ -18,10 +18,11 @@
                 }) }}
             </span>
             <div>
-                <p-anchor v-for="resource in availableResources"
-                          :key="resource.id"
-                          class="legend"
-                          :href="resource.link"
+                <p-link v-for="resource in availableResources"
+                        :key="resource.id"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        class="legend"
+                        :href="resource.link"
                 >
                     <template #left-extra>
                         <span class="circle"
@@ -29,7 +30,7 @@
                         />
                     </template>
                     {{ legendFormatter(resource) }}
-                </p-anchor>
+                </p-link>
             </div>
         </section>
         <section class="toolbox-section">
@@ -102,16 +103,15 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PAnchor, PSpinner,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -152,7 +152,7 @@ export default {
         PSelectDropdown,
         PSelectButtonGroup,
         PIconButton,
-        PAnchor,
+        PLink,
         MetricChart,
         PSpinner,
     },
@@ -382,6 +382,7 @@ export default {
         return {
             ...toRefs(state),
             TIME_RANGE,
+            ACTION_ICON,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
             },
@@ -421,8 +422,8 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    /* custom design-system component - p-anchor */
-    :deep(.legend.p-anchor) {
+    /* custom design-system component - p-link */
+    :deep(.legend.p-link) {
         @apply text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;

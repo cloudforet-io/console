@@ -13,14 +13,15 @@
                           @changeSort="handleChange"
             >
                 <template #col-name-format="{value, item}">
-                    <p-anchor
-                        :to="{
-                            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                            params: { serviceAccountId: item.service_account_id },
-                        }"
+                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :to="{
+                                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                                params: { serviceAccountId: item.service_account_id },
+                            }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </p-data-table>
         </div>
@@ -37,8 +38,9 @@ import {
     PPaneLayout,
     PHeading,
     PDataTable,
-    PAnchor,
+    PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -54,7 +56,7 @@ export default defineComponent({
         PPaneLayout,
         PHeading,
         PDataTable,
-        PAnchor,
+        PLink,
     },
     props: {
         serviceAccountId: {
@@ -119,6 +121,7 @@ export default defineComponent({
             fields,
             handleChange,
             ASSET_INVENTORY_ROUTE,
+            ACTION_ICON,
         };
     },
 });

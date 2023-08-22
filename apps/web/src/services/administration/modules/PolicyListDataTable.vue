@@ -44,8 +44,9 @@
             </template>
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
-                    <p-anchor
-                        :hide-icon="!!hideAnchorIcon"
+                    <p-link
+                        :action-icon="hideLinkIcon ? undefined : ACTION_ICON.INTERNAL_LINK"
+                        :new-tab="!hideLinkIcon"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
@@ -54,7 +55,7 @@
                         }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </template>
             <template #col-created_at-format="{ value }">
@@ -74,8 +75,9 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PAnchor, PBadge, PSelectStatus, PToolboxTable,
+    PLink, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { filter, capitalize } from 'lodash';
@@ -119,7 +121,7 @@ export default {
     components: {
         PToolboxTable,
         PSelectStatus,
-        PAnchor,
+        PLink,
         PBadge,
     },
     props: {
@@ -127,7 +129,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        hideAnchorIcon: {
+        hideLinkIcon: {
             type: Boolean,
             default: false,
         },
@@ -277,6 +279,7 @@ export default {
             policySearchHandler,
             ADMINISTRATION_ROUTE,
             POLICY_TYPE,
+            ACTION_ICON,
             policyTypeBadgeColorFormatter,
             policyCreatedAtFormatter,
             handleChange,

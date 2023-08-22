@@ -39,9 +39,12 @@
                 {{ storeState.users[value] ? storeState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
-                <p-anchor :to="projectLinkFormatter(value)">
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="projectLinkFormatter(value)"
+                >
                     {{ value }}
-                </p-anchor>
+                </p-link>
             </template>
             <template #col-labels-format="{ value }">
                 <p v-if="value.length === 0" />
@@ -90,7 +93,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor,
+    PLink,
     PBadge,
     PButton,
     PHeading,
@@ -98,6 +101,7 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -131,7 +135,7 @@ interface MemberDataTableItem extends MemberItem {
 export default {
     name: 'ProjectMemberTab',
     components: {
-        PAnchor,
+        PLink,
         PToolboxTable,
         PHeading,
         PButton,
@@ -342,6 +346,7 @@ export default {
             ...toRefs(state),
             storeState,
             checkMemberDeleteState,
+            ACTION_ICON,
             handleClickInviteMember,
             handleSelectDropdown,
             handleConfirmDeleteMember,

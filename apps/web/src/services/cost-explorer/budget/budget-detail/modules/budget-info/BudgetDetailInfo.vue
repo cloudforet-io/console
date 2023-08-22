@@ -31,13 +31,15 @@
             <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-anchor v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
-                          :to="referenceRouter(
-                              (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
-                              { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(
+                            (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
+                            { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
                     {{ getTargetLabel(projects) }}
-                </p-anchor>
+                </p-link>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
@@ -64,7 +66,8 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PPaneLayout, PAnchor } from '@spaceone/design-system';
+import { PPaneLayout, PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { store } from '@/store';
 
@@ -102,7 +105,7 @@ export default {
         AmountPlanningTypePopover,
         BudgetCostTypePopover,
         PPaneLayout,
-        PAnchor,
+        PLink,
     },
     props: {
         currency: {
@@ -161,6 +164,7 @@ export default {
             getTargetLabel,
             costTypeMap,
             BUDGET_TIME_UNIT,
+            ACTION_ICON,
         };
     },
 };

@@ -57,15 +57,14 @@
                 </template>
                 <template #col-title-format="{ value, item }">
                     <template v-if="value">
-                        <p-anchor hide-icon
-                                  highlight
-                                  :to="{
-                                      name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                                      params: { id: item.alert_id }
-                                  }"
+                        <p-link highlight
+                                :to="{
+                                    name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                    params: { id: item.alert_id }
+                                }"
                         >
                             {{ value }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
@@ -89,9 +88,12 @@
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
-                        <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
+                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                new-tab
+                                :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                        >
                             {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </template>
                 <template #col-created_at-format="{value, field}">
@@ -127,8 +129,9 @@ import {
 } from 'vue';
 
 import {
-    PToolboxTable, PButton, PHeading, PBadge, PI, PAnchor,
+    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@cloudforet/core-lib';
@@ -181,7 +184,7 @@ export default {
         PHeading,
         PBadge,
         PI,
-        PAnchor,
+        PLink,
     },
     props: {
         projectId: {
@@ -458,6 +461,7 @@ export default {
             ALERT_STATE_FILTER,
             ALERT_MANAGER_ROUTE,
             ASSIGNED_STATE,
+            ACTION_ICON,
             referenceRouter,
             alertStateBadgeStyleTypeFormatter,
             getAlerts,

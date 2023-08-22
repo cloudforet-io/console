@@ -2,12 +2,14 @@
     <div class="project-escalation-policy">
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.NAME_LABEL') }}</span>
-            <p-anchor class="value"
-                      :to="escalationPolicyLink"
-                      highlight
+            <p-link class="value"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="escalationPolicyLink"
+                    highlight
             >
                 {{ escalationPolicyName }}
-            </p-anchor>
+            </p-link>
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.FINISH_CONDITION_LABEL') }}</span>
@@ -61,15 +63,14 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, onActivated, reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PBadge, PDivider, PI, PAnchor,
+    PBadge, PDivider, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { get, filter } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -92,7 +93,7 @@ export default {
         PDivider,
         PBadge,
         PI,
-        PAnchor,
+        PLink,
     },
     props: {
         projectId: {
@@ -172,6 +173,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_MANAGER_ROUTE,
+            ACTION_ICON,
             notificationLevelFormatter,
             channelFormatter,
         };

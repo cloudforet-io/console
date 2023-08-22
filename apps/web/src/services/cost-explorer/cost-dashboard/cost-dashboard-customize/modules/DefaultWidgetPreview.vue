@@ -4,11 +4,13 @@
             <div class="info-item">
                 <div class="type">
                     <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TYPE') }}</p-field-title>
-                    <p-anchor highlight
-                              :href="thumbnailLink"
+                    <p-link highlight
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :href="thumbnailLink"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_PREVIEW') }}
-                    </p-anchor>
+                    </p-link>
                 </div>
                 <div class="image-wrapper">
                     <p-lazy-img :src="assetUrlConverter(chartThumbnail)"
@@ -24,7 +26,8 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PAnchor, PFieldTitle, PLazyImg } from '@spaceone/design-system';
+import { PLink, PFieldTitle, PLazyImg } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -40,7 +43,7 @@ export default {
         CostDashboardCustomizeWidgetPreview,
         PFieldTitle,
         PLazyImg,
-        PAnchor,
+        PLink,
     },
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
@@ -55,6 +58,7 @@ export default {
         return {
             ...toRefs(state),
             assetUrlConverter,
+            ACTION_ICON,
         };
     },
 };
@@ -68,7 +72,7 @@ export default {
     .type {
         @apply w-full inline-flex justify-between;
     }
-    .p-anchor {
+    .p-link {
         @apply items-center;
     }
 }

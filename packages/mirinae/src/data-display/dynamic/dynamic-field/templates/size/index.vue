@@ -6,7 +6,7 @@ import bytes from 'bytes';
 
 import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',
@@ -20,7 +20,7 @@ const UNIT_SEPARATOR = ' ';
 
 export default {
     name: 'PDynamicFieldSize',
-    components: { PAnchor },
+    components: { PLink },
     props: {
         options: {
             type: Object,
@@ -75,7 +75,7 @@ export default {
         let sizeEl = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
         if (props.options.link) {
-            sizeEl = h(PAnchor, {
+            sizeEl = h(PLink, {
                 attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
                 props: { value, showIcon: !!formattedValue },
             }, [sizeEl]);

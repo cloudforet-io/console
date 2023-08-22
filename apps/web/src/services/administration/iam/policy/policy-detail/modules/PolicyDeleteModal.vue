@@ -12,13 +12,14 @@
         >
             <div class="modal-delete-disabled-title">
                 <span>{{ $t('IAM.POLICY.MODAL.DELETE_HELP_TEXT') }} </span>
-                <p-anchor
+                <p-link
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="{ name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME }"
-                    size="lg"
                     highlight
                 >
                     {{ $t('IAM.POLICY.MODAL.DELETE_FOLLOW_ROLES') }}
-                </p-anchor>
+                </p-link>
             </div>
             <p-data-table :fields="fields"
                           :items="attachedRoles"
@@ -31,7 +32,8 @@
 import { getCurrentInstance, reactive, toRefs } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PAnchor, PDataTable } from '@spaceone/design-system';
+import { PLink, PDataTable } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -49,7 +51,7 @@ export default {
     name: 'PolicyDeleteModal',
     components: {
         deleteModal,
-        PAnchor,
+        PLink,
         PDataTable,
     },
     props: {
@@ -118,6 +120,7 @@ export default {
             deletePolicy,
             handleConfirm,
             ADMINISTRATION_ROUTE,
+            ACTION_ICON,
         };
     },
 };

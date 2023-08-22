@@ -1,10 +1,12 @@
 <template>
     <span>
-        <p-anchor v-if="link"
-                  :to="link"
+        <p-link v-if="link"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
+                :to="link"
         >
             {{ label }}
-        </p-anchor>
+        </p-link>
         <template v-else>
             {{ label }}
         </template>
@@ -18,7 +20,9 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PAnchor } from '@spaceone/design-system';
+import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
@@ -29,7 +33,7 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 export default {
     name: 'AlertTriggeredBy',
     components: {
-        PAnchor,
+        PLink,
     },
     props: {
         value: {
@@ -89,6 +93,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ACTION_ICON,
         };
     },
 };
