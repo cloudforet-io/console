@@ -105,7 +105,7 @@
         <dashboard-widget-edit-modal v-model:visible="state.visibleEditModal"
                                      :widget-config-id="props.widgetConfigId"
                                      :widget-key="props.widgetKey"
-                                     @refresh="emit('refresh')"
+                                     @refresh="handleRefresh"
         />
     </div>
 </template>
@@ -259,6 +259,9 @@ const handleClickViewModeButton = () => {
     dashboardDetailStore.$patch({
         widgetViewModeModalVisible: true,
     });
+};
+const handleRefresh = () => {
+    emit('refresh');
 };
 </script>
 
