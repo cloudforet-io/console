@@ -18,7 +18,7 @@ const { width } = useElementSize(containerRef as unknown as MaybeElementRef);
 
 interface Props {
     providerList?: ReferenceItem[];
-    selectedProvider: string;
+    selectedProvider?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,7 +26,9 @@ const props = withDefaults(defineProps<Props>(), {
     selectedProvider: 'all',
 });
 
-const emit = defineEmits<{(e: 'change-provider', providerName: string): void}>();
+const emit = defineEmits<{(e: 'change-provider', providerName: string): void;
+    (e: 'update:selected-provider', value: string): void;
+}>();
 
 const state = reactive({
     proxySelectedProvider: useProxyValue('selectedProvider', props, emit),

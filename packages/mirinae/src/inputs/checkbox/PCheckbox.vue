@@ -5,8 +5,7 @@
           v-on="listeners"
     >
         <input type="checkbox">
-        <slot :slot-scope="props"
-              name="icon"
+        <slot name="icon"
               v-bind="{isSelected}"
         >
             <p-i width="1.25rem"

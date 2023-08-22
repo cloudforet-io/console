@@ -85,7 +85,7 @@ const administrationRoutes: RouteRecordRaw = {
                             component: PolicyCreatePage,
                         },
                         {
-                            path: '/:id?',
+                            path: ':id?',
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
                             props: true,

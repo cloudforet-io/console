@@ -44,7 +44,7 @@ interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
     filters: ConsoleFilter[];
     period?: Period;
-    hiddenFilters: ConsoleFilter[];
+    hiddenFilters?: ConsoleFilter[];
     keyItemSets: KeyItemSet[];
 }
 

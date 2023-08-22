@@ -126,8 +126,8 @@ watch(() => state.detailPageParams, async (params) => {
 
 <template>
     <l-n-b :header="state.header"
-           :back-link="backLink"
-           :top-title="topTitle"
+           :back-link="state.backLink"
+           :top-title="state.topTitle"
            :menu-set="state.menuSet"
     />
 </template>

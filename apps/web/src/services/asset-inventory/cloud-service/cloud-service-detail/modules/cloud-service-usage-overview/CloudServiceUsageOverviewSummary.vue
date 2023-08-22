@@ -1,3 +1,60 @@
+<script lang="ts" setup>
+
+import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
+import type {
+    DynamicWidgetFieldHandler,
+    DynamicWidgetSchema,
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
+import {
+    reactive,
+} from 'vue';
+import { useStore } from 'vuex';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import type { Reference } from '@/lib/reference/type';
+
+import { gray } from '@/styles/colors';
+
+interface Props {
+    schemaLoading: boolean;
+    dataLoading: boolean;
+    dataList: any[];
+    widgetSchemaList: DynamicWidgetSchema[];
+    cloudServiceTypeId: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    schemaLoading: false,
+    dataLoading: false,
+    dataList: () => [],
+    widgetSchemaList: () => [],
+    cloudServiceTypeId: '',
+});
+
+const store = useStore();
+
+const state = reactive({
+    contextId: getUUID(),
+});
+
+const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
+    if (field.extraData?.reference) {
+        return referenceFieldFormatter(field.extraData.reference, field.data);
+    }
+    return {};
+};
+
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/loadAll');
+})();
+
+const skeletons = [1, 2, 3];
+const loaderBackdropColor = gray[100];
+
+</script>
+
 <template>
     <p-data-loader class="cloud-service-usage-overview-summary"
                    :loading="schemaLoading"
@@ -21,7 +78,7 @@
             </div>
         </template>
         <div v-for="(schema, idx) in widgetSchemaList"
-             :key="`${contextId}-${idx}`"
+             :key="`${state.contextId}-${idx}`"
              class="summary-wrapper"
         >
             <p-dynamic-widget type="summary"
@@ -34,80 +91,6 @@
         </div>
     </p-data-loader>
 </template>
-
-<script lang="ts">
-
-
-import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
-import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
-import {
-    reactive, toRefs,
-} from 'vue';
-import { useStore } from 'vuex';
-
-import { getUUID } from '@/lib/component-util/getUUID';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import type { Reference } from '@/lib/reference/type';
-
-import { gray } from '@/styles/colors';
-
-export default {
-    name: 'CloudServiceUsageOverviewSummary',
-    components: {
-        PDataLoader,
-        PSkeleton,
-        PDynamicWidget,
-    },
-    props: {
-        schemaLoading: {
-            type: Boolean,
-            default: false,
-        },
-        dataLoading: {
-            type: Boolean,
-            default: false,
-        },
-        dataList: {
-            type: Array,
-            default: () => [],
-        },
-        widgetSchemaList: {
-            type: Array,
-            default: () => [],
-        },
-        cloudServiceTypeId: {
-            type: String,
-            default: '',
-        },
-    },
-    setup() {
-        const store = useStore();
-
-        const state = reactive({
-            contextId: getUUID(),
-        });
-
-        const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
-            if (field.extraData?.reference) {
-                return referenceFieldFormatter(field.extraData.reference, field.data);
-            }
-            return {};
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/loadAll');
-        })();
-
-        return {
-            ...toRefs(state),
-            fieldHandler,
-            skeletons: [1, 2, 3],
-            loaderBackdropColor: gray[100],
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-data-loader */

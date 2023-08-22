@@ -29,7 +29,7 @@ interface Props {
         cloudServiceGroup?: string;
         cloudServiceType?: string;
     };
-    isServerPage: boolean;
+    isServerPage?: boolean;
 }
 
 type SelectedColumnMap = Record<string, DynamicField>;
