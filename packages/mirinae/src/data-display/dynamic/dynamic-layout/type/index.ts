@@ -38,7 +38,7 @@ export interface DynamicLayoutTypeOptions {
 export interface DynamicLayoutProps<
     SchemaOptions = DynamicLayoutOptions,
     > {
-    name: string;
+    name?: string;
     type: DynamicLayoutType;
     options: SchemaOptions;
     data?: any;

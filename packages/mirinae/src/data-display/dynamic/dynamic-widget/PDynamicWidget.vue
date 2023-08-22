@@ -26,12 +26,8 @@ import {
 
 // TODO: this (any) must be refactored
 const componentMap: Record<DynamicWidgetType, any> = {
-    summary: {
-        component: defineAsyncComponent(() => import('./templates/summary/index.vue')),
-    },
-    chart: {
-        component: defineAsyncComponent(() => import('./templates/chart/index.vue')),
-    },
+    summary: defineAsyncComponent(() => import('./templates/summary/index.vue')),
+    chart: defineAsyncComponent(() => import('./templates/chart/index.vue')),
 };
 
 const props = withDefaults(defineProps<DynamicWidgetProps>(), {
