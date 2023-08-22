@@ -15,34 +15,6 @@ import draggableHelper from './draggable-helper';
 // in follow code, options belongs to makeTreeDraggable, opt belongs to draggableHelper
 export default function makeTreeDraggable(treeEl, _options: any = {}) {
     const options = {
-        // indent: 20,
-        // triggerClass: 'tree-node',
-        // triggerBySelf: false,
-        // unfoldWhenDragover
-        // unfoldWhenDragoverDelay
-        // draggingNodePositionMode
-        // getTriggerEl optional
-        // rootClass: 'tree-root',
-        // childrenClass: 'tree-children',
-        // branchClass: 'tree-branch',
-        // nodeClass: 'tree-node',
-        // nodeBackClass: 'tree-node-back',
-        // placeholderClass: 'tree-placeholder',
-        // placeholderNodeBackClass: 'tree-placeholder-node-back',
-        // placeholderNodeClass: 'tree-placeholder-node',
-        // draggingClass: 'dragging',
-        // placeholderId
-        // unfoldTargetNodeByEl
-        // getPathByBranchEl
-        // edgeScroll: false,
-        // edgeScrollTriggerMargin: 50,
-        // edgeScrollSpeed: 0.35,
-        // edgeScrollTriggerMode: 'top_left_corner',
-        // edgeScrol: 'top_left_corner',
-        // edgeScrollSpecifiedContainerX?: HTMLElement,
-        // edgeScrollSpecifiedContainerY?: HTMLElement,
-        // rtl: false
-        // preventTextSelection: boolean
         ..._options,
         treeEl,
     };
@@ -62,8 +34,11 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
         updateMovedElementStyleManually: true,
         getMovedOrClonedElement: (directTriggerElement, store) => {
             // find closest branch from parents
-            const el = findParent(store.triggerElement,
-                _el => hasClass(_el, options.branchClass), { withSelf: true });
+            const el = findParent(
+                store.triggerElement,
+                (_el) => hasClass(_el, options.branchClass),
+                { withSelf: true },
+            );
             return el as HTMLElement;
         },
         beforeFirstMove(store, dhOptions) {
@@ -192,7 +167,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                     if (nodes.length === 0) return undefined;
                     //
                     let _found: HTMLElement|undefined;
-                    const t = binarySearch(nodes, node => getOffset(node).y - movingNodeOf.y, { returnNearestIfNoHit: true });
+                    const t = binarySearch(nodes, (node) => getOffset(node).y - movingNodeOf.y, { returnNearestIfNoHit: true });
                     if (t?.hit) {
                         _found = t.value;
                     } else if (t?.greater) {
@@ -203,7 +178,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                     return _found;
                 },
                 closestNodeOffset: () => getOffset(info.closestNode),
-                closestBranch: () => findParent(info.closestNode, el => hasClass(el, options.branchClass)),
+                closestBranch: () => findParent(info.closestNode, (el) => hasClass(el, options.branchClass)),
                 closestNext: () => {
                     let next = info.closestBranch.nextSibling;
                     while (next) {
@@ -246,7 +221,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                         prev = prev.previousSibling;
                     }
                     if (!_found) {
-                        cur = findParent(cur, el => hasClass(el, options.branchClass));
+                        cur = findParent(cur, (el) => hasClass(el, options.branchClass));
                     }
                     //
                     while (cur) {
@@ -270,7 +245,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                         if (hasNextBranch) {
                             break;
                         }
-                        const parent = findParent(cur, el => hasClass(el, options.branchClass));
+                        const parent = findParent(cur, (el) => hasClass(el, options.branchClass));
                         if (!parent) {
                             break;
                         }
@@ -283,8 +258,8 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
             // life cycle: one move
             const conditions = {
                 'no closest': () => !info.closestNode,
-                'closest is top': () => info.closestBranch === findNodeList(info.root.children, el => el !== movingEl && !isElementHidden(el)),
-                'closest is top excluding placeholder': () => info.closestBranch === findNodeList(info.root.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el)),
+                'closest is top': () => info.closestBranch === findNodeList(info.root.children, (el) => el !== movingEl && !isElementHidden(el)),
+                'closest is top excluding placeholder': () => info.closestBranch === findNodeList(info.root.children, (el) => el !== movingEl && el !== store.placeholder && !isElementHidden(el)),
                 'on closest middle': () => movingNodeOf.y < info.closestNodeOffset.y + info.closestNode.offsetHeight / 2,
                 'at closest indent right': () => movingNodeOf.x > info.closestNodeOffset.x + options.indent,
                 'at closest left': () => movingNodeOf.x < info.closestNodeOffset.x,
@@ -295,7 +270,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                 'closest has children excluding placeholder movingEl': () => {
                     const childrenEl = info.closestBranch.querySelector(`.${options.childrenClass}`);
                     if (childrenEl) {
-                        return findNodeList(childrenEl.children, el => el !== movingEl && el !== store.placeholder && !isElementHidden(el));
+                        return findNodeList(childrenEl.children, (el) => el !== movingEl && el !== store.placeholder && !isElementHidden(el));
                     }
                     return undefined;
                 },
@@ -310,7 +285,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
             // convert conditions result to Boolean
             Object.keys(conditions).forEach((key) => {
                 const old = conditions[key];
-                conditions[key] = function () {
+                conditions[key] = function condition() {
                     return Boolean(old.call(this));
                 };
             });
@@ -342,13 +317,13 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
             const actions = {
                 // eslint-disable-next-line no-empty-function
                 async nothing() {}, // do nothing
-                'append to root': async function () {
+                'append to root': async function appendToRoot() {
                     // no closest branch, just append to root
                     if (options.isTargetTreeRootDroppable(store)) {
                         if (store.placeholder) appendTo(store.placeholder, info.root);
                     }
                 },
-                'insert before': async function () {
+                'insert before': async function _insertBefore() {
                     if (options.isNodeParentDroppable(info.closestBranch, store.targetTreeEl)) {
                         if (store.placeholder) insertBefore(store.placeholder, info.closestBranch);
                     } else {
@@ -356,7 +331,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                     }
                     return undefined;
                 },
-                'insert after': async function (branch = info.closestBranch) {
+                'insert after': async function _insertAfter(branch = info.closestBranch) {
                     if (options.isNodeParentDroppable(branch, store.targetTreeEl)) {
                         if (store.placeholder) insertAfter(store.placeholder, branch);
                     } else {
@@ -382,7 +357,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                     }
                     return undefined;
                 },
-                'after above': async function () {
+                'after above': async function afterAbove() {
                     if (options.isNodeParentDroppable(info.aboveBranch, store.targetTreeEl)) {
                         if (store.placeholder) insertAfter(store.placeholder, info.aboveBranch);
                     } else {
@@ -390,7 +365,7 @@ export default function makeTreeDraggable(treeEl, _options: any = {}) {
                     }
                     return undefined;
                 },
-                'append to prev': async function () {
+                'append to prev': async function appendToPrev() {
                     if (info.closestPrev === store.placeholder) {
                         return undefined;
                     }

@@ -1,4 +1,4 @@
-import { TreeData } from './helpers';
+import { TreeData } from '@/data-display/tree/he-tree-vue/tree-data';
 
 export function cloneTreeData(treeData, opt?) {
     return (new TreeData(treeData)).clone(opt);

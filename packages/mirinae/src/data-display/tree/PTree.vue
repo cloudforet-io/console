@@ -107,8 +107,8 @@ import type {
 } from '@/data-display/tree/he-tree-vue/types';
 import { getDefaultNode } from '@/data-display/tree/helper';
 import type {
-    TreeNode,
     Tree,
+    TreeNode,
     Predicate,
     TreeItem,
     ToggleOptions,
@@ -124,12 +124,9 @@ import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 import OriginTree from './he-tree-vue/components/Tree.vue';
-import DraggablePlugin from './he-tree-vue/plugins/draggable/Draggable.vue';
-import FoldPlugin from './he-tree-vue/plugins/fold';
 import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
 
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Props {
     toggleOptions: ToggleOptions;
     selectOptions: SelectOptions;
@@ -148,11 +145,7 @@ export default defineComponent<Props>({
         PSpinner,
         PTextInput,
         PI,
-        Tree: {
-            name: 'Tree',
-            extends: OriginTree,
-            mixins: [FoldPlugin, DraggablePlugin],
-        },
+        Tree: OriginTree,
     },
     directives: { focus },
     props: {
@@ -288,9 +281,9 @@ export default defineComponent<Props>({
             setSelectItem(node, path, value);
         };
 
-        const onDragStart = (tree: any, e: Store) => {
+        const onDragStart = (e: Store) => {
             const validator = props.dragOptions.startValidator;
-            const parent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
+            const parent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) as TreeNode : null;
 
             if (validator && !validator(e.dragNode as TreeNode, parent)) return false;
 
@@ -298,10 +291,10 @@ export default defineComponent<Props>({
             return true;
         };
 
-        const onDragEnd = (tree: any, e: Store) => {
+        const onDragEnd = (e: Store) => {
             state.dragTargetParentPath = null;
-            const parent = e.targetPath ? tree.getNodeParentByPath(e.targetPath) as TreeNode : null;
-            const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
+            const parent = e.targetPath ? state.treeRef.getNodeParentByPath(e.targetPath) as TreeNode : null;
+            const oldParent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) as TreeNode : null;
 
             const validator = props.dragOptions.endValidator;
 
@@ -339,23 +332,23 @@ export default defineComponent<Props>({
             emit('drop', e.dragNode, oldParent, parent, rollback);
         };
 
-        const eachDraggable = (path: number[], tree: any, e: Store) => {
+        const eachDraggable = (path: number[], e: Store) => {
             const dragValidator = props.dragOptions.dragValidator;
             if (dragValidator
-                && !dragValidator(e.dragNode as TreeNode, path ? tree.getNodeParentByPath(path) as TreeNode : undefined)) {
+                && !dragValidator(e.dragNode as TreeNode, path ? state.treeRef.getNodeParentByPath(path) as TreeNode : undefined)) {
                 return false;
             }
             return true;
         };
-        const eachDroppable = (parentPath: number[], tree: any, e: Store) => {
+        const eachDroppable = (parentPath: number[], e: Store) => {
             const dropValidator = props.dragOptions.dropValidator;
 
             let parent: null|TreeNode = null;
             if (parentPath.length > 0) {
-                parent = tree.getNodeByPath(parentPath) as TreeNode;
+                parent = state.treeRef.getNodeByPath(parentPath) as TreeNode;
             }
 
-            const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) : null;
+            const oldParent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) : null;
 
             state.dragTargetParentPath = parentPath;
 

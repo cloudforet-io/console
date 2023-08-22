@@ -1,5 +1,4 @@
-import {
-    TreeDataPath,
+import type {
     WalkTreeDataHandler,
     WalkTreeDataOptions,
 } from './types';
@@ -77,6 +76,7 @@ export function createElementFromHTML(htmlString: string) {
  */
 export function isDescendantOf(el: Node, parent: Node): boolean|undefined {
     let element = el;
+    // eslint-disable-next-line no-constant-condition
     while (true) {
         if (element.parentNode == null) {
             return false;
@@ -86,7 +86,6 @@ export function isDescendantOf(el: Node, parent: Node): boolean|undefined {
         }
         element = element.parentNode;
     }
-    return undefined;
 }
 
 
@@ -130,17 +129,6 @@ export function resolveValueOrGetter(valueOrGetter, args: any[] = []) {
 }
 
 
-export function withoutUndefined<T extends object>(obj: T) {
-    const r = {} as T;
-    Object.keys(obj).forEach((key) => {
-        if (obj[key] !== undefined) {
-            r[key] = obj[key];
-        }
-    });
-    return r;
-}
-
-
 /**
  * return new array excluding n items from end
  * @param arr
@@ -164,8 +152,10 @@ export function* iterateAll<T>(
 ): Generator<{ value: T; index?: number; key?: string }> {
     // opt: {reverse, exclude}
     if (!opt.reverse) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (val.length != null) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             for (let i = 0; i < val.length; i++) {
                 const info = { value: val[i], index: i };
@@ -185,9 +175,11 @@ export function* iterateAll<T>(
             throw new Error('Unsupported type');
         }
     } else {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line no-lonely-if
         if (val.length != null) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             for (let i = val.length - 1; i >= 0; i--) {
                 const info = { value: val[i], index: i };
@@ -219,6 +211,8 @@ export function* iterateAll<T>(
  */
 export function joinFunctionsByNext(funcs: any[]): (...args: any[]) => any {
     let next = () => {};
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     // eslint-disable-next-line no-restricted-syntax
     for (const { value: func } of iterateAll(funcs, { reverse: true })) {
         const currentNext = next;
@@ -226,7 +220,7 @@ export function joinFunctionsByNext(funcs: any[]): (...args: any[]) => any {
     }
     return next;
     function wrapFuncWithNext(func, _next) {
-        return function (...args: any[]) {
+        return function getFunc(...args: any[]) {
             return func(_next, ...args);
         };
     }
@@ -302,7 +296,7 @@ export function arrayLast<T>(arr: T[]) {
  * walk tree data by with depth first search. tree data example: `[{children: [{}, {}]}]`
  * @param obj
  * @param handler
- * @param opt
+ * @param _opt
  */
 export function walkTreeData<T>(
     obj: T | T[],
@@ -363,275 +357,6 @@ export function walkTreeData<T>(
     }
 }
 
-
-// tree data helpers
-export class TreeData<Node> {
-    data: Node | Node[];
-
-    childrenKey = 'children';
-
-    // data = null;
-    constructor(data: Node | Node[] = []) {
-        this.data = data;
-    }
-
-    get rootChildren(): Node[] {
-        const { childrenKey } = this;
-        const { data } = this;
-        return isArray(data) ? data : data[childrenKey];
-    }
-
-    * iteratePath(
-        path: TreeDataPath,
-        opt: { reverse?: boolean } = {},
-    ): IterableIterator<{ path: TreeDataPath; node: Node }> {
-        const { childrenKey, rootChildren } = this;
-        if (!opt.reverse) {
-            let prevPath: number[] = [];
-            // let prevNode: Node;
-            let prevChildren = rootChildren;
-            // eslint-disable-next-line no-restricted-syntax
-            for (const index of path) {
-                const currentPath = [...prevPath, index];
-                const currentNode = prevChildren[index];
-                yield { path: currentPath, node: currentNode };
-                prevPath = currentPath;
-                // prevNode = currentNode;
-                prevChildren = currentNode[childrenKey];
-            }
-        } else {
-            const list = [...this.iteratePath(path, { ...opt, reverse: false })];
-            list.reverse();
-            // eslint-disable-next-line no-restricted-syntax
-            for (const { path: path0, node } of list) {
-                yield { path: path0 as TreeDataPath, node };
-            }
-        }
-    }
-
-    getAllNodes(path: TreeDataPath) {
-        const all: Node[] = [];
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { node } of this.iteratePath(path)) {
-            all.push(node);
-        }
-        return all;
-    }
-
-    getNode(path: TreeDataPath): Node {
-        return arrayLast(this.getAllNodes(path));
-    }
-
-    getNodeIndexAndParent(path: TreeDataPath) {
-        const parentPath = path.slice();
-        const index = parentPath.pop();
-        return { parent: this.getNode(parentPath), index, parentPath };
-    }
-
-    getNodeParent(path: TreeDataPath) {
-        return this.getNodeIndexAndParent(path).parent;
-    }
-
-    setPathNode(path: TreeDataPath, node: Node) {
-        if (path == null || path.length === 0) {
-            this.data = node;
-        } else {
-            const { childrenKey, rootChildren } = this;
-            const { parent, index } = this.getNodeIndexAndParent(path);
-            const parentChildren = path.length === 1 ? rootChildren : parent[childrenKey];
-            if (index !== undefined) parentChildren[index] = node;
-        }
-    }
-
-    removeNode(path: TreeDataPath): Node | undefined {
-        const { childrenKey, rootChildren } = this;
-        const { parent, index } = this.getNodeIndexAndParent(path);
-        const parentChildren = path.length === 1 ? rootChildren : parent[childrenKey];
-        if (index === undefined) return undefined;
-        const node = parentChildren[index];
-        parentChildren.splice(index, 1);
-        return node;
-    }
-
-    getFamily(path: TreeDataPath) {
-        const all: Node[] = [];
-        // eslint-disable-next-line no-restricted-syntax
-        for (const { node } of this.iteratePath(path)) {
-            all.push(node);
-        }
-        return all;
-    }
-
-    get(path: TreeDataPath): Node {
-        return arrayLast(this.getFamily(path));
-    }
-
-    getParentAndIndex(path: TreeDataPath) {
-        const parentPath = path.slice();
-        const index = parentPath.pop();
-        return { parent: this.get(parentPath), index, parentPath };
-    }
-
-    getParent(path: TreeDataPath) {
-        return this.getParentAndIndex(path).parent;
-    }
-
-    set(path: TreeDataPath, node: Node) {
-        if (path == null || path.length === 0) {
-            this.data = node;
-        } else {
-            const { childrenKey } = this;
-            const { rootChildren } = this;
-            const { parent, index } = this.getParentAndIndex(path);
-            let parentChildren: Node[];
-            if (path.length === 1) {
-                // fix data
-                if (!rootChildren) {
-                    if (this.data) {
-                        this.data[childrenKey] = [];
-                    } else {
-                        this.data = [];
-                    }
-                }
-                parentChildren = rootChildren;
-            } else {
-                if (!parent[childrenKey]) {
-                    parent[childrenKey] = [];
-                }
-                parentChildren = parent[childrenKey];
-            }
-            if (index !== undefined) parentChildren[index] = node;
-        }
-    }
-
-    delete(path: TreeDataPath): Node | undefined {
-        const { childrenKey, rootChildren } = this;
-        const { parent, index } = this.getParentAndIndex(path);
-        const parentChildren = path.length === 1 ? rootChildren : parent[childrenKey];
-        if (index !== undefined) {
-            const node = parentChildren[index];
-            parentChildren.splice(index, 1);
-            return node;
-        }
-        return undefined;
-    }
-
-    walk(handler: WalkTreeDataHandler<Node>, opt?: { reverse?: boolean }) {
-        const { childrenKey, data } = this;
-        // @ts-ignore
-        return walkTreeData(data, handler, childrenKey, opt);
-    }
-
-    clone(
-        opt: {
-            afterNodeCreated?: (
-                newNode: Node,
-                info: {
-                    oldNode: Node;
-                    index: number;
-                    parent: Node | undefined;
-                    path: TreeDataPath;
-                }
-            ) => void;
-        } = {},
-    ) {
-        // opt.afterNodeCreated(newNode, {oldNode: node, index, parent, path})
-        const { childrenKey } = this;
-        const td = new TreeData();
-        td.childrenKey = childrenKey;
-        this.walk((node, index, parent, path) => {
-            const newNode = Object.assign({}, node);
-            if (newNode[childrenKey]) {
-                newNode[childrenKey] = [];
-            }
-            if (opt.afterNodeCreated) {
-                opt.afterNodeCreated(newNode, {
-                    // @ts-ignore
-                    oldNode: node, index, parent, path,
-                });
-            }
-            td.setPathNode(path, newNode);
-        });
-        return td.data as Node[];
-    }
-}
-
-
-// vue functions
-
-/**
- * [updatablePropsEvenUnbound description]
- * @param  {[type]} props [object or getter]
- * @return {[type]}       [description]
- * props eg: {
-    value: {$localName: 'current', $localSetter: (value, vm)},
-  }
- default localName is `localProps_${name}`
- */
-export function updatablePropsEvenUnbound(_props) {
-    let props = _props;
-    if (isFunction(props)) {
-        props = props();
-    } else {
-        // object
-        props = Object.assign({}, props);
-    }
-    const standardProps = {}; // without key starts with `$`
-    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-    for (const name in props) {
-        const prop = props[name];
-        // complete
-        if (!prop.$localName) {
-            prop.$localName = `localProps_${name}`;
-        }
-        if (!prop.$localSetter) {
-            prop.$localSetter = value => value;
-        }
-        // make standardProp
-        const standardProp = {};
-        standardProps[name] = standardProp;
-        Object.keys(props[name]).forEach((key) => {
-            if (key[0] !== '$') {
-                standardProp[key] = prop[key];
-            }
-        });
-    }
-    const component = {
-        props: standardProps,
-        computed: {},
-        watch: {},
-        data() {
-            const t = {
-                localValueOfUpdatableProps: {},
-            };
-            // eslint-disable-next-line no-restricted-syntax
-            for (const name of Object.keys(props)) {
-                t.localValueOfUpdatableProps[name] = this[name];
-            }
-            return t;
-        },
-    };
-    // eslint-disable-next-line no-restricted-syntax
-    for (const name of Object.keys(props)) {
-        const prop = props[name];
-        component.watch[name] = function (value) {
-            (this as any).localValueOfUpdatableProps[name] = prop.$localSetter(value, this);
-        };
-        const localName = prop.$localName;
-        component.computed[localName] = {
-            get() { return this.localValueOfUpdatableProps[name]; },
-            set(value) {
-                if (name === 'value') {
-                    this.$emit('input', value);
-                } else {
-                    this.$emit(`update:${name}`, value);
-                }
-                this.localValueOfUpdatableProps[name] = prop.$localSetter(value, this);
-            },
-        };
-    }
-    return component;
-}
 
 
 export function findParent<T extends Element>(
@@ -740,7 +465,7 @@ export function scrollTo(options: {
     const startX = element.scrollLeft;
     const changeX = (x ?? 0) - startX;
     const startDate = +new Date();
-    const animateScroll = function () {
+    const animateScroll = function animateScroll() {
         if (
             options.beforeEveryFrame
                 && options.beforeEveryFrame(count) === false
@@ -786,6 +511,7 @@ export function scrollTo(options: {
 export function elementsFromPoint(x: number, y: number): Element[] {
     const args: [number, number] = [x, y];
     const func = document.elementsFromPoint
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         || document.msElementsFromPoint
         || _elementsFromPoint;
@@ -819,6 +545,8 @@ export function findNodeList(
     const iterator = iterateAll<HTMLElement>(list, {
         reverse: opt.reverse,
     });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     // eslint-disable-next-line no-restricted-syntax
     for (const { value, index } of iterator) {
         if (callback(value, index)) {
@@ -863,7 +591,6 @@ export function attachCache(obj: any, toCache: object, cache = new Cache()) {
         const getter = toCache[key];
         Object.defineProperty(obj, key, {
             get() {
-                // @ts-ignore
                 return cache.remember(key, () => getter.call(this));
             },
         });
