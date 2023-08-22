@@ -81,10 +81,10 @@ const getComponent = async () => {
     try {
         if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicLayoutTypes}. ${props.type} is not acceptable.`);
 
-        state.component = componentMap[props.type];
+        state.component = componentMap[props.type].component;
     } catch (e) {
         console.error(e);
-        state.component = componentMap.item;
+        state.component = componentMap.item.component;
     }
 };
 
