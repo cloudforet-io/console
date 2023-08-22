@@ -47,33 +47,15 @@ const RECURSIVE_TYPE = ['list', 'enum'];
 
 // TODO: this (any) must be refactored
 const componentMap: Record<DynamicFieldType, any> = {
-    text: {
-        component: defineAsyncComponent(() => import('./templates/text/index.vue')),
-    },
-    badge: {
-        component: defineAsyncComponent(() => import('./templates/badge/index.vue')),
-    },
-    datetime: {
-        component: defineAsyncComponent(() => import('./templates/datetime/index.vue')),
-    },
-    state: {
-        component: defineAsyncComponent(() => import('./templates/state/index.vue')),
-    },
-    enum: {
-        component: defineAsyncComponent(() => import('./templates/enum/index.vue')),
-    },
-    size: {
-        component: defineAsyncComponent(() => import('./templates/size/index.vue')),
-    },
-    dict: {
-        component: defineAsyncComponent(() => import('./templates/dict/index.vue')),
-    },
-    list: {
-        component: defineAsyncComponent(() => import('./templates/list/index.vue')),
-    },
-    more: {
-        component: defineAsyncComponent(() => import('./templates/more/index.vue')),
-    },
+    text: defineAsyncComponent(() => import('./templates/text/index.vue')),
+    badge: defineAsyncComponent(() => import('./templates/badge/index.vue')),
+    datetime: defineAsyncComponent(() => import('./templates/datetime/index.vue')),
+    state: defineAsyncComponent(() => import('./templates/state/index.vue')),
+    enum: defineAsyncComponent(() => import('./templates/enum/index.vue')),
+    size: defineAsyncComponent(() => import('./templates/size/index.vue')),
+    dict: defineAsyncComponent(() => import('./templates/dict/index.vue')),
+    list: defineAsyncComponent(() => import('./templates/list/index.vue')),
+    more: defineAsyncComponent(() => import('./templates/more/index.vue')),
 };
 
 const props = withDefaults(defineProps<DynamicFieldProps>(), {
