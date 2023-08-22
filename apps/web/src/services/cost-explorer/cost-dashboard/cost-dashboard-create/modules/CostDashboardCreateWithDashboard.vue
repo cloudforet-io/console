@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PAnchor, PSelectCard, PDivider, PTextPagination,
+    PLink, PSelectCard, PDivider, PTextPagination,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -92,13 +93,14 @@ listDashboard();
                 >
                     {{ dashboardData.name }}
                 </p-select-card>
-                <p-anchor
-                    target="_blank"
-                    :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        size="sm"
+                        :to=" { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
+                                params: { dashboardId: dashboardData.public_dashboard_id ? dashboardData.public_dashboard_id : dashboardData.user_dashboard_id } }"
                 >
                     {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW') }}
-                </p-anchor>
+                </p-link>
             </div>
         </div>
         <p-text-pagination
@@ -132,7 +134,7 @@ listDashboard();
                     @apply font-bold;
                 }
             }
-            .p-anchor {
+            .p-link {
                 @apply text-center text-blue-700;
             }
         }

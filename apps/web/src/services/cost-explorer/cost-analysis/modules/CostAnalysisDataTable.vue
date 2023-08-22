@@ -6,7 +6,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PAnchor, PI, PToolboxTable, PDataTable, PButtonModal,
+    PLink, PI, PToolboxTable, PDataTable, PButtonModal,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
@@ -467,9 +467,8 @@ watch(
             <span v-else-if="typeof value !== 'string'"
                   class="text-center"
             >
-                <p-anchor :to="value ? getLink(item, field.name) : undefined"
-                          hide-icon
-                          class="!align-middle"
+                <p-link :to="value ? getLink(item, field.name) : undefined"
+                        class="!align-middle"
                 >
                     <template v-if="getIsRaised(item, field.name)">
                         <span class="cell-text raised">{{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}</span>
@@ -481,7 +480,7 @@ watch(
                     <template v-else>
                         {{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}
                     </template>
-                </p-anchor>
+                </p-link>
             </span>
         </template>
     </p-toolbox-table>

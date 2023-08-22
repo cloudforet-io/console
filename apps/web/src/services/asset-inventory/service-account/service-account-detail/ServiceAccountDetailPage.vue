@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PAnchor, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
+    PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { render } from 'ejs';
 import {
     computed, reactive, watch,
@@ -150,9 +151,11 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                 <p-button style-type="tertiary"
                           class="link-button"
                 >
-                    <p-anchor :href="state.consoleLink">
+                    <p-link :href="state.consoleLink"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    >
                         {{ t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
-                    </p-anchor>
+                    </p-link>
                 </p-button>
             </template>
         </p-heading>
@@ -211,8 +214,8 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             display: inline-flex;
         }
         .link-button {
-            /* custom design-system component - p-anchor */
-            :deep(.p-anchor) {
+            /* custom design-system component - p-link */
+            :deep(.p-link) {
                 .text:hover {
                     text-decoration: none;
                 }

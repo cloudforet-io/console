@@ -1,7 +1,7 @@
 <template>
     <span class="p-dynamic-field-text">
-        <p-anchor v-if="isAnchor"
-                  v-bind="anchorProps"
+        <p-link v-if="isLink"
+                v-bind="linkProps"
         />
         <template v-else>{{ text }}</template>
     </span>
@@ -12,7 +12,7 @@ import { computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 import { commaFormatter } from '@/utils/helpers';
 
 const props = withDefaults(defineProps<TextDynamicFieldProps>(), {
@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<TextDynamicFieldProps>(), {
     extraData: () => ({}),
 });
 
-const isAnchor = computed(() => props.options?.link);
+const isLink = computed(() => props.options?.link);
 const text = computed<TranslateResult|number>(() => {
     let textValue: TranslateResult|number;
     if (props.data === null || props.data === undefined) {
@@ -34,7 +34,7 @@ const text = computed<TranslateResult|number>(() => {
     }
     return `${props.options.prefix ?? ''}${textValue}${props.options.postfix ?? ''}`;
 });
-const anchorProps = computed(() => {
+const linkProps = computed(() => {
     if (props.options.link) {
         return {
             href: props.options?.link,

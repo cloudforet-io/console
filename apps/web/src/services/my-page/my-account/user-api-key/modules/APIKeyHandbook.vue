@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { PAnchor } from '@spaceone/design-system';
+import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { useI18n } from 'vue-i18n';
 
 const githubLink = 'https://github.com/cloudforet-io/spacectl';
@@ -24,11 +25,12 @@ const { t } = useI18n();
             <p class="desc">
                 <i18n-t keypath="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
-                        <p-anchor :href="githubLink"
-                                  class="link"
+                        <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                class="link"
                         >
                             {{ t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </i18n-t>
                 <br>
@@ -100,11 +102,12 @@ const { t } = useI18n();
             <p class="desc last">
                 <i18n-t keypath="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
-                        <p-anchor :href="githubLink"
-                                  class="link"
+                        <p-link :href="githubLink"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                class="link"
                         >
                             {{ t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                 </i18n-t>
             </p>

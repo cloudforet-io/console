@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    PAnchor, PEmpty, PPaneLayout, PHeading,
+    PLink, PEmpty, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive,
 } from 'vue';
@@ -51,13 +52,15 @@ const state = reactive({
            :key="`${item}-${index}`"
            class="project-name"
         >
-            <p-anchor :to="referenceRouter(
-                          item,
-                          { resource_type: 'identity.Project' })"
-                      highlight
+            <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="referenceRouter(
+                        item,
+                        { resource_type: 'identity.Project' })"
+                    highlight
             >
                 {{ state.projects[item] ? state.projects[item].label : item }}
-            </p-anchor>
+            </p-link>
         </p>
     </p-pane-layout>
 </template>

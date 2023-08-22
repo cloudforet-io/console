@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-/* eslint-disable camelcase */
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PBadge, PDivider, PI, PAnchor,
+    PBadge, PDivider, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { get } from 'lodash';
 import {
     computed, onActivated, reactive, watch,
@@ -100,12 +99,14 @@ onActivated(async () => {
     <div class="project-escalation-policy">
         <section>
             <span class="label">{{ t('PROJECT.DETAIL.ALERT.NAME_LABEL') }}</span>
-            <p-anchor class="value"
-                      :to="state.escalationPolicyLink"
-                      highlight
+            <p-link class="value"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    :to="state.escalationPolicyLink"
+                    highlight
             >
                 {{ state.escalationPolicyName }}
-            </p-anchor>
+            </p-link>
         </section>
         <section>
             <span class="label">{{ t('PROJECT.DETAIL.ALERT.FINISH_CONDITION_LABEL') }}</span>

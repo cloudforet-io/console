@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PAnchor, PTextEditor,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import yaml from 'js-yaml';
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -133,9 +134,11 @@ const makeYamlItem = () => {
                         />
                         <p>{{ t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
-                                <p-anchor :href="state.githubLink">
+                                <p-link :href="state.githubLink"
+                                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                >
                                     {{ t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
-                                </p-anchor>
+                                </p-link>
                             </span>
                         </p>
                     </div>

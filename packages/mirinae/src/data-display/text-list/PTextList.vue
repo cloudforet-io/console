@@ -33,7 +33,7 @@ import {
 
 
 import type { TextListProps } from '@/data-display/text-list/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
 const props = withDefaults(defineProps<TextListProps>(), {
@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<TextListProps>(), {
 });
 
 const state = reactive({
-    component: computed(() => (props.link ? PAnchor : 'span')),
+    component: computed(() => (props.link ? PLink : 'span')),
     displayItems: computed(() => props.items.reduce((res, item) => {
         let data;
         if (typeof item === 'object' && props.subKey) {

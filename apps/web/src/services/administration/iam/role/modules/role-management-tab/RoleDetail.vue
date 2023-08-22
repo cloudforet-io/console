@@ -2,8 +2,9 @@
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PAnchor, PBadge, PDataTable, PDefinitionTable, PHeading,
+    PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import {
     computed, reactive, useAttrs, watch,
@@ -202,15 +203,17 @@ watch(() => props.roleId, async () => {
                 </p-badge>
             </template>
             <template #col-policy_id-format="{ value, item }">
-                <p-anchor :highlight="true"
-                          :to="{
-                              name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
-                              params: { id: value },
-                              query: { type: item.policy_type }
-                          }"
+                <p-link :highlight="true"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="{
+                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
+                            params: { id: value },
+                            query: { type: item.policy_type }
+                        }"
                 >
                     {{ value }}
-                </p-anchor>
+                </p-link>
             </template>
         </p-data-table>
     </div>

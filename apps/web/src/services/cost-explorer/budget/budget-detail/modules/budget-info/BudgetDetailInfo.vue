@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { PPaneLayout, PAnchor } from '@spaceone/design-system';
+import { PPaneLayout, PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
 
@@ -112,13 +113,15 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-anchor v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
-                          :to="referenceRouter(
-                              (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
-                              { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(
+                            (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
+                            { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
                     {{ getTargetLabel(state.projects) }}
-                </p-anchor>
+                </p-link>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">

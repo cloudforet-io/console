@@ -36,13 +36,15 @@
                     <span class="plugin-description-text">
                         {{ state.description }}
                     </span>
-                    <p-anchor v-if="state.pluginDetailLink"
-                              :href="state.pluginDetailLink"
-                              size="sm"
-                              :highlight="true"
+                    <p-link v-if="state.pluginDetailLink"
+                            :href="state.pluginDetailLink"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            size="sm"
+                            highlight
                     >
                         {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-                    </p-anchor>
+                    </p-link>
                 </div>
                 <div v-if="!props.hideLabels"
                      class="label-container"
@@ -60,8 +62,9 @@
 
 <script lang="ts" setup>
 import {
-    PAnchor, PLazyImg, PLabel, PI, PTooltip,
+    PLink, PLazyImg, PLabel, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     defineProps, reactive, computed,
 } from 'vue';

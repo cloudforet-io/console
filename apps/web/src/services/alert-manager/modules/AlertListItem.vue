@@ -7,12 +7,11 @@
                      height="1em"
                      :color="item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
                 />
-                <p-anchor class="title"
-                          hide-icon
-                          :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
+                <p-link class="title"
+                        :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
                 >
                     <span v-tooltip.bottom="item.title">{{ item.title }}</span>
-                </p-anchor>
+                </p-link>
                 <p-badge v-if="showMemberName && item.assignee"
                          style-type="primary1"
                          badge-type="solid-outline"
@@ -22,14 +21,16 @@
                 </p-badge>
             </div>
             <div class="right-part">
-                <p-anchor v-if="showProjectLink"
-                          v-tooltip.bottom="projectNameFormatter(item.project_id)"
-                          class="project-link"
-                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                          hide-icon
+                <p-link v-if="showProjectLink"
+                        v-tooltip.bottom="projectNameFormatter(item.project_id)"
+                        class="project-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+                        hide-icon
                 >
                     {{ projectNameFormatter(item.project_id) }}
-                </p-anchor>
+                </p-link>
                 <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
                          badge-type="subtle"
                          class="badge"
@@ -54,8 +55,9 @@
 <script lang="ts" setup>
 
 import {
-    PI, PBadge, PAnchor,
+    PI, PBadge, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     computed, reactive,

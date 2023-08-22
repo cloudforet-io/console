@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PAnchor, PDataTable } from '@spaceone/design-system';
+import { PLink, PDataTable } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -8,7 +9,7 @@ import { useRouter } from 'vue-router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import deleteModal from '@/common/components/modals/DeleteModal.vue';
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -91,13 +92,14 @@ const listRoles = async () => {
         >
             <div class="modal-delete-disabled-title">
                 <span>{{ t('IAM.POLICY.MODAL.DELETE_HELP_TEXT') }} </span>
-                <p-anchor
+                <p-link
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
                     :to="{ name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME }"
-                    size="lg"
                     highlight
                 >
                     {{ t('IAM.POLICY.MODAL.DELETE_FOLLOW_ROLES') }}
-                </p-anchor>
+                </p-link>
             </div>
             <p-data-table :fields="state.fields"
                           :items="state.attachedRoles"

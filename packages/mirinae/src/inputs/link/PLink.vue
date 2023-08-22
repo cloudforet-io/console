@@ -1,20 +1,20 @@
 <template>
-    <span class="p-anchor">
+    <span class="p-link">
         <router-link v-slot="{href: toHref, navigate}"
                      :to="props.to || {}"
                      custom
         >
-            <a ref="anchorRef"
-               class="p-anchor"
+            <a ref="linkRef"
+               class="p-link"
                :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
-               :target="validateTarget()"
+               :target="state.target"
                :href="props.to ? (toHref || props.href ): props.href"
                @click.stop="navigate"
             >
-                <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.left"
-                     :name="props.iconName"
-                     height="1.1em"
-                     width="1.1em"
+                <p-i v-if="state.hasText && !!props.leftIcon"
+                     :name="props.leftIcon"
+                     height="1rem"
+                     width="1rem"
                      color="inherit"
                      class="icon"
                 />
@@ -23,10 +23,10 @@
                         {{ props.text }}
                     </slot>
                 </span>
-                <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.right"
-                     :name="props.iconName"
-                     height="1.1em"
-                     width="1.1em"
+                <p-i v-if="state.hasText && props.actionIcon !== ACTION_ICON.NONE"
+                     :name="state.actionIconName"
+                     :height="state.iconSize"
+                     :width="state.iconSize"
                      color="inherit"
                      class="icon"
                 />
@@ -36,53 +36,66 @@
 </template>
 
 <script setup lang="ts">
-import {
-    computed, ref,
-} from 'vue';
-import type { RouteLocation } from 'vue-router';
+import { computed, reactive, ref } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
-import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
+import { ACTION_ICON, LinkSize } from '@/inputs/link/type';
+import type { ActionIcon } from '@/inputs/link/type';
 
 
-interface AnchorProps {
-  text?: string;
-  size?: AnchorSize;
-  iconPosition?: IconPosition;
-  hideIcon?: boolean;
-  iconName?: string;
-    // eslint-disable-next-line vue/require-default-prop
-  href?: string;
-    // eslint-disable-next-line vue/require-default-prop
-  to?: RouteLocation;
-  disabled?: boolean;
-  highlight?: boolean;
+interface LinkProps {
+    text?: string;
+    disabled?: boolean;
+    highlight?: boolean;
+    size?: LinkSize;
+    leftIcon?: string;
+    actionIcon?: ActionIcon;
+    newTab?: boolean;
+    href?: string;
+    to?: RouteLocationRaw;
 }
 
-const props = withDefaults(defineProps<AnchorProps>(), {
+const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
-    size: AnchorSize.md,
-    iconPosition: IconPosition.right,
-    iconName: 'ic_external-link',
+    size: undefined,
+    leftIcon: undefined,
+    actionIcon: 'none',
+    href: undefined,
+    to: undefined,
 });
 
-const validateTarget = () => {
-    if (props.disabled) return '_self';
-    if (props.iconName === 'ic_external-link' && !props.hideIcon) return '_blank';
-    return '_self';
-};
-const anchorRef = ref<HTMLElement|null>(null);
-const hasText = computed(() => !!anchorRef.value?.textContent);
-
+const linkRef = ref<HTMLElement|null>(null);
+const state = reactive({
+    hasText: computed(() => !!linkRef.value?.textContent),
+    target: computed(() => {
+        if (props.actionIcon === ACTION_ICON.EXTERNAL_LINK || props.newTab) return '_blank';
+        return '_self';
+    }),
+    actionIconName: computed(() => {
+        if (props.actionIcon === ACTION_ICON.INTERNAL_LINK) {
+            if (props.newTab) return 'ic_arrow-right-up';
+            return 'ic_arrow-right';
+        }
+        if (props.actionIcon === ACTION_ICON.EXTERNAL_LINK) return 'ic_external-link';
+        return undefined;
+    }),
+    iconSize: computed(() => {
+        if (props.size === LinkSize.sm) return '0.75rem';
+        if (props.size === LinkSize.md) return '0.875rem';
+        if (props.size === LinkSize.lg) return '1rem';
+        return '0.875rem';
+    }),
+});
 </script>
 
 <style lang="postcss">
-.p-anchor {
+.p-link {
     /* Do not change this to inline-flex style, because it must be used with inline texts. */
     @apply cursor-pointer inline-block items-end;
     font-size: inherit;
     vertical-align: baseline;
-    line-height: 1.25;
+    line-height: 100%;
     > .text {
         font-weight: inherit;
         font-size: inherit;
@@ -91,7 +104,7 @@ const hasText = computed(() => !!anchorRef.value?.textContent);
         vertical-align: baseline;
     }
     > .icon {
-        margin: 0 0.125em;
+        margin: 0 0.125rem 0 0;
         vertical-align: top;
     }
     &.disabled {
@@ -114,11 +127,11 @@ const hasText = computed(() => !!anchorRef.value?.textContent);
         }
     }
 
+    &.md {
+        font-size: 0.875rem;
+    }
     &.sm {
         font-size: 0.75rem;
-        .icon {
-            margin-bottom: 0.125rem;
-        }
     }
     &.lg {
         font-size: 1rem;

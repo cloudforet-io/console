@@ -443,11 +443,6 @@ onClickOutside(currencyInfoMenuRef as MaybeRef, handleClickOutsideCurrencyMenu);
                     @apply bg-white;
                 }
 
-                /* custom design-system component - p-anchor */
-                :deep(&.p-anchor:hover .text) {
-                    text-decoration: none;
-                }
-
                 .support-menu {
                     @apply justify-between;
                     display: flex;

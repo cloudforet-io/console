@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
+import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import {
     computed, reactive, watch,
@@ -215,15 +216,17 @@ watch(() => state.proxyVisible, async (after) => {
                     </p-badge>
                 </template>
                 <template #col-assignTo-format="{ value }">
-                    {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
+                    {{ state.users[value.resource_id] ? state.users[value.resource_id].label : '--' }}
                 </template>
                 <template #col-project-format="{ value }">
-                    <p-anchor v-if="value"
-                              :highlight="true"
-                              :href="getProjectLink(value)"
+                    <p-link v-if="value"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            highlight
+                            :href="getProjectLink(value)"
                     >
                         {{ projectFieldHandler(value, state.projects) }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </p-data-table>
         </template>

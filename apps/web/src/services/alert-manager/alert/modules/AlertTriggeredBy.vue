@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { PAnchor } from '@spaceone/design-system';
+import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive,
 } from 'vue';
@@ -65,11 +66,13 @@ const state = reactive({
 
 <template>
     <span>
-        <p-anchor v-if="state.link"
-                  :to="state.link"
+        <p-link v-if="state.link"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
+                :to="state.link"
         >
             {{ state.label }}
-        </p-anchor>
+        </p-link>
         <template v-else>
             {{ state.label }}
         </template>

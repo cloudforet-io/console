@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    PAnchor, PI, PTooltip,
+    PLink, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -54,11 +55,13 @@ const state = reactive({
 
 <template>
     <div class="service-account-project-detail">
-        <p-anchor v-if="!!state.projectName"
-                  :href="state.projectLink"
+        <p-link v-if="!!state.projectName"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
+                :href="state.projectLink"
         >
             {{ state.projectName }}
-        </p-anchor>
+        </p-link>
         <span v-if="!state.projectName && serviceAccountType === ACCOUNT_TYPE.TRUSTED">N/A</span>
         <div v-if="!state.projectName && serviceAccountType === ACCOUNT_TYPE.GENERAL">
             <span>-- <span class="required-span">{{ t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>

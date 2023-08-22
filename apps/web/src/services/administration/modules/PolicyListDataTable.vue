@@ -3,8 +3,9 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PAnchor, PBadge, PSelectStatus, PToolboxTable,
+    PLink, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import { filter, capitalize } from 'lodash';
@@ -44,13 +45,13 @@ const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], 
 
 interface Props {
     selectable: boolean;
-    hideAnchorIcon: boolean;
+    hideLinkIcon: boolean;
     initialPolicyList: Policy[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
     selectable: false,
-    hideAnchorIcon: false,
+    hideLinkIcon: false,
     initialPolicyList: () => [],
 });
 const emit = defineEmits<{(e:'update-selected-policy-list', value: Policy[]): void}>();
@@ -241,8 +242,9 @@ watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
             </template>
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
-                    <p-anchor
-                        :hide-icon="!!hideAnchorIcon"
+                    <p-link
+                        :action-icon="props.hideLinkIcon ? undefined : ACTION_ICON.INTERNAL_LINK"
+                        :new-tab="!props.hideLinkIcon"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
@@ -251,7 +253,7 @@ watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
                         }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </template>
             <template #col-created_at-format="{ value }">

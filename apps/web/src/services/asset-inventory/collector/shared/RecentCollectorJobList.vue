@@ -1,8 +1,9 @@
 <script setup lang="ts">
 
 import {
-    PTooltip, PI, PEmpty, PAnchor, PDataLoader,
+    PTooltip, PI, PEmpty, PLink, PDataLoader,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -83,14 +84,15 @@ watch(() => props.recentJobs, () => {
                     />
                 </p-tooltip>
             </p>
-            <p-anchor v-if="props.fullMode && props.historyLink"
-                      size="sm"
-                      highlight
-                      icon-name="ic_chevron-right"
-                      :to="props.historyLink"
+            <p-link size="sm"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    new-tab
+                    highlight
+                    :to="props.historyLink"
+                    class="view-all-link"
             >
                 View All
-            </p-anchor>
+            </p-link>
         </div>
         <p-data-loader :data="!!state.completedJobs?.length"
                        :loading="state.loading"
@@ -142,6 +144,9 @@ watch(() => props.recentJobs, () => {
                     @apply text-blue-600;
                 }
             }
+        }
+        .view-all-link {
+            margin-left: 0.25rem;
         }
     }
     .data-loader {
