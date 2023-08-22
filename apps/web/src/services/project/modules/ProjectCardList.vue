@@ -342,7 +342,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
                                         {{ title }}
                                     </div>
                                     <p-skeleton v-if="state.cardSummaryLoading" />
-                                    <router-link v-else-if="cardSummary[item.project_id]"
+                                    <router-link v-else-if="state.cardSummary[item.project_id]"
                                                  class="summary-item-num"
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                     >
