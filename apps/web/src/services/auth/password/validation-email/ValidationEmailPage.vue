@@ -97,7 +97,7 @@ watch(() => route.query.status, (res) => {
                 <div v-if="state.userId"
                      class="collapsible-wrapper"
                 >
-                    <p-collapsible-toggle v-if="state.isCollapsed"
+                    <p-collapsible-toggle v-if="!state.isCollapsed"
                                           v-model:is-collapsed="state.isCollapsed"
                     >
                         {{ t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
