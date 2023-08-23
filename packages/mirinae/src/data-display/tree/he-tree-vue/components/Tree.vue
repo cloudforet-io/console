@@ -39,8 +39,6 @@ import {
     randString,
 } from '../helpers';
 
-interface Func {(...args: any[]): any}
-
 const ChildrenList = defineAsyncComponent(() => import('./ChildrenList.vue'));
 
 interface Props {
@@ -119,44 +117,17 @@ watch(() => state.treeData, (treeData) => {
     treeDataHelper = new TreeData(treeData);
 }, { immediate: true });
 
-// get hooks in state._hooks, without which in props
-const _getNonPropHooksByName = (name: string) => {
-    if (state._hooks) {
-        return state._hooks[name];
-    }
-    return null;
-};
-
-const addHook = (name: string, func: Func) => {
-    if (!_getNonPropHooksByName(name)) {
-        if (!state._hooks) {
-            state._hooks = {};
-        }
-        if (!state._hooks[name]) {
-            state._hooks[name] = [];
-        }
-    }
-    state._hooks[name].push(func);
-};
-
-
 const iteratePath = (path: TreeDataPath, opt) => treeDataHelper.iteratePath(path, opt);
-
 const getAllNodesByPath = (path: TreeDataPath) => treeDataHelper.getAllNodes(path);
-
 const getNodeByPath = (path: TreeDataPath) => treeDataHelper.getNode(path);
-
 const getBranchElByPath = (path: TreeDataPath): Element|null => {
     if (treeRef.value) {
         return treeRef.value.querySelector(`[data-tree-node-path='${path.join(',')}']`);
     }
     return null;
 };
-
 const getNodeByBranchEl = (branchEl: HTMLElement) => getNodeByPath(draggableMethods.getPathByBranchEl(branchEl));
-
 const getNodeParentByPath = (path: TreeDataPath) => treeDataHelper.getNodeParent(path);
-
 const removeNodeByPath = (path: TreeDataPath) => treeDataHelper.removeNode(path);
 const walkTreeData = (handler, opt) => _walkTreeData(state.treeData, handler, opt);
 const cloneTreeData = (opt) => _cloneTreeData(state.treeData, opt);
@@ -164,7 +135,6 @@ const cloneTreeData = (opt) => _cloneTreeData(state.treeData, opt);
 const getPureTreeData = () => _getPureTreeData(state.treeData);
 
 const methods = {
-    addHook,
     iteratePath,
     getAllNodesByPath,
     getNodeByPath,
