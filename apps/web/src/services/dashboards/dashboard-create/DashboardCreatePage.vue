@@ -263,6 +263,7 @@ export default {
         });
 
         return {
+            t,
             ...toRefs(state),
             dashboardTemplate,
             dashboardProject,
