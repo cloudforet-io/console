@@ -273,6 +273,7 @@ export default {
             handleClickClose,
             handleClickBackButton,
             setPathFrom,
+            t,
         };
     },
 };
