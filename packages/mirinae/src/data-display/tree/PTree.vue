@@ -51,7 +51,7 @@
                     </span>
                     <p-text-input v-if="isEditing && getSelectState(path)"
                                   v-model="editText"
-                                  v-focus="true"
+                                  :is-focused="isEditing && getSelectState(path)"
                                   :invalid="invalid"
                                   @blur="finishEdit(node)"
                                   @keydown.enter="finishEdit(node)"
