@@ -20,6 +20,7 @@ import { isEmpty } from 'lodash';
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -56,6 +57,7 @@ import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud
 
 const store = useStore();
 const router = useRouter();
+const { t } = useI18n();
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;

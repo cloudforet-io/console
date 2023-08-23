@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const LEVEL_LIST = Object.freeze([
+const LEVEL_LIST: MenuItem[] = [
     { label: 'Level 1', name: 'LV1', type: 'item' },
     { label: 'Level 2', name: 'LV2', type: 'item' },
     { label: 'Level 3', name: 'LV3', type: 'item' },
     { label: 'Level 4', name: 'LV4', type: 'item' },
     { label: 'Level 5', name: 'LV5', type: 'item' },
-]);
+];
 
 interface props {
-    notificationLevel: string;
+    notificationLevel?: string;
 }
 
 const props = defineProps<props>();

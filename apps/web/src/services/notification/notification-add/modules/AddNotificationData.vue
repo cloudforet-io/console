@@ -33,7 +33,7 @@ const PROTOCOL_TYPE = {
 
 interface Props {
     projectId: string;
-    supportedSchema: string[];
+    supportedSchema: string | string[];
     protocolType: string;
     protocolId: string;
 }
@@ -41,10 +41,9 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'change', value: {
         channelName: string;
-        notificationLevel: string;
-        schemaForm: object;
-        selectedMember: string[];
         data: any;
+        notificationLevel: string;
+        isValid: boolean;
     }): void;
 }>();
 const route = useRoute();
@@ -59,14 +58,14 @@ const state = reactive({
     schemaForm: {},
     schema: null as null|object,
     isSchemaFormValid: false,
-    nameInvalidText: computed(() => {
+    nameInvalidText: computed<string>(() => {
         if (state.channelName !== undefined && state.channelName.length === 0) {
             return t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
         }
         if (state.channelName !== undefined && state.channelName.length > 40) {
             return t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
         }
-        return undefined;
+        return '';
     }),
     isNameInvalid: computed(() => !!state.nameInvalidText),
     //
@@ -95,7 +94,7 @@ const emitChange = () => {
     emit('change', {
         channelName: state.channelName,
         data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaForm : { users: state.selectedMember },
-        level: state.notificationLevel,
+        notificationLevel: state.notificationLevel,
         isValid: state.isDataValid,
     });
 };
