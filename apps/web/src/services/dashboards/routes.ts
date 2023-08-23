@@ -25,7 +25,7 @@ const dashboardsRoute: RouteRecordRaw = {
     component: DashboardsContainer,
     children: [
         {
-            path: '/',
+            path: '',
             component: { template: '<router-view/>' },
             redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
             children: [

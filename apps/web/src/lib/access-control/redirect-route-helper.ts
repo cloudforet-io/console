@@ -1,4 +1,5 @@
-import type { Location } from 'vue-router/types/router';
+
+import type { RouteLocationRaw } from 'vue-router';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 
@@ -31,7 +32,7 @@ const getSubMenuListByMenuId = (menuId: MenuId): MenuId[] => {
     return [];
 };
 
-export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissionsMap: Record<string, PagePermissionType>): Location => {
+export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissionsMap: Record<string, PagePermissionType>): RouteLocationRaw => {
     const subMenuIdList = getSubMenuListByMenuId(menuId);
     let redirectMenuId: MenuId|undefined;
     subMenuIdList.some((subMenuId) => {
