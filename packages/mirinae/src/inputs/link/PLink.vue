@@ -11,8 +11,8 @@
                    :href="props.to ? (toHref || props.href ): props.href"
                    @click.stop="navigate"
                 >
-                    <p-i v-if="state.hasText && !!props.leftIcon"
-                         :name="props.leftIcon"
+                    <p-i v-if="state.hasText && !!props.iconLeft"
+                         :name="props.iconLeft"
                          height="1rem"
                          width="1rem"
                          color="inherit"
@@ -51,7 +51,7 @@ interface LinkProps {
     disabled?: boolean;
     highlight?: boolean;
     size?: LinkSize;
-    leftIcon?: string;
+    iconLeft?: string;
     actionIcon?: ActionIcon;
     newTab?: boolean;
     href?: string;
@@ -61,7 +61,7 @@ interface LinkProps {
 const props = withDefaults(defineProps<LinkProps>(), {
     text: '',
     size: undefined,
-    leftIcon: undefined,
+    iconLeft: undefined,
     actionIcon: 'none',
     href: undefined,
     to: undefined,

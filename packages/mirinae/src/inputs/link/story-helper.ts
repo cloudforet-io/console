@@ -79,8 +79,8 @@ export const getLinkArgTypes = (): ArgTypes => ({
             options: [...Object.values(LinkSize)],
         },
     },
-    leftIcon: {
-        name: 'leftIcon',
+    iconLeft: {
+        name: 'iconLeft',
         type: { name: 'string' },
         description: 'The name of left icon to be displayed.',
         defaultValue: undefined,
