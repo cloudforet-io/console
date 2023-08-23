@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PAnchor, PToolboxTable,
+    PLink, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
 import {
@@ -229,13 +228,12 @@ watch(() => tabState.activeTab, () => {
                      :class="{active: tabState.activeTab === data.name}"
                      @click="tabState.activeTab = data.name"
                 >
-                    <p-anchor :href="summaryLinkFormatter(data.name).href"
-                              hide-icon
-                              class="count"
-                              highlight
+                    <p-link :href="summaryLinkFormatter(data.name).href"
+                            class="count"
+                            highlight
                     >
                         {{ summaryCount(data.count) }}
-                    </p-anchor>
+                    </p-link>
                     <span class="label">{{ data.label }}</span>
                     <span class="date">{{ data.date }}</span>
                 </div>
@@ -255,11 +253,12 @@ watch(() => tabState.activeTab, () => {
                                  @change="onChange"
                 >
                     <template #col-event-format="{ value }">
-                        <p-anchor :to="value.to"
-                                  highlight
+                        <p-link :to="value.to"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                highlight
                         >
                             {{ value.name }}
-                        </p-anchor>
+                        </p-link>
                     </template>
                     <template #col-region_code-format="{ value }">
                         <span>{{ regionFormatter(value) }}</span>
@@ -278,11 +277,13 @@ watch(() => tabState.activeTab, () => {
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-anchor :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                              highlight
+                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                            new-tab
+                                            :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                            highlight
                                     >
                                         {{ resource.entity_value }}
-                                    </p-anchor>
+                                    </p-link>
                                 </template>
                             </div>
                         </div>

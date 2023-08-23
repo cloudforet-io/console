@@ -1,13 +1,14 @@
 import type { ArgTypes } from '@storybook/addons';
-import { createRouter, createWebHistory } from 'vue-router';
+import VueRouter from 'vue-router';
 
-import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
+import { ACTION_ICON, LinkSize } from '@/inputs/link/type';
 
-export const getAnchorsArgTypes = (): ArgTypes => ({
+
+export const getLinkArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
         type: { name: 'string' },
-        description: 'Anchor text. It will be replaced by default slot if exists.',
+        description: 'Link text. It will be replaced by default slot if exists.',
         defaultValue: 'Hello World',
         table: {
             type: {
@@ -22,50 +23,10 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    size: {
-        name: 'size',
-        type: { name: 'string' },
-        description: `Select anchor size. ${
-            [...Object.values(AnchorSize)].map((d) => `\`${d}\``)} are available.`,
-        defaultValue: AnchorSize.md,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: AnchorSize.md,
-            },
-        },
-        control: {
-            type: 'select',
-            options: [...Object.values(AnchorSize)],
-        },
-    },
-    iconPosition: {
-        name: 'iconPosition',
-        type: { name: 'string' },
-        description: `Select icon position. ${
-            [...Object.values(IconPosition)].map((d) => `\`${d}\``)} are available.`,
-        defaultValue: IconPosition.right,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: IconPosition.right,
-            },
-        },
-        control: {
-            type: 'select',
-            options: [...Object.values(IconPosition)],
-        },
-    },
-    hideIcon: {
-        name: 'hideIcon',
+    disabled: {
+        name: 'disabled',
         type: { name: 'boolean' },
-        description: 'Whether or not hide icon.',
+        description: 'Disable link or not',
         defaultValue: false,
         table: {
             type: {
@@ -80,22 +41,97 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    iconName: {
-        name: 'iconName',
+    highlight: {
+        name: 'highlight',
+        type: { name: 'boolean' },
+        description: 'Fix link color for highlighting, not inherit parent\'s color.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    size: {
+        name: 'size',
         type: { name: 'string' },
-        description: 'The name of the icon to be displayed. Opens as a new tab only if you use the `ic_external-link` icon.',
-        defaultValue: 'ic_external-link',
+        description: `Select link size. ${
+            [...Object.values(LinkSize)].map((d) => `\`${d}\``)} are available.`,
+        defaultValue: LinkSize.md,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'ic_external-link',
+                summary: LinkSize.md,
+            },
+        },
+        control: {
+            type: 'select',
+            options: [...Object.values(LinkSize)],
+        },
+    },
+    leftIcon: {
+        name: 'leftIcon',
+        type: { name: 'string' },
+        description: 'The name of left icon to be displayed.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
             },
         },
         control: {
             type: 'text',
+        },
+    },
+    actionIcon: {
+        name: 'actionIcon',
+        type: { name: 'string' },
+        description: 'Action icon that will appear to the right of the link text.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ACTION_ICON.NONE,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ACTION_ICON),
+        },
+    },
+    newTab: {
+        name: 'newTab',
+        type: { name: 'boolean' },
+        description: 'Whether to open the link in a new tab or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
         },
     },
     href: {
@@ -134,42 +170,6 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
-    disabled: {
-        name: 'disabled',
-        type: { name: 'boolean' },
-        description: 'Disable anchor or not',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    highlight: {
-        name: 'highlight',
-        type: { name: 'boolean' },
-        description: 'Fix anchor color for highlighting, not inherit parent\'s color.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     defaultSlot: {
         name: 'default',
         description: 'Slot for text',
@@ -189,8 +189,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
     },
 });
 
-export const router = createRouter({
-    history: createWebHistory(),
+export const router = new VueRouter({
     routes: [
         {
             path: '/',

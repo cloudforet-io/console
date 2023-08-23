@@ -5,7 +5,7 @@ import { h, useAttrs } from 'vue';
 
 import type { SizeDynamicFieldProps, SizeTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',
@@ -58,7 +58,7 @@ else {
 let render = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
 if (props.options.link) {
-    render = h(PAnchor, {
+    render = h(PLink, {
         attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
         props: { value, showIcon: !!formattedValue },
     }, [render]);

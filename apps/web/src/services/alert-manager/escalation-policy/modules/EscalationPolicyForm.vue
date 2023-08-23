@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 
 import {
-    PAnchor, PFieldGroup, PRadio, PTextInput,
+    PLink, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -153,9 +154,11 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 >
                     <span>{{ state.scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
                     <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
-                        (<p-anchor :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
-                                   :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
-                                   highlight
+                        (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                 new-tab
+                                 :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
+                                 :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                 highlight
                         />)
                     </span>
                 </span>
@@ -169,10 +172,13 @@ watch(() => isAllValid.value, (_isAllValid) => {
         >
             <template #label>
                 <span>{{ t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
-                <p-anchor class="link-text"
-                          :to="{ name: PROJECT_ROUTE._NAME }"
-                          :text="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
-                          highlight
+                <p-link class="link-text"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        size="sm"
+                        :to="{ name: PROJECT_ROUTE._NAME }"
+                        :text="t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
+                        highlight
                 />
             </template>
             <template #default="{invalid}">
@@ -219,10 +225,16 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                .link-text {
-                    font-weight: normal;
-                    font-size: 0.75rem;
-                }
+            }
+        }
+        .link-text {
+            font-weight: normal;
+        }
+        .title-wrapper {
+            .title {
+                width: 100%;
+                justify-content: space-between;
+                display: flex;
             }
         }
     }

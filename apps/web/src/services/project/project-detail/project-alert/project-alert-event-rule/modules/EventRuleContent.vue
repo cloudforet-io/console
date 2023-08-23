@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { PAnchor } from '@spaceone/design-system';
+import { PLink } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -91,24 +92,28 @@ watch(() => props.data, () => {
                                 <span class="text-secondary">{{ t('PROJECT.EVENT_RULE.ON') }}</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
-                                <p-anchor :to="referenceRouter(
-                                    state.items[item.name],
-                                    { resource_type: 'identity.Project' })"
+                                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        new-tab
+                                        :to="referenceRouter(
+                                            state.items[item.name],
+                                            { resource_type: 'identity.Project' })"
                                 >
                                     {{ state.projects[state.items[item.name]] ? state.projects[state.items[item.name]].label : state.items[item.name] }}
-                                </p-anchor>
+                                </p-link>
                             </td>
                             <td v-else-if="item.name === 'add_project_dependency'">
                                 <p v-for="(projectId, idx) in state.items[item.name]"
                                    :key="`${projectId}-${idx}`"
                                    class="project-name"
                                 >
-                                    <p-anchor :to="referenceRouter(
-                                        projectId,
-                                        { resource_type: 'identity.Project' })"
+                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                            new-tab
+                                            :to="referenceRouter(
+                                                projectId,
+                                                { resource_type: 'identity.Project' })"
                                     >
                                         {{ state.projects[projectId] ? state.projects[projectId].label : projectId }}
-                                    </p-anchor>
+                                    </p-link>
                                 </p>
                             </td>
                             <td v-else-if="item.name === 'add_responder'">

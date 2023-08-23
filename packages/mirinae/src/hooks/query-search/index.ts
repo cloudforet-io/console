@@ -1,11 +1,11 @@
+import {
+    cloneDeep, debounce, find, throttle,
+} from 'lodash';
 import type { WatchStopHandle, Ref } from 'vue';
 import {
     computed, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
-import {
-    cloneDeep, debounce, find, throttle,
-} from 'lodash';
 
 import type PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {

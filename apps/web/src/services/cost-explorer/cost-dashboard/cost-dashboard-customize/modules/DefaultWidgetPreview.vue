@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { PAnchor, PFieldTitle, PLazyImg } from '@spaceone/design-system';
+import { PLink, PFieldTitle, PLazyImg } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -31,11 +32,13 @@ const state = reactive({
             <div class="info-item">
                 <div class="type">
                     <p-field-title>{{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TYPE') }}</p-field-title>
-                    <p-anchor highlight
-                              :href="state.thumbnailLink"
+                    <p-link highlight
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :href="state.thumbnailLink"
                     >
                         {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_PREVIEW') }}
-                    </p-anchor>
+                    </p-link>
                 </div>
                 <div class="image-wrapper">
                     <p-lazy-img :src="assetUrlConverter(state.chartThumbnail)"
@@ -57,7 +60,7 @@ const state = reactive({
     .type {
         @apply w-full inline-flex justify-between;
     }
-    .p-anchor {
+    .p-link {
         @apply items-center;
     }
 }

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor, PCopyButton, PI,
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -292,9 +292,10 @@ watch(() => formState.isAllValid, (isAllValid) => {
             >
                 <template #help>
                     <span>{{ t('IDENTITY.SERVICE_ACCOUNT.ADD.TRUSTED_ACCOUNT_HELP_TEXT') }}</span>
-                    <p-anchor class="see-more-text"
-                              :text="t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
-                              :href="state.trustedAccountInfoLink"
+                    <p-link class="see-more-text"
+                            :text="t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            :href="state.trustedAccountInfoLink"
                     />
                 </template>
                 <div class="radio-wrapper">

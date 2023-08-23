@@ -70,14 +70,14 @@
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
-                                  :href="props.widgetLink"
-                                  :to="props.widgetLocation"
-                                  class="anchor-button"
-                                  icon-name="ic_chevron-right"
+                        <p-link v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
+                                :href="props.widgetLink"
+                                :to="props.widgetLocation"
+                                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                class="link-button"
                         >
                             {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        </p-anchor>
+                        </p-link>
                     </slot>
                 </div>
             </div>
@@ -112,8 +112,9 @@
 
 <script setup lang="ts">
 import {
-    PAnchor, PButton, PDivider, PIconButton, PI, PTooltip,
+    PLink, PButton, PDivider, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     reactive, computed,
@@ -259,6 +260,9 @@ const handleClickViewModeButton = () => {
         widgetViewModeModalVisible: true,
     });
 };
+const handleRefresh = () => {
+    emit('refresh');
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -359,7 +363,7 @@ const handleClickViewModeButton = () => {
                 }
             }
             .footer-right {
-                .anchor-button {
+                .link-button {
                     @apply flex items-center flex-shrink-0 text-blue-700 font-normal cursor-pointer;
                     font-size: 0.75rem;
                     line-height: 150%;

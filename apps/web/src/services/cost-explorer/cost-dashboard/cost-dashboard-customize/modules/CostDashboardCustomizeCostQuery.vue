@@ -177,14 +177,6 @@ const handleClickCreateQuery = () => {
         .p-field-title {
             @apply mr-auto;
         }
-
-        /* custom design-system component - p-anchor */
-        :deep(.p-anchor) {
-            @apply ml-4;
-            &:hover .text {
-                text-decoration: none;
-            }
-        }
     }
 
     .content-wrapper {

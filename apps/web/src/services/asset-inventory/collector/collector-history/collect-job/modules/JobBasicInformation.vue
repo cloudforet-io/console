@@ -4,12 +4,14 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="state.collector.linkLocation"
-                          class="contents"
-                          size="sm"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="state.collector.linkLocation"
+                        class="contents"
+                        size="sm"
                 >
                     {{ state.collector.label }}
-                </p-anchor>
+                </p-link>
             </div>
             <div class="item">
                 <label>{{ t('MANAGEMENT.COLLECTOR_HISTORY.JOB.CREATED') }}</label>
@@ -44,7 +46,8 @@
 <script lang="ts" setup>
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
-import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import { PLink, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive,
 } from 'vue';

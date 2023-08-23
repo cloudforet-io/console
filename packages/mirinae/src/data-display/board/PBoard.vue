@@ -133,7 +133,7 @@ const handleClickBoardItem = (item: BoardSet, index: number) => {
     grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
     .p-board-item {
         @apply rounded-lg;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 6%);
     }
 
     @screen tablet {

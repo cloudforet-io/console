@@ -220,11 +220,11 @@ onBeforeUnmount(() => {
                     }
 
                     .CodeMirror-gutters {
-                        border-right: 0.03rem solid rgba(109, 138, 136, 0.5);
+                        border-right: 0.03rem solid rgba(109, 138, 136, 50%);
                     }
 
                     .CodeMirror-activeline-gutter, .CodeMirror-activeline-background {
-                        background-color: rgba(255, 255, 222, 0.3);
+                        background-color: rgba(255, 255, 222, 30%);
                     }
 
                     font-family: Inconsolata, monospace;

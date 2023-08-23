@@ -8,7 +8,7 @@ import { h, useAttrs } from 'vue';
 
 import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 
 
 dayjs.extend(utc);
@@ -55,7 +55,7 @@ if (value) {
 let render = h('span', { ...attrs }, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
 
 if (options.link) {
-    render = h(PAnchor, {
+    render = h(PLink, {
         ...attrs,
         attrs: { href: props.options.link, target: '_blank' },
     }, [render]);

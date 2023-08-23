@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-/* eslint-disable camelcase */
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PAnchor, PSpinner,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -282,10 +281,11 @@ watch([() => state.selectedToolId, () => props.selectedMetrics], async () => {
                 }) }}
             </span>
             <div>
-                <p-anchor v-for="resource in state.availableResources"
-                          :key="resource.id"
-                          class="legend"
-                          :href="resource.link"
+                <p-link v-for="resource in state.availableResources"
+                        :key="resource.id"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        class="legend"
+                        :href="resource.link"
                 >
                     <template #left-extra>
                         <span class="circle"
@@ -293,7 +293,7 @@ watch([() => state.selectedToolId, () => props.selectedMetrics], async () => {
                         />
                     </template>
                     {{ legendFormatter(resource) }}
-                </p-anchor>
+                </p-link>
             </div>
         </section>
         <section class="toolbox-section">
@@ -394,8 +394,8 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    /* custom design-system component - p-anchor */
-    :deep(.legend.p-anchor) {
+    /* custom design-system component - p-link */
+    :deep(.legend.p-link) {
         @apply text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;

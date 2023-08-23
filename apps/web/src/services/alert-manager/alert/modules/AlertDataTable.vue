@@ -8,8 +8,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PToolboxTable, PButton, PHeading, PBadge, PI, PAnchor,
+    PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     computed, onActivated, reactive,
@@ -366,15 +367,14 @@ if (!props.keepAlive) {
             </template>
             <template #col-title-format="{ value, item }">
                 <template v-if="value">
-                    <p-anchor hide-icon
-                              highlight
-                              :to="{
-                                  name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                                  params: { id: item.alert_id }
-                              }"
+                    <p-link highlight
+                            :to="{
+                                name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                params: { id: item.alert_id }
+                            }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </template>
             <template #col-state-format="{ value }">
@@ -398,9 +398,12 @@ if (!props.keepAlive) {
             </template>
             <template #col-project_id-format="{ value }">
                 <template v-if="value">
-                    <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
+                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                    >
                         {{ storeState.projects[value] ? storeState.projects[value].label : value }}
-                    </p-anchor>
+                    </p-link>
                 </template>
             </template>
             <template #col-created_at-format="{value, field}">

@@ -2,8 +2,8 @@ import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
-import type { QueryTagConverter, QueryTag, QueryTagValidator } from '@/inputs/search/query-search-tags/type';
 import type { KeyDataType, QueryItem } from '@/inputs/search/query-search/type';
+import type { QueryTagConverter, QueryTag, QueryTagValidator } from '@/inputs/search/query-search-tags/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);

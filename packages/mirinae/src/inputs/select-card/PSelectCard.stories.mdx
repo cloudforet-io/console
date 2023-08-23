@@ -7,7 +7,7 @@ import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
 import { getSelectCardArgTypes } from '@/inputs/select-card/story-helper';
 import PSelectCard from './PSelectCard.vue';
 import { peacock } from '@/styles/colors'
-import PAnchor from '@/inputs/anchors/PAnchor';
+import PLink from '@/inputs/anchors/PLink';
 import { useProxyValue } from '@/hooks';
 
 
@@ -312,7 +312,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Bottom Slot">
         {{
-            components: { PSelectCard, PAnchor },
+            components: { PSelectCard, PLink },
             template: `
     <div class="w-full overflow p-8 flex flex-wrap">
         <p-select-card v-for="(value, index) in values" :key="value"
@@ -324,7 +324,7 @@ export const Template = (args, { argTypes }) => ({
             style="min-width: 8rem; min-height: 8rem; margin: 1rem;"
         >
             <template #bottom>
-                <p-anchor highlight>Preview</p-anchor>
+                <p-link highlight>Preview</p-link>
             </template>
         </p-select-card>
     </div>

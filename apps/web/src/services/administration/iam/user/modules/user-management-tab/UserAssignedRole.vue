@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PHeading, PDataTable, PAnchor, PBadge,
+    PHeading, PDataTable, PLink, PBadge,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -12,8 +13,8 @@ import { useStore } from 'vuex';
 
 import type { Tags } from '@/models';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -113,21 +114,25 @@ watch(() => props.userId, () => {
             :striped="false"
         >
             <template #col-project_group_info.project_group_id-format="{value}">
-                <p-anchor v-if="value"
-                          :href="getProjectLink(value, false)"
+                <p-link v-if="value"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :href="getProjectLink(value, false)"
                 >
-                    {{ projectGroups[value] ? projectGroups[value].label : value }}
-                </p-anchor>
+                    {{ baseState.projectGroups[value] ? baseState.projectGroups[value].label : value }}
+                </p-link>
                 <p v-if="!value">
                     -
                 </p>
             </template>
             <template #col-project_info.project_id-format="{value}">
-                <p-anchor v-if="value"
-                          :href="getProjectLink(value, true)"
+                <p-link v-if="value"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :href="getProjectLink(value, true)"
                 >
-                    {{ projects[value] ? projects[value].label : value }}
-                </p-anchor>
+                    {{ baseState.projects[value] ? baseState.projects[value].label : value }}
+                </p-link>
                 <p v-if="!value">
                     -
                 </p>

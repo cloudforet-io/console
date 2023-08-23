@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    PButton, PAnchor, PButtonModal, PCopyButton,
+    PButton, PLink, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -66,13 +67,15 @@ const onSelectProject = (selected) => {
     >
         <span class="project">
             <p-copy-button :value="alertData.project_id">
-                <p-anchor :to="referenceRouter(
-                              alertData.project_id,
-                              { resource_type: 'identity.Project' })"
-                          highlight
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(
+                            alertData.project_id,
+                            { resource_type: 'identity.Project' })"
+                        highlight
                 >
                     {{ state.projects[alertData.project_id] ? state.projects[alertData.project_id].label : alertData.project_id }}
-                </p-anchor>
+                </p-link>
             </p-copy-button>
         </span>
         <p-button style-type="tertiary"

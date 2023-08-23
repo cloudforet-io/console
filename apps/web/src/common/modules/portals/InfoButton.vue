@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PI, PAnchor } from '@spaceone/design-system';
+import { PI, PLink } from '@spaceone/design-system';
 import {
     computed,
     onBeforeUnmount,
@@ -20,7 +20,7 @@ const { t } = useI18n();
 const store = useStore();
 
 const state = reactive({
-    tag: computed(() => (props.href ? PAnchor : 'span')),
+    tag: computed(() => (props.href ? PLink : 'span')),
     childProps: computed(() => {
         const res: any = {};
         if (props.href) {

@@ -5,14 +5,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PAnchor,
-    PBadge,
-    PButton,
-    PHeading,
-    PSelectDropdown,
-    PTableCheckModal,
-    PToolboxTable,
+    PLink, PBadge, PButton, PHeading, PSelectDropdown, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
@@ -21,8 +16,8 @@ import {
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -277,9 +272,12 @@ watch(() => store.state.reference.project.items, (projects) => {
                 {{ storeState.users[value] ? storeState.users[value].name : value }}
             </template>
             <template #col-assigned-format="{ value }">
-                <p-anchor :to="projectLinkFormatter(value)">
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="projectLinkFormatter(value)"
+                >
                     {{ value }}
-                </p-anchor>
+                </p-link>
             </template>
             <template #col-labels-format="{ value }">
                 <p v-if="value.length === 0" />

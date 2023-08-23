@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { PAnchor, PDivider, PFieldTitle } from '@spaceone/design-system';
+import { PLink, PDivider, PFieldTitle } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, defineProps, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -61,13 +62,14 @@ const state = reactive({
             >
                 {{ state.description }}
             </p>
-            <p-anchor v-if="props.plugin?.tags?.link"
-                      size="sm"
-                      highlight
-                      class="plugin-link"
+            <p-link v-if="props.plugin?.tags?.link"
+                    size="sm"
+                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    highlight
+                    class="plugin-link"
             >
                 {{ t('INVENTORY.COLLECTOR.CREATE.LEARN_MORE') }}
-            </p-anchor>
+            </p-link>
         </template>
     </div>
 </template>

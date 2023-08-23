@@ -68,9 +68,11 @@
                     </div>
                     <div v-if="state.selectedItem.message.link">
                         <b>{{ t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
-                        <p-anchor :href="state.selectedItem.message.link">
+                        <p-link :href="state.selectedItem.message.link"
+                                :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        >
                             {{ state.selectedItem.message.link }}
-                        </p-anchor>
+                        </p-link>
                     </div>
                 </div>
                 <div v-if="state.selectedItem.message.description"
@@ -99,8 +101,9 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton, PEmpty,
+    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { useInfiniteScroll } from '@vueuse/core';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';

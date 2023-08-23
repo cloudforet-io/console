@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-    PDataTable, PAnchor, PBadge,
+    PDataTable, PLink, PBadge,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -129,12 +130,14 @@ const onChangeSort = (sortBy, sortDesc) => {
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value">
-                <p-anchor :to="referenceRouter(
-                    value,
-                    { resource_type: 'identity.Project' })"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(
+                            value,
+                            { resource_type: 'identity.Project' })"
                 >
                     {{ state.projects[value] ? state.projects[value].label : value }}
-                </p-anchor>
+                </p-link>
             </template>
         </template>
     </p-data-table>

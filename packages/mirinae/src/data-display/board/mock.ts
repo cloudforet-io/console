@@ -1,5 +1,5 @@
-import { standardIconActionSet } from '@/data-display/board-item/mock';
 import type { BoardSet, StyleOptions } from '@/data-display/board/type';
+import { standardIconActionSet } from '@/data-display/board-item/mock';
 
 export const basicItemSets: BoardSet[] = [
     {

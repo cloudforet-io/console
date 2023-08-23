@@ -2,8 +2,9 @@
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import {
-    PAnchor, PBadge, PButton, PCard, PIconButton, PSpinner,
+    PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -135,16 +136,19 @@ const handleBudgetNotifications = () => {
                             <span class="sub-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.NOTIFICATIONS_CHANNEL') }}</span>
                             <div class="desc-wrapper">
                                 <span class="desc">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_2') }}</span>
-                                <p-anchor v-if="state.budgetTargetId"
-                                          class="link-text"
-                                          :text="t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                          :to="{
-                                              name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                                              params: {
-                                                  id: state.budgetTargetId
-                                              }
-                                          }"
-                                          highlight
+                                <p-link v-if="state.budgetTargetId"
+                                        class="link-text"
+                                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                        new-tab
+                                        size="md"
+                                        :text="t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
+                                        :to="{
+                                            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                                            params: {
+                                                id: state.budgetTargetId
+                                            }
+                                        }"
+                                        highlight
                                 />
                             </div>
                             <budget-notifications-channel :project-id="state.budgetTargetId" />

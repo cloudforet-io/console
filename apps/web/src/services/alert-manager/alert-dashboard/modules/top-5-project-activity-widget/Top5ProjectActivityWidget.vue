@@ -3,7 +3,7 @@
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PAnchor, PSelectStatus, PStatus, PSkeleton,
+    PLink, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
@@ -216,16 +216,15 @@ watch(() => state.selectedPeriod, async () => {
                      :key="`table-row-${idx}`"
                      class="table-row"
                 >
-                    <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                              hide-icon
-                              size="sm"
-                              class="col-name"
+                    <p-link :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
+                            size="sm"
+                            class="col-name"
                     >
                         <span v-tooltip.bottom="projectNameFormatter(projectId, state.projects)"
                               class="tablet:hidden"
                         >{{ projectNameFormatter(projectId, state.projects) }}</span>
                         <span class="tablet-text">{{ projectNameFormatter(projectId, state.projects) }}</span>
-                    </p-anchor>
+                    </p-link>
                     <div class="col-activity">
                         <div v-for="(activity, aIdx) in state.activity[projectId]"
                              :key="`activity-${aIdx}`"

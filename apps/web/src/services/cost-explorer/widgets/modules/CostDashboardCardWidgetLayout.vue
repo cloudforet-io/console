@@ -42,7 +42,7 @@ const { t } = useI18n();
                     </span>
                     <router-link v-if="widgetLink && !printMode"
                                  :to="widgetLink"
-                                 class="anchor-button"
+                                 class="link-button"
                     >
                         {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         <p-i name="ic_chevron-right"
@@ -83,7 +83,7 @@ const { t } = useI18n();
                 @apply text-gray-300 ml-1 mr-2;
             }
         }
-        .anchor-button {
+        .link-button {
             @apply flex items-center flex-shrink-0 text-sm text-blue-700 font-normal cursor-pointer;
             font-size: 0.75rem;
             line-height: 150%;

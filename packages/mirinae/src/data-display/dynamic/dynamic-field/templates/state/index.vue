@@ -1,11 +1,11 @@
 <template>
     <span>
-        <p-anchor v-if="options.link"
-                  :href="options.link"
-                  target="_blank"
+        <p-link v-if="options.link"
+                :href="options.link"
+                target="_blank"
         >
             <p-status v-bind="statusProps" />
-        </p-anchor>
+        </p-link>
         <p-status v-else
                   v-bind="statusProps"
         />
@@ -19,7 +19,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { StatusProps } from '@/data-display/status/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 import { getColor } from '@/utils/helpers';
 
 const props = withDefaults(defineProps<StateDynamicFieldProps>(), {

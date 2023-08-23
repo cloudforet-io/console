@@ -3,7 +3,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PListCard, PI, PAnchor,
+    PListCard, PI, PLink,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
@@ -97,10 +97,9 @@ watch(() => props.projectId, async (projectId) => {
             <div v-else
                  class="view-all-text"
             >
-                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
-                          :text="t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
-                          hide-icon
-                          highlight
+                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
+                        :text="t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
+                        highlight
                 />
             </div>
         </template>
