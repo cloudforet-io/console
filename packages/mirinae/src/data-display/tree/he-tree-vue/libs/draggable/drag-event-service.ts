@@ -1,40 +1,27 @@
+/* eslint-disable class-methods-use-this */
 // support desktop and mobile
 // support start, move, end
+
+import type { EventOptions, EventPosition } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
 
 const events = {
     start: ['mousedown', 'touchstart'],
     move: ['mousemove', 'touchmove'],
     end: ['mouseup', 'touchend'],
 };
-export type MouseOrTouchEvent = MouseEvent | TouchEvent
-export interface EventPosition {
-  pageX: number;
-  pageY: number;
-  clientX: number;
-  clientY: number;
-  screenX: number;
-  screenY: number;
-}
 
-export interface Options {
-  args?: any[];
-  mouseArgs?: any[];
-  touchArgs?: any[];
-}
 
-const DragEventService = {
+export class DragEventService {
+    _wrapperStore: any[];
+
+    constructor() {
+        this._wrapperStore = [];
+    }
+
     isTouch(e: MouseEvent | TouchEvent) {
         return e.type && e.type.startsWith('touch');
-    },
-    _getStore(el: Element | Document | Window) {
-    // @ts-ignore
-        if (!el._wrapperStore) {
-            // @ts-ignore
-            el._wrapperStore = [];
-        }
-        // @ts-ignore
-        return el._wrapperStore;
-    },
+    }
+
     on<T>(
         el: Element | Document | Window,
         name: string,
@@ -42,15 +29,13 @@ const DragEventService = {
       event: MouseEvent | TouchEvent,
       eventPosition: EventPosition
     ) => T,
-        options?: Options,
+        options?: EventOptions,
     ) {
         const { args, mouseArgs, touchArgs } = resolveOptions(options);
-        const store = this._getStore(el);
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const ts = this;
-        const wrapper = function (e) {
+        const store = this._wrapperStore;
+        const wrapper = (e): T|undefined => {
             let mouse;
-            const isTouch = ts.isTouch(e);
+            const isTouch = this.isTouch(e);
             if (isTouch) {
                 // touch
                 mouse = {
@@ -77,11 +62,9 @@ const DragEventService = {
                 };
                 if (name === 'start' && e.which !== 1) {
                     // not left button mousedown
-                    return;
+                    return undefined;
                 }
             }
-            // @ts-ignore
-            // eslint-disable-next-line consistent-return
             return handler.call(this, e, mouse);
         };
         store.push({ handler, wrapper });
@@ -89,15 +72,16 @@ const DragEventService = {
         // on(el, events[name][0], wrapper, ...args)
         on.call(null, el, events[name][0], wrapper, ...[...args, ...mouseArgs]);
         on.call(null, el, events[name][1], wrapper, ...[...args, ...touchArgs]);
-    },
+    }
+
     off(
         el: Element | Document | Window,
         name: string,
         handler: any,
-        options?: Options,
+        options?: EventOptions,
     ) {
         const { args, mouseArgs } = resolveOptions(options);
-        const store = this._getStore(el);
+        const store = this._wrapperStore;
         for (let i = store.length - 1; i >= 0; i--) {
             const { handler: handler2, wrapper } = store[i];
             if (handler === handler2) {
@@ -118,10 +102,8 @@ const DragEventService = {
                 store.splice(i, 1);
             }
         }
-    },
-};
-
-export default DragEventService;
+    }
+}
 
 function resolveOptions(options: Record<string, any> = {}) {
     const args = options.args || [];
@@ -142,18 +124,10 @@ function off<T extends Event>(
     el: Node | Window | Document,
     name: string,
     handler: (event: T) => void,
+    // eslint-disable-next-line no-undef
     options?: boolean | AddEventListenerOptions,
 ) {
-    if (el.removeEventListener) {
-        // All major browsers except IE 8 and earlier
-        // @ts-ignore
-        el.removeEventListener(name, handler, options);
-        // @ts-ignore
-    } else if (el.detachEvent) {
-        // IE 8 and earlier IE versions
-        // @ts-ignore
-        el.detachEvent(`on${name}`, handler, options);
-    }
+    el.removeEventListener(name, handler, options);
 }
 
 
@@ -168,16 +142,8 @@ function on<T extends Event>(
     el: Node | Window | Document,
     name: string,
     handler: (event: T) => void,
+    // eslint-disable-next-line no-undef
     options?: boolean | AddEventListenerOptions,
 ) {
-    if (el.addEventListener) {
-        // All major browsers except IE 8 and earlier
-        // @ts-ignore
-        el.addEventListener(name, handler, options);
-        // @ts-ignore
-    } else if (el.attachEvent) {
-        // IE 8 and earlier IE versions
-        // @ts-ignore
-        el.attachEvent(`on${name}`, handler, options);
-    }
+    el.addEventListener(name, handler, options);
 }

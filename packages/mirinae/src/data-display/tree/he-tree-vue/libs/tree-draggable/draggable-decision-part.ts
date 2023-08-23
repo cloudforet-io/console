@@ -1,5 +1,5 @@
 // arg {options, event, store, opt, info, conditions, actions, doAction}
-export default function ({ conditions, doAction }) {
+export const doDraggableDecision = ({ conditions, doAction }) => {
     // decision start =================================
     if (conditions['no closest'] === true) {
         doAction('append to root');
@@ -147,4 +147,4 @@ export default function ({ conditions, doAction }) {
         }
     }
     // decision end =================================
-}
+};
