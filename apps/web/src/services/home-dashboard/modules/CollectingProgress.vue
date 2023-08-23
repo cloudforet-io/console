@@ -11,47 +11,22 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { TimeStamp } from '@/models';
-
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel } from '@/services/asset-inventory/collector/model';
+import type { CollectorModel, JobModel, JobStatus } from '@/services/asset-inventory/collector/model';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { ExtraParams } from '@/services/home-dashboard/modules/type';
 
 
-enum COLLECT_MODE {
-    all = 'ALL',
-    create = 'CREATE',
-    update = 'UPDATE'
-}
-
-enum JOB_STATE {
-    created = 'CREATED',
-    progress = 'IN_PROGRESS',
-    failure = 'FAILURE',
-    timeout = 'TIMEOUT',
-    canceled = 'CANCELED',
-    success = 'SUCCESS'
-}
-
-interface JobModel {
-    job_id: string;
-    state: JOB_STATE;
-    collect_mode: COLLECT_MODE;
-    collector_info: CollectorModel;
-    secret_id: string;
-    filter: any;
-    errors: {
-        code: string;
-        message: string;
-        secret_id?: string;
-    }[];
-    created_at: TimeStamp;
-    finished_at: TimeStamp;
+const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
+interface JobItem extends JobModel {
+    progress: string;
+    color?: string;
+    provider?: string;
+    collector?: string;
 }
 
 interface Props {
@@ -70,7 +45,30 @@ const state = reactive({
     skeletons: range(2),
     timezone: computed(() => store.state.user.timezone || 'UTC'),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    items: [] as JobModel[],
+    jobs: [] as JobModel[],
+    collectors: [] as CollectorModel[],
+    collectorsMap: computed<Record<string, CollectorModel>>(() => {
+        const map = {} as Record<string, CollectorModel>;
+        state.collectors.forEach((collector) => {
+            map[collector.collector_id] = collector;
+        });
+        return map;
+    }),
+    items: computed<JobItem[]>(() => {
+        const collectorsMap = state.collectorsMap;
+        const providersMap = state.providers;
+        return state.jobs.map((job) => {
+            const collector = collectorsMap[job.collector_id];
+            const provider = providersMap[collector?.provider];
+            return {
+                ...job,
+                progress: `${(Math.round((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100)}%`,
+                color: provider?.color,
+                provider: provider?.label,
+                collector: collector?.name,
+            };
+        });
+    }),
     fields: computed(() => [
         { label: t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
         { label: t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
@@ -78,17 +76,6 @@ const state = reactive({
 });
 
 /* util */
-const convertJobsToFieldItem = (jobs) => {
-    const items = [] as JobModel[];
-    jobs.forEach((job) => {
-        const newJob = {
-            progress: `${(Math.round((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100)}%`,
-            ...job,
-        };
-        items.push(newJob);
-    });
-    return items;
-};
 const timeFormatter = (value) => {
     let time = dayjs(dayjs(value)).utc();
     if (state.timezone !== 'UTC') {
@@ -98,21 +85,44 @@ const timeFormatter = (value) => {
 };
 
 /* api */
-const apiQuery = new ApiQueryHelper();
+const collectorApiQuery = new ApiQueryHelper();
+const fetchCollectors = async (collectorIds: string[]) => {
+    try {
+        collectorApiQuery.setFilters([{ k: 'collector_id', v: collectorIds, o: '=' }]);
+        const res = await SpaceConnector.client.inventory.collector.list({
+            query: collectorApiQuery.data,
+        });
+        state.collectors = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.collectors = [];
+    }
+};
+
+const jobApiQuery = new ApiQueryHelper();
+const fetchJobs = async () => {
+    try {
+        jobApiQuery.setSort('created_at')
+            .setPage(1, 5)
+            .setFilters([{ k: 'status', v: STATUS_FILTER, o: '=' }]);
+        const res = await SpaceConnector.client.inventory.job.list({
+            ...props.extraParams,
+            query: jobApiQuery.data,
+        });
+        state.jobs = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.jobs = [];
+    }
+};
+
 const getData = async () => {
     state.loading = true;
     try {
-        apiQuery.setSort('created_at')
-            .setPage(1, 5)
-            .setFilters([{ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: '=' }]);
-        const res = await SpaceConnector.client.inventory.job.list({
-            ...props.extraParams,
-            query: apiQuery.data,
-        });
-        state.items = convertJobsToFieldItem(res.results);
+        await fetchJobs();
+        await fetchCollectors(state.items.map((item) => item.collector_id));
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.items = [];
     } finally {
         state.loading = false;
     }
@@ -126,9 +136,10 @@ const goToCollectorHistory = async (item) => {
 };
 
 const init = async () => {
-    await getData();
-    // LOAD REFERENCE STORE
-    await store.dispatch('reference/provider/load');
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+        getData(),
+    ]);
 };
 init();
 
@@ -177,9 +188,9 @@ init();
             >
                 <div class="left-part col-span-10">
                     <span class="collector-provider"
-                          :style="{color: state.providers[item.collector_info.provider] ? state.providers[item.collector_info.provider].color : undefined }"
-                    >{{ state.providers[item.collector_info.provider] ? state.providers[item.collector_info.provider].label : item.collector_info.provider }}</span>
-                    <span class="collector-title">{{ item.collector_info.name }}</span>
+                          :style="{color: item.color }"
+                    >{{ item.provider }}</span>
+                    <span class="collector-title">{{ item.collector }}</span>
                     <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
                 </div>
                 <div class="right-part col-span-2">
