@@ -1,5 +1,5 @@
 import {
-    arrayLast, isArray, walkTreeData,
+    arrayLast, isArray, walkTreeData as _walkTreeData,
 } from '@/data-display/tree/he-tree-vue/helpers';
 import type { TreeDataPath, WalkTreeDataHandler } from '@/data-display/tree/he-tree-vue/types';
 
@@ -164,7 +164,7 @@ export class TreeData<Node> {
         const { childrenKey, data } = this;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        return walkTreeData(data, handler, childrenKey, opt);
+        return _walkTreeData(data, handler, childrenKey, opt);
     }
 
     clone(
@@ -199,3 +199,20 @@ export class TreeData<Node> {
         return td.data as Node[];
     }
 }
+
+export const cloneTreeData = (treeData, opt?) => (new TreeData(treeData)).clone(opt);
+
+export const walkTreeData = (treeData, handler, opt = {}) => (new TreeData(treeData)).walk(handler, opt);
+
+export const getPureTreeData = (treeData) => {
+    const opt = {
+        afterNodeCreated: (newNode) => {
+            Object.keys(newNode).forEach((key) => {
+                if (key[0] === '$') {
+                    delete newNode[key];
+                }
+            });
+        },
+    };
+    return cloneTreeData(treeData, opt);
+};

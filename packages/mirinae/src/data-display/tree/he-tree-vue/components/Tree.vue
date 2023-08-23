@@ -30,13 +30,14 @@ import {
 import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
 import { useDraggable } from '@/data-display/tree/he-tree-vue/plugins/draggable/use-draggable';
 import { useFold } from '@/data-display/tree/he-tree-vue/plugins/use-fold';
-import { TreeData } from '@/data-display/tree/he-tree-vue/tree-data';
+import {
+    TreeData, walkTreeData as _walkTreeData, cloneTreeData as _cloneTreeData, getPureTreeData as _getPureTreeData,
+} from '@/data-display/tree/he-tree-vue/tree-data';
 import type { TreeDataPath } from '@/data-display/tree/he-tree-vue/types';
 
 import {
     randString,
 } from '../helpers';
-import * as ut from '../utils';
 
 interface Func {(...args: any[]): any}
 
@@ -157,10 +158,10 @@ const getNodeByBranchEl = (branchEl: HTMLElement) => getNodeByPath(draggableMeth
 const getNodeParentByPath = (path: TreeDataPath) => treeDataHelper.getNodeParent(path);
 
 const removeNodeByPath = (path: TreeDataPath) => treeDataHelper.removeNode(path);
-const walkTreeData = (handler, opt) => ut.walkTreeData(state.treeData, handler, opt);
-const cloneTreeData = (opt) => ut.cloneTreeData(state.treeData, opt);
+const walkTreeData = (handler, opt) => _walkTreeData(state.treeData, handler, opt);
+const cloneTreeData = (opt) => _cloneTreeData(state.treeData, opt);
 // return cloned new tree data without property witch starts with `$`
-const getPureTreeData = () => ut.getPureTreeData(state.treeData);
+const getPureTreeData = () => _getPureTreeData(state.treeData);
 
 const methods = {
     addHook,

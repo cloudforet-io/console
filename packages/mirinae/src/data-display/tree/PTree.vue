@@ -124,7 +124,7 @@ import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 import OriginTree from './he-tree-vue/components/Tree.vue';
-import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
+import { walkTreeData, cloneTreeData } from './he-tree-vue/tree-data';
 
 
 interface Props {
