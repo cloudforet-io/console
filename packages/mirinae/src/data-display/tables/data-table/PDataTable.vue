@@ -190,127 +190,52 @@
 
 <script setup lang="ts">
 import { get, range } from 'lodash';
-import type { PropType } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineAsyncComponent, reactive, toRefs, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
+import { DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 import type {
-    DataTableField, DataTableFieldType, DataTableProps, DataTableStyleType,
+    DataTableField, DataTableFieldType, DataTableProps,
 } from '@/data-display/tables/data-table/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/utils/helpers';
 
-const PCheckbox = () => import('@/inputs/checkbox/PCheckbox.vue');
-const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
-const PRadio = () => import('@/inputs/radio/PRadio.vue');
-const PI = () => import('@/foundation/icons/PI.vue');
-const PCopyButton = () => import('@/inputs/buttons/copy-button/PCopyButton.vue');
+const PCheckbox = defineAsyncComponent(() => import('@/inputs/checkbox/PCheckbox.vue'));
+const PTextBeautifier = defineAsyncComponent(() => import('@/data-display/text-beautifier/PTextBeautifier.vue'));
+const PRadio = defineAsyncComponent(() => import('@/inputs/radio/PRadio.vue'));
+const PI = defineAsyncComponent(() => import('@/foundation/icons/PI.vue'));
+const PCopyButton = defineAsyncComponent(() => import('@/inputs/buttons/copy-button/PCopyButton.vue'));
 
 interface TableField extends DataTableFieldType {
     depth?: number;
 }
 
-const props = defineProps({
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    fields: {
-        type: Array as PropType<DataTableProps['fields']>,
-        required: true,
-        default: () => [],
-    },
-    items: {
-        type: Array as PropType<DataTableProps['items']>,
-        default: () => [],
-    },
-    sortable: {
-        type: Boolean,
-        default: false,
-    },
-    sortBy: {
-        type: String,
-        default: undefined,
-    },
-    sortDesc: {
-        type: Boolean,
-        default: undefined,
-    },
-    colCopy: {
-        type: Boolean,
-        default: false,
-    },
-    selectable: {
-        type: Boolean,
-        default: false,
-    },
-    selectIndex: {
-        type: Array as PropType<DataTableProps['selectIndex']>,
-        default: () => [],
-    },
-    multiSelect: {
-        type: Boolean,
-        default: true,
-    },
-    rowClickMultiSelectMode: {
-        type: Boolean,
-        default: false,
-    },
-    useCursorLoading: {
-        type: Boolean,
-        default: false,
-    },
-    tableStyleType: {
-        type: String as PropType<DataTableStyleType>,
-        default: 'default',
-        validator(value: any) {
-            return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
-        },
-    },
-    tableCustomStyle: {
-        type: Object as PropType<DataTableProps['tableCustomStyle']>,
-        default: () => ({}),
-    },
-    striped: {
-        type: Boolean,
-        default: false,
-    },
-    bordered: {
-        type: Boolean as PropType<DataTableProps['bordered']>,
-        default: true,
-    },
-    disableHover: {
-        type: Boolean,
-        default: false,
-    },
-    rowHeightFixed: {
-        type: Boolean,
-        default: true,
-    },
-    rowCursorPointer: {
-        type: Boolean,
-        default: false,
-    },
-    invalid: {
-        type: Boolean,
-        default: false,
-    },
-    getRowClassNames: {
-        type: Function as PropType<DataTableProps['getRowClassNames']>,
-        default: undefined,
-    },
-    getRowSelectable: {
-        type: Function as PropType<DataTableProps['getRowSelectable']>,
-        default: undefined,
-    },
-    beautifyText: {
-        type: Boolean,
-        default: false,
-    },
+const props = withDefaults(defineProps<DataTableProps>(), {
+    loading: false,
+    fields: () => [],
+    items: () => [],
+    sortable: false,
+    sortBy: undefined,
+    sortDesc: undefined,
+    colCopy: false,
+    selectable: false,
+    selectIndex: () => [],
+    multiSelect: true,
+    rowClickMultiSelectMode: false,
+    useCursorLoading: false,
+    tableStyleType: 'default',
+    tableCustomStyle: () => ({}),
+    striped: false,
+    disableHover: false,
+    rowHeightFixed: true,
+    rowCursorPointer: false,
+    invalid: false,
+    getRowClassNames: undefined,
+    getRowSelectable: undefined,
+    beautifyText: false,
 });
 
 const emit = defineEmits(['update:select-index', 'update:sort-by', 'update:sort-desc', 'row-left-click', 'change-sort']);

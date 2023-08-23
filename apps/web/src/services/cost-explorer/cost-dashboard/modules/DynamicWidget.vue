@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, useAttrs,
+    computed, defineAsyncComponent, reactive, useAttrs,
 } from 'vue';
 
 import { CURRENCY } from '@/store/modules/settings/config';
@@ -32,7 +32,7 @@ const attrs = useAttrs();
 // noinspection TypeScriptCheckImport
 const state = reactive({
     component: null as any,
-    loader: computed<() => Promise<any>>(() => () => import(`./../../widgets/${props.widgetFileName}.vue`)) as unknown as () => Promise<any>,
+    loader: computed<() => Promise<any>>(() => defineAsyncComponent(() => import(`./../../widgets/${props.widgetFileName}.vue`))) as unknown as () => Promise<any>,
 });
 
 const getComponent = async () => {

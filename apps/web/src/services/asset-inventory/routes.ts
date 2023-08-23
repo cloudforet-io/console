@@ -1,4 +1,5 @@
 import { upperCase } from 'lodash';
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 
@@ -10,27 +11,27 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
+const AssetInventoryContainer = defineAsyncComponent(() => import('@/services/asset-inventory/AssetInventoryContainer.vue'));
 
-const CloudServiceDetailPage = () => import('@/services/asset-inventory/cloud-service/cloud-service-detail/CloudServiceDetailPage.vue');
-const CloudServiceSearch = () => import('@/services/asset-inventory/cloud-service/cloud-service-search/CloudServiceSearchPage.vue');
-const CloudServiceTypeSearch = () => import('@/services/asset-inventory/cloud-service/cloud-service-type-search/CloudServiceTypeSearchPage.vue');
+const CloudServiceDetailPage = defineAsyncComponent(() => import('@/services/asset-inventory/cloud-service/cloud-service-detail/CloudServiceDetailPage.vue'));
+const CloudServiceSearch = defineAsyncComponent(() => import('@/services/asset-inventory/cloud-service/cloud-service-search/CloudServiceSearchPage.vue'));
+const CloudServiceTypeSearch = defineAsyncComponent(() => import('@/services/asset-inventory/cloud-service/cloud-service-type-search/CloudServiceTypeSearchPage.vue'));
 
-const ServerPage = () => import('@/services/asset-inventory/server/ServerPage.vue');
-const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/CloudServicePage.vue');
-const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
+const ServerPage = defineAsyncComponent(() => import('@/services/asset-inventory/server/ServerPage.vue'));
+const CloudServicePage = defineAsyncComponent(() => import('@/services/asset-inventory/cloud-service/CloudServicePage.vue'));
+const NoResourcePage = defineAsyncComponent(() => import('@/common/pages/NoResourcePage.vue'));
 
-const CollectorMainPage = () => import('@/services/asset-inventory/collector/collector-main/CollectorMainPage.vue');
-const CreateCollectorPage = () => import('@/services/asset-inventory/collector/collector-create/CollectorCreatePage.vue');
+const CollectorMainPage = defineAsyncComponent(() => import('@/services/asset-inventory/collector/collector-main/CollectorMainPage.vue'));
+const CreateCollectorPage = defineAsyncComponent(() => import('@/services/asset-inventory/collector/collector-create/CollectorCreatePage.vue'));
 
-const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
-const ServiceAccountDetailPage = () => import('@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');
-const ServiceAccountAddPage = () => import('@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
-const ServiceAccountSearchPage = () => import('@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
+const ServiceAccountPage = defineAsyncComponent(() => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue'));
+const ServiceAccountDetailPage = defineAsyncComponent(() => import('@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue'));
+const ServiceAccountAddPage = defineAsyncComponent(() => import('@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue'));
+const ServiceAccountSearchPage = defineAsyncComponent(() => import('@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue'));
 
-const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
-const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
-const CollectorDetailPage = () => import('@/services/asset-inventory/collector/collector-detail/CollectorDetailPage.vue');
+const CollectorHistoryPage = defineAsyncComponent(() => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue'));
+const CollectJobPage = defineAsyncComponent(() => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue'));
+const CollectorDetailPage = defineAsyncComponent(() => import('@/services/asset-inventory/collector/collector-detail/CollectorDetailPage.vue'));
 
 const assetInventoryRoute: RouteRecordRaw = {
     path: 'asset-inventory',

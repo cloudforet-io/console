@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
@@ -8,15 +9,15 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
-const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
+const MyPageContainer = defineAsyncComponent(() => import('@/services/my-page/MyPageContainer.vue'));
 
-const UserAccountPage = () => import('@/services/my-page/my-account/user-account/UserAccountPage.vue');
-const UserAPIKeyPage = () => import('@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue');
-const UserNotificationPage = () => import('@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
-const NotificationAddPage = () => import('@/services/notification/notification-add/NotificationAddPage.vue');
+const UserAccountPage = defineAsyncComponent(() => import('@/services/my-page/my-account/user-account/UserAccountPage.vue'));
+const UserAPIKeyPage = defineAsyncComponent(() => import('@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue'));
+const UserNotificationPage = defineAsyncComponent(() => import('@/services/my-page/my-account/user-notification/UserNotificationPage.vue'));
+const NotificationAddPage = defineAsyncComponent(() => import('@/services/notification/notification-add/NotificationAddPage.vue'));
 
 // eslint-disable-next-line max-len
-// const UserManageNotificationPage = () => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue');
+// const UserManageNotificationPage = defineAsyncComponent(() => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue'));
 
 const myPageRoutes: RouteRecordRaw = {
     path: 'my-page',
@@ -63,7 +64,7 @@ const myPageRoutes: RouteRecordRaw = {
                         //     props: true,
                         // },
                         {
-                            path: '/:protocol/:protocolId/:userId',
+                            path: ':protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                             meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
                             props: true,
