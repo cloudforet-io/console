@@ -55,13 +55,15 @@ else {
     }
 }
 
-let render = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
+let Render = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
 if (props.options.link) {
-    render = h(PLink, {
-        attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
-        props: { value, showIcon: !!formattedValue },
-    }, [render]);
+    Render = h(PLink, {
+        href: (props.options as SizeOptions).link,
+        target: '_blank',
+        value,
+        showIcon: !!formattedValue,
+    }, [Render]);
 }
 
 </script>
