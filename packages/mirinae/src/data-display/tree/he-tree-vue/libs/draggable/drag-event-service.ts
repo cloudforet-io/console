@@ -12,14 +12,14 @@ const events = {
 
 
 export class DragEventService {
-    constructor() {}
+    _wrapperStore: any[];
+
+    constructor() {
+        this._wrapperStore = [];
+    }
 
     isTouch(e: MouseEvent | TouchEvent) {
         return e.type && e.type.startsWith('touch');
-    }
-
-    _getStore() {
-        return [];
     }
 
     on<T>(
@@ -32,7 +32,7 @@ export class DragEventService {
         options?: EventOptions,
     ) {
         const { args, mouseArgs, touchArgs } = resolveOptions(options);
-        const store = this._getStore();
+        const store = this._wrapperStore;
         const wrapper = (e): T|undefined => {
             let mouse;
             const isTouch = this.isTouch(e);
@@ -81,7 +81,7 @@ export class DragEventService {
         options?: EventOptions,
     ) {
         const { args, mouseArgs } = resolveOptions(options);
-        const store = this._getStore();
+        const store = this._wrapperStore;
         for (let i = store.length - 1; i >= 0; i--) {
             const { handler: handler2, wrapper } = store[i];
             if (handler === handler2) {
