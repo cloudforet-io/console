@@ -6,7 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import {
-    computed, reactive, watch,
+    computed, defineAsyncComponent, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
@@ -18,8 +18,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
-const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
-const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
+const SelectCloudServiceTagColumns = defineAsyncComponent(() => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue'));
+const SelectTagColumns = defineAsyncComponent(() => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue'));
 
 interface Props {
     visible: boolean;

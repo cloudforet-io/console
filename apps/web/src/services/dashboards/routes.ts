@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
@@ -11,11 +12,11 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
-const DashboardsMainPage = () => import('@/services/dashboards/dashboard-main/DashboardsMainPage.vue');
-const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create/DashboardCreatePage.vue');
-const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
-const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
+const DashboardsContainer = defineAsyncComponent(() => import('@/services/dashboards/DashboardsContainer.vue'));
+const DashboardsMainPage = defineAsyncComponent(() => import('@/services/dashboards/dashboard-main/DashboardsMainPage.vue'));
+const DashboardCreatePage = defineAsyncComponent(() => import('@/services/dashboards/dashboard-create/DashboardCreatePage.vue'));
+const DashboardCustomizePage = defineAsyncComponent(() => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue'));
+const DashboardDetailPage = defineAsyncComponent(() => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue'));
 
 const dashboardsRoute: RouteRecordRaw = {
     path: 'dashboards',

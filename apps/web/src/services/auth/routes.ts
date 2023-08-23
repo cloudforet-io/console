@@ -1,16 +1,17 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
-const SignOutPage = () => import('@/services/auth/sign-out/SignOutPage.vue');
-const SignInPage = () => import('@/services/auth/sign-in/SignInPage.vue');
-const DomainAdminSignInPage = () => import('@/services/auth/sign-in/DomainAdminSignInPage.vue');
-const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
-const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
-const PasswordPage = () => import('@/services/auth/password/PasswordPage.vue');
-const ValidationEmailPage = () => import('@/services/auth/password/validation-email/ValidationEmailPage.vue');
+const SignOutPage = defineAsyncComponent(() => import('@/services/auth/sign-out/SignOutPage.vue'));
+const SignInPage = defineAsyncComponent(() => import('@/services/auth/sign-in/SignInPage.vue'));
+const DomainAdminSignInPage = defineAsyncComponent(() => import('@/services/auth/sign-in/DomainAdminSignInPage.vue'));
+const KeycloakPage = defineAsyncComponent(() => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue'));
+const KB_SSO = defineAsyncComponent(() => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue'));
+const PasswordPage = defineAsyncComponent(() => import('@/services/auth/password/PasswordPage.vue'));
+const ValidationEmailPage = defineAsyncComponent(() => import('@/services/auth/password/validation-email/ValidationEmailPage.vue'));
 
 export default [
     {

@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
@@ -8,12 +9,12 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
-const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
+const AlertManagerContainer = defineAsyncComponent(() => import('@/services/alert-manager/AlertManagerContainer.vue'));
 
-const AlertDashboardPage = () => import('@/services/alert-manager/alert-dashboard/AlertDashboardPage.vue');
-const AlertPage = () => import('@/services/alert-manager/alert/AlertPage.vue');
-const EscalationPolicyPage = () => import('@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
-const AlertDetailPage = () => import('@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
+const AlertDashboardPage = defineAsyncComponent(() => import('@/services/alert-manager/alert-dashboard/AlertDashboardPage.vue'));
+const AlertPage = defineAsyncComponent(() => import('@/services/alert-manager/alert/AlertPage.vue'));
+const EscalationPolicyPage = defineAsyncComponent(() => import('@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue'));
+const AlertDetailPage = defineAsyncComponent(() => import('@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue'));
 
 const alertManagerRoutes: RouteRecordRaw = {
     path: 'alert-manager',

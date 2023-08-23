@@ -95,7 +95,7 @@
 import { useFocus, onClickOutside } from '@vueuse/core';
 import { isEqual } from 'lodash';
 import {
-    computed,
+    computed, defineAsyncComponent,
     ref, toRef, toRefs, watch,
 } from 'vue';
 
@@ -114,8 +114,8 @@ import type {
     KeyMenuItem, ValueMenuItem, QueryItem, KeyItemSet, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
 
-const PBadge = () => import('@/data-display/badge/PBadge.vue');
-const PTag = () => import('@/data-display/tags/PTag.vue');
+const PBadge = defineAsyncComponent(() => import('@/data-display/badge/PBadge.vue'));
+const PTag = defineAsyncComponent(() => import('@/data-display/tags/PTag.vue'));
 
 interface QueryInputProps {
     value?: string|number;

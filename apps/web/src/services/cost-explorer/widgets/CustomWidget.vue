@@ -9,7 +9,7 @@ import type {
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import {
-    computed, reactive, watch,
+    computed, defineAsyncComponent, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -44,8 +44,8 @@ import type {
     Legend, PieChartData, WidgetProps, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 
-const CostAnalysisStackedColumnChart = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue');
-const CostAnalysisPieChart = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue');
+const CostAnalysisStackedColumnChart = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue'));
+const CostAnalysisPieChart = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue'));
 
 const PAGE_SIZE = 5;
 const DAILY_CHART_COUNT = 14;

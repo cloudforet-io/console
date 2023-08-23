@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { errorRoutes } from '@/router/error-routes';
@@ -6,7 +7,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import administrationRoute from '@/services/administration/routes';
 import authRoutes from '@/services/auth/routes';
 
-const TotalDashboardPage = () => import('@/services/total-dashboard/TotalDashboardPage.vue');
+const TotalDashboardPage = defineAsyncComponent(() => import('@/services/total-dashboard/TotalDashboardPage.vue'));
 
 const ROOT_DOMAIN_ROUTE = Object.freeze({
     _NAME: 'root',

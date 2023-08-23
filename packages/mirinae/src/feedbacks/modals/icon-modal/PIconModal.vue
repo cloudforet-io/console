@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { defineAsyncComponent, reactive } from 'vue';
 
 import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -66,7 +66,7 @@ import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 import { primaryDark } from '@/styles/colors';
 
-const PI = () => import('@/foundation/icons/PI.vue');
+const PI = defineAsyncComponent(() => import('@/foundation/icons/PI.vue'));
 
 interface IconModalProps {
     size?: string;

@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -5,23 +6,23 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-const ProjectPage = () => import('@/services/project/ProjectPage.vue');
-const ProjectDetailPage = () => import('@/services/project/project-detail/ProjectDetailPage.vue');
+const ProjectPage = defineAsyncComponent(() => import('@/services/project/ProjectPage.vue'));
+const ProjectDetailPage = defineAsyncComponent(() => import('@/services/project/project-detail/ProjectDetailPage.vue'));
 
-const ProjectDashboardPage = () => import('@/services/project/project-detail/project-summary/ProjectSummaryPage.vue');
-const ProjectMemberPage = () => import('@/services/project/project-detail/project-member/ProjectMemberPage.vue');
-const ProjectAlertPage = () => import('@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
-const ProjectNotificationsPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
-const ProjectTagPage = () => import('@/services/project/project-detail/project-tag/ProjectTagPage.vue');
+const ProjectDashboardPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-summary/ProjectSummaryPage.vue'));
+const ProjectMemberPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-member/ProjectMemberPage.vue'));
+const ProjectAlertPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/ProjectAlertPage.vue'));
+const ProjectNotificationsPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-notification/ProjectNotificationPage.vue'));
+const ProjectTagPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-tag/ProjectTagPage.vue'));
 // eslint-disable-next-line max-len
-const ProjectAlertEventRulePage = () => import('@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
-const ProjectNotificationAddPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue');
+const ProjectAlertEventRulePage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue'));
+const ProjectNotificationAddPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue'));
 
-const ProjectAlertListPage = () => import('@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
+const ProjectAlertListPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue'));
 // eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import('@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
-const ProjectWebhookPage = () => import('@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
-const ProjectAlertSettingsPage = () => import('@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
+const ProjectMaintenanceWindowPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue'));
+const ProjectWebhookPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue'));
+const ProjectAlertSettingsPage = defineAsyncComponent(() => import('@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue'));
 
 export default {
     path: 'project',
