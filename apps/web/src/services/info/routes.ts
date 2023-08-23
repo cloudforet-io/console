@@ -51,7 +51,7 @@ const infoRoute: RouteRecordRaw = {
                     props: true,
                 },
                 {
-                    path: '/:boardId/:postId',
+                    path: ':boardId/:postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     meta: {
                         translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,

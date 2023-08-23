@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PHeading } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import BaseInformation from '@/services/my-page/my-account/user-account/modules/BaseInformation.vue';
@@ -11,6 +12,7 @@ const store = useStore();
 const state = reactive({
     userType: computed(() => store.state.user.backend),
 });
+const { t } = useI18n();
 </script>
 
 <template>
