@@ -1,4 +1,3 @@
-import { defineAsyncComponent } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 import { store } from '@/store';
@@ -9,15 +8,15 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-const AdministrationContainer = defineAsyncComponent(() => import('@/services/administration/AdministrationContainer.vue'));
+const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
-const UserPage = defineAsyncComponent(() => import('@/services/administration/iam/user/UserPage.vue'));
-const RolePage = defineAsyncComponent(() => import('@/services/administration/iam/role/RolePage.vue'));
-const RoleCreatePage = defineAsyncComponent(() => import('@/services/administration/iam/role/role-create/RoleCreatePage.vue'));
-const RoleUpdatePage = defineAsyncComponent(() => import('@/services/administration/iam/role/role-update/RoleUpdatePage.vue'));
-const PolicyPage = defineAsyncComponent(() => import('@/services/administration/iam/policy/PolicyPage.vue'));
-const PolicyCreatePage = defineAsyncComponent(() => import('@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue'));
-const PolicyDetailPage = defineAsyncComponent(() => import('@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue'));
+const UserPage = () => import('@/services/administration/iam/user/UserPage.vue');
+const RolePage = () => import('@/services/administration/iam/role/RolePage.vue');
+const RoleCreatePage = () => import('@/services/administration/iam/role/role-create/RoleCreatePage.vue');
+const RoleUpdatePage = () => import('@/services/administration/iam/role/role-update/RoleUpdatePage.vue');
+const PolicyPage = () => import('@/services/administration/iam/policy/PolicyPage.vue');
+const PolicyCreatePage = () => import('@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
+const PolicyDetailPage = () => import('@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
 
 const administrationRoutes: RouteRecordRaw = {
     path: 'administration',
