@@ -40,11 +40,11 @@ badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
 if (options.link) {
     badgeEl = [h(PLink, {
-        attrs: { href: options.link, target: '_blank' },
+        href: options.link, target: '_blank',
     }, badgeEl)];
 }
 
-const render = h(PBadge, { props: badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
+const Render = h(PBadge, { ...badgeProps, class: { 'p-dynamic-field-badge': true } }, badgeEl);
 
 </script>
 

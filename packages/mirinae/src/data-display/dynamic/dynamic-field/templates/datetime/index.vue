@@ -52,13 +52,14 @@ if (value) {
     }
 }
 
-let render = h('span', { ...attrs }, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
+let Render = h('span', { ...attrs }, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
 
 if (options.link) {
-    render = h(PLink, {
+    Render = h(PLink, {
         ...attrs,
-        attrs: { href: props.options.link, target: '_blank' },
-    }, [render]);
+        href: props.options.link,
+        target: '_blank',
+    }, [Render]);
 }
 
 </script>
