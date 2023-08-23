@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { test, expect } from '@playwright/test';
 
 
@@ -77,36 +78,14 @@ test.describe('Collector Create', () => {
             const collectorCount = await page.locator('div.plugin-card-list div.plugin-card-item').count();
             const randomIndex = getRandomIndexInRange(collectorCount);
             await page.getByRole('button', { name: 'Select' }).nth(randomIndex).click();
-            // await page.getByPlaceholder('Search', { exact: true }).click();
-            // await page.getByPlaceholder('Search', { exact: true }).fill('prowler');
-            // await page.getByPlaceholder('Search', { exact: true }).press('Enter');
-            // await page.getByRole('button', { name: 'Select' }).first().click();
             await expect(page.locator('p.step')).toContainText('Step 2');
         });
 
         let collectorTitle;
         let selectedPluginName = '';
         await test.step('9. Fill in the Name field > Select one Provider if applicable.', async () => {
-            let isSameName = false;
-            let checkSameNameCount = 0;
-            const checkSameName = async () => {
-                checkSameNameCount++;
-                const validationText = await page.locator('div.name-form > div.invalid-feedback').textContent();
-                return (validationText ?? '').includes('Name already registered.');
-            };
-            collectorTitle = `test collector-${checkSameNameCount}`;
+            collectorTitle = `test collector-${new Date().getTime()}`;
             await page.locator('div.name-form > div.p-text-input').getByRole('textbox').fill(collectorTitle);
-            isSameName = await checkSameName();
-            while (isSameName) {
-                collectorTitle = `test collector-${Math.floor(Math.random() * 100)}`;
-                // eslint-disable-next-line no-await-in-loop
-                await page.locator('div.name-form > div.p-text-input').getByRole('textbox').fill(collectorTitle);
-                // eslint-disable-next-line no-await-in-loop
-                isSameName = await checkSameName();
-                if (checkSameNameCount > 10) {
-                    throw new Error('Same name error occurred more than 10 times.');
-                }
-            }
             const providerCount = await page.locator('div.multiple-provider-form > div.radio-container > div > span').count();
             if (providerCount) {
                 const randomIndex = getRandomIndexInRange(providerCount);
@@ -114,7 +93,6 @@ test.describe('Collector Create', () => {
             }
             selectedPluginName = (await page.locator('div.plugin-data-contents > div > p.plugin-name').textContent() ?? '');
         });
-
 
         await test.step('10. Version - Auto Upgrade Switch Off.', async () => {
             await checkApiCall(page, '/repository/plugin/get-versions');
@@ -164,7 +142,6 @@ test.describe('Collector Create', () => {
                 await firstServiceAccount.click();
                 const firstServiceAccountText = await firstServiceAccount.textContent();
                 if (firstServiceAccountText) selectedServiceAccount.push(firstServiceAccountText);
-                await page.waitForTimeout(2000);
                 serviceAccountCount = await getServiceAccountCount();
                 let randomIndex2 = getRandomIndexInRange(serviceAccountCount);
                 while (randomIndex === randomIndex2) {
@@ -176,26 +153,23 @@ test.describe('Collector Create', () => {
                     const secondServiceAccountText = await secondServiceAccount.textContent();
                     if (secondServiceAccountText) selectedServiceAccount.push(secondServiceAccountText);
                 }
-                await page.locator('.arrow-button > .p-i-icon').click();
+                await page.locator('.arrow-button > .p-i-icon').first().click();
             } else {
                 await page.getByText('All').first().click();
             }
             await expect(page.locator('p.step')).toContainText('Step 3');
         });
 
+        let selectedComplianceType:string;
         await test.step('15. If there are Additional Options, input or select fields randomly.', async () => {
-            // Discussion: How should we handle dynamic components such as JsonSchema?
-            // Current processing method: Test only Prowler Case
-            try {
-                if (selectedPluginName.includes('Prowler Security Compliance Collector')) {
-                    const complianceType = await page.locator('div.collector-options-form-contents form > div:nth-child(2)');
-                    await complianceType.getByRole('button').first().click();
-                    const complianceTypeItemsCount = await complianceType.locator('span.p-context-menu-item').count();
-                    const randomIndex = getRandomIndexInRange(complianceTypeItemsCount);
-                    await complianceType.locator('span.p-context-menu-item').nth(randomIndex).click();
-                }
-            } catch (error) {
-                console.error('error', error);
+            if (selectedPluginName.includes('Prowler Security Compliance Collector')) {
+                const complianceType = await page.locator('div.collector-options-form-contents form > div:nth-child(2)');
+                await complianceType.getByRole('button').first().click();
+                const complianceTypeItemsCount = await complianceType.locator('span.p-context-menu-item').count();
+                const randomIndex = getRandomIndexInRange(complianceTypeItemsCount);
+                const selectedCompliance = await complianceType.locator('span.p-context-menu-item').nth(randomIndex);
+                await selectedCompliance.textContent();
+                selectedComplianceType = (await selectedCompliance.textContent() ?? '');
             }
         });
         await test.step('16. Click [Continue] Button to move to Step 4/4.', async () => {
@@ -245,7 +219,6 @@ test.describe('Collector Create', () => {
             await expect(collectorPageTitle).toContain(collectorTitle);
         });
         await test.step('23. Click the right-arrow next to the [Collect Data] Button at the top right to confirm In-Progress status (Data collection has started).', async () => {
-            // await checkApiCall(page, '/inventory/job/list');
             const collectorState = await page.locator('div.popper-content-wrapper > div > div > div.info-item > div > div > span').textContent();
             await expect(collectorState).toContain('In-Progress');
         });
@@ -266,9 +239,7 @@ test.describe('Collector Create', () => {
             const tagList:string[] = [];
 
             for (let i = 0; i < tagsCount; i++) {
-                // eslint-disable-next-line no-await-in-loop
                 const tagElement = await tags.nth(i);
-                // eslint-disable-next-line no-await-in-loop
                 const innerText = await tagElement.textContent();
                 if (innerText) tagList.push(innerText);
             }
@@ -292,20 +263,24 @@ test.describe('Collector Create', () => {
             const scheduleCount = await scheduleElement.count();
             const scheduleList:number[] = [];
             for (let i = 0; i < scheduleCount; i++) {
-                // eslint-disable-next-line no-await-in-loop
                 const schedule = await scheduleElement.nth(i).textContent();
                 scheduleList.push(Number(schedule));
             }
             await expect(scheduleList.sort()).toEqual((collectorData?.schedule?.hours ?? []).sort());
         });
         await test.step('26. Check the Additional Options section: If Additional Options were selected, confirm the chosen or inputted content.', async () => {
+            // Discussion: How should we handle dynamic components such as JsonSchema?
+            // Current processing method: Test only Prowler Case
+            if (selectedPluginName.includes('Prowler Security Compliance Collector')) {
+                const complianceType = await page.getByTestId('collector-options-section').locator('tbody > tr:nth-child(2) > td.value-wrapper > span > span > span').textContent();
+                await expect(complianceType).toContain(selectedComplianceType);
+            }
         });
         await test.step('27. Check the Attached Service Accounts section: Confirm if the selected Service Accounts are correct.', async () => {
             const attachedServiceAccountTableRowList = await page.locator('div.p-data-table.bordered.default > div > table > tbody tr');
             const attachedServiceAccountTableRowCount = await attachedServiceAccountTableRowList.count();
             const attachedServiceAccountNameList:any = [];
             for (let i = 0; i < attachedServiceAccountTableRowCount; i++) {
-                // eslint-disable-next-line no-await-in-loop
                 const attachedServiceAccountName = await attachedServiceAccountTableRowList.nth(i).locator('td').nth(0).textContent();
                 attachedServiceAccountNameList.push(attachedServiceAccountName);
             }
@@ -321,9 +296,7 @@ test.describe('Collector Create', () => {
             const jobTableRowList = await page.locator('div.p-data-table.bordered.default > div > table > tbody tr');
             const jobTableRowCount = await jobTableRowList.count();
             for (let i = 0; i < jobTableRowCount; i++) {
-                // eslint-disable-next-line no-await-in-loop
                 const jobName = await jobTableRowList.nth(i).locator('td').nth(2).textContent();
-                // eslint-disable-next-line no-await-in-loop
                 await expect(jobName).toContain(pluginData?.name);
             }
         });
