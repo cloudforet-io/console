@@ -107,7 +107,7 @@ const onClickSave = async () => {
 const onChangeData = (value) => {
     state.channelName = value.channelName;
     state.data = value.data;
-    state.notificationLevel = value.level;
+    state.notificationLevel = value.notificationLevel;
     state.isDataValid = value.isValid;
 };
 
