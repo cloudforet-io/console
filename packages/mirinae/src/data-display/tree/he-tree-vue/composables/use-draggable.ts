@@ -2,16 +2,15 @@
 import type { Ref } from 'vue';
 import { onMounted, watch, nextTick } from 'vue';
 
+import type { Store, Node } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
 import {
     arrayLast,
     arrayWithoutEnd,
     findParent,
     hasClass, iterateAll, joinFunctionsByNext,
-} from '@/data-display/tree/he-tree-vue/helpers';
-import type { TreeDraggableOptions } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable';
-import makeTreeDraggable from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable';
-import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
-import type { Node } from '@/data-display/tree/he-tree-vue/types';
+} from '@/data-display/tree/he-tree-vue/libs/helpers';
+import type { TreeDraggableOptions } from '@/data-display/tree/he-tree-vue/libs/tree-draggable';
+import makeTreeDraggable from '@/data-display/tree/he-tree-vue/libs/tree-draggable';
 
 interface UseDraggableOptions {
     treeRef: Ref<HTMLElement|null>;
@@ -125,7 +124,6 @@ export const useDraggable = (props, emit, {
             emit('after-move', store);
         },
         beforeDrop: (store: Store) => {
-            console.debug('beforeDrop', joinFunctionsByNext([props.ondragend])(store));
             if (props.ondragend && joinFunctionsByNext([props.ondragend])(store) === false) {
                 return false;
             }
@@ -155,18 +153,16 @@ export const useDraggable = (props, emit, {
                 //  [3, 1]      [3, 3]
                 //  [3, 1]      [3, 3, 5]
                 // above targetPaths should be transformed to [0], [0, 0] [3, 2] [3, 2, 5]
-                if (JSON.stringify(startPath) === JSON.stringify(targetPath)) {
-                    if (startPath.length <= targetPath.length) {
-                        const sw = startPath.slice(0, startPath.length - 1); // without end
-                        const tw = targetPath.slice(0, sw.length); // same length with sw
-                        if (sw.toString() === tw.toString()) {
-                            const endIndex = sw.length;
-                            if (startPath[endIndex] < targetPath[endIndex]) {
-                                targetPath = targetPath.slice(0); // create a copy of targetPath
-                                targetPath[endIndex] -= 1;
-                            } else if (startPath[endIndex] === targetPath[endIndex]) {
-                                console.error('Draggable.afterDrop: That is impossible!');
-                            }
+                if (startPath.length <= targetPath.length) {
+                    const sw = startPath.slice(0, startPath.length - 1); // without end
+                    const tw = targetPath.slice(0, sw.length); // same length with sw
+                    if (sw.toString() === tw.toString()) {
+                        const endIndex = sw.length;
+                        if (startPath[endIndex] < targetPath[endIndex]) {
+                            targetPath = targetPath.slice(0); // create a copy of targetPath
+                            targetPath[endIndex] -= 1;
+                        } else if (startPath[endIndex] === targetPath[endIndex]) {
+                            console.error('Draggable.afterDrop: That is impossible!');
                         }
                     }
                 }

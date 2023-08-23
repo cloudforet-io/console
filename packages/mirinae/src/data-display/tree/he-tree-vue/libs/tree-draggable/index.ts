@@ -1,17 +1,23 @@
+import { makeDraggable } from '@/data-display/tree/he-tree-vue/libs/draggable';
+import type { DraggableHelperOptions, Store } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
+import { doDraggableDecision } from '@/data-display/tree/he-tree-vue/libs/tree-draggable/draggable-decision-part';
+import {
+    findNodeList,
+    binarySearch,
+    attachCache,
+    insertAfter,
+    appendTo, insertBefore, prependTo, getOffset,
+} from '@/data-display/tree/he-tree-vue/libs/tree-draggable/helpers';
+
 import {
     addClass,
-    appendTo,
-    attachCache, binarySearch, createElementFromHTML,
-    elementsFromPoint, findNodeList,
+    createElementFromHTML,
+    elementsFromPoint,
     findParent,
-    getOffset, getViewportPosition,
-    hasClass, insertAfter, insertBefore,
-    isDescendantOf, prependTo, removeEl,
-} from '../../helpers';
-import doDraggableDecision from './draggable-decision-part';
-import type { DraggableHelperOptions } from './draggable-helper';
-import draggableHelper from './draggable-helper';
-import type { Store } from './draggable-types';
+    getViewportPosition,
+    hasClass,
+    isDescendantOf, removeEl,
+} from '../helpers';
 
 
 export interface TreeDraggableOptions extends DraggableHelperOptions {
@@ -25,7 +31,6 @@ export interface TreeDraggableOptions extends DraggableHelperOptions {
     placeholderClass: string;
     placeholderNodeBackClass: string;
     placeholderNodeClass: string;
-    draggingClassName: string;
     placeholderId: string;
     unfoldWhenDragover: boolean;
     unfoldWhenDragoverDelay: number;
@@ -38,16 +43,12 @@ export interface TreeDraggableOptions extends DraggableHelperOptions {
     _findClosestDroppablePosition: (branchEl: HTMLElement) => Element|null|undefined;
     afterPlaceholderCreated: (store: Store) => void;
     getPathByBranchEl: (branchEl: HTMLElement) => number[];
-    beforeFirstMove: (store: Store, dhOptions: DraggableHelperOptions) => boolean|undefined;
     filterTargetTree: (targetTreeEl: HTMLElement, store: Store, dhOptions: DraggableHelperOptions) => boolean|undefined;
-    afterMove: (store: Store, dhOptions: DraggableHelperOptions) => void;
-    beforeDrop: (store: Store, dhOptions: DraggableHelperOptions) => boolean|undefined;
-    afterDrop: (store: Store, dhOptions: DraggableHelperOptions) => Promise<void>|undefined;
 }
 
 // in follow code, options belongs to makeTreeDraggable, opt belongs to draggableHelper
 export default function makeTreeDraggable(treeEl: HTMLElement, options: TreeDraggableOptions) {
-    const { destroy, options: draggableHelperOptions } = draggableHelper(treeEl, {
+    const { destroy, options: draggableHelperOptions } = makeDraggable(treeEl, {
         triggerClassName: options.triggerClassName,
         triggerBySelf: options.triggerBySelf,
         draggingClassName: options.draggingClassName,

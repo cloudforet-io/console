@@ -1,7 +1,6 @@
 import {
-    arrayLast, isArray, walkTreeData as _walkTreeData,
-} from '@/data-display/tree/he-tree-vue/helpers';
-import type { TreeDataPath, WalkTreeDataHandler } from '@/data-display/tree/he-tree-vue/types';
+    arrayLast, isArray, objectAssignIfNoKey,
+} from '@/data-display/tree/he-tree-vue/libs/helpers';
 
 export class TreeData<Node> {
     data: Node | Node[];
@@ -20,9 +19,9 @@ export class TreeData<Node> {
     }
 
     * iteratePath(
-        path: TreeDataPath,
+        path: number[],
         opt: { reverse?: boolean } = {},
-    ): IterableIterator<{ path: TreeDataPath; node: Node }> {
+    ): IterableIterator<{ path: number[]; node: Node }> {
         const { childrenKey, rootChildren } = this;
         if (!opt.reverse) {
             let prevPath: number[] = [];
@@ -44,12 +43,12 @@ export class TreeData<Node> {
             list.reverse();
             // eslint-disable-next-line no-restricted-syntax
             for (const { path: path0, node } of list) {
-                yield { path: path0 as TreeDataPath, node };
+                yield { path: path0 as number[], node };
             }
         }
     }
 
-    getAllNodes(path: TreeDataPath) {
+    getAllNodes(path: number[]) {
         const all: Node[] = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -60,21 +59,21 @@ export class TreeData<Node> {
         return all;
     }
 
-    getNode(path: TreeDataPath): Node {
+    getNode(path: number[]): Node {
         return arrayLast(this.getAllNodes(path));
     }
 
-    getNodeIndexAndParent(path: TreeDataPath) {
+    getNodeIndexAndParent(path: number[]) {
         const parentPath = path.slice();
         const index = parentPath.pop();
         return { parent: this.getNode(parentPath), index, parentPath };
     }
 
-    getNodeParent(path: TreeDataPath) {
+    getNodeParent(path: number[]) {
         return this.getNodeIndexAndParent(path).parent;
     }
 
-    setPathNode(path: TreeDataPath, node: Node) {
+    setPathNode(path: number[], node: Node) {
         if (path == null || path.length === 0) {
             this.data = node;
         } else {
@@ -85,7 +84,7 @@ export class TreeData<Node> {
         }
     }
 
-    removeNode(path: TreeDataPath): Node | undefined {
+    removeNode(path: number[]): Node | undefined {
         const { childrenKey, rootChildren } = this;
         const { parent, index } = this.getNodeIndexAndParent(path);
         const parentChildren = path.length === 1 ? rootChildren : parent[childrenKey];
@@ -95,7 +94,7 @@ export class TreeData<Node> {
         return node;
     }
 
-    getFamily(path: TreeDataPath) {
+    getFamily(path: number[]) {
         const all: Node[] = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -106,21 +105,21 @@ export class TreeData<Node> {
         return all;
     }
 
-    get(path: TreeDataPath): Node {
+    get(path: number[]): Node {
         return arrayLast(this.getFamily(path));
     }
 
-    getParentAndIndex(path: TreeDataPath) {
+    getParentAndIndex(path: number[]) {
         const parentPath = path.slice();
         const index = parentPath.pop();
         return { parent: this.get(parentPath), index, parentPath };
     }
 
-    getParent(path: TreeDataPath) {
+    getParent(path: number[]) {
         return this.getParentAndIndex(path).parent;
     }
 
-    set(path: TreeDataPath, node: Node) {
+    set(path: number[], node: Node) {
         if (path == null || path.length === 0) {
             this.data = node;
         } else {
@@ -148,7 +147,7 @@ export class TreeData<Node> {
         }
     }
 
-    delete(path: TreeDataPath): Node | undefined {
+    delete(path: number[]): Node | undefined {
         const { childrenKey, rootChildren } = this;
         const { parent, index } = this.getParentAndIndex(path);
         const parentChildren = path.length === 1 ? rootChildren : parent[childrenKey];
@@ -175,7 +174,7 @@ export class TreeData<Node> {
                     oldNode: Node;
                     index: number;
                     parent: Node | undefined;
-                    path: TreeDataPath;
+                    path: number[];
                 }
             ) => void;
         } = {},
@@ -216,3 +215,83 @@ export const getPureTreeData = (treeData) => {
     };
     return cloneTreeData(treeData, opt);
 };
+
+type WalkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings';
+export type WalkTreeDataHandler<T> = (
+    node: T,
+    index: number,
+    parent: T | null,
+    path: number[],
+) => WalkTreeDataCallbackReturn;
+export type WalkTreeDataCallback = WalkTreeDataHandler<Node>;
+
+type WalkTreeDataOptions = {
+    childrenKey?: string;
+    reverse?: boolean;
+    childFirst?: boolean;
+};
+
+/**
+ * walk tree data by with depth first search. tree data example: `[{children: [{}, {}]}]`
+ * @param obj
+ * @param handler
+ * @param _opt
+ */
+function _walkTreeData<T>(
+    obj: T | T[],
+    handler: WalkTreeDataHandler<T>,
+    _opt: WalkTreeDataOptions = {},
+) {
+    const opt = objectAssignIfNoKey(
+        { ..._opt },
+        {
+            childrenKey: 'children',
+        },
+    );
+    const { childrenKey } = opt;
+    const rootChildren = isArray(obj) ? obj : [obj];
+    //
+    class StopException {}
+    const func = (_children, parent, parentPath) => {
+        let children = _children;
+        if (opt.reverse) {
+            children = _children.slice();
+            children.reverse();
+        }
+        const len = children.length;
+        for (let i = 0; i < len; i++) {
+            const item = children[i];
+            const index = opt.reverse ? len - i - 1 : i;
+            const path = parentPath ? [...parentPath, index] : [];
+            if (opt.childFirst && childrenKey !== undefined) {
+                if (item[childrenKey] != null) {
+                    func(item[childrenKey], item, path);
+                }
+            }
+            const r = handler(item, index, parent, path);
+            if (r === false) {
+                // stop
+                throw new StopException();
+            } else if (r === 'skip children') {
+                // eslint-disable-next-line no-continue
+                continue;
+            } else if (r === 'skip siblings') {
+                break;
+            }
+            if (!opt.childFirst && childrenKey !== undefined) {
+                if (item[childrenKey] != null) {
+                    func(item[childrenKey], item, path);
+                }
+            }
+        }
+    };
+    try {
+        func(rootChildren, null, isArray(obj) ? [] : null);
+    } catch (e) {
+        if (e instanceof StopException) {
+            // stop
+        } else {
+            throw e;
+        }
+    }
+}

@@ -22,22 +22,17 @@
 <script setup lang="ts">
 import {
     reactive, toRefs,
-    computed, watch, ref, onMounted,
+    computed, watch, ref,
     onBeforeMount, defineExpose, toRef,
     defineAsyncComponent,
 } from 'vue';
 
-import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
-import { useDraggable } from '@/data-display/tree/he-tree-vue/plugins/draggable/use-draggable';
-import { useFold } from '@/data-display/tree/he-tree-vue/plugins/use-fold';
+import { useDraggable } from '@/data-display/tree/he-tree-vue/composables/use-draggable';
+import { useFold } from '@/data-display/tree/he-tree-vue/composables/use-fold';
+import type { Store } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
 import {
     TreeData, walkTreeData as _walkTreeData, cloneTreeData as _cloneTreeData, getPureTreeData as _getPureTreeData,
 } from '@/data-display/tree/he-tree-vue/tree-data';
-import type { TreeDataPath } from '@/data-display/tree/he-tree-vue/types';
-
-import {
-    randString,
-} from '../helpers';
 
 const ChildrenList = defineAsyncComponent(() => import('./ChildrenList.vue'));
 
@@ -89,9 +84,7 @@ const emit = defineEmits<{(event: 'input', value: any[]): void;
 
 const state = reactive({
     rootNode: {} as any,
-    treeClass: '',
-    treeId: randString(),
-    _hooks: {} as Record<string, {(...args: any[]): any}[]>,
+    treeId: Math.floor(Math.random() * Date.now()),
     proxyValue: [] as any[],
     treeData: computed({
         get() {
@@ -118,18 +111,18 @@ watch(() => state.treeData, (treeData) => {
     treeDataHelper = new TreeData(treeData);
 }, { immediate: true });
 
-const iteratePath = (path: TreeDataPath, opt) => treeDataHelper.iteratePath(path, opt);
-const getAllNodesByPath = (path: TreeDataPath) => treeDataHelper.getAllNodes(path);
-const getNodeByPath = (path: TreeDataPath) => treeDataHelper.getNode(path);
-const getBranchElByPath = (path: TreeDataPath): Element|null => {
+const iteratePath = (path: number[], opt) => treeDataHelper.iteratePath(path, opt);
+const getAllNodesByPath = (path: number[]) => treeDataHelper.getAllNodes(path);
+const getNodeByPath = (path: number[]) => treeDataHelper.getNode(path);
+const getBranchElByPath = (path: number[]): Element|null => {
     if (treeRef.value) {
         return treeRef.value.querySelector(`[data-tree-node-path='${path.join(',')}']`);
     }
     return null;
 };
 const getNodeByBranchEl = (branchEl: HTMLElement) => getNodeByPath(draggableMethods.getPathByBranchEl(branchEl));
-const getNodeParentByPath = (path: TreeDataPath) => treeDataHelper.getNodeParent(path);
-const removeNodeByPath = (path: TreeDataPath) => treeDataHelper.removeNode(path);
+const getNodeParentByPath = (path: number[]) => treeDataHelper.getNodeParent(path);
+const removeNodeByPath = (path: number[]) => treeDataHelper.removeNode(path);
 const walkTreeData = (handler, opt) => _walkTreeData(state.treeData, handler, opt);
 const cloneTreeData = (opt) => _cloneTreeData(state.treeData, opt);
 // return cloned new tree data without property witch starts with `$`
@@ -155,10 +148,6 @@ onBeforeMount(() => {
     };
     watch(() => state.rootNode, updateRootNode, { immediate: true });
     watch(() => state.treeData, updateRootNode, { immediate: true });
-});
-
-onMounted(() => {
-    state.treeId = randString();
 });
 
 const { methods: foldMethods } = useFold(props, emit, { walkTreeData });

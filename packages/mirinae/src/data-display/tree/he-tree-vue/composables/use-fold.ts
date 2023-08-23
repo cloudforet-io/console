@@ -1,6 +1,10 @@
 import { onMounted } from 'vue';
 
-import type { Node, Path, UnfoldOptions } from '@/data-display/tree/he-tree-vue/types';
+import type { Node } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
+
+interface UnfoldOptions {
+    foldOthers?: boolean;
+}
 
 export const useFold = (props, emit, { walkTreeData }) => {
     onMounted(() => {
@@ -31,7 +35,7 @@ export const useFold = (props, emit, { walkTreeData }) => {
             emit('node-folded-changed', node);
         }
     };
-    const toggleFold = (node: Node, path: Path, opt: UnfoldOptions) => {
+    const toggleFold = (node: Node, path: number[], opt: UnfoldOptions) => {
         if (node.$folded) {
             unfold(node, path, opt);
         } else {

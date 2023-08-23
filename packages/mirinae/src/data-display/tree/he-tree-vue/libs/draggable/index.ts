@@ -1,29 +1,34 @@
+import { afterDrop, afterMove } from '@/data-display/tree/he-tree-vue/libs/draggable/edge-scroll';
 import {
-    addClass, backupAttr, elementsFromPoint,
+    addClass, backupAttr,
     findParent,
     getViewportPosition,
-    hasClass, isDescendantOf,
-    objectAssignIfKeyNull, removeEl, restoreAttr, scrollTo,
+    hasClass,
+    objectAssignIfKeyNull, removeEl, restoreAttr,
     toArrayIfNot,
-} from '@/data-display/tree/he-tree-vue/helpers';
+} from '@/data-display/tree/he-tree-vue/libs/helpers';
 
-import type { EventPosition, MouseOrTouchEvent } from './drag-event-service';
-import DragEventService from './drag-event-service';
-import type { Store } from './draggable-types';
+import { DragEventService } from './drag-event-service';
+import type {
+    DraggableHelperOptions, EventPosition, MouseOrTouchEvent, Store,
+} from './types';
+
 
 const _edgeScroll = {
     afterFirstMove: undefined,
     afterMove,
     afterDrop,
 };
-export default function draggableHelper(listenerElement: HTMLElement, opt: DraggableHelperOptions) {
+
+export const makeDraggable = (listenerElement: HTMLElement, opt: DraggableHelperOptions) => {
     let store: Store;
+    const dragEventService = new DragEventService();
     // set default value of options
     objectAssignIfKeyNull(opt, defaultOptions);
     // define the event listener of mousedown and touchstart
     const onMousedownOrTouchStart = (e:MouseOrTouchEvent, mouse: EventPosition) => {
         // execute native event hooks
-        if (!DragEventService.isTouch(e)) {
+        if (!dragEventService.isTouch(e)) {
             if (opt.onmousedown) opt.onmousedown(e as MouseEvent);
         } else if (opt.ontouchstart) opt.ontouchstart(e as TouchEvent);
         const target = e.target as HTMLElement;
@@ -98,24 +103,24 @@ export default function draggableHelper(listenerElement: HTMLElement, opt: Dragg
             return;
         }
         // prevent text be selected
-        if (!DragEventService.isTouch(e)) {
+        if (!dragEventService.isTouch(e)) {
             // Do not prevent when touch. Or the elements within the node can not trigger click event.
             if (opt.preventTextSelection) {
                 e.preventDefault();
             }
         }
         // listen mousemove and touchmove
-        DragEventService.on(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
+        dragEventService.on(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
         // listen mouseup and touchend
-        DragEventService.on(window, 'end', onMouseupOrTouchEnd);
+        dragEventService.on(window, 'end', onMouseupOrTouchEnd);
     };
     // bind mousedown or touchstart event listener
-    DragEventService.on(listenerElement, 'start', onMousedownOrTouchStart, { touchArgs: [{ passive: true }] });
+    dragEventService.on(listenerElement, 'start', onMousedownOrTouchStart, { touchArgs: [{ passive: true }] });
 
     // define the event listener of mousemove and touchmove
     const onMousemoveOrTouchMove = (e: MouseOrTouchEvent, mouse: EventPosition) => {
         // execute native event hooks
-        if (!DragEventService.isTouch(e)) {
+        if (!dragEventService.isTouch(e)) {
             if (opt.onmousemove) opt.onmousemove(e as MouseEvent);
         } else if (opt.ontouchmove) opt.ontouchmove(e as TouchEvent);
         //
@@ -128,7 +133,7 @@ export default function draggableHelper(listenerElement: HTMLElement, opt: Dragg
         store.move = move;
         store.moveEvent = e;
         store.mouse = mouse;
-        if (DragEventService.isTouch(e)) {
+        if (dragEventService.isTouch(e)) {
             // prevent page scroll when touch.
             e.preventDefault();
             // prevent text be selected
@@ -206,7 +211,6 @@ export default function draggableHelper(listenerElement: HTMLElement, opt: Dragg
             if (!opt.updateMovedElementStyleManually) {
                 store.updateMovedElementStyle();
             }
-            // if (_edgeScroll.afterFirstMove) _edgeScroll.afterFirstMove(store, opt);
             if (opt.afterFirstMove) opt.afterFirstMove(store, opt);
 
             // Not the first move
@@ -236,12 +240,12 @@ export default function draggableHelper(listenerElement: HTMLElement, opt: Dragg
     // define the event listener of mouseup and touchend
     const onMouseupOrTouchEnd = async (e: MouseOrTouchEvent) => {
         // execute native event hooks
-        if (!DragEventService.isTouch(e)) {
+        if (!dragEventService.isTouch(e)) {
             if (opt.onmousedown) opt.onmousedown(e as MouseEvent);
         } else if (opt.ontouchend) opt.ontouchend(e as TouchEvent);
         // cancel listening mousemove, touchmove, mouseup, touchend
-        DragEventService.off(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
-        DragEventService.off(window, 'end', onMouseupOrTouchEnd);
+        dragEventService.off(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
+        dragEventService.off(window, 'end', onMouseupOrTouchEnd);
         //
         if (store.movedCount === 0) {
             return;
@@ -272,13 +276,13 @@ export default function draggableHelper(listenerElement: HTMLElement, opt: Dragg
 
     // define the destroy function
     const destroy = () => {
-        DragEventService.off(listenerElement, 'start', onMousedownOrTouchStart, { touchArgs: [{ passive: true }] });
-        DragEventService.off(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
-        DragEventService.off(window, 'end', onMouseupOrTouchEnd);
+        dragEventService.off(listenerElement, 'start', onMousedownOrTouchStart, { touchArgs: [{ passive: true }] });
+        dragEventService.off(document, 'move', onMousemoveOrTouchMove, { touchArgs: [{ passive: false }] });
+        dragEventService.off(window, 'end', onMouseupOrTouchEnd);
     };
     //
     return { destroy, options: opt };
-}
+};
 
 
 // available options and default options value
@@ -294,243 +298,10 @@ export const defaultOptions = {
     edgeScrollSpeed: 0.35,
     edgeScrollTriggerMode: 'top_left_corner',
 };
-export interface DraggableHelperOptions {
-    ignoreTags?: string[];
-    undraggableClassName?: string;
-    minDisplacement?: number;
-    draggingClassName?: string;
-    updateMovedElementStyleManually?: boolean;
-    triggerClassName?: string|string[] // triggerElement must have the class name.
-    triggerBySelf?: boolean // directTriggerElement must be the triggerElement
-    getTriggerElement?: (directTriggerElement: HTMLElement, store: Store) => HTMLElement|undefined // get triggerElement by directTriggerElement. override triggerClassName.
-    getMovedOrClonedElement?: (directTriggerElement: HTMLElement, store: Store, opt: DraggableHelperOptions) => HTMLElement
-    beforeFirstMove?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined
-    afterFirstMove?: (store:Store, opt:DraggableHelperOptions) => void
-    beforeMove?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined
-    afterMove?: (store:Store, opt:DraggableHelperOptions) => void
-    beforeDrop?: (store:Store, opt:DraggableHelperOptions) => boolean|undefined|Promise<boolean|void>
-    afterDrop?: (store:Store, opt:DraggableHelperOptions) => void|Promise<void>
-    preventTextSelection?: boolean
-    rtl?: boolean;
-    // edge scroll
-    edgeScroll?: boolean
-    edgeScrollTriggerMargin?: number
-    edgeScrollSpeed?: number
-    edgeScrollTriggerMode?: 'top_left_corner'|'mouse'
-    edgeScrollSpecifiedContainerX?: HTMLElement|((store:Store, opt:DraggableHelperOptions) => HTMLElement)
-    edgeScrollSpecifiedContainerY?: HTMLElement|((store:Store, opt:DraggableHelperOptions) => HTMLElement)
-    // native event hooks
-    onmousedown?: (e: MouseEvent) => void
-    onmousemove?: (e: MouseEvent) => void
-    onmouseup?: (e: MouseEvent) => void
-    ontouchstart?: (e: TouchEvent) => void
-    ontouchmove?: (e: TouchEvent) => void
-    ontouchend?: (e: TouchEvent) => void
-    // clone
-    clone?: boolean;
-    onClone?: (store: Store, opt: DraggableHelperOptions) => boolean; // control clone when drag start
-}
+
 // Info after event triggered. Created when mousedown or touchstart, destroied after mouseup or touchend.
 export const initialStore = {
     movedCount: 0,
 };
 
-// edge scroll
-let stopHorizontalScroll;
-let stopVerticalScroll;
-function afterMove(store: Store, opt: DraggableHelperOptions) {
-    if (!opt.edgeScroll) {
-        return;
-    }
-    const margin = opt.edgeScrollTriggerMargin ?? 0;
-    stopOldScrollAnimation();
-    // get triggerPoint. The point trigger edge scroll.
-    let triggerPoint = { x: store.mouse.clientX, y: store.mouse.clientY };
-    if (opt.edgeScrollTriggerMode === 'top_left_corner') {
-        const vp = getViewportPosition(store.movedElement);
-        triggerPoint = { x: vp.x, y: vp.y };
-    }
-    //
-    let foundHorizontal: HTMLElement|undefined;
-    let foundVertical: HTMLElement|null|undefined;
-    let prevElement: HTMLElement|null|undefined;
-    let horizontalDir:'left'|'right'|undefined;
-    let verticalDir:'up'|'down'|undefined;
-    let findInElements: HTMLElement[]|null|undefined;
-    let cachedElementsFromPoint: HTMLElement[]|null|undefined;
-    // find x container
-    const minScrollableDisplacement = 10;
-    if (opt.edgeScrollSpecifiedContainerX) {
-        let containerX;
-        if (typeof opt.edgeScrollSpecifiedContainerX === 'function') {
-            containerX = opt.edgeScrollSpecifiedContainerX(store, opt);
-        } else {
-            containerX = opt.edgeScrollSpecifiedContainerX;
-        }
-        if (containerX) {
-            findInElements = [containerX];
-        }
-    }
-    if (!findInElements) {
-        findInElements = elementsFromPoint(triggerPoint.x, triggerPoint.y) as HTMLElement[];
-        cachedElementsFromPoint = findInElements;
-    }
-    // eslint-disable-next-line no-restricted-syntax
-    for (const itemEl of findInElements as HTMLElement[]) {
-        if (prevElement && !isDescendantOf(prevElement, itemEl)) {
-            // itemEl is being covered by other elements
-            // eslint-disable-next-line no-continue
-            continue;
-        }
-        const t = minScrollableDisplacement; // min scrollable displacement.
-        if (!foundHorizontal) {
-            if (itemEl.scrollWidth > itemEl.clientWidth) {
-                const vp = fixedGetViewportPosition(itemEl);
-                if (triggerPoint.x <= vp.left + margin) {
-                    if (scrollableDisplacement(itemEl, 'left') as number > t && isScrollable(itemEl, 'x')) {
-                        foundHorizontal = itemEl;
-                        horizontalDir = 'left';
-                    }
-                } else if (triggerPoint.x >= vp.left + itemEl.clientWidth - margin) {
-                    if (scrollableDisplacement(itemEl, 'right') as number > t && isScrollable(itemEl, 'x')) {
-                        foundHorizontal = itemEl;
-                        horizontalDir = 'right';
-                    }
-                }
-            }
-        }
-        if (foundHorizontal) {
-            break;
-        }
-        prevElement = itemEl;
-    }
-    prevElement = null;
-    // find y container
-    findInElements = null;
-    if (opt.edgeScrollSpecifiedContainerY) {
-        let containerY;
-        if (typeof opt.edgeScrollSpecifiedContainerY === 'function') {
-            containerY = opt.edgeScrollSpecifiedContainerY(store, opt);
-        } else {
-            containerY = opt.edgeScrollSpecifiedContainerY;
-        }
-        if (containerY) {
-            findInElements = [containerY];
-        }
-    }
-    if (!findInElements) {
-        findInElements = cachedElementsFromPoint || elementsFromPoint(triggerPoint.x, triggerPoint.y) as HTMLElement[];
-    }
-    // eslint-disable-next-line no-restricted-syntax
-    for (const itemEl of findInElements) {
-        if (prevElement && !isDescendantOf(prevElement, itemEl)) {
-            // itemEl is being covered by other elements
-            // eslint-disable-next-line no-continue
-            continue;
-        }
-        const t = minScrollableDisplacement; // min scrollable displacement.
-        if (!foundVertical) {
-            if (itemEl.scrollHeight > itemEl.clientHeight) {
-                const vp = fixedGetViewportPosition(itemEl);
-                if (triggerPoint.y <= vp.top + margin) {
-                    if (scrollableDisplacement(itemEl, 'up') as number > t && isScrollable(itemEl, 'y')) {
-                        foundVertical = itemEl;
-                        verticalDir = 'up';
-                    }
-                } else if (triggerPoint.y >= vp.top + itemEl.clientHeight - margin) {
-                    if (scrollableDisplacement(itemEl, 'down') as number > t && isScrollable(itemEl, 'y')) {
-                        foundVertical = itemEl;
-                        verticalDir = 'down';
-                    }
-                }
-            }
-        }
-        if (foundVertical) {
-            break;
-        }
-        prevElement = itemEl;
-    }
-    // scroll
-    if (foundHorizontal) {
-        if (horizontalDir === 'left') {
-            stopHorizontalScroll = scrollTo({
-                x: 0,
-                element: foundHorizontal,
-                duration: opt.edgeScrollSpeed ? scrollableDisplacement(foundHorizontal, 'left') as number / opt.edgeScrollSpeed : 0,
-            });
-        } else {
-            stopHorizontalScroll = scrollTo({
-                x: foundHorizontal.scrollWidth - foundHorizontal.clientWidth,
-                element: foundHorizontal,
-                duration: opt.edgeScrollSpeed ? scrollableDisplacement(foundHorizontal, 'right') as number / opt.edgeScrollSpeed : 0,
-            });
-        }
-    }
-    if (foundVertical) {
-        if (verticalDir === 'up') {
-            stopVerticalScroll = scrollTo({
-                y: 0,
-                element: foundVertical,
-                duration: opt.edgeScrollSpeed ? scrollableDisplacement(foundVertical, 'up') as number / opt.edgeScrollSpeed : 0,
-            });
-        } else {
-            stopVerticalScroll = scrollTo({
-                y: foundVertical.scrollHeight - foundVertical.clientHeight,
-                element: foundVertical,
-                duration: opt.edgeScrollSpeed ? scrollableDisplacement(foundVertical, 'down') as number / opt.edgeScrollSpeed : 0,
-            });
-        }
-    }
-    // is element scrollable in a direction
-    function isScrollable(el:HTMLElement, dir:'x'|'y') {
-        const style = getComputedStyle(el);
-        const key = `overflow-${dir}`;
-        // document.documentElement is special
-        const special = document.scrollingElement || document.documentElement;
-        if (el === special) {
-            return style[key] === 'visible' || style[key] === 'auto' || style[key] === 'scroll';
-        }
-        return style[key] === 'auto' || style[key] === 'scroll';
-    }
-    // scrollable displacement of element  in a direction
-    function scrollableDisplacement(el:HTMLElement, dir: 'up'|'down'|'left'|'right'): number|undefined {
-        if (dir === 'up') {
-            return el.scrollTop;
-        } if (dir === 'down') {
-            return el.scrollHeight - el.scrollTop - el.clientHeight;
-        } if (dir === 'left') {
-            return el.scrollLeft;
-        } if (dir === 'right') {
-            return el.scrollWidth - el.scrollLeft - el.clientWidth;
-        }
-        return undefined;
-    }
-    function fixedGetViewportPosition(el: HTMLElement) {
-        const r = getViewportPosition(el);
-        // document.documentElement is special
-        const special = document.scrollingElement || document.documentElement;
-        if (el === special) {
-            r.top = 0;
-            r.left = 0;
-        }
-        return r;
-    }
-}
-function afterDrop(store: Store, opt: DraggableHelperOptions) {
-    if (!opt.edgeScroll) {
-        return;
-    }
-    stopOldScrollAnimation();
-}
 
-// stop old scroll animation
-function stopOldScrollAnimation() {
-    if (stopHorizontalScroll) {
-        stopHorizontalScroll();
-        stopHorizontalScroll = null;
-    }
-    if (stopVerticalScroll) {
-        stopVerticalScroll();
-        stopVerticalScroll = null;
-    }
-}

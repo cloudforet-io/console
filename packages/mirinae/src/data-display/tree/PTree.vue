@@ -101,10 +101,7 @@ import {
 import { unionBy } from 'lodash';
 import { focus } from 'vue-focus';
 
-import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
-import type {
-    CloneTreeDataOptions, WalkTreeDataCallback,
-} from '@/data-display/tree/he-tree-vue/types';
+import type { Store } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
 import { getDefaultNode } from '@/data-display/tree/helper';
 import type {
     Tree,
@@ -117,13 +114,14 @@ import type {
     DragOptions,
     DataGetter,
     DataSetter,
-    GetClassNames, DataFetcher,
+    GetClassNames, DataFetcher, CloneTreeDataOptions,
 } from '@/data-display/tree/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 import OriginTree from './he-tree-vue/components/Tree.vue';
+import type { WalkTreeDataCallback } from './he-tree-vue/tree-data';
 import { walkTreeData, cloneTreeData } from './he-tree-vue/tree-data';
 
 
@@ -138,6 +136,8 @@ interface Props {
     fetchOnInit?: boolean;
     getClassNames: GetClassNames;
 }
+
+
 
 export default defineComponent<Props>({
     name: 'PTree',
