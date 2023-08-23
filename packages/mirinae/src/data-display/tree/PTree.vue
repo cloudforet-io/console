@@ -96,15 +96,15 @@
 /* eslint-disable no-await-in-loop */
 import { unionBy } from 'lodash';
 import {
-    computed, defineComponent, onMounted, reactive, toRef, useSlots, watch,
+    computed, onMounted, reactive, toRef, useSlots, watch,
 } from 'vue';
 
-import type { Store } from '@/data-display/tree/he-tree-vue/plugins/draggable/draggable-types';
-import type {
-    CloneTreeDataOptions, WalkTreeDataCallback,
-} from '@/data-display/tree/he-tree-vue/types';
+import type { Store } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
+import type { WalkTreeDataCallback } from '@/data-display/tree/he-tree-vue/tree-data';
+import { walkTreeData, cloneTreeData } from '@/data-display/tree/he-tree-vue/tree-data';
 import { getDefaultNode } from '@/data-display/tree/helper';
 import type {
+    CloneTreeDataOptions,
     TreeType,
     TreeNode,
     Predicate,
@@ -121,10 +121,7 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
-import OriginTree from './he-tree-vue/components/Tree.vue';
-import DraggablePlugin from './he-tree-vue/plugins/draggable/Draggable.vue';
-import FoldPlugin from './he-tree-vue/plugins/fold';
-import { walkTreeData, cloneTreeData } from './he-tree-vue/utils';
+import Tree from './he-tree-vue/components/Tree.vue';
 
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -153,13 +150,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits(['start-drag', 'end-drag', 'drop', 'finish-edit', 'click-node', 'change-select', 'init']);
 const slots = useSlots();
-
-// TODO: this need to be checked
-const Tree = defineComponent({
-    name: 'Tree',
-    extends: OriginTree,
-    mixins: [FoldPlugin, DraggablePlugin],
-});
 
 const state = reactive({
     treeRef: null as null|any,
@@ -256,9 +246,9 @@ const changeSelectState = (node: TreeNode, path: number[], value = true): void =
     setSelectItem(node, path, value);
 };
 
-const onDragStart = (tree: any, e: Store) => {
+const onDragStart = (e: Store) => {
     const validator = props.dragOptions.startValidator;
-    const parent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
+    const parent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) as TreeNode : null;
 
     if (validator && !validator(e.dragNode as TreeNode, parent)) return false;
 
@@ -266,10 +256,10 @@ const onDragStart = (tree: any, e: Store) => {
     return true;
 };
 
-const onDragEnd = (tree: any, e: Store) => {
+const onDragEnd = (e: Store) => {
     state.dragTargetParentPath = null;
-    const parent = e.targetPath ? tree.getNodeParentByPath(e.targetPath) as TreeNode : null;
-    const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
+    const parent = e.targetPath ? state.treeRef.getNodeParentByPath(e.targetPath) as TreeNode : null;
+    const oldParent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) as TreeNode : null;
 
     const validator = props.dragOptions.endValidator;
 
@@ -298,32 +288,32 @@ const handleDrop = (e: Store, targetPath, _rollback) => {
     let oldParent: TreeNode|null = null;
     if (e.startPath) {
         try {
-            oldParent = e.startTree?.getNodeParentByPath(e.startPath) as TreeNode;
+            oldParent = state.targetRef.getNodeParentByPath(e.startPath) as TreeNode;
         } catch (error) {}
     }
 
-    const parent = e.targetTree?.getNodeParentByPath(targetPath) as TreeNode;
+    const parent = state.targetRef.getNodeParentByPath(targetPath) as TreeNode;
 
     emit('drop', e.dragNode, oldParent, parent, rollback);
 };
 
-const eachDraggable = (path: number[], tree: any, e: Store) => {
+const eachDraggable = (path: number[], e: Store) => {
     const dragValidator = props.dragOptions.dragValidator;
     if (dragValidator
-                && !dragValidator(e.dragNode as TreeNode, path ? tree.getNodeParentByPath(path) as TreeNode : undefined)) {
+        && !dragValidator(e.dragNode as TreeNode, path ? state.treeRef.getNodeParentByPath(path) as TreeNode : undefined)) {
         return false;
     }
     return true;
 };
-const eachDroppable = (parentPath: number[], tree: any, e: Store) => {
+const eachDroppable = (parentPath: number[], e: Store) => {
     const dropValidator = props.dragOptions.dropValidator;
 
     let parent: null|TreeNode = null;
     if (parentPath.length > 0) {
-        parent = tree.getNodeByPath(parentPath) as TreeNode;
+        parent = state.treeRef.getNodeByPath(parentPath) as TreeNode;
     }
 
-    const oldParent = e.startPath ? tree.getNodeParentByPath(e.startPath) : null;
+    const oldParent = e.startPath ? state.treeRef.getNodeParentByPath(e.startPath) : null;
 
     state.dragTargetParentPath = parentPath;
 

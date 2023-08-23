@@ -1,4 +1,5 @@
-import type { CloneTreeDataOptions, WalkTreeDataCallback, Node } from '@/data-display/tree/he-tree-vue/types';
+import type { Node } from '@/data-display/tree/he-tree-vue/libs/draggable/types';
+import type { WalkTreeDataCallback } from '@/data-display/tree/he-tree-vue/tree-data';
 
 export interface TreeNode<T=any> extends Node {
     data: T;
@@ -84,4 +85,8 @@ export interface TreeType<T=any> {
     cloneTreeData(treeData: TreeNode<T>[]|null, options?: CloneTreeDataOptions): TreeNode[];
     fold(node: TreeNode<T>): void;
     unfold(node: TreeNode<T>): void;
+}
+
+export interface CloneTreeDataOptions {
+    afterNodeCreated(newNode: object, info: {oldNode: object; index: number; parent: object; path: number[]}): void;
 }
