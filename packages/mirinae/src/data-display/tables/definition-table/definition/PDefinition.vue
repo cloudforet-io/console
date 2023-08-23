@@ -111,7 +111,7 @@ const state = reactive({
     > .key {
         @apply font-bold;
         min-width: 18rem;
-        padding: 0.65rem 1rem 0.35rem 1rem;
+        padding: 0.65rem 1rem 0.35rem;
         font-size: 0.875rem;
         line-height: 1.25;
 

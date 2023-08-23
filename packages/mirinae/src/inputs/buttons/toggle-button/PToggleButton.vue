@@ -111,7 +111,7 @@ const handleChangeToggle = () => {
         }
 
         &:focus {
-            box-shadow: 0 0 0 2px rgba(73, 167, 247, 0.2);
+            box-shadow: 0 0 0 2px rgba(73, 167, 247, 20%);
         }
     }
 

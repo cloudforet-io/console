@@ -54,13 +54,13 @@ import { useI18n } from 'vue-i18n';
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import type { QueryItem } from '@/inputs/search/query-search/type';
 import { defaultConverter, defaultValidator } from '@/inputs/search/query-search-tags/helper';
 import type {
     QuerySearchTagsFunctions,
     QuerySearchTagsProps,
     QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/inputs/search/query-search-tags/type';
-import type { QueryItem } from '@/inputs/search/query-search/type';
 
 const props = withDefaults(defineProps<QuerySearchTagsProps>(), {
     tags: () => [],

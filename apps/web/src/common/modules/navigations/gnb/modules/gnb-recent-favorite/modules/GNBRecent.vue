@@ -14,8 +14,8 @@ import type { DisplayMenu } from '@/store/modules/display/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
