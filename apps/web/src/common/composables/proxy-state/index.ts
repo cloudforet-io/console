@@ -24,7 +24,6 @@ export function useProxyValue<T = any, Prop = any>(
     const setProxyValue = (value: T) => {
         (proxyValue.value as T) = value;
         if (!additionalEvents) {
-            emit(`update:${name}`, value); // will be deprecated
             emit(`update:${kebabCaseName}`, value);
             return;
         }
