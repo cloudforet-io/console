@@ -22,7 +22,7 @@ const ProjectMaintenanceWindowPage = () => import('@/services/project/project-de
 const ProjectWebhookPage = () => import('@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import('@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
 
-export default {
+const projectRoutes: RouteRecordRaw = {
     path: 'project',
     meta: { menuId: MENU_ID.PROJECT },
     component: { template: '<router-view />' },
@@ -38,7 +38,10 @@ export default {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
             meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-            redirect: (to) => `${to.params.id}/summary`,
+            redirect: (to) => ({
+                name: PROJECT_ROUTE.DETAIL.TAB._NAME,
+                params: to.params,
+            }),
             props: true,
             component: {
                 template: `
@@ -53,7 +56,10 @@ export default {
                 {
                     path: '',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: 'summary',
+                    redirect: (to) => ({
+                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                        params: to.params,
+                    }),
                     props: true,
                     component: ProjectDetailPage,
                     children: [
@@ -72,7 +78,10 @@ export default {
                         {
                             path: 'alert',
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-                            redirect: 'alert/alert',
+                            redirect: (to) => ({
+                                name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+                                params: to.params,
+                            }),
                             props: true,
                             component: ProjectAlertPage,
                             children: [
@@ -114,10 +123,6 @@ export default {
                             props: true,
                             component: ProjectTagPage,
                         },
-                        {
-                            path: '*',
-                            redirect: 'summary',
-                        },
                     ],
                 },
                 {
@@ -135,4 +140,6 @@ export default {
             ],
         },
     ],
-} as RouteRecordRaw;
+};
+
+export default projectRoutes;

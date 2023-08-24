@@ -37,7 +37,7 @@ export const serviceRoutes: RouteRecordRaw[] = [
         children: [
             {
                 path: 'dashboard',
-                redirect: '/home-dashboard',
+                redirect: () => ({ name: HOME_DASHBOARD_ROUTE._NAME }),
             },
             homeDashboardRoute,
             dashboardsRoute,

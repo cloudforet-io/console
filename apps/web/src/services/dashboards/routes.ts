@@ -64,7 +64,7 @@ const dashboardsRoute: RouteRecordRaw = {
                             component: DashboardDetailPage,
                         },
                         {
-                            path: 'customize/:dashboardId?',
+                            path: 'customize/:dashboardId',
                             name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
                             meta: {
                                 accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
@@ -77,18 +77,16 @@ const dashboardsRoute: RouteRecordRaw = {
                                             },
                                         },
                                     ];
-                                    if (params.dashboardId) {
-                                        breadcrumbs.push({
-                                            name: params.dashboardId,
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                                                params: {
-                                                    dashboardId: params.dashboardId,
-                                                },
+                                    breadcrumbs.push({
+                                        name: params.dashboardId,
+                                        to: {
+                                            name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
+                                            params: {
+                                                dashboardId: params.dashboardId,
                                             },
-                                            copiable: true,
-                                        });
-                                    }
+                                        },
+                                        copiable: true,
+                                    });
                                     return breadcrumbs;
                                 },
                             },
@@ -113,7 +111,7 @@ const dashboardsRoute: RouteRecordRaw = {
                             component: DashboardDetailPage,
                         },
                         {
-                            path: 'customize/:dashboardId?',
+                            path: 'customize/:dashboardId',
                             name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
                             meta: {
                                 accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
@@ -126,18 +124,16 @@ const dashboardsRoute: RouteRecordRaw = {
                                             },
                                         },
                                     ];
-                                    if (params.dashboardId) {
-                                        breadcrumbs.push({
-                                            name: params.dashboardId,
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                                                params: {
-                                                    dashboardId: params.dashboardId,
-                                                },
+                                    breadcrumbs.push({
+                                        name: params.dashboardId,
+                                        to: {
+                                            name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                                            params: {
+                                                dashboardId: params.dashboardId,
                                             },
-                                            copiable: true,
-                                        });
-                                    }
+                                        },
+                                        copiable: true,
+                                    });
                                     return breadcrumbs;
                                 },
                             },
