@@ -84,9 +84,9 @@ watch(() => props.recentJobs, () => {
                     />
                 </p-tooltip>
             </p>
-            <p-link size="sm"
+            <p-link v-if="props.fullMode && props.historyLink"
+                    size="sm"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
-                    new-tab
                     highlight
                     :to="props.historyLink"
                     class="view-all-link"
