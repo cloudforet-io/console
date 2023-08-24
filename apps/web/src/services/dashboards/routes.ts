@@ -19,13 +19,13 @@ const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail
 
 const dashboardsRoute: RouteRecordRaw = {
     path: 'dashboards',
-    name: DASHBOARDS_ROUTE._NAME,
     meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: () => getRedirectRouteByPagePermission(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionMap']),
     component: DashboardsContainer,
     children: [
         {
             path: '',
+            name: DASHBOARDS_ROUTE._NAME,
             component: { template: '<router-view/>' },
             redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
             children: [

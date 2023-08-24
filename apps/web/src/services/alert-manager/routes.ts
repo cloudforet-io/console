@@ -40,7 +40,7 @@ const alertManagerRoutes: RouteRecordRaw = {
                     component: AlertPage as any,
                 },
                 {
-                    path: ':id?',
+                    path: ':id',
                     name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
                     meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
                     props: true,
