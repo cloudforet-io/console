@@ -21,16 +21,16 @@
 
 <script setup lang="ts">
 import {
-    computed, defineAsyncComponent,
+    computed,
     reactive,
 } from 'vue';
 
+import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { MoreDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/more/type';
 import type { MoreOptions, CommonOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
-const PDynamicLayout = defineAsyncComponent(() => import('@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue'));
-const PDynamicField = defineAsyncComponent(() => import('@/data-display/dynamic/dynamic-field/PDynamicField.vue'));
 
 const SUPPORTED_TYPES = ['popup'];
 

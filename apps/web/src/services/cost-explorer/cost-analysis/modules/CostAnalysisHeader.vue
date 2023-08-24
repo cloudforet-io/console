@@ -6,7 +6,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import {
-    computed, defineAsyncComponent, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -16,22 +16,23 @@ import { CURRENCY } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
+import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/type';
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
+import CostAnalysisPreview from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPreview.vue';
+import CostAnalysisSaveQueryFormModal from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
 import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/type';
 import { getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
-const CostAnalysisSaveQueryFormModal = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue'));
-const DeleteModal = defineAsyncComponent(() => import('@/common/components/modals/DeleteModal.vue'));
-const PdfDownloadOverlay = defineAsyncComponent(() => import('@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue'));
-const CostAnalysisPreview = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPreview.vue'));
-const PdfDownloadButton = defineAsyncComponent(() => import('@/common/components/buttons/PdfDownloadButton.vue'));
+
 
 interface Props {
     printMode?: boolean;

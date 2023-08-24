@@ -28,12 +28,11 @@
 <script setup lang="ts">
 import { get } from 'lodash';
 import {
-    computed, reactive,
+    computed, defineAsyncComponent, reactive,
 } from 'vue';
 
 
 import type { TextListProps } from '@/data-display/text-list/type';
-import PLink from '@/inputs/link/PLink.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
 const props = withDefaults(defineProps<TextListProps>(), {
@@ -42,7 +41,7 @@ const props = withDefaults(defineProps<TextListProps>(), {
 });
 
 const state = reactive({
-    component: computed(() => (props.link ? PLink : 'span')),
+    component: computed(() => (props.link ? defineAsyncComponent(() => import('@/inputs/link/PLink.vue')) : 'span')),
     displayItems: computed(() => props.items.reduce((res, item) => {
         let data;
         if (typeof item === 'object' && props.subKey) {

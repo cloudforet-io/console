@@ -209,12 +209,6 @@ import PCheckbox from '@/inputs/checkbox/PCheckbox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
 import { copyAnyData } from '@/utils/helpers';
 
-// const PCheckbox = defineAsyncComponent(() => import('@/inputs/checkbox/PCheckbox.vue'));
-// const PTextBeautifier = defineAsyncComponent(() => import('@/data-display/text-beautifier/PTextBeautifier.vue'));
-// const PRadio = defineAsyncComponent(() => import('@/inputs/radio/PRadio.vue'));
-// const PI = defineAsyncComponent(() => import('@/foundation/icons/PI.vue'));
-// const PCopyButton = defineAsyncComponent(() => import('@/inputs/buttons/copy-button/PCopyButton.vue'));
-
 interface TableField extends DataTableFieldType {
     depth?: number;
 }

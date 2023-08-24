@@ -95,10 +95,12 @@
 import { useFocus, onClickOutside } from '@vueuse/core';
 import { isEqual } from 'lodash';
 import {
-    computed, defineAsyncComponent,
+    computed,
     ref, toRef, toRefs, watch,
 } from 'vue';
 
+import PBadge from '@/data-display/badge/PBadge.vue';
+import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
@@ -114,8 +116,7 @@ import type {
     KeyMenuItem, ValueMenuItem, QueryItem, KeyItemSet, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
 
-const PBadge = defineAsyncComponent(() => import('@/data-display/badge/PBadge.vue'));
-const PTag = defineAsyncComponent(() => import('@/data-display/tags/PTag.vue'));
+
 
 interface QueryInputProps {
     value?: string|number;
