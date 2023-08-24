@@ -49,7 +49,9 @@
                                      :history-link="state.collectorHistoryLink"
         />
         <collector-schedule-section class="section" />
-        <collector-options-section class="section" />
+        <collector-options-section class="section"
+                                   data-test-id="collector-options-section"
+        />
         <collector-service-accounts-section class="section"
                                             :manage-disabled="!state.hasManagePermission"
         />
