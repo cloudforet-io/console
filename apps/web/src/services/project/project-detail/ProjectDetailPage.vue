@@ -269,9 +269,11 @@ onUnmounted(() => {
                    :tabs="singleItemTabState.tabs"
                    @change="onChangeTab"
             >
-                <keep-alive>
-                    <router-view />
-                </keep-alive>
+                <router-view v-slot="{ Component }">
+                    <keep-alive>
+                        <component :is="Component" />
+                    </keep-alive>
+                </router-view>
                 <template #extra="tab">
                     <p-badge v-if="tab.label === t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
                              style-type="primary3"
