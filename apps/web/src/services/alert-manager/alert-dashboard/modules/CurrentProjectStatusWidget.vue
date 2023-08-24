@@ -5,7 +5,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PDataLoader } from '@spaceone/design-system';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref, watch, onBeforeUnmount,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -58,21 +58,21 @@ const state = reactive({
         },
     ] as ChartData[])),
     chart: null as null | any,
-    chartRegistry: {},
 });
+const chartRegistry = {} as Record<string, any>;
 
 /* util */
 const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
+    if (chartRegistry[ctx]) {
+        chartRegistry[ctx].dispose();
+        delete chartRegistry[ctx];
     }
 };
 const drawChart = (ctx, isLoading) => {
     const createChart = () => {
         disposeChart(ctx);
-        state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
-        return state.chartRegistry[ctx];
+        chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
+        return chartRegistry[ctx];
     };
 
     const chart = createChart();
@@ -143,6 +143,12 @@ watch([() => state.loading, () => loaderRef.value, () => chartRef.value], ([load
         drawChart(chartCtx, false);
     }
 }, { immediate: true });
+
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
+});
 
 </script>
 

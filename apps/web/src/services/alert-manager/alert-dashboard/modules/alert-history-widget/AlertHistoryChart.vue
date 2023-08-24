@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-
-
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -8,7 +6,7 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {
-    computed, reactive, watch, ref,
+    computed, reactive, watch, ref, onBeforeUnmount,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -48,7 +46,6 @@ const chartRef = ref(null as null | HTMLElement);
 const state = reactive(({
     loading: true,
     chart: null,
-    chartRegistry: {},
     chartData: [] as ChartData[],
     currentMonthStart: computed(() => dayjs.utc(props.currentDate).startOf('month')),
     currentMonthEnd: computed(() => dayjs.utc(props.currentDate).endOf('month')),
@@ -57,6 +54,7 @@ const state = reactive(({
         [ALERT_STATE.RESOLVED]: t('MONITORING.ALERT.DASHBOARD.RESOLVED'),
     })),
 }));
+const chartRegistry = {} as Record<string, any>;
 
 /* util */
 const initChartData = (data) => {
@@ -90,16 +88,16 @@ const initChartData = (data) => {
     return chartData;
 };
 const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
+    if (chartRegistry[ctx]) {
+        chartRegistry[ctx].dispose();
+        delete chartRegistry[ctx];
     }
 };
 const drawChart = (ctx) => {
     const createChart = () => {
         disposeChart(ctx);
-        state.chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
-        return state.chartRegistry[ctx];
+        chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
+        return chartRegistry[ctx];
     };
     const chart = createChart();
     state.chart = chart;
@@ -217,6 +215,12 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
         state.loading = false;
     }
 }, { immediate: true });
+
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
+});
 
 </script>
 
