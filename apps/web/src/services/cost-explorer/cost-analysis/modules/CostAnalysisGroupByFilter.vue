@@ -1,12 +1,10 @@
 <template>
-    <div class="cost-analysis-group-by-filter"
-         :class="{ 'print-mode': printMode }"
-    >
+    <div class="cost-analysis-group-by-filter">
         <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
-        <p-select-button v-for="groupByItem in (printMode ? selectedGroupByItems : allGroupByItems)"
+        <p-select-button v-for="groupByItem in allGroupByItems"
                          :key="groupByItem.name"
                          :value="groupByItem"
-                         :selected="printMode ? '' : selectedGroupByItems"
+                         :selected="selectedGroupByItems"
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
@@ -37,12 +35,6 @@ export default {
         CostAnalysisGroupByFilterMore,
         PSelectButton,
         PDivider,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -79,12 +71,6 @@ export default {
     font-size: 0.875rem;
     padding: 1rem;
     margin-bottom: 1rem;
-    &.print-mode {
-        .label {
-            @apply mr-3;
-            white-space: nowrap;
-        }
-    }
     .p-divider {
         @apply bg-gray-300;
         height: 1rem;

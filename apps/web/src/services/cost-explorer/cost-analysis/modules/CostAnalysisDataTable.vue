@@ -6,7 +6,7 @@
                          :items="tableState.items"
                          :total-count="tableState.totalCount"
                          :searchable="false"
-                         :row-height-fixed="!printMode"
+                         row-height-fixed
                          exportable
                          @change="handleChange"
                          @refresh="handleChange()"
@@ -83,14 +83,12 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PLink, PI, PToolboxTable, PDataTable, PButtonModal,
+    PLink, PI, PToolboxTable, PButtonModal,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { get } from 'lodash';
-import type { Table } from 'pdfmake/interfaces';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -99,7 +97,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -112,7 +109,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 
-import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -125,14 +121,6 @@ import {
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
-
-interface PrintModeFieldSet {
-    widths?: Table['widths'];
-    fields: DataTableFieldType[];
-}
-// must be greater than selectable group by items' count
-const PRINT_MODE_MAX_COL = 10;
-
 export default {
     name: 'CostAnalysisDataTable',
     components: {
@@ -141,18 +129,12 @@ export default {
         PI,
         PToolboxTable,
     },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
+    setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
         const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
-            component: computed(() => (props.printMode ? PDataTable : PToolboxTable)),
+            component: computed(() => PToolboxTable),
             timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period.start), dayjs.utc(costAnalysisPageState.period.end))),
             dateFormat: computed(() => {
                 if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
@@ -343,7 +325,6 @@ export default {
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const query = costApiQueryHelper.data;
-                if (props.printMode) query.page = undefined;
 
                 const moreGroupByKeyList = moreGroupBy.filter((d) => d.selected).map((d) => `${d.category}.${d.key}`);
 
@@ -425,62 +406,6 @@ export default {
             } else await handleExcelDownload();
         };
 
-        // Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
-        const getPrintModeFieldSets = (): PrintModeFieldSet[] => {
-            const groupByLength = tableState.groupByFields.length;
-            const costFieldLength = tableState.costFields.length;
-            const totalLength = costFieldLength + groupByLength;
-            const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;
-            const groupByFieldWidthValues = Array(groupByLength).fill('auto');
-            let costFieldWidthValues = Array(tableState.costFields.length).fill('*');
-
-            if (props.printMode && totalLength > PRINT_MODE_MAX_COL) {
-                const fieldSetCount = Math.ceil(costFieldLength / costColumnCount);
-                const results = [] as PrintModeFieldSet[];
-                for (let idx = 0; idx < fieldSetCount; idx++) {
-                    const tableFields = tableState.costFields.slice(idx * costColumnCount, (idx + 1) * costColumnCount);
-                    costFieldWidthValues = Array(tableFields.length).fill('*');
-                    const widths = groupByFieldWidthValues.concat(costFieldWidthValues);
-                    results.push({
-                        widths,
-                        fields: tableState.groupByFields.concat(tableFields),
-                    });
-                }
-                return results;
-            }
-            return [{
-                widths: groupByFieldWidthValues.concat(costFieldWidthValues),
-                fields: tableState.groupByFields.concat(tableState.costFields),
-            }];
-        };
-
-        const getPdfItems = (): PdfOverlayItem[] => {
-            const items = tableState.items;
-            const fieldSets = getPrintModeFieldSets();
-            return fieldSets.map(({ widths, fields }) => {
-                const headRows: string[][] = [fields.map((f) => f.label as string)];
-                const bodyRows: string[][] = items.map((d) => fields.map((f) => {
-                    let value = get(d, f.name, '-');
-                    if (f.name === 'totalCost') value = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST');
-                    else if (state.groupByStoreMap[f.name]) {
-                        const referenceStore = state.groupByStoreMap[f.name];
-                        value = referenceStore[value] ? referenceStore[value].label : value;
-                    } else if (typeof value === 'number') {
-                        value = currencyMoneyFormatter(value, state.currency, state.currencyRates, true);
-                    }
-
-                    return value;
-                }));
-                return {
-                    tableData: {
-                        widths,
-                        body: headRows.concat(bodyRows),
-                    },
-                    type: 'data-table',
-                };
-            });
-        };
-
         watch(
             [
                 () => costAnalysisPageState.granularity,
@@ -493,7 +418,6 @@ export default {
             async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
                 await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
                 tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
-                if (props.printMode) emit('rendered', getPdfItems());
             },
             { immediate: true, deep: true },
         );

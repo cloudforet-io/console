@@ -1,13 +1,9 @@
 <template>
-    <div class="cost-analysis-chart-query-section"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-analysis-chart-query-section">
         <!--filter-->
         <div class="title-wrapper">
             <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
-            <div v-if="!printMode"
-                 class="button-wrapper"
-            >
+            <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
                           :disabled="!filtersLength"
@@ -24,8 +20,7 @@
             </div>
         </div>
         <div class="filter-wrapper">
-            <cost-explorer-filter-tags :print-mode="printMode"
-                                       :filters="costAnalysisPageState.filters"
+            <cost-explorer-filter-tags :filters="costAnalysisPageState.filters"
                                        deletable
                                        @update-filter-tags="handleUpdateFilters"
             />
@@ -37,15 +32,12 @@
                                :items="groupByMenuItems"
                                :selected="costAnalysisPageState.primaryGroupBy"
                                style-type="transparent"
-                               :read-only="printMode"
                                @select="handlePrimaryGroupByItem"
             />
             <span v-else
                   class="title"
             >Total Cost</span>
-            <div v-if="!printMode"
-                 class="button-wrapper"
-            >
+            <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
                           font-weight="normal"
@@ -78,8 +70,7 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <cost-explorer-set-filter-modal v-if="!printMode"
-                                        :visible.sync="filterModalVisible"
+        <cost-explorer-set-filter-modal :visible.sync="filterModalVisible"
                                         :prev-selected-filters="costAnalysisPageState.filters"
                                         :categories="CATEGORIES"
                                         @confirm="handleUpdateFilters"
@@ -112,7 +103,6 @@ import type { Legend } from '@/services/cost-explorer/widgets/type';
 
 
 interface Props {
-    printMode: boolean;
     loading: boolean;
     legends: Legend[];
 }
@@ -131,10 +121,6 @@ export default defineComponent<Props>({
         PStatus,
     },
     props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
         loading: {
             type: Boolean,
             default: true,
@@ -322,16 +308,8 @@ export default defineComponent<Props>({
         }
     }
 
-    &.print-mode {
+    @screen tablet {
         @mixin row-stack;
-        .title {
-            white-space: nowrap;
-        }
-    }
-    &:not(.print-mode) {
-        @screen tablet {
-            @mixin row-stack;
-        }
     }
 }
 </style>
