@@ -1,7 +1,5 @@
 <template>
-    <div class="cost-analysis-period-select-dropdown"
-         :class="{responsive: !printMode}"
-    >
+    <div class="cost-analysis-period-select-dropdown">
         <p-badge style-type="gray200"
                  badge-type="subtle"
         >
@@ -9,8 +7,7 @@
                 {{ periodText }}
             </p>
         </p-badge>
-        <p-select-dropdown v-if="!printMode"
-                           :items="periodMenuItems"
+        <p-select-dropdown :items="periodMenuItems"
                            :selected="selectedPeriod"
                            style-type="transparent"
                            @select="handleSelectPeriod"
@@ -65,10 +62,6 @@ export default {
         fixedPeriod: {
             type: Object,
             default: () => (getInitialDates()),
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props, { emit }) {
@@ -219,11 +212,10 @@ export default {
             white-space: nowrap;
         }
     }
-    &.responsive {
-        @screen mobile {
-            @apply flex flex-wrap justify-end items-center;
-            width: 100%;
-        }
+
+    @screen mobile {
+        @apply flex flex-wrap justify-end items-center;
+        width: 100%;
     }
 }
 

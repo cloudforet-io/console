@@ -78,10 +78,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
@@ -94,7 +90,7 @@ export default {
         /* util */
         const _createDummySeries = (chart) => {
             const series = chart.series.push(new am4charts.PieSeries());
-            series.showOnInit = !props.printMode;
+            series.showOnInit = true;
             series.dataFields.category = CATEGORY_KEY;
             series.dataFields.value = VALUE_KEY;
             series.slices.template.togglable = false;
@@ -108,7 +104,7 @@ export default {
         };
         const _createSeries = (chart) => {
             const series = chart.series.push(new am4charts.PieSeries());
-            series.showOnInit = !props.printMode;
+            series.showOnInit = true;
             series.dataFields.category = CATEGORY_KEY;
             series.dataFields.value = VALUE_KEY;
             series.slices.template.stroke = am4core.color('white');
