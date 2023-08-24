@@ -176,6 +176,7 @@ export default {
 
         return {
             t,
+            router,
             ...toRefs(state),
             dashboardTemplate,
             dashboardProject,
@@ -212,7 +213,7 @@ export default {
                 <p-button
                     style-type="transparent"
                     size="lg"
-                    @click="$router.go(-1)"
+                    @click="router.go(-1)"
                 >
                     {{ t('DASHBOARDS.CREATE.CANCEL') }}
                 </p-button>
