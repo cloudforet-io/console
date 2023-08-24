@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     getCurrentInstance,
     reactive, toRefs, watch,
@@ -110,10 +109,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
@@ -163,7 +158,7 @@ export default {
 
         const _createSeries = (chart, legend, timeUnit) => {
             const series = chart.series.push(new am4charts.ColumnSeries());
-            series.showOnInit = !props.printMode;
+            series.showOnInit = true;
             series.name = legend.label;
             series.dataFields.categoryX = CATEGORY_KEY;
             series.dataFields.valueY = legend.name;

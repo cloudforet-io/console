@@ -1,7 +1,5 @@
 <template>
-    <div class="cost-analysis-query-filter"
-         :class="{ 'print-mode': printMode }"
-    >
+    <div class="cost-analysis-query-filter">
         <div class="filter-wrapper tablet-off">
             <div class="left-part">
                 <div class="filter-item">
@@ -9,7 +7,6 @@
                     <p-select-dropdown :items="granularityItems"
                                        :selected="costAnalysisPageState.granularity"
                                        style-type="transparent"
-                                       :read-only="printMode"
                                        class="granularity-select"
                                        @select="handleSelectGranularity"
                     />
@@ -17,37 +14,29 @@
                 <div v-if="costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED"
                      class="filter-item"
                 >
-                    <template v-if="!printMode">
-                        <span class="v-divider" />
-                        <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
-                            <template #right>
-                                <p-toggle-button :value="costAnalysisPageState.stack"
-                                                 class="toggle-button"
-                                                 @change-toggle="handleToggleStack"
-                                />
-                            </template>
-                        </p-field-title>
-                    </template>
-                    <template v-else-if="costAnalysisPageState.stack">
-                        <span class="v-divider" />
-                        <span>Stacked</span>
-                    </template>
+                    <span class="v-divider" />
+                    <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
+                        <template #right>
+                            <p-toggle-button :value="costAnalysisPageState.stack"
+                                             class="toggle-button"
+                                             @change-toggle="handleToggleStack"
+                            />
+                        </template>
+                    </p-field-title>
                 </div>
             </div>
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
                 <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
-                                                      :print-mode="printMode"
                                                       @update="handleSelectedDates"
                 />
                 <span class="v-divider" />
-                <currency-select-dropdown :print-mode="printMode" />
+                <currency-select-dropdown />
             </div>
         </div>
         <div class="filter-wrapper tablet-on">
             <div class="right-part">
                 <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
-                                                      :print-mode="printMode"
                                                       @update="handleSelectedDates"
                 />
                 <span class="v-divider" />
@@ -93,12 +82,6 @@ export default {
         PIconButton,
         PToggleButton,
         PFieldTitle,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -209,19 +192,6 @@ export default {
     }
     .tablet-on {
         display: none;
-    }
-
-    &.print-mode {
-        .label {
-            white-space: nowrap;
-        }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.granularity-select) {
-            .text {
-                white-space: nowrap;
-            }
-        }
     }
 
     @screen tablet {

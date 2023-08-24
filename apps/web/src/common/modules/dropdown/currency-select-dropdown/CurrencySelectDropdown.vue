@@ -2,9 +2,7 @@
     <p-select-dropdown :items="currencyItems"
                        :selected="currency"
                        style-type="transparent"
-                       :read-only="printMode"
                        class="currency-select-dropdown"
-                       :class="{ 'print-mode': printMode }"
                        @select="handleSelectCurrency"
     >
         <template v-if="defaultCurrencyMode"
@@ -61,10 +59,6 @@ export default {
         PBadge,
     },
     props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
         defaultCurrencyMode: {
             type: Boolean,
             default: false,
@@ -100,12 +94,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-select-dropdown */
-.print-mode {
-    .text {
-        white-space: nowrap;
-    }
-}
 .p-badge {
     margin-left: 0.25rem;
 }

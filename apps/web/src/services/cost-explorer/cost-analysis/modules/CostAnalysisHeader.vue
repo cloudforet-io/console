@@ -1,12 +1,9 @@
 <template>
-    <div class="cost-analysis-header"
-         :class="{'interactive-mode': !printMode}"
-    >
+    <div class="cost-analysis-header">
         <section class="title-section">
             <p-heading :title="costAnalysisPageState.selectedQueryId ? title : defaultTitle">
                 <template #title-left-extra>
-                    <p-select-dropdown v-if="!printMode"
-                                       :items="costQueryMenuItems"
+                    <p-select-dropdown :items="costQueryMenuItems"
                                        style-type="icon-button"
                                        button-icon="ic_list-bulleted-3"
                                        class="list-button"
@@ -35,10 +32,8 @@
                         </template>
                     </p-select-dropdown>
                 </template>
-                <template v-if="!printMode"
-                          #title-right-extra
-                >
-                    <div v-if="!printMode && costAnalysisPageState.selectedQueryId"
+                <template #title-right-extra>
+                    <div v-if="costAnalysisPageState.selectedQueryId"
                          class="button-wrapper"
                     >
                         <p-icon-button name="ic_delete"
@@ -49,7 +44,6 @@
                         />
                     </div>
                     <div class="button-wrapper extra">
-                        <pdf-download-button @click="handleClickPdf" />
                         <p-button v-if="costAnalysisPageState.selectedQueryId"
                                   style-type="tertiary"
                                   @click="handleSaveQueryOption"
@@ -65,27 +59,16 @@
                 </template>
             </p-heading>
         </section>
-        <cost-analysis-save-query-form-modal v-if="!printMode"
-                                             :header-title="saveQueryFormState.title"
+        <cost-analysis-save-query-form-modal :header-title="saveQueryFormState.title"
                                              :visible.sync="saveQueryFormState.visible"
                                              :selected-query="saveQueryFormState.selectedQuery"
                                              :request-type="saveQueryFormState.requestType"
                                              @confirm="handleSaveQueryConfirm"
         />
-        <delete-modal v-if="!printMode"
-                      :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
+        <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
                       :visible.sync="checkDeleteState.visible"
                       @confirm="handleDeleteQueryConfirm"
         />
-        <pdf-download-overlay v-if="!printMode"
-                              v-model="visiblePdfOverlay"
-                              :items="previewItems"
-                              orientation="landscape"
-                              :file-name="pdfFileName"
-                              :font-language="pdfFontLanguage"
-        >
-            <cost-analysis-preview @rendered="handlePreviewRendered" />
-        </pdf-download-overlay>
     </div>
 </template>
 
@@ -99,7 +82,6 @@ import {
     PButton, PIconButton, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -107,11 +89,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue';
@@ -124,29 +103,17 @@ import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const CostAnalysisSaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
-const PdfDownloadOverlay = () => import('@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue');
-const CostAnalysisPreview = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPreview.vue');
-const PdfDownloadButton = () => import('@/common/components/buttons/PdfDownloadButton.vue');
 
 
 export default {
     name: 'CostAnalysisHeader',
     components: {
-        CostAnalysisPreview,
-        PdfDownloadOverlay,
         DeleteModal,
         CostAnalysisSaveQueryFormModal,
-        PdfDownloadButton,
         PHeading,
         PIconButton,
         PSelectDropdown,
         PButton,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -165,16 +132,7 @@ export default {
             ])),
             title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
-            visiblePdfOverlay: false,
-            pdfFileName: computed<string>(() => `${costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
-            previewItems: [] as Item[],
             currency: computed(() => store.state.settings.currency),
-            pdfFontLanguage: computed<string>(() => {
-                // https://pdfmake.github.io/docs/0.1/fonts/custom-fonts-client-side/url/
-                if (state.currency === CURRENCY.USD) return 'en';
-                if (state.currency === CURRENCY.KRW) return 'ko';
-                return 'ja';
-            }),
         });
 
         const saveQueryFormState = reactive({
@@ -274,14 +232,6 @@ export default {
             }
         };
 
-        const handleClickPdf = () => {
-            state.visiblePdfOverlay = true;
-        };
-
-        const handlePreviewRendered = (items: Item[]) => {
-            state.previewItems = items;
-        };
-
         /* Watchers */
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
@@ -299,8 +249,6 @@ export default {
             handleSaveQueryConfirm,
             handleSaveQueryOption,
             handleDeleteQueryConfirm,
-            handleClickPdf,
-            handlePreviewRendered,
         };
     },
 };
@@ -352,12 +300,10 @@ export default {
         width: 100%;
     }
 
-    &.interactive-mode {
-        @screen mobile {
-            .button-wrapper.extra {
-                margin-top: 1rem;
-                width: 100%;
-            }
+    @screen mobile {
+        .button-wrapper.extra {
+            margin-top: 1rem;
+            width: 100%;
         }
     }
 }

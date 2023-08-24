@@ -1,7 +1,5 @@
 <template>
-    <div class="cost-analysis-chart"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-analysis-chart">
         <section ref="chartRef"
                  class="chart-section"
         >
@@ -12,7 +10,6 @@
                                      :legends="legends"
                                      :currency="currency"
                                      :currency-rates="currencyRates"
-                                     :print-mode="printMode"
                                      @rendered="handleChartRendered"
             />
             <cost-analysis-stacked-column-chart v-else
@@ -25,12 +22,10 @@
                                                 :period="costAnalysisPageState.period"
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
-                                                :print-mode="printMode"
                                                 @rendered="handleChartRendered"
             />
         </section>
         <cost-analysis-chart-query-section ref="queryRef"
-                                           :print-mode="printMode"
                                            :loading="loading"
                                            :legends.sync="legends"
                                            @toggle-series="handleToggleSeries"
@@ -93,12 +88,6 @@ export default {
         CostAnalysisChartQuerySection,
         CostAnalysisStackedColumnChart,
         CostAnalysisPieChart,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -218,32 +207,8 @@ export default {
         }
     }
 
-    &.print-mode {
+    @screen tablet {
         @mixin row-stack;
-        .filter-wrapper {
-            height: auto;
-            padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
-            .p-empty {
-                @apply flex justify-start;
-            }
-        }
-        .legend-wrapper {
-            height: auto;
-            overflow-y: visible;
-        }
-        .query-section {
-            .title {
-                white-space: nowrap;
-            }
-        }
-    }
-    &:not(.print-mode) {
-        @screen tablet {
-            @mixin row-stack;
-        }
     }
 }
 </style>

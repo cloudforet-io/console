@@ -1,7 +1,5 @@
 <template>
-    <div class="cost-explorer-filter-tags"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-explorer-filter-tags">
         <template v-if="!tagItems.length">
             <slot name="no-filter">
                 <p-empty>
@@ -12,7 +10,7 @@
         <template v-else>
             <p-tag v-for="(item, idx) in tagItems"
                    :key="`selected-tag-${idx}-${item.value}`"
-                   :deletable="!printMode && deletable"
+                   :deletable="deletable"
                    :category-item="hideCategory ? undefined : item.categoryItem"
                    :key-item="item.keyItem"
                    :value-item="item.valueItem"
@@ -41,7 +39,6 @@ import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 interface Props {
-    printMode: boolean;
     filters: CostFiltersMap;
     deletable: boolean;
 }
@@ -59,10 +56,6 @@ export default defineComponent<Props>({
         PTag,
     },
     props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
         filters: {
             type: Object,
             default: () => ({}),
@@ -155,11 +148,6 @@ export default defineComponent<Props>({
     overflow-y: auto;
     .p-tag {
         margin-bottom: 0.5rem;
-    }
-    &.print-mode {
-        .p-empty {
-            @apply flex justify-start;
-        }
     }
 }
 </style>

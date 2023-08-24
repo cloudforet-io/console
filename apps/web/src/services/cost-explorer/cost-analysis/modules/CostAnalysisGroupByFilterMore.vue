@@ -4,7 +4,7 @@
             <p-select-button v-if="!moreGroupByItem.disabled"
                              :key="`more-group-by-${moreGroupByItem.key}-${idx}`"
                              :value="moreGroupByItem"
-                             :selected="printMode ? '' : costAnalysisPageStore.orderedMoreGroupByItems.filter(d => d.selected)"
+                             :selected="costAnalysisPageStore.orderedMoreGroupByItems.filter(d => d.selected)"
                              multi-selectable
                              size="sm"
                              :predicate="predicate"
@@ -88,12 +88,6 @@ export default defineComponent({
         PButton,
         PSelectButton,
         PCheckbox,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
