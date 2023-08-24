@@ -8,7 +8,6 @@ import PortalVue from 'portal-vue';
 import { createApp } from 'vue';
 import Vue3Lottie from 'vue3-lottie';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -26,14 +25,11 @@ import '@spaceone/design-system/dist/style.css';
 /** ********** CREATE VUE APP INSTANCE ************** */
 const app = createApp(App);
 
+/** ********** SET VUE PLUGINS ************** */
 const pinia = createPinia();
 pinia.use(resetStore);
-
-/** ********** SET VUE PLUGINS ************** */
-const router = SpaceRouter.router;
 app.use(pinia);
 app.use(store);
-app.use(router);
 app.use(i18n);
 app.use(FloatingVue, { boundary: document.body });
 app.use(PortalVue);
