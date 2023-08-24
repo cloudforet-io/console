@@ -9,7 +9,7 @@ import type {
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import {
-    computed, defineAsyncComponent, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -20,6 +20,8 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CostAnalysisPieChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
+import CostAnalysisStackedColumnChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
@@ -44,8 +46,6 @@ import type {
     Legend, PieChartData, WidgetProps, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 
-const CostAnalysisStackedColumnChart = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue'));
-const CostAnalysisPieChart = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue'));
 
 const PAGE_SIZE = 5;
 const DAILY_CHART_COUNT = 14;

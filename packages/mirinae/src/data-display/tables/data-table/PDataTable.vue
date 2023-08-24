@@ -191,23 +191,23 @@
 <script setup lang="ts">
 import { get, range } from 'lodash';
 import {
-    computed, defineAsyncComponent, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 import type {
     DataTableField, DataTableFieldType, DataTableProps,
 } from '@/data-display/tables/data-table/type';
+import PTextBeautifier from '@/data-display/text-beautifier/PTextBeautifier.vue';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
+import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
+import PCheckbox from '@/inputs/checkbox/PCheckbox.vue';
+import PRadio from '@/inputs/radio/PRadio.vue';
 import { copyAnyData } from '@/utils/helpers';
-
-const PCheckbox = defineAsyncComponent(() => import('@/inputs/checkbox/PCheckbox.vue'));
-const PTextBeautifier = defineAsyncComponent(() => import('@/data-display/text-beautifier/PTextBeautifier.vue'));
-const PRadio = defineAsyncComponent(() => import('@/inputs/radio/PRadio.vue'));
-const PI = defineAsyncComponent(() => import('@/foundation/icons/PI.vue'));
-const PCopyButton = defineAsyncComponent(() => import('@/inputs/buttons/copy-button/PCopyButton.vue'));
 
 interface TableField extends DataTableFieldType {
     depth?: number;

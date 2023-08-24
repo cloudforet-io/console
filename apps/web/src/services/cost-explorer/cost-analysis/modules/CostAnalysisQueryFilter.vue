@@ -3,19 +3,20 @@ import {
     PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { computed, defineAsyncComponent, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
+import CostAnalysisSetQueryModal from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
-const CostAnalysisSetQueryModal = defineAsyncComponent(() => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue'));
+
 
 interface Props {
     printMode?: boolean;

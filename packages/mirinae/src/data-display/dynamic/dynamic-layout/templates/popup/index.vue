@@ -22,15 +22,14 @@
 
 <script setup lang="ts">
 import {
-    computed, defineAsyncComponent, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 import type { PopupDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/popup/type';
 import type { PopupOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
-
-const PButtonModal = defineAsyncComponent(() => import('@/feedbacks/modals/button-modal/PButtonModal.vue'));
+import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 
 const props = withDefaults(defineProps<PopupDynamicLayoutProps>(), {
     options: () => ({}) as PopupOptions,
