@@ -18,12 +18,14 @@ import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
 
 interface Props {
     visible: boolean;
-    mode: ACTION;
-    escalationPolicy: EscalationPolicyDataModel;
+    mode?: ACTION;
+    escalationPolicy?: EscalationPolicyDataModel;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    mode: undefined,
+    escalationPolicy: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
