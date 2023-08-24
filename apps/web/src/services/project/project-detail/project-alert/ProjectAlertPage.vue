@@ -109,7 +109,11 @@ watch(() => props.id, (projectId) => {
                       :tabs="tabState.tabs"
                       @change="onChangeTab"
         >
-            <keep-alive><router-view /></keep-alive>
+            <router-view v-slot="{ Component }">
+                <keep-alive>
+                    <component :is="Component" />
+                </keep-alive>
+            </router-view>
         </p-button-tab>
     </div>
 </template>

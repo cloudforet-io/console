@@ -111,7 +111,15 @@ const assetInventoryRoute: RouteRecordRaw = {
                 {
                     path: 'history',
                     meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
-                    component: { template: '<keep-alive><router-view /></keep-alive>' },
+                    component: {
+                        template: `
+<router-view v-slot="{ Component }">
+        <keep-alive>
+            <component :is="Component" />
+        </keep-alive>
+</router-view>
+`,
+                    },
                     children: [
                         {
                             path: '',

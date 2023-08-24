@@ -40,7 +40,15 @@ export default {
             meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
             redirect: (to) => `${to.params.id}/summary`,
             props: true,
-            component: { template: '<keep-alive><router-view /></keep-alive>' },
+            component: {
+                template: `
+<router-view v-slot="{ Component }">
+        <keep-alive>
+            <component :is="Component" />
+        </keep-alive>
+</router-view>
+`,
+            },
             children: [
                 {
                     path: '',
