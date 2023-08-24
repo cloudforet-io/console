@@ -22,9 +22,9 @@ import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 interface Props {
-    mode: ACTION;
+    mode?: ACTION;
     showScope: boolean;
-    escalationPolicyData: EscalationPolicyDataModel;
+    escalationPolicyData?: EscalationPolicyDataModel;
 }
 
 const props = withDefaults(defineProps<Props>(), {

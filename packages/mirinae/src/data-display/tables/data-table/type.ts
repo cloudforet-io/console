@@ -42,7 +42,7 @@ export interface DataTableProps {
     tableStyleType?: DataTableStyleType;
     tableCustomStyle?: {[key: string]: string};
     striped?: boolean;
-    bordered?: boolean|null|unknown;
+    bordered?: boolean;
     disableHover?: boolean;
     rowHeightFixed?: boolean;
     rowCursorPointer?: boolean;

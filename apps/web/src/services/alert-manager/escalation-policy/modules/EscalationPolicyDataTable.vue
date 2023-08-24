@@ -20,7 +20,7 @@ interface Props {
     loading: boolean;
     items: any[];
     selectIndex: number[];
-    tableCustomStyle: Record<string, any>;
+    tableCustomStyle?: Record<string, any>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
