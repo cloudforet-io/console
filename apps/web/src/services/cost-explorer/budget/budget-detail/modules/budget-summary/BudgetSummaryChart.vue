@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-
-
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -8,7 +6,7 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
     computed,
-    onUnmounted,
+    onBeforeUnmount,
     reactive, ref, watch,
 } from 'vue';
 
@@ -34,7 +32,6 @@ const budgetPageState = budgetPageStore.$state;
 const chartRef = ref<HTMLElement|null>(null);
 const state = reactive({
     chart: null as XYChart | null,
-    chartRegistry: {},
     limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
     chartData: [] as any,
     loading: true,
@@ -42,7 +39,7 @@ const state = reactive({
     budgetUsageData: computed(() => budgetPageState.budgetUsageData),
     budgetData: computed(() => budgetPageState.budgetData),
 });
-
+const chartRegistry = {} as Record<string, any>;
 const getChartData = () => {
     try {
         state.loading = true;
@@ -65,9 +62,9 @@ const getChartData = () => {
 };
 
 const disposeChart = (chartContext) => {
-    if (state.chartRegistry[chartContext]) {
-        state.chartRegistry[chartContext].dispose();
-        delete state.chartRegistry[chartContext];
+    if (chartRegistry[chartContext]) {
+        chartRegistry[chartContext].dispose();
+        delete chartRegistry[chartContext];
     }
 };
 
@@ -105,8 +102,8 @@ const drawChart = (chartContext) => {
     /* Create chart */
     const createChart = () => {
         disposeChart(chartContext);
-        state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
-        return state.chartRegistry[chartContext];
+        chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+        return chartRegistry[chartContext];
     };
     const chart = createChart();
     state.chart = chart;
@@ -167,8 +164,10 @@ watch([() => chartRef.value], ([chartContext]) => {
     }
 }, { immediate: false });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    Object.values(chartRegistry).forEach((chart) => {
+        if (chart) chart.dispose();
+    });
 });
 
 (() => {
