@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-
-
 import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 import {
@@ -125,7 +123,7 @@ watch(() => props.visible, async (visible) => {
         await store.dispatch('recent/load', { limit: RECENT_LIMIT });
         state.loading = false;
     }
-});
+}, { immediate: true });
 
 </script>
 

@@ -53,6 +53,7 @@ const handleClickAnchor = (navigateFn, event: Event) => {
     >
         <router-link v-slot="{ href: toHref, navigate }"
                      :to="href ? {} : to"
+                     :href="href"
                      custom
         >
             <span class="gnb-sub-menu">

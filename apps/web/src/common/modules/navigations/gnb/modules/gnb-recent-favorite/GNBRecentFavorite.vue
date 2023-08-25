@@ -5,7 +5,6 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { onClickOutside } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
@@ -57,7 +56,12 @@ const handleRecentFavoriteButtonClick = () => {
     ]);
 })();
 
-onClickOutside(containerRef as MaybeRef, hideRecentFavoriteMenu);
+const handleClickOutside = () => {
+    if (props.visible) {
+        hideRecentFavoriteMenu();
+    }
+};
+onClickOutside(containerRef, handleClickOutside);
 
 </script>
 

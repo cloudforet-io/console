@@ -159,7 +159,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { onClickOutside } from '@vueuse/core';
 import ejs from 'ejs';
-import type { MaybeRef } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
@@ -252,22 +251,22 @@ const setCurrencyMenuVisible = (visible: boolean) => {
 const handleProfileButtonClick = () => {
     setVisible(!props.visible);
 };
-const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
+const handleClickOutsideLanguageMenu = <E = PointerEvent>(e: E) => {
     if (!profileMenuRef.value) return;
-    const target = e.target as HTMLElement;
+    const target = (e as MouseEvent).target as HTMLElement;
     setLanguageMenuVisible(false);
-    /*
-                v-on-click-outside directive stops click event bubbling.
-                So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
-                The code below closes the profile menu when the user clicks outside the profileMenuRef.
-             */
+    /* NOTE:
+        onClickOutside stops click event bubbling.
+        So when this function is called, hideProfileMenu function will never be called.
+        The code below closes the profile menu when the user clicks outside the profileMenuRef.
+     */
     if (!profileMenuRef.value.contains(target)) hideProfileMenu();
 };
 
-const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
+const handleClickOutsideCurrencyMenu = <E = PointerEvent>(e: E) => {
     const _profileMenuRef = profileMenuRef.value;
     if (!_profileMenuRef) return;
-    const target = e.target as HTMLElement;
+    const target = (e as MouseEvent).target as HTMLElement;
     setCurrencyMenuVisible(false);
     if (!_profileMenuRef.contains(target)) hideProfileMenu();
 };
@@ -305,10 +304,13 @@ const handleClickSignOut = async () => {
     } as RouteLocationRaw;
     await router.push(res);
 };
+const handleClickOutsideProfileMenu = () => {
+    if (props.visible) hideProfileMenu();
+};
 
-onClickOutside(profileMenuRef as MaybeRef, hideProfileMenu);
-onClickOutside(languageInfoMenuRef as MaybeRef, handleClickOutsideLanguageMenu);
-onClickOutside(currencyInfoMenuRef as MaybeRef, handleClickOutsideCurrencyMenu);
+onClickOutside(profileMenuRef, handleClickOutsideProfileMenu);
+onClickOutside(languageInfoMenuRef, handleClickOutsideLanguageMenu);
+onClickOutside(currencyInfoMenuRef, handleClickOutsideCurrencyMenu);
 
 </script>
 

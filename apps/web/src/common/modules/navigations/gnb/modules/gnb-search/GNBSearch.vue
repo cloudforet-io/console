@@ -6,7 +6,6 @@ import { onClickOutside } from '@vueuse/core';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
-import type { MaybeRef } from 'vue';
 import {
     computed, onMounted, onUnmounted,
     reactive, ref, watch,
@@ -339,8 +338,10 @@ watch(() => props.visible, async (visible) => {
     }
 });
 
-onClickOutside(containerRef as MaybeRef, hideSearchMenu);
-
+const handleClickOutsice = () => {
+    if (props.visible) hideSearchMenu();
+};
+onClickOutside(containerRef, handleClickOutsice);
 </script>
 
 <template>
