@@ -94,12 +94,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
 import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
-import type { Legend } from '@/services/cost-explorer/widgets/type';
 
 
 interface Props {

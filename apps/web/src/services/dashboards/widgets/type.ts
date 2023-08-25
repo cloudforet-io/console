@@ -76,3 +76,16 @@ export interface PieChartData {
     usd_cost_sum?: number;
     usage_quantity_sum?: number;
 }
+
+export const CHART_TYPE = Object.freeze({
+    CARD: 'CARD',
+    TREEMAP: 'TREEMAP',
+    MAP: 'MAP',
+    LINE: 'LINE',
+    STACKED_COLUMN: 'STACKED_COLUMN',
+    DONUT: 'DONUT',
+    PIE: 'PIE',
+    WAFFLE: 'WAFFLE',
+    TABLE: 'TABLE',
+} as const);
+export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];

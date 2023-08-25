@@ -33,9 +33,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { gray } from '@/styles/colors';
 
-import type {
-    Legend, PieChartData, WidgetProps,
-} from '@/services/cost-explorer/widgets/type';
+import type { Legend, PieChartData, WidgetProps } from '@/services/cost-explorer/cost-analysis/type';
+
 
 interface Props extends WidgetProps {
     loading: boolean;

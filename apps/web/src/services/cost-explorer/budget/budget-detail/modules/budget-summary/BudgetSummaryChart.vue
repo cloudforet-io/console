@@ -32,8 +32,8 @@ import {
 } from '@/styles/colors';
 
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
-import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 
 const categoryKey = 'date';

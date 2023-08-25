@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -65,11 +64,11 @@ import type {
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/type';
+import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import type { Period } from '@/services/cost-explorer/type';
-import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };

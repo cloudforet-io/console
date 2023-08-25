@@ -58,12 +58,18 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helpe
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    getLegends, getPieChartData, getXYChartData,
+} from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import CostAnalysisChartQuerySection
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
 import CostAnalysisPieChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
+import type {
+    Legend, PieChartData, XYChartData,
+} from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
@@ -74,12 +80,6 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type {
     Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
-import {
-    getLegends, getPieChartData, getXYChartData,
-} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import type {
-    Legend, PieChartData, XYChartData,
-} from '@/services/cost-explorer/widgets/type';
 
 
 export default {

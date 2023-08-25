@@ -52,10 +52,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         icon: 'ic_service_cost-explorer',
         needPermissionByRole: true,
     },
-    [MENU_ID.COST_EXPLORER_DASHBOARD]: {
-        translationId: 'MENU.COST_EXPLORER_DASHBOARD',
-        needPermissionByRole: true,
-    },
     [MENU_ID.COST_EXPLORER_COST_ANALYSIS]: {
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
         needPermissionByRole: true,

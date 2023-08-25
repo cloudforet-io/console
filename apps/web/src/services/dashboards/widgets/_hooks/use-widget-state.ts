@@ -17,7 +17,6 @@ import type { Currency } from '@/store/modules/settings/type';
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
@@ -34,6 +33,7 @@ import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-h
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+import type { ChartType } from '@/services/dashboards/widgets/type';
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;

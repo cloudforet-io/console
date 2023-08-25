@@ -112,6 +112,7 @@ import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, MORE_GROUP_BY, MORE_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
@@ -119,7 +120,7 @@ import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
+
 
 export default {
     name: 'CostAnalysisDataTable',

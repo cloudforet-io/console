@@ -11,7 +11,6 @@ export const MENU_ID = Object.freeze({
     ASSET_INVENTORY_COLLECTOR: 'asset_inventory.collector',
     ASSET_INVENTORY_SERVICE_ACCOUNT: 'asset_inventory.service_account',
     COST_EXPLORER: 'cost_explorer',
-    COST_EXPLORER_DASHBOARD: 'cost_explorer.dashboard',
     COST_EXPLORER_COST_ANALYSIS: 'cost_explorer.cost_analysis',
     COST_EXPLORER_BUDGET: 'cost_explorer.budget',
     ALERT_MANAGER: 'alert_manager',
