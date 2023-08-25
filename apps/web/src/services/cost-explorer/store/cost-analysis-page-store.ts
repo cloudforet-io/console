@@ -77,7 +77,7 @@ const getMergedMoreGroupByItems = (selectedGroupBy: string[], storedMoreGroupByI
 
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     state: (): CostAnalysisPageState => ({
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.MONTHLY,
         stack: false,
         groupBy: [],
         primaryGroupBy: undefined,
@@ -112,7 +112,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     },
     actions: {
         async initState() {
-            this.granularity = GRANULARITY.ACCUMULATED;
+            this.granularity = GRANULARITY.MONTHLY;
             this.stack = false;
             this.groupBy = [];
             this.primaryGroupBy = undefined;

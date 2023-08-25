@@ -147,7 +147,7 @@ export default {
                 const link = {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     query: {
-                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                         group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
                         period: objectToQueryString(period),
                         filters: objectToQueryString({ ...costTypeFilters, ...targetFilters }),

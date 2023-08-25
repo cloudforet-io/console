@@ -8,9 +8,9 @@ import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import type {
-    ChartData, CostAnalyzeModel, Legend, PieChartData, XYChartData,
+    ChartData, CostAnalyzeModel, Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
-import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 
@@ -60,10 +60,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
 
         const legends: Legend[] = [];
         rawData.forEach((d) => {
-            if (
-                (granularity === GRANULARITY.ACCUMULATED && d.usd_cost > 0)
-                || (granularity !== GRANULARITY.ACCUMULATED && Object.keys(d.usd_cost).length)
-            ) {
+            if (Object.keys(d.usd_cost).length) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 let _color;
@@ -123,62 +120,6 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
     if (groupBy === GROUP_BY.REGION) return _regions[data]?.name || data;
     if (groupBy === GROUP_BY.PROVIDER) return _providers[data]?.name || data;
     return 'Unknown';
-};
-
-/**
- * @name getPieChartData
- * @description Convert raw data to PieChart data.
- * @example [{ provider: 'aws', usd_cost: 100 }, { provider: 'azure', usd_cost: 30 }]
- *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
- * @usage SpcProjectWiseUsageSummary, CostAnalysisChart
- */
-export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy | string): PieChartData[] => {
-    let chartData: PieChartData[] = [];
-    if (groupBy) {
-        let _groupBy: string = groupBy;
-        // Parsing to match api data (ex. tags.Name -> tags_Name)
-        if (groupBy.startsWith(MORE_GROUP_BY.TAGS) || groupBy.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
-            _groupBy = groupBy.replace('.', '_');
-        }
-        rawData.forEach((d) => {
-            let _category = d[_groupBy];
-            let _color;
-            if (!_category) {
-                if (d.is_others) _category = 'Etc.';
-                else _category = 'Unknown';
-            }
-            if (_groupBy === GROUP_BY.PROVIDER) {
-                const _providers = store.getters['reference/providerItems'];
-                _color = _providers[_category]?.color;
-                _category = _providers[_category]?.label || _category;
-            } else if (_groupBy === GROUP_BY.REGION) {
-                const _regions = store.getters['reference/regionItems'];
-                _category = _regions[_category]?.name || _category;
-            } else if (_groupBy === GROUP_BY.PROJECT) {
-                const _projects = store.getters['reference/projectItems'];
-                _category = _projects[_category]?.label || _category;
-            } else if (_groupBy === GROUP_BY.PROJECT_GROUP) {
-                const _projectGroups = store.getters['reference/projectGroupItems'];
-                _category = _projectGroups[_category]?.label || _category;
-            } else if (_groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-                const _serviceAccounts = store.getters['reference/serviceAccountItems'];
-                _category = _serviceAccounts[_category]?.name || _category;
-            }
-            if (d.usd_cost > 0) {
-                chartData.push({
-                    category: _category,
-                    value: d.usd_cost as number,
-                    color: _color,
-                });
-            }
-        });
-    } else if (rawData.length) {
-        chartData = [{
-            category: 'Total Cost',
-            value: (rawData[0]?.usd_cost ?? 0) as number,
-        }];
-    }
-    return chartData;
 };
 
 /**

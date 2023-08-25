@@ -61,18 +61,13 @@ export const getConvertedBudgetFilter = (filters: CostFiltersMap): ConsoleFilter
 };
 
 export const getTimeUnitByPeriod = (granularity: Granularity, start: Dayjs, end: Dayjs): TimeUnit => {
-    if (granularity !== GRANULARITY.ACCUMULATED) {
-        if (granularity === GRANULARITY.DAILY) return 'day';
-        if (granularity === GRANULARITY.MONTHLY) return 'month';
-        return 'year';
-    }
     if (end.diff(start, 'month') < 2) return 'day';
     if (end.diff(start, 'year') < 2) return 'month';
     return 'year';
 };
 
 export const getInitialDates = (): Period => {
-    const start = dayjs.utc().startOf('month').format();
+    const start = dayjs.utc().subtract(5, 'month').startOf('month').format(); // 6 months ago
     const end = dayjs.utc().endOf('month').format();
     return { start, end };
 };
@@ -110,20 +105,6 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
 };
 export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
     const costFields: DataTableFieldType[] = [];
-
-    if (granularity === GRANULARITY.ACCUMULATED) {
-        const label = `${dayjs.utc(period.start).format('M/D')}~${dayjs.utc(period.end).format('M/D')}`;
-        if (!hasGroupBy) {
-            costFields.push({
-                name: 'totalCost', label: ' ',
-            });
-        }
-        costFields.push({
-            name: 'usd_cost', label, textAlign: 'right',
-        });
-        return costFields;
-    }
-
     if (!hasGroupBy) {
         costFields.push({
             name: 'totalCost', label: ' ', textAlign: 'right',
