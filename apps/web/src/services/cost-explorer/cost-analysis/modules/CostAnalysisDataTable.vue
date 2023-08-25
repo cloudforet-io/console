@@ -283,10 +283,12 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
         tableState.items = items;
         tableState.totalCount = total_count;
         listCostAnalysisRequest = undefined;
-    } catch (e) {
-        tableState.items = [];
-        tableState.totalCount = 0;
-        ErrorHandler.handleError(e);
+    } catch (e: any) {
+        if (!axios.isCancel(e.axiosError)) {
+            tableState.items = [];
+            tableState.totalCount = 0;
+            ErrorHandler.handleError(e);
+        }
     } finally {
         tableState.loading = false;
     }

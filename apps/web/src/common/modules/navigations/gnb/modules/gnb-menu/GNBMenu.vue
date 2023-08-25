@@ -1,13 +1,11 @@
 <script lang="ts" setup>
-
 import { PI } from '@spaceone/design-system';
 import { onClickOutside } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
 import type { RouteLocation } from 'vue-router';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
@@ -56,6 +54,7 @@ const emit = defineEmits<{(e: 'hide-menu'): void;
     (e: 'open-menu', value: MenuId): void;
 }>();
 const router = useRouter();
+const route = useRoute();
 const containerRef = ref<HTMLElement | null>(null);
 const state = reactive({
     hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
@@ -70,7 +69,7 @@ const handleMenu = () => {
     if (state.isMenuWithAdditionalMenu) {
         emit('open-menu', props.menuId);
     } else {
-        const isDuplicatePath = router.currentRoute.value.name === props.menuId;
+        const isDuplicatePath = route.name === props.menuId;
         if (isDuplicatePath) return;
         hideMenu();
         if (props.to) router.push(props.to);
@@ -78,7 +77,10 @@ const handleMenu = () => {
     }
 };
 
-onClickOutside(containerRef as MaybeRef, hideMenu);
+const handleClickOutside = () => {
+    if (props.isOpened) hideMenu();
+};
+onClickOutside(containerRef, handleClickOutside);
 
 </script>
 

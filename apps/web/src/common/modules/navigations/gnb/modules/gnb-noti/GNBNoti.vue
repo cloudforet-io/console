@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { commaFormatter } from '@cloudforet/core-lib';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
@@ -7,7 +6,6 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { onClickOutside, useDocumentVisibility } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
 import {
     computed, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
@@ -20,7 +18,6 @@ import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modu
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
 import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-
 
 
 interface Props {
@@ -106,7 +103,10 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
     if (isSessionExpired) store.dispatch('display/stopCheckNotification');
 });
 
-onClickOutside(containerRef as MaybeRef, hideNotiMenu);
+const handleClickOutside = () => {
+    if (props.visible) hideNotiMenu();
+};
+onClickOutside(containerRef, handleClickOutside);
 
 </script>
 

@@ -86,7 +86,7 @@ const tableState = reactive({
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
 });
 
-const searchFilter = new ApiQueryHelper();
+const searchFilter = new QueryHelper();
 const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
     computed(() => tableState.schema?.options?.search as unknown as ConsoleSearchSchema[] ?? []),
     'identity.ServiceAccount',
