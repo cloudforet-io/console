@@ -38,15 +38,16 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
+import {
+    getStackedChartData, getCurrencyAppliedChartData,
+} from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import type {
+    Legend, XYChartData, WidgetProps,
+} from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Granularity } from '@/services/cost-explorer/type';
-import {
-    getStackedChartData, getCurrencyAppliedChartData,
-} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import type {
-    Legend, XYChartData, WidgetProps,
-} from '@/services/cost-explorer/widgets/type';
+
 
 const CATEGORY_KEY = 'date';
 

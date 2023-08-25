@@ -83,13 +83,6 @@ const SERVICE_CONTENTS = {
             thumbnail_url: 'img_landing_cost-explorer_cost-analysis.png',
         },
         {
-            name: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_DASHBOARD_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/dashboard/',
-            thumbnail_url: 'img_landing_cost-explorer_dashboard.png',
-        },
-        {
             name: i18n.t('MENU.COST_EXPLORER_BUDGET'),
             description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_BUDGET_DESC'),
             link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),

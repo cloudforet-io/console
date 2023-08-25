@@ -1,6 +1,5 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
-import { isEqual } from 'lodash';
 
 import { store } from '@/store';
 
@@ -8,18 +7,20 @@ import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import type {
+    ChartData, CostAnalyzeModel, Legend, PieChartData, XYChartData,
+} from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
-import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
-import type {
-    ChartData,
-    CostAnalyzeModel,
-    Legend,
-    PieChartData,
-    XYChartData,
-} from '@/services/cost-explorer/widgets/type';
+
+
+const DATE_FORMAT = Object.freeze({
+    day: 'YYYY-MM-DD',
+    month: 'YYYY-MM',
+    year: 'YYYY',
+});
+
 
 /**
  * This function only merges numeric values, not string.
@@ -274,23 +275,4 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
         return `{${categoryKey}}: [bold]${money}[/]`;
     }
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
-};
-
-const getWidgetDefaultOptions = async (widgetId?: string): Promise<WidgetOptions|undefined> => {
-    try {
-        const defaultWidgetList = await import('./defaultWidgetList.json');
-        return defaultWidgetList.default.find((widget) => widget.widget_id === widgetId)?.options as WidgetOptions;
-    } catch (e) {
-        throw new Error('Failed to fetch default widget list');
-    }
-};
-
-export const getWidgetOption = async (customOptions: WidgetOptions, widgetId?: string) => {
-    try {
-        const defaultOptions = await getWidgetDefaultOptions(widgetId);
-        if (isEqual(defaultOptions, customOptions)) return defaultOptions;
-        return customOptions;
-    } catch (e) {
-        throw new Error('Failed to get default options');
-    }
 };

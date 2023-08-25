@@ -80,17 +80,6 @@ export const MANAGE_FEATURE_MAP = {
             'IAM.ROLE.FORM.TOOLTIP_TAG_EDIT',
         ],
     },
-    [MENU_ID.COST_EXPLORER_DASHBOARD]: {
-        title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
-        features: [
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_DUPLICATE',
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_CREATE',
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_FIX_DATE',
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_FILTER',
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_CUSTOMIZE',
-            'IAM.ROLE.FORM.TOOLTIP_PUBLIC_DELETE',
-        ],
-    },
     [MENU_ID.COST_EXPLORER_BUDGET]: {
         title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
         features: [
