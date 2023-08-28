@@ -1,8 +1,5 @@
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 
 import {
     PHeading, PDivider, PButton,
@@ -19,54 +16,34 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import BudgetList from '@/services/cost-explorer/budget/modules/budget-list/BudgetList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-export default {
-    name: 'BudgetPage',
-    components: {
-        BudgetList,
-        PHeading,
-        PDivider,
-        PButton,
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+const currentRoute = SpaceRouter.router.currentRoute;
 
-        const queryHelper = new QueryHelper();
+const queryHelper = new QueryHelper();
 
-        const state = reactive({
-            createButtonItemList: computed(() => [
-                {
-                    label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
-                    name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                },
-                // {
-                //     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BULK_BUDGET'),
-                //     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
-                // },
-            ]),
-            filters: queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters,
-            hasManagePermission: useManagePermissionState(),
-        });
+const state = reactive({
+    createButtonItemList: computed(() => [
+        {
+            label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
+            name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
+        },
+    ]),
+    filters: queryHelper.setFiltersAsRawQueryString(currentRoute.query.filters).filters,
+    hasManagePermission: useManagePermissionState(),
+});
 
-        const handleCreateBudgetSelect = (name) => {
-            SpaceRouter.router.push({ name });
-        };
-
-        const handleUpdateFilters = (filters: ConsoleFilter[]) => {
-            state.filters = filters;
-            SpaceRouter.router.replace({
-                query: {
-                    filters: queryHelper.setFilters(filters).rawQueryStrings,
-                },
-            });
-        };
-
-        return {
-            ...toRefs(state),
-            handleCreateBudgetSelect,
-            handleUpdateFilters,
-        };
-    },
+const handleCreateBudgetSelect = (name) => {
+    SpaceRouter.router.push({ name });
 };
+
+const handleUpdateFilters = (filters: ConsoleFilter[]) => {
+    state.filters = filters;
+    SpaceRouter.router.replace({
+        query: {
+            filters: queryHelper.setFilters(filters).rawQueryStrings,
+        },
+    });
+};
+
 </script>
 
 <template>
@@ -83,15 +60,15 @@ export default {
                 <!--                />-->
                 <p-button style-type="secondary"
                           icon-left="ic_plus_bold"
-                          :disabled="!hasManagePermission"
-                          @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
+                          :disabled="!state.hasManagePermission"
+                          @click="handleCreateBudgetSelect(state.createButtonItemList[0].name)"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
                 </p-button>
             </template>
         </p-heading>
         <p-divider />
-        <budget-list :filters="filters"
+        <budget-list :filters="state.filters"
                      @update:filters="handleUpdateFilters"
         />
     </div>
