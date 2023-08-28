@@ -136,7 +136,6 @@ watch([
                                                 :chart-data="state.chartData"
                                                 :legends="state.legends"
                                                 :granularity="costAnalysisPageState.granularity"
-                                                :stack="costAnalysisPageState.stack"
                                                 :period="costAnalysisPageState.period"
                                                 :currency="state.currency"
                                                 :currency-rates="state.currencyRates"

@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PLink, PI, PToolboxTable, PButtonModal,
+    PButtonModal, PI, PLink, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
@@ -29,18 +27,16 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/cost-analysis/type';
+import type { CostAnalyzeModel } from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, MORE_GROUP_BY, MORE_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import {
-    getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
-} from '@/services/cost-explorer/lib/helper';
+import { getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 
@@ -189,25 +185,6 @@ const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
     }
     return false;
 };
-const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
-    const results: CostAnalyzeModel[] = [];
-    rawData.forEach((d) => {
-        const usdCost: UsdCost = {};
-        let now = dayjs.utc(period.start).clone();
-        let stackedData = 0;
-        while (now.isSameOrBefore(dayjs.utc(period.end), state.timeUnit)) {
-            const currValue = d.usd_cost[now.format(state.dateFormat)] || 0;
-            stackedData += currValue;
-            usdCost[now.format(state.dateFormat)] = stackedData;
-            now = now.add(1, state.timeUnit);
-        }
-        results.push({
-            ...d,
-            usd_cost: usdCost,
-        });
-    });
-    return results;
-};
 const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     if (field.name.startsWith(`${MORE_GROUP_BY.TAGS}_`)) {
         return ` (${MORE_GROUP_BY_ITEM_MAP[MORE_GROUP_BY.TAGS].label})`;
@@ -223,7 +200,7 @@ let listCostAnalysisRequest: CancelTokenSource | undefined;
 const costApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('total_usd_cost', true);
-const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters, stack) => {
+const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters) => {
     if (listCostAnalysisRequest) {
         listCostAnalysisRequest.cancel('Next request has been called.');
         listCostAnalysisRequest = undefined;
@@ -246,9 +223,7 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
             end: dayjs.utc(period.end).format(dateFormat),
             ...query,
         }, { cancelToken: listCostAnalysisRequest.token });
-        let items = results;
-        if (stack) items = _getStackedTableData(results, granularity, period);
-        tableState.items = items;
+        tableState.items = results;
         tableState.totalCount = total_count;
         listCostAnalysisRequest = undefined;
     } catch (e) {
@@ -269,7 +244,6 @@ const handleChange = async (options: any = {}) => {
         costAnalysisPageStore.orderedMoreGroupByItems,
         costAnalysisPageStore.currentQuerySetOptions.period,
         costAnalysisPageStore.currentQuerySetOptions.filters,
-        costAnalysisPageStore.currentQuerySetOptions.stack,
     );
 };
 const handleExcelDownload = async () => {
@@ -301,9 +275,7 @@ const handleExcelDownload = async () => {
 };
 
 const handleExport = async () => {
-    if (costAnalysisPageState.stack) {
-        state.visibleExcelNotiModal = true;
-    } else await handleExcelDownload();
+    await handleExcelDownload();
 };
 
 watch(
@@ -313,10 +285,9 @@ watch(
         () => costAnalysisPageStore.orderedMoreGroupByItems,
         () => costAnalysisPageState.period,
         () => costAnalysisPageState.filters,
-        () => costAnalysisPageState.stack,
     ],
-    async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
-        await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
+    async ([granularity, groupBy, moreGroupBy, period, filters]) => {
+        await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters);
         tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
     },
     { immediate: true, deep: true },

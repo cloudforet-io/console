@@ -116,7 +116,6 @@ const handleSaveQueryOption = async () => {
             cost_query_set_id: costAnalysisPageState.selectedQueryId,
             options: getRefinedCostQueryOptions({
                 granularity: costAnalysisPageState.granularity,
-                stack: costAnalysisPageState.stack,
                 period: costAnalysisPageState.period,
                 group_by: costAnalysisPageState.groupBy,
                 primary_group_by: costAnalysisPageState.primaryGroupBy, // will be deprecated(< v1.10.5)
