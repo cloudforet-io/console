@@ -37,6 +37,11 @@ export interface CostQuerySetModel {
     options?: CostQuerySetOption;
 }
 
+export interface GroupByItem {
+    name: string;
+    label: string;
+}
+
 export interface MoreGroupByItem {
     category: string;
     key: string;
