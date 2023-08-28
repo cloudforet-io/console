@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PSelectDropdown, PToggleButton,
+    PButtonModal, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -35,7 +35,6 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     granularity: '' as Granularity,
-    stack: false,
     currency: '' as Currency,
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -69,7 +68,6 @@ const handleFormConfirm = async () => {
     }
     costAnalysisPageStore.$patch({
         granularity: state.granularity,
-        stack: state.stack,
     });
     store.commit('settings/setCurrency', state.currency);
 
@@ -81,14 +79,10 @@ const handleSelectGranularity = (granularity: Granularity) => {
 const handleSelectCurrency = (currency: Currency) => {
     state.currency = currency;
 };
-const handleToggleStack = (value) => {
-    state.stack = value;
-};
 
 watch(() => state.proxyVisible, (after) => {
     if (after) {
         state.granularity = costAnalysisPageState.granularity;
-        state.stack = costAnalysisPageState.stack;
         state.currency = store.state.settings.currency;
     }
 });
@@ -113,14 +107,6 @@ watch(() => state.proxyVisible, (after) => {
                         :items="state.granularityItems"
                         :selected="granularity"
                         @select="handleSelectGranularity"
-                    />
-                </div>
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
-                    </p>
-                    <p-toggle-button :value="state.stack"
-                                     @change-toggle="handleToggleStack"
                     />
                 </div>
                 <div class="input-wrapper">

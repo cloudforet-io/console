@@ -17,7 +17,6 @@ import type {
 
 interface CostAnalysisPageState {
     granularity: Granularity;
-    stack: boolean;
     groupBy: Array<GroupBy|string>;
     primaryGroupBy?: GroupBy|string;
     moreGroupBy: MoreGroupByItem[];
@@ -78,7 +77,6 @@ const getMergedMoreGroupByItems = (selectedGroupBy: string[], storedMoreGroupByI
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     state: (): CostAnalysisPageState => ({
         granularity: GRANULARITY.MONTHLY,
-        stack: false,
         groupBy: [],
         primaryGroupBy: undefined,
         moreGroupBy: [],
@@ -93,7 +91,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             return state.costQueryList.find((item) => item.cost_query_set_id === state.selectedQueryId);
         },
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
-            stack: state.stack,
             granularity: state.granularity,
             group_by: state.groupBy,
             primary_group_by: state.primaryGroupBy,
@@ -113,7 +110,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     actions: {
         async initState() {
             this.granularity = GRANULARITY.MONTHLY;
-            this.stack = false;
             this.groupBy = [];
             this.primaryGroupBy = undefined;
             this.period = getInitialDates();
@@ -131,7 +127,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             const refinedOptions = getRefinedCostQueryOptions(options);
 
             if (refinedOptions.granularity) this.granularity = refinedOptions.granularity;
-            if (typeof refinedOptions.stack === 'boolean') this.stack = refinedOptions.stack;
 
             const refinedDefaultGroupBy: string[] = [];
             const refinedGroupBy = refinedOptions.group_by?.filter((d) => {
@@ -171,7 +166,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
             const options = getRefinedCostQueryOptions({
                 granularity: this.granularity,
-                stack: this.stack,
                 period: this.period,
                 group_by: this.groupBy,
                 primary_group_by: this.primaryGroupBy, // will be deprecated(< v1.10.5)
