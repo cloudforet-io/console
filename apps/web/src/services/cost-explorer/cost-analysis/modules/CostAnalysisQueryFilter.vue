@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
+    PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -47,9 +47,6 @@ const handleSelectGranularity = async (granularity: Granularity) => {
     }
     costAnalysisPageStore.$patch({ granularity });
 };
-const handleToggleStack = async (value) => {
-    costAnalysisPageStore.$patch({ stack: value });
-};
 const handleSelectedDates = (period) => {
     costAnalysisPageStore.$patch((_state) => {
         _state.period = period;
@@ -72,17 +69,6 @@ const handleClickSetFilter = () => {
                                        class="granularity-select"
                                        @select="handleSelectGranularity"
                     />
-                </div>
-                <div class="filter-item">
-                    <span class="v-divider" />
-                    <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
-                        <template #right>
-                            <p-toggle-button :value="costAnalysisPageState.stack"
-                                             class="toggle-button"
-                                             @change-toggle="handleToggleStack"
-                            />
-                        </template>
-                    </p-field-title>
                 </div>
             </div>
             <div class="right-part">
@@ -139,9 +125,6 @@ const handleClickSetFilter = () => {
         .filter-item {
             display: flex;
             align-items: center;
-            .toggle-button {
-                margin-left: 0.25rem;
-            }
         }
         .v-divider {
             @apply bg-gray-300;

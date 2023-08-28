@@ -12,7 +12,7 @@ import {
     arrayToQueryString,
     objectToQueryString,
     primitiveToQueryString,
-    queryStringToArray, queryStringToBoolean,
+    queryStringToArray,
     queryStringToObject,
     queryStringToString,
 } from '@/lib/router-query-string';
@@ -53,7 +53,6 @@ const setQueryOptions = (options?: CostQuerySetOption) => {
 
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
     granularity: queryStringToString(urlQuery.granularity) as Granularity,
-    stack: queryStringToBoolean(urlQuery.stack),
     group_by: queryStringToArray(urlQuery.group_by),
     period: queryStringToObject(urlQuery.period) ?? {},
     filters: queryStringToObject(urlQuery.filters),
@@ -80,7 +79,6 @@ const registerStoreWatch = (currentQuery) => {
 
         const newQuery: CostAnalysisPageUrlQuery = {
             granularity: primitiveToQueryString(options.granularity),
-            stack: primitiveToQueryString(options.stack),
             group_by: arrayToQueryString(options.group_by),
             period: objectToQueryString(options.period),
             filters: objectToQueryString(options.filters),

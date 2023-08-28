@@ -134,7 +134,6 @@ export const convertFiltersInToNewType = (filters: OldType | CostFiltersMap): Co
 export const getRefinedCostQueryOptions = (options: Partial<CostQuerySetOption>): Partial<CostQuerySetOption> => {
     const newOptions: Partial<CostQuerySetOption> = {
         granularity: options.granularity,
-        stack: options.stack,
         period: options.period,
         filters: options.filters,
     };

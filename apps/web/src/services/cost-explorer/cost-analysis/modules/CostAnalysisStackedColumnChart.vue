@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
-    nextTick,
-    reactive, ref, watch,
+    nextTick, reactive, ref, watch,
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
@@ -25,7 +24,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import {
-    getStackedChartData, getCurrencyAppliedChartData,
+    getCurrencyAppliedChartData,
 } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import type {
     Legend, XYChartData,
@@ -45,7 +44,6 @@ interface Props {
     chartData: XYChartData[];
     legends: Legend[];
     granularity: Granularity;
-    stack: boolean;
 }
 
 const DATE_FIELD_NAME = 'date';
@@ -56,7 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
     chartData: () => ([]),
     legends: () => ([]),
     granularity: GRANULARITY.DAILY,
-    stack: false,
     period: () => ({}),
     currency: CURRENCY.USD,
     currencyRates: () => ({}) as CurrencyRates,
@@ -80,13 +77,10 @@ const drawChart = (period: Period) => {
     if (props.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (props.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
-    let usdChartData = cloneDeep(props.chartData);
-    if (props.stack) {
-        usdChartData = getStackedChartData(props.chartData as XYChartData[], period, timeUnit);
-    }
+    const usdChartData = cloneDeep(props.chartData);
     state.usdChartData = usdChartData;
 
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(props.period));
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(period));
     xAxis.get('baseInterval').timeUnit = timeUnit;
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
