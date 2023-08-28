@@ -1,29 +1,3 @@
-<template>
-    <div class="budget-list">
-        <budget-toolbox :filters="queryStoreFilters"
-                        @update-range="handleUpdateRange"
-                        @update-pagination="handleUpdatePagination"
-                        @update-period="handleUpdatePeriod"
-                        @update-filters="handleUpdateFilters"
-                        @refresh="handleRefresh"
-                        @export="handleExport"
-                        @update-sort="handleUpdateSort"
-        />
-        <budget-stat :query-store-filters="queryStoreFilters"
-                     :period="period"
-                     :usage-range="range"
-                     class="budget-stat"
-        />
-        <div class="budget-list-card-box">
-            <budget-list-card v-for="(budgetUsage, i) in budgetUsages"
-                              :key="`${budgetUsage.budget_id}-${i}`"
-                              :budget-usage="budgetUsage"
-                              :budget-loading="loading"
-            />
-        </div>
-    </div>
-</template>
-
 <script lang="ts">
 
 import {
@@ -201,6 +175,33 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<template>
+    <div class="budget-list">
+        <budget-toolbox :filters="queryStoreFilters"
+                        @update-range="handleUpdateRange"
+                        @update-pagination="handleUpdatePagination"
+                        @update-period="handleUpdatePeriod"
+                        @update-filters="handleUpdateFilters"
+                        @refresh="handleRefresh"
+                        @export="handleExport"
+                        @update-sort="handleUpdateSort"
+        />
+        <budget-stat :query-store-filters="queryStoreFilters"
+                     :period="period"
+                     :usage-range="range"
+                     class="budget-stat"
+        />
+        <div class="budget-list-card-box">
+            <budget-list-card v-for="(budgetUsage, i) in budgetUsages"
+                              :key="`${budgetUsage.budget_id}-${i}`"
+                              :budget-usage="budgetUsage"
+                              :budget-loading="loading"
+            />
+        </div>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .budget-list {
     .budget-stat {

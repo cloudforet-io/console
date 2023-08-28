@@ -1,31 +1,3 @@
-<template>
-    <div class="budget-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
-            <template #extra>
-                <!--                <p-select-dropdown-->
-                <!--                    class="create-budget-box"-->
-                <!--                    use-fixed-menu-style-->
-                <!--                    :items="createButtonItemList"-->
-                <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
-                <!--                    type="outline-button"-->
-                <!--                    @select="handleCreateBudgetSelect"-->
-                <!--                />-->
-                <p-button style-type="secondary"
-                          icon-left="ic_plus_bold"
-                          :disabled="!hasManagePermission"
-                          @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
-                </p-button>
-            </template>
-        </p-heading>
-        <p-divider />
-        <budget-list :filters="filters"
-                     @update:filters="handleUpdateFilters"
-        />
-    </div>
-</template>
-
 <script lang="ts">
 import {
     computed, getCurrentInstance, reactive, toRefs,
@@ -96,6 +68,35 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="budget-page">
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
+            <template #extra>
+                <!--                <p-select-dropdown-->
+                <!--                    class="create-budget-box"-->
+                <!--                    use-fixed-menu-style-->
+                <!--                    :items="createButtonItemList"-->
+                <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
+                <!--                    type="outline-button"-->
+                <!--                    @select="handleCreateBudgetSelect"-->
+                <!--                />-->
+                <p-button style-type="secondary"
+                          icon-left="ic_plus_bold"
+                          :disabled="!hasManagePermission"
+                          @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
+                </p-button>
+            </template>
+        </p-heading>
+        <p-divider />
+        <budget-list :filters="filters"
+                     @update:filters="handleUpdateFilters"
+        />
+    </div>
+</template>
+
 <style scoped lang="postcss">
 .budget-page {
     .create-budget-box {
