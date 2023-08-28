@@ -19,11 +19,6 @@ export interface CostAnalysisPageQueryValue {
     granularity?: Granularity;
 }
 
-export const CHART_TYPE = Object.freeze({
-    STACKED_COLUMN: 'STACKED_COLUMN',
-    DONUT: 'DONUT',
-});
-
 export interface QueryItemResource {
     key: string;
     name: string;
@@ -42,11 +37,6 @@ export interface XYChartData {
 }
 export interface UsdCost {
     [key: string]: number;
-}
-export interface PieChartData {
-    category: string;
-    value: number | UsdCost;
-    color?: string;
 }
 export interface Legend {
     name: string;

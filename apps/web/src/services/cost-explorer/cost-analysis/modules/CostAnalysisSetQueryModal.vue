@@ -19,9 +19,7 @@
                         @select="handleSelectGranularity"
                     />
                 </div>
-                <div v-if="granularity !== GRANULARITY.ACCUMULATED"
-                     class="input-wrapper"
-                >
+                <div class="input-wrapper">
                     <p class="input-title">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
                     </p>
@@ -100,11 +98,6 @@ export default {
             stack: false,
             currency: '' as Currency,
             granularityItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: GRANULARITY.ACCUMULATED,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
-                },
                 {
                     type: 'item',
                     name: GRANULARITY.DAILY,

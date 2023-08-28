@@ -11,9 +11,7 @@
                                        @select="handleSelectGranularity"
                     />
                 </div>
-                <div v-if="costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED"
-                     class="filter-item"
-                >
+                <div class="filter-item">
                     <span class="v-divider" />
                     <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
                         <template #right>
@@ -89,11 +87,6 @@ export default {
 
         const state = reactive({
             granularityItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: GRANULARITY.ACCUMULATED,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
-                },
                 {
                     type: 'item',
                     name: GRANULARITY.DAILY,

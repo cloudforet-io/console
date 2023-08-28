@@ -3,17 +3,7 @@
         <section ref="chartRef"
                  class="chart-section"
         >
-            <cost-analysis-pie-chart v-if="costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED"
-                                     :loading="loading"
-                                     :chart.sync="chart"
-                                     :chart-data="chartData"
-                                     :legends="legends"
-                                     :currency="currency"
-                                     :currency-rates="currencyRates"
-                                     @rendered="handleChartRendered"
-            />
-            <cost-analysis-stacked-column-chart v-else
-                                                :loading="loading"
+            <cost-analysis-stacked-column-chart :loading="loading"
                                                 :chart.sync="chart"
                                                 :chart-data="chartData"
                                                 :legends="legends"
@@ -59,16 +49,14 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helpe
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    getLegends, getPieChartData, getXYChartData,
+    getLegends, getXYChartData,
 } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import CostAnalysisChartQuerySection
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
-import CostAnalysisPieChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import type {
-    Legend, PieChartData, XYChartData,
+    Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY,
@@ -87,7 +75,6 @@ export default {
     components: {
         CostAnalysisChartQuerySection,
         CostAnalysisStackedColumnChart,
-        CostAnalysisPieChart,
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -99,7 +86,7 @@ export default {
             //
             loading: true,
             legends: [] as Legend[],
-            chartData: [] as Array<XYChartData|PieChartData>,
+            chartData: [] as XYChartData[],
             chart: null as XYChart | PieChart | null,
             queryRef: null as null|Vue,
             chartRef: null as null|HTMLElement,
@@ -138,11 +125,7 @@ export default {
 
             const rawData = await listCostAnalysisData();
             state.legends = getLegends(rawData, granularity, groupBy);
-            if (granularity === GRANULARITY.ACCUMULATED) {
-                state.chartData = getPieChartData(rawData, groupBy);
-            } else {
-                state.chartData = getXYChartData(rawData, granularity, period, groupBy);
-            }
+            state.chartData = getXYChartData(rawData, granularity, period, groupBy);
             state.loading = false;
         }, 300);
 

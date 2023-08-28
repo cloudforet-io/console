@@ -211,17 +211,13 @@ export default {
                 query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0].v);
             }
 
-            if (costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED) {
-                query.period = objectToQueryString(costAnalysisPageState.period);
-            } else {
-                const date = fieldName.split('.')[1]; // usd_cost.2022-01-04
-                const _period = { start: date, end: date };
-                if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-                    _period.start = dayjs.utc(date).format('YYYY-MM-01');
-                    _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
-                }
-                query.period = objectToQueryString(_period);
+            const date = fieldName.split('.')[1]; // usd_cost.2022-01-04
+            const _period = { start: date, end: date };
+            if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
+                _period.start = dayjs.utc(date).format('YYYY-MM-01');
+                _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
             }
+            query.period = objectToQueryString(_period);
 
             const filters: ConsoleFilter[] = [];
             if (typeof item.project_id === 'string') {
@@ -338,7 +334,7 @@ export default {
                     ...query,
                 }, { cancelToken: listCostAnalysisRequest.token });
                 let items = results;
-                if (granularity !== GRANULARITY.ACCUMULATED && stack) items = _getStackedTableData(results, granularity, period);
+                if (stack) items = _getStackedTableData(results, granularity, period);
                 tableState.items = items;
                 tableState.totalCount = total_count;
                 listCostAnalysisRequest = undefined;
@@ -402,7 +398,7 @@ export default {
         };
 
         const handleExport = async () => {
-            if (costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED && costAnalysisPageState.stack) {
+            if (costAnalysisPageState.stack) {
                 state.visibleExcelNotiModal = true;
             } else await handleExcelDownload();
         };

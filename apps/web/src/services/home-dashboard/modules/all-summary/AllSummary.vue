@@ -373,7 +373,7 @@ export default {
                 return {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     query: {
-                        granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+                        granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                         period: objectToQueryString(_period),
                     },
                 };
