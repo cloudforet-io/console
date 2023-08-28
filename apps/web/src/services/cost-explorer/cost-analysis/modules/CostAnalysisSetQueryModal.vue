@@ -1,63 +1,10 @@
-<template>
-    <p-button-modal
-        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_QUERY')"
-        :visible.sync="proxyVisible"
-        size="sm"
-        @confirm="handleFormConfirm"
-    >
-        <template #body>
-            <div class="set-query-modal-body">
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}
-                    </p>
-                    <p-select-dropdown
-                        class="select-input-box"
-                        use-fixed-menu-style
-                        :items="granularityItems"
-                        :selected="granularity"
-                        @select="handleSelectGranularity"
-                    />
-                </div>
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
-                    </p>
-                    <p-toggle-button :value="stack"
-                                     @change-toggle="handleToggleStack"
-                    />
-                </div>
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}
-                    </p>
-                    <p class="input-description">
-                        Global setting
-                    </p>
-                    <p-select-dropdown
-                        class="select-input-box"
-                        :items="currencyItems"
-                        :selected="currency"
-                        use-fixed-menu-style
-                        @select="handleSelectCurrency"
-                    />
-                </div>
-            </div>
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
+<script lang="ts" setup>
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
-    PButtonModal,
-    PSelectDropdown,
-    PToggleButton,
+    PButtonModal, PSelectDropdown, PToggleButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -75,96 +22,126 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type { Granularity } from '@/services/cost-explorer/type';
 
 
-export default {
-    name: 'CostAnalysisSetQueryModal',
-    components: {
-        PButtonModal,
-        PSelectDropdown,
-        PToggleButton,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
+interface Props {
+    visible: boolean;
+}
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
+}>();
+
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    granularity: '' as Granularity,
+    stack: false,
+    currency: '' as Currency,
+    granularityItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: GRANULARITY.DAILY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
         },
-    },
-    setup(props, { emit }: SetupContext) {
-        const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.$state;
+        {
+            type: 'item',
+            name: GRANULARITY.MONTHLY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
+        },
+        {
+            type: 'item',
+            name: GRANULARITY.YEARLY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
+        },
+    ])),
+    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        type: 'item',
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
+});
 
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            granularity: '' as Granularity,
-            stack: false,
-            currency: '' as Currency,
-            granularityItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: GRANULARITY.DAILY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
-                },
-                {
-                    type: 'item',
-                    name: GRANULARITY.MONTHLY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
-                },
-                {
-                    type: 'item',
-                    name: GRANULARITY.YEARLY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
-                },
-            ])),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-                type: 'item',
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-            }))),
+const handleFormConfirm = async () => {
+    if (costAnalysisPageState.granularity !== state.granularity) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.period = getInitialDates();
         });
+    }
+    costAnalysisPageStore.$patch({
+        granularity: state.granularity,
+        stack: state.stack,
+    });
+    store.commit('settings/setCurrency', state.currency);
 
-        const handleFormConfirm = async () => {
-            if (costAnalysisPageState.granularity !== state.granularity) {
-                costAnalysisPageStore.$patch((_state) => {
-                    _state.period = getInitialDates();
-                });
-            }
-            costAnalysisPageStore.$patch({
-                granularity: state.granularity,
-                stack: state.stack,
-            });
-            store.commit('settings/setCurrency', state.currency);
-
-            state.proxyVisible = false;
-        };
-        const handleSelectGranularity = (granularity: Granularity) => {
-            state.granularity = granularity;
-        };
-        const handleSelectCurrency = (currency: Currency) => {
-            state.currency = currency;
-        };
-        const handleToggleStack = (value) => {
-            state.stack = value;
-        };
-
-        watch(() => state.proxyVisible, (after) => {
-            if (after) {
-                state.granularity = costAnalysisPageState.granularity;
-                state.stack = costAnalysisPageState.stack;
-                state.currency = store.state.settings.currency;
-            }
-        });
-
-        return {
-            ...toRefs(state),
-            GRANULARITY,
-            handleFormConfirm,
-            handleSelectGranularity,
-            handleSelectCurrency,
-            handleToggleStack,
-        };
-    },
+    state.proxyVisible = false;
+};
+const handleSelectGranularity = (granularity: Granularity) => {
+    state.granularity = granularity;
+};
+const handleSelectCurrency = (currency: Currency) => {
+    state.currency = currency;
+};
+const handleToggleStack = (value) => {
+    state.stack = value;
 };
 
+watch(() => state.proxyVisible, (after) => {
+    if (after) {
+        state.granularity = costAnalysisPageState.granularity;
+        state.stack = costAnalysisPageState.stack;
+        state.currency = store.state.settings.currency;
+    }
+});
 </script>
+
+<template>
+    <p-button-modal
+        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_QUERY')"
+        :visible.sync="state.proxyVisible"
+        size="sm"
+        @confirm="handleFormConfirm"
+    >
+        <template #body>
+            <div class="set-query-modal-body">
+                <div class="input-wrapper">
+                    <p class="input-title">
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}
+                    </p>
+                    <p-select-dropdown
+                        class="select-input-box"
+                        use-fixed-menu-style
+                        :items="state.granularityItems"
+                        :selected="granularity"
+                        @select="handleSelectGranularity"
+                    />
+                </div>
+                <div class="input-wrapper">
+                    <p class="input-title">
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
+                    </p>
+                    <p-toggle-button :value="state.stack"
+                                     @change-toggle="handleToggleStack"
+                    />
+                </div>
+                <div class="input-wrapper">
+                    <p class="input-title">
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}
+                    </p>
+                    <p class="input-description">
+                        Global setting
+                    </p>
+                    <p-select-dropdown
+                        class="select-input-box"
+                        :items="state.currencyItems"
+                        :selected="currency"
+                        use-fixed-menu-style
+                        @select="handleSelectCurrency"
+                    />
+                </div>
+            </div>
+        </template>
+    </p-button-modal>
+</template>
 
 <style scoped lang="postcss">
 .set-query-modal-body {

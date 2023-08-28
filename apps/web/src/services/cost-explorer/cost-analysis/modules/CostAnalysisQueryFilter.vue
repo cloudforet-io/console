@@ -1,10 +1,72 @@
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
+import {
+    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+
+import { i18n } from '@/translations';
+
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
+
+import CostAnalysisPeriodSelectDropdown
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { Granularity } from '@/services/cost-explorer/type';
+
+const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
+
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const state = reactive({
+    granularityItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: GRANULARITY.DAILY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
+        },
+        {
+            type: 'item',
+            name: GRANULARITY.MONTHLY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
+        },
+    ])),
+    setQueryModalVisible: false,
+});
+
+/* event */
+const handleSelectGranularity = async (granularity: Granularity) => {
+    if (granularity !== costAnalysisPageState.granularity) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.period = getInitialDates();
+        });
+    }
+    costAnalysisPageStore.$patch({ granularity });
+};
+const handleToggleStack = async (value) => {
+    costAnalysisPageStore.$patch({ stack: value });
+};
+const handleSelectedDates = (period) => {
+    costAnalysisPageStore.$patch((_state) => {
+        _state.period = period;
+    });
+};
+const handleClickSetFilter = () => {
+    state.setQueryModalVisible = true;
+};
+</script>
+
 <template>
     <div class="cost-analysis-query-filter">
         <div class="filter-wrapper tablet-off">
             <div class="left-part">
                 <div class="filter-item">
                     <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
-                    <p-select-dropdown :items="granularityItems"
+                    <p-select-dropdown :items="state.granularityItems"
                                        :selected="costAnalysisPageState.granularity"
                                        style-type="transparent"
                                        class="granularity-select"
@@ -44,99 +106,9 @@
                 />
             </div>
         </div>
-        <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
+        <cost-analysis-set-query-modal :visible.sync="state.setQueryModalVisible" />
     </div>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
-
-import { i18n } from '@/translations';
-
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
-
-import CostAnalysisPeriodSelectDropdown
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Granularity } from '@/services/cost-explorer/type';
-
-const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
-
-export default {
-    name: 'CostAnalysisQueryFilter',
-    components: {
-        CurrencySelectDropdown,
-        CostAnalysisSetQueryModal,
-        CostAnalysisPeriodSelectDropdown,
-        PSelectDropdown,
-        PIconButton,
-        PToggleButton,
-        PFieldTitle,
-    },
-    setup() {
-        const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.$state;
-
-        const state = reactive({
-            granularityItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: GRANULARITY.DAILY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
-                },
-                {
-                    type: 'item',
-                    name: GRANULARITY.MONTHLY,
-                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
-                },
-            ])),
-            setQueryModalVisible: false,
-        });
-
-        /* event */
-        const handleSelectGranularity = async (granularity: Granularity) => {
-            if (granularity !== costAnalysisPageState.granularity) {
-                costAnalysisPageStore.$patch((_state) => {
-                    _state.period = getInitialDates();
-                });
-            }
-            costAnalysisPageStore.$patch({ granularity });
-        };
-        const handleToggleStack = async (value) => {
-            costAnalysisPageStore.$patch({ stack: value });
-        };
-        const handleSelectedDates = (period) => {
-            costAnalysisPageStore.$patch((_state) => {
-                _state.period = period;
-            });
-        };
-        const handleClickSetFilter = () => {
-            state.setQueryModalVisible = true;
-        };
-
-        const dateFormatter = (date) => dayjs.utc(date).format('YYYY/MM/DD');
-
-        return {
-            ...toRefs(state),
-            costAnalysisPageState,
-            GRANULARITY,
-            handleSelectGranularity,
-            handleToggleStack,
-            handleSelectedDates,
-            handleClickSetFilter,
-            dateFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {

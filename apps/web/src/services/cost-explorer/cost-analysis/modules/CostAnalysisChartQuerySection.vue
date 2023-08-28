@@ -1,3 +1,119 @@
+<script lang="ts" setup>
+import {
+    computed, defineEmits, reactive, watch,
+} from 'vue';
+
+import {
+    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
+} from '@spaceone/design-system';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { cloneDeep, sum } from 'lodash';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
+import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
+import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
+import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
+
+
+const CATEGORIES = Object.values(FILTER);
+
+interface Props {
+    loading: boolean;
+    legends: Legend[];
+}
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+});
+const emit = defineEmits<{(e: 'toggle-series', index: number): void;
+    (e: 'hide-all-series'): void;
+    (e: 'show-all-series'): void;
+}>();
+
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const state = reactive({
+    filtersLength: computed<number>(() => {
+        const selectedValues = Object.values(costAnalysisPageState.filters);
+        return sum(selectedValues.map((v) => v?.length || 0));
+    }),
+    filterModalVisible: false,
+    //
+    proxyLegends: useProxyValue('legends', props, emit),
+    groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
+        const groupByItems = costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
+        const moreGroupByItems = costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
+            name: `${d.category}.${d.key}`,
+            label: d.key,
+        }));
+        return [...groupByItems, ...moreGroupByItems];
+    }),
+    showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
+});
+
+/* Util */
+const getLegendIconColor = (index) => {
+    const legend = props.legends[index];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.color) return legend.color;
+    return DEFAULT_CHART_COLORS[index];
+};
+const getLegendTextColor = (index) => {
+    const legend = props.legends[index];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    return null;
+};
+
+/* Event */
+const handleClickAddFilterButton = () => {
+    state.filterModalVisible = true;
+};
+const handleUpdateFilters = (filters: CostFiltersMap) => {
+    costAnalysisPageStore.$patch((_state) => {
+        _state.filters = filters;
+    });
+};
+const handleToggleSeries = (index) => {
+    const _legends = cloneDeep(props.legends);
+    _legends[index].disabled = !_legends[index]?.disabled;
+    state.proxyLegends = _legends;
+    emit('toggle-series', index);
+};
+const handleToggleAllLegends = () => {
+    const _legends = cloneDeep(props.legends);
+    if (state.showHideAll) {
+        _legends.forEach((d) => {
+            d.disabled = true;
+        });
+        emit('hide-all-series');
+    } else {
+        _legends.forEach((d) => {
+            d.disabled = false;
+        });
+        emit('show-all-series');
+    }
+    state.proxyLegends = _legends;
+};
+const handlePrimaryGroupByItem = (groupBy?: string) => {
+    costAnalysisPageStore.$patch({ primaryGroupBy: groupBy });
+};
+
+/* Watcher */
+watch(() => state.groupByMenuItems, (after) => {
+    if (!after.length) {
+        costAnalysisPageStore.$patch({ primaryGroupBy: undefined });
+    } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
+        costAnalysisPageStore.$patch({ primaryGroupBy: after[0].name });
+    }
+});
+</script>
+
 <template>
     <div class="cost-analysis-chart-query-section">
         <!--filter-->
@@ -6,7 +122,7 @@
             <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
-                          :disabled="!filtersLength"
+                          :disabled="!state.filtersLength"
                           @click="handleUpdateFilters({})"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
@@ -28,8 +144,8 @@
 
         <!--legend-->
         <div class="title-wrapper">
-            <p-select-dropdown v-if="groupByMenuItems.length"
-                               :items="groupByMenuItems"
+            <p-select-dropdown v-if="state.groupByMenuItems.length"
+                               :items="state.groupByMenuItems"
                                :selected="costAnalysisPageState.primaryGroupBy"
                                style-type="transparent"
                                @select="handlePrimaryGroupByItem"
@@ -43,7 +159,7 @@
                           font-weight="normal"
                           @click="handleToggleAllLegends"
                 >
-                    {{ showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
+                    {{ state.showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
                 </p-button>
             </div>
         </div>
@@ -70,160 +186,13 @@
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <cost-explorer-set-filter-modal :visible.sync="filterModalVisible"
+        <cost-explorer-set-filter-modal :visible.sync="state.filterModalVisible"
                                         :prev-selected-filters="costAnalysisPageState.filters"
                                         :categories="CATEGORIES"
                                         @confirm="handleUpdateFilters"
         />
     </div>
 </template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, sum } from 'lodash';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
-import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
-import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
-import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
-import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostFiltersMap } from '@/services/cost-explorer/type';
-
-
-interface Props {
-    loading: boolean;
-    legends: Legend[];
-}
-
-const CATEGORIES = Object.values(FILTER);
-
-export default defineComponent<Props>({
-    name: 'CostAnalysisChartQuerySection',
-    components: {
-        CostExplorerFilterTags,
-        CostExplorerSetFilterModal,
-        PSelectDropdown,
-        PIconButton,
-        PDataLoader,
-        PButton,
-        PStatus,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: true,
-        },
-        legends: {
-            type: Array,
-            default: () => ([]),
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.$state;
-
-        const state = reactive({
-            filtersLength: computed<number>(() => {
-                const selectedValues = Object.values(costAnalysisPageState.filters);
-                return sum(selectedValues.map((v) => v?.length || 0));
-            }),
-            filterModalVisible: false,
-            //
-            proxyLegends: useProxyValue('legends', props, emit),
-            groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const groupByItems = costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
-                const moreGroupByItems = costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
-                    name: `${d.category}.${d.key}`,
-                    label: d.key,
-                }));
-                return [...groupByItems, ...moreGroupByItems];
-            }),
-            showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
-        });
-
-        /* Util */
-        const getLegendIconColor = (index) => {
-            const legend = props.legends[index];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[index];
-        };
-        const getLegendTextColor = (index) => {
-            const legend = props.legends[index];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            return null;
-        };
-
-        /* Event */
-        const handleClickAddFilterButton = () => {
-            state.filterModalVisible = true;
-        };
-        const handleUpdateFilters = (filters: CostFiltersMap) => {
-            costAnalysisPageStore.$patch((_state) => {
-                _state.filters = filters;
-            });
-        };
-        const handleToggleSeries = (index) => {
-            const _legends = cloneDeep(props.legends);
-            _legends[index].disabled = !_legends[index]?.disabled;
-            state.proxyLegends = _legends;
-            emit('toggle-series', index);
-        };
-        const handleToggleAllLegends = () => {
-            const _legends = cloneDeep(props.legends);
-            if (state.showHideAll) {
-                _legends.forEach((d) => {
-                    d.disabled = true;
-                });
-                emit('hide-all-series');
-            } else {
-                _legends.forEach((d) => {
-                    d.disabled = false;
-                });
-                emit('show-all-series');
-            }
-            state.proxyLegends = _legends;
-        };
-        const handlePrimaryGroupByItem = (groupBy?: string) => {
-            costAnalysisPageStore.$patch({ primaryGroupBy: groupBy });
-        };
-
-        /* Watcher */
-        watch(() => state.groupByMenuItems, (after) => {
-            if (!after.length) {
-                costAnalysisPageStore.$patch({ primaryGroupBy: undefined });
-            } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
-                costAnalysisPageStore.$patch({ primaryGroupBy: after[0].name });
-            }
-        });
-
-        return {
-            ...toRefs(state),
-            costAnalysisPageState,
-            CATEGORIES,
-            getLegendIconColor,
-            getLegendTextColor,
-            handleClickAddFilterButton,
-            handleUpdateFilters,
-            handlePrimaryGroupByItem,
-            handleToggleSeries,
-            handleToggleAllLegends,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .cost-analysis-chart-query-section {
