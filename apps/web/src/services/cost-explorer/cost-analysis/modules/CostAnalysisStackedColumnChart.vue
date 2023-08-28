@@ -4,8 +4,8 @@ import {
     reactive, ref, watch,
 } from 'vue';
 
-import type { TimeUnit } from '@amcharts/amcharts4/core';
 import { color } from '@amcharts/amcharts5';
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
