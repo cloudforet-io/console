@@ -23,13 +23,6 @@ export const MORE_GROUP_BY = {
     ADDITIONAL_INFO: 'additional_info',
 };
 
-export const GRANULARITY_ITEM_MAP = {
-    [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
-    [GRANULARITY.DAILY]: { name: GRANULARITY.DAILY, label: 'Daily' },
-    [GRANULARITY.MONTHLY]: { name: GRANULARITY.MONTHLY, label: 'Monthly' },
-    [GRANULARITY.YEARLY]: { name: GRANULARITY.YEARLY, label: 'Yearly' },
-} as const;
-
 export const MORE_GROUP_BY_ITEM_MAP = {
     [MORE_GROUP_BY.TAGS]: { name: MORE_GROUP_BY.TAGS, label: 'Tags' },
     [MORE_GROUP_BY.ADDITIONAL_INFO]: { name: MORE_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },
