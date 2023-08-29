@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PIconButton, PHeading, PSelectDropdown,
+    PIconButton, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -19,15 +19,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue';
-import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
-import { getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
-const CostAnalysisSaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
+const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
@@ -48,17 +45,10 @@ const state = reactive({
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
-});
-
-const saveQueryFormState = reactive({
-    visible: false,
-    title: '' as string | TranslateResult,
-    selectedQuery: {},
-    requestType: REQUEST_TYPE.SAVE as RequestType,
-});
-
-const checkDeleteState = reactive({
-    visible: false,
+    currencySymbol: computed(() => store.getters['settings/currencySymbol']),
+    selectedQuerySetId: undefined as string|undefined,
+    queryFormModalVisible: false,
+    queryDeleteModalVisible: false,
 });
 
 /* Utils */
@@ -80,58 +70,20 @@ const handleClickQueryItem = async (queryId: string) => {
 
 const handleClickDeleteQuery = (id: string) => {
     state.itemIdForDeleteQuery = id;
-    checkDeleteState.visible = true;
+    state.queryDeleteModalVisible = true;
 };
 
-const handleClickEditQuery = (queryItemId: string) => {
-    const queryItem = getQueryWithKey(queryItemId);
-    saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
-    saveQueryFormState.requestType = REQUEST_TYPE.EDIT;
-    saveQueryFormState.selectedQuery = queryItem;
-    saveQueryFormState.visible = true;
-};
-const handleClickSaveQuery = () => {
-    saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
-    saveQueryFormState.requestType = REQUEST_TYPE.SAVE;
-    saveQueryFormState.visible = true;
+const handleClickEditQuery = (id: string) => {
+    state.selectedQuerySetId = id;
+    state.queryFormModalVisible = true;
 };
 
-const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
-    if (!updatedQuery) return;
-
+const handleUpdateQuery = () => {
     costAnalysisPageStore.listCostQueryList();
-
-    if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== costAnalysisPageState.selectedQueryId) {
-        return;
-    }
-
-    if (requestType === REQUEST_TYPE.SAVE) {
-        costAnalysisPageStore.$patch({ selectedQueryId: updatedQuery.cost_query_set_id });
-    }
-};
-
-const handleSaveQueryOption = async () => {
-    try {
-        await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageState.selectedQueryId,
-            options: getRefinedCostQueryOptions({
-                granularity: costAnalysisPageState.granularity,
-                period: costAnalysisPageState.period,
-                group_by: costAnalysisPageState.groupBy,
-                primary_group_by: costAnalysisPageState.primaryGroupBy, // will be deprecated(< v1.10.5)
-                more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
-                filters: costAnalysisPageState.filters,
-            }),
-        });
-        await costAnalysisPageStore.listCostQueryList();
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
-    }
 };
 
 const handleDeleteQueryConfirm = async () => {
-    checkDeleteState.visible = false;
+    state.queryDeleteModalVisible = false;
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
         await costAnalysisPageStore.listCostQueryList();
@@ -145,11 +97,6 @@ const handleDeleteQueryConfirm = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }
 };
-
-/* Watchers */
-watch(() => saveQueryFormState.visible, () => {
-    if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
-});
 </script>
 
 <template>
@@ -188,7 +135,7 @@ watch(() => saveQueryFormState.visible, () => {
                 </template>
                 <template #title-right-extra>
                     <div v-if="costAnalysisPageState.selectedQueryId"
-                         class="button-wrapper"
+                         class="title-right-extra"
                     >
                         <p-icon-button name="ic_delete"
                                        @click.stop="handleClickDeleteQuery(costAnalysisPageState.selectedQueryId)"
@@ -197,30 +144,21 @@ watch(() => saveQueryFormState.visible, () => {
                                        @click.stop="handleClickEditQuery(costAnalysisPageState.selectedQueryId)"
                         />
                     </div>
-                    <div class="button-wrapper extra">
-                        <p-button v-if="costAnalysisPageState.selectedQueryId"
-                                  style-type="tertiary"
-                                  @click="handleSaveQueryOption"
-                        >
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
-                        </p-button>
-                        <p-button style-type="tertiary"
-                                  @click="handleClickSaveQuery"
-                        >
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
-                        </p-button>
+                    <div class="title-right-extra currency-wrapper">
+                        <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
+                        <span>{{ state.currencySymbol }}{{ state.currency }}</span>
                     </div>
                 </template>
             </p-heading>
         </section>
-        <cost-analysis-save-query-form-modal :header-title="saveQueryFormState.title"
-                                             :visible.sync="saveQueryFormState.visible"
-                                             :selected-query="saveQueryFormState.selectedQuery"
-                                             :request-type="saveQueryFormState.requestType"
-                                             @confirm="handleSaveQueryConfirm"
+        <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
+                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_COST_ANALYSIS')"
+                                        :request-type="REQUEST_TYPE.EDIT"
+                                        :selected-query-set-id="state.selectedQuerySetId"
+                                        @update-query="handleUpdateQuery"
         />
         <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
-                      :visible.sync="checkDeleteState.visible"
+                      :visible.sync="state.queryDeleteModalVisible"
                       @confirm="handleDeleteQueryConfirm"
         />
     </div>
@@ -233,11 +171,16 @@ watch(() => saveQueryFormState.visible, () => {
         display: flex;
     }
 
-    .button-wrapper {
+    .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
-        &.extra {
-            @apply gap-4 justify-end;
+        &.currency-wrapper {
+            @apply justify-end;
+            font-size: 0.875rem;
             float: right;
+            .label {
+                font-weight: 700;
+                padding-right: 0.25rem;
+            }
         }
     }
     .dropdown-item-wrapper {
@@ -270,13 +213,6 @@ watch(() => saveQueryFormState.visible, () => {
     .query-item-wrapper {
         @apply flex justify-between;
         width: 100%;
-    }
-
-    @screen mobile {
-        .button-wrapper.extra {
-            margin-top: 1rem;
-            width: 100%;
-        }
     }
 }
 </style>

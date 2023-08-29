@@ -17,9 +17,6 @@ import {
     queryStringToString,
 } from '@/lib/router-query-string';
 
-import type {
-    RequestType,
-} from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
@@ -31,11 +28,6 @@ import type {
     CostQuerySetModel, CostQuerySetOption, Granularity,
 } from '@/services/cost-explorer/type';
 
-
-export interface SaveQueryEmitParam {
-    updatedQuery: CostQuerySetModel;
-    requestType: RequestType;
-}
 
 interface Props {
     querySetId?: string;
