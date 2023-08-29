@@ -18,6 +18,7 @@ import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/con
 import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
+import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 
@@ -36,7 +37,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisLNBStore = useCostAnalysisLNBStore();
+const costAnalysisLNBState = costAnalysisLNBStore.$state;
 
 const formState = reactive({
     queryName: undefined as undefined | string,
@@ -98,7 +100,7 @@ const handleFirstQueryNameInput = () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.requestType === REQUEST_TYPE.EDIT) {
-            const selectedQuerySet = costAnalysisPageState.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
+            const selectedQuerySet = costAnalysisLNBState.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
             formState.queryName = selectedQuerySet?.name;
         }
         state.showValidation = true;
