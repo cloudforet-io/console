@@ -135,20 +135,23 @@ export default defineComponent({
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-            isExpired: computed(() => vm.$store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+            isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+            isRoutingToSignIn: false,
             isEmailVerified: computed(() => store.state.user.emailVerified),
             userId: computed(() => store.state.user.userId),
             email: computed(() => store.state.user.email),
             domainId: computed(() => store.state.domain.domainId),
             notificationEmailModalVisible: false,
         });
-        const goToSignIn = () => {
+        const goToSignIn = async () => {
+            state.isRoutingToSignIn = true;
             const res: Location = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
                 query: { nextPath: vm.$route.fullPath },
             };
             store.commit('error/setVisibleSessionExpiredError', false);
-            vm.$router.push(res);
+            await vm.$router.push(res);
+            state.isRoutingToSignIn = false;
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
         const updateUser = async () => {
