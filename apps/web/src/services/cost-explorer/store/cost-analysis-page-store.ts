@@ -7,8 +7,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
+import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-query-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -25,8 +25,8 @@ interface CostAnalysisPageState {
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
-const costAnalysisLNBStore = useCostAnalysisLNBStore();
-
+const costQueryStore = useCostAnalysisLNBStore();
+const costQueryState = costQueryStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -83,6 +83,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         filters: {},
     }),
     getters: {
+        selectedQueryId: () => costQueryState.selectedQueryId,
+        costQueryList: () => costQueryState.costQueryList,
+        selectedQuerySet: () => costQueryStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -158,7 +161,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                     name,
                     options,
                 });
-                costAnalysisLNBStore.$patch({ selectedQueryId: createdData.cost_query_set_id });
+                this.selectQueryId(createdData.cost_query_set_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -166,7 +169,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         },
         async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (costAnalysisLNBStore.selectedQuerySet?.name !== name) {
+            if (costQueryStore.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                         cost_query_set_id: querySetId,
@@ -181,6 +184,12 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         setMoreGroupByWithSettings(moreGroupByItems: MoreGroupByItem[]) {
             this.moreGroupBy = moreGroupByItems;
             costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
+        },
+        selectQueryId(querySetId: string|undefined) {
+            costQueryStore.$patch({ selectedQueryId: querySetId });
+        },
+        async getCostQueryList() {
+            await costQueryStore.listCostQueryList();
         },
     },
 });

@@ -21,7 +21,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
@@ -30,21 +29,19 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisLNBStore = useCostAnalysisLNBStore();
-const costAnalysisLNBState = costAnalysisLNBStore.$state;
 
 const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     costQueryMenuItems: computed<MenuItem[]>(() => ([
         { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
         { name: undefined, label: 'Cost Analysis', type: 'item' },
-        ...costAnalysisLNBState.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
+        ...costAnalysisPageStore.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
             name: item.cost_query_set_id,
             label: item.name,
             type: 'item',
         })),
     ])),
-    title: computed<string>(() => costAnalysisLNBStore.selectedQuerySet?.name ?? 'Cost Analysis'),
+    title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
     currencySymbol: computed(() => store.getters['settings/currencySymbol']),
@@ -54,19 +51,19 @@ const state = reactive({
 });
 
 /* Utils */
-const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisLNBState.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
+const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
 /* Event Handlers */
 const handleClickQueryItem = async (queryId: string) => {
-    if (queryId === costAnalysisLNBState.selectedQueryId) return;
+    if (queryId === costAnalysisPageStore.selectedQueryId) return;
 
     if (queryId) {
         const { options } = getQueryWithKey(queryId);
         await costAnalysisPageStore.setQueryOptions(options);
-        costAnalysisLNBStore.$patch({ selectedQueryId: queryId });
+        costAnalysisPageStore.selectQueryId(queryId);
     } else {
         await costAnalysisPageStore.setQueryOptions();
-        costAnalysisLNBStore.$patch({ selectedQueryId: undefined });
+        costAnalysisPageStore.selectQueryId(undefined);
     }
 };
 
@@ -81,19 +78,19 @@ const handleClickEditQuery = (id: string) => {
 };
 
 const handleUpdateQuery = () => {
-    costAnalysisLNBStore.listCostQueryList();
+    costAnalysisPageStore.getCostQueryList();
 };
 
 const handleDeleteQueryConfirm = async () => {
     state.queryDeleteModalVisible = false;
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
-        await costAnalysisLNBStore.listCostQueryList();
+        await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
-        if (costAnalysisLNBState.selectedQueryId === state.itemIdForDeleteQuery) {
+        if (costAnalysisPageStore.selectedQueryId === state.itemIdForDeleteQuery) {
             await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
             await costAnalysisPageStore.setQueryOptions();
-            costAnalysisLNBStore.$patch({ selectedQueryId: undefined });
+            costAnalysisPageStore.selectQueryId(undefined);
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
@@ -104,7 +101,7 @@ const handleDeleteQueryConfirm = async () => {
 <template>
     <div class="cost-analysis-header">
         <section class="title-section">
-            <p-heading :title="costAnalysisLNBState.selectedQueryId ? state.title : state.defaultTitle">
+            <p-heading :title="costAnalysisPageStore.selectedQueryId ? state.title : state.defaultTitle">
                 <template #title-left-extra>
                     <p-select-dropdown :items="state.costQueryMenuItems"
                                        style-type="icon-button"
@@ -136,14 +133,14 @@ const handleDeleteQueryConfirm = async () => {
                     </p-select-dropdown>
                 </template>
                 <template #title-right-extra>
-                    <div v-if="costAnalysisLNBState.selectedQueryId"
+                    <div v-if="costAnalysisPageStore.selectedQueryId"
                          class="title-right-extra"
                     >
                         <p-icon-button name="ic_delete"
-                                       @click.stop="handleClickDeleteQuery(costAnalysisLNBState.selectedQueryId)"
+                                       @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                         <p-icon-button name="ic_edit-text"
-                                       @click.stop="handleClickEditQuery(costAnalysisLNBState.selectedQueryId)"
+                                       @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                     </div>
                     <div class="title-right-extra currency-wrapper">
