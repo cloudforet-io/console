@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -171,16 +171,8 @@ watch(() => state.period, (period) => {
 
 <template>
     <div class="cost-analysis-period-select-dropdown">
-        <p-badge style-type="gray200"
-                 badge-type="subtle"
-        >
-            <p class="text">
-                {{ state.periodText }}
-            </p>
-        </p-badge>
         <p-select-dropdown :items="state.periodMenuItems"
                            :selected="state.selectedPeriod"
-                           style-type="transparent"
                            @select="handleSelectPeriod"
         />
         <custom-date-range-modal :visible.sync="state.customRangeModalVisible"

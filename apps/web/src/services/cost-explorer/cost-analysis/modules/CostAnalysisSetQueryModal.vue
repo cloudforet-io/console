@@ -8,11 +8,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -35,7 +31,6 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     granularity: '' as Granularity,
-    currency: '' as Currency,
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -53,11 +48,6 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
     ])),
-    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-        type: 'item',
-        name: currency,
-        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-    }))),
 });
 
 const handleFormConfirm = async () => {
@@ -69,21 +59,15 @@ const handleFormConfirm = async () => {
     costAnalysisPageStore.$patch({
         granularity: state.granularity,
     });
-    store.commit('settings/setCurrency', state.currency);
-
     state.proxyVisible = false;
 };
 const handleSelectGranularity = (granularity: Granularity) => {
     state.granularity = granularity;
 };
-const handleSelectCurrency = (currency: Currency) => {
-    state.currency = currency;
-};
 
 watch(() => state.proxyVisible, (after) => {
     if (after) {
         state.granularity = costAnalysisPageState.granularity;
-        state.currency = store.state.settings.currency;
     }
 });
 </script>
@@ -109,21 +93,6 @@ watch(() => state.proxyVisible, (after) => {
                         @select="handleSelectGranularity"
                     />
                 </div>
-                <div class="input-wrapper">
-                    <p class="input-title">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}
-                    </p>
-                    <p class="input-description">
-                        Global setting
-                    </p>
-                    <p-select-dropdown
-                        class="select-input-box"
-                        :items="state.currencyItems"
-                        :selected="currency"
-                        use-fixed-menu-style
-                        @select="handleSelectCurrency"
-                    />
-                </div>
             </div>
         </template>
     </p-button-modal>
@@ -142,10 +111,6 @@ watch(() => state.proxyVisible, (after) => {
         }
         .select-input-box {
             width: 100%;
-        }
-        .input-description {
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
         }
     }
 }

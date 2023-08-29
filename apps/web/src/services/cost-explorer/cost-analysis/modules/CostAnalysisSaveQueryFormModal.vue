@@ -144,15 +144,6 @@ watch(() => props.selectedQuery.name, (after) => {
 </template>
 
 <style lang="postcss" scoped>
-.visibility-radio-list {
-    @apply inline-flex justify-between;
-    gap: 1rem;
-}
-.visibility-radio-content-wrapper {
-    @apply inline-flex items-center;
-    margin-left: 0.3rem;
-}
-
 .query-name-input-wrap {
     margin-bottom: 2rem;
 }
