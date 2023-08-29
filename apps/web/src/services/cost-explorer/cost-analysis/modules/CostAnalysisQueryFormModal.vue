@@ -14,7 +14,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue';
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import {
     REQUEST_TYPE,
@@ -25,20 +24,19 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 interface Props {
     visible: boolean;
     headerTitle: string;
-    selectedQuery?: Record<string, any>;
     requestType: RequestType;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     headerTitle: '',
-    selectedQuery: undefined,
     requestType: REQUEST_TYPE.SAVE,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
-    (e: 'confirm', param: SaveQueryEmitParam)
+    (e: 'update-query', updatedQueryId: string)
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const formState = reactive({
     queryName: undefined as undefined | string,
@@ -53,6 +51,16 @@ const state = reactive({
         if (formState.queryName.length > 40) {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
         }
+
+        const duplicatedNameQuerySet = costAnalysisPageState.costQueryList.find((query) => query.name === formState.queryName);
+        if (duplicatedNameQuerySet) {
+            if (props.requestType === REQUEST_TYPE.SAVE) {
+                return 'Duplicated name.'; // TODO: song-lang
+            }
+            if (duplicatedNameQuerySet.cost_query_set_id !== costAnalysisPageStore.selectedQuerySet?.cost_query_set_id) {
+                return 'Duplicated name.'; // TODO: song-lang
+            }
+        }
         return undefined;
     }),
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
@@ -66,7 +74,7 @@ const saveQuery = async () => {
         const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
         if (!updatedQuery) return;
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
-        emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.SAVE });
+        emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
     }
@@ -74,12 +82,10 @@ const saveQuery = async () => {
 
 const editQuery = async () => {
     try {
-        const updatedQuery = await costAnalysisPageStore.editQuery({
-            selectedQuery: props.selectedQuery, formState,
-        });
+        const updatedQuery = await costAnalysisPageStore.editQuery(formState);
         if (!updatedQuery) return;
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '');
-        emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.EDIT });
+        emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
     }
@@ -98,17 +104,15 @@ const handleFirstQueryNameInput = () => {
 };
 
 /* Watcher */
-watch(() => state.proxyVisible, (after) => {
-    if (!after) {
+watch(() => state.proxyVisible, (visible) => {
+    if (visible) {
+        if (props.requestType === REQUEST_TYPE.EDIT) {
+            formState.queryName = costAnalysisPageStore.selectedQuerySet?.name;
+        }
+        state.showValidation = true;
+    } else {
         formState.queryName = undefined;
         state.showValidation = false;
-    }
-});
-
-watch(() => props.selectedQuery.name, (after) => {
-    if (after) {
-        formState.queryName = after;
-        state.showValidation = true;
     }
 });
 </script>
