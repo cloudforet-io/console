@@ -61,14 +61,10 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router';
 
 import { PI } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -120,31 +116,10 @@ export default defineComponent<Props>({
             state.isFolded = !state.isFolded;
         };
 
-        const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
-            let currentPath = props.currentPath;
-            if (!currentPath) return false;
-
-            const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
-            if (!resolved) return false;
-
-            if (currentPath.indexOf('?') > 0) {
-                currentPath = currentPath.slice(0, currentPath.indexOf('?'));
-            }
-            let resolvedHref = resolved.href;
-            if (!currentPath.endsWith('/')) currentPath += '/';
-            if (!resolvedHref.endsWith('/')) resolvedHref += '/';
-            return currentPath.startsWith(resolvedHref);
-        };
-
-        const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
-
         return {
             ...toRefs(state),
             handleFoldableToggle,
-            isSelectedMenu,
-            FAVORITE_TYPE,
             MENU_ITEM_TYPE,
-            getIsHovered,
         };
     },
 });
@@ -179,51 +154,6 @@ export default defineComponent<Props>({
         padding-top: 1.25rem;
         padding-left: 0.5rem;
         padding-bottom: 0.75rem;
-    }
-    .menu-item {
-        @apply border border-transparent inline-flex items-center w-full h-full justify-between;
-        font-size: 0.875rem;
-        line-height: 125%;
-        border-radius: 4px;
-        box-sizing: border-box;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        outline: 0;
-        height: 2rem;
-
-        &.second-depth {
-            padding-left: 1.25rem;
-        }
-        &:focus, &:focus-within, &:active {
-            @apply bg-white border-secondary1;
-            box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);
-        }
-        &.selected {
-            @apply bg-blue-200;
-        }
-        &:hover {
-            @apply bg-blue-100 cursor-pointer;
-        }
-        .text-wrapper {
-            @apply inline-flex overflow-hidden whitespace-no-wrap;
-            .text {
-                @apply overflow-hidden whitespace-no-wrap;
-                text-overflow: ellipsis;
-            }
-            .icon {
-                flex-shrink: 0;
-                margin-right: 0.25rem;
-            }
-        }
-        .favorite-button {
-            flex-shrink: 0;
-            margin-left: 0.25rem;
-        }
-    }
-    .divider {
-        margin-top: 1.25rem;
-        margin-bottom: 1.25rem;
-        height: 0;
     }
 }
 </style>
