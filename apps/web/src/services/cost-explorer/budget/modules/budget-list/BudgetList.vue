@@ -16,13 +16,13 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import BudgetListCard from '@/services/cost-explorer/budget/modules/budget-list/BudgetListCard.vue';
 import BudgetStat from '@/services/cost-explorer/budget/modules/budget-stat/BudgetStat.vue';
 import type { Pagination } from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolbox.vue';
 import type {
     BudgetUsageAnalyzeRequestParam,
-    BudgetUsageData,
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
@@ -41,7 +41,7 @@ const emit = defineEmits<{(e: 'update:filters', filters:ConsoleFilter[]): void;
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const state = reactive({
-    budgetUsages: [] as BudgetUsageData[],
+    budgetUsages: [] as BudgetUsageModel[],
     loading: false,
     // query
     range: {} as BudgetUsageRange,

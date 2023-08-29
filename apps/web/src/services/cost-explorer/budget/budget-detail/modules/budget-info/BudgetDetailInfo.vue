@@ -82,10 +82,10 @@ import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import BudgetCostTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { CostType } from '@/services/cost-explorer/budget/type';
+import type { CostType } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
-} from '@/services/cost-explorer/budget/type';
+} from '@/services/cost-explorer/budget/model';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 
 

@@ -55,9 +55,9 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import type {
     BudgetUsageAnalyzeRequestParam,
-    BudgetUsageData,
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
@@ -106,7 +106,7 @@ export default defineComponent<Props>({
         const { i18nDayjs } = useI18nDayjs();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({
-            budgetUsage: {} as BudgetUsageData,
+            budgetUsage: {} as BudgetUsageModel,
             loading: false,
             // currency
             currency: computed(() => store.state.settings.currency),

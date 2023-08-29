@@ -28,7 +28,7 @@ import { PFieldTitle, PSelectCard } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import type { BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
 
 interface Plan {
     title: TranslateResult;

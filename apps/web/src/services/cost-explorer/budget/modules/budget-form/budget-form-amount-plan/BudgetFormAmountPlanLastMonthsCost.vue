@@ -32,8 +32,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import type { Granularity } from '@/services/cost-explorer/type';
 
 interface Props {
@@ -75,7 +75,7 @@ export default {
         const { i18nDayjs } = useI18nDayjs();
 
         const state = reactive({
-            last3MonthsBudgets: [] as BudgetData[],
+            last3MonthsBudgets: [] as BudgetModel[],
             months: computed(() => {
                 const today = i18nDayjs.value.utc();
                 return [
