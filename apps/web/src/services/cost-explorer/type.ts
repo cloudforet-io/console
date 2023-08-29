@@ -25,7 +25,6 @@ export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     more_group_by?: MoreGroupByItem[]; // will be deprecated(< v1.10.5)
     granularity: Granularity;
-    stack?: boolean;
     period: Period;
     filters?: CostFiltersMap;
 }
