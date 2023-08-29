@@ -155,7 +155,7 @@ export class SpaceConnector {
                 // Bind APIHandler if last index
                 if ((apiInfoArr.length - 1) === idx) {
                     const afterCall = this.afterCallApiMap[apiInfo.path];
-                    currentPath[objCamel] = this.APIHandler(apiInfo.path, afterCall, version);
+                    currentPath[objCamel] = this.getAPIHandler(apiInfo.path, afterCall, version);
                 } else {
                     currentPath[objCamel] = {};
                 }
@@ -164,15 +164,21 @@ export class SpaceConnector {
         });
     }
 
-    protected APIHandler(path: string, afterCall: AfterCallApi, version: number) {
+    protected getAPIHandler(path: string, afterCall: AfterCallApi, version: number) {
         const mockEndpoint = SpaceConnector.mockInfo.endpoints?.[version - 1];
         const serviceApi = version === 2 ? this.serviceApiV2 : this.serviceApi;
+        /*
+            NOTE: It is separated by if mock endpoint exists because it's pretty slow to check if it's mock mode every time especially in the production environment.
+            Usually in the development environment, the mock endpoint exists, so it is necessary to check. (if statement)
+            In the production environment, the mock endpoint does not exist, so it is not necessary to check. (else statement)
+         */
         if (mockEndpoint) {
             return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
                 const mockConfig = { ...config };
                 let url = path;
 
-                if (SpaceConnector.mockInfo.all || mockConfig.mockMode) {
+                const mockApiList = SpaceConnector.mockInfo.apiList?.[version - 1] ?? [];
+                if (SpaceConnector.mockInfo.all || mockApiList.includes(path) || mockConfig.mockMode) {
                     mockConfig.baseURL = mockEndpoint;
                     if (mockConfig.mockPath) {
                         url += mockConfig.mockPath;
