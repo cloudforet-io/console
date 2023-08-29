@@ -7,8 +7,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
+import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-query-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -26,7 +26,7 @@ interface CostAnalysisPageState {
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
 const costAnalysisLNBStore = useCostAnalysisLNBStore();
-
+const costAnalysisLNBState = costAnalysisLNBStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -83,6 +83,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         filters: {},
     }),
     getters: {
+        selectedQueryId: () => costAnalysisLNBState.selectedQueryId,
+        costQueryList: () => costAnalysisLNBState.costQueryList,
+        selectedQuerySet: () => costAnalysisLNBStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -158,7 +161,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                     name,
                     options,
                 });
-                costAnalysisLNBStore.$patch({ selectedQueryId: createdData.cost_query_set_id });
+                this.selectQueryId(createdData.cost_query_set_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -181,6 +184,12 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         setMoreGroupByWithSettings(moreGroupByItems: MoreGroupByItem[]) {
             this.moreGroupBy = moreGroupByItems;
             costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
+        },
+        selectQueryId(querySetId: string|undefined) {
+            costAnalysisLNBStore.$patch({ selectedQueryId: querySetId });
+        },
+        async getCostQueryList() {
+            await costAnalysisLNBStore.listCostQueryList();
         },
     },
 });

@@ -23,7 +23,6 @@ import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/mo
 import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
 import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
     CostQuerySetModel, CostQuerySetOption, Granularity,
@@ -36,8 +35,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisLNBStore = useCostAnalysisLNBStore();
-const costAnalysisLNBState = costAnalysisLNBStore.$state;
 
 /* util */
 const setQueryOptions = (options?: CostQuerySetOption) => {
@@ -52,10 +49,10 @@ const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQu
     filters: queryStringToObject(urlQuery.filters),
 });
 
-const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisLNBState.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
+const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
 /* Watchers */
-watch(() => costAnalysisLNBState.selectedQueryId, (selectedQueryId) => {
+watch(() => costAnalysisPageStore.selectedQueryId, (selectedQueryId) => {
     if (props.querySetId !== selectedQueryId) {
         const location: Location = {
             params: { querySetId: selectedQueryId as string },
@@ -99,16 +96,16 @@ onUnmounted(() => {
 (async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     // list cost query sets
-    await costAnalysisLNBStore.listCostQueryList();
+    await costAnalysisPageStore.getCostQueryList();
 
     // init states
     if (props.querySetId) {
         const { name, options } = getQueryWithKey(props.querySetId);
         if (name) {
             setQueryOptions(options);
-            costAnalysisLNBStore.$patch({ selectedQueryId: props.querySetId });
+            costAnalysisPageStore.selectQueryId(props.querySetId);
         } else {
-            costAnalysisLNBStore.$patch({ selectedQueryId: undefined });
+            costAnalysisPageStore.selectQueryId(undefined);
         }
     } else if (Object.keys(currentQuery).length) {
         const options = getQueryOptionsFromUrlQuery(currentQuery);
