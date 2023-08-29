@@ -25,8 +25,8 @@ interface CostAnalysisPageState {
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
-const costAnalysisLNBStore = useCostAnalysisLNBStore();
-const costAnalysisLNBState = costAnalysisLNBStore.$state;
+const costQueryStore = useCostAnalysisLNBStore();
+const costQueryState = costQueryStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -83,9 +83,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         filters: {},
     }),
     getters: {
-        selectedQueryId: () => costAnalysisLNBState.selectedQueryId,
-        costQueryList: () => costAnalysisLNBState.costQueryList,
-        selectedQuerySet: () => costAnalysisLNBStore.selectedQuerySet,
+        selectedQueryId: () => costQueryState.selectedQueryId,
+        costQueryList: () => costQueryState.costQueryList,
+        selectedQuerySet: () => costQueryStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -169,7 +169,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         },
         async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (costAnalysisLNBStore.selectedQuerySet?.name !== name) {
+            if (costQueryStore.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                         cost_query_set_id: querySetId,
@@ -186,10 +186,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
         },
         selectQueryId(querySetId: string|undefined) {
-            costAnalysisLNBStore.$patch({ selectedQueryId: querySetId });
+            costQueryStore.$patch({ selectedQueryId: querySetId });
         },
         async getCostQueryList() {
-            await costAnalysisLNBStore.listCostQueryList();
+            await costQueryStore.listCostQueryList();
         },
     },
 });
