@@ -18,11 +18,7 @@ interface CostAnalysisLNBState {
 export const useCostAnalysisLNBStore = defineStore('cost-analysis-l-n-b', {
     state: (): CostAnalysisLNBState => ({
         costQueryList: [],
-        dataSourceList: [
-            'aws',
-            'azure',
-            'gcp',
-        ],
+        dataSourceList: [],
         selectedQueryId: undefined,
         selectedDataSource: undefined,
     }),
