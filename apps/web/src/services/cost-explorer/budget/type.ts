@@ -15,7 +15,7 @@ export interface BudgetUsageRange {
 	condition?: 'or'|'and'; // default: 'and'
 }
 
-export interface BudgetUsageAnalyze {
+export interface BudgetUsageAnalyzeRequestParam {
 	include_budget_count?: boolean;
 	group_by?: string[];
 	start?: string;
