@@ -51,7 +51,11 @@ export const useBudgetPageStore = defineStore('budget-page', {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.list({
                     budget_id: budgetId,
                 });
-                this.budgetUsageData = results;
+                // TODO: Remove conversion process after the cost analysis API is updated.
+                this.budgetUsageData = results.map((budgetUsage: any) => ({
+                    ...budgetUsage,
+                    cost: budgetUsage.usd_cost,
+                }));
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

@@ -88,7 +88,7 @@ export default {
                 const data = state.last3MonthsBudgets[i];
                 return {
                     month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
-                    cost: data ? data.usd_cost : 0,
+                    cost: data ? data.cost : 0,
                 };
             })),
             showList: computed(() => props.projectId || props.projectGroupId),
@@ -132,7 +132,12 @@ export default {
         const getRecentBudgets = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
-                state.last3MonthsBudgets = results.sort((a, b) => {
+                // TODO: Remove conversion process after the cost analysis API is updated.
+                const converted = results.map((result: any) => ({
+                    ...result,
+                    cost: result.usd_cost,
+                }));
+                state.last3MonthsBudgets = converted.sort((a, b) => {
                     if (dayjs(a.date).isAfter(dayjs(b.date))) return -1;
                     if (dayjs(a.date).isBefore(dayjs(b.date))) return 1;
                     return 0;

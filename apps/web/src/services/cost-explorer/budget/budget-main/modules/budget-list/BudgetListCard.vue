@@ -219,7 +219,7 @@ export default {
 
                 return costTypeResourceListMap;
             }),
-            cost: computed<number>(() => props.budgetUsage.usd_cost ?? 0),
+            cost: computed<number>(() => props.budgetUsage.cost ?? 0),
             limit: computed<number>(() => props.budgetUsage.limit ?? 0),
             percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
             progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {

@@ -82,7 +82,11 @@ const setFilters = (filters: ConsoleFilter[]) => {
 const fetchBudgetUsages = async () => {
     try {
         const { results, total_count } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-        state.budgetUsages = results;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        state.budgetUsages = results.map((budgetUsage: any) => ({
+            ...budgetUsage,
+            cost: budgetUsage.usd_cost,
+        }));
         state.totalCount = total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -133,7 +137,7 @@ const handleExport = async () => {
         { key: 'name', name: 'Budget Name' },
         { key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } },
         { key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } },
-        { key: 'usd_cost', name: 'USD Cost' },
+        { key: 'cost', name: 'USD Cost' },
         { key: 'limit', name: 'Limit' },
         { key: 'usage', name: 'Usage (%)' },
         { key: 'cost_types.service_account_id', name: 'Cost Type (Service Account)', reference: { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' } },
