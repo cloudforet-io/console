@@ -1,33 +1,3 @@
-<template>
-    <div class="budget-form-amount-plan-monthly">
-        <div class="header">
-            <p class="title">
-                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
-            </p>
-            <p-button style-type="tertiary"
-                      @click="handleAutofillButtonClick"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
-            </p-button>
-        </div>
-        <slot name="last-3-months" />
-        <p-divider class="mt-2" />
-        <div class="input-wrapper">
-            <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap"
-                                                 :key="month"
-                                                 class="input"
-                                                 :amount="monthAmountInputMap[month].amount"
-                                                 :month="month"
-                                                 :is-month-to-date="index === 0"
-                                                 @update="handleUpdateMonthInput(month, $event)"
-            />
-        </div>
-        <budget-form-amount-plan-autofill-modal v-model="visibleAutofillModal"
-                                                @confirm="handleAutofillConfirm"
-        />
-    </div>
-</template>
-
 <script lang="ts">
 
 import {
@@ -165,6 +135,37 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="budget-form-amount-plan-monthly">
+        <div class="header">
+            <p class="title">
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
+            </p>
+            <p-button style-type="tertiary"
+                      @click="handleAutofillButtonClick"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
+            </p-button>
+        </div>
+        <slot name="last-3-months" />
+        <p-divider class="mt-2" />
+        <div class="input-wrapper">
+            <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap"
+                                                 :key="month"
+                                                 class="input"
+                                                 :amount="monthAmountInputMap[month].amount"
+                                                 :month="month"
+                                                 :is-month-to-date="index === 0"
+                                                 @update="handleUpdateMonthInput(month, $event)"
+            />
+        </div>
+        <budget-form-amount-plan-autofill-modal v-model="visibleAutofillModal"
+                                                @confirm="handleAutofillConfirm"
+        />
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .budget-form-amount-plan-monthly {
     max-width: 87rem;

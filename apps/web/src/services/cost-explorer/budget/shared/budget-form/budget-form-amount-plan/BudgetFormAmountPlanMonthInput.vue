@@ -1,26 +1,3 @@
-<template>
-    <p-field-group required
-                   :label="formattedMonth"
-                   class="budget-form-amount-plan-month-input"
-                   :invalid-texts="invalidTexts._amount"
-                   :invalid="invalidState._amount"
-    >
-        <template v-if="isMonthToDate"
-                  #label-extra
-        >
-            <span>(MTD)</span>
-        </template>
-        <p-text-input v-model="formattedAmount"
-                      placeholder="1,000"
-                      :invalid="invalidState._amount"
-        >
-            <template #right-extra>
-                ($)
-            </template>
-        </p-text-input>
-    </p-field-group>
-</template>
-
 <script lang="ts">
 
 import {
@@ -121,6 +98,29 @@ export default {
     },
 };
 </script>
+
+<template>
+    <p-field-group required
+                   :label="formattedMonth"
+                   class="budget-form-amount-plan-month-input"
+                   :invalid-texts="invalidTexts._amount"
+                   :invalid="invalidState._amount"
+    >
+        <template v-if="isMonthToDate"
+                  #label-extra
+        >
+            <span>(MTD)</span>
+        </template>
+        <p-text-input v-model="formattedAmount"
+                      placeholder="1,000"
+                      :invalid="invalidState._amount"
+        >
+            <template #right-extra>
+                ($)
+            </template>
+        </p-text-input>
+    </p-field-group>
+</template>
 
 <style lang="postcss" scoped>
 .budget-form-amount-plan-month-input {
