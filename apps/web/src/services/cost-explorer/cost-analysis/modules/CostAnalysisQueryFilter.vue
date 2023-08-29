@@ -164,8 +164,9 @@ const handleUpdateQuery = (updatedQueryId: string) => {
             </div>
         </div>
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
-                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')"
+                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
                                         :request-type="REQUEST_TYPE.SAVE"
+                                        :selected-query-set-id="costAnalysisPageState.selectedQueryId"
                                         @update-query="handleUpdateQuery"
         />
     </div>

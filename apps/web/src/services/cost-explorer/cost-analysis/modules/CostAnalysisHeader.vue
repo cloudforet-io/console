@@ -46,6 +46,7 @@ const state = reactive({
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
     currencySymbol: computed(() => store.getters['settings/currencySymbol']),
+    selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
 });
@@ -72,7 +73,8 @@ const handleClickDeleteQuery = (id: string) => {
     state.queryDeleteModalVisible = true;
 };
 
-const handleClickEditQuery = () => {
+const handleClickEditQuery = (id: string) => {
+    state.selectedQuerySetId = id;
     state.queryFormModalVisible = true;
 };
 
@@ -150,8 +152,9 @@ const handleDeleteQueryConfirm = async () => {
             </p-heading>
         </section>
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
-                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY')"
+                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_COST_ANALYSIS')"
                                         :request-type="REQUEST_TYPE.EDIT"
+                                        :selected-query-set-id="state.selectedQuerySetId"
                                         @update-query="handleUpdateQuery"
         />
         <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"

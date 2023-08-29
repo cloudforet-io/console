@@ -184,14 +184,13 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             }
             return createdData;
         },
-        async editQuery(formState): Promise<CostQuerySetModel> {
-            const { queryName } = formState;
+        async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (this.selectedQuerySet?.name !== queryName) {
+            if (this.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                        cost_query_set_id: this.selectedQuerySet?.cost_query_set_id,
-                        name: queryName,
+                        cost_query_set_id: querySetId,
+                        name,
                     });
                 } catch (e) {
                     ErrorHandler.handleError(e);
