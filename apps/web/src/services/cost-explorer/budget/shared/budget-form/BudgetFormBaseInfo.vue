@@ -29,12 +29,6 @@ export default {
         PFieldGroup,
         PTextInput,
     },
-    props: {
-        budgetId: {
-            type: String,
-            default: undefined,
-        },
-    },
     setup(props, { emit }) {
         const {
             forms: {

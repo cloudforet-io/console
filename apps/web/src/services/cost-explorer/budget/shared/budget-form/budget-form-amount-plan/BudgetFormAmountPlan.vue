@@ -29,7 +29,6 @@ export interface BudgetAmountPlanInfo {
 }
 
 interface Props {
-    budgetId?: string;
     projectId?: string;
     projectGroupId?: string;
     costTypes?: CostTypes;
@@ -47,10 +46,6 @@ export default {
         PHeading,
     },
     props: {
-        budgetId: {
-            type: String,
-            default: undefined,
-        },
         projectId: {
             type: String,
             default: undefined,

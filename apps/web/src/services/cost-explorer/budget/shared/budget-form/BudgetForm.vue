@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    computed, defineProps, reactive,
+    computed, reactive,
 } from 'vue';
 
 import { PButton } from '@spaceone/design-system';
@@ -22,12 +22,6 @@ import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/shared/budg
 import BudgetFormBaseInfo from '@/services/cost-explorer/budget/shared/budget-form/BudgetFormBaseInfo.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-
-interface Props {
-    budgetId?: string;
-}
-
-const props = defineProps<Props>();
 
 const state = reactive({
     baseInfo: {} as BudgetBaseInfo,
@@ -77,11 +71,8 @@ const handleClickConfirm = () => {
 
 <template>
     <div>
-        <budget-form-base-info :budget-id="props.budgetId"
-                               @update="handleChangeBaseInfo"
-        />
+        <budget-form-base-info @update="handleChangeBaseInfo" />
         <budget-form-amount-plan class="mt-4"
-                                 :budget-id="props.budgetId"
                                  :project-group-id="state.baseInfo.project_group_id"
                                  :project-id="state.baseInfo.project_id"
                                  :cost-types="state.baseInfo.cost_types"
