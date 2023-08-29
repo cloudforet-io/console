@@ -36,49 +36,22 @@
                 <span class="top-title">{{ item.label }}</span>
             </p>
 
-            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu"
-                 class="divider"
+            <l-n-b-divider-menu-item v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" />
+            <l-n-b-router-menu-item v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+                                    :item="item"
+                                    :depth="depth"
+                                    :is-domain-owner="isDomainOwner"
+                                    :idx="idx"
+                                    :current-path="currentPath"
             >
-                <p-divider />
-            </div>
-            <router-link
-                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
-                class="menu-item"
-                :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
-                :to="item.to"
-                @click.native="$event.stopImmediatePropagation()"
-                @mouseenter.native="hoveredItem = item.id"
-                @mouseleave.native="hoveredItem = ''"
-            >
-                <slot name="before-text"
-                      v-bind="{...$props, item, index: idx}"
-                />
-                <div class="text-wrapper">
-                    <p-i v-if="item.icon"
-                         :name="item.icon"
-                         width="1rem"
-                         height="1rem"
-                         class="icon"
+                <template v-for="(_, slot) of $scopedSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="slot"
+                          v-bind="scope"
                     />
-                    <span class="text">{{ item.label }}</span>
-                    <slot name="after-text"
-                          v-bind="{...$props, item, index: idx}"
-                    />
-                    <new-mark v-if="item.isNew" />
-                    <beta-mark v-if="item.isBeta" />
-                </div>
-                <slot name="right-extra"
-                      v-bind="{...$props, item, index: idx}"
-                />
-                <favorite-button
-                    v-if="!item.hideFavorite && !isDomainOwner"
-                    :item-id="item.id"
-                    :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
-                    :visible-active-case-only="!getIsHovered(item.id)"
-                    scale="0.8"
-                    class="favorite-button"
-                />
-            </router-link>
+                </template>
+            </l-n-b-router-menu-item>
         </div>
     </div>
 </template>
@@ -90,7 +63,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PDivider, PI } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -99,7 +72,8 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
+import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
@@ -111,11 +85,11 @@ interface Props {
 export default defineComponent<Props>({
     name: 'LNBMenuItem',
     components: {
-        FavoriteButton,
         PI,
         BetaMark,
         NewMark,
-        PDivider,
+        LNBRouterMenuItem,
+        LNBDividerMenuItem,
     },
     props: {
         menuData: {
@@ -135,7 +109,7 @@ export default defineComponent<Props>({
     setup(props) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-            processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
+            processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
             isFolded: false,
             isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
