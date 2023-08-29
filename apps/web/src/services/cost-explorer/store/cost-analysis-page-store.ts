@@ -3,12 +3,11 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
+import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
@@ -22,12 +21,12 @@ interface CostAnalysisPageState {
     moreGroupBy: MoreGroupByItem[];
     period: Period;
     filters: CostFiltersMap;
-    selectedQueryId?: string;
-    costQueryList: CostQuerySetModel[];
 }
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
+const costAnalysisLNBStore = useCostAnalysisLNBStore();
+
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -82,14 +81,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         moreGroupBy: [],
         period: getInitialDates(),
         filters: {},
-        selectedQueryId: undefined,
-        costQueryList: [],
     }),
     getters: {
-        selectedQuerySet: (state): CostQuerySetModel|undefined => {
-            if (!state.selectedQueryId) return undefined;
-            return state.costQueryList.find((item) => item.cost_query_set_id === state.selectedQueryId);
-        },
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -150,19 +143,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 this.filters = convertFiltersInToNewType(options.filters);
             }
         },
-        async listCostQueryList(): Promise<void> {
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
-                    query: {
-                        filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                    },
-                });
-                this.costQueryList = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                this.costQueryList = [];
-            }
-        },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
             const options = getRefinedCostQueryOptions({
                 granularity: this.granularity,
@@ -178,7 +158,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                     name,
                     options,
                 });
-                this.selectedQueryId = createdData.cost_query_set_id;
+                costAnalysisLNBStore.$patch({ selectedQueryId: createdData.cost_query_set_id });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -186,7 +166,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         },
         async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (this.selectedQuerySet?.name !== name) {
+            if (costAnalysisLNBStore.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                         cost_query_set_id: querySetId,

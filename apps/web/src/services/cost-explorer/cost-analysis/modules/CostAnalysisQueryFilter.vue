@@ -20,6 +20,7 @@ import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
+import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-analysis-l-n-b-store';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
@@ -28,6 +29,8 @@ const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-a
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisLNBStore = useCostAnalysisLNBStore();
+const costAnalysisLNBState = costAnalysisLNBStore.$state;
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -85,7 +88,7 @@ const handleSelectedDates = (period) => {
 const handleSaveQuerySet = async () => {
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageState.selectedQueryId,
+            cost_query_set_id: costAnalysisLNBState.selectedQueryId,
             options: getRefinedCostQueryOptions({
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
@@ -95,7 +98,7 @@ const handleSaveQuerySet = async () => {
                 filters: costAnalysisPageState.filters,
             }),
         });
-        await costAnalysisPageStore.listCostQueryList();
+        await costAnalysisLNBStore.listCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -109,8 +112,8 @@ const handleClickSaveAsButton = () => {
     state.queryFormModalVisible = true;
 };
 const handleUpdateQuery = (updatedQueryId: string) => {
-    costAnalysisPageStore.listCostQueryList();
-    costAnalysisPageStore.$patch({ selectedQueryId: updatedQueryId });
+    costAnalysisLNBStore.listCostQueryList();
+    costAnalysisLNBStore.$patch({ selectedQueryId: updatedQueryId });
 };
 </script>
 
@@ -128,8 +131,8 @@ const handleUpdateQuery = (updatedQueryId: string) => {
                 />
             </div>
             <div class="right-part">
-                <template v-if="costAnalysisPageState.selectedQueryId">
-                    <p-button v-if="costAnalysisPageState.selectedQueryId"
+                <template v-if="costAnalysisLNBState.selectedQueryId">
+                    <p-button v-if="costAnalysisLNBState.selectedQueryId"
                               class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
@@ -166,7 +169,7 @@ const handleUpdateQuery = (updatedQueryId: string) => {
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
                                         :request-type="REQUEST_TYPE.SAVE"
-                                        :selected-query-set-id="costAnalysisPageState.selectedQueryId"
+                                        :selected-query-set-id="costAnalysisLNBState.selectedQueryId"
                                         @update-query="handleUpdateQuery"
         />
     </div>
