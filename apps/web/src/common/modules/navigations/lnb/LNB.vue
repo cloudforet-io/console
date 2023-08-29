@@ -63,6 +63,7 @@
                                  :menu-data="menuData"
                                  :current-path="currentPath"
                                  :depth="Array.isArray(menuData) ? 2 : 1"
+                                 @select="handleSelect"
                 >
                     <template v-for="(_, slot) of $scopedSlots"
                               #[slot]="scope"
@@ -136,6 +137,9 @@ export default {
         const handleFavoriteToggle = () => {
             state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
         };
+        const handleSelect = (id: string, selected: string) => {
+            emit('select', id, selected);
+        };
 
         return {
             ...toRefs(state),
@@ -143,6 +147,7 @@ export default {
             assetUrlConverter,
             getUUID,
             handleFavoriteToggle,
+            handleSelect,
         };
     },
 };

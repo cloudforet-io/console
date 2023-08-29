@@ -47,45 +47,42 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
 </script>
 
 <template>
-    <fragment>
-        <router-link class="l-n-b-router-menu-item"
-                     :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
-                     :to="item.to"
-                     @click.native="$event.stopImmediatePropagation()"
-                     @mouseenter.native="state.hoveredItem = item.id"
-                     @mouseleave.native="state.hoveredItem = ''"
-        >
-            <slot name="before-text"
+    <router-link class="l-n-b-router-menu-item"
+                 :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+                 :to="item.to"
+                 @click.native="$event.stopImmediatePropagation()"
+                 @mouseenter.native="state.hoveredItem = item.id"
+                 @mouseleave.native="state.hoveredItem = ''"
+    >
+        <slot name="before-text"
+              v-bind="{...props, item, index: idx}"
+        />
+        <div class="text-wrapper">
+            <p-i v-if="item.icon"
+                 :name="item.icon"
+                 width="1rem"
+                 height="1rem"
+                 class="icon"
+            />
+            <span class="text">{{ item.label }}</span>
+            <slot name="after-text"
                   v-bind="{...props, item, index: idx}"
             />
-            <div class="text-wrapper">
-                <p-i v-if="item.icon"
-                     :name="item.icon"
-                     width="1rem"
-                     height="1rem"
-                     class="icon"
-                />
-                <span class="text">{{ item.label }}</span>
-                <slot name="after-text"
-                      v-bind="{...props, item, index: idx}"
-                />
-                <new-mark v-if="item.isNew" />
-                <beta-mark v-if="item.isBeta" />
-            </div>
-            <slot name="right-extra"
-                  v-bind="{...props, item, index: idx}"
-            />
-            <favorite-button
-                v-if="!item.hideFavorite && !isDomainOwner"
-                :item-id="item.id"
-                :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
-                :visible-active-case-only="!getIsHovered(item.id)"
-                scale="0.8"
-                class="favorite-button"
-            />
-        </router-link>
-        <slot name="bottom-extra" />
-    </fragment>
+            <new-mark v-if="item.isNew" />
+            <beta-mark v-if="item.isBeta" />
+        </div>
+        <slot name="right-extra"
+              v-bind="{...props, item, index: idx}"
+        />
+        <favorite-button
+            v-if="!item.hideFavorite && !isDomainOwner"
+            :item-id="item.id"
+            :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
+            :visible-active-case-only="!getIsHovered(item.id)"
+            scale="0.8"
+            class="favorite-button"
+        />
+    </router-link>
 </template>
 
 <style lang="postcss" scoped>
