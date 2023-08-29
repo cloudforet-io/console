@@ -12,7 +12,7 @@ interface BudgetPlannedLimit {
 
 interface BudgetMonthlyCost {
 	date: string;
-	usd_cost: number|string;
+	cost: number|string;
 }
 
 export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'product';
@@ -72,7 +72,7 @@ export interface BudgetUsageData {
 	budget_id: string;
 	name: string;
 	limit: number;
-	usd_cost: number;
+	cost: number;
 	date: string;
 	domain_id?: string;
 	updated_at: TimeStamp;
