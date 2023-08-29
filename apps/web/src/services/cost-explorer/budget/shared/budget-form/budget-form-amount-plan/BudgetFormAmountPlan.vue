@@ -49,16 +49,16 @@ import { PPaneLayout, PHeading } from '@spaceone/design-system';
 
 import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
 import BudgetFormAmountPlanLastMonthsCost
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
-import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
+import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanMonthly
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanTotal
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
 import BudgetFormAmountPlanUnitSelect
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetPeriodSelect
-    from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
+    from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 export interface BudgetAmountPlanInfo {

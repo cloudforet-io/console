@@ -69,9 +69,9 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
-import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
-import BudgetPeriodSelect from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
-import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
+import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
+import BudgetPeriodSelect from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
+import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 type CostTypes = BudgetModel['cost_types'];

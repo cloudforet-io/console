@@ -29,7 +29,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import BudgetToolboxUsageRange
-    from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
+    from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
 import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
 

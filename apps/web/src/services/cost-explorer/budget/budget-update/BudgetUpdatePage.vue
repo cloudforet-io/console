@@ -17,7 +17,7 @@ import {
 
 import { PHeading } from '@spaceone/design-system';
 
-import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
+import BudgetForm from '@/services/cost-explorer/budget/shared/budget-form/BudgetForm.vue';
 
 export default {
     name: 'BudgetUpdatePage',

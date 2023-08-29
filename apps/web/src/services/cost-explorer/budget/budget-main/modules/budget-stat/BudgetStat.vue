@@ -42,7 +42,7 @@ import type { Vue } from 'vue/types/vue';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
-import { commaFormatter, isNotEmpty } from '@cloudforet/core-lib';
+import { commaFormatter, isNotEmpty } from '@cloudforet/core-lib/index';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
