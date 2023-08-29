@@ -71,9 +71,9 @@ const listCostAnalysisData = async () => {
         costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
         const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-            include_others: !!costAnalysisPageState.primaryGroupBy,
+            include_others: !!costAnalysisPageState.chartGroupBy,
             granularity: costAnalysisPageState.granularity,
-            group_by: costAnalysisPageState.primaryGroupBy ? [costAnalysisPageState.primaryGroupBy] : [],
+            group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
             start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
             end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
             limit: 15,
@@ -119,7 +119,7 @@ const handleChartRendered = () => {
 watch([
     () => costAnalysisPageState.granularity,
     () => costAnalysisPageState.period,
-    () => costAnalysisPageState.primaryGroupBy,
+    () => costAnalysisPageState.chartGroupBy,
     () => costAnalysisPageState.filters,
 ], ([granularity, period, groupBy]) => {
     setChartData(granularity, period, groupBy);

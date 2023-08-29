@@ -90,7 +90,6 @@ const handleSaveQuerySet = async () => {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
                 group_by: costAnalysisPageState.groupBy,
-                primary_group_by: costAnalysisPageState.primaryGroupBy, // will be deprecated(< v1.10.5)
                 more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
                 filters: costAnalysisPageState.filters,
             }),
