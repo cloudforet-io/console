@@ -47,6 +47,7 @@ const state = reactive({
     range: {} as BudgetUsageRange,
     pageStart: 1,
     pageLimit: 24,
+    totalCount: 0,
     queryStoreFilters: props.filters as ConsoleFilter[],
     period: {} as Period,
     // api request params
@@ -80,11 +81,13 @@ const setFilters = (filters: ConsoleFilter[]) => {
 
 const fetchBudgetUsages = async () => {
     try {
-        const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
+        const { results, total_count } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
         state.budgetUsages = results;
+        state.totalCount = total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.budgetUsages = [];
+        state.totalCount = 0;
     }
 };
 
@@ -165,6 +168,7 @@ const handleUpdateSort = (sort) => {
 <template>
     <div class="budget-list">
         <budget-toolbox :filters="state.queryStoreFilters"
+                        :total-count="state.totalCount"
                         @update-range="handleUpdateRange"
                         @update-pagination="handleUpdatePagination"
                         @update-period="handleUpdatePeriod"

@@ -46,10 +46,12 @@ type Sort = BudgetUsageAnalyzeRequestParam['sort'];
 
 interface Props {
     filters: ConsoleFilter[];
+    totalCount: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     filters: () => [],
+    totalCount: 0,
 });
 const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
     (e: 'update-range', range: BudgetUsageRange): void;
@@ -215,7 +217,8 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                    :setting-visible="false"
                    filters-visible
                    :page-size-options="pageSizeOptions"
-                   :page-size="24"
+                   :page-size="state.pageLimit"
+                   :total-count="props.totalCount"
                    :query-tags="state.queryTags"
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
