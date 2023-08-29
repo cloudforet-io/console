@@ -30,14 +30,22 @@
                     />
                 </span>
             </p>
-            <p v-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
+            <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
                class="top-title-wrapper"
             >
                 <span class="top-title">{{ item.label }}</span>
             </p>
-
-            <l-n-b-divider-menu-item v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" />
-            <l-n-b-router-menu-item v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+            <div v-else-if="item.type === MENU_ITEM_TYPE.DROPDOWN"
+                 class="select-options-wrapper"
+            >
+                <p-select-dropdown class="select-options-dropdown"
+                                   :items="item.selectOptions.items"
+                                   :selected="item.selectOptions.defaultSelected"
+                                   @update:selected="handleSelect(item.id, $event)"
+                />
+            </div>
+            <l-n-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" />
+            <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
                                     :item="item"
                                     :depth="depth"
                                     :is-domain-owner="isDomainOwner"
@@ -62,7 +70,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PSelectDropdown } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -82,6 +90,7 @@ export default defineComponent<Props>({
     name: 'LNBMenuItem',
     components: {
         PI,
+        PSelectDropdown,
         BetaMark,
         NewMark,
         LNBRouterMenuItem,
@@ -102,7 +111,7 @@ export default defineComponent<Props>({
         },
     },
 
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
@@ -116,9 +125,14 @@ export default defineComponent<Props>({
             state.isFolded = !state.isFolded;
         };
 
+        const handleSelect = (id: string, selected: string) => {
+            emit('select', id, selected);
+        };
+
         return {
             ...toRefs(state),
             handleFoldableToggle,
+            handleSelect,
             MENU_ITEM_TYPE,
         };
     },
