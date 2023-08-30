@@ -244,7 +244,6 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
-                             :sort-by="state.sortBy"
                              :selectable="false"
                              :exportable="false"
                              :class="state.items.length === 0 ? 'no-data' : ''"
