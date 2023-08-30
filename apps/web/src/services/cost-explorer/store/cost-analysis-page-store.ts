@@ -8,7 +8,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-query-store';
+import { useCostQueryStore } from '@/services/cost-explorer/store/cost-query-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -25,7 +25,7 @@ interface CostAnalysisPageState {
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
-const costQueryStore = useCostAnalysisLNBStore();
+const costQueryStore = useCostQueryStore();
 const costQueryState = costQueryStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
@@ -83,8 +83,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         filters: {},
     }),
     getters: {
-        selectedQueryId: () => costQueryState.selectedQueryId,
-        costQueryList: () => costQueryState.costQueryList,
+        selectedQueryId: () => costQueryState.selectedQuerySetId,
+        costQueryList: () => costQueryState.costQuerySetList,
         selectedQuerySet: () => costQueryStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
@@ -184,10 +184,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
         },
         selectQueryId(querySetId: string|undefined) {
-            costQueryStore.$patch({ selectedQueryId: querySetId });
+            costQueryStore.$patch({ selectedQuerySetId: querySetId });
         },
         async getCostQueryList() {
-            await costQueryStore.listCostQueryList();
+            await costQueryStore.listCostQuerySets();
         },
     },
 });
