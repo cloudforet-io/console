@@ -1,6 +1,54 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import { PI, PSelectDropdown } from '@spaceone/design-system';
+
+import { store } from '@/store';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
+import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
+import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+
+interface Props {
+    menuData: LNBMenu;
+    currentPath: string;
+    depth: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    menuData: () => ({}) as LNBItem,
+    currentPath: undefined,
+    depth: 1,
+});
+const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
+
+const state = reactive({
+    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+    processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
+    isFolded: false,
+    isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
+    showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
+    hoveredItem: '',
+});
+
+const handleFoldableToggle = () => {
+    state.isFolded = !state.isFolded;
+};
+
+const handleSelect = (id: string, selected: string) => {
+    emit('select', id, selected);
+};
+
+</script>
+
 <template>
     <div class="lnb-menu-list">
-        <div v-for="(item, idx) in processedMenuData"
+        <div v-for="(item, idx) in state.processedMenuData"
              :key="item.id"
              class="lnb-menu-item"
         >
@@ -44,11 +92,11 @@
                                    @update:selected="handleSelect(item.id, $event)"
                 />
             </div>
-            <l-n-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" />
-            <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+            <l-n-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
+            <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
                                     :depth="depth"
-                                    :is-domain-owner="isDomainOwner"
+                                    :is-domain-owner="state.isDomainOwner"
                                     :idx="idx"
                                     :current-path="currentPath"
             >
@@ -63,81 +111,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-
-import { PI, PSelectDropdown } from '@spaceone/design-system';
-
-import { store } from '@/store';
-
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
-import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
-import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
-
-interface Props {
-    menuData: LNBMenu;
-    currentPath: string;
-}
-
-export default defineComponent<Props>({
-    name: 'LNBMenuItem',
-    components: {
-        PI,
-        PSelectDropdown,
-        BetaMark,
-        NewMark,
-        LNBRouterMenuItem,
-        LNBDividerMenuItem,
-    },
-    props: {
-        menuData: {
-            type: [Object, Array] as PropType<LNBMenu>,
-            default: () => ({}),
-        },
-        currentPath: {
-            type: String,
-            default: undefined,
-        },
-        depth: {
-            type: Number,
-            default: 1,
-        },
-    },
-
-    setup(props, { emit }) {
-        const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-            processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
-            isFolded: false,
-            isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
-            showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
-            hoveredItem: '',
-        });
-
-        const handleFoldableToggle = () => {
-            state.isFolded = !state.isFolded;
-        };
-
-        const handleSelect = (id: string, selected: string) => {
-            emit('select', id, selected);
-        };
-
-        return {
-            ...toRefs(state),
-            handleFoldableToggle,
-            handleSelect,
-            MENU_ITEM_TYPE,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .lnb-menu-item {
