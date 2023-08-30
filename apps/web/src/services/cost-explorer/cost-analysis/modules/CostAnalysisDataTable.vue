@@ -78,7 +78,7 @@ const tableState = reactive({
         if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
         if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
         if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
-        if (d.name.startsWith('usd_cost')) {
+        if (d.name.startsWith('cost')) {
             field.type = 'currency';
             field.options = {
                 currency: state.currency,
@@ -120,7 +120,7 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
         query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0].v);
     }
 
-    const date = fieldName.split('.')[1]; // usd_cost.2022-01-04
+    const date = fieldName.split('.')[1]; // cost.2022-01-04
     const _period = { start: date, end: date };
     if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
         _period.start = dayjs.utc(date).format('YYYY-MM-01');
@@ -169,10 +169,10 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
     };
 };
 const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
-    const currDate: string = fieldName.split('.')[1]; // usd_cost.2022-01-04
+    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04
     const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-    const currValue: number|undefined = item.usd_cost[currDate];
-    const prevValue: number|undefined = item.usd_cost[prevDate];
+    const currValue: number|undefined = item.cost[currDate];
+    const prevValue: number|undefined = item.cost[prevDate];
 
     if (prevValue === undefined || currValue === undefined) return false;
     if (currValue < prevValue) return false;
@@ -199,7 +199,7 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 let listCostAnalysisRequest: CancelTokenSource | undefined;
 const costApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
-    .setSort('total_usd_cost', true);
+    .setSort('total_cost', true);
 const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters) => {
     if (listCostAnalysisRequest) {
         listCostAnalysisRequest.cancel('Next request has been called.');

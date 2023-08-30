@@ -31,13 +31,13 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 
 
 const categoryKey = 'date';
-const columnChartValueName = 'usd_cost';
+const columnChartValueName = 'cost';
 
 export default {
     name: 'BudgetSummaryChart',
@@ -167,7 +167,7 @@ export default {
                 if (target.dataItem?.dataContext?.date === MonthToDate) {
                     return am4core.color(indigo[300]);
                 }
-                if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.usd_cost) {
+                if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.cost) {
                     return am4core.color(red[400]);
                 }
                 return am4core.color(indigo[600]);

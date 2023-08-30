@@ -35,7 +35,7 @@ export interface XYChartData {
     aggregation?: number;
     [key: string]: any;
 }
-export interface UsdCost {
+interface Cost {
     [key: string]: number;
 }
 export interface Legend {
@@ -46,8 +46,8 @@ export interface Legend {
 }
 
 export interface CostAnalyzeModel {
-    total_usd_cost?: number;
-    usd_cost: UsdCost | number;
+    total_cost?: number;
+    cost: Cost | number;
     is_others?: boolean;
     [key: string]: any;
 }

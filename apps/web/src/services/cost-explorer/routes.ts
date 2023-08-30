@@ -11,7 +11,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 
 const CostAnalysisPage = () => import('@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue');
-const BudgetPage = () => import('@/services/cost-explorer/budget/BudgetPage.vue');
+const BudgetMainPage = () => import('@/services/cost-explorer/budget/budget-main/BudgetMainPage.vue');
 const BudgetCreatePage = () => import('@/services/cost-explorer/budget/budget-create/BudgetCreatePage.vue');
 const BudgetBulkCreatePage = () => import('@/services/cost-explorer/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
 const BudgetUpdatePage = () => import('@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
@@ -49,7 +49,7 @@ const costExplorerRoutes: RouteConfig = {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                     meta: { lnbVisible: true },
-                    component: BudgetPage as any,
+                    component: BudgetMainPage as any,
                 },
                 {
                     path: 'create',

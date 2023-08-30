@@ -47,26 +47,26 @@ import {
 
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 
+import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
 import BudgetFormAmountPlanLastMonthsCost
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
-import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
+import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanMonthly
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanTotal
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
 import BudgetFormAmountPlanUnitSelect
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetPeriodSelect
-    from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
-import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
+    from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 export interface BudgetAmountPlanInfo {
-    limit?: BudgetData['limit'];
-    planned_limits?: BudgetData['planned_limits'];
-    time_unit: BudgetData['time_unit'];
-    start: BudgetData['start'];
-    end: BudgetData['end'];
+    limit?: BudgetModel['limit'];
+    planned_limits?: BudgetModel['planned_limits'];
+    time_unit: BudgetModel['time_unit'];
+    start: BudgetModel['start'];
+    end: BudgetModel['end'];
 }
 
 interface Props {

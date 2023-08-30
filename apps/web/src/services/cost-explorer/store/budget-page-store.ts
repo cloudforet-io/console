@@ -4,14 +4,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { BudgetData, BudgetUsageData, BudgetNotifications } from '@/services/cost-explorer/budget/type';
+import type { BudgetUsageModel, BudgetNotifications, BudgetModel } from '@/services/cost-explorer/budget/model';
 
 
 export const useBudgetPageStore = defineStore('budget-page', {
     state: () => ({
         loading: true,
-        budgetData: null as BudgetData|null,
-        budgetUsageData: null as BudgetUsageData|null,
+        budgetData: null as BudgetModel|null,
+        budgetUsageData: null as BudgetUsageModel|null,
     }),
     actions: {
         async getBudgetData(budgetId: string): Promise<void> {
@@ -51,7 +51,11 @@ export const useBudgetPageStore = defineStore('budget-page', {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.list({
                     budget_id: budgetId,
                 });
-                this.budgetUsageData = results;
+                // TODO: Remove conversion process after the cost analysis API is updated.
+                this.budgetUsageData = results.map((budgetUsage: any) => ({
+                    ...budgetUsage,
+                    cost: budgetUsage.usd_cost,
+                }));
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

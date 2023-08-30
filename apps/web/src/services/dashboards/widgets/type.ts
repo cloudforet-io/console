@@ -4,7 +4,7 @@ export interface CostAnalyzeDataModel {
     more?: boolean;
     results: Array<{
         [groupBy: string]: string | any; // product: 'AmazonCloudFront'
-        usd_cost_sum?: Array<{
+        cost_sum?: Array<{
             [field_group: string]: any;
             value: number
         }> | number;
@@ -12,7 +12,7 @@ export interface CostAnalyzeDataModel {
             [field_group: string]: any;
             value: number
         }> | number;
-        _total_usd_cost_sum?: number;
+        _total_cost_sum?: number;
         _total_usage_quantity_sum?: number;
     }>;
 }
@@ -22,7 +22,7 @@ export interface AnalyzeDataModel {
     results: Array<{
         [groupBy: string]: string | any; // product: 'AmazonCloudFront'
         // cost-analysis/analyze
-        usd_cost_sum?: Array<{
+        cost_sum?: Array<{
             [field_group: string]: any;
             value: number
         }> | number;
@@ -30,7 +30,7 @@ export interface AnalyzeDataModel {
             [field_group: string]: any;
             value: number
         }> | number;
-        _total_usd_cost_sum?: number;
+        _total_cost_sum?: number;
         _total_usage_quantity_sum?: number;
         // cloud-service/stats
         value?: Array<{ date: string; value: number }>;
@@ -64,7 +64,7 @@ export interface TreemapChartData {
     value?: any;
     children: Array<{
         [groupBy: string]: string | any;
-        usd_cost_sum: number;
+        cost_sum: number;
         label?: string;
         background_color?: string;
         font_color?: string;
@@ -73,7 +73,7 @@ export interface TreemapChartData {
 
 export interface PieChartData {
     [groupBy: string]: string | any;
-    usd_cost_sum?: number;
+    cost_sum?: number;
     usage_quantity_sum?: number;
 }
 

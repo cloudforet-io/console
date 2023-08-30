@@ -124,7 +124,7 @@ const state = reactive({
             label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
-            label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
+            label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
     legends: [] as Legend[],
@@ -168,7 +168,7 @@ const getCostDataByProvider = (results: FullData['results']): CostDataByProvider
         const providerGroupBy = groupBy(cItem, 'provider');
         Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
             if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => d.usd_cost_sum));
+                const providerCost = sum(pItem.map((d) => d.cost_sum));
                 if (result[continent]) result[continent][provider] = providerCost;
                 else result[continent] = { [provider]: providerCost };
             }
@@ -213,12 +213,13 @@ const fetchData = async (): Promise<FullData> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'usd_cost_sum', desc: true }],
+                sort: [{ key: 'cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });

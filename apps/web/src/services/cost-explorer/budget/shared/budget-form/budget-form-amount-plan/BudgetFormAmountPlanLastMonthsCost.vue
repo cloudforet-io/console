@@ -32,8 +32,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import type { Granularity } from '@/services/cost-explorer/type';
 
 interface Props {
@@ -75,7 +75,7 @@ export default {
         const { i18nDayjs } = useI18nDayjs();
 
         const state = reactive({
-            last3MonthsBudgets: [] as BudgetData[],
+            last3MonthsBudgets: [] as BudgetModel[],
             months: computed(() => {
                 const today = i18nDayjs.value.utc();
                 return [
@@ -88,7 +88,7 @@ export default {
                 const data = state.last3MonthsBudgets[i];
                 return {
                     month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
-                    cost: data ? data.usd_cost : 0,
+                    cost: data ? data.cost : 0,
                 };
             })),
             showList: computed(() => props.projectId || props.projectGroupId),
@@ -132,7 +132,12 @@ export default {
         const getRecentBudgets = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
-                state.last3MonthsBudgets = results.sort((a, b) => {
+                // TODO: Remove conversion process after the cost analysis API is updated.
+                const converted = results.map((result: any) => ({
+                    ...result,
+                    cost: result.usd_cost,
+                }));
+                state.last3MonthsBudgets = converted.sort((a, b) => {
                     if (dayjs(a.date).isAfter(dayjs(b.date))) return -1;
                     if (dayjs(a.date).isBefore(dayjs(b.date))) return 1;
                     return 0;
