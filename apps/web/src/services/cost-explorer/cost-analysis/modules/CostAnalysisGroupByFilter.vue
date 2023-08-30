@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PDivider, PSelectButton } from '@spaceone/design-system';
+import { PSelectButton } from '@spaceone/design-system';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import CostAnalysisGroupByFilterMore
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMore.vue';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { GroupByItem } from '@/services/cost-explorer/type';
@@ -14,8 +13,12 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    selectedGroupByItems: computed<GroupByItem[]>(() => costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d])),
+    selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
+        if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
+        return { name: d, label: d.split('.')[1] };
+    })),
     allGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
+    // TODO: add additional group by
 });
 
 /* util */
@@ -41,8 +44,6 @@ const handleSelectGroupByItems = async (items: GroupByItem[]) => {
         >
             {{ groupByItem.label }}
         </p-select-button>
-        <p-divider :vertical="true" />
-        <cost-analysis-group-by-filter-more />
     </div>
 </template>
 
