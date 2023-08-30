@@ -131,6 +131,7 @@ export default {
         /* Api */
         const getRecentBudgets = async () => {
             try {
+                // TODO: Change to clientV2 after the cost analysis API is updated.
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
                 // TODO: Remove conversion process after the cost analysis API is updated.
                 const converted = results.map((result: any) => ({
