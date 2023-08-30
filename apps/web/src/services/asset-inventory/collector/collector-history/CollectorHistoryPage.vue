@@ -96,7 +96,6 @@ const state = reactive({
     selectedStatus: 'ALL',
     items: [] as any[],
     sortBy: 'created_at',
-    sortDesc: true as boolean | undefined,
 });
 
 const queryTagsHelper = useQueryTags({
@@ -107,13 +106,12 @@ const queryTagsHelper = useQueryTags({
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
 
-const apiQueryHelper = new ApiQueryHelper();
-const getQuery = () => {
-    apiQueryHelper
-        .setPage(state.pageStart, state.pageSize)
-        .setSort(state.sortBy, state.sortDesc)
-        .setFilters(searchFilters.value);
+const apiQueryHelper = new ApiQueryHelper()
+    .setPage(state.pageStart, state.pageSize)
+    .setSort(state.sortBy, true)
+    .setFilters(searchFilters.value);
 
+const getQuery = () => {
     let statusValues: string[] = [];
     if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
         statusValues = [JOB_STATE.IN_PROGRESS];
@@ -140,8 +138,6 @@ const handleSelect = (item) => {
     }).catch(() => {});
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    state.sortBy = options.sortBy || 'created_at';
-    state.sortDesc = options.sortDesc;
     setApiQueryWithToolboxOptions(apiQueryHelper, options);
     if (options.queryTags) {
         queryTagsHelper.setQueryTags(options.queryTags);
@@ -244,6 +240,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
+                             :sort-by="state.sortBy"
                              :selectable="false"
                              :exportable="false"
                              :class="state.items.length === 0 ? 'no-data' : ''"
