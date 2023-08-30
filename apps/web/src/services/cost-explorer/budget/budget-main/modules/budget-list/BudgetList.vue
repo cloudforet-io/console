@@ -16,13 +16,13 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import BudgetListCard from '@/services/cost-explorer/budget/modules/budget-list/BudgetListCard.vue';
-import BudgetStat from '@/services/cost-explorer/budget/modules/budget-stat/BudgetStat.vue';
-import type { Pagination } from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolbox.vue';
-import BudgetToolbox from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolbox.vue';
+import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
+import BudgetStat from '@/services/cost-explorer/budget/budget-main/modules/budget-stat/BudgetStat.vue';
+import type { Pagination } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
+import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
+import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import type {
     BudgetUsageAnalyzeRequestParam,
-    BudgetUsageData,
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
@@ -41,7 +41,7 @@ const emit = defineEmits<{(e: 'update:filters', filters:ConsoleFilter[]): void;
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
 
 const state = reactive({
-    budgetUsages: [] as BudgetUsageData[],
+    budgetUsages: [] as BudgetUsageModel[],
     loading: false,
     // query
     range: {} as BudgetUsageRange,
@@ -82,7 +82,11 @@ const setFilters = (filters: ConsoleFilter[]) => {
 const fetchBudgetUsages = async () => {
     try {
         const { results, total_count } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-        state.budgetUsages = results;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        state.budgetUsages = results.map((budgetUsage: any) => ({
+            ...budgetUsage,
+            cost: budgetUsage.usd_cost,
+        }));
         state.totalCount = total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -133,7 +137,7 @@ const handleExport = async () => {
         { key: 'name', name: 'Budget Name' },
         { key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } },
         { key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } },
-        { key: 'usd_cost', name: 'USD Cost' },
+        { key: 'cost', name: 'USD Cost' },
         { key: 'limit', name: 'Limit' },
         { key: 'usage', name: 'Usage (%)' },
         { key: 'cost_types.service_account_id', name: 'Cost Type (Service Account)', reference: { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' } },

@@ -42,7 +42,7 @@ import type { Vue } from 'vue/types/vue';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
-import { commaFormatter, isNotEmpty } from '@cloudforet/core-lib';
+import { commaFormatter, isNotEmpty } from '@cloudforet/core-lib/index';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -55,9 +55,9 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import type {
     BudgetUsageAnalyzeRequestParam,
-    BudgetUsageData,
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
@@ -106,7 +106,7 @@ export default defineComponent<Props>({
         const { i18nDayjs } = useI18nDayjs();
         const budgetUsageApiQueryHelper = new ApiQueryHelper();
         const state = reactive({
-            budgetUsage: {} as BudgetUsageData,
+            budgetUsage: {} as BudgetUsageModel,
             loading: false,
             // currency
             currency: computed(() => store.state.settings.currency),
@@ -117,7 +117,7 @@ export default defineComponent<Props>({
                 // total cost
                 {
                     title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.TOTAL_COST'),
-                    data: state.budgetUsage.usd_cost ?? 0,
+                    data: state.budgetUsage.cost ?? 0,
                     unit: UNIT.currency,
                     dataType: '',
                     description: state.formattedPeriod,
@@ -154,7 +154,7 @@ export default defineComponent<Props>({
                 return `${start.format('MMM D, YYYY')} ~ ${end.format('MMM D, YYYY')}`;
             }),
             availableBudget: computed<string>(() => {
-                let availableBudget = state.budgetUsage.limit - state.budgetUsage.usd_cost;
+                let availableBudget = state.budgetUsage.limit - state.budgetUsage.cost;
                 availableBudget = availableBudget > 0 ? availableBudget : 0;
 
                 return `${currencyMoneyFormatter(availableBudget, state.currency, state.currencyRates)} ${i18n.t('BILLING.COST_MANAGEMENT.BUDGET.STAT.AVAILABLE')}`;
@@ -180,7 +180,11 @@ export default defineComponent<Props>({
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
 
-                state.budgetUsage = results[0] ?? {};
+                // TODO: Remove conversion process after the cost analysis API is updated.
+                state.budgetUsage = results[0] ? {
+                    ...results[0],
+                    cost: results[0].usd_cost,
+                } : {};
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.budgetUsage = {};

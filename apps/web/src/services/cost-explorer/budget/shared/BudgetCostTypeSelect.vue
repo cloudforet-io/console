@@ -62,9 +62,10 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { BudgetCostType, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
+import type { CostType, BudgetModel } from '@/services/cost-explorer/budget/model';
 
-type CostTypes = BudgetData['cost_types'];
+type CostTypes = BudgetModel['cost_types'];
+type BudgetCostType = 'all'| CostType;
 
 interface Props {
     costTypes?: CostTypes;

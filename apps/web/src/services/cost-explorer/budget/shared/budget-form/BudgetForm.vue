@@ -45,11 +45,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
+import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
 import BudgetFormAmountPlan
-    from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
-import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/modules/budget-form/BudgetFormBaseInfo.vue';
-import BudgetFormBaseInfo from '@/services/cost-explorer/budget/modules/budget-form/BudgetFormBaseInfo.vue';
+    from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
+import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/shared/budget-form/BudgetFormBaseInfo.vue';
+import BudgetFormBaseInfo from '@/services/cost-explorer/budget/shared/budget-form/BudgetFormBaseInfo.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 export default {

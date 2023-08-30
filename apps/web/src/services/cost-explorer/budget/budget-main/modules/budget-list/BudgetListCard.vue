@@ -114,12 +114,12 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import type { BudgetUsageData } from '@/services/cost-explorer/budget/type';
+import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 interface Props {
-    budgetUsage: BudgetUsageData;
+    budgetUsage: BudgetUsageModel;
     budgetLoading: boolean;
 }
 
@@ -219,7 +219,7 @@ export default {
 
                 return costTypeResourceListMap;
             }),
-            cost: computed<number>(() => props.budgetUsage.usd_cost ?? 0),
+            cost: computed<number>(() => props.budgetUsage.cost ?? 0),
             limit: computed<number>(() => props.budgetUsage.limit ?? 0),
             percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
             progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {

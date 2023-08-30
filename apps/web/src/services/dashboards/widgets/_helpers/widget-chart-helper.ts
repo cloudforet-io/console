@@ -27,7 +27,7 @@ export const getRefinedXYChartData = (
     rawData: CostAnalyzeDataModel['results'],
     groupBy?: CostGroupBy,
     categoryKey = 'date',
-    valueKey = 'usd_cost_sum',
+    valueKey = 'cost_sum',
     isHorizontal = false,
     allReferenceTypeInfo?: AllReferenceTypeInfo,
 ): XYChartData[] => {
@@ -149,8 +149,8 @@ export const getRefinedTreemapChartData = (rawData: TreemapChartData['children']
 /**
  * @name getRefinedPieChartData
  * @description Convert raw data to XYDateChart data.
- * @example(before) [{ provider: 'aws', usd_cost_sum: 100  }, { provider: 'google_cloud', usd_cost_sum: 100  }]
- * @example(after) [{ provider: 'AWS', usd_cost_sum: 100  }, { provider: 'Google Cloud', usd_cost_sum: 100  }]
+ * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
+ * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
  */
 export const getRefinedPieChartData = (
     rawData: CostAnalyzeDataModel['results'],

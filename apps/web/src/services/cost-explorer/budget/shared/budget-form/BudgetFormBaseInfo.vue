@@ -36,13 +36,13 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
-import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
-import type { BudgetData } from '@/services/cost-explorer/budget/type';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
+import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
+import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 
-export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>;
+export type BudgetBaseInfo = Pick<BudgetModel, 'name'|'cost_types'|'project_group_id'|'project_id'>;
 
-type CostTypes = BudgetData['cost_types'];
+type CostTypes = BudgetModel['cost_types'];
 
 export default {
     name: 'BudgetFormBaseInfo',

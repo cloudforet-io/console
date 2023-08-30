@@ -42,8 +42,8 @@ import { store } from '@/store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import type { BudgetData } from '@/services/cost-explorer/budget/type';
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 
 export default {
     name: 'AmountPlanningTypePopover',
@@ -52,7 +52,7 @@ export default {
     },
     props: {
         budgetData: {
-            type: Object as () => BudgetData,
+            type: Object as () => BudgetModel,
             default: () => ({}),
         },
     },

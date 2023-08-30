@@ -60,7 +60,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
 
         const legends: Legend[] = [];
         rawData.forEach((d) => {
-            if (Object.keys(d.usd_cost).length) {
+            if (Object.keys(d.cost).length) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 let _color;
@@ -128,7 +128,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'usd_cost'): XYChartData[] => {
+export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'cost'): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
@@ -164,8 +164,8 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granula
 /**
  * @name getStackedChartData
  * @description Get accumulated array of chart data. Chart data must have 'date' property.
- * @example [{ date: '2021-01', usd_cost: 10, limit: 100 }, { date: '2021-02', usd_cost: 10, limit: 0 }, { date: '2021-03', usd_cost: 10, limit: 100 }]
- *       => [{ date: '2021-01-01', usd_cost: 10, limit: 100 }, { date: '2021-02-01', usd_cost: 20, limit: 100 }, { date: '2021-03-01', usd_cost: 30, limit: 200 }]
+ * @example [{ date: '2021-01', cost: 10, limit: 100 }, { date: '2021-02', cost: 10, limit: 0 }, { date: '2021-03', cost: 10, limit: 100 }]
+ *       => [{ date: '2021-01-01', cost: 10, limit: 100 }, { date: '2021-02-01', cost: 20, limit: 100 }, { date: '2021-03-01', cost: 30, limit: 200 }]
  * @usage CostAnalysisDynamicWidget
  */
 export const getStackedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {

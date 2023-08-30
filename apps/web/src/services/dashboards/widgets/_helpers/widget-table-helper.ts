@@ -12,13 +12,13 @@ import type { CostAnalyzeDataModel, AnalyzeDataModel } from '@/services/dashboar
 /**
  * @name getWidgetTableDateFields
  * @description Get refined PDataTable fields.
- * @example [{ name: 'usd_cost_sum.0.value', label: '2022-09' }, ...]
+ * @example [{ name: 'cost_sum.0.value', label: '2022-09' }, ...]
  */
 export const getWidgetTableDateFields = (
     granularity: Granularity,
     dateRange: DateRange,
     textOptions: Field['textOptions'],
-    fieldsKey = 'usd_cost_sum',
+    fieldsKey = 'cost_sum',
 ): Field[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: Field[] = [];
@@ -50,14 +50,14 @@ export const getWidgetTableDateFields = (
 
 /**
  * @name getRefinedDateTableData
- * @description set data of empty date. This is necessary for index-oriented fields, like `usd_cost_sum.0.value`
+ * @description set data of empty date. This is necessary for index-oriented fields, like `cost_sum.0.value`
  * @example (before) [{ date: '2023-01', provider: 'aws' }]
  * @example (after) [{ date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }, { date: '2023-01', provider: 'aws' }]
  */
 export const getRefinedDateTableData = (
     results: AnalyzeDataModel['results'],
     dateRange: DateRange,
-    fieldsKey = 'usd_cost_sum',
+    fieldsKey = 'cost_sum',
 ): AnalyzeDataModel['results'] => {
     if (!results?.length) return [];
     const _results = cloneDeep(results);
@@ -79,17 +79,17 @@ export const getRefinedDateTableData = (
 export const sortTableData = (rawData: CostAnalyzeDataModel['results'], sortKey = 'date'): CostAnalyzeDataModel['results'] => {
     const results: CostAnalyzeDataModel['results'] = [];
     rawData.forEach((d) => {
-        let _usdCostSum = d.usd_cost_sum;
+        let _usdCostSum = d.cost_sum;
         let _usageQuantitySum = d.usage_quantity_sum;
-        if (typeof d.usd_cost_sum === 'object') {
-            _usdCostSum = sortBy(d.usd_cost_sum, sortKey);
+        if (typeof d.cost_sum === 'object') {
+            _usdCostSum = sortBy(d.cost_sum, sortKey);
         }
         if (typeof d.usage_quantity_sum === 'object') {
             _usageQuantitySum = sortBy(d.usage_quantity_sum, sortKey);
         }
         results.push({
             ...d,
-            usd_cost_sum: _usdCostSum,
+            cost_sum: _usdCostSum,
             usage_quantity_sum: _usageQuantitySum,
         });
     });

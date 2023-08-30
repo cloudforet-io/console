@@ -119,7 +119,7 @@ const state = reactive({
             },
             {
                 label: 'Cost',
-                name: 'usd_cost_sum',
+                name: 'cost_sum',
                 textOptions: { type: 'cost' },
                 textAlign: 'right',
             },
@@ -158,12 +158,13 @@ const fetchData = async (): Promise<Data> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'usd_cost_sum', desc: true }],
+                sort: [{ key: 'cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
@@ -180,7 +181,7 @@ const drawChart = (chartData: PieChartData[]) => {
     else chart = chartHelper.createPieChart();
     const seriesSettings = {
         categoryField: state.groupBy,
-        valueField: 'usd_cost_sum',
+        valueField: 'cost_sum',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     series.labels.template.set('forceHidden', true);
@@ -188,14 +189,14 @@ const drawChart = (chartData: PieChartData[]) => {
     chart.series.push(series);
     chartHelper.setChartColors(chart, colorSet.value);
 
-    if (chartData.some((d) => d.usd_cost_sum && d.usd_cost_sum > 0)) {
+    if (chartData.some((d) => d.cost_sum && d.cost_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
         chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(chartData);
     } else {
         series.data.setAll([{
-            usd_cost_sum: 1,
+            cost_sum: 1,
         }]);
         series.slices.template.setAll({
             fill: color(gray[200]),

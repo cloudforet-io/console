@@ -122,7 +122,7 @@ import BudgetNotificationsChannel
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
 import BudgetNotificationsModal
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
-import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/cost-explorer/budget/type';
+import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/cost-explorer/budget/model';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 

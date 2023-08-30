@@ -127,6 +127,7 @@ const fetchData = async (): Promise<Data> => {
                 end: state.dateRange.end,
                 fields: {
                     total_spent: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },

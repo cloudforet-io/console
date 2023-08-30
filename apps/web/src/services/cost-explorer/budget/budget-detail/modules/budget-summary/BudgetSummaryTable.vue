@@ -23,7 +23,7 @@
                         : currencyMoneyFormatter(value[value.path], currency, currencyRates, false, 1000000000)
                     }}
                 </span>
-                <span v-else-if="field.name && value.path === 'usd_cost'"
+                <span v-else-if="field.name && value.path === 'cost'"
                       class="text-blue-700"
                 >
                     <router-link :to="value.link"
@@ -56,27 +56,23 @@ import { CURRENCY } from '@/store/modules/settings/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import type {
-    BudgetTimeUnit,
-    BudgetUsageData,
-    CostType,
-} from '@/services/cost-explorer/budget/type';
+import type { CostType, BudgetTimeUnit, BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
-} from '@/services/cost-explorer/budget/type';
+} from '@/services/cost-explorer/budget/model';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 
-const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
+const defaultTableKey = [{ name: 'Actual Cost', path: 'cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
 
 const firstColumnData = {
     date: '',
     limit: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGETED'),
-    usd_cost: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ACTUAL_COST'),
+    cost: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ACTUAL_COST'),
     ratio: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SPENT'),
 };
 
@@ -86,7 +82,7 @@ const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeK
 interface EnrichedBudgetUsageData {
     date: string;
     limit: number|string;
-    usd_cost: number;
+    cost: number;
     ratio: number;
     link?: Location | string;
 }
@@ -121,7 +117,7 @@ export default {
         const budgetPageStore = useBudgetPageStore();
         const budgetPageState = budgetPageStore.$state;
 
-        const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
+        const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 
         const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit) => {
             if (totalBudgetLimit === 0 || monthlyLimit === 0) return '-';
@@ -141,9 +137,9 @@ export default {
                     start: dayjs.utc(d.date).startOf('month').format('YYYY-MM-DD'),
                     end: dayjs.utc(d.date).endOf('month').format('YYYY-MM-DD'),
                 };
-                const ratio = getBudgetRatio(budgetTimeUnit, d.usd_cost, totalBudgetLimit, d.limit);
-                // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.usd_cost / totalBudgetLimit) * 100)}%`
-                //     : `${Math.round((d.usd_cost / d.limit) * 100)}%`;
+                const ratio = getBudgetRatio(budgetTimeUnit, d.cost, totalBudgetLimit, d.limit);
+                // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.cost / totalBudgetLimit) * 100)}%`
+                //     : `${Math.round((d.cost / d.limit) * 100)}%`;
                 const link = {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     query: {
@@ -160,7 +156,7 @@ export default {
         };
 
         const getEnrichedBudgetUsageData = (
-            budgetUsageData: BudgetUsageData[],
+            budgetUsageData: BudgetUsageModel[],
             period: Period,
             budgetTimeUnit: BudgetTimeUnit,
             totalBudgetLimit: number,
