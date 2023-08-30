@@ -18,21 +18,25 @@ const handleMenuDismiss = () => {
     <div class="relocate-dashboard-notification">
         <div class="relocate-notification-wrapper">
             <p class="notification-title">
+                <!--TODO: translation-->
                 {{ $t('Reloate dashboard') }}
             </p>
             <span class="notification-description">
+                <!--TODO: translation-->
                 {{ $t('Your whole Cost Explorer dashboard has been securely transferred to the Dashboard menu for improved usabillity.') }}
             </span>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleLearnMore"
             >
+                <!--TODO: translation-->
                 {{ $t('Learn more') }}
             </p-text-button>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleMenuDismiss"
             >
+                <!--TODO: translation-->
                 {{ $t('Dismiss') }}
             </p-text-button>
         </div>

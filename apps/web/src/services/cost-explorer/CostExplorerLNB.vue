@@ -87,7 +87,8 @@ export default {
             data: computed<LNBItem>(() => ({
                 type: 'item',
                 id: MENU_ID.DASHBOARDS,
-                label: 'Go to Dashboard',
+                // TODO: translation
+                label: i18n.t('Go to Dashboard'),
                 to: { name: DASHBOARDS_ROUTE._NAME },
                 isNew: true,
                 hideFavorite: true,
