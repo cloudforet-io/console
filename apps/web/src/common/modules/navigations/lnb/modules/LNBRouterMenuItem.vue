@@ -11,7 +11,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import type { LNBMenu, LNBIcon } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
     item: LNBMenu;
@@ -42,7 +42,7 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (!resolvedHref.endsWith('/')) resolvedHref += '/';
     return currentPath.startsWith(resolvedHref);
 };
-const getIconName = (icon): string => {
+const getIconName = (icon: LNBIcon): string => {
     if (typeof icon === 'string') return icon;
     return icon.name;
 };

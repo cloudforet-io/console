@@ -22,6 +22,8 @@ export interface SelectOptions {
     defaultSelected?: string | number;
 }
 
+export type LNBIcon = string | { name: string; color?: string; };
+
 export interface LNBItem {
     type: MenuItemType;
     label?: TranslateResult;
@@ -32,7 +34,7 @@ export interface LNBItem {
     isBeta?: boolean;
     hideFavorite?: boolean;
     favoriteType?: FavoriteType;
-    icon?: string | { name: string; color?: string; };
+    icon?: LNBIcon;
     selectOptions?: SelectOptions;
 }
 
