@@ -29,7 +29,6 @@ const state = reactive({
 const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
 const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     let currentPath = props.currentPath;
-    console.debug('currentPath', currentPath, selectedMenuRoute);
     if (!currentPath) return false;
 
     const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
