@@ -32,7 +32,7 @@ export interface LNBItem {
     isBeta?: boolean;
     hideFavorite?: boolean;
     favoriteType?: FavoriteType;
-    icon?: string;
+    icon?: string | { name: string; color?: string; };
     selectOptions?: SelectOptions;
 }
 

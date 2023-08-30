@@ -42,6 +42,10 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (!resolvedHref.endsWith('/')) resolvedHref += '/';
     return currentPath.startsWith(resolvedHref);
 };
+const getIconName = (icon): string => {
+    if (typeof icon === 'string') return icon;
+    return icon.name;
+};
 
 </script>
 
@@ -58,7 +62,8 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
         />
         <div class="text-wrapper">
             <p-i v-if="item.icon"
-                 :name="item.icon"
+                 :name="getIconName(item.icon)"
+                 :color="item.icon.color"
                  width="1rem"
                  height="1rem"
                  class="icon"
