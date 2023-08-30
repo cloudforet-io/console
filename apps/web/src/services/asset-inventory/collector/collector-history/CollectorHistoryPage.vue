@@ -51,6 +51,7 @@ const fields: DataTableField[] = [
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
     { label: 'Job Progress', name: 'progress' },
+    { label: 'Total Task', name: 'total_tasks' },
     { label: 'Created', name: 'created_at' },
     { label: 'Duration', name: 'duration', sortable: false },
 ];
