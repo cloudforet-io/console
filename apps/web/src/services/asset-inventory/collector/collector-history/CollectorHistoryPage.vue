@@ -106,10 +106,7 @@ const queryTagsHelper = useQueryTags({
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
 
-const apiQueryHelper = new ApiQueryHelper()
-    .setPage(state.pageStart, state.pageSize)
-    .setSort(state.sortBy, true)
-    .setFilters(searchFilters.value);
+const apiQueryHelper = new ApiQueryHelper();
 
 const getQuery = () => {
     let statusValues: string[] = [];
@@ -207,6 +204,9 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
+    apiQueryHelper.setPage(state.pageStart, state.pageSize)
+        .setSort(state.sortBy, true)
+        .setFilters(searchFilters.value);
 
     await getJobs();
     if (state.totalCount === 0) state.modalVisible = true;
