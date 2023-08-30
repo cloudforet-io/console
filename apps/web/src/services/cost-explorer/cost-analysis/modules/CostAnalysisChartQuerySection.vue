@@ -100,16 +100,16 @@ const handleToggleAllLegends = () => {
     }
     state.proxyLegends = _legends;
 };
-const handlePrimaryGroupByItem = (groupBy?: string) => {
-    costAnalysisPageStore.$patch({ primaryGroupBy: groupBy });
+const handleChartGroupByItem = (groupBy?: string) => {
+    costAnalysisPageStore.$patch({ chartGroupBy: groupBy });
 };
 
 /* Watcher */
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {
-        costAnalysisPageStore.$patch({ primaryGroupBy: undefined });
-    } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
-        costAnalysisPageStore.$patch({ primaryGroupBy: after[0].name });
+        costAnalysisPageStore.$patch({ chartGroupBy: undefined });
+    } else if (!after.filter((d) => d.name === costAnalysisPageState.chartGroupBy).length) {
+        costAnalysisPageStore.$patch({ chartGroupBy: after[0].name });
     }
 });
 </script>
@@ -146,9 +146,9 @@ watch(() => state.groupByMenuItems, (after) => {
         <div class="title-wrapper">
             <p-select-dropdown v-if="state.groupByMenuItems.length"
                                :items="state.groupByMenuItems"
-                               :selected="costAnalysisPageState.primaryGroupBy"
+                               :selected="costAnalysisPageState.chartGroupBy"
                                style-type="transparent"
-                               @select="handlePrimaryGroupByItem"
+                               @select="handleChartGroupByItem"
             />
             <span v-else
                   class="title"

@@ -17,7 +17,7 @@ import type {
 interface CostAnalysisPageState {
     granularity: Granularity;
     groupBy: Array<GroupBy|string>;
-    primaryGroupBy?: GroupBy|string;
+    chartGroupBy?: GroupBy|string;
     moreGroupBy: MoreGroupByItem[];
     period: Period;
     filters: CostFiltersMap;
@@ -77,7 +77,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     state: (): CostAnalysisPageState => ({
         granularity: GRANULARITY.MONTHLY,
         groupBy: [],
-        primaryGroupBy: undefined,
+        chartGroupBy: undefined,
         moreGroupBy: [],
         period: getInitialDates(),
         filters: {},
@@ -89,7 +89,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             granularity: state.granularity,
             group_by: state.groupBy,
-            primary_group_by: state.primaryGroupBy,
             more_group_by: state.moreGroupBy,
             period: state.period,
             filters: state.filters,
@@ -107,7 +106,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         async initState() {
             this.granularity = GRANULARITY.MONTHLY;
             this.groupBy = [];
-            this.primaryGroupBy = undefined;
+            this.chartGroupBy = undefined;
             this.period = getInitialDates();
             this.filters = {};
             // set more group by items
@@ -135,7 +134,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 return !!convertGroupByStringToMoreGroupByItem(d);
             });
             this.groupBy = refinedDefaultGroupBy;
-            this.primaryGroupBy = refinedGroupBy?.[0];
+            this.chartGroupBy = refinedGroupBy?.[0];
 
             // set moreGroupByItems
             const storedMoreGroupByItems: MoreGroupByItem[] = costExplorerSettingsStore.$state.costAnalysisMoreGroupBy;
@@ -151,7 +150,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 granularity: this.granularity,
                 period: this.period,
                 group_by: this.groupBy,
-                primary_group_by: this.primaryGroupBy, // will be deprecated(< v1.10.5)
                 more_group_by: this.moreGroupBy, // will be deprecated(< v1.10.5)
                 filters: this.filters,
             });

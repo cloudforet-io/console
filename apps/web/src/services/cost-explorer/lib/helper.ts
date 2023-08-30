@@ -147,13 +147,6 @@ export const getRefinedCostQueryOptions = (options: Partial<CostQuerySetOption>)
             .map((d) => `${d.category}.${d.key}`);
         refinedGroupBy = options.group_by.concat(refinedMoreGroupBy);
     }
-    // < 1.10.5 version compatible code
-    if (options.primary_group_by) {
-        refinedGroupBy = [
-            options.primary_group_by,
-            ...refinedGroupBy.filter((d) => d !== options.primary_group_by),
-        ];
-    }
 
     newOptions.group_by = refinedGroupBy;
     return newOptions;

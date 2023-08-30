@@ -15,7 +15,6 @@ export interface CostAnalysisPageQueryValue {
     period?: Period;
     group_by?: string[];
     filters?: CostFiltersMap;
-    stack?: boolean;
     granularity?: Granularity;
 }
 
