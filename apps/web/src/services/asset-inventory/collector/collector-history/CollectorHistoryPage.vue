@@ -50,7 +50,7 @@ const fields: DataTableField[] = [
     { label: 'Collector', name: 'collector_info.label', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
-    { label: 'Job Progress', name: 'progress' },
+    { label: 'Job Progress', name: 'progress', sortable: false },
     { label: 'Total Task', name: 'total_tasks' },
     { label: 'Created', name: 'created_at' },
     { label: 'Duration', name: 'duration', sortable: false },
@@ -95,6 +95,8 @@ const state = reactive({
     isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
+    sortBy: 'created_at',
+    sortDesc: true as boolean | undefined,
 });
 
 const queryTagsHelper = useQueryTags({
@@ -109,7 +111,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const getQuery = () => {
     apiQueryHelper
         .setPage(state.pageStart, state.pageSize)
-        .setSort('created_at', true)
+        .setSort(state.sortBy, state.sortDesc)
         .setFilters(searchFilters.value);
 
     let statusValues: string[] = [];
@@ -138,7 +140,9 @@ const handleSelect = (item) => {
     }).catch(() => {});
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
+    state.sortBy = options.sortBy || 'created_at';
+    state.sortDesc = options.sortDesc;
+    setApiQueryWithToolboxOptions(apiQueryHelper, options);
     if (options.queryTags) {
         queryTagsHelper.setQueryTags(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
@@ -240,6 +244,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
+                             :sort-by="state.sortBy"
                              :selectable="false"
                              :exportable="false"
                              :class="state.items.length === 0 ? 'no-data' : ''"

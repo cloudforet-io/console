@@ -8,6 +8,7 @@ export interface ToolboxOptions {
     sortBy?: string;
     queryTags?: QueryTag[];
     searchText?: string;
+    sortDesc?: boolean;
 }
 
 export interface ToolboxProps {
