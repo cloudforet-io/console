@@ -8,6 +8,8 @@ import { PButtonModal, PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -16,25 +18,25 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-query-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const costQueryStore = useCostAnalysisLNBStore();
+const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
+
+const costQueryStore = useCostQuerySetStore();
+const costQueryState = costQueryStore.$state;
 
 const state = reactive({
     loading: true,
     header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
     menuSet: computed<LNBMenu[]>(() => [
+        ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
-            {
-                type: 'item',
-                id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
-                label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
-                to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
-            },
             {
                 type: 'item',
                 id: MENU_ID.COST_EXPLORER_BUDGET,
@@ -43,6 +45,44 @@ const state = reactive({
             },
         ], store.getters['user/pagePermissionList']),
     ]),
+    costAnalysisMenuSet: computed<LNBMenu[]>(() => [
+        { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
+        {
+            type: MENU_ITEM_TYPE.TOP_TITLE,
+            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+        },
+        {
+            type: MENU_ITEM_TYPE.DROPDOWN,
+            id: DATA_SOURCE_DROPDOWN_KEY,
+            selectOptions: {
+                items: costQueryState.dataSourceList.map((dataSource) => ({
+                    name: dataSource,
+                    label: dataSource,
+                })),
+                defaultSelected: state.selectedDataSource,
+            },
+        },
+        ...state.queryMenuSet,
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+    ]),
+    queryMenuSet: computed<LNBMenu>(() => {
+        const currentQueryMenuList: LNBMenu = costQueryState.costQuerySetList.map((d) => ({
+            type: 'item',
+            id: d.cost_query_set_id,
+            label: d.name,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? 'ic_main-filled' : undefined,
+            to: {
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                params: {
+                    querySetId: d.cost_query_set_id,
+                },
+            },
+            favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
+        }));
+        return currentQueryMenuList;
+    }),
 });
 
 const relocateNotificationState = reactive({
@@ -59,8 +99,16 @@ const relocateNotificationState = reactive({
     isModalVisible: false,
 });
 
+const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
+    const pagePermission = store.getters['user/pagePermissionMap'];
+    const routeName = MENU_ID.COST_EXPLORER_COST_ANALYSIS;
+
+    if (pagePermission[routeName]) return [...menuSet];
+    return [];
+};
+
 const handleSelect = (id: string, selected: string) => {
-    if (id === 'data-source') costQueryStore.$patch({ selectedDataSource: selected });
+    if (id === DATA_SOURCE_DROPDOWN_KEY) costQueryStore.$patch({ selectedDataSource: selected });
 };
 
 const handleLearnMoreRelocateNotification = () => {
@@ -79,9 +127,7 @@ const handleDismissRelocateNotification = () => {
                :menu-set="state.menuSet"
                @select="handleSelect"
         >
-            <template v-if="relocateNotificationState.isShow"
-                      #default
-            >
+            <template #default>
                 <l-n-b-router-menu-item :item="relocateNotificationState.data">
                     <template #after-text>
                         <p-i name="ic_arrow-right-up"
@@ -91,7 +137,8 @@ const handleDismissRelocateNotification = () => {
                         />
                     </template>
                 </l-n-b-router-menu-item>
-                <relocate-dashboard-notification @click-dismiss="handleDismissRelocateNotification"
+                <relocate-dashboard-notification v-if="relocateNotificationState.isShow"
+                                                 @click-dismiss="handleDismissRelocateNotification"
                                                  @click-learn-more="handleLearnMoreRelocateNotification"
                 />
                 <l-n-b-divider-menu-item />

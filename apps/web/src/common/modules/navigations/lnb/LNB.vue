@@ -19,7 +19,7 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
-    header: string;
+    header?: string;
     backLink?: BackLink;
     topTitle?: TopTitle;
     menuSet: LNBMenu[];
