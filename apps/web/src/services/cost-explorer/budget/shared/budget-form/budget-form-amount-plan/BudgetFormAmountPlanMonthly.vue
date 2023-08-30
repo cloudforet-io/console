@@ -1,8 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
 
 import {
-    computed,
-    reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
@@ -23,117 +22,100 @@ interface Props {
 
 export type MonthAmountInputMap = Record<string, MonthAmountInput>;
 
-export default {
-    name: 'BudgetFormAmountPlanMonthly',
-    components: {
-        BudgetFormAmountPlanAutofillModal,
-        BudgetFormAmountPlanMonthInput,
-        PFieldTitle,
-        PButton,
-        PDivider,
-    },
-    props: {
-        period: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props: Props, { emit }) {
-        const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
-            const months: string[] = [];
-            let _month = month;
-            while (_month.isSameOrBefore(monthEnd, 'month')) {
-                months.push(dayjs.utc(_month).locale('en').format('YYYY-MM'));
-                _month = _month.add(1, 'month');
-            }
-            return months;
-        };
+const props = withDefaults(defineProps<Props>(), {
+    period: () => ({}),
+});
 
-        const state = reactive({
-            months: computed<string[]>(() => {
-                const { start, end } = props.period;
-                if (!start || !end) return [];
+const emit = defineEmits<{(e: 'update', monthAmountInputMap: MonthAmountInputMap, isAllValid: boolean): void; }>();
 
-                const month = dayjs.utc(start as string);
-                const monthEnd = dayjs.utc(end as string);
 
-                return getAllMonths(month, monthEnd);
-            }),
-            monthAmountInputMap: {} as MonthAmountInputMap,
-            // autofill
-            visibleAutofillModal: false,
-            autofillOptions: null as AutofillOptions|null,
-            // validation
-            isAllValid: computed<boolean>(() => {
-                const items = Object.values(state.monthAmountInputMap) as MonthAmountInput[];
-                return items.every(({ isValid }) => !!isValid);
-            }),
-        });
-
-        const getAutofillAmount = (index: number, { start, growth }: AutofillOptions) => {
-            const amount = start ?? 0;
-            const growthAmount = growth ? amount / 100 * growth : 0;
-            return amount + (growthAmount * index);
-        };
-
-        const fillAmountMapWithOptions = (options: AutofillOptions) => {
-            Object.keys(state.monthAmountInputMap).forEach((month, index) => {
-                state.monthAmountInputMap[month].amount = getAutofillAmount(index, options);
-                state.monthAmountInputMap[month].isValid = true;
-            });
-        };
-
-        const initAmountInputMapWithMonths = (months: string[]) => {
-            const amountMap: MonthAmountInputMap = {};
-            months.forEach((month, index) => {
-                if (state.autofillOptions) {
-                    amountMap[month] = {
-                        amount: getAutofillAmount(index, state.autofillOptions),
-                        isValid: true,
-                    };
-                } else {
-                    amountMap[month] = {
-                        amount: index === 0 ? 1000 : undefined,
-                        isValid: index === 0,
-                    };
-                }
-            });
-            state.monthAmountInputMap = amountMap;
-        };
-
-        /* Handlers */
-        const handleAutofillButtonClick = () => {
-            state.visibleAutofillModal = true;
-        };
-
-        const handleAutofillConfirm = (options: AutofillOptions) => {
-            state.autofillOptions = options;
-
-            fillAmountMapWithOptions(options);
-        };
-
-        const handleUpdateMonthInput = (month: string, { amount, isValid }: MonthAmountInput) => {
-            state.monthAmountInputMap[month].amount = amount;
-            state.monthAmountInputMap[month].isValid = isValid;
-        };
-
-        /* Watchers */
-        watch(() => state.months, (months) => {
-            initAmountInputMapWithMonths(months);
-        }, { immediate: true });
-
-        watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
-            emit('update', monthAmountInputMap, state.isAllValid);
-        }, { deep: true });
-
-        return {
-            ...toRefs(state),
-            handleAutofillButtonClick,
-            handleAutofillConfirm,
-            handleUpdateMonthInput,
-        };
-    },
+const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
+    const months: string[] = [];
+    let _month = month;
+    while (_month.isSameOrBefore(monthEnd, 'month')) {
+        months.push(dayjs.utc(_month).locale('en').format('YYYY-MM'));
+        _month = _month.add(1, 'month');
+    }
+    return months;
 };
+
+const state = reactive({
+    months: computed<string[]>(() => {
+        const { start, end } = props.period;
+        if (!start || !end) return [];
+
+        const month = dayjs.utc(start as string);
+        const monthEnd = dayjs.utc(end as string);
+
+        return getAllMonths(month, monthEnd);
+    }),
+    monthAmountInputMap: {} as MonthAmountInputMap,
+    // autofill
+    visibleAutofillModal: false,
+    autofillOptions: null as AutofillOptions|null,
+    // validation
+    isAllValid: computed<boolean>(() => {
+        const items = Object.values(state.monthAmountInputMap) as MonthAmountInput[];
+        return items.every(({ isValid }) => !!isValid);
+    }),
+});
+
+const getAutofillAmount = (index: number, { start, growth }: AutofillOptions) => {
+    const amount = start ?? 0;
+    const growthAmount = growth ? amount / 100 * growth : 0;
+    return amount + (growthAmount * index);
+};
+
+const fillAmountMapWithOptions = (options: AutofillOptions) => {
+    Object.keys(state.monthAmountInputMap).forEach((month, index) => {
+        state.monthAmountInputMap[month].amount = getAutofillAmount(index, options);
+        state.monthAmountInputMap[month].isValid = true;
+    });
+};
+
+const initAmountInputMapWithMonths = (months: string[]) => {
+    const amountMap: MonthAmountInputMap = {};
+    months.forEach((month, index) => {
+        if (state.autofillOptions) {
+            amountMap[month] = {
+                amount: getAutofillAmount(index, state.autofillOptions),
+                isValid: true,
+            };
+        } else {
+            amountMap[month] = {
+                amount: index === 0 ? 1000 : undefined,
+                isValid: index === 0,
+            };
+        }
+    });
+    state.monthAmountInputMap = amountMap;
+};
+
+/* Handlers */
+const handleAutofillButtonClick = () => {
+    state.visibleAutofillModal = true;
+};
+
+const handleAutofillConfirm = (options: AutofillOptions) => {
+    state.autofillOptions = options;
+
+    fillAmountMapWithOptions(options);
+};
+
+const handleUpdateMonthInput = (month: string, { amount, isValid }: MonthAmountInput) => {
+    state.monthAmountInputMap[month].amount = amount;
+    state.monthAmountInputMap[month].isValid = isValid;
+};
+
+/* Watchers */
+watch(() => state.months, (months) => {
+    initAmountInputMapWithMonths(months);
+}, { immediate: true });
+
+watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
+    emit('update', monthAmountInputMap, state.isAllValid);
+}, { deep: true });
+
 </script>
 
 <template>
@@ -151,16 +133,16 @@ export default {
         <slot name="last-3-months" />
         <p-divider class="mt-2" />
         <div class="input-wrapper">
-            <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap"
+            <budget-form-amount-plan-month-input v-for="(_, month, index) in state.monthAmountInputMap"
                                                  :key="month"
                                                  class="input"
-                                                 :amount="monthAmountInputMap[month].amount"
+                                                 :amount="state.monthAmountInputMap[month].amount"
                                                  :month="month"
                                                  :is-month-to-date="index === 0"
                                                  @update="handleUpdateMonthInput(month, $event)"
             />
         </div>
-        <budget-form-amount-plan-autofill-modal v-model="visibleAutofillModal"
+        <budget-form-amount-plan-autofill-modal v-model="state.visibleAutofillModal"
                                                 @confirm="handleAutofillConfirm"
         />
     </div>
