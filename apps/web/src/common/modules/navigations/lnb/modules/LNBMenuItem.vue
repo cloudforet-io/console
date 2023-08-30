@@ -73,7 +73,7 @@ const handleSelect = (id: string, selected: string) => {
                 >
                     <p-i width="1rem"
                          height="1rem"
-                         :name="isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         :name="state.isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
                          color="inherit transparent"
                     />
                 </span>
@@ -141,6 +141,12 @@ const handleSelect = (id: string, selected: string) => {
         padding-top: 1.25rem;
         padding-left: 0.5rem;
         padding-bottom: 0.75rem;
+    }
+    .select-options-wrapper {
+        padding: 0 0.5rem;
+        .select-options-dropdown {
+            @apply w-full;
+        }
     }
 }
 </style>
