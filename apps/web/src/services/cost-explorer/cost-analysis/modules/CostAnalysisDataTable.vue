@@ -216,6 +216,7 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
         const moreGroupByKeyList = moreGroupBy.filter((d) => d.selected).map((d) => `${d.category}.${d.key}`);
 
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
             granularity,
             group_by: [...groupBy, ...moreGroupByKeyList],
@@ -223,7 +224,12 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
             end: dayjs.utc(period.end).format(dateFormat),
             ...query,
         }, { cancelToken: listCostAnalysisRequest.token });
-        tableState.items = results;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        tableState.items = results.map((d) => ({
+            ...d,
+            cost: d.usd_cost,
+            total_cost: d.total_usd_cost,
+        }));
         tableState.totalCount = total_count;
         listCostAnalysisRequest = undefined;
     } catch (e) {
