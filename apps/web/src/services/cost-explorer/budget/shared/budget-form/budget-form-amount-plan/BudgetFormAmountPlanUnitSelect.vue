@@ -1,22 +1,3 @@
-<template>
-    <div class="budget-form-amount-plan-unit-select">
-        <p-select-card v-for="({title, desc, unit}, index) in plans"
-                       :key="unit"
-                       :tab-index="index"
-                       :value="unit"
-                       :selected="selectedUnit"
-                       @change="handleUnitChange"
-        >
-            <p-field-title class="title">
-                {{ title }}
-            </p-field-title>
-            <p class="desc">
-                {{ desc }}
-            </p>
-        </p-select-card>
-    </div>
-</template>
-
 <script lang="ts">
 import {
     computed,
@@ -81,6 +62,25 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="budget-form-amount-plan-unit-select">
+        <p-select-card v-for="({title, desc, unit}, index) in plans"
+                       :key="unit"
+                       :tab-index="index"
+                       :value="unit"
+                       :selected="selectedUnit"
+                       @change="handleUnitChange"
+        >
+            <p-field-title class="title">
+                {{ title }}
+            </p-field-title>
+            <p class="desc">
+                {{ desc }}
+            </p>
+        </p-select-card>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .budget-form-amount-plan-unit-select {

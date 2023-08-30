@@ -1,98 +1,3 @@
-<template>
-    <router-link :to="linkLocation"
-                 class="budget-list-card"
-    >
-        <div v-if="budgetLoading"
-             class="skeleton-wrapper"
-        >
-            <div class="top">
-                <p-skeleton width="30%"
-                            height="1rem"
-                />
-                <p-skeleton width="23%"
-                            height="1.5rem"
-                />
-            </div>
-            <p-skeleton width="40%"
-                        height="1rem"
-            />
-        </div>
-        <div v-else
-             class="card-wrapper"
-        >
-            <div class="card-header">
-                <div class="flex items-center mb-1">
-                    <span v-for="(name, index) in projects"
-                          :key="name"
-                          class="project-info"
-                          :class="{target: index === projects.length - 1}"
-                    >
-                        <p-i v-if="index === projects.length - 1"
-                             :name="isProject ? 'ic_document-filled' : 'ic_folder-filled'"
-                             color="inherit"
-                             width="1em"
-                             height="1em"
-                             class="mr-1"
-                        />
-                        {{ name }}
-                        <p-i v-if="index < projects.length - 1"
-                             name="ic_chevron-right-thin"
-                             width="1em"
-                             height="1em"
-                        />
-                    </span>
-                </div>
-                <p class="budget-name">
-                    {{ budgetUsage.name }}
-                </p>
-            </div>
-            <p-divider />
-            <div class="card-body">
-                <div class="budget-progress">
-                    <div class="label-wrapper">
-                        <div class="label-left">
-                            <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
-                            </p>
-                            <div class="amount-used-wrapper"
-                                 :class="progressStatus"
-                            >
-                                <span class="cost">{{ currencyMoneyFormatter(cost, storeState.currency, storeState.currencyRates) }}</span>
-                                <span class="percent">(<template v-if="percentage < 0">0.00</template>
-                                    <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
-                            </div>
-                        </div>
-                        <div class="label-right">
-                            <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
-                            </p>
-                            <div class="cost">
-                                {{ currencyMoneyFormatter(limit, storeState.currency, storeState.currencyRates) }}
-                            </div>
-                        </div>
-                    </div>
-                    <budget-usage-progress-bar :usage-rate="percentage" />
-                </div>
-                <div class="budget-description">
-                    <div class="cost-type-wrapper">
-                        <div class="label">
-                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
-                        </div>
-                        <div class="cost-type">
-                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap"
-                                  :key="costTypeLabel"
-                                  class="truncate"
-                            >
-                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </router-link>
-</template>
-
 <script lang="ts">
 import {
     computed, reactive, toRefs,
@@ -249,6 +154,101 @@ export default {
     },
 };
 </script>
+
+<template>
+    <router-link :to="linkLocation"
+                 class="budget-list-card"
+    >
+        <div v-if="budgetLoading"
+             class="skeleton-wrapper"
+        >
+            <div class="top">
+                <p-skeleton width="30%"
+                            height="1rem"
+                />
+                <p-skeleton width="23%"
+                            height="1.5rem"
+                />
+            </div>
+            <p-skeleton width="40%"
+                        height="1rem"
+            />
+        </div>
+        <div v-else
+             class="card-wrapper"
+        >
+            <div class="card-header">
+                <div class="flex items-center mb-1">
+                    <span v-for="(name, index) in projects"
+                          :key="name"
+                          class="project-info"
+                          :class="{target: index === projects.length - 1}"
+                    >
+                        <p-i v-if="index === projects.length - 1"
+                             :name="isProject ? 'ic_document-filled' : 'ic_folder-filled'"
+                             color="inherit"
+                             width="1em"
+                             height="1em"
+                             class="mr-1"
+                        />
+                        {{ name }}
+                        <p-i v-if="index < projects.length - 1"
+                             name="ic_chevron-right-thin"
+                             width="1em"
+                             height="1em"
+                        />
+                    </span>
+                </div>
+                <p class="budget-name">
+                    {{ budgetUsage.name }}
+                </p>
+            </div>
+            <p-divider />
+            <div class="card-body">
+                <div class="budget-progress">
+                    <div class="label-wrapper">
+                        <div class="label-left">
+                            <p class="label">
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
+                            </p>
+                            <div class="amount-used-wrapper"
+                                 :class="progressStatus"
+                            >
+                                <span class="cost">{{ currencyMoneyFormatter(cost, storeState.currency, storeState.currencyRates) }}</span>
+                                <span class="percent">(<template v-if="percentage < 0">0.00</template>
+                                    <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
+                            </div>
+                        </div>
+                        <div class="label-right">
+                            <p class="label">
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
+                            </p>
+                            <div class="cost">
+                                {{ currencyMoneyFormatter(limit, storeState.currency, storeState.currencyRates) }}
+                            </div>
+                        </div>
+                    </div>
+                    <budget-usage-progress-bar :usage-rate="percentage" />
+                </div>
+                <div class="budget-description">
+                    <div class="cost-type-wrapper">
+                        <div class="label">
+                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
+                        </div>
+                        <div class="cost-type">
+                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap"
+                                  :key="costTypeLabel"
+                                  class="truncate"
+                            >
+                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </router-link>
+</template>
 
 <style lang="postcss" scoped>
 .skeleton-wrapper {

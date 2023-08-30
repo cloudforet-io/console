@@ -1,17 +1,3 @@
-<template>
-    <div v-show="showList"
-         class="budget-form-amount-plan-last-months-cost"
-    >
-        <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
-        <span v-for="({month, cost}, index) in items"
-              :key="index"
-              class="data"
-        >
-            {{ month }}: {{ currencyMoneyFormatter(cost, currency) }}
-        </span>
-    </div>
-</template>
-
 <script lang="ts">
 
 import {
@@ -162,6 +148,20 @@ export default {
 
 };
 </script>
+
+<template>
+    <div v-show="showList"
+         class="budget-form-amount-plan-last-months-cost"
+    >
+        <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
+        <span v-for="({month, cost}, index) in items"
+              :key="index"
+              class="data"
+        >
+            {{ month }}: {{ currencyMoneyFormatter(cost, currency) }}
+        </span>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .budget-form-amount-plan-last-months-cost {

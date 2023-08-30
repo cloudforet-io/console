@@ -1,44 +1,3 @@
-<template>
-    <p-pane-layout class="budget-form-amount-plan">
-        <p-heading heading-type="sub"
-                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING')"
-        />
-        <div class="p-4">
-            <budget-period-select class="mb-2"
-                                  @update="handleUpdatePeriod"
-            />
-            <budget-form-amount-plan-unit-select class="mb-6"
-                                                 :selected-unit.sync="timeUnit"
-            />
-            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'"
-                                             class="mb-6"
-                                             :period="period"
-                                             @update="handleMonthlyInputUpdate"
-            >
-                <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
-                                                              :time-unit="timeUnit"
-                    />
-                </template>
-            </budget-form-amount-plan-monthly>
-            <budget-form-amount-plan-total v-else
-                                           class="mb-6"
-                                           @update="handleTotalAmountUpdate"
-            >
-                <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
-                                                              :time-unit="timeUnit"
-                    />
-                </template>
-            </budget-form-amount-plan-total>
-        </div>
-    </p-pane-layout>
-</template>
-
 <script lang="ts">
 import {
     computed,
@@ -70,7 +29,6 @@ export interface BudgetAmountPlanInfo {
 }
 
 interface Props {
-    budgetId?: string;
     projectId?: string;
     projectGroupId?: string;
     costTypes?: CostTypes;
@@ -88,10 +46,6 @@ export default {
         PHeading,
     },
     props: {
-        budgetId: {
-            type: String,
-            default: undefined,
-        },
         projectId: {
             type: String,
             default: undefined,
@@ -171,6 +125,48 @@ export default {
     },
 };
 </script>
+
+<template>
+    <p-pane-layout class="budget-form-amount-plan">
+        <p-heading heading-type="sub"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING')"
+        />
+        <div class="p-4">
+            <budget-period-select class="mb-2"
+                                  @update="handleUpdatePeriod"
+            />
+            <budget-form-amount-plan-unit-select class="mb-6"
+                                                 :selected-unit.sync="timeUnit"
+            />
+            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'"
+                                             class="mb-6"
+                                             :period="period"
+                                             @update="handleMonthlyInputUpdate"
+            >
+                <template #last-3-months>
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
+                                                              :project-group-id="projectGroupId"
+                                                              :cost-types="costTypes"
+                                                              :time-unit="timeUnit"
+                    />
+                </template>
+            </budget-form-amount-plan-monthly>
+            <budget-form-amount-plan-total v-else
+                                           class="mb-6"
+                                           @update="handleTotalAmountUpdate"
+            >
+                <template #last-3-months>
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
+                                                              :project-group-id="projectGroupId"
+                                                              :cost-types="costTypes"
+                                                              :time-unit="timeUnit"
+                    />
+                </template>
+            </budget-form-amount-plan-total>
+        </div>
+    </p-pane-layout>
+</template>
+
 <style lang="postcss" scoped>
 .p-heading {
     margin-bottom: 0.5rem;
