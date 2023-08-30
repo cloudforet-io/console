@@ -20,20 +20,22 @@ import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRoute
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
-import { managedCostQuertSetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useCostQueryStore } from '@/services/cost-explorer/store/cost-query-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const costQueryStore = useCostQueryStore();
+const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
+
+const costQueryStore = useCostQuerySetStore();
 const costQueryState = costQueryStore.$state;
 
 const state = reactive({
     loading: true,
     header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
     menuSet: computed<LNBMenu[]>(() => [
-        ...state.costAnalysisMenuSet,
+        ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
             {
                 type: 'item',
@@ -47,11 +49,11 @@ const state = reactive({
         { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
-            label: 'Cost Analysis',
+            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
         },
         {
             type: MENU_ITEM_TYPE.DROPDOWN,
-            id: 'data-source',
+            id: DATA_SOURCE_DROPDOWN_KEY,
             selectOptions: {
                 items: costQueryState.dataSourceList.map((dataSource) => ({
                     name: dataSource,
@@ -70,7 +72,7 @@ const state = reactive({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
-            icon: managedCostQuertSetIdList.includes(d.cost_query_set_id) ? 'ic_main-filled' : undefined,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? 'ic_main-filled' : undefined,
             to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {
@@ -97,8 +99,16 @@ const relocateNotificationState = reactive({
     isModalVisible: false,
 });
 
+const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
+    const pagePermission = store.getters['user/pagePermissionMap'];
+    const routeName = MENU_ID.COST_EXPLORER_COST_ANALYSIS;
+
+    if (pagePermission[routeName]) return [...menuSet];
+    return [];
+};
+
 const handleSelect = (id: string, selected: string) => {
-    if (id === 'data-source') costQueryStore.$patch({ selectedDataSource: selected });
+    if (id === DATA_SOURCE_DROPDOWN_KEY) costQueryStore.$patch({ selectedDataSource: selected });
 };
 
 const handleLearnMoreRelocateNotification = () => {

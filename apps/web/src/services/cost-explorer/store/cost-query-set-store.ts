@@ -16,7 +16,7 @@ interface CostAnalysisLNBState {
     selectedDataSource?: string;
 }
 
-export const useCostQueryStore = defineStore('cost-query', {
+export const useCostQuerySetStore = defineStore('cost-query-set', {
     state: (): CostAnalysisLNBState => ({
         costQuerySetList: [],
         dataSourceList: [],

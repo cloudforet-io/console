@@ -8,7 +8,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
-import { useCostQueryStore } from '@/services/cost-explorer/store/cost-query-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -25,7 +25,7 @@ interface CostAnalysisPageState {
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
-const costQueryStore = useCostQueryStore();
+const costQueryStore = useCostQuerySetStore();
 const costQueryState = costQueryStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
