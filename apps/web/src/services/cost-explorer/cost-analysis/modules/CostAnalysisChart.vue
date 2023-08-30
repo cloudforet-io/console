@@ -70,6 +70,7 @@ const listCostAnalysisData = async () => {
     try {
         costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
             include_others: !!costAnalysisPageState.chartGroupBy,
             granularity: costAnalysisPageState.granularity,
@@ -80,7 +81,12 @@ const listCostAnalysisData = async () => {
             ...costQueryHelper.apiQuery,
         }, { cancelToken: listCostAnalysisRequest.token });
         listCostAnalysisRequest = undefined;
-        return results;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        return results.map((d) => ({
+            ...d,
+            cost: d.usd_cost,
+            total_cost: d.total_usd_cost,
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
