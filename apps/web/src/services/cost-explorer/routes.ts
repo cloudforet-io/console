@@ -14,7 +14,6 @@ const CostAnalysisPage = () => import('@/services/cost-explorer/cost-analysis/Co
 const BudgetMainPage = () => import('@/services/cost-explorer/budget/budget-main/BudgetMainPage.vue');
 const BudgetCreatePage = () => import('@/services/cost-explorer/budget/budget-create/BudgetCreatePage.vue');
 const BudgetBulkCreatePage = () => import('@/services/cost-explorer/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
-const BudgetUpdatePage = () => import('@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
@@ -62,13 +61,6 @@ const costExplorerRoutes: RouteConfig = {
                     name: COST_EXPLORER_ROUTE.BUDGET.BULK_CREATE._NAME,
                     meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BULK_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: BudgetBulkCreatePage as any,
-                },
-                {
-                    path: 'update/:budgetId',
-                    name: COST_EXPLORER_ROUTE.BUDGET.UPDATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.UPDATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                    props: true,
-                    component: BudgetUpdatePage as any,
                 },
                 {
                     path: ':budgetId',

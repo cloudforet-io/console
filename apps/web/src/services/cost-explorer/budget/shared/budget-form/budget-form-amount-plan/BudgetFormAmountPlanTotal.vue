@@ -1,26 +1,3 @@
-<template>
-    <div class="budget-form-amount-plan-total">
-        <p-field-group required
-                       :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_BUDGET_TOTAL')"
-                       :invalid-text="invalidTexts.amount"
-                       :invalid="invalidState.amount"
-        >
-            <template #right-extra>
-                ($USD)
-            </template>
-            <p-text-input v-model="formattedAmount"
-                          placeholder="1,000"
-                          :invalid="invalidState.amount"
-            >
-                <template #right-extra>
-                    ($)
-                </template>
-            </p-text-input>
-        </p-field-group>
-        <slot name="last-3-months" />
-    </div>
-</template>
-
 <script lang="ts">
 
 import {
@@ -71,6 +48,30 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="budget-form-amount-plan-total">
+        <p-field-group required
+                       :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_BUDGET_TOTAL')"
+                       :invalid-text="invalidTexts.amount"
+                       :invalid="invalidState.amount"
+        >
+            <template #right-extra>
+                ($USD)
+            </template>
+            <p-text-input v-model="formattedAmount"
+                          placeholder="1,000"
+                          :invalid="invalidState.amount"
+            >
+                <template #right-extra>
+                    ($)
+                </template>
+            </p-text-input>
+        </p-field-group>
+        <slot name="last-3-months" />
+    </div>
+</template>
+
 <style>
 .p-text-input {
     width: 28.5rem;

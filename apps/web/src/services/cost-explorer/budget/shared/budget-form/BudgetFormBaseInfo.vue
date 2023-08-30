@@ -1,28 +1,3 @@
-<template>
-    <p-pane-layout>
-        <p-heading heading-type="sub"
-                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.BASE_INFORMATION')"
-        />
-        <div class="p-4">
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
-                           :invalid="invalidState.name"
-                           :invalid-text="invalidTexts.name"
-                           required
-                           class="base-info-field"
-            >
-                <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              @update:value="setForm('name', $event)"
-                />
-            </p-field-group>
-
-            <budget-target-select @update="handleUpdateTarget" />
-
-            <budget-cost-type-select @update="handleUpdateCostTypes" />
-        </div>
-    </p-pane-layout>
-</template>
-
 <script lang="ts">
 import {
     computed, reactive, toRefs, watch,
@@ -53,12 +28,6 @@ export default {
         PPaneLayout,
         PFieldGroup,
         PTextInput,
-    },
-    props: {
-        budgetId: {
-            type: String,
-            default: undefined,
-        },
     },
     setup(props, { emit }) {
         const {
@@ -122,6 +91,32 @@ export default {
     },
 };
 </script>
+
+<template>
+    <p-pane-layout>
+        <p-heading heading-type="sub"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.BASE_INFORMATION')"
+        />
+        <div class="p-4">
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
+                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.name"
+                           required
+                           class="base-info-field"
+            >
+                <p-text-input :value="name"
+                              :invalid="invalidState.name"
+                              @update:value="setForm('name', $event)"
+                />
+            </p-field-group>
+
+            <budget-target-select @update="handleUpdateTarget" />
+
+            <budget-cost-type-select @update="handleUpdateCostTypes" />
+        </div>
+    </p-pane-layout>
+</template>
+
 <style lang="postcss" scoped>
 .p-heading {
     margin-bottom: 0.5rem;

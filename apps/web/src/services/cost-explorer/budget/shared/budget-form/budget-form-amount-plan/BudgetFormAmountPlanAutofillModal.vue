@@ -1,48 +1,3 @@
-<template>
-    <p-button-modal :visible="proxyVisible"
-                    :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
-                    :disabled="!isAllValid"
-                    size="sm"
-                    @confirm="handleConfirm"
-                    @update:visible="handleUpdateVisible"
-    >
-        <template #body>
-            <div class="inner">
-                <p class="description">
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL_DESC') }}
-                </p>
-
-                <p-field-group required
-                               :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_STARTING_BUDGET')"
-                               :invalid="invalidState.start"
-                               :invalid-text="invalidTexts.start"
-                >
-                    <p-text-input v-model="formattedStartBudget"
-                                  placeholder="1,000"
-                                  :invalid="invalidState.start"
-                    >
-                        <template #right-extra>
-                            ($)
-                        </template>
-                    </p-text-input>
-                </p-field-group>
-
-                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_EXPECTED_BUDGET')">
-                    <p-text-input :value="growth"
-                                  placeholder="10"
-                                  type="number"
-                                  @update:value="setForm('growth', $event)"
-                    >
-                        <template #right-extra>
-                            %
-                        </template>
-                    </p-text-input>
-                </p-field-group>
-            </div>
-        </template>
-    </p-button-modal>
-</template>
-
 <script lang="ts">
 
 import type { SetupContext } from 'vue';
@@ -145,6 +100,52 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<template>
+    <p-button-modal :visible="proxyVisible"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
+                    :disabled="!isAllValid"
+                    size="sm"
+                    @confirm="handleConfirm"
+                    @update:visible="handleUpdateVisible"
+    >
+        <template #body>
+            <div class="inner">
+                <p class="description">
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL_DESC') }}
+                </p>
+
+                <p-field-group required
+                               :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_STARTING_BUDGET')"
+                               :invalid="invalidState.start"
+                               :invalid-text="invalidTexts.start"
+                >
+                    <p-text-input v-model="formattedStartBudget"
+                                  placeholder="1,000"
+                                  :invalid="invalidState.start"
+                    >
+                        <template #right-extra>
+                            ($)
+                        </template>
+                    </p-text-input>
+                </p-field-group>
+
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_EXPECTED_BUDGET')">
+                    <p-text-input :value="growth"
+                                  placeholder="10"
+                                  type="number"
+                                  @update:value="setForm('growth', $event)"
+                    >
+                        <template #right-extra>
+                            %
+                        </template>
+                    </p-text-input>
+                </p-field-group>
+            </div>
+        </template>
+    </p-button-modal>
+</template>
+
 <style lang="postcss" scoped>
 .inner {
     .description {
