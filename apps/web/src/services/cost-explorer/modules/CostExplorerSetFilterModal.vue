@@ -2,7 +2,7 @@
     <p-button-modal
         v-if="visible"
         class="cost-explorer-set-filter-modal"
-        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTER')"
+        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTERS')"
         :visible.sync="proxyVisible"
         :footer-reset-button-visible="true"
         @confirm="handleFormConfirm"
@@ -31,7 +31,7 @@
                 <div class="right-select-filter-section">
                     <div class="selected-filter-section">
                         <div class="title">
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTERS') }} ({{ selectedItemsLength }})
                         </div>
                         <cost-explorer-filter-tags :filters="selectedFilters"
                                                    deletable
