@@ -3,6 +3,7 @@ import {
     onUnmounted, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
+import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
 
@@ -33,6 +34,7 @@ interface Props {
     querySetId?: string;
 }
 const props = defineProps<Props>();
+const route = useRoute();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
@@ -91,6 +93,21 @@ onUnmounted(() => {
     costAnalysisPageStore.$dispose();
     costAnalysisPageStore.$reset();
 });
+
+watch(() => route.params, async (params) => {
+    const querySetId = params.querySetId;
+
+    if (querySetId === costAnalysisPageStore.selectedQueryId) return;
+
+    if (querySetId) {
+        const { options } = getQueryWithKey(querySetId);
+        await costAnalysisPageStore.setQueryOptions(options);
+        costAnalysisPageStore.selectQueryId(querySetId);
+    } else {
+        await costAnalysisPageStore.setQueryOptions();
+        costAnalysisPageStore.selectQueryId(undefined);
+    }
+}, { immediate: true });
 
 /* Page Init */
 (async () => {
