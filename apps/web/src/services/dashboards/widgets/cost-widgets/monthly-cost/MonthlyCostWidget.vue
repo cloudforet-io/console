@@ -102,7 +102,8 @@ const fetchData = async (): Promise<Data> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
@@ -121,7 +122,7 @@ const fetchData = async (): Promise<Data> => {
 /* Util */
 const getMonthlyCost = (month) => {
     if (!state.data?.length) return '--';
-    const monthlyCost = state.data[0].usd_cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
+    const monthlyCost = state.data[0].cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
     return monthlyCost;
 };
 

@@ -62,7 +62,7 @@ const { colorSet } = useWidgetColorSet({
 });
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
-    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost_sum' : 'usage_quantity_sum')),
+    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost_sum' : 'usage_quantity_sum')),
     chartData: computed<XYChartData[]>(() => {
         const valueKey = state.fieldsKey;
         return getRefinedXYChartData(state.data, state.groupBy, DATE_FIELD_NAME, valueKey);
@@ -70,7 +70,7 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const _textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'usd_cost_sum' ? 'cost' : 'size',
+            type: state.fieldsKey === 'cost_sum' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, _textOptions, state.fieldsKey);
@@ -123,7 +123,8 @@ const fetchData = async (): Promise<Data> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },

@@ -12,7 +12,6 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 interface Props {
-    printMode?: boolean;
     defaultCurrencyMode?: boolean;
     currency?: Currency;
 }
@@ -48,9 +47,7 @@ const handleSelectCurrency = (currency: Currency) => {
     <p-select-dropdown :items="state.currencyItems"
                        :selected="state.currency"
                        style-type="transparent"
-                       :read-only="printMode"
                        class="currency-select-dropdown"
-                       :class="{ 'print-mode': printMode }"
                        @select="handleSelectCurrency"
     >
         <template v-if="defaultCurrencyMode"
@@ -85,12 +82,6 @@ const handleSelectCurrency = (currency: Currency) => {
 </template>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-select-dropdown */
-.print-mode {
-    .text {
-        white-space: nowrap;
-    }
-}
 .p-badge {
     margin-left: 0.25rem;
 }

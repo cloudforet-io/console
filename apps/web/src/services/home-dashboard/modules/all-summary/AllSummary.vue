@@ -280,7 +280,7 @@ const getAllSummaryTabLocation = (type: DataType): RouteLocationRaw => {
         return {
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
             query: {
-                granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED) as string,
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY) as string,
                 period: objectToQueryString(_period) as string,
             },
         };

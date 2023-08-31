@@ -7,43 +7,35 @@ import CostAnalysisGroupByFilterMore
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMore.vue';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { GroupByItem } from '@/services/cost-explorer/type';
 
-interface Props {
-    printMode?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-    printMode: false,
-});
-const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const { t } = useI18n();
+
 const state = reactive({
-    selectedGroupByItems: computed(() => costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d])),
-    allGroupByItems: Object.values(GROUP_BY_ITEM_MAP),
+    selectedGroupByItems: computed<GroupByItem[]>(() => costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d])),
+    allGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
 });
 
 /* util */
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleSelectGroupByItems = async (items) => {
+const handleSelectGroupByItems = async (items: GroupByItem[]) => {
     costAnalysisPageStore.$patch({ groupBy: items.map((d) => d.name) });
 };
-
 </script>
 
 <template>
-    <div class="cost-analysis-group-by-filter"
-         :class="{ 'print-mode': printMode }"
-    >
+    <div class="cost-analysis-group-by-filter">
         <b class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
-        <p-select-button v-for="groupByItem in (printMode ? state.selectedGroupByItems : state.allGroupByItems)"
+        <p-select-button v-for="groupByItem in state.allGroupByItems"
                          :key="groupByItem.name"
                          :value="groupByItem"
-                         :selected="printMode ? '' : state.selectedGroupByItems"
+                         :selected="state.selectedGroupByItems"
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
@@ -65,12 +57,6 @@ const handleSelectGroupByItems = async (items) => {
     font-size: 0.875rem;
     padding: 1rem;
     margin-bottom: 1rem;
-    &.print-mode {
-        .label {
-            @apply mr-3;
-            white-space: nowrap;
-        }
-    }
     .p-divider {
         @apply bg-gray-300;
         height: 1rem;

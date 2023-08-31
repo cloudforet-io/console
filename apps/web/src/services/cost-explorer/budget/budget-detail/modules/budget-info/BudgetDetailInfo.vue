@@ -8,7 +8,7 @@ import { useStore } from 'vuex';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import { CURRENCY } from '@/store/modules/settings/config';
-import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -16,15 +16,15 @@ import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import BudgetCostTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { CostType } from '@/services/cost-explorer/budget/type';
+import type { CostTypes } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
-} from '@/services/cost-explorer/budget/type';
+} from '@/services/cost-explorer/budget/model';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 
-type CostTypeArg = Record<CostType, string[]|null>;
-const getKeyOfCostType = (costType: CostTypeArg): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: CostTypeArg, costTypeKey: string) => costType[costTypeKey];
+
+const getKeyOfCostType = (costType: CostTypes): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
+const getValueOfCostType = (costType: CostTypes, costTypeKey: string) => costType[costTypeKey];
 
 const costTypeMap = {
     region_code: 'Region',
@@ -53,11 +53,11 @@ const state = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
     costTypeKey: computed(() => {
         if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
-        return getKeyOfCostType(budgetPageState.budgetData.cost_types as CostTypeArg);
+        return getKeyOfCostType(budgetPageState.budgetData.cost_types);
     }),
     costTypeValue: computed(() => {
         if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return [];
-        return getValueOfCostType(budgetPageState.budgetData.cost_types as CostTypeArg, state.costTypeKey);
+        return getValueOfCostType(budgetPageState.budgetData.cost_types, state.costTypeKey);
     }),
     processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
     buttonRef: null as HTMLElement | null,
@@ -120,7 +120,7 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
                             (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
                             { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ getTargetLabel(state.projects) }}
+                    {{ getTargetLabel(projects) }}
                 </p-link>
             </p>
         </p-pane-layout>
@@ -128,15 +128,15 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <span class="summary-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
                 <span v-if="!budgetPageState.loading"
                       class="text-gray-900 font-normal"
-                >{{ costTypeMap[state.costTypeKey] }}</span>
+                >{{ costTypeMap[costTypeKey] }}</span>
             </span>
             <p v-if="!budgetPageState.loading"
                class="summary-content cost-type"
             >
-                <span class="cost-type-content">{{ state.processedCostTypeValue }}</span>
+                <span class="cost-type-content">{{ processedCostTypeValue }}</span>
                 <budget-cost-type-popover
-                    :cost-type-key="state.costTypeKey"
-                    :cost-type-value="state.processedCostTypeValue"
+                    :cost-type-key="costTypeKey"
+                    :cost-type-value="processedCostTypeValue"
                 >
                     <span class="view-all">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
                 </budget-cost-type-popover>

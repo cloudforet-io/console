@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+
+
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -6,8 +8,8 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
     computed,
-    onBeforeUnmount,
-    reactive, ref, watch,
+    onUnmounted,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import config from '@/lib/config';
@@ -18,20 +20,21 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
+import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
-import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
 
 const categoryKey = 'date';
-const columnChartValueName = 'usd_cost';
+const columnChartValueName = 'cost';
 
 const budgetPageStore = useBudgetPageStore();
 const budgetPageState = budgetPageStore.$state;
 
-const chartRef = ref<HTMLElement|null>(null);
 const state = reactive({
+    chartRef: null as HTMLElement | null,
     chart: null as XYChart | null,
+    chartRegistry: {},
     limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
     chartData: [] as any,
     loading: true,
@@ -39,7 +42,9 @@ const state = reactive({
     budgetUsageData: computed(() => budgetPageState.budgetUsageData),
     budgetData: computed(() => budgetPageState.budgetData),
 });
-const chartRegistry = {} as Record<string, any>;
+
+const { chartRef } = toRefs(state);
+
 const getChartData = () => {
     try {
         state.loading = true;
@@ -62,9 +67,9 @@ const getChartData = () => {
 };
 
 const disposeChart = (chartContext) => {
-    if (chartRegistry[chartContext]) {
-        chartRegistry[chartContext].dispose();
-        delete chartRegistry[chartContext];
+    if (state.chartRegistry[chartContext]) {
+        state.chartRegistry[chartContext].dispose();
+        delete state.chartRegistry[chartContext];
     }
 };
 
@@ -102,8 +107,8 @@ const drawChart = (chartContext) => {
     /* Create chart */
     const createChart = () => {
         disposeChart(chartContext);
-        chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
-        return chartRegistry[chartContext];
+        state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
+        return state.chartRegistry[chartContext];
     };
     const chart = createChart();
     state.chart = chart;
@@ -146,7 +151,7 @@ const drawChart = (chartContext) => {
         if (target.dataItem?.dataContext?.date === MonthToDate) {
             return am4core.color(indigo[300]);
         }
-        if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.usd_cost) {
+        if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.cost) {
             return am4core.color(red[400]);
         }
         return am4core.color(indigo[600]);
@@ -158,16 +163,14 @@ const drawChart = (chartContext) => {
     chart.data = getChartData();
 };
 
-watch([() => chartRef.value], ([chartContext]) => {
+watch([() => state.chartRef], ([chartContext]) => {
     if (chartContext) {
         drawChart(chartContext);
     }
 }, { immediate: false });
 
-onBeforeUnmount(() => {
-    Object.values(chartRegistry).forEach((chart) => {
-        if (chart) chart.dispose();
-    });
+onUnmounted(() => {
+    if (state.chart) state.chart.dispose();
 });
 
 (() => {

@@ -89,12 +89,13 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
                 end: state.dateRange.end,
                 group_by: [state.groupBy],
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'usd_cost_sum', desc: true }],
+                sort: [{ key: 'cost_sum', desc: true }],
                 page: { limit: LIMIT_DATA },
                 ...apiQueryHelper.data,
             },
@@ -108,7 +109,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
 
 const drawChart = (chartData) => {
     const seriesSettings = {
-        valueField: 'usd_cost_sum',
+        valueField: 'cost_sum',
         categoryField: 'value',
         nodePaddingInner: 4,
     };

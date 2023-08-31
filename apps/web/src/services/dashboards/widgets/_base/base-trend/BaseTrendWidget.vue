@@ -117,12 +117,13 @@ const fetchData = async (): Promise<Data> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                sort: [{ key: '_total_cost_sum', desc: true }],
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },

@@ -7,15 +7,15 @@ import { useStore } from 'vuex';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import type { BudgetData } from '@/services/cost-explorer/budget/type';
-import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
+import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 
 interface Props {
-    budgetData: BudgetData;
+    budgetData: BudgetModel;
 }
 
 withDefaults(defineProps<Props>(), {
-    budgetData: () => ({}) as BudgetData,
+    budgetData: () => ({}) as BudgetModel,
 });
 
 const store = useStore();

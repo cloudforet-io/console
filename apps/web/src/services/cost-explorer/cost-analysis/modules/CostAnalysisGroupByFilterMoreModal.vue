@@ -8,7 +8,7 @@ import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dr
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import {
-    reactive, watch,
+    defineEmits, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -22,16 +22,12 @@ import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
 interface Props {
     visible: boolean;
-    headerTitle?: string;
     prevMoreGroupByItems: MoreGroupByItem[];
 }
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+}>();
 
-const props = withDefaults(defineProps<Props>(), {
-    visible: false,
-    headerTitle: '',
-    prevMoreGroupByItems: () => [],
-});
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -122,7 +118,6 @@ watch(() => props.visible, (visible) => {
         }));
     }
 }, { immediate: true });
-
 </script>
 
 <template>

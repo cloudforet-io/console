@@ -6,7 +6,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, sum } from 'lodash';
 import {
-    computed, reactive, watch,
+    computed, defineEmits, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -14,36 +14,32 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
 import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
-import type { Legend } from '@/services/cost-explorer/widgets/type';
 
-
-interface Props {
-    printMode: boolean;
-    loading: boolean;
-    legends: Legend[];
-}
 
 const CATEGORIES = Object.values(FILTER);
 
+interface Props {
+    loading: boolean;
+    legends: Legend[];
+}
 const props = withDefaults(defineProps<Props>(), {
-    printMode: false,
-    loading: true,
-    legends: () => [],
+    loading: false,
 });
-const emit = defineEmits<{(e: 'update:legends', value: Legend[]): void;
-    (e: 'toggle-series', value: number): void
-    (e: 'hide-all-series'): void
-    (e: 'show-all-series'): void
+const emit = defineEmits<{(e: 'toggle-series', index: number): void;
+    (e: 'hide-all-series'): void;
+    (e: 'show-all-series'): void;
 }>();
-const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const { t } = useI18n();
 
 const state = reactive({
     filtersLength: computed<number>(() => {
@@ -107,31 +103,26 @@ const handleToggleAllLegends = () => {
     }
     state.proxyLegends = _legends;
 };
-const handlePrimaryGroupByItem = (groupBy?: string) => {
-    costAnalysisPageStore.$patch({ primaryGroupBy: groupBy });
+const handleChartGroupByItem = (groupBy?: string) => {
+    costAnalysisPageStore.$patch({ chartGroupBy: groupBy });
 };
 
 /* Watcher */
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {
-        costAnalysisPageStore.$patch({ primaryGroupBy: undefined });
-    } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
-        costAnalysisPageStore.$patch({ primaryGroupBy: after[0].name });
+        costAnalysisPageStore.$patch({ chartGroupBy: undefined });
+    } else if (!after.filter((d) => d.name === costAnalysisPageState.chartGroupBy).length) {
+        costAnalysisPageStore.$patch({ chartGroupBy: after[0].name });
     }
 });
-
 </script>
 
 <template>
-    <div class="cost-analysis-chart-query-section"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-analysis-chart-query-section">
         <!--filter-->
         <div class="title-wrapper">
             <span class="title">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
-            <div v-if="!printMode"
-                 class="button-wrapper"
-            >
+            <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
                           :disabled="!state.filtersLength"
@@ -148,8 +139,7 @@ watch(() => state.groupByMenuItems, (after) => {
             </div>
         </div>
         <div class="filter-wrapper">
-            <cost-explorer-filter-tags :print-mode="printMode"
-                                       :filters="costAnalysisPageState.filters"
+            <cost-explorer-filter-tags :filters="costAnalysisPageState.filters"
                                        deletable
                                        @update-filter-tags="handleUpdateFilters"
             />
@@ -159,17 +149,14 @@ watch(() => state.groupByMenuItems, (after) => {
         <div class="title-wrapper">
             <p-select-dropdown v-if="state.groupByMenuItems.length"
                                :items="state.groupByMenuItems"
-                               :selected="costAnalysisPageState.primaryGroupBy"
+                               :selected="costAnalysisPageState.chartGroupBy"
                                style-type="transparent"
-                               :read-only="printMode"
-                               @select="handlePrimaryGroupByItem"
+                               @select="handleChartGroupByItem"
             />
             <span v-else
                   class="title"
             >Total Cost</span>
-            <div v-if="!printMode"
-                 class="button-wrapper"
-            >
+            <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
                           font-weight="normal"
@@ -202,8 +189,7 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <cost-explorer-set-filter-modal v-if="!printMode"
-                                        v-model:visible="state.filterModalVisible"
+        <cost-explorer-set-filter-modal v-model:visible="state.filterModalVisible"
                                         :prev-selected-filters="costAnalysisPageState.filters"
                                         :categories="CATEGORIES"
                                         @confirm="handleUpdateFilters"
@@ -294,16 +280,8 @@ watch(() => state.groupByMenuItems, (after) => {
         }
     }
 
-    &.print-mode {
+    @screen tablet {
         @mixin row-stack;
-        .title {
-            white-space: nowrap;
-        }
-    }
-    &:not(.print-mode) {
-        @screen tablet {
-            @mixin row-stack;
-        }
     }
 }
 </style>

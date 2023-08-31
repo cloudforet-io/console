@@ -1,3 +1,69 @@
+<script setup lang="ts">
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import {
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+
+import { store } from '@/store';
+
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+
+import { getRouteAccessLevel } from '@/lib/access-control';
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
+import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
+import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
+import GNB from '@/common/modules/navigations/gnb/GNB.vue';
+import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
+import TopNotification from '@/common/modules/portals/TopNotification.vue';
+
+import MobileGuideModal from '@/services/auth/password/MobileGuideModal.vue';
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+
+const route = useRoute();
+const router = useRouter();
+
+const state = reactive({
+    showGNB: computed(() => route.matched[0]?.name === 'root'),
+    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
+    isRoutingToSignIn: false,
+    isEmailVerified: computed(() => store.state.user.emailVerified),
+    userId: computed<string>(() => store.state.user.userId),
+    email: computed<string>(() => store.state.user.email),
+    domainId: computed<string>(() => store.state.domain.domainId),
+    notificationEmailModalVisible: false,
+});
+
+const goToSignIn = async () => {
+    state.isRoutingToSignIn = true;
+    const res: RouteLocationRaw = {
+        name: AUTH_ROUTE.SIGN_OUT._NAME,
+        query: { nextPath: route.fullPath },
+    };
+    store.commit('error/setVisibleSessionExpiredError', false);
+    await router.push(res);
+    state.isRoutingToSignIn = false;
+};
+const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
+
+watch(() => route, (value) => {
+    state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
+});
+
+watch(() => state.userId, (userId) => {
+    if (userId) {
+        store.dispatch('settings/initSettings');
+    }
+}, { immediate: true });
+</script>
+
 <template>
     <div v-cloak
          id="app"
@@ -9,7 +75,7 @@
             <p-notice-alert group="noticeBottomRight" />
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
-            <template v-if="showGNB">
+            <template v-if="state.showGNB">
                 <g-n-b class="gnb" />
                 <div class="app-body">
                     <p-sidebar :visible="store.state.display.visibleSidebar"
@@ -55,7 +121,7 @@
                 </div>
             </template>
             <router-view v-else />
-            <p-icon-modal :visible="isExpired"
+            <p-icon-modal :visible="state.isExpired"
                           emoji="👋"
                           :header-title="t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
                           :button-text="t('COMMON.SESSION_MODAL.SIGNIN')"
@@ -63,9 +129,9 @@
                           @click-button="goToSignIn"
             />
             <notification-email-modal
-                v-model:visible="notificationEmailModalVisible"
-                :domain-id="domainId"
-                :user-id="userId"
+                v-model:visible="state.notificationEmailModalVisible"
+                :domain-id="state.domainId"
+                :user-id="state.userId"
                 :modal-type="MODAL_TYPE.SEND"
             />
             <notice-popup v-if="!store.getters['user/hasSystemRole']" />
@@ -82,104 +148,6 @@
         <mobile-guide-modal v-if="store.state.display.visibleMobileGuideModal" />
     </div>
 </template>
-
-<script lang="ts">
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
-} from '@spaceone/design-system';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-
-import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-
-import { getRouteAccessLevel } from '@/lib/access-control';
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
-
-import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
-import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
-import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
-import GNB from '@/common/modules/navigations/gnb/GNB.vue';
-import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
-import TopNotification from '@/common/modules/portals/TopNotification.vue';
-
-import MobileGuideModal from '@/services/auth/password/MobileGuideModal.vue';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-// import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
-
-export default defineComponent({
-    name: 'App',
-    components: {
-        NotificationEmailModal,
-        NoticePopup,
-        MobileGuideModal,
-        // SurveyModal,
-        RecommendedBrowserModal,
-        TopNotification,
-        GNB: GNB as any,
-        PNoticeAlert,
-        PToastAlert,
-        PIconModal: PIconModal as any,
-        PSidebar,
-    },
-    setup() {
-        const route = useRoute();
-        const router = useRouter();
-        const store = useStore();
-        const { t } = useI18n();
-
-        const state = reactive({
-            showGNB: computed(() => route.matched[0]?.name === 'root'),
-            isExpired: computed(() => store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
-            isEmailVerified: computed(() => store.state.user.emailVerified),
-            userId: computed(() => store.state.user.userId),
-            email: computed(() => store.state.user.email),
-            domainId: computed(() => store.state.domain.domainId),
-            notificationEmailModalVisible: false,
-        });
-        const goToSignIn = () => {
-            const res = {
-                name: AUTH_ROUTE.SIGN_OUT._NAME,
-                query: { nextPath: route.fullPath },
-            };
-            store.commit('error/setVisibleSessionExpiredError', false);
-            router.push(res);
-        };
-        const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
-        const updateUser = async () => {
-            await store.dispatch('user/setUser', { email: state.email, email_verified: state.isEmailVerified });
-        };
-
-        watch(() => route, (value) => {
-            state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
-        });
-
-        watch(() => state.userId, (userId) => {
-            if (userId) {
-                store.dispatch('settings/initSettings');
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            goToSignIn,
-            SIDEBAR_TYPE,
-            MODAL_TYPE,
-            showsBrowserRecommendation,
-            updateUser,
-            store,
-            t,
-        };
-    },
-
-});
-
-</script>
 
 <style lang="postcss">
 #app {

@@ -17,7 +17,6 @@ import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 interface Props {
-    printMode: boolean;
     filters: CostFiltersMap;
     deletable: boolean;
     hideCategory?: boolean;
@@ -107,9 +106,7 @@ const handleDeleteFilterTag = (item: TagItem) => {
 </script>
 
 <template>
-    <div class="cost-explorer-filter-tags"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-explorer-filter-tags">
         <template v-if="!state.tagItems.length">
             <slot name="no-filter">
                 <p-empty>
@@ -120,7 +117,7 @@ const handleDeleteFilterTag = (item: TagItem) => {
         <template v-else>
             <p-tag v-for="(item, idx) in state.tagItems"
                    :key="`selected-tag-${idx}-${item.value}`"
-                   :deletable="!printMode && deletable"
+                   :deletable="deletable"
                    :category-item="hideCategory ? undefined : item.categoryItem"
                    :key-item="item.keyItem"
                    :value-item="item.valueItem"
@@ -136,11 +133,6 @@ const handleDeleteFilterTag = (item: TagItem) => {
     overflow-y: auto;
     .p-tag {
         margin-bottom: 0.5rem;
-    }
-    &.print-mode {
-        .p-empty {
-            @apply flex justify-start;
-        }
     }
 }
 </style>

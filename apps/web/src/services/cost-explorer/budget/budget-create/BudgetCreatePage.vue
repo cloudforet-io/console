@@ -3,7 +3,7 @@ import { PHeading } from '@spaceone/design-system';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
+import BudgetForm from '@/services/cost-explorer/budget/shared/budget-form/BudgetForm.vue';
 
 const router = useRouter();
 const { t } = useI18n();

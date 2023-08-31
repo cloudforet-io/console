@@ -3,13 +3,12 @@ import { orderBy, union } from 'lodash';
 import { defineStore } from 'pinia';
 
 
-import { store } from '@/store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, MoreGroupByItem, Period,
 } from '@/services/cost-explorer/type';
@@ -17,18 +16,17 @@ import type {
 
 interface CostAnalysisPageState {
     granularity: Granularity;
-    stack: boolean;
     groupBy: Array<GroupBy|string>;
-    primaryGroupBy?: GroupBy|string;
+    chartGroupBy?: GroupBy|string;
     moreGroupBy: MoreGroupByItem[];
     period: Period;
     filters: CostFiltersMap;
-    selectedQueryId?: string;
-    costQueryList: CostQuerySetModel[];
 }
 
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 costExplorerSettingsStore.initState();
+const costQueryStore = useCostQuerySetStore();
+const costQueryState = costQueryStore.$state;
 
 const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
 const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
@@ -77,26 +75,20 @@ const getMergedMoreGroupByItems = (selectedGroupBy: string[], storedMoreGroupByI
 
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     state: (): CostAnalysisPageState => ({
-        granularity: GRANULARITY.ACCUMULATED,
-        stack: false,
+        granularity: GRANULARITY.MONTHLY,
         groupBy: [],
-        primaryGroupBy: undefined,
+        chartGroupBy: undefined,
         moreGroupBy: [],
         period: getInitialDates(),
         filters: {},
-        selectedQueryId: undefined,
-        costQueryList: [],
     }),
     getters: {
-        selectedQuerySet: (state): CostQuerySetModel|undefined => {
-            if (!state.selectedQueryId) return undefined;
-            return state.costQueryList.find((item) => item.cost_query_set_id === state.selectedQueryId);
-        },
+        selectedQueryId: () => costQueryState.selectedQuerySetId,
+        costQueryList: () => costQueryState.costQuerySetList,
+        selectedQuerySet: () => costQueryStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
-            stack: state.stack,
             granularity: state.granularity,
             group_by: state.groupBy,
-            primary_group_by: state.primaryGroupBy,
             more_group_by: state.moreGroupBy,
             period: state.period,
             filters: state.filters,
@@ -112,10 +104,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     },
     actions: {
         async initState() {
-            this.granularity = GRANULARITY.ACCUMULATED;
-            this.stack = false;
+            this.granularity = GRANULARITY.MONTHLY;
             this.groupBy = [];
-            this.primaryGroupBy = undefined;
+            this.chartGroupBy = undefined;
             this.period = getInitialDates();
             this.filters = {};
             // set more group by items
@@ -131,7 +122,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             const refinedOptions = getRefinedCostQueryOptions(options);
 
             if (refinedOptions.granularity) this.granularity = refinedOptions.granularity;
-            if (typeof refinedOptions.stack === 'boolean') this.stack = refinedOptions.stack;
 
             const refinedDefaultGroupBy: string[] = [];
             const refinedGroupBy = refinedOptions.group_by?.filter((d) => {
@@ -144,7 +134,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 return !!convertGroupByStringToMoreGroupByItem(d);
             });
             this.groupBy = refinedDefaultGroupBy;
-            this.primaryGroupBy = refinedGroupBy?.[0];
+            this.chartGroupBy = refinedGroupBy?.[0];
 
             // set moreGroupByItems
             const storedMoreGroupByItems: MoreGroupByItem[] = costExplorerSettingsStore.$state.costAnalysisMoreGroupBy;
@@ -155,26 +145,11 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 this.filters = convertFiltersInToNewType(options.filters);
             }
         },
-        async listCostQueryList(): Promise<void> {
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
-                    query: {
-                        filter: [{ k: 'user_id', v: store.state['user/userId'], o: 'eq' }],
-                    },
-                });
-                this.costQueryList = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                this.costQueryList = [];
-            }
-        },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
             const options = getRefinedCostQueryOptions({
                 granularity: this.granularity,
-                stack: this.stack,
                 period: this.period,
                 group_by: this.groupBy,
-                primary_group_by: this.primaryGroupBy, // will be deprecated(< v1.10.5)
                 more_group_by: this.moreGroupBy, // will be deprecated(< v1.10.5)
                 filters: this.filters,
             });
@@ -184,20 +159,19 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                     name,
                     options,
                 });
-                this.selectedQueryId = createdData.cost_query_set_id;
+                this.selectQueryId(createdData.cost_query_set_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
             return createdData;
         },
-        async editQuery({ selectedQuery, formState }): Promise<CostQuerySetModel> {
-            const { queryName } = formState;
+        async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (selectedQuery.name !== queryName) {
+            if (costQueryStore.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                        cost_query_set_id: selectedQuery.cost_query_set_id,
-                        name: queryName,
+                        cost_query_set_id: querySetId,
+                        name,
                     });
                 } catch (e) {
                     ErrorHandler.handleError(e);
@@ -208,6 +182,12 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         setMoreGroupByWithSettings(moreGroupByItems: MoreGroupByItem[]) {
             this.moreGroupBy = moreGroupByItems;
             costExplorerSettingsStore.setCostAnalysisMoreGroupBy(moreGroupByItems);
+        },
+        selectQueryId(querySetId: string|undefined) {
+            costQueryStore.$patch({ selectedQuerySetId: querySetId });
+        },
+        async getCostQueryList() {
+            await costQueryStore.listCostQuerySets();
         },
     },
 });
