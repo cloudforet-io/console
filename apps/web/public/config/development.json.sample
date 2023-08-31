@@ -7,5 +7,14 @@
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",
-  "DOMAIN_NAME_REF": "config"
+  "DOMAIN_NAME_REF": "config",
+  "MOCK": {
+    "ALL": false,
+    "ENDPOINT_V1": "https://mock-api-v1.com",
+    "ENDPOINT_V2": "https://mock-api-v2.com",
+    "REFLECTION":false,
+    "SKIP_TOKEN_CHECK": false,
+    "API_LIST_V1": [],
+    "API_LIST_V2": []
+  },
 }

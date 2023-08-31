@@ -1,3 +1,5 @@
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { CostAnalysisPageUrlQueryKey, RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
@@ -12,14 +14,8 @@ export interface CostAnalysisPageQueryValue {
     period?: Period;
     group_by?: string[];
     filters?: CostFiltersMap;
-    stack?: boolean;
     granularity?: Granularity;
 }
-
-export const CHART_TYPE = Object.freeze({
-    STACKED_COLUMN: 'STACKED_COLUMN',
-    DONUT: 'DONUT',
-});
 
 export interface QueryItemResource {
     key: string;
@@ -29,4 +25,44 @@ export interface QueryItemResource {
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
     requestType: RequestType;
+}
+
+
+/* widget spec */
+export interface ChartData {
+    [key: string]: any;
+}
+export interface XYChartData {
+    date: string;
+    totalCost?: number;
+    aggregation?: number;
+    [key: string]: any;
+}
+interface Cost {
+    [key: string]: number;
+}
+export interface Legend {
+    name: string;
+    label: string;
+    color?: string;
+    disabled?: boolean;
+}
+
+export interface CostAnalyzeModel {
+    total_cost?: number;
+    cost: Cost | number;
+    is_others?: boolean;
+    [key: string]: any;
+}
+
+/* component props */
+export interface WidgetProps<Options = any> {
+    widgetId?: string;
+    name?: string;
+    options: Options;
+    period: Period;
+    filters: CostFiltersMap;
+    currency: Currency;
+    currencyRates: CurrencyRates;
+    printMode?: boolean;
 }

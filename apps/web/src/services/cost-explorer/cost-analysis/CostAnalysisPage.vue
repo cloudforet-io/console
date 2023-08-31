@@ -3,13 +3,14 @@ import { isEqual } from 'lodash';
 import {
     onUnmounted, watch,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import { useRouter } from 'vue-router';
 
 import {
     arrayToQueryString,
     objectToQueryString,
     primitiveToQueryString,
-    queryStringToArray, queryStringToBoolean,
+    queryStringToArray,
     queryStringToObject,
     queryStringToString,
 } from '@/lib/router-query-string';
@@ -25,16 +26,14 @@ import type {
     CostQuerySetModel, CostQuerySetOption, Granularity,
 } from '@/services/cost-explorer/type';
 
+
 interface Props {
     querySetId?: string;
 }
-
 const props = defineProps<Props>();
-const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
-
+const router = useRouter();
 /* util */
 const setQueryOptions = (options?: CostQuerySetOption) => {
     if (options) costAnalysisPageStore.setQueryOptions(options);
@@ -43,18 +42,17 @@ const setQueryOptions = (options?: CostQuerySetOption) => {
 
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
     granularity: queryStringToString(urlQuery.granularity) as Granularity,
-    stack: queryStringToBoolean(urlQuery.stack),
     group_by: queryStringToArray(urlQuery.group_by),
     period: queryStringToObject(urlQuery.period) ?? {},
     filters: queryStringToObject(urlQuery.filters),
 });
 
-const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageState.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
+const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
 /* Watchers */
-watch(() => costAnalysisPageState.selectedQueryId, (selectedQueryId) => {
+watch(() => costAnalysisPageStore.selectedQueryId, (selectedQueryId) => {
     if (props.querySetId !== selectedQueryId) {
-        const location = {
+        const location: RouteLocationRaw = {
             params: { querySetId: selectedQueryId as string },
             query: {},
         };
@@ -70,7 +68,6 @@ const registerStoreWatch = (currentQuery) => {
 
         const newQuery: CostAnalysisPageUrlQuery = {
             granularity: primitiveToQueryString(options.granularity),
-            stack: primitiveToQueryString(options.stack),
             group_by: arrayToQueryString(options.group_by),
             period: objectToQueryString(options.period),
             filters: objectToQueryString(options.filters),
@@ -97,16 +94,16 @@ onUnmounted(() => {
 (async () => {
     const currentQuery = router.currentRoute.value.query;
     // list cost query sets
-    await costAnalysisPageStore.listCostQueryList();
+    await costAnalysisPageStore.getCostQueryList();
 
     // init states
     if (props.querySetId) {
         const { name, options } = getQueryWithKey(props.querySetId);
         if (name) {
             setQueryOptions(options);
-            costAnalysisPageStore.$patch({ selectedQueryId: props.querySetId });
+            costAnalysisPageStore.selectQueryId(props.querySetId);
         } else {
-            costAnalysisPageStore.$patch({ selectedQueryId: undefined });
+            costAnalysisPageStore.selectQueryId(undefined);
         }
     } else if (Object.keys(currentQuery).length) {
         const options = getQueryOptionsFromUrlQuery(currentQuery);
@@ -118,7 +115,6 @@ onUnmounted(() => {
     // register store watch
     registerStoreWatch(currentQuery);
 })();
-
 </script>
 
 <template>

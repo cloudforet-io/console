@@ -26,7 +26,6 @@ export const MENU_LIST: Menu[] = [
     {
         id: MENU_ID.COST_EXPLORER,
         subMenuList: [
-            { id: MENU_ID.COST_EXPLORER_DASHBOARD },
             { id: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
             { id: MENU_ID.COST_EXPLORER_BUDGET },
         ],

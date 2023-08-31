@@ -1,17 +1,13 @@
 <script lang="ts" setup>
-
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { debounce } from 'lodash';
 import {
-    debounce,
-} from 'lodash';
-import type { ComponentPublicInstance } from 'vue';
-import {
-    computed, reactive, ref, watch,
+    computed, defineEmits, reactive, toRefs, watch,
 } from 'vue';
 import { useStore } from 'vuex';
 
@@ -19,12 +15,16 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helpe
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    getLegends, getXYChartData,
+} from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import CostAnalysisChartQuerySection
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
-import CostAnalysisPieChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
+import type {
+    Legend, XYChartData,
+} from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
@@ -35,37 +35,27 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type {
     Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
-import {
-    getLegends, getPieChartData, getXYChartData,
-} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import type {
-    Legend, PieChartData, XYChartData,
-} from '@/services/cost-explorer/widgets/type';
-
-interface Props {
-    printMode?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-    printMode: false,
-});
-const emit = defineEmits<{(e: 'rendered', value: Element[]): void}>();
-const store = useStore();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const store = useStore();
+
+const emit = defineEmits<{(e: 'rendered', elements: Element[]): void;
+}>();
 const state = reactive({
     currency: computed(() => store.state.settings.currency),
     currencyRates: computed(() => store.state.settings.currencyRates),
     //
     loading: true,
     legends: [] as Legend[],
-    chartData: [] as Array<XYChartData|PieChartData>,
+    chartData: [] as XYChartData[],
     chart: null as XYChart | PieChart | null,
+    queryRef: null as null,
+    chartRef: null as null|HTMLElement,
 });
-const queryRef = ref<null|ComponentPublicInstance>(null);
-const chartRef = ref<null|HTMLElement>(null);
+
+const { queryRef, chartRef } = toRefs(state);
 
 /* api */
 let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -79,17 +69,23 @@ const listCostAnalysisData = async () => {
     try {
         costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-            include_others: !!costAnalysisPageState.primaryGroupBy,
+            include_others: !!costAnalysisPageState.chartGroupBy,
             granularity: costAnalysisPageState.granularity,
-            group_by: costAnalysisPageState.primaryGroupBy ? [costAnalysisPageState.primaryGroupBy] : [],
+            group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
             start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
             end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
             limit: 15,
             ...costQueryHelper.apiQuery,
         }, { cancelToken: listCostAnalysisRequest.token });
         listCostAnalysisRequest = undefined;
-        return results;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        return results.map((d) => ({
+            ...d,
+            cost: d.usd_cost,
+            total_cost: d.total_usd_cost,
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
@@ -100,11 +96,7 @@ const setChartData = debounce(async (granularity: Granularity, period: Period, g
 
     const rawData = await listCostAnalysisData();
     state.legends = getLegends(rawData, granularity, groupBy);
-    if (granularity === GRANULARITY.ACCUMULATED) {
-        state.chartData = getPieChartData(rawData, groupBy);
-    } else {
-        state.chartData = getXYChartData(rawData, granularity, period, groupBy);
-    }
+    state.chartData = getXYChartData(rawData, granularity, period, groupBy);
     state.loading = false;
 }, 300);
 
@@ -120,10 +112,10 @@ const handleAllSeries = (type) => {
     }
 };
 const handleChartRendered = () => {
-    if (chartRef.value && queryRef.value) {
+    if (state.chartRef && state.queryRef?.$el) {
         const elements: Element[] = [
-            queryRef.value,
-            chartRef.value,
+            state.queryRef.$el,
+            state.chartRef,
         ];
         emit('rendered', elements);
     }
@@ -132,48 +124,31 @@ const handleChartRendered = () => {
 watch([
     () => costAnalysisPageState.granularity,
     () => costAnalysisPageState.period,
-    () => costAnalysisPageState.primaryGroupBy,
+    () => costAnalysisPageState.chartGroupBy,
     () => costAnalysisPageState.filters,
 ], ([granularity, period, groupBy]) => {
     setChartData(granularity, period, groupBy);
 }, { immediate: true, deep: true });
-
 </script>
 
 <template>
-    <div class="cost-analysis-chart"
-         :class="{'print-mode': printMode}"
-    >
+    <div class="cost-analysis-chart">
         <section ref="chartRef"
                  class="chart-section"
         >
-            <cost-analysis-pie-chart v-if="costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED"
-                                     v-model:chart="state.chart"
-                                     :loading="state.loading"
-                                     :chart-data="state.chartData"
-                                     :legends="state.legends"
-                                     :currency="state.currency"
-                                     :currency-rates="state.currencyRates"
-                                     :print-mode="printMode"
-                                     @rendered="handleChartRendered"
-            />
-            <cost-analysis-stacked-column-chart v-else
-                                                v-model:chart="state.chart"
+            <cost-analysis-stacked-column-chart v-model:chart="state.chart"
                                                 :loading="state.loading"
                                                 :chart-data="state.chartData"
                                                 :legends="state.legends"
                                                 :granularity="costAnalysisPageState.granularity"
-                                                :stack="costAnalysisPageState.stack"
                                                 :period="costAnalysisPageState.period"
                                                 :currency="state.currency"
                                                 :currency-rates="state.currencyRates"
-                                                :print-mode="printMode"
                                                 @rendered="handleChartRendered"
             />
         </section>
         <cost-analysis-chart-query-section ref="queryRef"
                                            v-model:legends="state.legends"
-                                           :print-mode="printMode"
                                            :loading="state.loading"
                                            @toggle-series="handleToggleSeries"
                                            @show-all-series="handleAllSeries('show')"
@@ -201,32 +176,8 @@ watch([
         }
     }
 
-    &.print-mode {
+    @screen tablet {
         @mixin row-stack;
-        .filter-wrapper {
-            height: auto;
-            padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
-            .p-empty {
-                @apply flex justify-start;
-            }
-        }
-        .legend-wrapper {
-            height: auto;
-            overflow-y: visible;
-        }
-        .query-section {
-            .title {
-                white-space: nowrap;
-            }
-        }
-    }
-    &:not(.print-mode) {
-        @screen tablet {
-            @mixin row-stack;
-        }
     }
 }
 </style>

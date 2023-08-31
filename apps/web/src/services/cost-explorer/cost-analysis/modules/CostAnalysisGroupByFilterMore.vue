@@ -13,16 +13,10 @@ import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
-interface Props {
-    printMode?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-    printMode: false,
-});
-const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+
+const { t } = useI18n();
 
 const state = reactive({
     addMoreModalVisible: false,
@@ -77,16 +71,16 @@ const handleDeleteItem = (item: MoreGroupByItem) => {
     _moreGroupBy.splice(targetIdx, 1);
     costAnalysisPageStore.setMoreGroupByWithSettings(_moreGroupBy);
 };
-
 </script>
 
 <template>
     <div class="cost-analysis-group-by-filter-more">
-        <template v-for="(moreGroupByItem, idx) in costAnalysisPageStore.orderedMoreGroupByItems">
+        <template v-for="(moreGroupByItem, idx) in costAnalysisPageStore.orderedMoreGroupByItems"
+                  :key="`more-group-by-${moreGroupByItem.key}-${idx}`"
+        >
             <p-select-button v-if="!moreGroupByItem.disabled"
-                             :key="`more-group-by-${moreGroupByItem.key}-${idx}`"
                              :value="moreGroupByItem"
-                             :selected="printMode ? '' : costAnalysisPageStore.orderedMoreGroupByItems.filter(d => d.selected)"
+                             :selected="costAnalysisPageStore.orderedMoreGroupByItems.filter(d => d.selected)"
                              multi-selectable
                              size="sm"
                              :predicate="predicate"

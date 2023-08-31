@@ -1,94 +1,41 @@
 <script lang="ts" setup>
-import { PI } from '@spaceone/design-system';
+import { PButtonModal, PI } from '@spaceone/design-system';
 import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
+import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
-import type {
-    PublicDashboardInfo, UserDashboardInfo,
-} from '@/services/cost-explorer/cost-dashboard/type';
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
+const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
 
-const store = useStore();
+const costQueryStore = useCostQuerySetStore();
+const costQueryState = costQueryStore.$state;
+
 const { t } = useI18n();
-
-const costExplorerDashboardStore = useCostExplorerDashboardStore();
-const costExplorerDashboardState = costExplorerDashboardStore.$state;
+const store = useStore();
 
 const state = reactive({
     loading: true,
     header: computed(() => t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
-    topTitle: computed(() => {
-        if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD, store.getters['user/pagePermissionList'])) {
-            return {
-                label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_DASHBOARD].translationId),
-                visibleAddButton: true,
-                addButtonLink: { name: COST_EXPLORER_ROUTE.DASHBOARD.CREATE._NAME },
-            };
-        }
-        return undefined;
-    }),
-    dashboardMenuSet: computed<LNBMenu[]>(() => {
-        const results: LNBMenu[] = [];
-        if (state.topTitle) {
-            results.push(
-                [
-                    {
-                        type: 'title', label: 'Public', id: 'public', foldable: false,
-                    },
-                    ...costExplorerDashboardState.publicDashboardList.map((list: PublicDashboardInfo) => ({
-                        type: 'item',
-                        label: list.name,
-                        id: list.public_dashboard_id,
-                        to: {
-                            name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: list.public_dashboard_id },
-                        },
-                        hideFavorite: true,
-                    })) as LNBItem[],
-                ],
-                [
-                    {
-                        type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
-                    },
-                    ...costExplorerDashboardState.userDashboardList.map((list: UserDashboardInfo) => ({
-                        type: 'item',
-                        label: list.name,
-                        id: list.user_dashboard_id,
-                        to: {
-                            name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
-                            params: { dashboardId: list.user_dashboard_id },
-                        },
-                        hideFavorite: true,
-                    })) as LNBItem[],
-                ],
-                { type: 'divider' },
-            );
-        }
-        return results;
-    }),
     menuSet: computed<LNBMenu[]>(() => [
-        ...state.dashboardMenuSet,
+        ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
-            {
-                type: 'item',
-                id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
-                label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
-                to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
-            },
             {
                 type: 'item',
                 id: MENU_ID.COST_EXPLORER_BUDGET,
@@ -97,48 +44,113 @@ const state = reactive({
             },
         ], store.getters['user/pagePermissionList']),
     ]),
-    selectedMenu: {} as LNBItem,
+    costAnalysisMenuSet: computed<LNBMenu[]>(() => [
+        { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
+        {
+            type: MENU_ITEM_TYPE.TOP_TITLE,
+            label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+        },
+        {
+            type: MENU_ITEM_TYPE.DROPDOWN,
+            id: DATA_SOURCE_DROPDOWN_KEY,
+            selectOptions: {
+                items: costQueryState.dataSourceList.map((dataSource) => ({
+                    name: dataSource,
+                    label: dataSource,
+                })),
+                defaultSelected: state.selectedDataSource,
+            },
+        },
+        ...state.queryMenuSet,
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+    ]),
+    queryMenuSet: computed<LNBMenu>(() => {
+        const currentQueryMenuList: LNBMenu = costQueryState.costQuerySetList.map((d) => ({
+            type: 'item',
+            id: d.cost_query_set_id,
+            label: d.name,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? 'ic_main-filled' : undefined,
+            to: {
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                params: {
+                    querySetId: d.cost_query_set_id,
+                },
+            },
+        }));
+        return currentQueryMenuList;
+    }),
 });
 
-const listDashboard = async () => {
-    try {
-        state.loading = true;
-        await costExplorerDashboardStore.setDashboardList();
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+const relocateNotificationState = reactive({
+    isShow: true,
+    data: computed<LNBItem>(() => ({
+        type: 'item',
+        id: MENU_ID.DASHBOARDS,
+        // TODO: translation
+        label: t('Go to Dashboard'),
+        to: { name: DASHBOARDS_ROUTE._NAME },
+        isNew: true,
+        hideFavorite: true,
+    })),
+    isModalVisible: false,
+});
+
+const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
+    const pagePermission = store.getters['user/pagePermissionMap'];
+    const routeName = MENU_ID.COST_EXPLORER_COST_ANALYSIS;
+
+    if (pagePermission[routeName]) return [...menuSet];
+    return [];
 };
 
-const setInitialHomeDashboard = () => {
-    costExplorerDashboardStore.setHomeDashboard(costExplorerDashboardState.publicDashboardList[0]?.public_dashboard_id);
+const handleSelect = (id: string, selected: string) => {
+    if (id === DATA_SOURCE_DROPDOWN_KEY) costQueryStore.$patch({ selectedDataSource: selected });
 };
 
-/* Init */
-(async () => {
-    await listDashboard();
-    if (!costExplorerDashboardStore.homeDashboardId) setInitialHomeDashboard();
-})();
+const handleLearnMoreRelocateNotification = () => {
+    relocateNotificationState.isModalVisible = true;
+};
+
+const handleDismissRelocateNotification = () => {
+    relocateNotificationState.isShow = false;
+};
 
 </script>
 
 <template>
     <aside class="sidebar-menu">
-        <l-n-b
-            v-if="!costExplorerDashboardState.loading"
-            :header="state.header"
-            :top-title="state.topTitle"
-            :menu-set="state.menuSet"
+        <l-n-b :header="state.header"
+               :menu-set="state.menuSet"
+               @select="handleSelect"
         >
-            <template #after-text="{item}">
-                <p-i v-if="item.id === costExplorerDashboardStore.homeDashboardId"
-                     name="ic_home-filled"
-                     width="1rem"
-                     height="1rem"
-                     class="ml-1"
+            <template #default>
+                <l-n-b-router-menu-item :item="relocateNotificationState.data">
+                    <template #after-text>
+                        <p-i name="ic_arrow-right-up"
+                             width="1rem"
+                             height="1rem"
+                             class="link-icon"
+                        />
+                    </template>
+                </l-n-b-router-menu-item>
+                <relocate-dashboard-notification v-if="relocateNotificationState.isShow"
+                                                 @click-dismiss="handleDismissRelocateNotification"
+                                                 @click-learn-more="handleLearnMoreRelocateNotification"
                 />
+                <l-n-b-divider-menu-item />
             </template>
         </l-n-b>
+        <!--TODO: Should be replaced with lean-more modal-->
+        <p-button-modal v-model:visible="relocateNotificationState.isModalVisible" />
     </aside>
 </template>
+
+<style scoped lang="postcss">
+.sidebar-menu {
+    .link-icon {
+        margin-left: 0.25rem;
+    }
+}
+</style>

@@ -6,19 +6,17 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PLink, PI, PToolboxTable, PDataTable, PButtonModal,
+    PButtonModal, PI, PLink, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import type { CancelTokenSource } from 'axios';
 import dayjs from 'dayjs';
-import { get } from 'lodash';
-import type { Table } from 'pdfmake/interfaces';
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
+import type { LocationQueryRaw } from 'vue-router';
+
+import { store } from '@/store';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -29,52 +27,26 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import type {
-    RouteQueryString,
-} from '@/lib/router-query-string';
-import {
-    objectToQueryString,
-    primitiveToQueryString,
-    arrayToQueryString,
-} from '@/lib/router-query-string';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { CostAnalyzeModel } from '@/services/cost-explorer/cost-analysis/type';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, MORE_GROUP_BY, MORE_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import {
-    getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
-} from '@/services/cost-explorer/lib/helper';
+import { getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
-
-interface PrintModeFieldSet {
-    widths?: Table['widths'];
-    fields: DataTableFieldType[];
-}
-// must be greater than selectable group by items' count
-const PRINT_MODE_MAX_COL = 10;
-
-interface Props {
-    printMode?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    printMode: false,
-});
-const emit = defineEmits<{(e: 'rendered', value: PdfOverlayItem[]): void}>();
-const store = useStore();
-const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const { t } = useI18n();
+
 const state = reactive({
-    component: computed(() => (props.printMode ? PDataTable : PToolboxTable)),
+    component: computed(() => PToolboxTable),
     timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period.start), dayjs.utc(costAnalysisPageState.period.end))),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
@@ -108,7 +80,7 @@ const tableState = reactive({
         if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
         if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
         if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
-        if (d.name.startsWith('usd_cost')) {
+        if (d.name.startsWith('cost')) {
             field.type = 'currency';
             field.options = {
                 currency: state.currency,
@@ -138,8 +110,7 @@ const tableState = reactive({
 /* util */
 const getLink = (item: CostAnalyzeModel, fieldName: string) => {
     const queryHelper = new QueryHelper();
-    // TODO: need to be refacrtored with new router types
-    const query: Record<string, RouteQueryString> = {};
+    const query: LocationQueryRaw = {};
     if (item.region_code) {
         query.region = arrayToQueryString([item.region_code]);
     } else if (costAnalysisPageState.filters.region_code?.length) {
@@ -151,17 +122,13 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
         query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0].v);
     }
 
-    if (costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED) {
-        query.period = objectToQueryString(costAnalysisPageState.period);
-    } else {
-        const date = fieldName.split('.')[1]; // usd_cost.2022-01-04
-        const _period = { start: date, end: date };
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-            _period.start = dayjs.utc(date).format('YYYY-MM-01');
-            _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
-        }
-        query.period = objectToQueryString(_period);
+    const date = fieldName.split('.')[1]; // cost.2022-01-04
+    const _period = { start: date, end: date };
+    if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
+        _period.start = dayjs.utc(date).format('YYYY-MM-01');
+        _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
     }
+    query.period = objectToQueryString(_period);
 
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {
@@ -204,10 +171,10 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
     };
 };
 const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
-    const currDate: string = fieldName.split('.')[1]; // usd_cost.2022-01-04
+    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04
     const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-    const currValue: number|undefined = item.usd_cost[currDate];
-    const prevValue: number|undefined = item.usd_cost[prevDate];
+    const currValue: number|undefined = item.cost[currDate];
+    const prevValue: number|undefined = item.cost[prevDate];
 
     if (prevValue === undefined || currValue === undefined) return false;
     if (currValue < prevValue) return false;
@@ -219,25 +186,6 @@ const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
         return currValue * 2 >= prevValue;
     }
     return false;
-};
-const _getStackedTableData = (rawData: CostAnalyzeModel[], granularity, period): CostAnalyzeModel[] => {
-    const results: CostAnalyzeModel[] = [];
-    rawData.forEach((d) => {
-        const usdCost: UsdCost = {};
-        let now = dayjs.utc(period.start).clone();
-        let stackedData = 0;
-        while (now.isSameOrBefore(dayjs.utc(period.end), state.timeUnit)) {
-            const currValue = d.usd_cost[now.format(state.dateFormat)] || 0;
-            stackedData += currValue;
-            usdCost[now.format(state.dateFormat)] = stackedData;
-            now = now.add(1, state.timeUnit);
-        }
-        results.push({
-            ...d,
-            usd_cost: usdCost,
-        });
-    });
-    return results;
 };
 const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     if (field.name.startsWith(`${MORE_GROUP_BY.TAGS}_`)) {
@@ -253,8 +201,8 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 let listCostAnalysisRequest: CancelTokenSource | undefined;
 const costApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
-    .setSort('total_usd_cost', true);
-const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters, stack) => {
+    .setSort('total_cost', true);
+const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters) => {
     if (listCostAnalysisRequest) {
         listCostAnalysisRequest.cancel('Next request has been called.');
         listCostAnalysisRequest = undefined;
@@ -266,11 +214,11 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
         costApiQueryHelper.setFilters(_convertedFilters);
 
         const query = costApiQueryHelper.data;
-        if (props.printMode) query.page = undefined;
 
         const moreGroupByKeyList = moreGroupBy.filter((d) => d.selected).map((d) => `${d.category}.${d.key}`);
 
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
             granularity,
             group_by: [...groupBy, ...moreGroupByKeyList],
@@ -278,17 +226,18 @@ const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, peri
             end: dayjs.utc(period.end).format(dateFormat),
             ...query,
         }, { cancelToken: listCostAnalysisRequest.token });
-        let items = results;
-        if (granularity !== GRANULARITY.ACCUMULATED && stack) items = _getStackedTableData(results, granularity, period);
-        tableState.items = items;
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        tableState.items = results.map((d) => ({
+            ...d,
+            cost: d.usd_cost,
+            total_cost: d.total_usd_cost,
+        }));
         tableState.totalCount = total_count;
         listCostAnalysisRequest = undefined;
-    } catch (e: any) {
-        if (!axios.isCancel(e.axiosError)) {
-            tableState.items = [];
-            tableState.totalCount = 0;
-            ErrorHandler.handleError(e);
-        }
+    } catch (e) {
+        tableState.items = [];
+        tableState.totalCount = 0;
+        ErrorHandler.handleError(e);
     } finally {
         tableState.loading = false;
     }
@@ -303,7 +252,6 @@ const handleChange = async (options: any = {}) => {
         costAnalysisPageStore.orderedMoreGroupByItems,
         costAnalysisPageStore.currentQuerySetOptions.period,
         costAnalysisPageStore.currentQuerySetOptions.filters,
-        costAnalysisPageStore.currentQuerySetOptions.stack,
     );
 };
 const handleExcelDownload = async () => {
@@ -335,65 +283,7 @@ const handleExcelDownload = async () => {
 };
 
 const handleExport = async () => {
-    if (costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED && costAnalysisPageState.stack) {
-        state.visibleExcelNotiModal = true;
-    } else await handleExcelDownload();
-};
-
-// Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
-const getPrintModeFieldSets = (): PrintModeFieldSet[] => {
-    const groupByLength = tableState.groupByFields.length;
-    const costFieldLength = tableState.costFields.length;
-    const totalLength = costFieldLength + groupByLength;
-    const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;
-    const groupByFieldWidthValues = Array(groupByLength).fill('auto');
-    let costFieldWidthValues = Array(tableState.costFields.length).fill('*');
-
-    if (props.printMode && totalLength > PRINT_MODE_MAX_COL) {
-        const fieldSetCount = Math.ceil(costFieldLength / costColumnCount);
-        const results = [] as PrintModeFieldSet[];
-        for (let idx = 0; idx < fieldSetCount; idx++) {
-            const tableFields = tableState.costFields.slice(idx * costColumnCount, (idx + 1) * costColumnCount);
-            costFieldWidthValues = Array(tableFields.length).fill('*');
-            const widths = groupByFieldWidthValues.concat(costFieldWidthValues);
-            results.push({
-                widths,
-                fields: tableState.groupByFields.concat(tableFields),
-            });
-        }
-        return results;
-    }
-    return [{
-        widths: groupByFieldWidthValues.concat(costFieldWidthValues),
-        fields: tableState.groupByFields.concat(tableState.costFields),
-    }];
-};
-
-const getPdfItems = (): PdfOverlayItem[] => {
-    const items = tableState.items;
-    const fieldSets = getPrintModeFieldSets();
-    return fieldSets.map(({ widths, fields }) => {
-        const headRows: string[][] = [fields.map((f) => f.label as string)];
-        const bodyRows: string[][] = items.map((d) => fields.map((f) => {
-            let value = get(d, f.name, '-');
-            if (f.name === 'totalCost') value = t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST');
-            else if (state.groupByStoreMap[f.name]) {
-                const referenceStore = state.groupByStoreMap[f.name];
-                value = referenceStore[value] ? referenceStore[value].label : value;
-            } else if (typeof value === 'number') {
-                value = currencyMoneyFormatter(value, state.currency, state.currencyRates, true);
-            }
-
-            return value;
-        }));
-        return {
-            tableData: {
-                widths,
-                body: headRows.concat(bodyRows),
-            },
-            type: 'data-table',
-        };
-    });
+    await handleExcelDownload();
 };
 
 watch(
@@ -403,12 +293,10 @@ watch(
         () => costAnalysisPageStore.orderedMoreGroupByItems,
         () => costAnalysisPageState.period,
         () => costAnalysisPageState.filters,
-        () => costAnalysisPageState.stack,
     ],
-    async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
-        await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
+    async ([granularity, groupBy, moreGroupBy, period, filters]) => {
+        await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters);
         tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
-        if (props.printMode) emit('rendered', getPdfItems());
     },
     { immediate: true, deep: true },
 );
@@ -423,7 +311,6 @@ watch(
         store.dispatch('reference/serviceAccount/load'),
     ]);
 })();
-
 </script>
 
 <template>
@@ -433,7 +320,7 @@ watch(
                      :items="tableState.items"
                      :total-count="tableState.totalCount"
                      :searchable="false"
-                     :row-height-fixed="!printMode"
+                     row-height-fixed
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"

@@ -12,13 +12,13 @@ import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
-import BudgetPeriodSelect from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
-import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
-import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
+import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
+import BudgetPeriodSelect from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
+import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
-type CostTypes = BudgetData['cost_types'];
+type CostTypes = BudgetModel['cost_types'];
 interface BudgetBulkCreateTemplateSource {
     start?: string;
     end?: string;

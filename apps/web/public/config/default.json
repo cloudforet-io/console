@@ -17,7 +17,9 @@
     "ENDPOINT_V1": "",
     "ENDPOINT_V2": "",
     "REFLECTION": false,
-    "SKIP_TOKEN_CHECK": false
+    "SKIP_TOKEN_CHECK": false,
+    "API_LIST_V1": [],
+    "API_LIST_V2": []
   },
   "ASSET_PATH": {
   },

@@ -1,42 +1,38 @@
 <script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
+    PSelectDropdown, PButton, PContextMenu, PIconButton, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { computed, reactive } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+import { computed, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
-import CostAnalysisSetQueryModal from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates } from '@/services/cost-explorer/lib/helper';
+import { getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
+const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
 
-
-interface Props {
-    printMode?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-    printMode: false,
-});
-const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const { t } = useI18n();
+
+const contextMenuRef = ref<any|null>(null);
+const targetRef = ref<HTMLElement | null>(null);
 const state = reactive({
+    queryFormModalVisible: false,
     granularityItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: GRANULARITY.ACCUMULATED,
-            label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
-        },
         {
             type: 'item',
             name: GRANULARITY.DAILY,
@@ -48,8 +44,28 @@ const state = reactive({
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
         },
     ])),
-    setQueryModalVisible: false,
+    saveDropdownMenuItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: 'saveAs',
+            icon: 'ic_disk-edit-filled',
+            label: `${t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
+        },
+    ])),
 });
+
+const {
+    visibleMenu: visibleContextMenu,
+    contextMenuStyle,
+    showContextMenu,
+    hideContextMenu,
+} = useContextMenuController({
+    useFixedStyle: true,
+    targetRef,
+    contextMenuRef,
+    menu: state.saveDropdownMenuItems,
+});
+onClickOutside(contextMenuRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -60,80 +76,97 @@ const handleSelectGranularity = async (granularity: Granularity) => {
     }
     costAnalysisPageStore.$patch({ granularity });
 };
-const handleToggleStack = async (value) => {
-    costAnalysisPageStore.$patch({ stack: value });
-};
 const handleSelectedDates = (period) => {
     costAnalysisPageStore.$patch((_state) => {
         _state.period = period;
     });
 };
-const handleClickSetFilter = () => {
-    state.setQueryModalVisible = true;
+const handleSaveQuerySet = async () => {
+    try {
+        await SpaceConnector.client.costAnalysis.costQuerySet.update({
+            cost_query_set_id: costAnalysisPageStore.selectedQueryId,
+            options: getRefinedCostQueryOptions({
+                granularity: costAnalysisPageState.granularity,
+                period: costAnalysisPageState.period,
+                group_by: costAnalysisPageState.groupBy,
+                more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
+                filters: costAnalysisPageState.filters,
+            }),
+        });
+        await costAnalysisPageStore.getCostQueryList();
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
+    }
 };
-
+const handleClickMoreMenuButton = () => {
+    if (visibleContextMenu.value) hideContextMenu();
+    else showContextMenu();
+};
+const handleClickSaveAsButton = () => {
+    state.queryFormModalVisible = true;
+};
+const handleUpdateQuery = (updatedQueryId: string) => {
+    costAnalysisPageStore.getCostQueryList();
+    costAnalysisPageStore.selectQueryId(updatedQueryId);
+};
 </script>
 
 <template>
-    <div class="cost-analysis-query-filter"
-         :class="{ 'print-mode': printMode }"
-    >
-        <div class="filter-wrapper tablet-off">
+    <div class="cost-analysis-query-filter">
+        <div class="filter-wrapper">
             <div class="left-part">
-                <div class="filter-item">
-                    <b class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
-                    <p-select-dropdown :items="state.granularityItems"
-                                       :selected="costAnalysisPageState.granularity"
-                                       style-type="transparent"
-                                       :read-only="printMode"
-                                       class="granularity-select"
-                                       @select="handleSelectGranularity"
+                <p-select-dropdown :items="state.granularityItems"
+                                   :selected="costAnalysisPageState.granularity"
+                                   class="granularity-select-dropdown"
+                                   @select="handleSelectGranularity"
+                />
+                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
+                                                      @update="handleSelectedDates"
+                />
+            </div>
+            <div class="right-part">
+                <template v-if="costAnalysisPageStore.selectedQueryId">
+                    <p-button v-if="costAnalysisPageStore.selectedQueryId"
+                              class="save-button"
+                              style-type="tertiary"
+                              icon-left="ic_disk-filled"
+                              @click="handleSaveQuerySet"
+                    >
+                        {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
+                    </p-button>
+                    <p-icon-button ref="targetRef"
+                                   class="more-menu-button"
+                                   :name="visibleContextMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                                   style-type="tertiary"
+                                   shape="square"
+                                   size="md"
+                                   color="inherit"
+                                   @click="handleClickMoreMenuButton"
                     />
-                </div>
-                <div v-if="costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED"
-                     class="filter-item"
-                >
-                    <template v-if="!printMode">
-                        <span class="v-divider" />
-                        <p-field-title :label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
-                            <template #right>
-                                <p-toggle-button :value="costAnalysisPageState.stack"
-                                                 class="toggle-button"
-                                                 @change-toggle="handleToggleStack"
-                                />
-                            </template>
-                        </p-field-title>
-                    </template>
-                    <template v-else-if="costAnalysisPageState.stack">
-                        <span class="v-divider" />
-                        <span>Stacked</span>
-                    </template>
-                </div>
-            </div>
-            <div class="right-part">
-                <span class="timezone-text">UTC</span>
-                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
-                                                      :print-mode="printMode"
-                                                      @update="handleSelectedDates"
-                />
-                <span class="v-divider" />
-                <currency-select-dropdown :print-mode="printMode" />
+                    <p-context-menu v-show="visibleContextMenu"
+                                    ref="contextMenuRef"
+                                    :menu="state.saveDropdownMenuItems"
+                                    :style="contextMenuStyle"
+                                    @select="handleClickSaveAsButton"
+                    />
+                </template>
+                <template v-else>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_disk-edit-filled"
+                              @click="handleClickSaveAsButton"
+                    >
+                        {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
+                    </p-button>
+                </template>
             </div>
         </div>
-        <div class="filter-wrapper tablet-on">
-            <div class="right-part">
-                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
-                                                      :print-mode="printMode"
-                                                      @update="handleSelectedDates"
-                />
-                <span class="v-divider" />
-                <p-icon-button class="filter-item"
-                               name="ic_settings-filled"
-                               @click="handleClickSetFilter"
-                />
-            </div>
-        </div>
-        <cost-analysis-set-query-modal v-model:visible="state.setQueryModalVisible" />
+        <cost-analysis-query-form-modal v-model:visible="state.queryFormModalVisible"
+                                        :header-title="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
+                                        :request-type="REQUEST_TYPE.SAVE"
+                                        :selected-query-set-id="costAnalysisPageStore.selectedQueryId"
+                                        @update-query="handleUpdateQuery"
+        />
     </div>
 </template>
 
@@ -143,86 +176,35 @@ const handleClickSetFilter = () => {
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
-        .timezone-text {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            font-weight: bold;
-            line-height: 1.5;
-            padding-right: 0.5rem;
-        }
+        margin-bottom: 1rem;
         .left-part {
             display: flex;
             align-items: center;
-            .filter-item {
-                .p-select-dropdown {
-                    padding-left: 0.5rem;
+            .granularity-select-dropdown {
+                margin-right: 0.5rem;
+            }
+        }
+        .right-part {
+            display: flex;
+            align-items: center;
+
+            .save-button {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            .more-menu-button {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-left: 0;
+            }
+
+            /* custom design-system component - p-context-menu */
+            :deep(.p-context-menu) {
+                right: 1.5rem;
+                margin-top: -0.15rem;
+                .p-context-menu-item {
+                    min-width: 9rem;
                 }
-            }
-        }
-        .right-part {
-            display: flex;
-            align-items: center;
-        }
-        .filter-item {
-            display: flex;
-            align-items: center;
-            .toggle-button {
-                margin-left: 0.25rem;
-            }
-        }
-        .v-divider {
-            @apply bg-gray-300;
-            display: inline-block;
-            position: relative;
-            width: 1px;
-            height: 1rem;
-            margin: 0 0.5rem;
-        }
-        .p-select-dropdown {
-            @apply bg-transparent;
-        }
-    }
-    .tablet-on {
-        display: none;
-    }
-
-    &.print-mode {
-        .label {
-            white-space: nowrap;
-        }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.granularity-select) {
-            .text {
-                white-space: nowrap;
-            }
-        }
-    }
-
-    @screen tablet {
-        .tablet-off {
-            display: none;
-        }
-        .tablet-on {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-            padding-bottom: 1rem;
-        }
-        .right-part {
-            margin-left: auto;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-    }
-
-    @screen mobile {
-        .filter-wrapper {
-            .cost-analysis-period-select-dropdown {
-                width: 100%;
-            }
-            .v-divider {
-                @apply hidden;
             }
         }
     }

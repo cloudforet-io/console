@@ -19,11 +19,11 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
-    header: string;
+    header?: string;
     backLink?: BackLink;
     topTitle?: TopTitle;
     menuSet: LNBMenu[];
-    showFavoriteOnly?: boolean | undefined;
+    showFavoriteOnly?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,10 +33,10 @@ const props = withDefaults(defineProps<Props>(), {
     menuSet: () => [],
     showFavoriteOnly: undefined,
 });
-const emit = defineEmits<{(e: 'update:show-favorite-only', value: boolean| undefined): void}>();
+const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
+const route = useRoute();
 const { t } = useI18n();
 const slots = useSlots();
-const route = useRoute();
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
@@ -45,6 +45,9 @@ const state = reactive({
 
 const handleFavoriteToggle = () => {
     state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
+};
+const handleSelect = (id: string, selected: string) => {
+    emit('select', id, selected);
 };
 
 </script>
@@ -115,6 +118,7 @@ const handleFavoriteToggle = () => {
                                  :menu-data="menuData"
                                  :current-path="state.currentPath"
                                  :depth="Array.isArray(menuData) ? 2 : 1"
+                                 @select="handleSelect"
                 >
                     <template v-for="(_, slot) of slots"
                               #[slot]="scope"

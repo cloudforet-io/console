@@ -70,7 +70,7 @@ const { colorSet } = useWidgetColorSet({
 });
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
+    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
@@ -80,7 +80,7 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
+            type: state.fieldsKey === 'cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
         const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
@@ -137,7 +137,8 @@ const fetchData = async (): Promise<FullData> => {
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
+                    cost_sum: {
+                        // TODO: Change to 'cost' after the cost analysis API is updated.
                         key: 'usd_cost',
                         operator: 'sum',
                     },
@@ -146,7 +147,7 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                sort: [{ key: '_total_cost_sum', desc: true }],
                 field_group: ['usage_type'],
                 ...apiQueryHelper.data,
             },

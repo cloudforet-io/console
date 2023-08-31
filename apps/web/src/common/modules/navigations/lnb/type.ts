@@ -1,4 +1,6 @@
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { RouteLocationRaw } from 'vue-router';
+
 
 import type { FavoriteType } from '@/store/modules/favorite/type';
 
@@ -10,8 +12,14 @@ export const MENU_ITEM_TYPE = {
     ITEM: 'item',
     DIVIDER: 'divider',
     FAVORITE_ONLY: 'favorite-only',
+    DROPDOWN: 'dropdown',
 } as const;
 type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
+
+export interface SelectOptions {
+    items: MenuItem[];
+    defaultSelected?: string | number;
+}
 
 export interface LNBItem {
     type: MenuItemType;
@@ -24,6 +32,7 @@ export interface LNBItem {
     hideFavorite?: boolean;
     favoriteType?: FavoriteType;
     icon?: string;
+    selectOptions?: SelectOptions;
 }
 
 export type LNBMenu = LNBItem[]|LNBItem;

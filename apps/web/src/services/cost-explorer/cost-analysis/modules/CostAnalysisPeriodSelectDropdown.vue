@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {
-    computed, reactive, watch,
+    computed, defineEmits, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -18,29 +19,28 @@ import type { Period, Granularity } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
 
 
+interface Props {
+    fixedPeriod: Period;
+}
+const props = withDefaults(defineProps<Props>(), {
+    fixedPeriod: () => getInitialDates(),
+});
+const emit = defineEmits<{(e: 'update', period: Period): void;
+}>();
+
 const today = dayjs.utc();
 interface PeriodItem {
     name: string;
-    label: string;
+    label: TranslateResult;
     start: Dayjs;
     end: Dayjs;
     enabled: Granularity[];
 }
 
-interface Props {
-    fixedPeriod: Period;
-    printMode: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    fixedPeriod: () => (getInitialDates()),
-    printMode: false,
-});
-const emit = defineEmits<{(e:'update', value: Period): void}>();
-const { t } = useI18n();
-
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const { t } = useI18n();
 
 const { i18nDayjs } = useI18nDayjs();
 const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
@@ -59,42 +59,42 @@ const state = reactive({
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_7_DAYS'),
             start: today.subtract(6, 'day'),
             end: today,
-            enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.DAILY],
         },
         {
             name: 'last14days',
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_14_DAYS'),
             start: today.subtract(13, 'day'),
             end: today,
-            enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.DAILY],
         },
         {
             name: 'thisMonth',
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
             start: today.startOf('month'),
             end: today.endOf('month'),
-            enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY],
         },
         {
             name: 'lastMonth',
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
             start: today.subtract(1, 'month').startOf('month'),
             end: today.subtract(1, 'month').endOf('month'),
-            enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY],
         },
         {
             name: 'last3Month',
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
             start: today.subtract(2, 'month').startOf('month'),
             end: today.endOf('month'),
-            enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.MONTHLY],
         },
         {
             name: 'last6Month',
             label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
             start: today.subtract(5, 'month').startOf('month'),
             end: today.endOf('month'),
-            enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
+            enabled: [GRANULARITY.MONTHLY],
         },
     ])),
     periodMenuItems: computed<MenuItem[]>(() => {
@@ -168,24 +168,12 @@ watch(() => state.period, (period) => {
         setPeriodMenuItemWithPeriod(period);
     }
 });
-
 </script>
 
 <template>
-    <div class="cost-analysis-period-select-dropdown"
-         :class="{responsive: !printMode}"
-    >
-        <p-badge style-type="gray200"
-                 badge-type="subtle"
-        >
-            <p class="text">
-                {{ state.periodText }}
-            </p>
-        </p-badge>
-        <p-select-dropdown v-if="!printMode"
-                           :items="state.periodMenuItems"
+    <div class="cost-analysis-period-select-dropdown">
+        <p-select-dropdown :items="state.periodMenuItems"
                            :selected="state.selectedPeriod"
-                           style-type="transparent"
                            @select="handleSelectPeriod"
         />
         <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
@@ -204,11 +192,10 @@ watch(() => state.period, (period) => {
             white-space: nowrap;
         }
     }
-    &.responsive {
-        @screen mobile {
-            @apply flex flex-wrap justify-end items-center;
-            width: 100%;
-        }
+
+    @screen mobile {
+        @apply flex flex-wrap justify-end items-center;
+        width: 100%;
     }
 }
 

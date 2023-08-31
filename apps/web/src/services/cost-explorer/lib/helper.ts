@@ -1,10 +1,10 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
@@ -61,18 +61,13 @@ export const getConvertedBudgetFilter = (filters: CostFiltersMap): ConsoleFilter
 };
 
 export const getTimeUnitByPeriod = (granularity: Granularity, start: Dayjs, end: Dayjs): TimeUnit => {
-    if (granularity !== GRANULARITY.ACCUMULATED) {
-        if (granularity === GRANULARITY.DAILY) return 'day';
-        if (granularity === GRANULARITY.MONTHLY) return 'month';
-        return 'year';
-    }
     if (end.diff(start, 'month') < 2) return 'day';
     if (end.diff(start, 'year') < 2) return 'month';
     return 'year';
 };
 
 export const getInitialDates = (): Period => {
-    const start = dayjs.utc().startOf('month').format();
+    const start = dayjs.utc().subtract(5, 'month').startOf('month').format(); // 6 months ago
     const end = dayjs.utc().endOf('month').format();
     return { start, end };
 };
@@ -99,7 +94,7 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
     let now = start;
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
-            name: `usd_cost.${now.format(nameDateFormat)}`,
+            name: `cost.${now.format(nameDateFormat)}`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             sortable: true,
@@ -110,20 +105,6 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
 };
 export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
     const costFields: DataTableFieldType[] = [];
-
-    if (granularity === GRANULARITY.ACCUMULATED) {
-        const label = `${dayjs.utc(period.start).format('M/D')}~${dayjs.utc(period.end).format('M/D')}`;
-        if (!hasGroupBy) {
-            costFields.push({
-                name: 'totalCost', label: ' ',
-            });
-        }
-        costFields.push({
-            name: 'usd_cost', label, textAlign: 'right',
-        });
-        return costFields;
-    }
-
     if (!hasGroupBy) {
         costFields.push({
             name: 'totalCost', label: ' ', textAlign: 'right',
@@ -153,7 +134,6 @@ export const convertFiltersInToNewType = (filters: OldType | CostFiltersMap): Co
 export const getRefinedCostQueryOptions = (options: Partial<CostQuerySetOption>): Partial<CostQuerySetOption> => {
     const newOptions: Partial<CostQuerySetOption> = {
         granularity: options.granularity,
-        stack: options.stack,
         period: options.period,
         filters: options.filters,
     };
@@ -166,13 +146,6 @@ export const getRefinedCostQueryOptions = (options: Partial<CostQuerySetOption>)
         const refinedMoreGroupBy: string[] = options.more_group_by.filter((d) => d.selected)
             .map((d) => `${d.category}.${d.key}`);
         refinedGroupBy = options.group_by.concat(refinedMoreGroupBy);
-    }
-    // < 1.10.5 version compatible code
-    if (options.primary_group_by) {
-        refinedGroupBy = [
-            options.primary_group_by,
-            ...refinedGroupBy.filter((d) => d !== options.primary_group_by),
-        ];
     }
 
     newOptions.group_by = refinedGroupBy;

@@ -27,7 +27,7 @@ export const getRefinedXYChartData = (
     rawData: CostAnalyzeDataModel['results'],
     groupBy?: CostGroupBy,
     categoryKey = 'date',
-    valueKey = 'usd_cost_sum',
+    valueKey = 'cost_sum',
     isHorizontal = false,
     allReferenceTypeInfo?: AllReferenceTypeInfo,
 ): XYChartData[] => {
@@ -110,7 +110,7 @@ export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], gro
 
 export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
     const start = dayjs.utc(dateRange.start);
-    const end = dayjs.utc(dateRange.end).add(1, 'month'); // 1 month added because of `max` property bug
+    const end = dayjs.utc(dateRange.end);
     return {
         min: start.valueOf(),
         max: end.valueOf(),
@@ -149,8 +149,8 @@ export const getRefinedTreemapChartData = (rawData: TreemapChartData['children']
 /**
  * @name getRefinedPieChartData
  * @description Convert raw data to XYDateChart data.
- * @example(before) [{ provider: 'aws', usd_cost_sum: 100  }, { provider: 'google_cloud', usd_cost_sum: 100  }]
- * @example(after) [{ provider: 'AWS', usd_cost_sum: 100  }, { provider: 'Google Cloud', usd_cost_sum: 100  }]
+ * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
+ * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
  */
 export const getRefinedPieChartData = (
     rawData: CostAnalyzeDataModel['results'],
