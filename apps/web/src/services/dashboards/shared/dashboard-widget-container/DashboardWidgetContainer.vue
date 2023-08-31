@@ -19,9 +19,6 @@ import {
 import {
     useWidgetReformer,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-reformer';
-import {
-    useWidgetValidator,
-} from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-validator';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type {
@@ -55,23 +52,11 @@ const containerRef = ref<HTMLElement|null>(null);
 const { containerWidth } = useContainerWidth({ containerRef, observeResize: true });
 
 /* reform widget info list */
-const { reformedWidgetInfoList, widgetConfigMap } = useWidgetReformer({
+const { reformedWidgetInfoList } = useWidgetReformer({
     dashboardWidgetInfoList: toRef(dashboardDetailState, 'dashboardWidgetInfoList'),
     containerWidth,
 });
 
-/* widget validation */
-useWidgetValidator({
-    validateOnVariablesSchemaChange: computed(() => props.editMode),
-    dashboardWidgetInfoList: reformedWidgetInfoList,
-    widgetConfigMap,
-    variablesSchema: toRef(dashboardDetailState, 'variablesSchema'),
-    updateWidgetValidMap: (validMap) => {
-        dashboardDetailStore.$patch((_state) => {
-            _state.widgetValidMap = validMap;
-        });
-    },
-});
 
 /* init widgets */
 const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {

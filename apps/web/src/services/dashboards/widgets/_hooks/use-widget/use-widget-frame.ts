@@ -7,6 +7,8 @@ import { i18n } from '@/translations';
 import type { Currency } from '@/store/modules/settings/type';
 
 import type { DateRange } from '@/services/dashboards/config';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';

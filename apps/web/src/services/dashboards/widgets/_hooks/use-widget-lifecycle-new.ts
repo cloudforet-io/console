@@ -228,7 +228,7 @@ export const useWidgetLifecycle = ({
         if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) {
             refreshWidgetAndEmitEvent();
         }
-    }, { deep: true });
+    }, { immediate: true, deep: true });
 
     if (widgetState.settings) {
         watch(() => widgetState.settings, (current, previous) => {
