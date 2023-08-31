@@ -23,7 +23,6 @@ export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
-    more_group_by?: MoreGroupByItem[]; // will be deprecated(< v1.10.5)
     granularity: Granularity;
     period: Period;
     filters?: CostFiltersMap;
@@ -38,11 +37,4 @@ export interface CostQuerySetModel {
 export interface GroupByItem {
     name: string;
     label: string;
-}
-
-export interface MoreGroupByItem {
-    category: string;
-    key: string;
-    disabled?: boolean;
-    selected?: boolean;
 }

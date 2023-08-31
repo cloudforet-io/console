@@ -10,7 +10,7 @@ import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 import type {
     ChartData, CostAnalyzeModel, Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
-import { GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 
@@ -49,7 +49,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
     if (groupBy) {
         let _groupBy: string = groupBy;
         // Parsing to match api data (ex. tags.Name -> tags_Name)
-        if (groupBy.startsWith(MORE_GROUP_BY.TAGS) || groupBy.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
+        if (groupBy.includes('.')) {
             _groupBy = groupBy.replace('.', '_');
         }
         const _providers = store.getters['reference/providerItems'];
@@ -135,7 +135,7 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granula
 
     let _groupBy: string | undefined = groupBy;
     // Parsing to match api data (ex. tags.Name -> tags_Name)
-    if (groupBy?.startsWith(MORE_GROUP_BY.TAGS) || groupBy?.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
+    if (groupBy?.includes('.')) {
         _groupBy = groupBy.replace('.', '_');
     }
 
