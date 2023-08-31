@@ -6,7 +6,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates } from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisLNBStore } from '@/services/cost-explorer/store/cost-query-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, Period,
 } from '@/services/cost-explorer/type';
@@ -20,8 +20,8 @@ interface CostAnalysisPageState {
     filters: CostFiltersMap;
 }
 
-const costQueryStore = useCostAnalysisLNBStore();
-const costQueryState = costQueryStore.$state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.$state;
 
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
     state: (): CostAnalysisPageState => ({
@@ -32,9 +32,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         filters: {},
     }),
     getters: {
-        selectedQueryId: () => costQueryState.selectedQuerySetId,
-        costQueryList: () => costQueryState.costQuerySetList,
-        selectedQuerySet: () => costQueryStore.selectedQuerySet,
+        selectedQueryId: () => costQuerySetState.selectedQuerySetId,
+        costQueryList: () => costQuerySetState.costQuerySetList,
+        selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
         currentQuerySetOptions: (state): Partial<CostQuerySetOption> => ({
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -87,7 +87,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         },
         async editQuery(querySetId: string, name: string): Promise<CostQuerySetModel> {
             let updatedQueryData;
-            if (costQueryStore.selectedQuerySet?.name !== name) {
+            if (costQuerySetStore.selectedQuerySet?.name !== name) {
                 try {
                     updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                         cost_query_set_id: querySetId,
@@ -100,10 +100,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             return updatedQueryData;
         },
         selectQueryId(querySetId: string|undefined) {
-            costQueryStore.$patch({ selectedQuerySetId: querySetId });
+            costQuerySetStore.$patch({ selectedQuerySetId: querySetId });
         },
         async getCostQueryList() {
-            await costQueryStore.listCostQuerySets();
+            await costQuerySetStore.listCostQuerySets();
         },
     },
 });
