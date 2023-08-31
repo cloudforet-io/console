@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, onUnmounted, reactive,
 } from 'vue';
 
 import { PButtonModal, PI } from '@spaceone/design-system';
@@ -30,8 +30,8 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
 
-const costQueryStore = useCostQuerySetStore();
-const costQueryState = costQueryStore.$state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetState = costQuerySetStore.$state;
 
 const state = reactive({
     loading: true,
@@ -57,7 +57,7 @@ const state = reactive({
             type: MENU_ITEM_TYPE.DROPDOWN,
             id: DATA_SOURCE_DROPDOWN_KEY,
             selectOptions: {
-                items: costQueryState.dataSourceList.map((dataSource) => ({
+                items: costQuerySetState.dataSourceList.map((dataSource) => ({
                     name: dataSource,
                     label: dataSource,
                 })),
@@ -70,7 +70,7 @@ const state = reactive({
         },
     ]),
     queryMenuSet: computed<LNBMenu>(() => {
-        const currentQueryMenuList: LNBMenu = costQueryState.costQuerySetList.map((d) => ({
+        const currentQueryMenuList: LNBMenu = costQuerySetState.costQuerySetList.map((d) => ({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
@@ -116,7 +116,7 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 };
 
 const handleSelect = (id: string, selected: string) => {
-    if (id === DATA_SOURCE_DROPDOWN_KEY) costQueryStore.$patch({ selectedDataSource: selected });
+    if (id === DATA_SOURCE_DROPDOWN_KEY) costQuerySetStore.$patch({ selectedDataSource: selected });
 };
 
 const handleLearnMoreRelocateNotification = () => {
@@ -126,6 +126,13 @@ const handleLearnMoreRelocateNotification = () => {
 const handleDismissRelocateNotification = () => {
     relocateNotificationState.isShow = false;
 };
+
+onUnmounted(() => {
+    costQuerySetStore.$dispose();
+    costQuerySetStore.$reset();
+});
+
+costQuerySetStore.listCostQuerySets();
 
 </script>
 
