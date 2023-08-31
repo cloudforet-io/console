@@ -18,14 +18,14 @@ export const GROUP_BY = {
     ACCOUNT: 'account',
 } as const;
 
-export const MORE_GROUP_BY = {
+export const ADDITIONAL_GROUP_BY = {
     TAGS: 'tags',
     ADDITIONAL_INFO: 'additional_info',
 };
 
-export const MORE_GROUP_BY_ITEM_MAP = {
-    [MORE_GROUP_BY.TAGS]: { name: MORE_GROUP_BY.TAGS, label: 'Tags' },
-    [MORE_GROUP_BY.ADDITIONAL_INFO]: { name: MORE_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },
+export const ADDITIONAL_GROUP_BY_ITEM_MAP = {
+    [ADDITIONAL_GROUP_BY.TAGS]: { name: ADDITIONAL_GROUP_BY.TAGS, label: 'Tags' },
+    [ADDITIONAL_GROUP_BY.ADDITIONAL_INFO]: { name: ADDITIONAL_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },
 } as const;
 
 export const GROUP_BY_ITEM_MAP = {
