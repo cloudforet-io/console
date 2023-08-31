@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 
-import { PButtonModal, PI } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
+
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -23,6 +25,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 import { gray } from '@/styles/colors';
 
 import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
@@ -88,7 +91,7 @@ const state = reactive({
 });
 
 const relocateNotificationState = reactive({
-    isShow: true,
+    isShow: false,
     data: computed<LNBItem>(() => ({
         type: 'item',
         id: MENU_ID.DASHBOARDS,
@@ -105,6 +108,7 @@ const relocateNotificationState = reactive({
         hideFavorite: true,
     })),
     isModalVisible: false,
+    userId: computed(() => store.state.user.userId),
 });
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
@@ -124,8 +128,21 @@ const handleLearnMoreRelocateNotification = () => {
 };
 
 const handleDismissRelocateNotification = () => {
+    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
+    settings.costExplorer.hideRelocateDashboardNotification = true;
+    LocalStorageAccessor.setItem(relocateNotificationState.userId, settings);
     relocateNotificationState.isShow = false;
 };
+
+
+
+onMounted(() => {
+    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
+    if (!settings.costExplorer.hideRelocateDashboardNotification) {
+        relocateNotificationState.isModalVisible = true;
+        relocateNotificationState.isShow = true;
+    }
+});
 
 onUnmounted(() => {
     costQuerySetStore.$dispose();
@@ -143,7 +160,9 @@ costQuerySetStore.listCostQuerySets();
                @select="handleSelect"
         >
             <template #default>
-                <l-n-b-router-menu-item :item="relocateNotificationState.data">
+                <l-n-b-router-menu-item :item="relocateNotificationState.data"
+                                        open-new-tab
+                >
                     <template #after-text>
                         <p-i name="ic_arrow-right-up"
                              width="1rem"
@@ -160,7 +179,7 @@ costQuerySetStore.listCostQuerySets();
             </template>
         </l-n-b>
         <!--TODO: Should be replaced with lean-more modal-->
-        <p-button-modal :visible.sync="relocateNotificationState.isModalVisible" />
+        <relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
     </aside>
 </template>
 
