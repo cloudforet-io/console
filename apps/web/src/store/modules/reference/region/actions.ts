@@ -9,7 +9,6 @@ import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 let lastLoadedTime = 0;
 
 export const load: Action<RegionReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {

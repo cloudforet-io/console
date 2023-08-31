@@ -5,9 +5,7 @@ import {
 import {
     computed, reactive, watch,
 } from 'vue';
-
-
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -34,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
     (e: 'update-query', updatedQueryId: string)
 }>();
-
+const { t } = useI18n();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const formState = reactive({
@@ -45,10 +43,10 @@ const state = reactive({
     queryNameInvalidText: computed(() => {
         if (typeof formState.queryName === 'undefined') return undefined;
         if (formState.queryName.length === 0) {
-            return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_REQUIRED');
+            return t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_REQUIRED');
         }
         if (formState.queryName.length > 40) {
-            return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
+            return t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
         }
         return undefined;
     }),
@@ -62,10 +60,10 @@ const saveQuery = async () => {
     try {
         const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
         if (!updatedQuery) return;
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
         emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
+        ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
     }
 };
 
@@ -74,10 +72,10 @@ const editQuery = async () => {
     try {
         const updatedQuery = await costAnalysisPageStore.editQuery(props.selectedQuerySetId, formState.queryName);
         if (!updatedQuery) return;
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '');
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '');
         emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
+        ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
     }
 };
 
@@ -120,7 +118,7 @@ watch(() => state.proxyVisible, (visible) => {
     >
         <template #body>
             <p-field-group class="query-name-input-wrap"
-                           :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_COST_ANALYSIS_NAME')"
+                           :label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_COST_ANALYSIS_NAME')"
                            :invalid="!state.isQueryNameValid"
                            :invalid-text="state.queryNameInvalidText"
                            required
@@ -128,7 +126,7 @@ watch(() => state.proxyVisible, (visible) => {
                 <template #default>
                     <p-text-input v-model="formState.queryName"
                                   class="block w-full"
-                                  :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
+                                  :placeholder="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
                                   :invalid="!state.isQueryNameValid"
                                   @update:value.once="handleFirstQueryNameInput"
                     />

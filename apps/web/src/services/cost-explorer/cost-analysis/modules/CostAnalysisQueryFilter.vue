@@ -16,7 +16,7 @@ import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config'
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates, getRefinedCostQueryOptions } from '@/services/cost-explorer/lib/helper';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
@@ -85,13 +85,12 @@ const handleSaveQuerySet = async () => {
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.update({
             cost_query_set_id: costAnalysisPageStore.selectedQueryId,
-            options: getRefinedCostQueryOptions({
+            options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
                 group_by: costAnalysisPageState.groupBy,
-                more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
                 filters: costAnalysisPageState.filters,
-            }),
+            },
         });
         await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
@@ -176,7 +175,6 @@ const handleUpdateQuery = (updatedQueryId: string) => {
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
-        margin-bottom: 1rem;
         .left-part {
             display: flex;
             align-items: center;

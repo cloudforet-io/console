@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { PI } from '@spaceone/design-system';
 import { reactive } from 'vue';
-import type { Location } from 'vue-router';
-
+import type { RouteLocationRaw } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
 
@@ -11,7 +10,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import type { LNBIcon, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 interface Props {
     item: LNBMenu;
@@ -27,7 +26,7 @@ const state = reactive({
 });
 
 const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
-const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
+const isSelectedMenu = (selectedMenuRoute: RouteLocationRaw): boolean => {
     let currentPath = props.currentPath;
     if (!currentPath) return false;
 
@@ -42,7 +41,10 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (!resolvedHref.endsWith('/')) resolvedHref += '/';
     return currentPath.startsWith(resolvedHref);
 };
-
+const getIconName = (icon: LNBIcon): string => {
+    if (typeof icon === 'string') return icon;
+    return icon.name;
+};
 </script>
 
 <template>
@@ -58,7 +60,8 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
         />
         <div class="text-wrapper">
             <p-i v-if="item.icon"
-                 :name="item.icon"
+                 :name="getIconName(item.icon)"
+                 :color="item.icon.color"
                  width="1rem"
                  height="1rem"
                  class="icon"

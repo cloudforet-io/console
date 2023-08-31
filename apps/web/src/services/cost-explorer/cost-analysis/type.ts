@@ -1,11 +1,12 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-import type { CostAnalysisPageUrlQueryKey, RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
+import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
 import type {
     Period, Granularity, CostFiltersMap,
-    CostQuerySetModel,
 } from '@/services/cost-explorer/type';
 
 export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>;
@@ -20,11 +21,6 @@ export interface CostAnalysisPageQueryValue {
 export interface QueryItemResource {
     key: string;
     name: string;
-}
-
-export interface SaveQueryEmitParam {
-    updatedQuery: CostQuerySetModel;
-    requestType: RequestType;
 }
 
 
@@ -43,7 +39,7 @@ interface Cost {
 }
 export interface Legend {
     name: string;
-    label: string;
+    label: string | TranslateResult;
     color?: string;
     disabled?: boolean;
 }

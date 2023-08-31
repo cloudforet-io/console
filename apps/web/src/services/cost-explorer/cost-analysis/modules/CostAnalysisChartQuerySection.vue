@@ -49,14 +49,13 @@ const state = reactive({
     filterModalVisible: false,
     //
     proxyLegends: useProxyValue('legends', props, emit),
-    groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
-        const groupByItems = costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
-        const moreGroupByItems = costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
-            name: `${d.category}.${d.key}`,
-            label: d.key,
-        }));
-        return [...groupByItems, ...moreGroupByItems];
-    }),
+    groupByMenuItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
+        if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
+        return {
+            name: d, // tags.Name
+            label: d.split('.')[1], // Name
+        };
+    })),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
 });
 

@@ -3,8 +3,6 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-import type { BudgetModel } from '@/services/cost-explorer/budget/model';
-
 export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>;
 
 export interface BudgetPageQueryValue {

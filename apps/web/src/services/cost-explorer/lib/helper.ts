@@ -9,7 +9,6 @@ import { cloneDeep } from 'lodash';
 import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
     Period, Granularity, CostFiltersMap,
-    CostQuerySetOption,
 } from '@/services/cost-explorer/type';
 
 export const getConvertedFilter = (filters: CostFiltersMap): ConsoleFilter[] => {
@@ -128,26 +127,4 @@ export const convertFiltersInToNewType = (filters: OldType | CostFiltersMap): Co
         }
     });
     return _filters as CostFiltersMap;
-};
-
-
-export const getRefinedCostQueryOptions = (options: Partial<CostQuerySetOption>): Partial<CostQuerySetOption> => {
-    const newOptions: Partial<CostQuerySetOption> = {
-        granularity: options.granularity,
-        period: options.period,
-        filters: options.filters,
-    };
-    if (!options.group_by) return newOptions;
-
-    let refinedGroupBy: string[] = options.group_by;
-
-    // < 1.10.5 version compatible code
-    if (options.more_group_by) {
-        const refinedMoreGroupBy: string[] = options.more_group_by.filter((d) => d.selected)
-            .map((d) => `${d.category}.${d.key}`);
-        refinedGroupBy = options.group_by.concat(refinedMoreGroupBy);
-    }
-
-    newOptions.group_by = refinedGroupBy;
-    return newOptions;
 };

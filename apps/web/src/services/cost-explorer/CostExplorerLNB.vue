@@ -16,6 +16,8 @@ import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRoute
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
+import { gray } from '@/styles/colors';
+
 import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -71,7 +73,7 @@ const state = reactive({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
-            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? 'ic_main-filled' : undefined,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? { name: 'ic_main-filled', color: gray[500] } : undefined,
             to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {
@@ -90,7 +92,13 @@ const relocateNotificationState = reactive({
         id: MENU_ID.DASHBOARDS,
         // TODO: translation
         label: t('Go to Dashboard'),
-        to: { name: DASHBOARDS_ROUTE._NAME },
+        to: {
+            name: DASHBOARDS_ROUTE._NAME,
+            query: {
+                // TODO: refactor
+                filters: ['[["Cost"],"label","="]'],
+            },
+        },
         isNew: true,
         hideFavorite: true,
     })),
