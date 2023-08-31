@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { flatten, forEach } from 'lodash';
+import type { LocationQueryValue } from 'vue-router';
 
 import type {
     QueryTag as Tag,
@@ -198,7 +199,7 @@ export class QueryHelper {
         return this;
     }
 
-    setFiltersAsRawQueryString(rawQueryStrings: undefined|string|(string|null)[]): this {
+    setFiltersAsRawQueryString(rawQueryStrings: LocationQueryValue | LocationQueryValue[]): this {
         this._filters = [];
         if (Array.isArray(rawQueryStrings)) {
             rawQueryStrings.forEach((q) => {
@@ -209,7 +210,7 @@ export class QueryHelper {
                     } catch (e) { console.error('QUERY HELPER - raw query string parsing error. input: ', rawQueryStrings, '\nerror: ', e); }
                 }
             });
-        } else if (typeof rawQueryStrings === 'string' && rawQueryStrings) {
+        } else if (rawQueryStrings) {
             try {
                 const [v, k, o] = JSON.parse(rawQueryStrings) as RawQuery;
                 this._filters.push({ k, v, o });

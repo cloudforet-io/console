@@ -8,7 +8,7 @@ import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query
 import { flatten, forEach } from 'lodash';
 import type { ComputedRef, Ref } from 'vue';
 import { computed, isRef, reactive } from 'vue';
-
+import type { LocationQueryValue } from 'vue-router';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -148,7 +148,7 @@ export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
     };
 
     const queryHelper = new QueryHelper();
-    const setURLQueryStringFilters = (rawQueryStrings: undefined|string|(string|null)[]) => {
+    const setURLQueryStringFilters = (rawQueryStrings: LocationQueryValue | LocationQueryValue[]) => {
         queryHelper.setFiltersAsRawQueryString(rawQueryStrings);
         setFilters(queryHelper.filters);
     };
