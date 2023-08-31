@@ -1,63 +1,3 @@
-<template>
-    <div class="widget-view-mode-sidebar">
-        <p-sidebar :visible="state.proxyVisible"
-                   style-type="primary"
-                   size="md"
-                   is-fixed-size
-                   hide-close-button
-                   @close="handleCloseSidebar"
-        >
-            <main class="main">
-                <slot />
-            </main>
-            <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
-            </template>
-            <template #sidebar>
-                <div class="sidebar-contents">
-                    <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
-                                                 :widget-key="props.widgetKey"
-                    />
-                </div>
-            </template>
-            <template #footer>
-                <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleCloseSidebar"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!widgetFormState.isValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-sidebar>
-        <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
-                        size="sm"
-                        @confirm="handleClickSaveButton"
-        >
-            <template #body>
-                <div class="non-inherited-option-modal-body">
-                    <p>
-                        <p-i name="ic_warning-filled"
-                             color="inherit"
-                             width="1rem"
-                             height="1rem"
-                             class="warning-icon"
-                        />
-                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
-                    </p>
-                </div>
-            </template>
-        </p-button-modal>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive,
@@ -159,6 +99,66 @@ const handleCloseSidebar = () => {
     emit('refresh');
 };
 </script>
+
+<template>
+    <div class="widget-view-mode-sidebar">
+        <p-sidebar :visible="state.proxyVisible"
+                   style-type="primary"
+                   size="md"
+                   is-fixed-size
+                   hide-close-button
+                   @close="handleCloseSidebar"
+        >
+            <main class="main">
+                <slot />
+            </main>
+            <template #title>
+                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
+            </template>
+            <template #sidebar>
+                <div class="sidebar-contents">
+                    <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
+                                                 :widget-key="props.widgetKey"
+                    />
+                </div>
+            </template>
+            <template #footer>
+                <div class="footer-wrapper">
+                    <p-button style-type="transparent"
+                              @click="handleCloseSidebar"
+                    >
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
+                    </p-button>
+                    <p-button style-type="primary"
+                              :disabled="!widgetFormState.isValid"
+                              @click="handleClickSaveButton"
+                    >
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-sidebar>
+        <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
+                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
+                        size="sm"
+                        @confirm="handleClickSaveButton"
+        >
+            <template #body>
+                <div class="non-inherited-option-modal-body">
+                    <p>
+                        <p-i name="ic_warning-filled"
+                             color="inherit"
+                             width="1rem"
+                             height="1rem"
+                             class="warning-icon"
+                        />
+                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
+                    </p>
+                </div>
+            </template>
+        </p-button-modal>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .widget-view-mode-sidebar {

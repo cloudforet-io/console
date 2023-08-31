@@ -1,27 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="budget-usage-by-target"
-                  @refresh="refreshWidget"
-    >
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.tableItems"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           @update:thisPage="handleUpdateThisPage"
-        >
-            <template #col-target="{value}">
-                {{ targetTextFormatter(value) }}
-            </template>
-            <template #col-progress="{value}">
-                <p-progress-bar size="lg"
-                                :percentage="value"
-                />
-            </template>
-        </widget-data-table>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -204,6 +180,30 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="budget-usage-by-target"
+                  @refresh="refreshWidget"
+    >
+        <widget-data-table :loading="state.loading"
+                           :fields="state.tableFields"
+                           :items="state.tableItems"
+                           :currency="state.currency"
+                           :currency-rates="props.currencyRates"
+                           @update:thisPage="handleUpdateThisPage"
+        >
+            <template #col-target="{value}">
+                {{ targetTextFormatter(value) }}
+            </template>
+            <template #col-progress="{value}">
+                <p-progress-bar size="lg"
+                                :percentage="value"
+                />
+            </template>
+        </widget-data-table>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .budget-usage-by-target {

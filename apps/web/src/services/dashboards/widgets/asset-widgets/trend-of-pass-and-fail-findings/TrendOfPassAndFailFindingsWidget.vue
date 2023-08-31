@@ -1,38 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="trend-of-pass-and-fail-findings"
-                  refresh-on-resize
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading || state.tableLoading"
-                               :fields="state.tableFields"
-                               :items="state.tableData.results"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.tableData.more"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -318,6 +283,41 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="trend-of-pass-and-fail-findings"
+                  refresh-on-resize
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading || state.tableLoading"
+                               :fields="state.tableFields"
+                               :items="state.tableData.results"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.tableData.more"
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .trend-of-pass-and-fail-findings {

@@ -1,24 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  @refresh="handleRefresh"
-    >
-        <div class="cost-map">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               :loader-backdrop-opacity="1"
-                               loader-type="skeleton"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -239,6 +218,28 @@ defineExpose<WidgetExpose<TreemapChartData['children']>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  @refresh="handleRefresh"
+    >
+        <div class="cost-map">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               loader-type="skeleton"
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .cost-map {
     padding-bottom: 1.25rem;

@@ -1,19 +1,6 @@
-<template>
-    <p-select-dropdown :items="currencyItems"
-                       :selected="currency"
-                       style-type="transparent"
-                       :read-only="printMode"
-                       class="currency-select-dropdown"
-                       :class="{ 'print-mode': printMode }"
-                       @select="handleSelectCurrency"
-    />
-</template>
-
-<script lang="ts">
-
+<script setup lang="ts">
 import {
-    computed,
-    reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import { PSelectDropdown } from '@spaceone/design-system';
@@ -22,40 +9,42 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { store } from '@/store';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
-export default {
-    name: 'CurrencySelectDropdown',
-    components: {
-        PSelectDropdown,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            currency: computed(() => store.state.settings.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-                type: 'item',
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-            }))),
-        });
+const props = withDefaults(defineProps<{
+    printMode?: boolean;
+}>(), {
+    printMode: false,
+});
+const emit = defineEmits<{(e: 'update', currency: Currency): void;
+}>();
 
-        const handleSelectCurrency = (currency) => {
-            store.commit('settings/setCurrency', currency);
-            emit('update', currency);
-        };
+const state = reactive({
+    currency: computed(() => store.state.settings.currency),
+    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        type: 'item',
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
+});
 
-        return {
-            ...toRefs(state),
-            handleSelectCurrency,
-        };
-    },
+const handleSelectCurrency = (currency: Currency) => {
+    store.commit('settings/setCurrency', currency);
+    emit('update', currency);
 };
+
 </script>
+
+<template>
+    <p-select-dropdown :items="state.currencyItems"
+                       :selected="state.currency"
+                       style-type="transparent"
+                       :read-only="props.printMode"
+                       class="currency-select-dropdown"
+                       :class="{ 'print-mode': props.printMode }"
+                       @select="handleSelectCurrency"
+    />
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */
