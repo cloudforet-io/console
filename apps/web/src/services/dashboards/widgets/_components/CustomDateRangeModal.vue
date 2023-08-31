@@ -45,8 +45,6 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
     (event: 'confirm', period: Period): void;
 }>();
 
-const t = i18n.t as (...args: Parameters<typeof i18n.t>) => string;
-
 const state = reactive({
     proxyVisible: computed({
         get() { return props.visible; },
@@ -147,7 +145,7 @@ watch(() => props.visible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :header-title="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
+    <p-button-modal :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
                     centered
                     size="sm"
                     fade
@@ -159,7 +157,7 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <p-field-group class="period-select"
-                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
+                           :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
                            :help-text="state.settingsByGranularity.helpTextFrom ?? ''"
                            required
             >
@@ -171,7 +169,7 @@ watch(() => props.visible, (visible) => {
                 />
             </p-field-group>
             <p-field-group class="period-select"
-                           :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
+                           :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
                            :help-text="state.settingsByGranularity.helpTextTo ?? ''"
                            required
             >
