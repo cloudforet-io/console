@@ -57,7 +57,7 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
+import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 export default defineComponent({
     name: 'DashboardDateDropdown',

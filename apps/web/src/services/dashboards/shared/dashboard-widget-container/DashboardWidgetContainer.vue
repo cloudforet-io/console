@@ -19,8 +19,8 @@ import {
 import {
     useWidgetReformer,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-reformer';
+import WidgetViewModeModal from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type {
     DashboardLayoutWidgetInfo,
     WidgetExpose, WidgetProps,
