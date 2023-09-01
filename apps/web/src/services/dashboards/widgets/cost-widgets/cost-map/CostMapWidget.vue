@@ -34,7 +34,7 @@ import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpe
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-new';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 // eslint-disable-next-line import/no-cycle

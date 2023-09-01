@@ -31,11 +31,11 @@ import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
 } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
 
 
 interface Data extends CloudServiceStatsModel {
