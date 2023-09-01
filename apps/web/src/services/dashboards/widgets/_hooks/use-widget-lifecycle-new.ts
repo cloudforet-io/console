@@ -52,7 +52,7 @@ export const useWidgetLifecycle = ({
     });
 
     watch(() => props.dashboardVariables, (after, before) => {
-        if (!props.initiated || props.errorMode || !props.inheritOptions || props.disableRefreshOnVariableChange) return;
+        if (props.errorMode || !props.inheritOptions || props.disableRefreshOnVariableChange) return;
         const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
         if (_isRefreshable) refreshWidgetAndEmitEvent();
     }, { deep: true });
@@ -72,7 +72,6 @@ export const useWidgetLifecycle = ({
             },
         });
 
-        if (!props.initiated) return;
         if (isValid !== undefined) {
             emit('update-widget-validation', isValid);
         }
