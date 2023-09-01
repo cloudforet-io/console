@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -28,17 +27,17 @@ import {
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-new';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useCostWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-cost-widget';
+// eslint-disable-next-line import/no-cycle
 import type { CostAnalyzeDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
 
 const COLOR_FIELD_NAME = 'background_color';
@@ -52,45 +51,48 @@ interface CostMapData {
 }
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const state = reactive({
-    ...toRefs(useWidgetState<CostAnalyzeDataModel['results']>(props)),
-    chartData: computed(() => getRefinedTreemapChartData(state.data, state.groupBy, props.allReferenceTypeInfo)),
-    dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
-        const start = state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM');
-        return { start, end };
-    }),
+const { widgetState, widgetFrameProps } = useCostWidget(props, {
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
         query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
+    dateRange: computed<DateRange>(() => {
+        const end = widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
+        const start = widgetState.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM');
+        return { start, end };
+    }),
 });
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+const state = reactive({
+    loading: true,
+    data: null as CostAnalyzeDataModel['results'] | null,
+    chartData: computed(() => getRefinedTreemapChartData(state.data, widgetState.groupBy, props.allReferenceTypeInfo)),
+});
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<TreemapChartData[]> => {
     try {
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
         const { status, response } = await fetchCostAnalyze({
             query: {
-                granularity: state.options.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
-                group_by: [state.groupBy],
+                granularity: widgetState.options.granularity,
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
+                group_by: [widgetState.groupBy],
                 fields: {
                     cost_sum: {
                         // TODO: Change to 'cost' after the cost analysis API is updated.
@@ -166,7 +168,7 @@ const drawChart = (chartData) => {
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, state.currency, props.currencyRates);
+    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
 
     setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
@@ -204,7 +206,8 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
         chartHelper.refreshRoot();
