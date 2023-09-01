@@ -2,7 +2,7 @@ import type { Tags } from '@/models';
 
 import type { Currency } from '@/store/modules/settings/type';
 
-export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'product';
+export type CostType = 'provider';
 export type CostTypes = Partial<Record<CostType, string[]>>;
 
 interface BudgetPlannedLimit {
