@@ -17,7 +17,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
-import BudgetStat from '@/services/cost-explorer/budget/budget-main/modules/budget-stat/BudgetStat.vue';
 import type { Pagination } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
@@ -180,11 +179,6 @@ const handleUpdateSort = (sort) => {
                         @refresh="handleRefresh"
                         @export="handleExport"
                         @update-sort="handleUpdateSort"
-        />
-        <budget-stat :query-store-filters="state.queryStoreFilters"
-                     :period="state.period"
-                     :usage-range="state.range"
-                     class="budget-stat"
         />
         <div class="budget-list-card-box">
             <budget-list-card v-for="(budgetUsage, i) in state.budgetUsages"
