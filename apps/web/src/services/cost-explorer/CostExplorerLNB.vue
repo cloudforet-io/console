@@ -3,7 +3,7 @@ import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PCollapsibleToggle } from '@spaceone/design-system';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
@@ -32,6 +32,7 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
+const FOLDING_COUNT_BY_SHOW_MORE = 7;
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
@@ -77,7 +78,10 @@ const state = reactive({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
-            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? { name: 'ic_main-filled', color: gray[500] } : undefined,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? {
+                name: 'ic_main-filled',
+                color: gray[500],
+            } : undefined,
             to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {
@@ -86,8 +90,18 @@ const state = reactive({
             },
             favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
         }));
-        return currentQueryMenuList;
+        const showMoreMenuSet: LNBMenu = [{
+            type: 'slot',
+            id: 'show-more',
+        }];
+
+        return [
+            ...(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
+            ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
+        ];
     }),
+    showMoreQuerySetStatus: true,
+    showFavoriteOnly: false,
 });
 
 const relocateNotificationState = reactive({
@@ -160,6 +174,7 @@ costQuerySetStore.listCostQuerySets();
     <aside class="sidebar-menu">
         <l-n-b :header="state.header"
                :menu-set="state.menuSet"
+               :show-favorite-only.sync="state.showFavoriteOnly"
                @select="handleSelect"
         >
             <template #default>
@@ -180,8 +195,10 @@ costQuerySetStore.listCostQuerySets();
                 />
                 <l-n-b-divider-menu-item />
             </template>
+            <template #slot-show-more>
+                <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus" />
+            </template>
         </l-n-b>
-        <!--TODO: Should be replaced with lean-more modal-->
         <relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
     </aside>
 </template>
