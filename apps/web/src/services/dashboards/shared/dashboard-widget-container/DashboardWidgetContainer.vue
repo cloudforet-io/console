@@ -190,7 +190,7 @@ onMounted(async () => {
                            @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                 />
-                <!-- TODO: remove this comment after refactoring 
+                <!-- TODO: remove this comment after refactoring
                 <component :is="widget.component"
                            :id="widget.widget_key"
                            :key="widget.widget_key"
