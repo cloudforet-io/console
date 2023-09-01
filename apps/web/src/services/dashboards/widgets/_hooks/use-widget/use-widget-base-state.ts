@@ -15,11 +15,13 @@ import type {
     WidgetConfig, WidgetOptions,
     InheritOptions, WidgetProps,
     WidgetFilter,
+    Granularity,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+import type { ChartType } from '@/services/dashboards/widgets/type';
 
 
 const getRefinedOptions = (
@@ -74,6 +76,8 @@ export interface WidgetBaseState {
     options: ComputedRef<WidgetOptions>;
     settings: ComputedRef<DashboardSettings|undefined>;
     consoleFilters: ComputedRef<ConsoleFilter[]>;
+    granularity: ComputedRef<Granularity|undefined>;
+    chartType: ComputedRef<ChartType|undefined>;
 }
 export function useWidgetBaseState(
     props: WidgetProps,
@@ -109,6 +113,8 @@ export function useWidgetBaseState(
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return flattenDeep<WidgetFilter[]>(Object.values(state.options.filters));
         }),
+        granularity: computed(() => state.options?.granularity),
+        chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
     }) as UnwrapRef<WidgetBaseState>;
 
     return state;

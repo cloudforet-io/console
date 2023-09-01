@@ -17,7 +17,6 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type {
     WidgetProps,
-    Granularity,
     WidgetFiltersMap,
     CostGroupBy,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -25,9 +24,31 @@ import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-w
 import {
     useWidgetBaseState,
 } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
-import type { ChartType } from '@/services/dashboards/widgets/type';
 
 
+export interface CostWidgetState extends WidgetBaseState {
+    currency: ComputedRef<Currency|undefined>;
+    groupBy: ComputedRef<CostGroupBy | undefined>;
+    budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
+}
+export function useCostWidgetState(
+    props: WidgetProps,
+) {
+    const baseState = useWidgetBaseState(props);
+
+    return reactive<CostWidgetState>({
+        ...toRefs(baseState) as WidgetBaseState,
+        currency: computed(() => {
+            if (baseState.settings?.currency.value === 'DEFAULT') return store.state.settings.currency;
+            return baseState.settings?.currency.value ?? CURRENCY.USD;
+        }),
+        groupBy: computed(() => baseState.options?.cost_group_by as CostGroupBy|undefined),
+        budgetConsoleFilters: computed(() => {
+            if (!baseState.options?.filters || isEmpty(baseState.options.filters)) return [];
+            return getConvertedBudgetConsoleFilters(baseState.options.filters);
+        }),
+    }) as UnwrapRef<CostWidgetState>;
+}
 
 const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): ConsoleFilter[] => {
     const results: ConsoleFilter[] = [];
@@ -50,32 +71,3 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
     });
     return results;
 };
-
-
-export interface CostWidgetState extends WidgetBaseState {
-    currency: ComputedRef<Currency|undefined>;
-    groupBy: ComputedRef<CostGroupBy | undefined>;
-    granularity: ComputedRef<Granularity|undefined>;
-    chartType: ComputedRef<ChartType|undefined>;
-    budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
-}
-export function useCostWidgetState(
-    props: WidgetProps,
-) {
-    const baseState = useWidgetBaseState(props);
-
-    return reactive<CostWidgetState>({
-        ...toRefs(baseState) as WidgetBaseState,
-        currency: computed(() => {
-            if (baseState.settings?.currency.value === 'DEFAULT') return store.state.settings.currency;
-            return baseState.settings?.currency.value ?? CURRENCY.USD;
-        }),
-        groupBy: computed(() => baseState.options?.cost_group_by as CostGroupBy|undefined),
-        granularity: computed(() => baseState.options?.granularity),
-        chartType: computed<ChartType|undefined>(() => baseState.options?.chart_type),
-        budgetConsoleFilters: computed(() => {
-            if (!baseState.options?.filters || isEmpty(baseState.options.filters)) return [];
-            return getConvertedBudgetConsoleFilters(baseState.options.filters);
-        }),
-    }) as UnwrapRef<CostWidgetState>;
-}
