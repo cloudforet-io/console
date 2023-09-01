@@ -14,7 +14,7 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
 import {
-    createBullet, createCircle, createDataProcessor, createLabel, createLegend, createTooltip, toggleSeries,
+    createBullet, createCircle, createDataProcessor, createLabel, createLegend, createTooltip, hideAllSeries, showAllSeries, toggleSeries,
 } from '@/common/composables/amcharts5/concepts-helper';
 import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
@@ -174,5 +174,7 @@ export const useAmcharts5 = (
         setTreemapLabelText,
         setChartColors,
         toggleSeries,
+        hideAllSeries,
+        showAllSeries,
     };
 };
