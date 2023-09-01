@@ -106,7 +106,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         <b
             class="label"
         >
-            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
+            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
         <p-select-button v-for="defaultGroupByItem in state.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
