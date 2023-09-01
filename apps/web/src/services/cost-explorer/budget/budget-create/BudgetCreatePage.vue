@@ -1,32 +1,14 @@
-<script lang="ts">
-import {
-    reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
 
 import { PHeading } from '@spaceone/design-system';
 
 import BudgetForm from '@/services/cost-explorer/budget/shared/budget-form/BudgetForm.vue';
 
-export default {
-    name: 'BudgetCreatePage',
-    components: {
-        BudgetForm,
-        PHeading,
-    },
-    setup() {
-        const state = reactive({
-        });
 
-        const handleFormConfirm = () => {
+const handleFormConfirm = () => {
 
-        };
-
-        return {
-            ...toRefs(state),
-            handleFormConfirm,
-        };
-    },
 };
+
 </script>
 
 <template>
