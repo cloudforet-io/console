@@ -33,7 +33,9 @@ const props = withDefaults(defineProps<Props>(), {
     menuSet: () => [],
     showFavoriteOnly: undefined,
 });
-const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
+const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void;
+    (e: 'update:showFavoriteOnly', value: boolean): void;
+}>();
 const route = useRoute();
 const state = reactive({
     currentPath: computed(() => route.fullPath),
@@ -109,6 +111,12 @@ const handleSelect = (id: string, selected: string) => {
                                      @change-toggle="handleFavoriteToggle"
                     />
                 </div>
+                <div v-else-if="menuData.type === MENU_ITEM_TYPE.EXTRA"
+                     :key="`${idx}-${getUUID()}`"
+                     class="extra-menu-wrapper"
+                >
+                    <slot name="extra-menu" />
+                </div>
                 <l-n-b-menu-item v-else
                                  :key="`${idx}-${getUUID()}`"
                                  :menu-data="menuData"
@@ -162,6 +170,11 @@ const handleSelect = (id: string, selected: string) => {
         @apply flex justify-between items-center text-gray-500;
         font-size: 0.75rem;
         padding: 0 0.5rem;
+    }
+    .extra-menu-wrapper {
+        @apply flex items-center;
+        padding: 0 0.5rem;
+        height: 2rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;
