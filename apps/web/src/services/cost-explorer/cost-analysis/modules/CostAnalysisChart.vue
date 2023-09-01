@@ -160,13 +160,14 @@ watch([
 
 <style lang="postcss" scoped>
 .cost-analysis-chart {
-    @apply grid grid-cols-12;
+    @apply grid grid-cols-12 border border-gray-200 rounded-md;
     grid-gap: 1rem;
     height: 30rem;
+    padding: 1rem;
 
     .chart-section {
-        @apply col-span-9 bg-white rounded-md border border-gray-200;
-        padding: 1rem 1rem 1.5rem 1rem;
+        @apply col-span-9;
+        padding: 1rem 0 2rem 0;
         min-height: 480px;
     }
 
