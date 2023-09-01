@@ -225,6 +225,7 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
     updated_at: string;
 }
 
+// TODO: replace with NewWidgetProps
 export interface WidgetProps {
     widgetConfigId: string;
     title?: string;
@@ -247,10 +248,29 @@ export interface WidgetProps {
     dashboardVariables?: DashboardVariables;
 }
 
+// TODO: remove this after replacing WidgetProps with NewWidgetProps
+export interface NewWidgetProps {
+    widgetConfigId: string;
+    widgetInfo: DashboardLayoutWidgetInfo;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    initiated?: boolean;
+    currencyRates?: CurrencyRates;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
+    settings?: DashboardSettings;
+    variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
+}
+
 export interface WidgetEmit {
-    (e: 'update-data', data: any): void;
+    (e: 'refreshed', data: any): void;
     (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
     (e: 'update-widget-validation', validation: boolean): void;
+    (event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
 }
 
 export interface WidgetExpose<Data = any> {

@@ -18,15 +18,11 @@ import type { Currency } from '@/store/modules/settings/type';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
@@ -54,7 +50,6 @@ export interface WidgetFrameProps {
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
-    refreshOnResize?: boolean;
     theme?: WidgetTheme;
     nonInheritOptionsTooltipText?: string;
 }
@@ -79,10 +74,11 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     nonInheritOptionsTooltipText: undefined,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits<{(event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
+}>();
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const widgetFormStore = useWidgetFormStore();
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -110,15 +106,13 @@ const state = reactive({
     }),
     currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
     isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
-    visibleEditModal: false,
-    visibleDeleteModal: false,
+    //
     editModeIconButtonList: computed<IconConfig[]>(() => [
         {
             isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
             name: state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all',
             handleClick: () => {
-                dashboardDetailStore.toggleWidgetSize(props.widgetKey);
-                if (props.refreshOnResize) emit('refresh');
+                emit('click-expand');
             },
         },
         {
@@ -130,24 +124,17 @@ const state = reactive({
             isAvailable: !props.disableDeleteIcon,
             name: 'ic_delete',
             handleClick: () => {
-                state.visibleDeleteModal = true;
+                emit('click-delete');
             },
         },
     ]),
 });
 
-const handleEditButtonClick = () => { state.visibleEditModal = true; };
-const handleDeleteModalConfirm = () => {
-    dashboardDetailStore.deleteWidget(props.widgetKey);
-    state.visibleDeleteModal = false;
+const handleEditButtonClick = () => {
+    emit('click-edit');
 };
 const handleClickViewModeButton = () => {
-    widgetFormStore.$patch({
-        widgetKey: props.widgetKey,
-    });
-    dashboardDetailStore.$patch({
-        widgetViewModeModalVisible: true,
-    });
+    emit('click-expand');
 };
 </script>
 
@@ -250,16 +237,6 @@ const handleClickViewModeButton = () => {
                 </template>
             </div>
         </div>
-        <delete-modal :visible.sync="state.visibleDeleteModal"
-                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
-                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
-                      @confirm="handleDeleteModalConfirm"
-        />
-        <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
-                                     :visible.sync="state.visibleEditModal"
-                                     :widget-key="props.widgetKey"
-                                     @refresh="emit('refresh')"
-        />
     </div>
 </template>
 
