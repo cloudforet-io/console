@@ -151,7 +151,7 @@ watch(() => route.params, async (params) => {
 <style lang="postcss" scoped>
 .cost-analysis-page {
     .content-wrapper {
-        @apply bg-white rounded-md;
+        @apply bg-white rounded-md border border-gray-200;
         padding: 0 1rem 2.5rem 1rem;
     }
     .cost-analysis-chart {
