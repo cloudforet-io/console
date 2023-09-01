@@ -1,9 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 
-import {
-    computed,
-    reactive, toRefs, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -13,40 +10,29 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-export default {
-    name: 'BudgetFormAmountPlanTotal',
-    components: {
-        PFieldGroup,
-        PTextInput,
-    },
-    setup(props, { emit }) {
-        const {
-            forms: { amount },
-            invalidTexts, invalidState, setForm, isAllValid,
-        } = useFormValidator({
-            amount: undefined as number|undefined,
-        }, {
-            amount: (val) => (val ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
-        });
+const emit = defineEmits<{(e: 'update', amount: number|undefined, isAllvalid: boolean): void; }>();
 
-        const state = reactive({
-            formattedAmount: computed<string>({
-                get: () => commaFormatter(amount.value),
-                set: (val: string) => { setForm('amount', getNumberFromString(val)); },
-            }),
-        });
 
-        watch(() => amount.value, (value) => {
-            emit('update', value, isAllValid.value);
-        });
+const {
+    forms: { amount },
+    invalidTexts, invalidState, setForm, isAllValid,
+} = useFormValidator({
+    amount: undefined as number|undefined,
+}, {
+    amount: (val) => (val ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
+});
 
-        return {
-            invalidTexts,
-            invalidState,
-            ...toRefs(state),
-        };
-    },
-};
+const state = reactive({
+    formattedAmount: computed<string>({
+        get: () => commaFormatter(amount.value),
+        set: (val: string) => { setForm('amount', getNumberFromString(val)); },
+    }),
+});
+
+watch(() => amount.value, (value) => {
+    emit('update', value, isAllValid.value);
+});
+
 </script>
 
 <template>
@@ -59,7 +45,7 @@ export default {
             <template #right-extra>
                 ($USD)
             </template>
-            <p-text-input v-model="formattedAmount"
+            <p-text-input v-model="state.formattedAmount"
                           placeholder="1,000"
                           :invalid="invalidState.amount"
             >

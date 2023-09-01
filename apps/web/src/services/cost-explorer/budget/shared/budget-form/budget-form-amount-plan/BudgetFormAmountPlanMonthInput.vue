@@ -1,7 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -14,7 +14,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 interface Props {
-    amount: number|undefined;
+    amount?: number;
     month: string;
     isMonthToDate: boolean;
 }
@@ -24,84 +24,60 @@ export interface MonthAmountInput {
     isValid?: boolean;
 }
 
-export default {
-    name: 'BudgetFormAmountPlanMonthInput',
-    components: {
-        PFieldGroup,
-        PTextInput,
-    },
-    model: {
-        prop: 'amount',
-        event: 'update:amount',
-    },
-    props: {
-        amount: {
-            type: Number,
-            default: undefined,
-        },
-        month: {
-            type: String,
-            default: '',
-        },
-        isMonthToDate: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: Props, { emit }) {
-        const { i18nDayjs } = useI18nDayjs();
+const props = withDefaults(defineProps<Props>(), {
+    amount: undefined,
+    month: '',
+    isMonthToDate: false,
+});
 
-        const {
-            forms: { _amount },
-            invalidTexts, invalidState, setForm, resetValidations,
-        } = useFormValidator({
-            _amount: props.amount,
-        }, {
-            _amount: (val) => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
-        });
+const emit = defineEmits<{(e: 'update:amount', amount: number|undefined): void;
+    (e: 'update', monthAmountInput: MonthAmountInput): void;
+}>();
 
-        const setAmount = (amount?: number) => {
-            setForm('_amount', amount);
-            emit('update:amount', amount);
-        };
+const { i18nDayjs } = useI18nDayjs();
 
-        const state = reactive({
-            formattedMonth: computed(() => i18nDayjs.value.utc(props.month).format('MMMM YYYY')),
-            formattedAmount: computed<string>({
-                get: () => commaFormatter(_amount.value),
-                set: (val: string) => { setAmount(getNumberFromString(val)); },
-            }),
-        });
+const {
+    forms: { _amount },
+    invalidTexts, invalidState, setForm, resetValidations,
+} = useFormValidator({
+    _amount: props.amount,
+}, {
+    _amount: (val) => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
+});
 
-        watch(() => props.amount, (amount) => {
-            if (_amount.value !== amount) {
-                setForm('_amount', amount);
-                resetValidations();
-            }
-        });
-        watch(() => _amount.value, (amount) => {
-            if (props.amount !== amount) {
-                emit('update', {
-                    amount: _amount.value,
-                    isValid: !invalidState._amount,
-                });
-            }
-        });
-
-        return {
-            _amount,
-            invalidTexts,
-            invalidState,
-            ...toRefs(state),
-            setAmount,
-        };
-    },
+const setAmount = (amount?: number) => {
+    setForm('_amount', amount);
+    emit('update:amount', amount);
 };
+
+const state = reactive({
+    formattedMonth: computed(() => i18nDayjs.value.utc(props.month).format('MMMM YYYY')),
+    formattedAmount: computed<string>({
+        get: () => commaFormatter(_amount.value),
+        set: (val: string) => { setAmount(getNumberFromString(val)); },
+    }),
+});
+
+watch(() => props.amount, (amount) => {
+    if (_amount.value !== amount) {
+        setForm('_amount', amount);
+        resetValidations();
+    }
+});
+watch(() => _amount.value, (amount) => {
+    if (props.amount !== amount) {
+        emit('update', {
+            amount: _amount.value,
+            isValid: !invalidState._amount,
+        });
+    }
+});
+
 </script>
 
 <template>
     <p-field-group required
-                   :label="formattedMonth"
+                   :label="state.formattedMonth"
                    class="budget-form-amount-plan-month-input"
                    :invalid-texts="invalidTexts._amount"
                    :invalid="invalidState._amount"
@@ -111,7 +87,7 @@ export default {
         >
             <span>(MTD)</span>
         </template>
-        <p-text-input v-model="formattedAmount"
+        <p-text-input v-model="state.formattedAmount"
                       placeholder="1,000"
                       :invalid="invalidState._amount"
         >

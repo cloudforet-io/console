@@ -1,7 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed,
-    reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
@@ -34,96 +33,67 @@ interface Props {
     costTypes?: CostTypes;
 }
 
-export default {
-    name: 'BudgetFormAmountPlan',
-    components: {
-        BudgetFormAmountPlanLastMonthsCost,
-        BudgetFormAmountPlanTotal,
-        BudgetFormAmountPlanMonthly,
-        BudgetFormAmountPlanUnitSelect,
-        BudgetPeriodSelect,
-        PPaneLayout,
-        PHeading,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-        projectGroupId: {
-            type: String,
-            default: undefined,
-        },
-        costTypes: {
-            type: Object,
-            default: undefined,
-        },
-    },
-    setup(props: Props, { emit }) {
-        const state = reactive({
-            period: {} as Period,
-            isPeriodValid: false,
-            //
-            timeUnit: 'TOTAL' as BudgetTimeUnit,
-            //
-            monthlyInputs: undefined as MonthAmountInputMap|undefined,
-            isMonthlyInputsValid: false,
-            //
-            totalAmount: undefined as number|undefined,
-            isTotalAmountValid: false,
-            //
-            isAllValid: computed<boolean>(() => {
-                if (state.timeUnit === 'TOTAL') { return state.isTotalAmountValid && state.isPeriodValid; }
-                return state.isMonthlyInputsValid && state.isPeriodValid;
-            }),
-            amountPlanInfo: computed<BudgetAmountPlanInfo>(() => {
-                const result = {
-                    time_unit: state.timeUnit,
-                    start: state.period.start,
-                    end: state.period.end,
-                } as BudgetAmountPlanInfo;
+const props = defineProps<Props>();
 
-                if (state.timeUnit === 'TOTAL') {
-                    result.limit = state.totalAmount;
-                } else if (state.monthlyInputs) {
-                    result.planned_limits = Object.keys(state.monthlyInputs)
-                        .map((key) => ({
-                            date: key,
-                            limit: state.monthlyInputs[key].amount,
-                        }));
-                }
+const emit = defineEmits<{(e: 'update', amountPlanInfo: BudgetAmountPlanInfo, isAllValid: boolean): void; }>();
 
-                return result;
-            }),
-        });
+const state = reactive({
+    period: {} as Period,
+    isPeriodValid: false,
+    //
+    timeUnit: 'TOTAL' as BudgetTimeUnit,
+    //
+    monthlyInputs: undefined as MonthAmountInputMap|undefined,
+    isMonthlyInputsValid: false,
+    //
+    totalAmount: undefined as number|undefined,
+    isTotalAmountValid: false,
+    //
+    isAllValid: computed<boolean>(() => {
+        if (state.timeUnit === 'TOTAL') { return state.isTotalAmountValid && state.isPeriodValid; }
+        return state.isMonthlyInputsValid && state.isPeriodValid;
+    }),
+    amountPlanInfo: computed<BudgetAmountPlanInfo>(() => {
+        const result = {
+            time_unit: state.timeUnit,
+            start: state.period.start,
+            end: state.period.end,
+        } as BudgetAmountPlanInfo;
 
-        const handleUpdatePeriod = (period: Period, isValid: boolean) => {
-            state.period = period;
-            state.isPeriodValid = isValid;
-        };
+        if (state.timeUnit === 'TOTAL') {
+            result.limit = state.totalAmount;
+        } else if (state.monthlyInputs) {
+            result.planned_limits = Object.keys(state.monthlyInputs)
+                .map((key) => ({
+                    date: key,
+                    limit: state.monthlyInputs[key].amount,
+                }));
+        }
 
-        const handleMonthlyInputUpdate = (monthAmountInputMap: MonthAmountInputMap, isValid: boolean) => {
-            state.monthlyInputs = monthAmountInputMap;
-            state.isMonthlyInputsValid = isValid;
-        };
+        return result;
+    }),
+});
 
-        const handleTotalAmountUpdate = (amount: number, isValid: boolean) => {
-            state.totalAmount = amount;
-            state.isTotalAmountValid = isValid;
-        };
-
-        watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, isAllValid]) => {
-            emit('update', amountPlanInfo, isAllValid);
-        });
-
-        return {
-            ...toRefs(state),
-            handleUpdatePeriod,
-            handleMonthlyInputUpdate,
-            handleTotalAmountUpdate,
-        };
-    },
+const handleUpdatePeriod = (period: Period, isValid: boolean) => {
+    state.period = period;
+    state.isPeriodValid = isValid;
 };
+
+const handleMonthlyInputUpdate = (monthAmountInputMap: MonthAmountInputMap, isValid: boolean) => {
+    state.monthlyInputs = monthAmountInputMap;
+    state.isMonthlyInputsValid = isValid;
+};
+
+const handleTotalAmountUpdate = (amount: number, isValid: boolean) => {
+    state.totalAmount = amount;
+    state.isTotalAmountValid = isValid;
+};
+
+watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, isAllValid]) => {
+    emit('update', amountPlanInfo, isAllValid);
+});
+
+
 </script>
 
 <template>
@@ -136,18 +106,18 @@ export default {
                                   @update="handleUpdatePeriod"
             />
             <budget-form-amount-plan-unit-select class="mb-6"
-                                                 :selected-unit.sync="timeUnit"
+                                                 :selected-unit.sync="state.timeUnit"
             />
-            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'"
+            <budget-form-amount-plan-monthly v-if="state.timeUnit === 'MONTHLY'"
                                              class="mb-6"
-                                             :period="period"
+                                             :period="state.period"
                                              @update="handleMonthlyInputUpdate"
             >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
-                                                              :time-unit="timeUnit"
+                    <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
+                                                              :project-group-id="props.projectGroupId"
+                                                              :cost-types="props.costTypes"
+                                                              :time-unit="state.timeUnit"
                     />
                 </template>
             </budget-form-amount-plan-monthly>
@@ -156,10 +126,10 @@ export default {
                                            @update="handleTotalAmountUpdate"
             >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
-                                                              :time-unit="timeUnit"
+                    <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
+                                                              :project-group-id="props.projectGroupId"
+                                                              :cost-types="props.costTypes"
+                                                              :time-unit="state.timeUnit"
                     />
                 </template>
             </budget-form-amount-plan-total>

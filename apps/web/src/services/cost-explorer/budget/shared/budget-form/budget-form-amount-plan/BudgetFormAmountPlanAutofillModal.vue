@@ -1,9 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
 
-import type { SetupContext } from 'vue';
 import {
-    computed, defineComponent,
-    reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -16,7 +14,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    visible: boolean;
+    visible?: boolean;
 }
 
 export interface AutofillOptions {
@@ -24,85 +22,58 @@ export interface AutofillOptions {
     growth?: number;
 }
 
-export default defineComponent<Props>({
-    name: 'BudgetFormAmountPlanAutofillModal',
-    components: {
-        PButtonModal,
-        PFieldGroup,
-        PTextInput,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const {
-            forms: { start, growth },
-            isAllValid, invalidState, invalidTexts,
-            setForm, resetAll,
-        } = useFormValidator({
-            start: undefined as number|undefined,
-            growth: undefined as number|undefined,
-        }, {
-            start: (val) => (typeof val === 'number' ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
-        }, { growth: true });
+const props = defineProps<Props>();
 
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            formattedStartBudget: computed({
-                get: () => commaFormatter(start.value),
-                set: (val: string) => { setForm('start', getNumberFromString(val)); },
-            }),
-        });
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; (e: 'confirm', options: AutofillOptions): void; }>();
 
-        const setVisible = (value: boolean) => {
-            state.proxyVisible = value;
-            emit('update:visible', value);
-        };
+const {
+    forms: { start, growth },
+    isAllValid, invalidState, invalidTexts,
+    setForm, resetAll,
+} = useFormValidator({
+    start: undefined as number|undefined,
+    growth: undefined as number|undefined,
+}, {
+    start: (val) => (typeof val === 'number' ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
+}, { growth: true });
 
-        const handleConfirm = () => {
-            emit('confirm', {
-                start: start.value,
-                growth: growth.value,
-            });
-
-            setVisible(false);
-        };
-
-        const handleUpdateVisible = (visible: boolean) => {
-            setVisible(visible);
-            if (!visible) {
-                resetAll();
-            }
-        };
-
-        watch(() => props.visible, (visible) => {
-            if (visible !== state.proxyVisible) state.proxyVisible = visible;
-        });
-
-        return {
-            start,
-            growth,
-            isAllValid,
-            invalidState,
-            invalidTexts,
-            ...toRefs(state),
-            setForm,
-            setVisible,
-            handleUpdateVisible,
-            handleConfirm,
-        };
-    },
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    formattedStartBudget: computed({
+        get: () => commaFormatter(start.value),
+        set: (val: string) => { setForm('start', getNumberFromString(val)); },
+    }),
 });
+
+const setVisible = (value: boolean) => {
+    state.proxyVisible = value;
+    emit('update:visible', value);
+};
+
+const handleConfirm = () => {
+    emit('confirm', {
+        start: start.value,
+        growth: growth.value,
+    });
+
+    setVisible(false);
+};
+
+const handleUpdateVisible = (visible: boolean) => {
+    setVisible(visible);
+    if (!visible) {
+        resetAll();
+    }
+};
+
+watch(() => props.visible, (visible) => {
+    if (visible !== state.proxyVisible) state.proxyVisible = visible;
+});
+
 </script>
 
 <template>
-    <p-button-modal :visible="proxyVisible"
+    <p-button-modal :visible="state.proxyVisible"
                     :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
                     :disabled="!isAllValid"
                     size="sm"
@@ -120,7 +91,7 @@ export default defineComponent<Props>({
                                :invalid="invalidState.start"
                                :invalid-text="invalidTexts.start"
                 >
-                    <p-text-input v-model="formattedStartBudget"
+                    <p-text-input v-model="state.formattedStartBudget"
                                   placeholder="1,000"
                                   :invalid="invalidState.start"
                     >
