@@ -179,7 +179,7 @@ const widgetEditState = reactive({
     visibleModal: false,
     targetWidget: null as DashboardLayoutWidgetInfo|null,
 });
-const handleConformWidgetEditModal = () => {
+const handleConfirmWidgetEditModal = () => {
     const target = widgetEditState.targetWidget;
     if (!target) return;
     const targetWidgetRef = widgetRef.value.find((d) => d?.$el?.id === target.widget_key);
@@ -275,7 +275,7 @@ onMounted(async () => {
                                      :visible="widgetEditState.visibleModal"
                                      :widget-key="widgetEditState.targetWidget.widget_key"
                                      @update:visible="widgetEditState.visibleModal = $event"
-                                     @confirm="handleConformWidgetEditModal"
+                                     @confirm="handleConfirmWidgetEditModal"
         />
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
