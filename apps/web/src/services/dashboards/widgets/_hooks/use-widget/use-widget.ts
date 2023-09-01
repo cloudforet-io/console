@@ -1,28 +1,28 @@
 import type {
     UnwrapRef,
-    Ref,
+    ComputedRef,
 } from 'vue';
 import {
     reactive, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import type { AssetWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-asset-widget-state';
-import {
-    useAssetWidgetState,
-} from '@/services/dashboards/widgets/_hooks/use-widget/use-asset-widget-state';
-import type { WidgetFrameOptions } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-frame';
 import { useWidgetFrame } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-frame';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-state';
+import {
+    useWidgetState,
+} from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-state';
 
 interface AdditionalState {
-    dateRange: Ref<DateRange>;
-    widgetLocation?: WidgetFrameOptions['widgetLocation'];
+    dateRange?: DateRange|ComputedRef<DateRange>;
+    widgetLocation?: Location|ComputedRef<Location>;
 }
 
 /**
  * @example
- const { widgetState, widgetFrameProps } = useAssetWidget(props, {
+ const { widgetState, widgetFrameProps } = useWidget(props, {
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
     })),
@@ -33,13 +33,13 @@ interface AdditionalState {
     }),
  });
  */
-export const useAssetWidget = <T = AdditionalState>(props: WidgetProps, emit: WidgetEmit, additionalState: AdditionalState) => {
-    const assetWidgetState = useAssetWidgetState(props);
+export const useWidget = <T extends AdditionalState = AdditionalState>(props: WidgetProps, emit: WidgetEmit, additionalState: T) => {
+    const state = useWidgetState(props);
 
     const widgetState = reactive({
-        ...toRefs(assetWidgetState),
+        ...toRefs(state),
         ...additionalState,
-    }) as UnwrapRef<AssetWidgetState & T>;
+    }) as UnwrapRef<WidgetState & T>;
 
     const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 

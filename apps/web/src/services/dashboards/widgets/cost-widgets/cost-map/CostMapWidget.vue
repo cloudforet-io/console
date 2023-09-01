@@ -36,7 +36,7 @@ import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-new';
 // eslint-disable-next-line import/no-cycle
-import { useCostWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-cost-widget';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 // eslint-disable-next-line import/no-cycle
 import type { CostAnalyzeDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
 
@@ -56,7 +56,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useCostWidget(props, emit, {
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},

@@ -29,7 +29,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useAssetWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-asset-widget';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
@@ -52,7 +52,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useAssetWidget(props, emit, {
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => ({
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
