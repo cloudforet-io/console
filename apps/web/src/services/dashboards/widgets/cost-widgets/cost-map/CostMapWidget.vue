@@ -26,7 +26,7 @@ import {
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
@@ -56,7 +56,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps } = useCostWidget(props, {
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useCostWidget(props, emit, {
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
@@ -225,6 +225,7 @@ defineExpose<WidgetExpose<TreemapChartData['children']>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="cost-map">
             <div class="chart-wrapper">

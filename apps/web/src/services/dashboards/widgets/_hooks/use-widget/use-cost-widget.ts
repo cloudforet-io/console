@@ -3,7 +3,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { CostWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-cost-widget-state';
 import {
     useCostWidgetState,
@@ -29,7 +29,7 @@ interface AdditionalState {
     }),
  });
  */
-export const useCostWidget = <T = AdditionalState>(props: WidgetProps, additionalState: AdditionalState) => {
+export const useCostWidget = <T = AdditionalState>(props: WidgetProps, emit: WidgetEmit, additionalState: AdditionalState) => {
     const costWidgetState = useCostWidgetState(props);
 
     const widgetState = reactive({
@@ -37,10 +37,11 @@ export const useCostWidget = <T = AdditionalState>(props: WidgetProps, additiona
         ...additionalState,
     }) as UnwrapRef<CostWidgetState & T>;
 
-    const { widgetFrameProps } = useWidgetFrame(props, widgetState);
+    const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
     return {
         widgetState,
         widgetFrameProps,
+        widgetFrameEventHandlers,
     };
 };

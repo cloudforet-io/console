@@ -10,7 +10,7 @@ import type { DateRange } from '@/services/dashboards/config';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
@@ -22,6 +22,7 @@ export interface WidgetFrameOptions {
 }
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
+    emit: WidgetEmit,
     widgetState: UnwrapRef<WidgetBaseState & WidgetFrameOptions>,
 ) => {
     const title = computed(() => props.title ?? widgetState.widgetConfig.title);
@@ -57,5 +58,17 @@ export const useWidgetFrame = (
         nonInheritOptionsTooltipText: nonInheritOptionsTooltipText.value,
     }));
 
-    return { widgetFrameProps };
+    const widgetFrameEventHandlers = {
+        'click-edit': () => {
+            emit('click-edit');
+        },
+        'click-delete': () => {
+            emit('click-delete');
+        },
+        'click-expand': () => {
+            emit('click-expand');
+        },
+    };
+
+    return { widgetFrameProps, widgetFrameEventHandlers };
 };

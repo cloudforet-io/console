@@ -18,7 +18,9 @@ interface Props {
     widgetConfigId: string;
 }
 interface EmitFn {
-    (e: string, value: string): void;
+    (e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
+    // TODO: remove this emit after refactoring WidgetFrame.vue
     (e: 'refresh'): void;
 }
 const emit = defineEmits<EmitFn>();
@@ -41,6 +43,8 @@ const handleEditModalConfirm = () => {
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
     dashboardDetailStore.updateWidgetValidation(true, props.widgetKey);
     state.proxyVisible = false;
+    emit('confirm');
+    // TODO: remove this emit after refactoring WidgetFrame.vue
     emit('refresh');
 };
 </script>
