@@ -268,6 +268,9 @@ export interface WidgetEmit {
     (e: 'refreshed', data: any): void;
     (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
     (e: 'update-widget-validation', validation: boolean): void;
+    (event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
 }
 
 export interface WidgetExpose<Data = any> {
