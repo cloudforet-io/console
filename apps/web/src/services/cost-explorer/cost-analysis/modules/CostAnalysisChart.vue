@@ -20,8 +20,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     getLegends, getXYChartData,
 } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
-import CostAnalysisChartQuerySection
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
+import CostAnalysisChartLegends
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartLegends.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import type {
@@ -119,26 +119,22 @@ watch([
 
 <template>
     <div class="cost-analysis-chart">
-        <section ref="chartRef"
-                 class="chart-section"
-        >
-            <cost-analysis-stacked-column-chart :loading="state.loading"
-                                                :chart.sync="state.chart"
-                                                :chart-data="state.chartData"
-                                                :legends="state.legends"
-                                                :granularity="costAnalysisPageState.granularity"
-                                                :period="costAnalysisPageState.period"
-                                                :currency="state.currency"
-                                                :currency-rates="state.currencyRates"
-                                                class="cost-analysis-stacked-column-chart"
-            />
-        </section>
-        <cost-analysis-chart-query-section ref="queryRef"
-                                           :loading="state.loading"
-                                           :legends.sync="state.legends"
-                                           @toggle-series="handleToggleSeries"
-                                           @show-all-series="handleAllSeries('show')"
-                                           @hide-all-series="handleAllSeries('hide')"
+        <cost-analysis-stacked-column-chart :loading="state.loading"
+                                            :chart.sync="state.chart"
+                                            :chart-data="state.chartData"
+                                            :legends="state.legends"
+                                            :granularity="costAnalysisPageState.granularity"
+                                            :period="costAnalysisPageState.period"
+                                            :currency="state.currency"
+                                            :currency-rates="state.currencyRates"
+                                            class="cost-analysis-stacked-column-chart"
+        />
+        <cost-analysis-chart-legends :loading="state.loading"
+                                     :legends.sync="state.legends"
+                                     class="cost-analysis-chart-legends"
+                                     @toggle-series="handleToggleSeries"
+                                     @show-all-series="handleAllSeries('show')"
+                                     @hide-all-series="handleAllSeries('hide')"
         />
     </div>
 </template>
@@ -147,24 +143,15 @@ watch([
 .cost-analysis-chart {
     @apply grid grid-cols-12 border border-gray-200 rounded-md;
     grid-gap: 1rem;
-    height: 30rem;
+    height: 26rem;
     padding: 1rem;
+    margin-bottom: 1rem;
 
-    .chart-section {
+    .cost-analysis-stacked-column-chart {
         @apply col-span-9;
-        padding: 1rem 0 2rem 0;
-        min-height: 480px;
     }
-
-    @define-mixin row-stack {
-        height: auto;
-        .chart-section {
-            @apply col-span-12;
-        }
-    }
-
-    @screen tablet {
-        @mixin row-stack;
+    .cost-analysis-chart-legends {
+        @apply col-span-3;
     }
 }
 </style>
