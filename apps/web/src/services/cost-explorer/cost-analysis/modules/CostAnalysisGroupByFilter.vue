@@ -117,7 +117,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         >
             {{ defaultGroupByItem.label }}
         </p-select-button>
-        <div class="tag-button-wrapper">
+        <div class="tags-button-wrapper">
             <p-button :style-type="state.selectedTagsMenu.length ? 'highlight' : 'tertiary'"
                       size="sm"
                       :icon-right="state.tagsDropdownVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
@@ -161,8 +161,9 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     .count-text {
         @apply text-label-lg text-gray-700;
     }
-    .tag-button-wrapper {
+    .tags-button-wrapper {
         position: relative;
+        min-width: 8rem;
 
         /* custom design-system component - p-filterable-dropdown */
         :deep(.p-filterable-dropdown) {

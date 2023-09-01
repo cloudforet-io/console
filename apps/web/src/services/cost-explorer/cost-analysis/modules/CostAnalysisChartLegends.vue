@@ -100,17 +100,13 @@ watch(() => state.groupByMenuItems, (after) => {
 </script>
 
 <template>
-    <div class="cost-analysis-chart-query-section">
-        <div class="title-wrapper">
-            <p-select-dropdown v-if="state.groupByMenuItems.length"
-                               :items="state.groupByMenuItems"
-                               :selected="costAnalysisPageState.chartGroupBy"
-                               @select="handleChartGroupByItem"
-            />
-            <span v-else
-                  class="title"
-            >Total Cost</span>
-        </div>
+    <div class="cost-analysis-chart-legends">
+        <p-select-dropdown :items="state.groupByMenuItems"
+                           :selected="costAnalysisPageState.chartGroupBy"
+                           :disabled="!costAnalysisPageState.groupBy.length"
+                           class="group-by-select-dropdown"
+                           @select="handleChartGroupByItem"
+        />
         <p-data-loader :loading="loading"
                        :data="legends"
                        class="legend-wrapper"
@@ -134,54 +130,24 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <div class="button-wrapper">
-            <p-button style-type="transparent"
-                      size="sm"
-                      font-weight="normal"
-                      @click="handleToggleAllLegends"
-            >
-                {{ state.showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
-            </p-button>
-        </div>
+        <p-button style-type="transparent"
+                  size="sm"
+                  font-weight="normal"
+                  @click="handleToggleAllLegends"
+        >
+            {{ state.showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
+        </p-button>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.cost-analysis-chart-query-section {
-    @apply col-span-3;
-    .title-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+.cost-analysis-chart-legends {
+    .group-by-select-dropdown {
+        width: 100%;
         margin-bottom: 0.5rem;
-        .title {
-            font-size: 0.875rem;
-            font-weight: bold;
-        }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
-            width: 100%;
-            .dropdown-button {
-                font-weight: bold;
-            }
-        }
-        .button-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    }
-    .filter-wrapper {
-        height: 8rem;
-        overflow-y: auto;
-        padding: 0.75rem 1rem;
-        .p-tag {
-            margin-bottom: 0.5rem;
-        }
     }
     .legend-wrapper {
-        height: 24rem;
+        height: 20rem;
         overflow-y: auto;
         padding: 0.5rem 0;
 
@@ -212,24 +178,6 @@ watch(() => state.groupByMenuItems, (after) => {
                 }
             }
         }
-    }
-
-    @define-mixin row-stack {
-        @apply col-span-12 row-start-1;
-        .legend-wrapper {
-            height: auto;
-            padding: 0.5rem;
-            .legend {
-                display: inline-block;
-                .p-status {
-                    height: 100%;
-                }
-            }
-        }
-    }
-
-    @screen tablet {
-        @mixin row-stack;
     }
 }
 </style>
