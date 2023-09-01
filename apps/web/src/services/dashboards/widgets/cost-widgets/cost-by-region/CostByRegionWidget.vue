@@ -1,46 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="cost-by-region"
-                  @refresh="handleRefresh"
-    >
-        <div class="content-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.chartData"
-                           :loader-backdrop-opacity="1"
-                           loader-type="skeleton"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-                <div class="legend-wrapper">
-                    <span v-for="(legend, idx) in state.chartLegends"
-                          :key="`${legend.name}-${idx}`"
-                          class="circle-wrapper"
-                    >
-                        <span v-if="legend.name"
-                              class="circle"
-                              :style="{background: storeState.providers[legend.name]?.color}"
-                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
-                    </span>
-                </div>
-            </p-data-loader>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -331,6 +288,50 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="cost-by-region"
+                  @refresh="handleRefresh"
+    >
+        <div class="content-wrapper">
+            <p-data-loader class="chart-loader"
+                           :loading="state.loading"
+                           :data="state.chartData"
+                           :loader-backdrop-opacity="1"
+                           loader-type="skeleton"
+                           show-data-from-scratch
+            >
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="legend-wrapper">
+                    <span v-for="(legend, idx) in state.chartLegends"
+                          :key="`${legend.name}-${idx}`"
+                          class="circle-wrapper"
+                    >
+                        <span v-if="legend.name"
+                              class="circle"
+                              :style="{background: storeState.providers[legend.name]?.color}"
+                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
+                    </span>
+                </div>
+            </p-data-loader>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .cost-by-region {
     .content-wrapper {

@@ -1,36 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="count-of-findings-widget"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
-                                   :disable-next-page="!state.showNextPage"
-                                   @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ state.thisPage }}</span>
-                        <span v-if="state.showNextPage"> / ...</span>
-                    </template>
-                </p-text-pagination>
-            </div>
-        </div>
-    </widget-frame>
-</template>
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -271,6 +238,41 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="count-of-findings-widget"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <div class="table-pagination-wrapper">
+                <p-text-pagination :this-page="state.thisPage"
+                                   :disable-next-page="!state.showNextPage"
+                                   @update:thisPage="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ state.thisPage }}</span>
+                        <span v-if="state.showNextPage"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .count-of-findings-widget {
     &.full {

@@ -1,49 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="budget-status-widget"
-                  @refresh="handleRefresh"
-    >
-        <p-data-loader :loading="state.loading"
-                       class="chart-wrapper"
-                       :loader-backdrop-opacity="1"
-        >
-            <template #loader>
-                <p-skeleton height="100%" />
-            </template>
-            <div class="waffle-chart">
-                <div v-for="colIdx in range(0, 20)"
-                     :key="`status-col-${colIdx}`"
-                     class="status-col-wrapper"
-                >
-                    <template v-for="rowIdx in range(0, 10)">
-                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
-                             :key="`status-box-${colIdx}-${rowIdx}`"
-                             v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
-                             class="box status-box"
-                             :style="{ 'background-color': getColor(rowIdx, colIdx) }"
-                        />
-                        <div v-else
-                             :key="`status-box-${colIdx}-${rowIdx}`"
-                             class="box"
-                        />
-                    </template>
-                </div>
-            </div>
-            <div class="legend-wrapper">
-                <div v-for="legend in state.legends"
-                     :key="`legend-${legend.label}`"
-                     class="legend"
-                >
-                    <span class="legend-icon"
-                          :style="{ 'background-color': legend.color }"
-                    />
-                    {{ legend.label }}
-                </div>
-            </div>
-        </p-data-loader>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -210,6 +164,53 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="budget-status-widget"
+                  @refresh="handleRefresh"
+    >
+        <p-data-loader :loading="state.loading"
+                       class="chart-wrapper"
+                       :loader-backdrop-opacity="1"
+        >
+            <template #loader>
+                <p-skeleton height="100%" />
+            </template>
+            <div class="waffle-chart">
+                <div v-for="colIdx in range(0, 20)"
+                     :key="`status-col-${colIdx}`"
+                     class="status-col-wrapper"
+                >
+                    <template v-for="rowIdx in range(0, 10)">
+                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
+                             :key="`status-box-${colIdx}-${rowIdx}`"
+                             v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
+                             class="box status-box"
+                             :style="{ 'background-color': getColor(rowIdx, colIdx) }"
+                        />
+                        <div v-else
+                             :key="`status-box-${colIdx}-${rowIdx}`"
+                             class="box"
+                        />
+                    </template>
+                </div>
+            </div>
+            <div class="legend-wrapper">
+                <div v-for="legend in state.legends"
+                     :key="`legend-${legend.label}`"
+                     class="legend"
+                >
+                    <span class="legend-icon"
+                          :style="{ 'background-color': legend.color }"
+                    />
+                    {{ legend.label }}
+                </div>
+            </div>
+        </p-data-loader>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .budget-status-widget {
     .chart-wrapper {

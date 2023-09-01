@@ -1,102 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  no-height-limit
-                  @refresh="handleRefresh"
-    >
-        <div class="budget-usage-summary">
-            <div class="data-container">
-                <div class="budget">
-                    <p class="budget-label">
-                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET_USAGE_IN', {period: totalSpentPeriod}) }}
-                    </p>
-                    <p-data-loader class="data-loader"
-                                   :loading="state.loading"
-                                   :data="state.data"
-                                   :loader-backdrop-opacity="1"
-                                   disable-empty-case
-                                   loader-type="skeleton"
-                    >
-                        <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalSpent, state.currency, props.currencyRates) }}
-                        </div>
-                        <div class="budget-info">
-                            {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
-                        </div>
-                        <template #loader>
-                            <div class="skeleton-wrapper">
-                                <p-skeleton class="skeleton"
-                                            width="10rem"
-                                            height="1.875rem"
-                                />
-                                <p-skeleton class="skeleton"
-                                            width="7.5rem"
-                                            height="1.5rem"
-                                />
-                            </div>
-                        </template>
-                    </p-data-loader>
-                </div>
-                <div class="budget">
-                    <p class="budget-label">
-                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
-                    </p>
-                    <p-data-loader class="data-loader"
-                                   :loading="state.loading"
-                                   :data="state.data"
-                                   :loader-backdrop-opacity="1"
-                                   disable-empty-case
-                                   loader-type="skeleton"
-                    >
-                        <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
-                        </div>
-                        <div v-if="state.leftBudget"
-                             class="budget-info"
-                             :style="{ color: state.leftBudget.color }"
-                        >
-                            {{ state.leftBudget.label }}
-                        </div>
-                        <template #loader>
-                            <div class="skeleton-wrapper">
-                                <p-skeleton class="skeleton"
-                                            width="10rem"
-                                            height="1.875rem"
-                                />
-                                <p-skeleton class="skeleton"
-                                            width="7.5rem"
-                                            height="1.5rem"
-                                />
-                            </div>
-                        </template>
-                    </p-data-loader>
-                </div>
-                <div class="chart-wrapper">
-                    <p-data-loader class="data-loader"
-                                   :loading="state.loading"
-                                   :data="state.data"
-                                   :loader-backdrop-opacity="1"
-                                   disable-empty-case
-                                   loader-type="skeleton"
-                    >
-                        <div ref="chartContext"
-                             class="chart"
-                        >
-                            <span class="budget-usage">
-                                <template v-if="Number.isNaN(state.spentBudget.rate)">
-                                    -- %
-                                </template>
-                                <template v-else>
-                                    {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
-                                </template>
-                            </span>
-                        </div>
-                    </p-data-loader>
-                </div>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -353,6 +254,106 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  no-height-limit
+                  @refresh="handleRefresh"
+    >
+        <div class="budget-usage-summary">
+            <div class="data-container">
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET_USAGE_IN', {period: totalSpentPeriod}) }}
+                    </p>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalSpent, state.currency, props.currencyRates) }}
+                        </div>
+                        <div class="budget-info">
+                            {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
+                </div>
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
+                    </p>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
+                        </div>
+                        <div v-if="state.leftBudget"
+                             class="budget-info"
+                             :style="{ color: state.leftBudget.color }"
+                        >
+                            {{ state.leftBudget.label }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
+                </div>
+                <div class="chart-wrapper">
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div ref="chartContext"
+                             class="chart"
+                        >
+                            <span class="budget-usage">
+                                <template v-if="Number.isNaN(state.spentBudget.rate)">
+                                    -- %
+                                </template>
+                                <template v-else>
+                                    {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
+                                </template>
+                            </span>
+                        </div>
+                    </p-data-loader>
+                </div>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .budget-usage-summary {
     height: 100%;

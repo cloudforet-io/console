@@ -1,47 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="aws-data-transfer-by-region"
-                  @refresh="refreshWidget"
-    >
-        <template #header-right>
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
-                               :legends="state.legends"
-                               :color-set="colorSet"
-                               show-legend
-                               disable-toggle
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -318,6 +274,51 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="aws-data-transfer-by-region"
+                  @refresh="refreshWidget"
+    >
+        <template #header-right>
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               :legends="state.legends"
+                               :color-set="colorSet"
+                               show-legend
+                               disable-toggle
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .aws-data-transfer-by-region {
     .data-container {

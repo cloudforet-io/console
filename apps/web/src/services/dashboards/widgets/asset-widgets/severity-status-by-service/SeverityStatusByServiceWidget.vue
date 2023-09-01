@@ -1,45 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="severity-status-by-service"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <p-data-loader class="chart-wrapper"
-                           :loading="state.loading"
-                           :data="state.refinedData"
-                           loader-type="skeleton"
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
-            >
-                <div class="box-wrapper"
-                     :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
-                >
-                    <div v-for="(data, idx) in state.refinedData"
-                         :key="`box-${idx}`"
-                         v-tooltip.bottom="`${data.service}: ${data.value}`"
-                         class="status-box"
-                         :style="{'background-color': SEVERITY_STATUS_MAP[data.severity].color}"
-                    >
-                        <span class="text">{{ data.service }}</span>
-                    </div>
-                </div>
-            </p-data-loader>
-            <div class="legend-wrapper">
-                <div v-for="status in SEVERITY_STATUS_MAP_VALUES"
-                     :key="`status-${status.label}`"
-                     class="legend"
-                >
-                    <div class="circle"
-                         :style="{ 'background-color': status.color }"
-                    />
-                    <div class="text">
-                        {{ status.label }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </widget-frame>
-</template>
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -216,6 +174,50 @@ defineExpose<WidgetExpose>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="severity-status-by-service"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <p-data-loader class="chart-wrapper"
+                           :loading="state.loading"
+                           :data="state.refinedData"
+                           loader-type="skeleton"
+                           :loader-backdrop-opacity="1"
+                           show-data-from-scratch
+            >
+                <div class="box-wrapper"
+                     :style="{'grid-template-columns': `repeat(auto-fill, ${state.boxWidth-4}px)`}"
+                >
+                    <div v-for="(data, idx) in state.refinedData"
+                         :key="`box-${idx}`"
+                         v-tooltip.bottom="`${data.service}: ${data.value}`"
+                         class="status-box"
+                         :style="{'background-color': SEVERITY_STATUS_MAP[data.severity].color}"
+                    >
+                        <span class="text">{{ data.service }}</span>
+                    </div>
+                </div>
+            </p-data-loader>
+            <div class="legend-wrapper">
+                <div v-for="status in SEVERITY_STATUS_MAP_VALUES"
+                     :key="`status-${status.label}`"
+                     class="legend"
+                >
+                    <div class="circle"
+                         :style="{ 'background-color': status.color }"
+                    />
+                    <div class="text">
+                        {{ status.label }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .severity-status-by-service {
     .data-container {
