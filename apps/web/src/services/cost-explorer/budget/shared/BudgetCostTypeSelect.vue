@@ -78,16 +78,8 @@ const state = reactive({
     costTypeItems: computed<BudgetCostTypes>(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
-        region_code: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REGION'),
-        service_account_id: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
-        product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
     })),
-    resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => {
-        if (selectedCostType.value === 'provider') return getSearchDropdownItems(state.providers);
-        if (selectedCostType.value === 'region_code') return getSearchDropdownItems(state.regions);
-        if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(state.serviceAccounts);
-        return undefined;
-    }),
+    resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
     visibleResourceMenu: false,
     costTypeInfo: computed<CostTypes|undefined>(() => {
