@@ -129,7 +129,10 @@ const handleLearnMoreRelocateNotification = () => {
 
 const handleDismissRelocateNotification = () => {
     const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
-    settings.costExplorer.hideRelocateDashboardNotification = true;
+    settings.costExplorer = {
+        ...settings.costExplorer,
+        hideRelocateDashboardNotification: true,
+    };
     LocalStorageAccessor.setItem(relocateNotificationState.userId, settings);
     relocateNotificationState.isShow = false;
 };
