@@ -1,102 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  @refresh="handleRefresh"
-    >
-        <div class="monthly-cost">
-            <div class="cost">
-                <p class="cost-label">
-                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedCurrentMonth}) }}
-                </p>
-                <p-data-loader class="data-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               :loader-backdrop-opacity="1"
-                               disable-empty-case
-                               loader-type="skeleton"
-                >
-                    <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency, props.currencyRates) }}
-                    </div>
-                    <div class="cost-info">
-                        <p-i v-if="typeof state.isDecreased === 'boolean'"
-                             :name="state.isDecreased ? 'ic_caret-down-filled-alt' : 'ic_caret-up-filled-alt'"
-                             fill
-                             width="1rem"
-                             height="1rem"
-                             :color="state.isDecreased ? green[700] : red[500]"
-                             original
-                        />
-                        {{ currencyMoneyFormatter(state.differenceCost, state.currency, props.currencyRates) }}
-                        <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
-                                 :badge-type="state.isDecreased ? 'subtle' : 'solid'"
-                                 shape="square"
-                        >
-                            {{ state.differenceCostRate }} %
-                        </p-badge>
-                    </div>
-                    <template #loader>
-                        <div class="skeleton-wrapper">
-                            <p-skeleton class="skeleton"
-                                        width="10rem"
-                                        height="1.875rem"
-                            />
-                            <p-skeleton class="skeleton"
-                                        width="7.5rem"
-                                        height="1.5rem"
-                            />
-                        </div>
-                    </template>
-                </p-data-loader>
-            </div>
-            <p-divider />
-            <div class="cost">
-                <p class="cost-label">
-                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedPreviousMonth}) }}
-                </p>
-                <p-data-loader class="data-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               :loader-backdrop-opacity="1"
-                               disable-empty-case
-                               loader-type="skeleton"
-                >
-                    <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency, props.currencyRates) }}
-                    </div>
-                    <div class="cost-info">
-                        {{ state.previousMonth.format('MMM YYYY') }}
-                    </div>
-                    <template #loader>
-                        <div class="skeleton-wrapper">
-                            <p-skeleton class="skeleton"
-                                        width="10rem"
-                                        height="1.875rem"
-                            />
-                            <p-skeleton class="skeleton"
-                                        width="7.5rem"
-                                        height="1.5rem"
-                            />
-                        </div>
-                    </template>
-                </p-data-loader>
-            </div>
-            <div class="chart-wrapper">
-                <p-data-loader class="data-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               :loader-backdrop-opacity="1"
-                               disable-empty-case
-                               loader-type="skeleton"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -311,6 +212,106 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  @refresh="handleRefresh"
+    >
+        <div class="monthly-cost">
+            <div class="cost">
+                <p class="cost-label">
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedCurrentMonth}) }}
+                </p>
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
+                >
+                    <div class="cost-value">
+                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency, props.currencyRates) }}
+                    </div>
+                    <div class="cost-info">
+                        <p-i v-if="typeof state.isDecreased === 'boolean'"
+                             :name="state.isDecreased ? 'ic_caret-down-filled-alt' : 'ic_caret-up-filled-alt'"
+                             fill
+                             width="1rem"
+                             height="1rem"
+                             :color="state.isDecreased ? green[700] : red[500]"
+                             original
+                        />
+                        {{ currencyMoneyFormatter(state.differenceCost, state.currency, props.currencyRates) }}
+                        <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
+                                 :badge-type="state.isDecreased ? 'subtle' : 'solid'"
+                                 shape="square"
+                        >
+                            {{ state.differenceCostRate }} %
+                        </p-badge>
+                    </div>
+                    <template #loader>
+                        <div class="skeleton-wrapper">
+                            <p-skeleton class="skeleton"
+                                        width="10rem"
+                                        height="1.875rem"
+                            />
+                            <p-skeleton class="skeleton"
+                                        width="7.5rem"
+                                        height="1.5rem"
+                            />
+                        </div>
+                    </template>
+                </p-data-loader>
+            </div>
+            <p-divider />
+            <div class="cost">
+                <p class="cost-label">
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.TOTAL_SPENT_IN', {period: formattedPreviousMonth}) }}
+                </p>
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
+                >
+                    <div class="cost-value">
+                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency, props.currencyRates) }}
+                    </div>
+                    <div class="cost-info">
+                        {{ state.previousMonth.format('MMM YYYY') }}
+                    </div>
+                    <template #loader>
+                        <div class="skeleton-wrapper">
+                            <p-skeleton class="skeleton"
+                                        width="10rem"
+                                        height="1.875rem"
+                            />
+                            <p-skeleton class="skeleton"
+                                        width="7.5rem"
+                                        height="1.5rem"
+                            />
+                        </div>
+                    </template>
+                </p-data-loader>
+            </div>
+            <div class="chart-wrapper">
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .monthly-cost {
     display: flex;

@@ -1,47 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  refresh-on-resize
-                  class="aws-data-transfer-cost-trend"
-                  @refresh="handleRefresh"
-    >
-        <template v-if="state.selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               disable-ellipsis
-                               disable-pagination
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -295,6 +251,50 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
+                  class="aws-data-transfer-cost-trend"
+                  @refresh="handleRefresh"
+    >
+        <template v-if="state.selectorItems.length"
+                  #header-right
+        >
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               disable-ellipsis
+                               disable-pagination
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {

@@ -1,45 +1,3 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="base-pie-widget"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                    <template #loader>
-                        <p-skeleton width="155px"
-                                    height="155px"
-                        />
-                    </template>
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data ? state.data.results: []"
-                               :legends.sync="state.legends"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data ? state.data.more: false"
-                               :color-set="colorSet"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               show-legend
-                               @toggle-legend="handleToggleLegend"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
@@ -261,6 +219,48 @@ defineExpose<WidgetExpose<Data>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="base-pie-widget"
+                  @refresh="refreshWidget"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <template #loader>
+                        <p-skeleton width="155px"
+                                    height="155px"
+                        />
+                    </template>
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results: []"
+                               :legends.sync="state.legends"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data ? state.data.more: false"
+                               :color-set="colorSet"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               show-legend
+                               @toggle-legend="handleToggleLegend"
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
 
 <style scoped lang="postcss">
 .base-pie-widget {

@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
+
+const { breadcrumbs } = useBreadcrumbs();
+</script>
+
 <template>
     <fragment>
         <vertical-page-layout v-if="$route.meta.lnbVisible"
@@ -22,29 +33,3 @@
         </general-page-layout>
     </fragment>
 </template>
-
-<script lang="ts">
-
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-
-import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
-
-export default {
-    name: 'DashboardsContainer',
-    components: {
-        CenteredPageLayout,
-        DashboardsLNB,
-        GeneralPageLayout,
-        VerticalPageLayout,
-    },
-    setup() {
-        const { breadcrumbs } = useBreadcrumbs();
-        return {
-            breadcrumbs,
-        };
-    },
-};
-</script>
