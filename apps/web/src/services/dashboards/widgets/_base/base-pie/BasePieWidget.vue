@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref, toRef, toRefs,
+    defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -31,7 +30,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
@@ -40,11 +39,12 @@ import {
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-new';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeDataModel, PieChartData } from '@/services/dashboards/widgets/type';
 
 
@@ -52,26 +52,50 @@ type Data = CostAnalyzeDataModel;
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
+
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed<DateRange>(() => ({
+        start: widgetState.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
+        end: widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
+    })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+        },
+    })),
+});
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
 const state = reactive({
-    ...toRefs(useWidgetState<Data>(props)),
+    loading: true,
+    data: null as Data|null,
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
     chartData: computed<PieChartData[]>(() => {
         if (!state.data?.results?.length) return [];
-        return getRefinedPieChartData(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+        return getRefinedPieChartData(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
     }),
     tableFields: computed<Field[]>(() => {
-        if (!state.groupBy) return [];
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
+        if (!widgetState.groupBy) return [];
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
         return [
             {
-                name: state.groupBy,
+                name: widgetState.groupBy,
                 label: groupByLabel,
                 textOptions: { type: 'reference', referenceType },
             },
@@ -84,37 +108,21 @@ const state = reactive({
         ];
     }),
     legends: [] as Legend[],
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
-        query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
-        },
-    })),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Data> => {
     try {
-        apiQueryHelper.setFilters(state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCostAnalyze({
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
                         // TODO: Change to 'cost' after the cost analysis API is updated.
@@ -135,10 +143,10 @@ const fetchData = async (): Promise<Data> => {
 
 const drawChart = (chartData: PieChartData[]) => {
     let chart;
-    if (state.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
+    if (widgetState.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
     else chart = chartHelper.createPieChart();
     const seriesSettings = {
-        categoryField: state.groupBy,
+        categoryField: widgetState.groupBy,
         valueField: 'cost_sum',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
@@ -149,7 +157,7 @@ const drawChart = (chartData: PieChartData[]) => {
 
     if (chartData.some((d) => d.cost_sum && d.cost_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(chartData);
     } else {
@@ -170,19 +178,19 @@ const drawChart = (chartData: PieChartData[]) => {
 const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getPieChartLegends(state.data.results, state.groupBy);
+    state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<Data> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getPieChartLegends(state.data.results, state.groupBy);
+    state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -194,20 +202,21 @@ const refreshWidget = async (thisPage = 1): Promise<Data> => {
 const handleToggleLegend = (index) => {
     chartHelper.toggleSeries(state.chart, index);
 };
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
     state.data = undefined;
-    refreshWidget(thisPage);
+    refreshWidget(_thisPage);
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getPieChartLegends(state.data.results, state.groupBy);
+        state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -223,7 +232,7 @@ defineExpose<WidgetExpose<Data>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-pie-widget"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <div class="chart-wrapper">
@@ -248,9 +257,9 @@ defineExpose<WidgetExpose<Data>>({
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results: []"
                                :legends.sync="state.legends"
-                               :currency="state.currency"
+                               :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
-                               :this-page="state.thisPage"
+                               :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more: false"
                                :color-set="colorSet"
                                :all-reference-type-info="props.allReferenceTypeInfo"
