@@ -73,7 +73,7 @@ const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
         }
     }
 };
-const handleUpdateData = (widgetKey: string, data: any) => {
+const handleWidgetRefreshed = (widgetKey: string, data: any) => {
     dashboardDetailStore.$patch((_state) => {
         _state.widgetDataMap[widgetKey] = data;
     });
@@ -186,25 +186,27 @@ onMounted(async () => {
                            :dashboard-settings="dashboardDetailState.settings"
                            :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                            :dashboard-variables="dashboardDetailState.variables"
-                           @update-data="handleUpdateData(widget.widget_key, $event)"
+                           @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
                            @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                 />
-                <!--
+                <!-- TODO: remove this comment after refactoring 
                 <component :is="widget.component"
                            :id="widget.widget_key"
                            :key="widget.widget_key"
                            ref="widgetRef"
                            v-intersection-observer="handleIntersectionObserver"
                            :widget-info="widget"
-                           :dashboard-info="dashboardDetailState.dashboardInfo"
-                           :currency-rates="currencyRates"
                            :edit-mode="editMode"
                            :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                           :all-reference-type-info="allReferenceTypeInfo"
-                           :initiated="!!initiatedWidgetMap[widget.widget_key]"
                            :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible && widget.widget_key !== widgetFormState.widgetKey"
-                           @update-data="handleUpdateData(widget.widget_key, $event)"
+                           :initiated="!!initiatedWidgetMap[widget.widget_key]"
+                           :currency-rates="currencyRates"
+                           :all-reference-type-info="allReferenceTypeInfo"
+                           :settings="dashboardDetailState.settings"
+                           :variables-schema="dashboardDetailState.variablesSchema"
+                           :variables="dashboardDetailState.variables"
+                           @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
                            @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                 />
