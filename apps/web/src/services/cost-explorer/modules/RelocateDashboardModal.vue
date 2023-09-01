@@ -27,7 +27,10 @@ const handleClose = () => {
 
 const handleReject = () => {
     const settings = LocalStorageAccessor.getItem(userId.value);
-    settings.costExplorer.hideRelocateDashboardNotification = true;
+    settings.costExplorer = {
+        ...settings.costExplorer,
+        isRelocateDashboardModalRejected: true,
+    };
     LocalStorageAccessor.setItem(userId.value, settings);
     emit('update:visible', false);
 };
