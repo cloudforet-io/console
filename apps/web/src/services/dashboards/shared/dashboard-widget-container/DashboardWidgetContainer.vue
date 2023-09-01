@@ -194,10 +194,11 @@ onMounted(async () => {
          class="dashboard-widget-container"
     >
         <template v-if="!dashboardDetailState.loadingDashboard">
-            <template v-for="(widget) in reformedWidgetInfoList">
+            <template v-for="(widget) in reformedWidgetInfoList"
+                              :key="widget.widget_key"
+            >
                 <component :is="widget.component"
                            :id="widget.widget_key"
-                           :key="widget.widget_key"
                            ref="widgetRef"
                            v-intersection-observer="handleIntersectionObserver"
                            :widget-config-id="widget.widget_name"
