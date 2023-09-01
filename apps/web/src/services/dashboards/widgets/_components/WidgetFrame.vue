@@ -32,7 +32,7 @@ import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
-interface WidgetFrameProps {
+export interface WidgetFrameProps {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;

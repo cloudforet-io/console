@@ -25,6 +25,7 @@ import {
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
 import type {
+    DashboardLayoutWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 
@@ -87,6 +88,20 @@ const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
         }
     }
 };
+const handleUpdateData = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
+};
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
+    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+};
+const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
+    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+};
+
+
 watch(reformedWidgetInfoList, (widgetInfoList) => {
     if (!Array.isArray(widgetInfoList)) return;
     const initiatedWidgetMap = {};
@@ -173,15 +188,42 @@ onMounted(async () => {
                            :title="widget.title"
                            :options="widget.widget_options"
                            :inherit-options="widget.inherit_options"
+                           :schema-properties="widget.schema_properties"
                            :size="widget.size"
                            :width="widget.width"
                            :theme="widget.theme"
                            :currency-rates="state.currencyRates"
-                           :edit-mode="props.editMode"
-                           :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                           :edit-mode="editMode"
+                           :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
                            :initiated="!!state.initiatedWidgetMap[widget.widget_key]"
+                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible"
+                           :dashboard-settings="dashboardDetailState.settings"
+                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                           :dashboard-variables="dashboardDetailState.variables"
+                           @update-data="handleUpdateData(widget.widget_key, $event)"
+                           @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
+                           @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                 />
+                <!--
+                <component :is="widget.component"
+                           :id="widget.widget_key"
+                           :key="widget.widget_key"
+                           ref="widgetRef"
+                           v-intersection-observer="handleIntersectionObserver"
+                           :widget-info="widget"
+                           :dashboard-info="dashboardDetailState.dashboardInfo"
+                           :currency-rates="currencyRates"
+                           :edit-mode="editMode"
+                           :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                           :all-reference-type-info="allReferenceTypeInfo"
+                           :initiated="!!initiatedWidgetMap[widget.widget_key]"
+                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible && widget.widget_key !== widgetFormState.widgetKey"
+                           @update-data="handleUpdateData(widget.widget_key, $event)"
+                           @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
+                           @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
+                />
+                -->
             </template>
         </template>
         <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"

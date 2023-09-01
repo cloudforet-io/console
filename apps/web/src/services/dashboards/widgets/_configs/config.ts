@@ -13,6 +13,7 @@ import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-confi
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -185,17 +186,18 @@ export interface BaseWidgetOptions {
     };
     filters?: WidgetFiltersMap;
 }
+export interface SelectorOptions {
+    enabled?: boolean;
+    type: 'cost-usage'|'days';
+}
 export interface CostWidgetOptions extends BaseWidgetOptions {
     cost_group_by?: CostGroupBy | string;
-    selector_options?: {
-        enabled?: boolean;
-        type: 'cost-usage'|'days';
-    };
+    selector_options?: SelectorOptions;
 }
 export interface AssetWidgetOptions extends BaseWidgetOptions {
     asset_group_by?: AssetGroupBy | string;
 }
-export type WidgetOptions = CostWidgetOptions|AssetWidgetOptions;
+export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
@@ -228,6 +230,7 @@ export interface WidgetProps {
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
+    schemaProperties?: string[];
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
@@ -238,6 +241,16 @@ export interface WidgetProps {
     allReferenceTypeInfo: AllReferenceTypeInfo;
     initiated?: boolean;
     disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    dashboardSettings?: DashboardSettings;
+    dashboardVariablesSchema?: DashboardVariablesSchema;
+    dashboardVariables?: DashboardVariables;
+}
+
+export interface WidgetEmit {
+    (e: 'update-data', data: any): void;
+    (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
+    (e: 'update-widget-validation', validation: boolean): void;
 }
 
 export interface WidgetExpose<Data = any> {

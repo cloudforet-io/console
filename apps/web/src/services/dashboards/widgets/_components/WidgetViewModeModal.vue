@@ -95,6 +95,19 @@ const handleRefreshWidget = () => {
     state.widgetRef?.refreshWidget();
 };
 
+const handleUpdateData = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
+};
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
+    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+};
+const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
+    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+};
+
 watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
@@ -177,6 +190,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :title="widgetFormState.widgetTitle"
                                :options="widgetFormState.widgetOptions"
                                :inherit-options="widgetFormState.inheritOptions"
+                               :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
                                :currency-rates="state.currencyRates"
@@ -184,6 +198,12 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
+                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables="dashboardDetailState.variables"
+                               @update-data="handleUpdateData(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetInfo.widget_key, $event)"
                     />
                 </div>
             </div>
