@@ -60,7 +60,6 @@ const props = withDefaults(defineProps<Props>(), {
     printMode: false,
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
-    (e:'rendered'): void;
 }>();
 
 const chartContext = ref<HTMLElement | null>(null);

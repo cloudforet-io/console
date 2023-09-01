@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import type Vue from 'vue';
 import {
-    computed, defineEmits, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
@@ -44,8 +43,6 @@ import type {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
-const emit = defineEmits<{(e: 'rendered', elements: Element[]): void;
-}>();
 const state = reactive({
     currency: computed(() => store.state.settings.currency),
     currencyRates: computed(() => store.state.settings.currencyRates),
@@ -54,8 +51,6 @@ const state = reactive({
     legends: [] as Legend[],
     chartData: [] as XYChartData[],
     chart: null as XYChart | PieChart | null,
-    queryRef: null as null|Vue,
-    chartRef: null as null|HTMLElement,
 });
 
 /* api */
@@ -112,15 +107,6 @@ const handleAllSeries = (type) => {
         hideAllSeries(state.chart as XYChart | PieChart);
     }
 };
-const handleChartRendered = () => {
-    if (state.chartRef && state.queryRef?.$el) {
-        const elements: Element[] = [
-            state.queryRef.$el,
-            state.chartRef,
-        ];
-        emit('rendered', elements);
-    }
-};
 
 watch([
     () => costAnalysisPageState.granularity,
@@ -145,7 +131,7 @@ watch([
                                                 :period="costAnalysisPageState.period"
                                                 :currency="state.currency"
                                                 :currency-rates="state.currencyRates"
-                                                @rendered="handleChartRendered"
+                                                class="cost-analysis-stacked-column-chart"
             />
         </section>
         <cost-analysis-chart-query-section ref="queryRef"
