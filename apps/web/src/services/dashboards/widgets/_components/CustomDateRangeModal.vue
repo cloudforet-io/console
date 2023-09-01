@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
@@ -13,8 +12,8 @@ import type { Period } from '@/services/cost-explorer/type';
 import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
 
 interface CustomRangeModalSettings {
-    helpTextFrom?: string | undefined;
-    helpTextTo?: string | undefined;
+    helpTextFrom?: string;
+    helpTextTo?: string;
     dateType?: DATA_TYPE;
 }
 
@@ -23,21 +22,25 @@ interface DateOption {
     maxDate?: string;
 }
 
-interface Props {
+export interface Period {
+    start?: string;
+    end?: string;
+}
+
+const props = withDefaults(defineProps<{
     visible: boolean;
     datetimePickerDataType?: DATA_TYPE;
     granularity?: Granularity;
     selectedDateRange?: Period;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
     visible: false,
     datetimePickerDataType: 'yearToDate',
     granularity: undefined,
     selectedDateRange: () => ({}),
 });
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm', value: Period): void;
+
+const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
+    (event: 'confirm', period: Period): void;
 }>();
 const { t } = useI18n();
 
@@ -91,6 +94,9 @@ const state = reactive({
 });
 
 /* Event */
+const handleUpdateVisible = (visible: boolean) => {
+    state.proxyVisible = visible;
+};
 const handleConfirm = () => {
     state.proxyVisible = false;
     const period: Period = {};
@@ -138,24 +144,24 @@ watch(() => props.visible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal
-        v-model:visible="state.proxyVisible"
-        :header-title="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
-        centered
-        size="sm"
-        fade
-        backdrop
-        :disabled="state.invalid"
-        @confirm="handleConfirm"
+    <p-button-modal :header-title="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CUSTOM_RANGE')"
+                    centered
+                    size="sm"
+                    fade
+                    backdrop
+                    :visible="state.proxyVisible"
+                    :disabled="state.invalid"
+                    @confirm="handleConfirm"
+                    @update:visible="handleUpdateVisible"
     >
         <template #body>
             <p-field-group class="period-select"
                            :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
-                           :help-text="state.settingsByGranularity.helpTextFrom"
+                           :help-text="state.settingsByGranularity.helpTextFrom ?? ''"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
-                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
+                                   :data-type="props.granularity ? state.settingsByGranularity.dateType : props.datetimePickerDataType"
                                    :selected-dates="state.startDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    @update:selected-dates="handleUpdateSelectedDates('start', $event)"
@@ -167,7 +173,7 @@ watch(() => props.visible, (visible) => {
                            required
             >
                 <p-datetime-picker class="datetime-picker"
-                                   :data-type="granularity ? state.settingsByGranularity.dateType : datetimePickerDataType"
+                                   :data-type="granularity ? state.settingsByGranularity.dateType : props.datetimePickerDataType"
                                    :selected-dates="state.endDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.endDateSetting.minDate"

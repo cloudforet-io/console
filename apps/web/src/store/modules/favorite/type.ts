@@ -5,6 +5,7 @@ export const FAVORITE_TYPE = {
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',
+    COST_ANALYSIS: 'COST_ANALYSIS',
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 

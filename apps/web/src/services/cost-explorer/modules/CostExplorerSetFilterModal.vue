@@ -106,7 +106,7 @@ watch(() => props.visible, (after) => {
         v-if="visible"
         v-model:visible="state.proxyVisible"
         class="cost-explorer-set-filter-modal"
-        :header-title="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTER')"
+        :header-title="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTERS')"
         :footer-reset-button-visible="true"
         @confirm="handleFormConfirm"
         @return="handleClearAll"
@@ -134,7 +134,7 @@ watch(() => props.visible, (after) => {
                 <div class="right-select-filter-section">
                     <div class="selected-filter-section">
                         <div class="title">
-                            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ state.selectedItemsLength }})
+                            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTERS') }} ({{ state.selectedItemsLength }})
                         </div>
                         <cost-explorer-filter-tags :filters="state.selectedFilters"
                                                    deletable

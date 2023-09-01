@@ -193,7 +193,7 @@ const drawChart = (chartData: MapChartData[]) => {
     const pointSeries = chartHelper.createMapPointSeries();
     chart.series.push(pointSeries);
     pointSeries.bullets.push((root, series, dataItem) => {
-        const _chartData = dataItem?.dataContext?.data;
+        const _chartData = (dataItem?.dataContext as any)?.data;
         const pieChart = chartHelper.createPieChart({
             width: 32,
             height: 32,
