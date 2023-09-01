@@ -202,6 +202,7 @@ interface ContextMenuEmits {
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
     (e: 'click-done', mouseEvent: MouseEvent): void,
     (e: 'click-show-more', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
+    (e: 'clear-selection'): void,
 }
 const props = withDefaults(defineProps<ContextMenuProps>(), {
     menu: () => [],
@@ -303,6 +304,7 @@ const onClickEsc = (e: MouseEvent) => {
 };
 const handleClickClearSelection = () => {
     state.proxySelected = state.proxySelected.filter((item) => item.disabled);
+    emit('clear-selection');
 };
 const handleUpdateSearchText = async (value: string) => {
     state.proxySearchText = value;

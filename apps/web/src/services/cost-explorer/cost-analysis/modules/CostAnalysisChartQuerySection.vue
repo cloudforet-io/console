@@ -117,7 +117,7 @@ watch(() => state.groupByMenuItems, (after) => {
     <div class="cost-analysis-chart-query-section">
         <!--filter-->
         <div class="title-wrapper">
-            <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
+            <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}</span>
             <div class="button-wrapper">
                 <p-button style-type="tertiary"
                           size="sm"
