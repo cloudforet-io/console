@@ -19,6 +19,7 @@ interface Props {
     isDomainOwner?: boolean;
     idx?: number | string;
     currentPath?: string;
+    openNewTab?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -52,6 +53,7 @@ const getIconName = (icon: LNBIcon): string => {
 <template>
     <router-link class="l-n-b-router-menu-item"
                  :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+                 :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click.native="$event.stopImmediatePropagation()"
                  @mouseenter.native="state.hoveredItem = item.id"
