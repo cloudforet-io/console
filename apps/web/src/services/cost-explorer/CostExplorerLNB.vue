@@ -90,13 +90,14 @@ const state = reactive({
             },
             favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
         }));
-        const showMoreExtraMenuSet: LNBMenu = [{
-            type: 'extra',
+        const showMoreMenuSet: LNBMenu = [{
+            type: 'slot',
+            id: 'show-more',
         }];
 
         return [
             ...(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
-            ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreExtraMenuSet : []),
+            ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
     }),
     showMoreQuerySetStatus: true,
@@ -194,7 +195,7 @@ costQuerySetStore.listCostQuerySets();
                 />
                 <l-n-b-divider-menu-item />
             </template>
-            <template #extra-menu>
+            <template #slot-show-more>
                 <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus" />
             </template>
         </l-n-b>

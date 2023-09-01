@@ -14,7 +14,7 @@ export const MENU_ITEM_TYPE = {
     DIVIDER: 'divider',
     FAVORITE_ONLY: 'favorite-only',
     DROPDOWN: 'dropdown',
-    EXTRA: 'extra',
+    SLOT: 'slot',
 } as const;
 type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
