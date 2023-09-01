@@ -240,7 +240,6 @@ export interface WidgetProps {
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
-    initiated?: boolean;
     disableViewMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
     dashboardSettings?: DashboardSettings;
@@ -256,7 +255,6 @@ export interface NewWidgetProps {
     errorMode?: boolean;
     disableViewMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
-    initiated?: boolean;
     currencyRates?: CurrencyRates;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     settings?: DashboardSettings;

@@ -196,6 +196,7 @@ const handleDeleteModalConfirm = () => {
     const target = widgetDeleteState.targetWidget;
     if (!target) return;
     dashboardDetailStore.deleteWidget(target.widget_key);
+    widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
 
@@ -232,8 +233,7 @@ onMounted(async () => {
                            :edit-mode="props.editMode"
                            :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
-                           :initiated="!!state.initiatedWidgetMap[widget.widget_key]"
-                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible"
+                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible || !state.initiatedWidgetMap[widget.widget_key]"
                            :dashboard-settings="dashboardDetailState.settings"
                            :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                            :dashboard-variables="dashboardDetailState.variables"
