@@ -80,6 +80,7 @@
                         @select="handleSelectMenuItem"
                         @click-done="hideMenu"
                         @click-show-more="handleClickShowMore"
+                        @clear-selection="handleClearSelection"
                         @keyup:up:end="focusDropdownButton"
                         @keyup:down:end="focusOnContextMenu()"
                         @keyup:esc="hideMenu"
@@ -169,6 +170,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
     (e: 'select', item: FilterableDropdownMenuItem): void;
     (e: 'delete-tag', item: FilterableDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
+    (e: 'clear-selection'): void;
 }>();
 
 const { t } = useI18n();
@@ -251,6 +253,9 @@ const handleClickShowMore = async () => {
         await showMoreMenu();
     }
     emit('click-show-more');
+};
+const handleClearSelection = () => {
+    emit('clear-selection');
 };
 const handleUpdateSearchText = debounce(async (searchText: string) => {
     proxySearchText.value = searchText;

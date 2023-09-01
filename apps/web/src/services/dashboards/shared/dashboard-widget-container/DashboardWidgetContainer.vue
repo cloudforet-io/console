@@ -60,14 +60,12 @@ import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 
-
-interface Props {
-    editMode?: boolean;
-    reusePreviousData?: boolean;
-}
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<{
+    editMode?: boolean;
+    reusePreviousData?: boolean;
+}>(), {
     editMode: false,
     reusePreviousData: false,
 });
@@ -190,6 +188,40 @@ onMounted(async () => {
 });
 
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="dashboard-widget-container"
+    >
+        <template v-if="!dashboardDetailState.loadingDashboard">
+            <template v-for="(widget) in reformedWidgetInfoList"
+                              :key="widget.widget_key"
+            >
+                <component :is="widget.component"
+                           :id="widget.widget_key"
+                           ref="widgetRef"
+                           v-intersection-observer="handleIntersectionObserver"
+                           :widget-config-id="widget.widget_name"
+                           :widget-key="widget.widget_key"
+                           :title="widget.title"
+                           :options="widget.widget_options"
+                           :inherit-options="widget.inherit_options"
+                           :size="widget.size"
+                           :width="widget.width"
+                           :theme="widget.theme"
+                           :currency-rates="state.currencyRates"
+                           :edit-mode="props.editMode"
+                           :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                           :all-reference-type-info="state.allReferenceTypeInfo"
+                           :initiated="!!state.initiatedWidgetMap[widget.widget_key]"
+                />
+            </template>
+        </template>
+        <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"
+                                @refresh-widget="handleRefreshWidget"
+        />
+    </div>
+</template>
 
 <style scoped>
 .dashboard-widget-container {

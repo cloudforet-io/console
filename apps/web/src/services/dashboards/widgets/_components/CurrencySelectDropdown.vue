@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
@@ -11,13 +10,12 @@ import { useStore } from 'vuex';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-interface Props {
-    printMode: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<{
+    printMode?: boolean;
+}>(), {
     printMode: false,
 });
+
 const emit = defineEmits<{(e: 'update', value: Currency): void}>();
 const store = useStore();
 
@@ -30,7 +28,7 @@ const state = reactive({
     }))),
 });
 
-const handleSelectCurrency = (currency) => {
+const handleSelectCurrency = (currency: Currency) => {
     store.commit('settings/setCurrency', currency);
     emit('update', currency);
 };
@@ -39,11 +37,11 @@ const handleSelectCurrency = (currency) => {
 
 <template>
     <p-select-dropdown :items="state.currencyItems"
-                       :selected="currency"
+                       :selected="state.currency"
                        style-type="transparent"
-                       :read-only="printMode"
+                       :read-only="props.printMode"
                        class="currency-select-dropdown"
-                       :class="{ 'print-mode': printMode }"
+                       :class="{ 'print-mode': props.printMode }"
                        @select="handleSelectCurrency"
     />
 </template>

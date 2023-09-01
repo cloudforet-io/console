@@ -4,7 +4,7 @@ import {
     onUnmounted, watch,
 } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 import {
     arrayToQueryString,
@@ -31,6 +31,7 @@ interface Props {
     querySetId?: string;
 }
 const props = defineProps<Props>();
+const route = useRoute();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const router = useRouter();
@@ -89,6 +90,21 @@ onUnmounted(() => {
     costAnalysisPageStore.$dispose();
     costAnalysisPageStore.$reset();
 });
+
+watch(() => route.params, async (params) => {
+    const querySetId = params.querySetId;
+
+    if (querySetId === costAnalysisPageStore.selectedQueryId) return;
+
+    if (querySetId) {
+        const { options } = getQueryWithKey(querySetId);
+        await costAnalysisPageStore.setQueryOptions(options);
+        costAnalysisPageStore.selectQueryId(querySetId);
+    } else {
+        await costAnalysisPageStore.setQueryOptions();
+        costAnalysisPageStore.selectQueryId(undefined);
+    }
+}, { immediate: true });
 
 /* Page Init */
 (async () => {

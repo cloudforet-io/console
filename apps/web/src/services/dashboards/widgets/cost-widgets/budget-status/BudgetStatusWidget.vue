@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -256,3 +255,4 @@ defineExpose<WidgetExpose<Data>>({
     }
 }
 </style>
+

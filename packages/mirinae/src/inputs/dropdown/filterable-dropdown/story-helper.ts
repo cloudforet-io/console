@@ -357,6 +357,19 @@ const extraArgTypes: ArgTypes = {
             category: 'events',
         },
     },
+    onClearSelection: {
+        name: 'clear-selection',
+        description: 'Event emitted when \'clear selection\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
 
 const initContextMenuArgTypes = (): ArgTypes => {

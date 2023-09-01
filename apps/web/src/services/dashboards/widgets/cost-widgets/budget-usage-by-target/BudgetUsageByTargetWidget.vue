@@ -35,7 +35,6 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
-
 type Data = BudgetDataModel;
 
 const budgetQueryHelper = new QueryHelper();
