@@ -141,9 +141,11 @@ watch(() => route.params, async (params) => {
         <cost-analysis-header />
         <cost-analysis-query-filter />
         <div class="content-wrapper">
-            <cost-analysis-group-by-filter />
-            <cost-analysis-chart />
-            <cost-analysis-data-table />
+            <div class="overflow-wrapper">
+                <cost-analysis-group-by-filter />
+                <cost-analysis-chart />
+                <cost-analysis-data-table />
+            </div>
         </div>
     </div>
 </template>
@@ -152,10 +154,11 @@ watch(() => route.params, async (params) => {
 .cost-analysis-page {
     .content-wrapper {
         @apply bg-white rounded-md border border-gray-200;
+        overflow-x: auto;
         padding: 0 1rem 2.5rem 1rem;
-    }
-    .cost-analysis-chart {
-        margin-bottom: 1rem;
+        .overflow-wrapper {
+            min-width: 40rem;
+        }
     }
 }
 </style>
