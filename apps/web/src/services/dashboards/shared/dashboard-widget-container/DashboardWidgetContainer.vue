@@ -13,6 +13,8 @@ import { store } from '@/store';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
 import {
     useContainerWidth,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-container-width';
@@ -21,6 +23,7 @@ import {
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-reformer';
 import WidgetViewModeModal from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type {
     DashboardLayoutWidgetInfo,
@@ -40,6 +43,8 @@ const props = withDefaults(defineProps<{
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const widgetFormStore = useWidgetFormStore();
 
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
@@ -89,6 +94,22 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 const handleClickWidgetEdit = (widget: DashboardLayoutWidgetInfo) => {
     widgetEditState.targetWidget = widget;
     widgetEditState.visibleModal = true;
+};
+const handleClickDeleteWidget = (widget: DashboardLayoutWidgetInfo) => {
+    widgetDeleteState.targetWidget = widget;
+    widgetDeleteState.visibleModal = true;
+};
+const handleClickWidgetExpand = (widget: DashboardLayoutWidgetInfo) => {
+    if (props.editMode) {
+        dashboardDetailStore.toggleWidgetSize(widget.widget_key);
+    } else {
+        widgetFormStore.$patch({
+            widgetKey: widget.widget_key,
+        });
+        dashboardDetailStore.$patch((_state) => {
+            _state.widgetViewModeModalVisible = true;
+        });
+    }
 };
 
 
@@ -166,6 +187,18 @@ const handleConformWidgetEditModal = () => {
     widgetEditState.targetWidget = null;
 };
 
+/* widget delete modal */
+const widgetDeleteState = reactive({
+    visibleModal: false,
+    targetWidget: null as DashboardLayoutWidgetInfo|null,
+});
+const handleDeleteModalConfirm = () => {
+    const target = widgetDeleteState.targetWidget;
+    if (!target) return;
+    dashboardDetailStore.deleteWidget(target.widget_key);
+    widgetDeleteState.targetWidget = null;
+};
+
 /* init */
 onMounted(async () => {
     await store.dispatch('reference/loadAll');
@@ -208,6 +241,8 @@ onMounted(async () => {
                            @update-widget-info="handleUpdateWidgetInfo(widget, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                            @click-edit="handleClickWidgetEdit(widget)"
+                           @click-delete="handleClickDeleteWidget(widget)"
+                           @click-expand="handleClickWidgetExpand(widget)"
                 />
                 <!-- TODO: remove this comment after refactoring
                 <component :is="widget.component"
@@ -241,6 +276,12 @@ onMounted(async () => {
                                      :widget-key="widgetEditState.targetWidget.widget_key"
                                      @update:visible="widgetEditState.visibleModal = $event"
                                      @confirm="handleConformWidgetEditModal"
+        />
+        <delete-modal :visible="widgetDeleteState.visibleModal"
+                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
+                      @update:visible="widgetDeleteState.visibleModal = $event"
+                      @confirm="handleDeleteModalConfirm"
         />
     </div>
 </template>
