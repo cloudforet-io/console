@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    cloneDeep, isEmpty, isEqual, union,
+    isEqual,
 } from 'lodash';
 
 import { i18n } from '@/translations';
@@ -13,31 +13,97 @@ import type { Currency } from '@/store/modules/settings/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import type { DashboardVariables } from '@/services/dashboards/config';
 import type {
-    InheritOptions, WidgetProps, WidgetConfig, DashboardLayoutWidgetInfo, WidgetFilterKey,
+    InheritOptions, WidgetProps, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetFilterSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
-import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import {
+    validateWidgetByVariablesSchemaUpdate,
+} from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
 
 
-interface UseWidgetLifecycleOptions {
-    disposeWidget?: () => void;
-    refreshWidget: () => any;
+interface UseWidgetLifecycleOptions<T extends WidgetBaseState = WidgetBaseState> {
     props: WidgetProps;
-    state: UnwrapRef<WidgetState>;
+    emit: WidgetEmit;
+    widgetState: UnwrapRef<T>;
+    refreshWidget: () => any;
+    disposeWidget?: () => void;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
-    redrawChart?: () => void;
-    redrawOnLanguageChange?: boolean;
+    onLanguageUpdate?: () => void;
 }
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
-const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+export const useWidgetLifecycle = ({
+    props,
+    emit,
+    widgetState,
+    refreshWidget,
+    disposeWidget,
+    onCurrencyUpdate,
+    onLanguageUpdate,
+}: UseWidgetLifecycleOptions): void => {
+    const refreshWidgetAndEmitEvent = () => {
+        const newData = refreshWidget();
+        emit('refreshed', newData);
+    };
+
+    onUnmounted(() => {
+        if (disposeWidget) disposeWidget();
+    });
+
+    watch(() => props.dashboardVariables, (after, before) => {
+        if (props.errorMode || !props.inheritOptions || props.disableRefreshOnVariableChange) return;
+        const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
+        if (_isRefreshable) refreshWidgetAndEmitEvent();
+    }, { deep: true });
+
+    watch(() => props.dashboardVariablesSchema, (after, before) => {
+        if (!props.editMode || !props.inheritOptions || !props.schemaProperties || !props.options
+            || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
+
+        const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
+            updatedVariablesSchema: after,
+            previousVariablesSchema: before,
+            widgetConfig: widgetState.widgetConfig,
+            widgetInfo: {
+                inherit_options: props.inheritOptions,
+                schema_properties: props.schemaProperties,
+                widget_options: props.options,
+            },
+        });
+
+        if (isValid !== undefined) {
+            emit('update-widget-validation', isValid);
+        }
+        if (updatedWidgetInfo) {
+            emit('update-widget-info', updatedWidgetInfo);
+        }
+        if (isWidgetUpdated) {
+            refreshWidgetAndEmitEvent();
+        }
+    }, { immediate: true, deep: true });
+
+    if (widgetState.settings) {
+        watch(() => widgetState.settings, (current, previous) => {
+            if (!current || !previous || props.disableRefreshOnVariableChange) return;
+            if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
+                refreshWidgetAndEmitEvent();
+            } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
+                onCurrencyUpdate();
+            }
+        });
+    }
+
+    if (onLanguageUpdate) {
+        try {
+            watch(() => i18n.locale, async () => {
+                onLanguageUpdate();
+            });
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    }
+};
 
 const checkRefreshableByDashboardVariables = (
     inheritOptions: InheritOptions,
@@ -54,179 +120,4 @@ const checkRefreshableByDashboardVariables = (
         if (!isEqual(_after, _before)) _refresh = true;
     });
     return _refresh;
-};
-
-/* Dashboard Variable Schema */
-const getUpdatedDashboardVariableSchemaProperties = (
-    after?: DashboardVariablesSchema,
-    before?: DashboardVariablesSchema,
-): [WidgetFilterKey[], WidgetFilterKey[], WidgetFilterKey[]] => {
-    const added: WidgetFilterKey[] = [];
-    const deleted: WidgetFilterKey[] = [];
-    const changed: WidgetFilterKey[] = [];
-    const afterVariables = Object.keys(after?.properties ?? {});
-    const beforeVariables = Object.keys(before?.properties ?? {});
-    union(afterVariables, beforeVariables).forEach((variable) => {
-        if (!after?.properties[variable].use && !before?.properties[variable].use) return;
-        if (after?.properties[variable].use && before?.properties[variable].use) {
-            if (isEqual(after?.properties[variable], before?.properties[variable])) return; /* Not changed variable */
-            changed.push(variable as WidgetFilterKey);
-        } else if (after?.properties[variable].use && !before?.properties[variable].use) {
-            added.push(variable as WidgetFilterKey);
-        } else {
-            deleted.push(variable as WidgetFilterKey);
-        }
-    });
-    return [added, deleted, changed];
-};
-const isAffectedByChangedVariableSchemaProperties = (
-    dashboardVariables: string[],
-    inheritOptions: InheritOptions,
-): boolean => {
-    const enabledInheritOptions = Object.entries(inheritOptions)
-        .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
-    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) return false;
-    return true;
-};
-const updateWidgetByAddedVariableSchemaProperties = (
-    dashboardVariables: WidgetFilterKey[],
-    widgetInfo: DashboardLayoutWidgetInfo,
-    widgetKey: string,
-    widgetConfig: WidgetConfig,
-): boolean => {
-    const _widgetInfo = cloneDeep(widgetInfo);
-    const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
-    let isAffected = false;
-    dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
-        const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
-        if (!isInWidgetOptionsSchema) return;
-
-        // enable widget option that match added variable
-        isAffected = true;
-        _widgetInfo.inherit_options[property] = { enabled: true, variable_info: { key: variableKey } };
-        _widgetInfo.schema_properties.push(property);
-    });
-    if (isAffected) {
-        dashboardDetailStore.updateWidgetInfo(widgetKey, _widgetInfo);
-    }
-    return isAffected;
-};
-const updateWidgetByDeletedVariableSchemaProperties = (
-    dashboardVariables: WidgetFilterKey[],
-    widgetInfo: DashboardLayoutWidgetInfo,
-    widgetKey: string,
-    widgetConfig: WidgetConfig,
-    inheritOptions: InheritOptions,
-    dashboardVariablesSchema?: DashboardVariablesSchema,
-): boolean => {
-    // check whether the deleted variable exists in inherit options
-    const _widgetInfo = cloneDeep(widgetInfo);
-    const enabledInheritOptions = Object.entries(inheritOptions)
-        .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
-    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) {
-        return false;
-    }
-
-    // delete or update options using deleted variables
-    dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
-        const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
-        if (isFixedProperty) { /* fixed property case */
-            _widgetInfo.widget_options[property] = widgetConfig.options?.[property] ?? undefined; // set default value to fixed option
-        } else { /* non-fixed property case */
-            const _schemaProperties = [..._widgetInfo.schema_properties];
-            _widgetInfo.schema_properties = _schemaProperties.filter((d) => d !== property);
-        }
-        _widgetInfo.inherit_options[property] = { enabled: false };
-    });
-
-    dashboardDetailStore.updateWidgetInfo(widgetKey, _widgetInfo);
-    validateWidget(_widgetInfo.inherit_options, widgetKey, widgetConfig, dashboardVariablesSchema);
-    return true;
-};
-const validateWidget = (
-    inheritOptions: InheritOptions,
-    widgetKey: string,
-    widgetConfig: WidgetConfig,
-    dashboardVariableSchema?: DashboardVariablesSchema,
-) => {
-    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema);
-    dashboardDetailStore.updateWidgetValidation(isEmpty(_widgetSchemaErrorMap), widgetKey);
-};
-
-const refreshWidgetAndUpdateDataMap = (refreshWidget: UseWidgetLifecycleOptions['refreshWidget'], widgetKey: string) => {
-    const newData = refreshWidget();
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap[widgetKey] = newData;
-    });
-};
-export const useWidgetLifecycle = ({
-    disposeWidget,
-    refreshWidget,
-    props,
-    state,
-    onCurrencyUpdate,
-    redrawChart,
-    redrawOnLanguageChange,
-}: UseWidgetLifecycleOptions): void => {
-    onUnmounted(() => {
-        if (disposeWidget) disposeWidget();
-    });
-    watch(() => dashboardDetailState.variables, (after, before) => {
-        if (!props.initiated || props.errorMode || !props.inheritOptions) return;
-        if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return; // disable when it's view mode
-        const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
-        if (_isRefreshable) refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
-    }, { deep: true });
-    watch(() => dashboardDetailState.variablesSchema, (after, before) => {
-        if (!props.editMode || !props.inheritOptions || isEqual(after, before)) return;
-        if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return;
-        if (!state.widgetInfo) return;
-
-        const [
-            addedVariableSchemaProperties,
-            deletedVariableSchemaProperties,
-            changedVariableSchemaProperties,
-        ] = getUpdatedDashboardVariableSchemaProperties(after, before);
-        let isWidgetOptionChanged; let isWidgetOptionAdded; let isWidgetOptionDeleted;
-        if (addedVariableSchemaProperties.length) {
-            isWidgetOptionAdded = updateWidgetByAddedVariableSchemaProperties(addedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig);
-        }
-        if (deletedVariableSchemaProperties.length) {
-            isWidgetOptionDeleted = updateWidgetByDeletedVariableSchemaProperties(deletedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig, props.inheritOptions, after);
-        }
-        if (changedVariableSchemaProperties.length) {
-            isWidgetOptionChanged = isAffectedByChangedVariableSchemaProperties(changedVariableSchemaProperties, props.inheritOptions);
-        }
-
-        if (!props.initiated) return;
-        if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) {
-            refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
-        }
-    }, { deep: true });
-    if (state.settings) {
-        watch(() => state.settings, (current, previous) => {
-            if (!current || !previous) return;
-            if (dashboardDetailState.widgetViewModeModalVisible && (props.widgetKey !== widgetFormState.widgetKey)) return;
-            if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
-                refreshWidgetAndUpdateDataMap(refreshWidget, props.widgetKey);
-            } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
-                onCurrencyUpdate();
-            }
-        });
-    }
-
-    if (redrawOnLanguageChange) {
-        try {
-            if (!redrawChart) throw Error('redrawChart is required');
-            watch(() => i18n.locale, async () => {
-                redrawChart();
-            });
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    }
 };

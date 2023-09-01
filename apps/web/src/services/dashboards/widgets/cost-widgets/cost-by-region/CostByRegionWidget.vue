@@ -37,11 +37,11 @@ import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
 import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 type FullData = CostAnalyzeDataModel;

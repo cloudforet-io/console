@@ -41,11 +41,11 @@ import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
 import type { CostAnalyzeDataModel, Legend } from '@/services/dashboards/widgets/type';
 
 
