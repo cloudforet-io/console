@@ -26,7 +26,6 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
@@ -208,7 +207,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                     {{ status.label }}
                 </p-select-status>
                 <p-divider :vertical="true" />
-                <currency-select-dropdown />
             </div>
         </div>
         <p-toolbox search-type="query"
