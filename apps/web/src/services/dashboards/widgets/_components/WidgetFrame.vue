@@ -54,6 +54,7 @@ export interface WidgetFrameProps {
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
+    // TODO: remove this prop after the widgets are refactored
     refreshOnResize?: boolean;
     theme?: WidgetTheme;
     nonInheritOptionsTooltipText?: string;
@@ -79,10 +80,17 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     nonInheritOptionsTooltipText: undefined,
 });
 
-const emit = defineEmits(['refresh']);
+// TODO: remove 'refresh' event after the widgets are refactored
+const emit = defineEmits<{(event: 'refresh'): void;
+    (event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
+}>();
 
+// TODO: remove stores after the widgets are refactored
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const widgetFormStore = useWidgetFormStore();
+
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -110,14 +118,21 @@ const state = reactive({
     }),
     currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
     isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
+    // TODO: remove visibleEditModal, visibleDeleteModal states after the widgets are refactored
     visibleEditModal: false,
     visibleDeleteModal: false,
+    //
     editModeIconButtonList: computed<IconConfig[]>(() => [
         {
             isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
             name: state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all',
             handleClick: () => {
+                emit('click-expand');
+
+                // TODO: remove this after the widgets are refactored
                 dashboardDetailStore.toggleWidgetSize(props.widgetKey);
+
+                // TODO: remove this after the widgets are refactored
                 if (props.refreshOnResize) emit('refresh');
             },
         },
@@ -131,24 +146,33 @@ const state = reactive({
             name: 'ic_delete',
             handleClick: () => {
                 state.visibleDeleteModal = true;
+                emit('click-delete');
             },
         },
     ]),
 });
 
-const handleEditButtonClick = () => { state.visibleEditModal = true; };
+const handleEditButtonClick = () => {
+    state.visibleEditModal = true;
+    emit('click-edit');
+};
+// TODO: remove this after the widgets are refactored
 const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;
 };
 const handleClickViewModeButton = () => {
+    // TODO: remove this after the widgets are refactored
     widgetFormStore.$patch({
         widgetKey: props.widgetKey,
         theme: props.theme,
     });
+    // TODO: remove this after the widgets are refactored
     dashboardDetailStore.$patch({
         widgetViewModeModalVisible: true,
     });
+
+    emit('click-expand');
 };
 </script>
 
@@ -251,11 +275,13 @@ const handleClickViewModeButton = () => {
                 </template>
             </div>
         </div>
+        <!-- TODO: remove this after the widgets are refactored, and move this component to upper directory, not under widgets/_components/. -->
         <delete-modal :visible.sync="state.visibleDeleteModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
                       :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
                       @confirm="handleDeleteModalConfirm"
         />
+        <!-- TODO: remove this after the widgets are refactored, and move this component to upper directory, not under widgets/_components/. -->
         <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
                                      :visible.sync="state.visibleEditModal"
                                      :widget-key="props.widgetKey"
