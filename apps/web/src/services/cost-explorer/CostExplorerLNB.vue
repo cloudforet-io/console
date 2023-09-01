@@ -138,7 +138,7 @@ const handleDismissRelocateNotification = () => {
 
 onMounted(() => {
     const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
-    if (!settings.costExplorer.hideRelocateDashboardNotification) {
+    if (!settings.costExplorer?.hideRelocateDashboardNotification) {
         relocateNotificationState.isModalVisible = true;
         relocateNotificationState.isShow = true;
     }
