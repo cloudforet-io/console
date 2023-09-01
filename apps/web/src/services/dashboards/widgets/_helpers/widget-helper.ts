@@ -82,9 +82,9 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
  * => { provider: [{k: 'provider', v: 'aws', o: '='}, {k: 'provider', v: 'google', o: '='}] }
  * @description This helper is used to sync with the cost analysis page. Will be deprecated soon.
  */
-export const getWidgetLocationFilters = (widgetFilters: WidgetFiltersMap): WidgetFiltersMap => {
+export const getWidgetLocationFilters = (widgetFilters?: WidgetFiltersMap): WidgetFiltersMap => {
     const result: WidgetFiltersMap = {};
-    Object.entries(widgetFilters).forEach(([filterKey, filterItems]) => {
+    Object.entries(widgetFilters ?? {}).forEach(([filterKey, filterItems]) => {
         result[filterKey] = [];
         filterItems.forEach((filterItem) => {
             if (Array.isArray(filterItem.v)) {

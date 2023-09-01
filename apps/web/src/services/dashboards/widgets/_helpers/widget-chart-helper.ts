@@ -122,7 +122,7 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
  * @name getRefinedTreemapChartData
  * @description Convert raw data to TreemapChart data.
  */
-export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: CostGroupBy, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         name: 'Root',
         value: '',
