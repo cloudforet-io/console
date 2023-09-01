@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import type { SerialChart } from '@amcharts/amcharts5';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -14,8 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
-
+import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
@@ -50,7 +49,7 @@ const state = reactive({
     loading: true,
     legends: [] as Legend[],
     chartData: [] as XYChartData[],
-    chart: null as XYChart | PieChart | null,
+    chart: null as SerialChart | null,
 });
 
 /* api */
@@ -98,13 +97,13 @@ const setChartData = debounce(async (granularity: Granularity, period: Period, g
 
 /* event */
 const handleToggleSeries = (index) => {
-    toggleSeries(state.chart as XYChart | PieChart, index);
+    toggleSeries(state.chart as SerialChart, index);
 };
 const handleAllSeries = (type) => {
     if (type === 'show') {
-        showAllSeries(state.chart as XYChart | PieChart);
+        showAllSeries(state.chart as SerialChart);
     } else {
-        hideAllSeries(state.chart as XYChart | PieChart);
+        hideAllSeries(state.chart as SerialChart);
     }
 };
 
