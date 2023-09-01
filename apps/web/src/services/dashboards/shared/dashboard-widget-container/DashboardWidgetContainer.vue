@@ -196,6 +196,7 @@ const handleDeleteModalConfirm = () => {
     const target = widgetDeleteState.targetWidget;
     if (!target) return;
     dashboardDetailStore.deleteWidget(target.widget_key);
+    widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
 

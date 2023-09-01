@@ -198,10 +198,6 @@ const refreshWidget = async (): Promise<TreemapChartData['children']> => {
     return state.data;
 };
 
-const handleRefresh = () => {
-    refreshWidget();
-};
-
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
@@ -224,7 +220,6 @@ defineExpose<WidgetExpose<TreemapChartData['children']>>({
 
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  @refresh="handleRefresh"
                   v-on="widgetFrameEventHandlers"
     >
         <div class="cost-map">
