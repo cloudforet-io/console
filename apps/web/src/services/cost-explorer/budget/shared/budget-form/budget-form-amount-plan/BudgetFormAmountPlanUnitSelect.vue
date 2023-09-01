@@ -1,8 +1,5 @@
-<script lang="ts">
-import {
-    computed,
-    reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PFieldTitle, PSelectCard } from '@spaceone/design-system';
@@ -17,59 +14,45 @@ interface Plan {
     unit: Extract<BudgetTimeUnit, 'MONTHLY'|'TOTAL'>;
 }
 
-export default {
-    name: 'BudgetFormAmountPlanUnitSelect',
-    components: {
-        PSelectCard,
-        PFieldTitle,
-    },
-    props: {
-        selectedUnit: {
-            type: String,
-            default: 'TOTAL',
-            required: true,
-            validator(unit: BudgetTimeUnit) {
-                return ['TOTAL', 'MONTHLY'].includes(unit);
-            },
+const props = withDefaults(defineProps<{
+    selectedUnit: BudgetTimeUnit;
+}>(), {
+    selectedUnit: 'TOTAL',
+});
+
+const emit = defineEmits<{(e: 'update:selectedUnit', unit: BudgetTimeUnit): void; }>();
+
+
+const state = reactive({
+    plans: computed<Plan[]>(() => [
+        {
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.TOTAL_AMOUNT'),
+            desc: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.TOTAL_AMOUNT_DESC'),
+            unit: 'TOTAL',
         },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            plans: computed<Plan[]>(() => [
-                {
-                    title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.TOTAL_AMOUNT'),
-                    desc: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.TOTAL_AMOUNT_DESC'),
-                    unit: 'TOTAL',
-                },
-                {
-                    title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN'),
-                    desc: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN_DESC'),
-                    unit: 'MONTHLY',
-                },
-            ]),
-        });
+        {
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN'),
+            desc: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN_DESC'),
+            unit: 'MONTHLY',
+        },
+    ]),
+});
 
-        const handleUnitChange = (value?: BudgetTimeUnit) => {
-            if (value && props.selectedUnit !== value) {
-                emit('update:selectedUnit', value);
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            handleUnitChange,
-        };
-    },
+const handleUnitChange = (value?: BudgetTimeUnit) => {
+    if (value && props.selectedUnit !== value) {
+        emit('update:selectedUnit', value);
+    }
 };
+
 </script>
 
 <template>
     <div class="budget-form-amount-plan-unit-select">
-        <p-select-card v-for="({title, desc, unit}, index) in plans"
+        <p-select-card v-for="({title, desc, unit}, index) in state.plans"
                        :key="unit"
                        :tab-index="index"
                        :value="unit"
-                       :selected="selectedUnit"
+                       :selected="props.selectedUnit"
                        @change="handleUnitChange"
         >
             <p-field-title class="title">

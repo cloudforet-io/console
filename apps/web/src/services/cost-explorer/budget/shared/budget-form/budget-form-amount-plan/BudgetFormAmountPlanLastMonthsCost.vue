@@ -1,8 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -35,130 +33,109 @@ interface BudgetListParams extends Query {
     granularity: Granularity;
 }
 
-export default {
-    name: 'BudgetFormAmountPlanLastMonthsCost',
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-        projectGroupId: {
-            type: String,
-            default: undefined,
-        },
-        costTypes: {
-            type: Object,
-            default: undefined,
-        },
-        timeUnit: {
-            type: String,
-            default: BUDGET_TIME_UNIT.TOTAL,
-        },
-    },
-    setup(props: Props) {
-        const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3).setSort('date', true);
+const props = withDefaults(defineProps<Props>(), {
+    projectId: undefined,
+    projectGroupId: undefined,
+    costTypes: undefined,
+    timeUnit: BUDGET_TIME_UNIT.TOTAL,
+});
 
-        const { i18nDayjs } = useI18nDayjs();
 
-        const state = reactive({
-            last3MonthsBudgets: [] as BudgetModel[],
-            months: computed(() => {
-                const today = i18nDayjs.value.utc();
-                return [
-                    today.subtract(1, 'month').startOf('month').format('MMMM YYYY'),
-                    today.subtract(2, 'month').startOf('month').format('MMMM YYYY'),
-                    today.subtract(3, 'month').startOf('month').format('MMMM YYYY'),
-                ];
-            }),
-            items: computed(() => state.months.map((month, i) => {
-                const data = state.last3MonthsBudgets[i];
-                return {
-                    month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
-                    cost: data ? data.cost : 0,
-                };
-            })),
-            showList: computed(() => props.projectId || props.projectGroupId),
-            currency: computed(() => store.state.settings.currency),
-            // api request params
-            budgetListParams: computed(() => {
-                let filters: ConsoleFilter[] = [];
+const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3).setSort('date', true);
 
-                if (props.projectId) filters.push({ k: 'project_id', v: props.projectId, o: '=' });
-                if (props.costTypes) filters = filters.concat(getConvertedFilter(props.costTypes));
-                recentBudgetApiQueryHelper.setFilters(filters);
+const { i18nDayjs } = useI18nDayjs();
 
-                const today = dayjs.utc();
-                const params: BudgetListParams = {
-                    start: today.subtract(3, 'month').startOf('month').format('YYYY-MM-DD'),
-                    end: today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
-                    granularity: 'MONTHLY',
-                    ...recentBudgetApiQueryHelper.data,
-                };
-
-                return params;
-            }),
-        });
-
-        /* Util */
-        const getConvertedFilter = (costTypes: CostTypes): ConsoleFilter[] => {
-            const results: ConsoleFilter[] = [];
-            Object.entries(costTypes).forEach(([type, values]) => {
-                if (values?.length) {
-                    results.push({
-                        k: type,
-                        v: values,
-                        o: '=',
-                    });
-                }
-            });
-            return results;
-        };
-
-        /* Api */
-        const getRecentBudgets = async () => {
-            try {
-                // TODO: Change to clientV2 after the cost analysis API is updated.
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
-                // TODO: Remove conversion process after the cost analysis API is updated.
-                const converted = results.map((result: any) => ({
-                    ...result,
-                    cost: result.usd_cost,
-                }));
-                state.last3MonthsBudgets = converted.sort((a, b) => {
-                    if (dayjs(a.date).isAfter(dayjs(b.date))) return -1;
-                    if (dayjs(a.date).isBefore(dayjs(b.date))) return 1;
-                    return 0;
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.last3MonthsBudgets = [];
-            }
-        };
-
-        watch(() => state.budgetListParams, () => {
-            if (state.showList) getRecentBudgets();
-        }, { immediate: true });
-
+const state = reactive({
+    last3MonthsBudgets: [] as BudgetModel[],
+    months: computed(() => {
+        const today = i18nDayjs.value.utc();
+        return [
+            today.subtract(1, 'month').startOf('month').format('MMMM YYYY'),
+            today.subtract(2, 'month').startOf('month').format('MMMM YYYY'),
+            today.subtract(3, 'month').startOf('month').format('MMMM YYYY'),
+        ];
+    }),
+    items: computed(() => state.months.map((month, i) => {
+        const data = state.last3MonthsBudgets[i];
         return {
-            ...toRefs(state),
-            currencyMoneyFormatter,
-
+            month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
+            cost: data ? data.cost : 0,
         };
-    },
+    })),
+    showList: computed(() => props.projectId || props.projectGroupId),
+    currency: computed(() => store.state.settings.currency),
+    // api request params
+    budgetListParams: computed(() => {
+        let filters: ConsoleFilter[] = [];
 
+        if (props.projectId) filters.push({ k: 'project_id', v: props.projectId, o: '=' });
+        if (props.costTypes) filters = filters.concat(getConvertedFilter(props.costTypes));
+        recentBudgetApiQueryHelper.setFilters(filters);
+
+        const today = dayjs.utc();
+        const params: BudgetListParams = {
+            start: today.subtract(3, 'month').startOf('month').format('YYYY-MM-DD'),
+            end: today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
+            granularity: 'MONTHLY',
+            ...recentBudgetApiQueryHelper.data,
+        };
+
+        return params;
+    }),
+});
+
+/* Util */
+const getConvertedFilter = (costTypes: CostTypes): ConsoleFilter[] => {
+    const results: ConsoleFilter[] = [];
+    Object.entries(costTypes).forEach(([type, values]) => {
+        if (values?.length) {
+            results.push({
+                k: type,
+                v: values,
+                o: '=',
+            });
+        }
+    });
+    return results;
 };
+
+/* Api */
+const getRecentBudgets = async () => {
+    try {
+        // TODO: Change to clientV2 after the cost analysis API is updated.
+        const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
+        // TODO: Remove conversion process after the cost analysis API is updated.
+        const converted = results.map((result: any) => ({
+            ...result,
+            cost: result.usd_cost,
+        }));
+        state.last3MonthsBudgets = converted.sort((a, b) => {
+            if (dayjs(a.date).isAfter(dayjs(b.date))) return -1;
+            if (dayjs(a.date).isBefore(dayjs(b.date))) return 1;
+            return 0;
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.last3MonthsBudgets = [];
+    }
+};
+
+watch(() => state.budgetListParams, () => {
+    if (state.showList) getRecentBudgets();
+}, { immediate: true });
+
 </script>
 
 <template>
-    <div v-show="showList"
+    <div v-show="state.showList"
          class="budget-form-amount-plan-last-months-cost"
     >
         <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
-        <span v-for="({month, cost}, index) in items"
+        <span v-for="({month, cost}, index) in state.items"
               :key="index"
               class="data"
         >
-            {{ month }}: {{ currencyMoneyFormatter(cost, currency) }}
+            {{ month }}: {{ currencyMoneyFormatter(cost, state.currency) }}
         </span>
     </div>
 </template>
