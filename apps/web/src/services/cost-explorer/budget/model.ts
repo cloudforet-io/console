@@ -32,15 +32,21 @@ export interface BudgetNotifications {
     notification_type: BudgetNotificationsType;
 }
 
+
+interface ProviderFilter {
+    providers: string[];
+    state: 'ENABLED' | 'DISABLED';
+}
+
 export interface BudgetModel {
     budget_id: string;
     name: string;
-    currency: Currency;
     project_id?: string;
     project_group_id?: string;
     limit: number;
     planned_limits: BudgetPlannedLimit[];
-    cost_types?: CostTypes;
+    currency: Currency;
+    provider_filter: ProviderFilter;
     time_unit: BudgetTimeUnit;
     start: string;
     end: string;
@@ -49,6 +55,8 @@ export interface BudgetModel {
     data_source_id: string;
     created_at: string;
     updated_at: string;
+    domain_id?: string;
+    cost_types?: CostTypes;
 }
 
 export interface BudgetUsageModel {
@@ -56,6 +64,7 @@ export interface BudgetUsageModel {
     name: string;
     date: string;
     cost: number;
+    usage: number;
     limit: number;
     cost_types?: Partial<Record<CostType, string[]>>;
     project_id?: string;
