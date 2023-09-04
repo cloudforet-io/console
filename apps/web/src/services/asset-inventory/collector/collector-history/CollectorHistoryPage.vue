@@ -118,10 +118,14 @@ const getQuery = () => {
         statusValues = [JOB_STATE.FAILURE];
     } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
         statusValues = [JOB_STATE.CANCELED];
+    } else {
+        statusValues = [];
     }
 
     if (statusValues.length > 0) {
-        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
+        apiQueryHelper.setFilters([{ k: 'status', v: statusValues, o: '=' }]);
+    } else {
+        apiQueryHelper.setFilters(searchFilters.value);
     }
 
     return apiQueryHelper.data;
