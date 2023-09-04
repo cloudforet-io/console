@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { PTextButton } from '@spaceone/design-system';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const emit = defineEmits<{(e: 'click-dismiss'): void;
     (e: 'click-learn-more'): void;
 }>();
@@ -19,25 +21,25 @@ const handleMenuDismiss = () => {
         <div class="relocate-notification-wrapper">
             <p class="notification-title">
                 <!--TODO: translation-->
-                {{ $t('Reloate dashboard') }}
+                {{ t('Reloate dashboard') }}
             </p>
             <span class="notification-description">
                 <!--TODO: translation-->
-                {{ $t('Your whole Cost Explorer dashboard has been securely transferred to the Dashboard menu for improved usabillity.') }}
+                {{ t('Your whole Cost Explorer dashboard has been securely transferred to the Dashboard menu for improved usabillity.') }}
             </span>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleLearnMore"
             >
                 <!--TODO: translation-->
-                {{ $t('Learn more') }}
+                {{ t('Learn more') }}
             </p-text-button>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleMenuDismiss"
             >
                 <!--TODO: translation-->
-                {{ $t('Dismiss') }}
+                {{ t('Dismiss') }}
             </p-text-button>
         </div>
     </div>

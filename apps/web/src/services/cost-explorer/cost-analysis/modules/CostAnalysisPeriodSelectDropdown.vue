@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -16,7 +15,7 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Period, Granularity } from '@/services/cost-explorer/type';
-import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
+import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
 interface Props {
@@ -31,7 +30,7 @@ const emit = defineEmits<{(e: 'update', period: Period): void;
 const today = dayjs.utc();
 interface PeriodItem {
     name: string;
-    label: TranslateResult;
+    label: string;
     start: Dayjs;
     end: Dayjs;
     enabled: Granularity[];

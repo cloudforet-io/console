@@ -103,10 +103,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
 
 <template>
     <div class="cost-analysis-group-by-filter">
-        <b
-            class="label"
-        >
-            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
+        <b class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}:</b>
+        <span class="count-text">{{ state.selectedGroupByItems.length }}/3</span>
         <p-select-button v-for="defaultGroupByItem in state.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
@@ -118,7 +116,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         >
             {{ defaultGroupByItem.label }}
         </p-select-button>
-        <div class="tag-button-wrapper">
+        <div class="tags-button-wrapper">
             <p-button :style-type="state.selectedTagsMenu.length ? 'highlight' : 'tertiary'"
                       size="sm"
                       :icon-right="state.tagsDropdownVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
@@ -152,16 +150,19 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
 
 <style lang="postcss" scoped>
 .cost-analysis-group-by-filter {
-    @apply flex flex-wrap bg-white rounded-md border border-gray-200;
+    @apply flex flex-wrap;
     column-gap: 0.375rem;
     row-gap: 0.5rem;
     align-items: center;
     font-size: 0.875rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 1rem 0;
 
-    .tag-button-wrapper {
+    .count-text {
+        @apply text-label-lg text-gray-700;
+    }
+    .tags-button-wrapper {
         position: relative;
+        min-width: 8rem;
 
         /* custom design-system component - p-filterable-dropdown */
         :deep(.p-filterable-dropdown) {

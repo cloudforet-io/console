@@ -54,7 +54,7 @@ import { useI18n } from 'vue-i18n';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
+import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 interface Props {
     dateRange?: DateRange;

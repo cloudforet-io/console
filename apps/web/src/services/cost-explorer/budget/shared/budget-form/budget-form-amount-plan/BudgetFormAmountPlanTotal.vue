@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 
 import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -10,8 +10,7 @@ import { useI18n } from 'vue-i18n';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-const emit = defineEmits<{(e: 'update', value: number|undefined, isValid: boolean): void;
-}>();
+const emit = defineEmits<{(e: 'update', amount: number|undefined, isAllvalid: boolean): void; }>();
 
 const { t } = useI18n();
 

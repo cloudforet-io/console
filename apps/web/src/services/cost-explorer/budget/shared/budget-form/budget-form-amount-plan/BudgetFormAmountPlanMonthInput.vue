@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 
 import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -12,23 +12,27 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { MonthAmountInput } from '@/services/cost-explorer/budget/type';
 
+export interface MonthAmountInput {
+    amount?: number;
+    isValid?: boolean;
+}
+
 interface Props {
-    amount: number|undefined;
+    amount?: number;
     month: string;
     isMonthToDate: boolean;
 }
 
+const { t } = useI18n();
 const props = withDefaults(defineProps<Props>(), {
     amount: undefined,
     month: '',
     isMonthToDate: false,
 });
-const emit = defineEmits<{(e: 'update:amount', value?: number): void;
-    (e: 'update', value: MonthAmountInput): void;
+
+const emit = defineEmits<{(e: 'update:amount', amount: number|undefined): void;
+    (e: 'update', monthAmountInput: MonthAmountInput): void;
 }>();
-
-const { t } = useI18n();
-
 
 const { i18nDayjs } = useI18nDayjs();
 

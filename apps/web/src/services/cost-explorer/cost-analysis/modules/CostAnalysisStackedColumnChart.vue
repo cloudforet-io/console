@@ -59,7 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
     printMode: false,
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
-    (e:'rendered'): void;
 }>();
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -170,7 +169,8 @@ watch([() => props.currency, () => state.usdChartData], ([currency]) => {
 
 <style lang="postcss" scoped>
 .cost-analysis-stacked-column-chart {
-    height: 100%;
+    height: 25rem;
+    padding-bottom: 1rem;
     .chart {
         height: 100%;
     }

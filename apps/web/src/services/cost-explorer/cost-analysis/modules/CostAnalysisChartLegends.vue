@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-
 import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
+    PButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, sum } from 'lodash';
@@ -15,19 +14,17 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
-import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
-import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
-
-const CATEGORIES = Object.values(FILTER);
 
 interface Props {
     loading: boolean;
     legends: Legend[];
 }
+
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
 });
@@ -39,14 +36,11 @@ const emit = defineEmits<{(e: 'toggle-series', index: number): void;
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
-const { t } = useI18n();
-
 const state = reactive({
     filtersLength: computed<number>(() => {
         const selectedValues = Object.values(costAnalysisPageState.filters);
         return sum(selectedValues.map((v) => v?.length || 0));
     }),
-    filterModalVisible: false,
     //
     proxyLegends: useProxyValue('legends', props, emit),
     groupByMenuItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
@@ -73,14 +67,6 @@ const getLegendTextColor = (index) => {
 };
 
 /* Event */
-const handleClickAddFilterButton = () => {
-    state.filterModalVisible = true;
-};
-const handleUpdateFilters = (filters: CostFiltersMap) => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.filters = filters;
-    });
-};
 const handleToggleSeries = (index) => {
     const _legends = cloneDeep(props.legends);
     _legends[index].disabled = !_legends[index]?.disabled;
@@ -117,54 +103,13 @@ watch(() => state.groupByMenuItems, (after) => {
 </script>
 
 <template>
-    <div class="cost-analysis-chart-query-section">
-        <!--filter-->
-        <div class="title-wrapper">
-            <span class="title">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}</span>
-            <div class="button-wrapper">
-                <p-button style-type="tertiary"
-                          size="sm"
-                          :disabled="!state.filtersLength"
-                          @click="handleUpdateFilters({})"
-                >
-                    {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
-                </p-button>
-                <p-icon-button name="ic_plus"
-                               style-type="tertiary"
-                               shape="square"
-                               size="sm"
-                               @click="handleClickAddFilterButton"
-                />
-            </div>
-        </div>
-        <div class="filter-wrapper">
-            <cost-explorer-filter-tags :filters="costAnalysisPageState.filters"
-                                       deletable
-                                       @update-filter-tags="handleUpdateFilters"
-            />
-        </div>
-
-        <!--legend-->
-        <div class="title-wrapper">
-            <p-select-dropdown v-if="state.groupByMenuItems.length"
-                               :items="state.groupByMenuItems"
-                               :selected="costAnalysisPageState.chartGroupBy"
-                               style-type="transparent"
-                               @select="handleChartGroupByItem"
-            />
-            <span v-else
-                  class="title"
-            >Total Cost</span>
-            <div class="button-wrapper">
-                <p-button style-type="tertiary"
-                          size="sm"
-                          font-weight="normal"
-                          @click="handleToggleAllLegends"
-                >
-                    {{ state.showHideAll ? t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
-                </p-button>
-            </div>
-        </div>
+    <div class="cost-analysis-chart-legends">
+        <p-select-dropdown :items="state.groupByMenuItems"
+                           :selected="costAnalysisPageState.chartGroupBy"
+                           :disabled="!costAnalysisPageState.groupBy.length"
+                           class="group-by-select-dropdown"
+                           @select="handleChartGroupByItem"
+        />
         <p-data-loader :loading="loading"
                        :data="legends"
                        class="legend-wrapper"
@@ -188,51 +133,24 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <cost-explorer-set-filter-modal v-model:visible="state.filterModalVisible"
-                                        :prev-selected-filters="costAnalysisPageState.filters"
-                                        :categories="CATEGORIES"
-                                        @confirm="handleUpdateFilters"
-        />
+        <p-button style-type="transparent"
+                  size="sm"
+                  font-weight="normal"
+                  @click="handleToggleAllLegends"
+        >
+            {{ state.showHideAll ? t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
+        </p-button>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.cost-analysis-chart-query-section {
-    @apply col-span-3 bg-white rounded-md border border-gray-200;
-    .title-wrapper {
-        @apply border-b border-gray-200;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 2.5rem;
-        padding: 0.5rem 1rem;
-        .title {
-            font-size: 0.875rem;
-            font-weight: bold;
-        }
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
-            .dropdown-button {
-                font-weight: bold;
-            }
-        }
-        .button-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    }
-    .filter-wrapper {
-        height: 8rem;
-        overflow-y: auto;
-        padding: 0.75rem 1rem;
-        .p-tag {
-            margin-bottom: 0.5rem;
-        }
+.cost-analysis-chart-legends {
+    .group-by-select-dropdown {
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
     .legend-wrapper {
-        height: 16.75rem;
+        height: 20rem;
         overflow-y: auto;
         padding: 0.5rem 0;
 
@@ -247,7 +165,7 @@ watch(() => state.groupByMenuItems, (after) => {
             align-items: center;
             font-size: 0.875rem;
             cursor: pointer;
-            padding: 0 1rem;
+            padding: 0 0.5rem;
 
             &:hover {
                 @apply bg-gray-100;
@@ -263,24 +181,6 @@ watch(() => state.groupByMenuItems, (after) => {
                 }
             }
         }
-    }
-
-    @define-mixin row-stack {
-        @apply col-span-12 row-start-1;
-        .legend-wrapper {
-            height: auto;
-            padding: 0.5rem;
-            .legend {
-                display: inline-block;
-                .p-status {
-                    height: 100%;
-                }
-            }
-        }
-    }
-
-    @screen tablet {
-        @mixin row-stack;
     }
 }
 </style>

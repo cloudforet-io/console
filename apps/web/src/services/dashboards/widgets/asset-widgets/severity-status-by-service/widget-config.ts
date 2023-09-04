@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -7,9 +9,7 @@ import {
 
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
     widget_config_id: 'severityStatusByService',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/asset-widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue')),
     title: 'Severity Status by Service',
     labels: ['Asset'],
     description: {

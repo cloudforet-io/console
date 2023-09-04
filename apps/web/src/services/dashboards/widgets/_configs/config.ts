@@ -1,8 +1,6 @@
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import type { Component } from 'vue';
-
-
+import type { defineAsyncComponent } from 'vue';
 
 import type { Tags } from '@/models';
 
@@ -13,6 +11,7 @@ import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-confi
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -81,7 +80,7 @@ export interface BaseConfigInfo {
 }
 export interface BaseWidgetConfig {
     widget_config_id: string;
-    widget_component?: Component;
+    widget_component?: ReturnType<typeof defineAsyncComponent>;
     base_configs?: BaseConfigInfo[];
     title?: string;
     // labels?: string[];
@@ -185,17 +184,18 @@ export interface BaseWidgetOptions {
     };
     filters?: WidgetFiltersMap;
 }
+export interface SelectorOptions {
+    enabled?: boolean;
+    type: 'cost-usage'|'days';
+}
 export interface CostWidgetOptions extends BaseWidgetOptions {
     cost_group_by?: CostGroupBy | string;
-    selector_options?: {
-        enabled?: boolean;
-        type: 'cost-usage'|'days';
-    };
+    selector_options?: SelectorOptions;
 }
 export interface AssetWidgetOptions extends BaseWidgetOptions {
     asset_group_by?: AssetGroupBy | string;
 }
-export type WidgetOptions = CostWidgetOptions|AssetWidgetOptions;
+export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
@@ -223,11 +223,13 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
     updated_at: string;
 }
 
+// TODO: replace with NewWidgetProps
 export interface WidgetProps {
     widgetConfigId: string;
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
+    schemaProperties?: string[];
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
@@ -236,8 +238,35 @@ export interface WidgetProps {
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
-    initiated?: boolean;
     disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    dashboardSettings?: DashboardSettings;
+    dashboardVariablesSchema?: DashboardVariablesSchema;
+    dashboardVariables?: DashboardVariables;
+}
+
+// TODO: remove this after replacing WidgetProps with NewWidgetProps
+export interface NewWidgetProps {
+    widgetConfigId: string;
+    widgetInfo: DashboardLayoutWidgetInfo;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    currencyRates?: CurrencyRates;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
+    settings?: DashboardSettings;
+    variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
+}
+
+export interface WidgetEmit {
+    (e: 'refreshed', data: any): void;
+    (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
+    (e: 'update-widget-validation', validation: boolean): void;
+    (event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
 }
 
 export interface WidgetExpose<Data = any> {

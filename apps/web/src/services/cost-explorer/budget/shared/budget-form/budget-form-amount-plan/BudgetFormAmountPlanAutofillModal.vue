@@ -1,10 +1,9 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 
 import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
-    computed,
-    reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -14,17 +13,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { AutofillOptions } from '@/services/cost-explorer/budget/type';
 
 interface Props {
-    visible: boolean;
+    visible?: boolean;
 }
 
 
-
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm', value: AutofillOptions): void;
-}>();
-const { t } = useI18n();
 
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; (e: 'confirm', options: AutofillOptions): void; }>();
+const { t } = useI18n();
 
 const {
     forms: { start, growth },

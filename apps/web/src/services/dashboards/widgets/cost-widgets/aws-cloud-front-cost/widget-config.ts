@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
@@ -6,12 +8,9 @@ import {
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsCloudFrontCost',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/AWSCloudFrontCostWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/AWSCloudFrontCostWidget.vue')),
     title: 'AWS CloudFront Cost',
     labels: ['Cost'],
     description: {

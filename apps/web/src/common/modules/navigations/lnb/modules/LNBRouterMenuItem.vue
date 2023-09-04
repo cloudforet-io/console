@@ -2,8 +2,7 @@
 import { PI } from '@spaceone/design-system';
 import { reactive } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -18,8 +17,10 @@ interface Props {
     isDomainOwner?: boolean;
     idx?: number | string;
     currentPath?: string;
+    openNewTab?: boolean;
 }
 
+const router = useRouter();
 const props = defineProps<Props>();
 const state = reactive({
     hoveredItem: '',
@@ -30,7 +31,7 @@ const isSelectedMenu = (selectedMenuRoute: RouteLocationRaw): boolean => {
     let currentPath = props.currentPath;
     if (!currentPath) return false;
 
-    const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
+    const resolved = router.resolve(selectedMenuRoute);
     if (!resolved) return false;
 
     if (currentPath.indexOf('?') > 0) {
@@ -50,6 +51,7 @@ const getIconName = (icon: LNBIcon): string => {
 <template>
     <router-link class="l-n-b-router-menu-item"
                  :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+                 :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click="$event.stopImmediatePropagation()"
                  @mouseenter="state.hoveredItem = item.id"

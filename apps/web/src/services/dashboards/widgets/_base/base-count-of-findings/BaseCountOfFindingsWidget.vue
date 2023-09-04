@@ -9,25 +9,23 @@ import { PDataLoader, PTextPagination } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { ComputedRef } from 'vue';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
@@ -45,11 +43,22 @@ interface ChartData {
 
 const DATE_FORMAT = 'YYYY-MM';
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed<DateRange>(() => ({
+        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    })),
+});
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    loading: true,
+    data: null as Data[]|null,
     groupByKey: computed<string|undefined>(() => {
         // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
         // ex. additional_info.service -> service
@@ -60,10 +69,6 @@ const state = reactive({
         }
         return state.groupBy;
     }),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
             return [
@@ -79,7 +84,6 @@ const state = reactive({
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
@@ -87,9 +91,9 @@ const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(S
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
         if (state.showPassFindings) {
             apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
@@ -99,9 +103,9 @@ const fetchData = async (): Promise<Data[]> => {
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.end,
-                end: state.dateRange.end,
-                group_by: ['key', 'unit', state.groupBy],
+                start: widgetState.dateRange.end,
+                end: widgetState.dateRange.end,
+                group_by: ['key', 'unit', widgetState.groupBy],
                 fields: {
                     value: {
                         key: 'value',
@@ -207,10 +211,10 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<Data[]> => {
+const refreshWidget = async (_thisPage = 1): Promise<Data[]> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
@@ -219,16 +223,17 @@ const refreshWidget = async (thisPage = 1): Promise<Data[]> => {
     return state.data;
 };
 
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
-    refreshWidget(thisPage);
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
+    refreshWidget(_thisPage);
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 defineExpose<WidgetExpose<Data[]>>({
     initWidget,
@@ -240,7 +245,7 @@ defineExpose<WidgetExpose<Data[]>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="count-of-findings-widget"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <div class="chart-wrapper">
@@ -257,12 +262,12 @@ defineExpose<WidgetExpose<Data[]>>({
                 </p-data-loader>
             </div>
             <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
+                <p-text-pagination :this-page="thisPage"
                                    :disable-next-page="!state.showNextPage"
                                    @update:this-page="handleUpdateThisPage"
                 >
                     <template #default>
-                        <span class="this-page">{{ state.thisPage }}</span>
+                        <span class="this-page">{{ thisPage }}</span>
                         <span v-if="state.showNextPage"> / ...</span>
                     </template>
                 </p-text-pagination>

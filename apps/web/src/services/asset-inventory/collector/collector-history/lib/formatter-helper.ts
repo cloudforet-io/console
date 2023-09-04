@@ -13,11 +13,11 @@ const FAILURE_ICON_COLOR = red[400];
 const PENDING_ICON_COLOR = violet[800];
 
 export const statusTextFormatter = (status) => {
-    if (status === JOB_STATE.SUCCESS) return i18n.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS');
-    if (status === JOB_STATE.IN_PROGRESS) return i18n.t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS');
-    if (status === JOB_STATE.CANCELED) return i18n.t('INVENTORY.COLLECTOR.HISTORY.CANCELED');
-    if (status === JOB_TASK_STATE.PENDING) return i18n.t('INVENTORY.COLLECTOR.HISTORY.PENDING');
-    return i18n.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
+    if (status === JOB_STATE.SUCCESS) return i18n.global.t('INVENTORY.COLLECTOR.HISTORY.SUCCESS');
+    if (status === JOB_STATE.IN_PROGRESS) return i18n.global.t('INVENTORY.COLLECTOR.HISTORY.IN_PROGRESS');
+    if (status === JOB_STATE.CANCELED) return i18n.global.t('INVENTORY.COLLECTOR.HISTORY.CANCELED');
+    if (status === JOB_TASK_STATE.PENDING) return i18n.global.t('INVENTORY.COLLECTOR.HISTORY.PENDING');
+    return i18n.global.t('INVENTORY.COLLECTOR.HISTORY.FAILURE');
 };
 
 export const statusTextColorFormatter = (status: string): string | undefined => {

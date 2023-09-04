@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { get } from 'lodash';
 import { computed } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import type { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/state/type';
 import PStatus from '@/data-display/status/PStatus.vue';
@@ -31,7 +30,7 @@ const props = withDefaults(defineProps<StateDynamicFieldProps>(), {
 const statusProps = computed<StatusProps>(() => {
     const options = props.options;
     const data = props.data === undefined || props.data === null ? options.default : props.data;
-    const text: TranslateResult = data === null || data === undefined ? '' : String(data);
+    const text: string = data === null || data === undefined ? '' : String(data);
 
     return {
         icon: get(options, ['icon', 'image'], null),

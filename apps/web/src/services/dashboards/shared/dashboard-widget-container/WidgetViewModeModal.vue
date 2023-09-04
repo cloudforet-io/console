@@ -3,7 +3,7 @@ import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
-import type { Component, ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import {
     computed, reactive, toRef, watch,
 } from 'vue';
@@ -20,9 +20,9 @@ import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } 
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import WidgetViewModeSidebar from '@/services/dashboards/widgets/_components/WidgetViewModeSidebar.vue';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -35,13 +35,13 @@ interface WidgetViewModeModalProps {
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
+const store = useStore();
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
 });
 const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
-
-const store = useStore();
-const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -53,7 +53,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    component: null as Component|null,
+    component: null as ComponentPublicInstance|null,
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
@@ -73,9 +73,9 @@ const initSnapshot = () => {
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: Component|null = null;
+    let component: ComponentPublicInstance|null = null;
     try {
-        component = getWidgetComponent(widget.widget_name);
+        component = getWidgetComponent(widget.widget_name) as ComponentPublicInstance;
     } catch (e) {
         console.error(e);
     }
@@ -95,6 +95,19 @@ const handleClickEditOption = () => {
 };
 const handleRefreshWidget = () => {
     state.widgetRef?.refreshWidget();
+};
+
+const handleUpdateData = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
+};
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
+    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+};
+const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
+    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
 };
 
 watch(() => props.visible, async (visible) => {
@@ -179,6 +192,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :title="widgetFormState.widgetTitle"
                                :options="widgetFormState.widgetOptions"
                                :inherit-options="widgetFormState.inheritOptions"
+                               :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
                                :currency-rates="state.currencyRates"
@@ -186,6 +200,12 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
+                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables="dashboardDetailState.variables"
+                               @update-data="handleUpdateData(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetInfo.widget_key, $event)"
                     />
                 </div>
             </div>

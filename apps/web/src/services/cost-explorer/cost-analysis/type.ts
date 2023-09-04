@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
@@ -39,7 +37,7 @@ interface Cost {
 }
 export interface Legend {
     name: string;
-    label: string | TranslateResult;
+    label: string | string;
     color?: string;
     disabled?: boolean;
 }

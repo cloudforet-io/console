@@ -71,7 +71,7 @@ interface DashboardDetailInfoStoreActions {
     convertDashboardInfoByChangedVariableSchema: any;
 }
 const DEFAULT_REFRESH_INTERVAL = '5m';
-const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
+export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     settings: {
         date_range: {
             start: dayjs.utc().format('YYYY-MM-01'),

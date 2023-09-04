@@ -52,7 +52,7 @@ const singleItemTabState = reactive({
         { label: t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
         { label: t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
         { label: t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-        // { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
+        // { label: t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
     ] as TabItem[])),
     activeTab: 'detail',
 });

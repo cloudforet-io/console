@@ -1,43 +1,44 @@
 <script setup lang="ts">
-
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import {
     PHeading, PDivider, PButton,
 } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import { useRouter, useRoute } from 'vue-router';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetList from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-const currentRoute = SpaceRouter.router.currentRoute;
+const router = useRouter();
+const route = useRoute();
+const { t } = useI18n();
+
+const currentRoute = route;
 
 const queryHelper = new QueryHelper();
 
 const state = reactive({
     createButtonItemList: computed(() => [
         {
-            label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
+            label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.SINGLE_BUDGET'),
             name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
         },
     ]),
-    filters: queryHelper.setFiltersAsRawQueryString(currentRoute.query.filters).filters,
+    filters: queryHelper.setFiltersAsRawQueryString(currentRoute.query?.filters ?? []).filters,
     hasManagePermission: useManagePermissionState(),
 });
 
 const handleCreateBudgetSelect = (name) => {
-    SpaceRouter.router.push({ name });
+    router.push({ name });
 };
 
 const handleUpdateFilters = (filters: ConsoleFilter[]) => {
     state.filters = filters;
-    SpaceRouter.router.replace({
+    router.replace({
         query: {
             filters: queryHelper.setFilters(filters).rawQueryStrings,
         },
@@ -48,13 +49,13 @@ const handleUpdateFilters = (filters: ConsoleFilter[]) => {
 
 <template>
     <div class="budget-page">
-        <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
+        <p-heading :title="t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
             <template #extra>
                 <!--                <p-select-dropdown-->
                 <!--                    class="create-budget-box"-->
                 <!--                    use-fixed-menu-style-->
                 <!--                    :items="createButtonItemList"-->
-                <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
+                <!--                    :placeholder="t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
                 <!--                    type="outline-button"-->
                 <!--                    @select="handleCreateBudgetSelect"-->
                 <!--                />-->
@@ -63,7 +64,7 @@ const handleUpdateFilters = (filters: ConsoleFilter[]) => {
                           :disabled="!state.hasManagePermission"
                           @click="handleCreateBudgetSelect(state.createButtonItemList[0].name)"
                 >
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
+                    {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
                 </p-button>
             </template>
         </p-heading>

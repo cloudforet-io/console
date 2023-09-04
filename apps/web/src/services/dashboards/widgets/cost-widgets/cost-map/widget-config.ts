@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -7,9 +9,7 @@ import {
 
 const costMapWidgetConfig: WidgetConfig = {
     widget_config_id: 'costMap',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-map/CostMapWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/cost-map/CostMapWidget.vue')),
     title: 'Cost Map',
     labels: ['Cost'],
     description: {

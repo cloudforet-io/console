@@ -1,8 +1,6 @@
-<script lang="ts" setup>
-import { PPaneLayout, PHeading } from '@spaceone/design-system';
+<script setup lang="ts">
 import {
-    computed,
-    reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -27,13 +25,11 @@ interface Props {
     projectGroupId?: string;
     costTypes?: CostTypes;
 }
-withDefaults(defineProps<Props>(), {
-    projectId: undefined,
-    projectGroupId: undefined,
-    costTypes: undefined,
-});
-const emit = defineEmits<{(e: 'update', amountPlanInfo: BudgetAmountPlanInfo, isValid: boolean): void}>();
 const { t } = useI18n();
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{(e: 'update', amountPlanInfo: BudgetAmountPlanInfo, isAllValid: boolean): void; }>();
 
 const state = reactive({
     period: {} as Period,
@@ -91,6 +87,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
     emit('update', amountPlanInfo, isAllValid);
 });
 
+
 </script>
 
 <template>
@@ -107,13 +104,13 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
             />
             <budget-form-amount-plan-monthly v-if="state.timeUnit === 'MONTHLY'"
                                              class="mb-6"
-                                             :period="period"
+                                             :period="state.period"
                                              @update="handleMonthlyInputUpdate"
             >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
+                    <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
+                                                              :project-group-id="props.projectGroupId"
+                                                              :cost-types="props.costTypes"
                                                               :time-unit="state.timeUnit"
                     />
                 </template>
@@ -123,9 +120,9 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
                                            @update="handleTotalAmountUpdate"
             >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
-                                                              :project-group-id="projectGroupId"
-                                                              :cost-types="costTypes"
+                    <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
+                                                              :project-group-id="props.projectGroupId"
+                                                              :cost-types="props.costTypes"
                                                               :time-unit="state.timeUnit"
                     />
                 </template>

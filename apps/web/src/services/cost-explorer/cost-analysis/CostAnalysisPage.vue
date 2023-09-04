@@ -137,16 +137,25 @@ watch(() => route.params, async (params) => {
     <div class="cost-analysis-page">
         <cost-analysis-header />
         <cost-analysis-query-filter />
-        <cost-analysis-group-by-filter />
-        <cost-analysis-chart />
-        <cost-analysis-data-table />
+        <div class="content-wrapper">
+            <div class="overflow-wrapper">
+                <cost-analysis-group-by-filter />
+                <cost-analysis-chart />
+                <cost-analysis-data-table />
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .cost-analysis-page {
-    .cost-analysis-chart {
-        margin-bottom: 1rem;
+    .content-wrapper {
+        @apply bg-white rounded-md border border-gray-200;
+        overflow-x: auto;
+        padding: 0 1rem 2.5rem;
+        .overflow-wrapper {
+            min-width: 40rem;
+        }
     }
 }
 </style>

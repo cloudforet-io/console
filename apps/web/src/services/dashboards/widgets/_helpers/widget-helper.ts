@@ -1,5 +1,5 @@
 import { mergeWith } from 'lodash';
-import type { Component } from 'vue';
+import type { defineAsyncComponent } from 'vue';
 
 
 import type {
@@ -66,7 +66,7 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
     return consoleWidgetConfigCacheMap.get(widgetConfigId) as WidgetConfig;
 };
 
-export const getWidgetComponent = (widgetConfigId: string): Component => {
+export const getWidgetComponent = (widgetConfigId: string): ReturnType<typeof defineAsyncComponent> => {
     const config = getWidgetConfig(widgetConfigId);
     if (!config) throw new Error(`No matching widget configuration found. ${widgetConfigId} does not exist.`);
     const widgetComponent = config.widget_component;
@@ -82,9 +82,9 @@ export const getWidgetComponent = (widgetConfigId: string): Component => {
  * => { provider: [{k: 'provider', v: 'aws', o: '='}, {k: 'provider', v: 'google', o: '='}] }
  * @description This helper is used to sync with the cost analysis page. Will be deprecated soon.
  */
-export const getWidgetLocationFilters = (widgetFilters: WidgetFiltersMap): WidgetFiltersMap => {
+export const getWidgetLocationFilters = (widgetFilters?: WidgetFiltersMap): WidgetFiltersMap => {
     const result: WidgetFiltersMap = {};
-    Object.entries(widgetFilters).forEach(([filterKey, filterItems]) => {
+    Object.entries(widgetFilters ?? {}).forEach(([filterKey, filterItems]) => {
         result[filterKey] = [];
         filterItems.forEach((filterItem) => {
             if (Array.isArray(filterItem.v)) {

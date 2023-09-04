@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
@@ -15,17 +14,14 @@ import dayjs from 'dayjs';
 import {
     computed, defineEmits, defineProps, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
-import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
@@ -38,7 +34,7 @@ export interface Pagination {
 }
 
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
-    label: string | TranslateResult;
+    label: string;
 };
 
 type Sort = BudgetUsageAnalyzeRequestParam['sort'];
@@ -47,6 +43,9 @@ interface Props {
     filters: ConsoleFilter[];
     totalCount: number;
 }
+
+const store = useStore();
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     filters: () => [],
@@ -105,8 +104,8 @@ const queryTagsHelper = useQueryTags({
 const state = reactive({
     selectedPeriod: ['total'] as string[],
     periodList: computed(() => [
-        { name: 'total', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
-        { name: 'thisMonth', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },
+        { name: 'total', label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
+        { name: 'thisMonth', label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },
     ]),
     pageStart: 1,
     pageLimit: 24,
@@ -127,9 +126,9 @@ const state = reactive({
         return period;
     }),
     sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
-        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
-        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'cost' },
-        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'cost' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
     ])),
     sortDesc: true,
     selectedSortKey: 'usage',
@@ -196,7 +195,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
             <p-divider :vertical="true" />
             <div class="period-box">
-                <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
+                <span class="label">{{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in state.periodList"
                                  :key="idx"
                                  :selected="state.selectedPeriod"
@@ -207,7 +206,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                     {{ status.label }}
                 </p-select-status>
                 <p-divider :vertical="true" />
-                <currency-select-dropdown />
             </div>
         </div>
         <p-toolbox search-type="query"
@@ -236,7 +234,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                               :icon-left="state.sort.desc ? 'ic_arrow-down-bold' : 'ic_arrow-up-bold'"
                               @click="handleSortType"
                     >
-                        <span>{{ state.sort.desc ? $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
+                        <span>{{ state.sort.desc ? t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
                     </p-button>
                 </div>
             </template>

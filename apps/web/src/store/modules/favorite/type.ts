@@ -28,6 +28,7 @@ export interface FavoriteHasLoaded {
     [FAVORITE_TYPE.PROJECT]: boolean;
     [FAVORITE_TYPE.PROJECT_GROUP]: boolean;
     [FAVORITE_TYPE.DASHBOARD]: boolean;
+    [FAVORITE_TYPE.COST_ANALYSIS]: boolean;
 }
 
 export interface FavoriteState {
@@ -45,4 +46,5 @@ export const FAVORITE_TYPE_TO_STATE_NAME = {
     [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
     [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
+    [FAVORITE_TYPE.COST_ANALYSIS]: 'costAnalysisItems',
 };
