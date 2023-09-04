@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -6,9 +8,7 @@ import {
 
 const complianceCheckStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'complianceCheckStatus',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/compliance-check-status/ComplianceCheckStatusWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/asset-widgets/compliance-check-status/ComplianceCheckStatusWidget.vue')),
     title: 'Compliance Check Status',
     labels: ['Asset'],
     description: {

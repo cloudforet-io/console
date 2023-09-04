@@ -3,13 +3,12 @@ import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
-import type { AsyncComponent, ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import {
     computed, reactive, toRef, watch,
 } from 'vue';
-
-
-import { store } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
@@ -36,6 +35,9 @@ interface WidgetViewModeModalProps {
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
+const store = useStore();
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
 });
@@ -51,7 +53,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    component: null as AsyncComponent|null,
+    component: null as ComponentPublicInstance|null,
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
@@ -71,9 +73,9 @@ const initSnapshot = () => {
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: AsyncComponent|null = null;
+    let component: ComponentPublicInstance|null = null;
     try {
-        component = getWidgetComponent(widget.widget_name);
+        component = getWidgetComponent(widget.widget_name) as ComponentPublicInstance;
     } catch (e) {
         console.error(e);
     }
@@ -139,7 +141,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                               size="lg"
                               @click="handleCloseModal"
                     >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
+                        {{ t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
                     </p-button>
                     <div class="right">
                         <template v-if="state.hasNonInheritedWidgetOptions">
@@ -153,7 +155,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                      class="non-inherit-badge"
                             >
                                 <span class="text">
-                                    {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
+                                    {{ t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
                                 </span>
                             </p-badge>
                         </template>
@@ -164,7 +166,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                   class="edit-button"
                                   @click="handleClickEditOption"
                         >
-                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
+                            {{ t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
                         </p-button>
                     </div>
                 </div>

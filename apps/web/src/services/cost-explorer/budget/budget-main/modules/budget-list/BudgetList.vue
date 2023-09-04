@@ -9,8 +9,7 @@ import dayjs from 'dayjs';
 import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
@@ -29,6 +28,8 @@ import type { Period } from '@/services/cost-explorer/type';
 interface Props {
     filters: ConsoleFilter[];
 }
+
+const store = useStore();
 
 const props = withDefaults(defineProps<Props>(), {
     filters: () => [],

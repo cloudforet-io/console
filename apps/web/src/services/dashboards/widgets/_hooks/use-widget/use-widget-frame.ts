@@ -37,8 +37,8 @@ export const useWidgetFrame = (
         // TODO: widget option name must be changed to readable name.
         // const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
         const tooltipText = nonInheritOptions.map((d) => `<p>• ${d}</p>`).join('\n');
-        return `${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
-            ${i18n.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
+        return `${i18n.global.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
+            ${i18n.global.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
     });
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
         widgetKey: props.widgetKey,

@@ -15,8 +15,7 @@ import dayjs from 'dayjs';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { LocationQueryRaw } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -44,6 +43,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const { t } = useI18n();
+const store = useStore();
 
 const state = reactive({
     component: computed(() => PToolboxTable),

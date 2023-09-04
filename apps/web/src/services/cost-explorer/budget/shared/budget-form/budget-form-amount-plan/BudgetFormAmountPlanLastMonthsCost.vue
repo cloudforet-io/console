@@ -5,8 +5,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import dayjs from 'dayjs';
 import { computed, reactive, watch } from 'vue';
-
-import { store } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -29,6 +29,9 @@ interface BudgetListParams extends Query {
     end: string;
     granularity: Granularity;
 }
+
+const store = useStore();
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
@@ -127,7 +130,7 @@ watch(() => state.budgetListParams, () => {
     <div v-show="state.showList"
          class="budget-form-amount-plan-last-months-cost"
     >
-        <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
+        <label>{{ t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
         <span v-for="({month, cost}, index) in state.items"
               :key="index"
               class="data"

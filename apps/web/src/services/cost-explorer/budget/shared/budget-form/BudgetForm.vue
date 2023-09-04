@@ -6,8 +6,7 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,7 +18,7 @@ import BudgetFormBaseInfo from '@/services/cost-explorer/budget/shared/budget-fo
 import type { BudgetAmountPlanInfo, BudgetBaseInfo } from '@/services/cost-explorer/budget/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-
+const router = useRouter();
 const { t } = useI18n();
 const state = reactive({
     baseInfo: {} as BudgetBaseInfo,
@@ -41,7 +40,7 @@ const createBudget = async () => {
         });
 
         showSuccessMessage(t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-        SpaceRouter.router.push({
+        router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
     } catch (e) {

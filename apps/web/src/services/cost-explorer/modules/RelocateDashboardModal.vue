@@ -3,8 +3,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 import { PButton, PDivider } from '@spaceone/design-system';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -12,6 +11,7 @@ interface Props {
     visible: boolean;
 }
 
+const store = useStore();
 const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,

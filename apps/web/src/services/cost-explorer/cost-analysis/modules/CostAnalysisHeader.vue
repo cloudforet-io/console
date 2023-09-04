@@ -7,9 +7,8 @@ import {
     computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-
-import { SpaceRouter } from '@/router';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,6 +26,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const { t } = useI18n();
 const store = useStore();
+const router = useRouter();
 
 const state = reactive({
     defaultTitle: computed<string>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
@@ -61,7 +61,7 @@ const handleDeleteQueryConfirm = async () => {
         await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
         if (costAnalysisPageStore.selectedQueryId === state.itemIdForDeleteQuery) {
-            await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
+            await router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
             await costAnalysisPageStore.setQueryOptions();
             costAnalysisPageStore.selectQueryId(undefined);
         }

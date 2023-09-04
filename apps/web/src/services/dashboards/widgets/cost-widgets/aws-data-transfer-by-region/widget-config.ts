@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -5,12 +7,9 @@ import {
     getWidgetFilterSchemaPropertyNames,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferByRegion',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/AWSDataTransferByRegionWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/AWSDataTransferByRegionWidget.vue')),
     title: 'AWS Data-Transfer by Region',
     labels: ['Cost'],
     description: {

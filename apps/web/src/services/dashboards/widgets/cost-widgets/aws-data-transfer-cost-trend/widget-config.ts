@@ -1,3 +1,5 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -6,14 +8,11 @@ import {
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-
 const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferCostTrend',
     title: 'AWS Data-Transfer Cost Trend',
     labels: ['Cost'],
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-cost-trend/AWSDataTransferCostTrendWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-cost-trend/AWSDataTransferCostTrendWidget.vue')),
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_COST_TREND.DESC',
         preview_image: 'widget-img_awsDataTransferCostTrend--thumbnail.png',

@@ -1,11 +1,11 @@
+import { defineAsyncComponent } from 'vue';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 
 const baseCountOfFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'baseCountOfFindings',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/_base/base-count-of-findings/BaseCountOfFindingsWidget.vue'),
-    }),
+    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/_base/base-count-of-findings/BaseCountOfFindingsWidget.vue')),
     scopes: ['WORKSPACE'],
     theme: {
         inherit: false,

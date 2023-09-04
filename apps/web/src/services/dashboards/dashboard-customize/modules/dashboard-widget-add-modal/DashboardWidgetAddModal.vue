@@ -35,7 +35,7 @@ const state = reactive({
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { name: 'default-widget', label: t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_DEFAULT') },
-        // { name: 'custom-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_CUSTOM') },
+        // { name: 'custom-widget', label: t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_CUSTOM') },
     ])),
     activeTab: 'default-widget',
 });

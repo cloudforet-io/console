@@ -2,8 +2,7 @@
 import { PI } from '@spaceone/design-system';
 import { reactive } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-
-import { SpaceRouter } from '@/router';
+import { useRouter } from 'vue-router';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -21,6 +20,7 @@ interface Props {
     openNewTab?: boolean;
 }
 
+const router = useRouter();
 const props = defineProps<Props>();
 const state = reactive({
     hoveredItem: '',
@@ -31,7 +31,7 @@ const isSelectedMenu = (selectedMenuRoute: RouteLocationRaw): boolean => {
     let currentPath = props.currentPath;
     if (!currentPath) return false;
 
-    const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
+    const resolved = router.resolve(selectedMenuRoute);
     if (!resolved) return false;
 
     if (currentPath.indexOf('?') > 0) {

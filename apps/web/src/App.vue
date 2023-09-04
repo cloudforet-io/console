@@ -8,8 +8,7 @@ import {
 } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -27,6 +26,7 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import MobileGuideModal from '@/services/auth/password/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
+const store = useStore();
 const route = useRoute();
 const router = useRouter();
 

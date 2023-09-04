@@ -166,9 +166,9 @@ const handleBackToListButtonClick = () => {
 //             post_id: props.postId,
 //             board_id: props.boardId,
 //         });
-//         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_SEND_EMAIL'), '');
+//         showSuccessMessage(t('INFO.NOTICE.FORM.ALT_S_SEND_EMAIL'), '');
 //     } catch (e) {
-//         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_SEND_EMAIL'));
+//         ErrorHandler.handleRequestError(e, t('INFO.NOTICE.FORM.ALT_E_SEND_EMAIL'));
 //     } finally {
 //         modalState.sendEmailModalVisible = false;
 //     }

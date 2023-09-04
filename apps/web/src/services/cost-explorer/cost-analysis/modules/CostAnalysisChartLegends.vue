@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import {
     PButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
@@ -8,6 +7,7 @@ import { cloneDeep, sum } from 'lodash';
 import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -22,6 +22,9 @@ interface Props {
     loading: boolean;
     legends: Legend[];
 }
+
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
 });
@@ -114,7 +117,7 @@ watch(() => state.groupByMenuItems, (after) => {
             <p v-if="legends.length > 15"
                class="too-many-text"
             >
-                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
             </p>
             <div v-for="(legend, idx) in legends"
                  :key="`legend-${legend.name}`"
@@ -127,7 +130,7 @@ watch(() => state.groupByMenuItems, (after) => {
                 />
             </div>
             <template #no-data>
-                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
         <p-button style-type="transparent"
@@ -135,7 +138,7 @@ watch(() => state.groupByMenuItems, (after) => {
                   font-weight="normal"
                   @click="handleToggleAllLegends"
         >
-            {{ state.showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
+            {{ state.showHideAll ? t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
         </p-button>
     </div>
 </template>

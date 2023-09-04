@@ -5,10 +5,9 @@ import {
 import {
     computed, reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router';
-
-
-import { store } from '@/store';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
+import { useStore } from 'vuex';
 
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -59,6 +58,8 @@ export default {
         },
     },
     setup(props: Props) {
+        const { t } = useI18n();
+        const store = useStore();
         const storeState = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
@@ -69,7 +70,7 @@ export default {
             currencyRates: computed(() => store.state.settings.currencyRates),
         });
         const state = reactive({
-            linkLocation: computed<Location>(() => ({
+            linkLocation: computed<RouteLocationRaw>(() => ({
                 name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                 params: {
                     budgetId: props.budgetUsage.budget_id,
@@ -150,6 +151,7 @@ export default {
             ...toRefs(state),
             storeState,
             currencyMoneyFormatter,
+            t,
         };
     },
 };
@@ -209,7 +211,7 @@ export default {
                     <div class="label-wrapper">
                         <div class="label-left">
                             <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
                             <div class="amount-used-wrapper"
                                  :class="progressStatus"
@@ -221,7 +223,7 @@ export default {
                         </div>
                         <div class="label-right">
                             <p class="label">
-                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
+                                {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
                                 {{ currencyMoneyFormatter(limit, storeState.currency, storeState.currencyRates) }}
@@ -233,7 +235,7 @@ export default {
                 <div class="budget-description">
                     <div class="cost-type-wrapper">
                         <div class="label">
-                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
+                            {{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
                         </div>
                         <div class="cost-type">
                             <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap"

@@ -7,11 +7,8 @@ import dayjs from 'dayjs';
 import {
     reactive, computed,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
-
-
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -29,11 +26,11 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-co
 
 
 export interface WidgetFrameProps {
-    title: TranslateResult;
+    title: string;
     size: WidgetSize;
     width?: number;
     widgetLink?: string;
-    widgetLocation?: Location;
+    widgetLocation?: RouteLocationRaw;
     widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;
@@ -60,6 +57,7 @@ interface IconConfig {
     handleClick: () => void;
 }
 const { i18nDayjs } = useI18nDayjs();
+const { t } = useI18n();
 
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
     width: undefined,
@@ -81,7 +79,7 @@ const emit = defineEmits<{(event: 'click-delete'): void;
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    dateLabel: computed<TranslateResult|undefined>(() => {
+    dateLabel: computed<string|undefined>(() => {
         const start = props.dateRange?.start;
         const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
         if (endDayjs) {
@@ -98,8 +96,8 @@ const state = reactive({
         if (start && !endDayjs) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
-            if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
-            if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
+            if (diff < 1) return t('DASHBOARDS.WIDGET.DATE_TODAY');
+            if (diff >= 6 && diff < 7) return t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
             return i18nDayjs.value(start).from(today.subtract(1, 'day'));
         }
         return undefined;
@@ -149,7 +147,7 @@ const handleClickViewModeButton = () => {
             </h3><slot name="header-right" />
         </div>
         <p-icon-button v-if="!props.editMode && !props.disableViewMode"
-                       v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
+                       v-tooltip.bottom="t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
                        class="view-mode-button"
                        name="ic_arrows-expand-all"
                        shape="square"
@@ -171,16 +169,16 @@ const handleClickViewModeButton = () => {
                              :color="red[400]"
                         />
                     </span>
-                    <span>{{ $t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
+                    <span>{{ t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
                 </div>
                 <span class="error-message">
-                    {{ $t("DASHBOARDS.WIDGET.ERROR_MSG") }}
+                    {{ t("DASHBOARDS.WIDGET.ERROR_MSG") }}
                 </span>
                 <p-button class="edit-button"
                           style-type="tertiary"
                           @click="handleEditButtonClick"
                 >
-                    {{ $t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
+                    {{ t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
                 </p-button>
             </div>
         </div>
@@ -216,7 +214,7 @@ const handleClickViewModeButton = () => {
                                 :action-icon="ACTION_ICON.INTERNAL_LINK"
                                 class="link-button"
                         >
-                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
+                            {{ t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         </p-link>
                     </slot>
                 </div>
