@@ -109,6 +109,8 @@ const { queryTags, filters: searchFilters } = queryTagsHelper;
 const apiQueryHelper = new ApiQueryHelper();
 
 const getQuery = () => {
+    apiQueryHelper.setFilters(searchFilters.value);
+
     let statusValues: string[] = [];
     if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
         statusValues = [JOB_STATE.IN_PROGRESS];
@@ -118,14 +120,10 @@ const getQuery = () => {
         statusValues = [JOB_STATE.FAILURE];
     } else if (state.selectedStatus === JOB_SELECTED_STATUS.CANCELED) {
         statusValues = [JOB_STATE.CANCELED];
-    } else {
-        statusValues = [];
     }
 
     if (statusValues.length > 0) {
-        apiQueryHelper.setFilters([{ k: 'status', v: statusValues, o: '=' }]);
-    } else {
-        apiQueryHelper.setFilters(searchFilters.value);
+        apiQueryHelper.addFilter({ k: 'status', v: statusValues, o: '=' });
     }
 
     return apiQueryHelper.data;
