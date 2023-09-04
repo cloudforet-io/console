@@ -65,31 +65,27 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleSelectDefaultGroupBy = async (items: GroupByItem[]) => {
-    if (items.length > 3) {
+const handleChangeDefaultGroupBy = async (selectedItems: GroupByItem[], isSelected: boolean) => {
+    if (isSelected && state.selectedGroupByItems.length >= 3) {
         showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
         return;
     }
-    if (costAnalysisPageState.groupBy.length > items.length) { // delete case
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = items.map((d) => d.name);
-        });
-    } else { // add case
-        const addedGroupByName: string = xor(costAnalysisPageState.groupBy, items.map((d) => d.name))[0];
+    if (isSelected) {
+        const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = [addedGroupByName, ..._state.groupBy];
+        });
+    } else {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = selectedItems.map((d) => d.name);
         });
     }
 };
 const handleClickTagsButton = () => {
     state.tagsDropdownVisible = !state.tagsDropdownVisible;
 };
-const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu) => {
-    if (state.selectedGroupByItems.find((d) => d.name === selectedItem.name)) { // delete case
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.filter((d) => d !== selectedItem.name);
-        });
-    } else { // add case
+const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: boolean) => {
+    if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
             showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
@@ -97,6 +93,10 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu) => {
         }
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = _state.groupBy.concat(selectedItem.name as string);
+        });
+    } else {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = _state.groupBy.filter((d) => d !== selectedItem.name);
         });
     }
 };
@@ -125,7 +125,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
-                         @change="handleSelectDefaultGroupBy"
+                         @change="handleChangeDefaultGroupBy"
         >
             {{ defaultGroupByItem.label }}
         </p-select-button>
