@@ -222,7 +222,7 @@ export const useWidgetLifecycle = ({
     if (redrawOnLanguageChange) {
         try {
             if (!redrawChart) throw Error('redrawChart is required');
-            watch(() => i18n.locale, async () => {
+            watch(() => i18n.global.locale, async () => {
                 redrawChart();
             });
         } catch (e) {

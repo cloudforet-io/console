@@ -9,7 +9,7 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
         interface Route {
             name: string;
             path?: string;
-            to?: Location;
+            to?: RouteLocation;
         }
         \`
         `,

@@ -1,4 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
 import type { RouteLocation } from 'vue-router';
 
 import type { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
@@ -6,7 +5,7 @@ import type { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/con
 export type SelectMarker = typeof SELECT_MARKERS[number];
 export interface ContextMenuItemProps {
     name?: string | number;
-    label?: number | TranslateResult;
+    label?: number | string;
     link?: string;
     to?: RouteLocation;
     disabled?: boolean;

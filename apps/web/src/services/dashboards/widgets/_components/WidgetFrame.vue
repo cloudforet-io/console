@@ -8,7 +8,7 @@ import {
     reactive, computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { TranslateResult } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -31,11 +31,11 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-co
 
 
 export interface WidgetFrameProps {
-    title: TranslateResult;
+    title: string;
     size: WidgetSize;
     width?: number;
     widgetLink?: string;
-    widgetLocation?: Location;
+    widgetLocation?: RouteLocationRaw;
     widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;

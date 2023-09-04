@@ -3,7 +3,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Location } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { CollectorModel, JobModel } from '@/services/asset-inventory/collector/model';
@@ -12,7 +12,7 @@ import RecentCollectorJobList from '@/services/asset-inventory/collector/shared/
 const props = defineProps<{
     collector?: CollectorModel|null;
     recentJobs?: JobModel[]|null;
-    historyLink?: Location
+    historyLink?: RouteLocationRaw;
 }>();
 
 const store = useStore();

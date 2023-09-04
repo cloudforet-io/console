@@ -1,6 +1,6 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed } from 'vue';
-import type { Location } from 'vue-router/types/router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -18,7 +18,7 @@ import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-w
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
     currency?: Currency|ComputedRef<Currency>;
-    widgetLocation?: Location|ComputedRef<Location>;
+    widgetLocation?: RouteLocationRaw|ComputedRef<RouteLocationRaw>;
 }
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,

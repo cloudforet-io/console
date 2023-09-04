@@ -121,7 +121,6 @@ import { unionBy } from 'lodash';
 import {
     computed, ref, toRef, useAttrs, useSlots, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
@@ -241,7 +240,7 @@ const updateInputValue = (value?: string|number) => {
     proxyInputValue.value = value;
     emit('update:value', value);
 };
-const displayedInputValue = computed<TranslateResult|number|undefined>(() => {
+const displayedInputValue = computed<string|number|undefined>(() => {
     if (props.multiInput) return proxyInputValue.value;
     if (props.useAutoComplete) {
         const item = proxySelected.value[0];

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-
 import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
@@ -42,7 +42,7 @@ interface EnrichedBudgetUsageData {
     limit: number|string;
     cost: number;
     ratio: number;
-    link?: Location | string;
+    link?: RouteLocationRaw | string;
 }
 
 interface BudgetCostType {

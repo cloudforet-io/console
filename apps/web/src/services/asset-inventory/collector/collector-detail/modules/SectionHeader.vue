@@ -3,11 +3,10 @@ import {
     PButton, PHeading, PIconButton, screens,
 } from '@spaceone/design-system';
 import { useWindowSize } from '@vueuse/core';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
-    title: TranslateResult;
+    title: string;
     editMode?: boolean;
     hideEditButton?: boolean;
     totalCount?: number;

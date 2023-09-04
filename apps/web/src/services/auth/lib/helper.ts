@@ -1,4 +1,4 @@
-import type { Location } from 'vue-router/types/router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { i18n } from '@/translations';
 
@@ -43,7 +43,7 @@ export const DOMAIN_OWNER_DEFAULT_ROUTE = Object.freeze({
     name: MENU_ID.ADMINISTRATION_USER,
 });
 
-export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
+export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasSystemRole: boolean, hasAnyPermissions: boolean): RouteLocationRaw => {
     if (isDomainOwner || hasSystemRole) return DOMAIN_OWNER_DEFAULT_ROUTE;
     if (hasAnyPermissions) return GENERAL_USER_DEFAULT_ROUTE;
     return NO_ROLE_USER_DEFAULT_ROUTE;

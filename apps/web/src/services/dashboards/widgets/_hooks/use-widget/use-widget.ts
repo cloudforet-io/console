@@ -5,7 +5,7 @@ import type {
 import {
     reactive, toRefs,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
@@ -17,7 +17,7 @@ import {
 
 interface AdditionalState {
     dateRange?: DateRange|ComputedRef<DateRange>;
-    widgetLocation?: Location|ComputedRef<Location>;
+    widgetLocation?: RouteLocationRaw|ComputedRef<RouteLocationRaw>;
 }
 
 /**

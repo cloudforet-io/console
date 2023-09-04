@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import {
     computed, defineEmits, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -31,7 +30,7 @@ const emit = defineEmits<{(e: 'update', period: Period): void;
 const today = dayjs.utc();
 interface PeriodItem {
     name: string;
-    label: TranslateResult;
+    label: string;
     start: Dayjs;
     end: Dayjs;
     enabled: Granularity[];

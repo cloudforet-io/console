@@ -14,7 +14,6 @@ import dayjs from 'dayjs';
 import {
     computed, defineEmits, defineProps, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -35,7 +34,7 @@ export interface Pagination {
 }
 
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
-    label: string | TranslateResult;
+    label: string;
 };
 
 type Sort = BudgetUsageAnalyzeRequestParam['sort'];

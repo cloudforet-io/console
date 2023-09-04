@@ -1,8 +1,6 @@
-import type { TranslateResult } from 'vue-i18n';
-
 export interface TabItem {
     name: string;
-    label?: string | TranslateResult;
+    label?: string;
     keepAlive?: boolean;
 }
 

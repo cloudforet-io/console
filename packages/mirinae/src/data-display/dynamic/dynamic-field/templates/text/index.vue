@@ -9,7 +9,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import PLink from '@/inputs/link/PLink.vue';
@@ -23,8 +22,8 @@ const props = withDefaults(defineProps<TextDynamicFieldProps>(), {
 });
 
 const isLink = computed(() => props.options?.link);
-const text = computed<TranslateResult|number>(() => {
-    let textValue: TranslateResult|number;
+const text = computed<string|number>(() => {
+    let textValue: string|number;
     if (props.data === null || props.data === undefined) {
         textValue = props.options?.default === undefined ? '' : props.options?.default;
     } else if (typeof props.data === 'number') {
