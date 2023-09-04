@@ -6,6 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { xor } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -64,10 +65,21 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.groupBy = items.map((d) => d.name);
-    });
+const handleSelectDefaultGroupBy = async (items: GroupByItem[]) => {
+    if (items.length > 3) {
+        showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+        return;
+    }
+    if (costAnalysisPageState.groupBy.length > items.length) { // delete case
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = items.map((d) => d.name);
+        });
+    } else { // add case
+        const addedGroupByName: string = xor(costAnalysisPageState.groupBy, items.map((d) => d.name))[0];
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = [addedGroupByName, ..._state.groupBy];
+        });
+    }
 };
 const handleClickTagsButton = () => {
     state.tagsDropdownVisible = !state.tagsDropdownVisible;
@@ -113,7 +125,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
-                         @change="handleSelectGroupByItems"
+                         @change="handleSelectDefaultGroupBy"
         >
             {{ defaultGroupByItem.label }}
         </p-select-button>
