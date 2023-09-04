@@ -560,6 +560,7 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "상세 기간 선택",
+					"LAST_12_MONTHS": "지난 12개월",
 					"LAST_14_DAYS": "최근 2주일",
 					"LAST_3_MONTHS": "지난 3개월",
 					"LAST_6_MONTHS": "지난 6개월",
