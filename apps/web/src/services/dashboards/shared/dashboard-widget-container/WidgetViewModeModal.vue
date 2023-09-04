@@ -3,12 +3,13 @@ import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
-import type { Component, ComponentPublicInstance } from 'vue';
+import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
     computed, reactive, toRef, watch,
 } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
+
+
+import { store } from '@/store';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
@@ -20,9 +21,9 @@ import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } 
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import WidgetViewModeSidebar from '@/services/dashboards/widgets/_components/WidgetViewModeSidebar.vue';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -40,9 +41,6 @@ const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
 });
 const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
 
-const store = useStore();
-const { t } = useI18n();
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
@@ -53,7 +51,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    component: null as Component|null,
+    component: null as AsyncComponent|null,
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
@@ -73,7 +71,7 @@ const initSnapshot = () => {
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: Component|null = null;
+    let component: AsyncComponent|null = null;
     try {
         component = getWidgetComponent(widget.widget_name);
     } catch (e) {
@@ -95,6 +93,19 @@ const handleClickEditOption = () => {
 };
 const handleRefreshWidget = () => {
     state.widgetRef?.refreshWidget();
+};
+
+const handleUpdateData = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
+};
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
+    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+};
+const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
+    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
 };
 
 watch(() => props.visible, async (visible) => {
@@ -128,7 +139,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                               size="lg"
                               @click="handleCloseModal"
                     >
-                        {{ t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
+                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.BACK_TO_DASHBOARD') }}
                     </p-button>
                     <div class="right">
                         <template v-if="state.hasNonInheritedWidgetOptions">
@@ -142,7 +153,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                      class="non-inherit-badge"
                             >
                                 <span class="text">
-                                    {{ t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
+                                    {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERIT_OPTION_APPLIED') }}
                                 </span>
                             </p-badge>
                         </template>
@@ -153,7 +164,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                   class="edit-button"
                                   @click="handleClickEditOption"
                         >
-                            {{ t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
                         </p-button>
                     </div>
                 </div>
@@ -179,6 +190,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :title="widgetFormState.widgetTitle"
                                :options="widgetFormState.widgetOptions"
                                :inherit-options="widgetFormState.inheritOptions"
+                               :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
                                :currency-rates="state.currencyRates"
@@ -186,6 +198,12 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
+                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables="dashboardDetailState.variables"
+                               @update-data="handleUpdateData(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetInfo.widget_key, $event)"
                     />
                 </div>
             </div>

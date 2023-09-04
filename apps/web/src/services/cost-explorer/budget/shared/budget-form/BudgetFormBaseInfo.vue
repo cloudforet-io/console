@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     PFieldGroup, PPaneLayout, PHeading, PTextInput,
 } from '@spaceone/design-system';
@@ -17,7 +17,7 @@ import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/type';
 
 type CostTypes = BudgetModel['cost_types'];
 
-const emit = defineEmits<{(e: 'update', budgetInfo: BudgetBaseInfo, isValid: boolean): void}>();
+const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllvalid: boolean): void; }>();
 const { t } = useI18n();
 
 const {

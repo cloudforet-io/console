@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PHeading, PSelectDropdown,
+    PIconButton, PHeading,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     computed, reactive,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -20,7 +18,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
@@ -32,16 +29,7 @@ const { t } = useI18n();
 const store = useStore();
 
 const state = reactive({
-    defaultTitle: computed<TranslateResult>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-    costQueryMenuItems: computed<MenuItem[]>(() => ([
-        { name: 'header', label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
-        { name: undefined, label: 'Cost Analysis', type: 'item' },
-        ...costAnalysisPageStore.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
-            name: item.cost_query_set_id,
-            label: item.name,
-            type: 'item',
-        })),
-    ])),
+    defaultTitle: computed<string>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
@@ -51,23 +39,7 @@ const state = reactive({
     queryDeleteModalVisible: false,
 });
 
-/* Utils */
-const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
-
 /* Event Handlers */
-const handleClickQueryItem = async (queryId: string) => {
-    if (queryId === costAnalysisPageStore.selectedQueryId) return;
-
-    if (queryId) {
-        const { options } = getQueryWithKey(queryId);
-        await costAnalysisPageStore.setQueryOptions(options);
-        costAnalysisPageStore.selectQueryId(queryId);
-    } else {
-        await costAnalysisPageStore.setQueryOptions();
-        costAnalysisPageStore.selectQueryId(undefined);
-    }
-};
-
 const handleClickDeleteQuery = (id: string) => {
     state.itemIdForDeleteQuery = id;
     state.queryDeleteModalVisible = true;
@@ -103,36 +75,6 @@ const handleDeleteQueryConfirm = async () => {
     <div class="cost-analysis-header">
         <section class="title-section">
             <p-heading :title="costAnalysisPageStore.selectedQueryId ? state.title : state.defaultTitle">
-                <template #title-left-extra>
-                    <p-select-dropdown :items="state.costQueryMenuItems"
-                                       style-type="icon-button"
-                                       button-icon="ic_list-bulleted-3"
-                                       class="list-button"
-                                       @select="handleClickQueryItem"
-                    >
-                        <template #menu-item--format="{item}">
-                            <div class="query-item-wrapper">
-                                <div class="dropdown-item-wrapper">
-                                    <span>{{ item.label }}</span><span v-if="!item.name"
-                                                                       class="default-item-suffix"
-                                    >(default)</span>
-                                </div>
-                                <div v-if="item.name"
-                                     class="button-wrapper"
-                                >
-                                    <p-icon-button name="ic_delete"
-                                                   size="sm"
-                                                   @click.stop="handleClickDeleteQuery(item.name)"
-                                    />
-                                    <p-icon-button name="ic_edit-text"
-                                                   size="sm"
-                                                   @click.stop="handleClickEditQuery(item.name)"
-                                    />
-                                </div>
-                            </div>
-                        </template>
-                    </p-select-dropdown>
-                </template>
                 <template #title-right-extra>
                     <div v-if="costAnalysisPageStore.selectedQueryId"
                          class="title-right-extra"
@@ -183,36 +125,10 @@ const handleDeleteQueryConfirm = async () => {
             }
         }
     }
-    .dropdown-item-wrapper {
-        @apply flex items-center gap-1;
-
-        .default-item-suffix {
-            @apply text-gray-400;
-        }
-    }
 
     /* custom design-system component - p-button-modal */
     :deep(.p-button-modal) {
         display: block;
-    }
-
-    /* custom design-system component - p-select-dropdown */
-    :deep(.list-button) {
-        @apply bg-transparent;
-        display: inline-flex;
-        .p-context-menu {
-            min-width: 22rem;
-
-            .menu-item-wrapper {
-                display: flex;
-                justify-content: space-between;
-            }
-        }
-    }
-
-    .query-item-wrapper {
-        @apply flex justify-between;
-        width: 100%;
     }
 }
 </style>

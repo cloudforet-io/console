@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PFieldGroup, PRadio, PFilterableDropdown } from '@spaceone/design-system';
 import type {
@@ -43,14 +43,15 @@ const getSearchDropdownItems = (resourceItems: ReferenceMap): FilterableDropdown
     name: k, label: resourceItems[k].label,
 }));
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     costTypes: undefined,
     disableValidation: false,
 });
-const emit = defineEmits<{(e: 'update', costTypes: CostTypes, isValid: boolean): void}>();
 
-const { t } = useI18n();
+const emit = defineEmits<{(e: 'update', costTypeInfo: CostTypes|undefined, isValid: boolean): void; }>();
+
 const store = useStore();
+const { t } = useI18n();
 
 const {
     forms: {
@@ -77,16 +78,8 @@ const state = reactive({
     costTypeItems: computed<BudgetCostTypes>(() => ({
         all: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
-        region_code: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REGION'),
-        service_account_id: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
-        product: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
     })),
-    resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => {
-        if (selectedCostType.value === 'provider') return getSearchDropdownItems(state.providers);
-        if (selectedCostType.value === 'region_code') return getSearchDropdownItems(state.regions);
-        if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(state.serviceAccounts);
-        return undefined;
-    }),
+    resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
     visibleResourceMenu: false,
     costTypeInfo: computed<CostTypes|undefined>(() => {
@@ -167,7 +160,7 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
 <template>
     <p-field-group :label="t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
                    required
-                   :invalid="!disableValidation && invalidState.selectedResources"
+                   :invalid="!props.disableValidation && invalidState.selectedResources"
                    :invalid-text="invalidTexts.selectedResources"
                    class="budget-cost-type-select-field"
     >
@@ -186,7 +179,7 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
                                :menu="state.resourceMenuItems"
                                :handler="state.resourceMenuItems ? undefined : resourceMenuHandler"
                                :loading="state.resourceMenuLoading"
-                               :invalid="!disableValidation && invalidState.selectedResources"
+                               :invalid="!props.disableValidation && invalidState.selectedResources"
                                :selected="selectedResources"
                                multi-selectable
                                show-select-marker

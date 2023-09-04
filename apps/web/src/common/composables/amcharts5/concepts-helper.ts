@@ -96,3 +96,33 @@ export const toggleSeries = (chart: am5.SerialChart, index: number) => {
         }
     }
 };
+export const hideAllSeries = (chart: am5.SerialChart) => {
+    if (chart instanceof am5percent.PieChart) {
+        const series = chart.series.getIndex(0);
+        if (!series) return;
+        const slices = series.slices.values;
+        slices.forEach((slice) => {
+            if (slice.dataItem) slice.dataItem.hide();
+        });
+    } else {
+        const series = chart.series.values;
+        series.forEach((d) => {
+            d.hide();
+        });
+    }
+};
+export const showAllSeries = (chart: am5.SerialChart) => {
+    if (chart instanceof am5percent.PieChart) {
+        const series = chart.series.getIndex(0);
+        if (!series) return;
+        const slices = series.slices.values;
+        slices.forEach((slice) => {
+            if (slice.dataItem) slice.dataItem.show();
+        });
+    } else {
+        const series = chart.series.values;
+        series.forEach((d) => {
+            d.show();
+        });
+    }
+};

@@ -33,7 +33,9 @@ const props = withDefaults(defineProps<Props>(), {
     menuSet: () => [],
     showFavoriteOnly: undefined,
 });
-const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
+const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void;
+    (e: 'update:show-favorite-only', value: boolean): void;
+}>();
 const route = useRoute();
 const { t } = useI18n();
 const slots = useSlots();
@@ -114,6 +116,12 @@ const handleSelect = (id: string, selected: string) => {
                                      @change-toggle="handleFavoriteToggle"
                     />
                 </div>
+                <div v-else-if="menuData.type === MENU_ITEM_TYPE.SLOT"
+                     :key="`${idx}-${getUUID()}`"
+                     class="slot-menu-wrapper"
+                >
+                    <slot :name="`slot-${menuData.id}`" />
+                </div>
                 <l-n-b-menu-item v-else
                                  :menu-data="menuData"
                                  :current-path="state.currentPath"
@@ -166,6 +174,11 @@ const handleSelect = (id: string, selected: string) => {
         @apply flex justify-between items-center text-gray-500;
         font-size: 0.75rem;
         padding: 0 0.5rem;
+    }
+    .slot-menu-wrapper {
+        @apply flex items-center;
+        padding: 0 0.5rem;
+        height: 2rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;

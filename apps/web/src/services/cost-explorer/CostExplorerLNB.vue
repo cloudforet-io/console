@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { PButtonModal, PI } from '@spaceone/design-system';
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import { PI, PCollapsibleToggle } from '@spaceone/design-system';
 import {
-    computed, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -19,12 +20,14 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 import { gray } from '@/styles/colors';
 
 import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
+const FOLDING_COUNT_BY_SHOW_MORE = 7;
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
@@ -73,7 +76,10 @@ const state = reactive({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
-            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? { name: 'ic_main-filled', color: gray[500] } : undefined,
+            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? {
+                name: 'ic_main-filled',
+                color: gray[500],
+            } : undefined,
             to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {
@@ -81,12 +87,22 @@ const state = reactive({
                 },
             },
         }));
-        return currentQueryMenuList;
+        const showMoreMenuSet: LNBMenu = [{
+            type: 'slot',
+            id: 'show-more',
+        }];
+
+        return [
+            ...(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
+            ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
+        ];
     }),
+    showMoreQuerySetStatus: true,
+    showFavoriteOnly: false,
 });
 
 const relocateNotificationState = reactive({
-    isShow: true,
+    isShow: false,
     data: computed<LNBItem>(() => ({
         type: 'item',
         id: MENU_ID.DASHBOARDS,
@@ -103,6 +119,7 @@ const relocateNotificationState = reactive({
         hideFavorite: true,
     })),
     isModalVisible: false,
+    userId: computed(() => store.state.user.userId),
 });
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
@@ -122,8 +139,24 @@ const handleLearnMoreRelocateNotification = () => {
 };
 
 const handleDismissRelocateNotification = () => {
+    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
+    settings.costExplorer = {
+        ...settings.costExplorer,
+        hideRelocateDashboardNotification: true,
+    };
+    LocalStorageAccessor.setItem(relocateNotificationState.userId, settings);
     relocateNotificationState.isShow = false;
 };
+
+
+
+onMounted(() => {
+    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
+    if (!settings.costExplorer?.hideRelocateDashboardNotification) {
+        relocateNotificationState.isModalVisible = true;
+        relocateNotificationState.isShow = true;
+    }
+});
 
 onUnmounted(() => {
     costQuerySetStore.$dispose();
@@ -136,12 +169,15 @@ costQuerySetStore.listCostQuerySets();
 
 <template>
     <aside class="sidebar-menu">
-        <l-n-b :header="state.header"
+        <l-n-b v-model:show-favorite-only="state.showFavoriteOnly"
+               :header="state.header"
                :menu-set="state.menuSet"
                @select="handleSelect"
         >
             <template #default>
-                <l-n-b-router-menu-item :item="relocateNotificationState.data">
+                <l-n-b-router-menu-item :item="relocateNotificationState.data"
+                                        open-new-tab
+                >
                     <template #after-text>
                         <p-i name="ic_arrow-right-up"
                              width="1rem"
@@ -156,9 +192,11 @@ costQuerySetStore.listCostQuerySets();
                 />
                 <l-n-b-divider-menu-item />
             </template>
+            <template #slot-show-more>
+                <p-collapsible-toggle v-model:is-collapsed="state.showMoreQuerySetStatus" />
+            </template>
         </l-n-b>
-        <!--TODO: Should be replaced with lean-more modal-->
-        <p-button-modal v-model:visible="relocateNotificationState.isModalVisible" />
+        <relocate-dashboard-modal v-model:visible="relocateNotificationState.isModalVisible" />
     </aside>
 </template>
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import type { SerialChart } from '@amcharts/amcharts5';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { CancelTokenSource } from 'axios';
@@ -7,19 +7,18 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
 import {
-    computed, defineEmits, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useStore } from 'vuex';
 
-import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
-
+import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     getLegends, getXYChartData,
 } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
-import CostAnalysisChartQuerySection
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
+import CostAnalysisChartLegends
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartLegends.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import type {
@@ -41,8 +40,6 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const store = useStore();
 
-const emit = defineEmits<{(e: 'rendered', elements: Element[]): void;
-}>();
 const state = reactive({
     currency: computed(() => store.state.settings.currency),
     currencyRates: computed(() => store.state.settings.currencyRates),
@@ -50,12 +47,8 @@ const state = reactive({
     loading: true,
     legends: [] as Legend[],
     chartData: [] as XYChartData[],
-    chart: null as XYChart | PieChart | null,
-    queryRef: null as null,
-    chartRef: null as null|HTMLElement,
+    chart: null as SerialChart | null,
 });
-
-const { queryRef, chartRef } = toRefs(state);
 
 /* api */
 let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -102,22 +95,13 @@ const setChartData = debounce(async (granularity: Granularity, period: Period, g
 
 /* event */
 const handleToggleSeries = (index) => {
-    toggleSeries(state.chart as XYChart | PieChart, index);
+    toggleSeries(state.chart as SerialChart, index);
 };
 const handleAllSeries = (type) => {
     if (type === 'show') {
-        showAllSeries(state.chart as XYChart | PieChart);
+        showAllSeries(state.chart as SerialChart);
     } else {
-        hideAllSeries(state.chart as XYChart | PieChart);
-    }
-};
-const handleChartRendered = () => {
-    if (state.chartRef && state.queryRef?.$el) {
-        const elements: Element[] = [
-            state.queryRef.$el,
-            state.chartRef,
-        ];
-        emit('rendered', elements);
+        hideAllSeries(state.chart as SerialChart);
     }
 };
 
@@ -133,51 +117,39 @@ watch([
 
 <template>
     <div class="cost-analysis-chart">
-        <section ref="chartRef"
-                 class="chart-section"
-        >
-            <cost-analysis-stacked-column-chart v-model:chart="state.chart"
-                                                :loading="state.loading"
-                                                :chart-data="state.chartData"
-                                                :legends="state.legends"
-                                                :granularity="costAnalysisPageState.granularity"
-                                                :period="costAnalysisPageState.period"
-                                                :currency="state.currency"
-                                                :currency-rates="state.currencyRates"
-                                                @rendered="handleChartRendered"
-            />
-        </section>
-        <cost-analysis-chart-query-section ref="queryRef"
-                                           v-model:legends="state.legends"
-                                           :loading="state.loading"
-                                           @toggle-series="handleToggleSeries"
-                                           @show-all-series="handleAllSeries('show')"
-                                           @hide-all-series="handleAllSeries('hide')"
+        <cost-analysis-stacked-column-chart v-model:chart="state.chart"
+                                            :loading="state.loading"
+                                            :chart-data="state.chartData"
+                                            :legends="state.legends"
+                                            :granularity="costAnalysisPageState.granularity"
+                                            :period="costAnalysisPageState.period"
+                                            :currency="state.currency"
+                                            :currency-rates="state.currencyRates"
+                                            class="cost-analysis-stacked-column-chart"
+        />
+        <cost-analysis-chart-legends v-model:legends="state.legends"
+                                     :loading="state.loading"
+                                     class="cost-analysis-chart-legends"
+                                     @toggle-series="handleToggleSeries"
+                                     @show-all-series="handleAllSeries('show')"
+                                     @hide-all-series="handleAllSeries('hide')"
         />
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .cost-analysis-chart {
-    @apply grid grid-cols-12;
+    @apply grid grid-cols-12 border border-gray-200 rounded-md;
     grid-gap: 1rem;
-    height: 30rem;
+    height: 26rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 
-    .chart-section {
-        @apply col-span-9 bg-white rounded-md border border-gray-200;
-        padding: 1rem 1rem 1.5rem;
-        min-height: 480px;
+    .cost-analysis-stacked-column-chart {
+        @apply col-span-9;
     }
-
-    @define-mixin row-stack {
-        height: auto;
-        .chart-section {
-            @apply col-span-12;
-        }
-    }
-
-    @screen tablet {
-        @mixin row-stack;
+    .cost-analysis-chart-legends {
+        @apply col-span-3;
     }
 }
 </style>

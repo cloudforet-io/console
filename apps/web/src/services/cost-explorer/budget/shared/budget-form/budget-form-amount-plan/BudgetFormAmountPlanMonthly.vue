@@ -1,6 +1,4 @@
-<script lang="ts" setup>
-
-
+<script setup lang="ts">
 import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -22,11 +20,14 @@ interface Props {
     period: Period;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    period: () => ({}) as Period,
-});
-const emit = defineEmits<{(e: 'update', amountPlanInfo: MonthAmountInputMap, isValid: boolean): void}>();
 const { t } = useI18n();
+
+const props = withDefaults(defineProps<Props>(), {
+    period: () => ({}),
+});
+
+const emit = defineEmits<{(e: 'update', monthAmountInputMap: MonthAmountInputMap, isAllValid: boolean): void; }>();
+
 
 const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
     const months: string[] = [];
@@ -106,6 +107,10 @@ const handleUpdateMonthInput = (month: string, { amount, isValid }: MonthAmountI
     state.monthAmountInputMap[month].isValid = isValid;
 };
 
+const handleUpdateVisible = (visible: boolean) => {
+    state.visibleAutofillModal = visible;
+};
+
 /* Watchers */
 watch(() => state.months, (months) => {
     initAmountInputMapWithMonths(months);
@@ -141,7 +146,8 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
                                                  @update="handleUpdateMonthInput(month, $event)"
             />
         </div>
-        <budget-form-amount-plan-autofill-modal v-model:visible="state.visibleAutofillModal"
+        <budget-form-amount-plan-autofill-modal :visible="state.visibleAutofillModal"
+                                                @update:visible="handleUpdateVisible"
                                                 @confirm="handleAutofillConfirm"
         />
     </div>

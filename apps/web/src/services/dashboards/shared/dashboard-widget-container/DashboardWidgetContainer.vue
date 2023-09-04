@@ -1,37 +1,3 @@
-<template>
-    <div ref="containerRef"
-         class="dashboard-widget-container"
-    >
-        <template v-if="!dashboardDetailState.loadingDashboard">
-            <template v-for="(widget) in reformedWidgetInfoList"
-                      :key="widget.widget_key"
-            >
-                <component :is="widget.component"
-                           :id="widget.widget_key"
-                           ref="widgetRef"
-                           v-intersection-observer="handleIntersectionObserver"
-                           :widget-config-id="widget.widget_name"
-                           :widget-key="widget.widget_key"
-                           :title="widget.title"
-                           :options="widget.widget_options"
-                           :inherit-options="widget.inherit_options"
-                           :size="widget.size"
-                           :width="widget.width"
-                           :theme="widget.theme"
-                           :currency-rates="state.currencyRates"
-                           :edit-mode="editMode"
-                           :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                           :all-reference-type-info="allReferenceTypeInfo"
-                           :initiated="!!state.initiatedWidgetMap[widget.widget_key]"
-                />
-            </template>
-        </template>
-        <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"
-                                @refresh-widget="handleRefreshWidget"
-        />
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { vIntersectionObserver } from '@vueuse/components';
 import {
@@ -45,18 +11,20 @@ import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
 import {
     useContainerWidth,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-container-width';
 import {
     useWidgetReformer,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-reformer';
-import {
-    useWidgetValidator,
-} from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-validator';
+import WidgetViewModeModal from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import WidgetViewModeModal from '@/services/dashboards/widgets/_components/WidgetViewModeModal.vue';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type {
+    DashboardLayoutWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 
@@ -74,7 +42,9 @@ const store = useStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
-const widgetRef = ref<WidgetComponent[]|null>([]);
+const widgetFormStore = useWidgetFormStore();
+
+const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
     initiatedWidgetMap: {} as Record<string, any>,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
@@ -86,23 +56,11 @@ const containerRef = ref<HTMLElement|null>(null);
 const { containerWidth } = useContainerWidth({ containerRef, observeResize: true });
 
 /* reform widget info list */
-const { reformedWidgetInfoList, widgetConfigMap } = useWidgetReformer({
+const { reformedWidgetInfoList } = useWidgetReformer({
     dashboardWidgetInfoList: toRef(dashboardDetailState, 'dashboardWidgetInfoList'),
     containerWidth,
 });
 
-/* widget validation */
-useWidgetValidator({
-    validateOnVariablesSchemaChange: computed(() => !!props.editMode),
-    dashboardWidgetInfoList: reformedWidgetInfoList,
-    widgetConfigMap,
-    variablesSchema: toRef(dashboardDetailState, 'variablesSchema'),
-    updateWidgetValidMap: (validMap) => {
-        dashboardDetailStore.$patch((_state) => {
-            _state.widgetValidMap = validMap;
-        });
-    },
-});
 
 /* init widgets */
 const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
@@ -119,6 +77,40 @@ const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
         }
     }
 };
+const handleWidgetRefreshed = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
+};
+const handleUpdateWidgetInfo = (widget: DashboardLayoutWidgetInfo, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const originWidgetInfo = widget;
+    dashboardDetailStore.updateWidgetInfo(originWidgetInfo.widget_key, { ...originWidgetInfo, ...widgetInfo });
+};
+const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
+    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+};
+const handleClickWidgetEdit = (widget: DashboardLayoutWidgetInfo) => {
+    widgetEditState.targetWidget = widget;
+    widgetEditState.visibleModal = true;
+};
+const handleClickDeleteWidget = (widget: DashboardLayoutWidgetInfo) => {
+    widgetDeleteState.targetWidget = widget;
+    widgetDeleteState.visibleModal = true;
+};
+const handleClickWidgetExpand = (widget: DashboardLayoutWidgetInfo) => {
+    if (props.editMode) {
+        dashboardDetailStore.toggleWidgetSize(widget.widget_key);
+    } else {
+        widgetFormStore.$patch({
+            widgetKey: widget.widget_key,
+        });
+        dashboardDetailStore.$patch((_state) => {
+            _state.widgetViewModeModalVisible = true;
+        });
+    }
+};
+
+
 watch(reformedWidgetInfoList, (widgetInfoList) => {
     if (!Array.isArray(widgetInfoList)) return;
     const initiatedWidgetMap = {};
@@ -180,6 +172,32 @@ defineExpose({
     refreshAllWidget,
 });
 
+/* widget edit modal */
+const widgetEditState = reactive({
+    visibleModal: false,
+    targetWidget: null as DashboardLayoutWidgetInfo|null,
+});
+const handleConfirmWidgetEditModal = () => {
+    const target = widgetEditState.targetWidget;
+    if (!target) return;
+    const targetWidgetRef = widgetRef.value.find((d) => d?.$el?.id === target.widget_key);
+    targetWidgetRef?.refreshWidget();
+    widgetEditState.targetWidget = null;
+};
+
+/* widget delete modal */
+const widgetDeleteState = reactive({
+    visibleModal: false,
+    targetWidget: null as DashboardLayoutWidgetInfo|null,
+});
+const handleDeleteModalConfirm = () => {
+    const target = widgetDeleteState.targetWidget;
+    if (!target) return;
+    dashboardDetailStore.deleteWidget(target.widget_key);
+    widgetDeleteState.visibleModal = false;
+    widgetDeleteState.targetWidget = null;
+};
+
 /* init */
 onMounted(async () => {
     await store.dispatch('reference/loadAll');
@@ -195,7 +213,7 @@ onMounted(async () => {
     >
         <template v-if="!dashboardDetailState.loadingDashboard">
             <template v-for="(widget) in reformedWidgetInfoList"
-                              :key="widget.widget_key"
+                      :key="widget.widget_key"
             >
                 <component :is="widget.component"
                            :id="widget.widget_key"
@@ -206,6 +224,7 @@ onMounted(async () => {
                            :title="widget.title"
                            :options="widget.widget_options"
                            :inherit-options="widget.inherit_options"
+                           :schema-properties="widget.schema_properties"
                            :size="widget.size"
                            :width="widget.width"
                            :theme="widget.theme"
@@ -213,12 +232,55 @@ onMounted(async () => {
                            :edit-mode="props.editMode"
                            :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
-                           :initiated="!!state.initiatedWidgetMap[widget.widget_key]"
+                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible || !state.initiatedWidgetMap[widget.widget_key]"
+                           :dashboard-settings="dashboardDetailState.settings"
+                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                           :dashboard-variables="dashboardDetailState.variables"
+                           @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
+                           @update-widget-info="handleUpdateWidgetInfo(widget, $event)"
+                           @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
+                           @click-edit="handleClickWidgetEdit(widget)"
+                           @click-delete="handleClickDeleteWidget(widget)"
+                           @click-expand="handleClickWidgetExpand(widget)"
                 />
+                <!-- TODO: remove this comment after refactoring
+                <component :is="widget.component"
+                           :id="widget.widget_key"
+                           :key="widget.widget_key"
+                           ref="widgetRef"
+                           v-intersection-observer="handleIntersectionObserver"
+                           :widget-info="widget"
+                           :edit-mode="editMode"
+                           :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                           :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible && widget.widget_key !== widgetFormState.widgetKey"
+                           :initiated="!!initiatedWidgetMap[widget.widget_key]"
+                           :currency-rates="currencyRates"
+                           :all-reference-type-info="allReferenceTypeInfo"
+                           :settings="dashboardDetailState.settings"
+                           :variables-schema="dashboardDetailState.variablesSchema"
+                           :variables="dashboardDetailState.variables"
+                           @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
+                           @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
+                           @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
+                />
+                -->
             </template>
         </template>
         <widget-view-mode-modal :visible="dashboardDetailState.widgetViewModeModalVisible"
                                 @refresh-widget="handleRefreshWidget"
+        />
+        <dashboard-widget-edit-modal v-if="widgetEditState.targetWidget"
+                                     :widget-config-id="widgetEditState.targetWidget.widget_name"
+                                     :visible="widgetEditState.visibleModal"
+                                     :widget-key="widgetEditState.targetWidget.widget_key"
+                                     @update:visible="widgetEditState.visibleModal = $event"
+                                     @confirm="handleConfirmWidgetEditModal"
+        />
+        <delete-modal :visible="widgetDeleteState.visibleModal"
+                      :header-title="t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="t('DASHBOARDS.WIDGET.DELETE_CONTEN`T`S')"
+                      @update:visible="widgetDeleteState.visibleModal = $event"
+                      @confirm="handleDeleteModalConfirm"
         />
     </div>
 </template>

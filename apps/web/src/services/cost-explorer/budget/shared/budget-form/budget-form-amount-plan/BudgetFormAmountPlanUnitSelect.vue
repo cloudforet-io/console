@@ -14,14 +14,14 @@ interface Plan {
     unit: Extract<BudgetTimeUnit, 'MONTHLY'|'TOTAL'>;
 }
 
-interface Props {
+const props = withDefaults(defineProps<{
     selectedUnit: BudgetTimeUnit;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
     selectedUnit: 'TOTAL',
 });
-const emit = defineEmits<{(e: 'update:selectedUnit', unit: BudgetTimeUnit): void}>();
+
+const emit = defineEmits<{(e: 'update:selectedUnit', unit: BudgetTimeUnit): void; }>();
+
 const { t } = useI18n();
 
 const state = reactive({
@@ -53,7 +53,7 @@ const handleUnitChange = (value?: BudgetTimeUnit) => {
                        :key="unit"
                        :tab-index="index"
                        :value="unit"
-                       :selected="selectedUnit"
+                       :selected="props.selectedUnit"
                        @change="handleUnitChange"
         >
             <p-field-title class="title">
