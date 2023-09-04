@@ -19,11 +19,11 @@ const handleMenuDismiss = () => {
         <div class="relocate-notification-wrapper">
             <p class="notification-title">
                 <!--TODO: translation-->
-                {{ $t('Reloate dashboard') }}
+                {{ $t('Looking for your cost dashboards?') }}
             </p>
             <span class="notification-description">
                 <!--TODO: translation-->
-                {{ $t('Your whole Cost Explorer dashboard has been securely transferred to the Dashboard menu for improved usabillity.') }}
+                {{ $t('You can now create enhanced cost dashboards within the new Dashboards menu.') }}
             </span>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
