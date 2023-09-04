@@ -154,7 +154,7 @@ watch(() => state.groupByMenuItems, (after) => {
         .too-many-text {
             @apply text-gray-400;
             font-size: 0.75rem;
-            padding: 0 1rem 0.5rem 1rem;
+            padding: 0 0.5rem 0.5rem 0.5rem;
         }
         .legend {
             height: 25px;

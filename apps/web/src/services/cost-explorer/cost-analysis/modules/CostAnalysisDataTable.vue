@@ -6,14 +6,13 @@ import {
     PButtonModal, PI, PLink, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -197,16 +196,12 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 /* api */
-let listCostAnalysisRequest: CancelTokenSource | undefined;
+// HACK: add response type after the cost analysis API is updated.
+const fetchCostAnalyze = getCancellableFetcher(SpaceConnector.client.costAnalysis.cost.analyze);
 const costApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('total_cost', true);
 const listCostAnalysisTableData = async (granularity, groupBy, period, filters) => {
-    if (listCostAnalysisRequest) {
-        listCostAnalysisRequest.cancel('Next request has been called.');
-        listCostAnalysisRequest = undefined;
-    }
-    listCostAnalysisRequest = axios.CancelToken.source();
     try {
         tableState.loading = true;
         const _convertedFilters = getConvertedFilter(filters);
@@ -216,21 +211,22 @@ const listCostAnalysisTableData = async (granularity, groupBy, period, filters) 
 
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
         // TODO: Change to clientV2 after the cost analysis API is updated.
-        const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             granularity,
             group_by: groupBy,
             start: dayjs.utc(period.start).format(dateFormat),
             end: dayjs.utc(period.end).format(dateFormat),
             ...query,
-        }, { cancelToken: listCostAnalysisRequest.token });
+        });
         // TODO: Remove conversion process after the cost analysis API is updated.
-        tableState.items = results.map((d) => ({
-            ...d,
-            cost: d.usd_cost,
-            total_cost: d.total_usd_cost,
-        }));
-        tableState.totalCount = total_count;
-        listCostAnalysisRequest = undefined;
+        if (status === 'succeed') {
+            tableState.items = response.results.map((d) => ({
+                ...d,
+                cost: d.usd_cost,
+                total_cost: d.total_usd_cost,
+            }));
+            tableState.totalCount = response?.total_count; // HACK: total_count will be deprecated after the cost analysis API is updated.
+        }
     } catch (e) {
         tableState.items = [];
         tableState.totalCount = 0;

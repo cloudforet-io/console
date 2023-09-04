@@ -4,13 +4,12 @@ import {
 } from 'vue';
 
 import type { SerialChart } from '@amcharts/amcharts5';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 
@@ -37,6 +36,7 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type {
     Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
+import type { CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -53,19 +53,14 @@ const state = reactive({
 });
 
 /* api */
-let listCostAnalysisRequest: CancelTokenSource | undefined;
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.client.costAnalysis.cost.analyze);
 const costQueryHelper = new QueryHelper();
 const listCostAnalysisData = async () => {
-    if (listCostAnalysisRequest) {
-        listCostAnalysisRequest.cancel('Next request has been called.');
-        listCostAnalysisRequest = undefined;
-    }
-    listCostAnalysisRequest = axios.CancelToken.source();
     try {
         costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
         // TODO: Change to clientV2 after the cost analysis API is updated.
-        const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+        const { status, response } = await fetchCostAnalyze({
             include_others: !!costAnalysisPageState.chartGroupBy,
             granularity: costAnalysisPageState.granularity,
             group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
@@ -73,18 +68,19 @@ const listCostAnalysisData = async () => {
             end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
             limit: 15,
             ...costQueryHelper.apiQuery,
-        }, { cancelToken: listCostAnalysisRequest.token });
-        listCostAnalysisRequest = undefined;
+        });
         // TODO: Remove conversion process after the cost analysis API is updated.
-        return results.map((d) => ({
-            ...d,
-            cost: d.usd_cost,
-            total_cost: d.total_usd_cost,
-        }));
+        if (status === 'succeed') {
+            return response.results.map((d) => ({
+                ...d,
+                cost: d.usd_cost,
+                total_cost: d.total_usd_cost,
+            }));
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy | string) => {
     state.loading = true;

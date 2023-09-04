@@ -165,7 +165,7 @@ const props = withDefaults(defineProps<FilterableDropdownProps>(), {
 const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
     (e: 'update:search-text', searchText: string): void;
     (e: 'update:selected', selected: FilterableDropdownMenuItem[]): void;
-    (e: 'select', item: FilterableDropdownMenuItem): void;
+    (e: 'select', item: FilterableDropdownMenuItem, isSelected: boolean): void;
     (e: 'delete-tag', item: FilterableDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
@@ -183,9 +183,9 @@ watch(() => props.selected, (selected) => {
         updateSelected(selected);
     }
 });
-const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
+const handleSelectMenuItem = (item: FilterableDropdownMenuItem, _, isSelected: boolean) => {
     if (!props.multiSelectable) hideMenu();
-    emit('select', item);
+    emit('select', item, isSelected);
 };
 const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
     updateSelected(selected);

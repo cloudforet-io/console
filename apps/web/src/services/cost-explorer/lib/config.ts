@@ -1,5 +1,4 @@
 export const GRANULARITY = {
-    ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
