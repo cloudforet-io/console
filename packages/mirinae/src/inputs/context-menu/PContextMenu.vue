@@ -196,7 +196,7 @@ interface ContextMenuEmits {
     (e: 'blur'): void,
     (e: 'keyup:up:end'): void,
     (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index: number): void,
+    (e: 'select', item: MenuItem, index: number, isSelected: boolean): void,
     (e: 'update:search-text', searchText: string): void,
     (e: 'keyup:esc', mouseEvent: MouseEvent): void,
     (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
@@ -283,6 +283,9 @@ const onClickMenu = (item: MenuItem, index) => {
     if (item.disabled) return;
     if (props.readonly) return;
 
+    let isSelected = true;
+    if (state.proxySelected.find((d) => d.name === item.name)) isSelected = false;
+
     if (props.multiSelectable) {
         if (state.selectedNameMap[item.name ?? ''] !== undefined) {
             const indexOfSelected = state.selectedNameMap[item.name ?? ''];
@@ -296,7 +299,7 @@ const onClickMenu = (item: MenuItem, index) => {
         state.proxySelected = [item];
     }
 
-    emit('select', item, index);
+    emit('select', item, index, isSelected);
 };
 const onClickEsc = (e: MouseEvent) => {
     emit('keyup:esc', e);
