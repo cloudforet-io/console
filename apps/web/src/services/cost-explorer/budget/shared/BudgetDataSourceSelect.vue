@@ -2,7 +2,7 @@
 
 import { reactive, watch } from 'vue';
 
-import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
+import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -42,6 +42,7 @@ const fetchDataSource = async () => {
         const dataSourceItems: MenuItem[] = results.map((dataSource:DataSourceInfoModel) => ({
             name: dataSource.data_source_id,
             label: dataSource.name,
+            imageUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
         }));
 
         state.dataSourceItems = dataSourceItems;
@@ -69,7 +70,23 @@ const fetchDataSource = async () => {
                            :items="state.dataSourceItems"
                            :selected="selectedDataSource"
                            @update:selected="setForm('selectedDataSource', $event)"
-        />
+        >
+            <template #default="{ item }">
+                <!--TODO: Currency should be changed to real data.-->
+                <div class="selected-input">
+                    <p-lazy-img :src="item.imageUrl"
+                                width="1rem"
+                                height="1rem"
+                    /><span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                </div>
+            </template>
+            <template #menu-item--format="{item}">
+                <div class="menu-item">
+                    <!--TODO: Currency should be changed to real data.-->
+                    <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                </div>
+            </template>
+        </p-select-dropdown>
     </p-field-group>
 </template>
 
@@ -79,6 +96,12 @@ const fetchDataSource = async () => {
     width: 30rem;
     .data-source-dropdown {
         width: 100%;
+        .selected-input {
+            @apply flex items-center gap-1;
+        }
+        .selected-item-postfix {
+            @apply text-gray-400;
+        }
     }
 }
 
