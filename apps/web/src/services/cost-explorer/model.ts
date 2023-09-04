@@ -21,7 +21,7 @@ export interface TemplateModel {
         schema: JsonSchema;
     };
 }
-export interface DataSourceInfoModel {
+export interface DataSourceModel {
     data_source_id: string;
     name: string;
     state: 'ENABLED' | 'DISABLED';

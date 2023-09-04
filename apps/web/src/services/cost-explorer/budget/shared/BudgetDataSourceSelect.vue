@@ -11,7 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DataSourceInfoModel } from '@/services/cost-explorer/model';
+import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 const emit = defineEmits<{(e: 'update', dataSource: string|null, isValid: boolean): void; }>();
 
@@ -39,7 +39,7 @@ const fetchDataSource = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
 
-        const dataSourceItems: MenuItem[] = results.map((dataSource:DataSourceInfoModel) => ({
+        const dataSourceItems: MenuItem[] = results.map((dataSource:DataSourceModel) => ({
             name: dataSource.data_source_id,
             label: dataSource.name,
             imageUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
@@ -69,6 +69,7 @@ const fetchDataSource = async () => {
         <p-select-dropdown class="data-source-dropdown"
                            :items="state.dataSourceItems"
                            :selected="selectedDataSource"
+                           is-fixed-width
                            @update:selected="setForm('selectedDataSource', $event)"
         >
             <template #default="{ item }">
