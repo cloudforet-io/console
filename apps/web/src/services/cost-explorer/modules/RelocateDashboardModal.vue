@@ -63,13 +63,16 @@ const handleRouteToDashboard = () => {
                     <div class="main-content-wrapper">
                         <div class="update-badge">
                             <p class="text">
-                                FEATURE UPDATED
+                                <!--TODO: translation-->
+                                {{ $t('FEATURE UPDATED') }}
                             </p>
                         </div>
                         <div class="title">
-                            <p>We are thrilled to introduce a significant enhancement to your cost dashboard!</p>
+                            <!--TODO: translation-->
+                            <p>{{ $t('We are thrilled to introduce a significant enhancement to your cost dashboard!') }}</p>
                         </div>
                         <div class="description">
+                            <!--TODO: translation-->
                             <p>
                                 We have integrated the previous Cost Explore's Dashboard feature into a brand new standalone service called "Dashboards".
                                 Therefore, the old dashboards are no longer supported.
@@ -80,17 +83,20 @@ const handleRouteToDashboard = () => {
                                   icon-right="ic_arrow-right-up"
                                   @click="handleRouteToDashboard"
                         >
-                            Go to Dashboard
+                            <!--TODO: translation-->
+                            {{ $t('Go to Dashboard') }}
                         </p-button>
                         <p-divider class="divider" />
                         <div class="footer">
                             <p-button style-type="tertiary"
                                       @click="handleReject"
                             >
-                                Don't show me again
+                                <!--TODO: translation-->
+                                {{ $t("Don't show me again") }}
                             </p-button>
                             <p-button @click="handleClose">
-                                Got it
+                                <!--TODO: translation-->
+                                {{ $t('Got it') }}
                             </p-button>
                         </div>
                     </div>
