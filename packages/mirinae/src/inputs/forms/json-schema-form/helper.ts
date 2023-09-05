@@ -63,6 +63,14 @@ export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
     if (type === 'object') return val; // In case of object, child JsonSchemaForm refines the data.
     if (type === 'array') return refineArrayTypeValue(schema, val);
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
+    if (type === 'string') {
+        // PSelectDropdown case (string, single select)
+        if (Array.isArray(val)) {
+            return val[0]?.name;
+        } if (typeof val === 'object') {
+            return val.name;
+        }
+    }
     if (typeof val === 'string') return val?.trim() || undefined;
     return undefined;
 };
