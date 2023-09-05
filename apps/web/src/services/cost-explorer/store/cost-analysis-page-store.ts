@@ -4,6 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { CostAnalysisPeriodType } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType, getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
@@ -16,7 +17,8 @@ interface CostAnalysisPageState {
     granularity: Granularity;
     groupBy: Array<GroupBy|string>;
     chartGroupBy?: GroupBy|string;
-    period: Period;
+    period?: Period;
+    periodType?: CostAnalysisPeriodType;
     filters: CostFiltersMap;
 }
 
@@ -29,6 +31,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         groupBy: [],
         chartGroupBy: undefined,
         period: getInitialDates(),
+        periodType: undefined,
         filters: {},
     }),
     getters: {
@@ -39,6 +42,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             granularity: state.granularity,
             group_by: state.groupBy,
             period: state.period,
+            period_type: state.periodType,
             filters: state.filters,
         }),
     },
@@ -48,6 +52,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.groupBy = [];
             this.chartGroupBy = undefined;
             this.period = getInitialDates();
+            this.periodType = undefined;
             this.filters = {};
         },
         async setQueryOptions(options?: CostQuerySetOption) {
@@ -61,7 +66,12 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.groupBy = options.group_by ?? [];
             this.chartGroupBy = options.group_by?.[0];
 
-            if (options.period) this.period = { start: options.period.start, end: options.period.end };
+            if (options.period_type) {
+                this.periodType = options.period_type;
+            }
+            if (options.period) {
+                this.period = { start: options.period.start, end: options.period.end };
+            }
             if (options.filters) {
                 this.filters = convertFiltersInToNewType(options.filters);
             }
@@ -70,6 +80,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             const options: CostQuerySetOption = {
                 granularity: this.granularity,
                 period: this.period,
+                period_type: this.periodType,
                 group_by: this.groupBy,
                 filters: this.filters,
             };
