@@ -456,6 +456,7 @@
 						"ACCOUNT": "アカウント",
 						"ALL": "すべて",
 						"BASE_INFORMATION": "基本情報",
+						"DATA_SOURCE": "",
 						"LABEL_COST_TYPE": "コストタイプ",
 						"LABEL_CURRENCY": "通貨",
 						"LABEL_NAME": "名前",

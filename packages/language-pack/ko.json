@@ -456,6 +456,7 @@
 						"ACCOUNT": "계정",
 						"ALL": "모두",
 						"BASE_INFORMATION": "기본 정보",
+						"DATA_SOURCE": "",
 						"LABEL_COST_TYPE": "비용 발생 기준",
 						"LABEL_CURRENCY": "통화",
 						"LABEL_NAME": "이름",
