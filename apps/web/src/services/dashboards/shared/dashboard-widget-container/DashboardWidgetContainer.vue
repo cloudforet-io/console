@@ -11,7 +11,8 @@ import {
 
 import { store } from '@/store';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -46,10 +47,12 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 const widgetFormStore = useWidgetFormStore();
 
+const allReferenceStore = useAllReferenceStore();
+
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
     initiatedWidgetMap: {} as Record<string, any>,
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     currencyRates: computed(() => store.state.settings.currencyRates),
 });
 

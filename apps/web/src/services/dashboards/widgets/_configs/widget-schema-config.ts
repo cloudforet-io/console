@@ -104,7 +104,7 @@ export const ASSET_GROUP_BY_SCHEMA = {
     menuItems: Object.values(ASSET_GROUP_BY_ITEM_MAP),
 };
 
-export const DATA_SOURCE_SCHEMA = {
+export const COST_DATA_SOURCE_SCHEMA = {
     title: 'Data Source',
     type: 'string',
     reference: {

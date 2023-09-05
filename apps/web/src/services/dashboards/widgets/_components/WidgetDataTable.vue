@@ -12,9 +12,9 @@ import { cloneDeep, throttle } from 'lodash';
 
 import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
