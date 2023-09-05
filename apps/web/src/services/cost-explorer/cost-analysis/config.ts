@@ -1,6 +1,5 @@
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import type { CostQuerySetModel, Period } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 export const MANAGED_COST_QUERY_SET_IDS = {
     MONTHLY_PROJECT: 'Monthly cost by project',
@@ -14,7 +13,21 @@ export const managedCostQuerySetIdList: string[] = [
     MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
 ];
 
-const defaultPeriod: Period = getInitialDates();
+export const COST_ANALYSIS_PERIOD_TYPE = {
+    // monthly
+    THIS_MONTH: 'thisMonth',
+    LAST_MONTH: 'lastMonth',
+    LAST_3_MONTHS: 'last3months',
+    LAST_6_MONTHS: 'last6months',
+    LAST_12_MONTHS: 'last12months',
+    // yearly
+    THIS_YEAR: 'thisYear',
+    LAST_YEAR: 'lastYear',
+    LAST_3_YEARS: 'last3years',
+    LAST_5_YEARS: 'last5years',
+    // custom
+    CUSTOM: 'custom',
+} as const;
 
 export const managedCostQuerySets: CostQuerySetModel[] = [
     {
@@ -23,7 +36,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
         options: {
             group_by: [GROUP_BY.PROJECT],
             granularity: GRANULARITY.MONTHLY,
-            period: defaultPeriod,
+            period_type: COST_ANALYSIS_PERIOD_TYPE.LAST_6_MONTHS,
         },
     },
     {
@@ -32,7 +45,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
         options: {
             group_by: [GROUP_BY.SERVICE_ACCOUNT],
             granularity: GRANULARITY.MONTHLY,
-            period: defaultPeriod,
+            period_type: COST_ANALYSIS_PERIOD_TYPE.LAST_6_MONTHS,
         },
     },
     {
@@ -41,7 +54,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
         options: {
             group_by: [GROUP_BY.PRODUCT],
             granularity: GRANULARITY.MONTHLY,
-            period: defaultPeriod,
+            period_type: COST_ANALYSIS_PERIOD_TYPE.LAST_6_MONTHS,
         },
     },
 ];
