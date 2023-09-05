@@ -12,7 +12,7 @@ const basePieWidgetConfig: WidgetConfig = {
     },
     sizes: ['sm', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         cost_group_by: COST_GROUP_BY.PROVIDER,
         chart_type: CHART_TYPE.PIE,
         legend_options: {

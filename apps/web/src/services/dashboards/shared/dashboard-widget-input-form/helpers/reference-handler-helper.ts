@@ -1,46 +1,46 @@
+
 import type { ReferenceHandler } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-let resourceToken: CancelTokenSource | undefined;
-const getResources = async (inputText: string, distinctKey: string, resourceType: string): Promise<{name: string; key: string}[]> => {
-    if (resourceToken) {
-        resourceToken.cancel('Next request has been called.');
-        resourceToken = undefined;
+const getApi = (resourceType: string, referenceType: string, referenceKey?: string) => {
+    const reference = REFERENCE_TYPE_INFO[referenceType];
+    if (referenceKey && reference?.key === referenceKey) {
+        return SpaceConnector.client.addOns.autocomplete.distinct;
     }
+    return SpaceConnector.client.addOns.autocomplete.resource;
+};
 
-    resourceToken = axios.CancelToken.source();
-
+const getResources = async (inputText: string, resourceType: string, referenceType: string, distinctKey?: string): Promise<{name: string; key: string}[]> => {
     try {
-        const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
+        const fetcher = getCancellableFetcher(getApi(resourceType, referenceType, distinctKey));
+        const { status, response } = await fetcher({
             resource_type: resourceType,
-            distinct_key: distinctKey,
             search: inputText,
             options: {
                 limit: 10,
             },
-        }, {
-            cancelToken: resourceToken.token,
+            distinct_key: distinctKey,
         });
-        resourceToken = undefined;
 
-        return results;
-    } catch (e: any) {
-        if (!axios.isCancel(e.axiosError)) {
-            ErrorHandler.handleError(e);
+        if (status === 'succeed') {
+            return response.results;
         }
-
+        return [];
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
         return [];
     }
 };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getReferenceHandler = (): ReferenceHandler => async (inputText, schema, pageStart, pageLimit) => {
     if (!schema.reference) return { results: [] };
-    const resources = await getResources(inputText, schema.reference.reference_key ?? schema.propertyName, schema.reference.resource_type);
+    const resources = await getResources(inputText, schema.reference.resource_type, schema.propertyName, schema.reference.reference_key);
     return {
         results: resources.map((resource) => ({ name: resource.key, label: resource.name })),
     };

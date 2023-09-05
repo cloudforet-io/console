@@ -24,7 +24,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     sizes: ['sm'],
     options: {
         chart_type: CHART_TYPE.WAFFLE,
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         cost_group_by: 'budget_id',
     },
     options_schema: {

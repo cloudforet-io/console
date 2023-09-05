@@ -27,7 +27,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
         chart_type: CHART_TYPE.STACKED_COLUMN,
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         legend_options: {
             enabled: true,
             show_at: 'chart',

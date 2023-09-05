@@ -21,7 +21,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
     },
     sizes: ['md'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),

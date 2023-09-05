@@ -7,7 +7,6 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -25,7 +24,6 @@ import {
 } from '@/styles/colors';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -67,11 +65,6 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
-    dateRange: computed<DateRange>(() => {
-        const end = widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
-        const start = widgetState.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM');
-        return { start, end };
-    }),
 });
 
 const state = reactive({
@@ -88,15 +81,15 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.data_source,
             query: {
-                granularity: widgetState.options.granularity,
+                granularity: widgetState.granularity,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 group_by: [widgetState.groupBy],
                 fields: {
                     cost_sum: {
-                        // TODO: Change to 'cost' after the cost analysis API is updated.
-                        key: 'usd_cost',
+                        key: 'cost',
                         operator: 'sum',
                     },
                 },

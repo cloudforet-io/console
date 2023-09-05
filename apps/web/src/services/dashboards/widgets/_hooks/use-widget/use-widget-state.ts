@@ -1,54 +1,87 @@
-import type { ComputedRef, UnwrapRef } from 'vue';
+import { asyncComputed } from '@vueuse/core';
+import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
+import dayjs from 'dayjs';
+import { flattenDeep, isEmpty } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-
-import { store } from '@/store';
-
-import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import type { useDataSourceReferenceStore } from '@/services/cost-explorer/store/data-source-reference-store';
+import type { DateRange } from '@/services/dashboards/config';
 import type {
     WidgetProps,
     WidgetFiltersMap,
+
+    AssetGroupBy,
+    CostGroupBy,
+    Granularity,
+    WidgetFilter,
+} from '@/services/dashboards/widgets/_configs/config';
+import {
+    GRANULARITY,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
 import {
     useWidgetBaseState,
 } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
+import type { ChartType } from '@/services/dashboards/widgets/type';
 
 
 export interface WidgetState extends WidgetBaseState {
-    currency: ComputedRef<Currency|undefined>;
+    granularity: ComputedRef<Granularity|undefined>;
+    chartType: ComputedRef<ChartType|undefined>;
+    groupBy: ComputedRef<CostGroupBy | AssetGroupBy | undefined>;
+    dateRange: ComputedRef<DateRange>;
+    currency: Ref<Currency|undefined>;
+    // filters
+    consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
 }
-export function useWidgetState(
-    props: WidgetProps,
-) {
-    const baseState = useWidgetBaseState(props);
+export function useWidgetState(props: WidgetProps, dataSourceReferenceStore: ReturnType<typeof useDataSourceReferenceStore>) {
+    const state = useWidgetBaseState(props);
 
     return reactive<WidgetState>({
-        ...toRefs(baseState) as WidgetBaseState,
-        currency: computed(() => {
-            if (baseState.settings?.currency.value === 'DEFAULT') return store.state.settings.currency;
-            return baseState.settings?.currency.value ?? CURRENCY.USD;
+        ...toRefs(state) as WidgetBaseState,
+        granularity: computed(() => state.options?.granularity),
+        chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
+        groupBy: computed(() => {
+            if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_group_by;
+            if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_group_by;
+            return undefined;
+        }),
+        dateRange: computed<DateRange>(() => {
+            const dateRangeFormat = state.options.granularity === GRANULARITY.YEARLY ? 'YYYY' : 'YYYY-MM';
+            const end = dayjs.utc(state.settings?.date_range?.end).format(dateRangeFormat);
+            const start = dayjs.utc(state.settings?.date_range?.start).format(dateRangeFormat);
+            return { start, end };
+        }),
+        currency: asyncComputed<Currency|undefined>(async () => {
+            await dataSourceReferenceStore.load();
+            const dataSources = dataSourceReferenceStore.referenceMap;
+            if (!state.options?.data_source) return undefined;
+            return dataSources[state.options.data_source]?.data?.currency;
+        }),
+        // filters
+        consoleFilters: computed<WidgetFilter[]>(() => {
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return flattenDeep<WidgetFilter[]>(Object.values(state.options.filters));
         }),
         budgetConsoleFilters: computed(() => {
-            if (!baseState.options?.filters || isEmpty(baseState.options.filters)) return [];
-            return getConvertedBudgetConsoleFilters(baseState.options.filters);
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
         cloudServiceStatsConsoleFilters: computed(() => {
-            if (!baseState.options?.filters || isEmpty(baseState.options.filters)) return [];
-            return getConvertedCloudServiceStatsConsoleFilters(baseState.options.filters);
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return getConvertedCloudServiceStatsConsoleFilters(state.options.filters);
         }),
     }) as UnwrapRef<WidgetState>;
 }
