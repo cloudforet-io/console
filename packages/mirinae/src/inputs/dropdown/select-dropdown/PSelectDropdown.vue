@@ -330,7 +330,6 @@ watch(() => state.proxySelected, (proxySelected) => {
         .text {
             flex-grow: 1;
             flex-shrink: 0;
-            padding: 0.25rem 0;
             line-height: 1.5;
             height: 100%;
             .inner-label {
@@ -407,9 +406,6 @@ watch(() => state.proxySelected, (proxySelected) => {
             &.default {
                 .dropdown-button {
                     @apply border-blue-600;
-                }
-                .dropdown-icon {
-                    @apply text-gray-900;
                 }
             }
             &.rounded {
@@ -564,7 +560,7 @@ watch(() => state.proxySelected, (proxySelected) => {
         .dropdown-button {
             .text {
                 @apply truncate;
-                width: calc(100% - 1.5rem);
+                flex: 1;
             }
             &.text-only {
                 .text {
