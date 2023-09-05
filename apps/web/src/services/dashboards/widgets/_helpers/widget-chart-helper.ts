@@ -4,10 +4,10 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { AssetGroupBy, CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData, PieChartData,
@@ -122,7 +122,7 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
  * @name getRefinedTreemapChartData
  * @description Convert raw data to TreemapChart data.
  */
-export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: AssetGroupBy|CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         name: 'Root',
         value: '',

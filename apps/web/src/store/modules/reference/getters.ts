@@ -3,14 +3,14 @@ import type { Getter } from 'vuex';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import type { VuexStoreAllReferenceTypeInfo } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
@@ -40,7 +40,7 @@ export const userItems: Getter<any, any> = (state): UserReferenceMap => state.us
 
 export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => state.webhook?.items ?? {};
 
-export const allReferenceTypeInfo: Getter<any, any> = (state, getters): AllReferenceTypeInfo => ({
+export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStoreAllReferenceTypeInfo => ({
     projectGroup: {
         ...REFERENCE_TYPE_INFO.project_group,
         referenceMap: getters.projectGroupItems,

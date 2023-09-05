@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy } from 'lodash';
 
-import type { AllReferenceTypeInfo, ReferenceType } from '@/store/modules/reference/type';
+import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
