@@ -110,6 +110,8 @@ const { queryTags, filters: searchFilters } = queryTagsHelper;
 const apiQueryHelper = new ApiQueryHelper();
 
 const getQuery = () => {
+    apiQueryHelper.setFilters(searchFilters.value);
+
     let statusValues: string[] = [];
     if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
         statusValues = [JOB_STATE.IN_PROGRESS];
