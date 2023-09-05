@@ -26,7 +26,6 @@ export const WIDGET_SIZE = {
 } as const;
 
 export const GRANULARITY = {
-    ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',

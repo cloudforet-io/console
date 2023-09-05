@@ -23,7 +23,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         cost_group_by: COST_GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {

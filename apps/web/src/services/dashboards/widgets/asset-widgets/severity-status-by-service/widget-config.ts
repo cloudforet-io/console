@@ -22,7 +22,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
     },
     sizes: ['full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         legend_options: {
             enabled: true,
             show_at: 'chart',

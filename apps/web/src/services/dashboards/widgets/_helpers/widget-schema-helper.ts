@@ -12,15 +12,15 @@ import type {
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
-    RESOURCE_REFERENCE_SCHEMA,
+    RESOURCE_REFERENCE_SCHEMA, DATA_SOURCE_SCHEMA,
 } from '@/services/dashboards/widgets/_configs/widget-schema-config';
-
 
 export const getWidgetOptionsSchema = (...optionNames: WidgetOptionsSchemaProperty[]): object => {
     const result: JsonSchema['properties'] = {};
 
     optionNames.forEach((optionName) => {
-        if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
+        if (optionName === 'data_source') result.data_source = DATA_SOURCE_SCHEMA;
+        else if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
         else if (optionName === 'asset_group_by') result.asset_group_by = ASSET_GROUP_BY_SCHEMA;
         else if (optionName.startsWith('filters.')) {
             const filterKey = optionName.replace('filters.', '');

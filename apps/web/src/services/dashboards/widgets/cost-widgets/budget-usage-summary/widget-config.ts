@@ -23,7 +23,7 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     },
     sizes: ['sm', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
