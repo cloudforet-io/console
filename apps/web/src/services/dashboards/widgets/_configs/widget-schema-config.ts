@@ -103,3 +103,11 @@ export const ASSET_GROUP_BY_SCHEMA = {
     enum: Object.values(ASSET_GROUP_BY),
     menuItems: Object.values(ASSET_GROUP_BY_ITEM_MAP),
 };
+
+export const DATA_SOURCE_SCHEMA = {
+    title: 'Data Source',
+    type: 'string',
+    reference: {
+        resource_type: 'cost_analysis.DataSource',
+    },
+};
