@@ -16,6 +16,8 @@ import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { DataSourceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -36,12 +38,14 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
+
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
 const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
 const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -107,12 +111,16 @@ const state = reactive({
     showFavoriteOnly: false,
 });
 const dataSourceState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    items: computed<MenuItem[]>(() => costQuerySetState.dataSourceList.map((dataSource) => ({
-        name: dataSource.data_source_id,
-        label: dataSource.name,
-        imageUrl: dataSourceState.plugins[dataSource.plugin_info?.plugin_id]?.icon,
-    }))),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    items: computed<MenuItem[]>(() => {
+        const dataSourceMap: DataSourceMap = allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap;
+        const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
+            name: key,
+            label: value.name,
+            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon,
+        }));
+        return dataSourceMenuItemList;
+    }),
     selected: computed(() => costQuerySetState.selectedDataSourceId),
 });
 const relocateNotificationState = reactive({
@@ -200,8 +208,7 @@ watch(() => route.params, (params) => {
 }, { immediate: true });
 
 (async () => {
-    await store.dispatch('reference/loadAll');
-    await costQuerySetStore.listDataSources();
+    await allReferenceStore.load('plugin');
     await costQuerySetStore.listCostQuerySets();
 })();
 
