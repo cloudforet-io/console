@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const costByRegionWidgetConfig: WidgetConfig = {
@@ -35,31 +35,40 @@ const costByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_account', 'cost_product'),
+        default_properties: [
+            'cost_data_source',
+            ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_account', 'cost_product'),
+        ],
+        fixed_properties: ['cost_data_source'],
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_account',
-            ),
-            order: getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_account',
-            ),
+            properties: {
+                ...getWidgetOptionsSchema('cost_data_source'),
+                ...getWidgetFilterOptionsSchema(
+                    'provider',
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'cost_category',
+                    'cost_resource_group',
+                    'cost_product',
+                    'region',
+                    'cost_account',
+                ),
+            },
+            order: [
+                'cost_data_source',
+                ...getWidgetFilterSchemaPropertyNames(
+                    'provider',
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'cost_category',
+                    'cost_resource_group',
+                    'cost_product',
+                    'region',
+                    'cost_account',
+                )],
         },
     },
 };
