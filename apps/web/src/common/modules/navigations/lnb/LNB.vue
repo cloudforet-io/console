@@ -115,7 +115,9 @@ const handleSelect = (id: string, selected: string) => {
                      :key="`${idx}-${getUUID()}`"
                      class="slot-menu-wrapper"
                 >
-                    <slot :name="`slot-${menuData.id}`" />
+                    <slot :name="`slot-${menuData.id}`"
+                          v-bind="menuData"
+                    />
                 </div>
                 <l-n-b-menu-item v-else
                                  :key="`${idx}-${getUUID()}`"
@@ -173,7 +175,6 @@ const handleSelect = (id: string, selected: string) => {
     }
     .slot-menu-wrapper {
         @apply flex items-center;
-        padding: 0 0.5rem;
         height: 2rem;
     }
     .top-title {
