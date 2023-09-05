@@ -38,13 +38,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
-        currentQuerySetOptions: (state): Partial<CostQuerySetOption> => ({
-            granularity: state.granularity,
-            group_by: state.groupBy,
-            period: state.period,
-            period_type: state.periodType,
-            filters: state.filters,
-        }),
+        selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
     },
     actions: {
         async initState() {
