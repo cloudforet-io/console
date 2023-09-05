@@ -6,7 +6,7 @@ import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import {
     SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
-    SELECT_DROPDOWN_SIZE,
+    APPEARANCE_TYPE,
 } from '@/inputs/dropdown/select-dropdown/type';
 
 export const getSelectDropdownArgTypes = (): ArgTypes => {
@@ -21,7 +21,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         }
     });
     return {
-        /* context menu fixed style props */
         useFixedMenuStyle: {
             name: 'useFixedMenuStyle',
             type: { name: 'boolean' },
@@ -58,7 +57,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: null,
             },
         },
-        //
         invalid: contextMenuArgTypes.invalid,
         loading: contextMenuArgTypes.loading,
         items: {
@@ -189,26 +187,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 options: [undefined, ...Object.values(SELECT_DROPDOWN_STYLE_TYPE)],
             },
         },
-        size: {
-            name: 'size',
-            type: { name: 'string' },
-            description: `Select size. ${
-                [...Object.values(SELECT_DROPDOWN_SIZE)].map((d) => `\`${d}\``)} are available.`,
-            defaultValue: SELECT_DROPDOWN_SIZE.md,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: SELECT_DROPDOWN_SIZE.md,
-                },
-            },
-            control: {
-                type: 'select',
-                options: [undefined, ...Object.values(SELECT_DROPDOWN_SIZE)],
-            },
-        },
         buttonIcon: {
             name: 'buttonIcon',
             type: { name: 'string' },
@@ -262,6 +240,81 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'boolean',
+            },
+        },
+        highlightSelectionState: {
+            name: 'highlightSelectionState',
+            type: { name: 'boolean' },
+            description: 'Visual indication of whether there are selected items or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        innerLabel: {
+            name: 'innerLabel',
+            type: { name: 'boolean' },
+            description: 'Whether there are inner label or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'select',
+                options: [...Object.values(CONTEXT_MENU_POSITION)],
+            },
+        },
+        deleteButton: {
+            name: 'deleteButton',
+            type: { name: 'boolean' },
+            description: 'Whether there are delete button for selected item or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'select',
+                options: [...Object.values(CONTEXT_MENU_POSITION)],
+            },
+        },
+        appearanceType: {
+            name: 'appearanceType',
+            type: { name: 'string' },
+            description: 'Appearance type of Dropdown button',
+            defaultValue: APPEARANCE_TYPE.DEFAULT,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: APPEARANCE_TYPE.DEFAULT,
+                },
+            },
+            control: {
+                type: 'select',
+                options: [...Object.values(APPEARANCE_TYPE)],
             },
         },
         /* model */
@@ -327,6 +380,19 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         onFocusMenu: {
             name: 'focus-menu',
             description: 'Event emitted when menu must be focused, but there are no menu items to focus because `menu-menu` slot was given.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onClickDelete: {
+            name: 'click-delete',
+            description: 'Event emitted when delete button was clicked.',
             table: {
                 type: {
                     summary: null,

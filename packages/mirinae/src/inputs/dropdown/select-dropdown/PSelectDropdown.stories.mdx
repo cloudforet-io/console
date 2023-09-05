@@ -9,6 +9,7 @@ import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
 import {
+    APPEARANCE_TYPE,
     SELECT_DROPDOWN_SIZE, SELECT_DROPDOWN_STYLE_TYPE
 } from "@/inputs/dropdown/select-dropdown/type";
 import { useProxyValue } from '@/hooks';
@@ -42,9 +43,14 @@ export const Template = (args, { argTypes }) => ({
             :button-icon="buttonIcon"
             :menu-position="menuPosition"
             :is-fixed-width="isFixedWidth"
+            :highlight-selection-state="highlightSelectionState"
+            :inner-label="innerLabel"
+            :delete-button="deleteButton"
+            :appearance-type="appearanceType"
             @select="onSelect"
             @update:selected="onUpdateSelected"
             @focus-menu="onFocusMenu"
+            @click-delete="onClickDelete"
         ></p-select-dropdown>
     </div>
     `,
@@ -67,12 +73,12 @@ export const Template = (args, { argTypes }) => ({
 ## Default
 
 <Canvas>
-    <Story name="Basic" height={'500px'}>
+    <Story name="Basic" height={'300px'}>
         {{
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
+    <div class="h-full w-full overflow">
         <p-select-dropdown :items="menuItems"></p-select-dropdown>
     </div>
     `,
@@ -93,13 +99,28 @@ export const Template = (args, { argTypes }) => ({
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems" disabled></p-select-dropdown>
-    </div>
-    `,
+                            <table class="w-full border-separate border-spacing-1">
+                                <thead>
+                                    <tr>
+                                        <th>default</th>
+                                        <th>rounded</th>
+                                        <th>transparent</th>
+                                        <th>icon-button</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th v-for="styleType in styleTypes" :key="styleType">
+                                            <p-select-dropdown :items="menuItems" :styleType="styleType" class="m-2" disabled/>
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `,
             setup() {
                 return {
-                    menuItems
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
                 }
             }
         }}
@@ -109,28 +130,43 @@ export const Template = (args, { argTypes }) => ({
 ## Invalid
 
 <Canvas>
-    <Story name="Invalid" height={'500px'}>
+    <Story name="Invalid" height={'300px'}>
         {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems" invalid></p-select-dropdown>
-    </div>
-    `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
+                    i18n: I18nConnector.i18n,
+                    components: { PSelectDropdown },
+                    template: `
+                                    <table class="w-full border-separate border-spacing-1">
+                                        <thead>
+                                            <tr>
+                                                <th>default</th>
+                                                <th>rounded</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    <p-select-dropdown :items="menuItems" class="m-2" invalid/>
+                                                </th>
+                                                <th>
+                                                    <p-select-dropdown :items="menuItems" styleType="rounded" class="m-2" invalid/>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                `,
+                    setup() {
+                        return {
+                            menuItems,
+                        }
+                    }
+                }}
     </Story>
 </Canvas>
 
 ## Button Style Type
 
 <Canvas>
-    <Story name="Button Style Type" height={'500px'}>
+    <Story name="Button Style Type" height={'300px'}>
         {{
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
@@ -139,9 +175,9 @@ export const Template = (args, { argTypes }) => ({
                     <thead>
                         <tr>
                             <th>default</th>
-                            <th>icon-button</th>
+                            <th>rounded</th>
                             <th>transparent</th>
-                            <th>secondary-button</th>
+                            <th>icon-button</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -163,58 +199,10 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Size
-
-<Canvas>
-    <Story name="Size" height={'500px'}>
-        {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-                <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
-                            <th class="w-24"></th>
-                            <th>default</th>
-                            <th>icon-button</th>
-                            <th>transparent</th>
-                            <th>secondary-button</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>md</th>
-                            <th v-for="styleType in styleTypes" :key="styleType" >
-                                <p-select-dropdown size="md" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
-                            </th>
-                        </tr>
-                        <tr>
-                            <th>lg</th>
-                            <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown size="lg" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
-            `,
-            setup() {
-                const state = reactive({
-                    sizes: Object.values(SELECT_DROPDOWN_SIZE)
-                })
-                return {
-                    ...toRefs(state),
-                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
-                    menuItems,
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
 ## Read Only
 
 <Canvas>
-    <Story name="Read Only" height={'500px'}>
+    <Story name="Read Only" height={'300px'}>
         {{
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
@@ -224,9 +212,9 @@ export const Template = (args, { argTypes }) => ({
                         <tr>
                             <th></th>
                             <th>default</th>
-                            <th>icon-button</th>
+                            <th>rounded</th>
                             <th>transparent</th>
-                            <th>secondary-button</th>
+                            <th>icon-button</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -255,37 +243,31 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Icon Button Type
+## Button Icon Type
 
 <Canvas>
-    <Story name="Icon Button Type" height={'500px'}>
+    <Story name="Button Icon Type" height={'300px'}>
         {{
             i18n: I18nConnector.i18n,
             components: {
                 PSelectDropdown
             },
             template: `
-                <table class="w-full border-separate border-spacing-1">
+                <table class="w-5/12 border-separate border-spacing-1">
                     <thead>
                         <tr>
                             <th class="w-2/12">icon / variations</th>
                             <th>default</th>
-                            <th>disabled</th>
-                            <th>invalid</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <th>default</th>
                             <th><p-select-dropdown :items="menuItems" style-type="icon-button" /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" disabled /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" invalid /></th>
                         </tr>
                         <tr>
                             <th>custom</th>
                             <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" disabled /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" invalid /></th>
                         </tr>
                     </tbody>
                 </table>
@@ -302,38 +284,15 @@ export const Template = (args, { argTypes }) => ({
 ## Is Fixed Width
 
 <Canvas>
-    <Story name="Is Fixed Width" height={'500px'}>
+    <Story name="Is Fixed Width" height={'300px'}>
         {{
             i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
                 <div class="h-full w-full overflow p-8">
-                    <p-select-dropdown :items="menuItems" is-fixed-width class="w-52" placeholder="long long long long long long long long long long long placeholder"></p-select-dropdown>
+                    <p-select-dropdown class="w-96" :items="menuItems" is-fixed-width placeholder="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long placeholder "></p-select-dropdown>
                 </div>
             `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-## Default Slot
-
-<Canvas>
-    <Story name="Default Slot" height={'500px'}>
-        {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems">
-            Actions
-        </p-select-dropdown>
-    </div>
-    `,
             setup() {
                 return {
                     menuItems
@@ -351,7 +310,7 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectDropdown, PToggleButton },
             template: `
         <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
-            <div style="height: 500px;">
+            <div style="height: 300px;">
                 <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
                     Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
                     The menu's style position will be set 'fixed'.<br/>
@@ -379,6 +338,196 @@ export const Template = (args, { argTypes }) => ({
                     menuItems,
                     onChange
                 }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## highlight Selection State
+
+<Canvas>
+    <Story name="highlight Selection State" height={'300px'}>
+        {{
+                    i18n: I18nConnector.i18n,
+                    components: { PSelectDropdown },
+                    template: `
+                                    <table class="w-full border-separate border-spacing-1">
+                                        <thead>
+                                            <tr>
+                                                <th>default</th>
+                                                <th>highlight Selection State</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    <p-select-dropdown :items="menuItems" class="m-2" style-type="rounded" />
+                                                </th>
+                                                <th>
+                                                    <p-select-dropdown :items="menuItems" class="m-2" style-type="rounded" highlight-selection-state :selected="[0]" index-mode />
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                `,
+                    setup() {
+                        return {
+                            menuItems,
+                        }
+                    }
+                }}
+    </Story>
+</Canvas>
+
+## Menu Position
+
+<Canvas>
+    <Story name="Menu Position" height={'300px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>left</th>
+                            <th>right</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2 w-24"  />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2 w-24" menu-position="right"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Inner Label
+
+<Canvas>
+    <Story name="Inner Label" height={'300px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>inner label</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2"  />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2" inner-label />
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Delete Button
+
+<Canvas>
+    <Story name="Delete Button" height={'300px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>rounded</th>
+                            <th>transparent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2 w-6/12" delete-button />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" styleType="rounded" class="m-2 w-6/12" delete-button />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" styleType="transparent" class="m-2 w-6/12" delete-button />
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Appearance Type
+
+<Canvas>
+    <Story name="Appearance Type" height={'300px'}>
+        {{
+            i18n: I18nConnector.i18n,
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>badge</th>
+                            <th>stack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="m-2 w-24" />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="my-2 mx-auto w-48" appearance-type="badge" />
+                            </th>
+                            <th>
+                                <p-select-dropdown :items="menuItems" class="my-2 mx-auto w-auto" appearance-type="stack" />
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                };
             }
         }}
     </Story>

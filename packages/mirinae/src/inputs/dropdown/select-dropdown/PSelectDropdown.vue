@@ -6,24 +6,24 @@ import {
     toRef,
     ref,
     useSlots,
+    watch,
 } from 'vue';
 
 import { onClickOutside } from '@vueuse/core';
 import { groupBy, reduce } from 'lodash';
 
+import PBadge from '@/data-display/badge/PBadge.vue';
+import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SelectDropdownSize } from '@/inputs/dropdown/select-dropdown/type';
 import {
     SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
-    SELECT_DROPDOWN_SIZE,
+    APPEARANCE_TYPE,
 } from '@/inputs/dropdown/select-dropdown/type';
-
 
 interface Props {
     useFixedMenuStyle?: boolean;
@@ -39,8 +39,11 @@ interface Props {
     buttonIcon?: string;
     menuPosition?: CONTEXT_MENU_POSITION;
     readOnly?: boolean;
-    size?: SelectDropdownSize;
     isFixedWidth?: boolean;
+    highlightSelectionState?: boolean;
+    innerLabel?: string|boolean;
+    deleteButton?: boolean;
+    appearanceType?: APPEARANCE_TYPE;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,8 +60,11 @@ const props = withDefaults(defineProps<Props>(), {
     items: () => [],
     selected: undefined,
     indexMode: false,
-    size: SELECT_DROPDOWN_SIZE.md,
     buttonIcon: undefined,
+    highlightSelectionState: false,
+    innerLabel: undefined,
+    deleteButton: false,
+    appearanceType: APPEARANCE_TYPE.DEFAULT,
 });
 
 const emit = defineEmits<{(e: 'update:selected', value?: string | number): void;
@@ -73,17 +79,8 @@ const slots = useSlots();
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
     contextMenuRef: null as null|any,
-    proxySelected: useProxyValue('selected', props, emit),
-    selectedItem: computed<MenuItem|null>(() => {
-        if (!Array.isArray(props.items)) return null;
-
-        if (props.indexMode) return props.items[state.proxySelected ?? ''] || null;
-
-        const data = groupBy(props.items, 'name')[state.proxySelected ?? ''];
-        if (Array.isArray(data)) return data[0] || null;
-
-        return null;
-    }),
+    proxySelected: useProxyValue<string|number|undefined>('selected', props, emit),
+    selectedItems: [] as MenuItem[],
     menuSlots: computed(() => reduce(slots, (res, d, name) => {
         if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
         return res;
@@ -94,15 +91,22 @@ const state = reactive({
         }
         return res;
     }, {})),
+    innerText: computed<string>(() => {
+        // TODO: need to check at console for translation.
+        if (typeof (props.innerLabel) === 'string') {
+            return state.selectedItems?.length > 0
+                ? `${state.selectedItems[0].label || state.selectedItems[0].name || ''}`
+                : (props.innerLabel || 'Label');
+        }
+
+        return state.selectedItems.length > 0
+            ? (state.selectedItems[0].label || state.selectedItems[0].name || '')
+            : (props.placeholder || 'Select');
+    }),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = toRef(state, 'contextMenuRef');
-
-const hideMenu = () => {
-    state.proxyVisibleMenu = false;
-};
-onClickOutside(containerRef, hideMenu);
 
 const {
     targetRef, contextMenuStyle,
@@ -136,68 +140,145 @@ const handlePressDownKey = () => {
         }
     });
 };
+const handleDeleteTag = (index: number) => {
+    state.proxySelected = undefined;
+    state.selectedItems.splice(index, 1);
+};
+const handleDeleteButtonClick = () => {
+    state.proxySelected = undefined;
+    state.selectedItems = [];
+    emit('click-delete');
+};
+
+const hideMenu = () => {
+    state.proxyVisibleMenu = false;
+};
+onClickOutside(containerRef, hideMenu);
+
+/* Watcher */
+watch(() => state.proxySelected, (proxySelected) => {
+    if (proxySelected === undefined || null) return;
+
+    if (!props.items) {
+        state.selectedItems = [];
+        return;
+    }
+
+    let item;
+    if ((props.appearanceType === APPEARANCE_TYPE.BADGE) || (props.appearanceType === APPEARANCE_TYPE.STACK)) {
+        if (props.indexMode) {
+            item = props.items[proxySelected ?? 0];
+            return;
+        }
+        item = props.items.filter((i) => i.name === proxySelected)[0];
+
+        state.selectedItems.push(item);
+        return;
+    }
+
+    if (props.indexMode) {
+        item = props.items[proxySelected ?? 0];
+        state.selectedItems = [item];
+        return;
+    }
+
+    const data = groupBy(props.items, 'name')[proxySelected ?? ''];
+    if (Array.isArray(data)) {
+        state.selectedItems = data;
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <div ref="containerRef"
          class="p-select-dropdown"
          :class="{
-             [styleType] : true,
-             invalid,
-             disabled,
-             'read-only': readOnly,
-             active: state.proxyVisibleMenu && !readOnly,
-             [size] : true,
-             'is-fixed-width': isFixedWidth,
+             [props.styleType] : true,
+             [props.appearanceType]: true,
+             invalid: props.invalid,
+             disabled: props.disabled,
+             active: state.proxyVisibleMenu && !props.readOnly,
+             'read-only': props.readOnly,
+             'is-fixed-width': props.isFixedWidth,
+             'highlight-selection-state': props.highlightSelectionState,
+             'selected': state.selectedItems.length > 0,
          }"
     >
-        <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
-                       ref="targetRef"
-                       :name="buttonIcon || (state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
-                       :activated="state.proxyVisibleMenu"
-                       :disabled="disabled"
-                       color="inherit"
-                       class="icon-button"
-                       @click="handleClick"
-                       @keydown.down="handlePressDownKey"
+        <p-i v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
+             ref="targetRef"
+             :name="props.buttonIcon || (state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
+             :activated="state.proxyVisibleMenu"
+             :disabled="props.disabled"
+             color="inherit"
+             class="only-icon-button"
+             style-type="tertiary"
+             @click="handleClick"
+             @keydown.down="handlePressDownKey"
         />
         <button v-else
                 ref="targetRef"
                 class="dropdown-button"
-                :class="{'text-only': (styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)}"
+                :class="{'text-only': (props.styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && props.readOnly)}"
                 @click="handleClick"
                 @keydown.down="handlePressDownKey"
         >
             <span class="text"
-                  :class="{placeholder: !state.selectedItem}"
+                  :class="{placeholder: state.selectedItems.length === 0}"
             >
                 <slot name="default"
-                      v-bind="{item: state.selectedItem}"
+                      v-bind="{item: state.selectedItems}"
                 >
-                    {{
-                        state.selectedItem ?
-                            (state.selectedItem.label || state.selectedItem.name || '') :
-                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
-                    }}
+                    <strong v-if="props.innerLabel !== undefined && state.selectedItems.length > 0">
+                        {{ props.innerLabel || 'Label' }}:
+                    </strong>
+                    <span v-if="props.appearanceType === APPEARANCE_TYPE.STACK && state.selectedItems.length > 0"
+                          class="tags-wrapper"
+                    >
+                        <p-tag v-for="(selectedItem, index) in state.selectedItems"
+                               :key="index"
+                               class="stack-tag"
+                               :value-item="selectedItem"
+                               @delete="handleDeleteTag(index)"
+                        />
+                    </span>
+                    <span v-else>
+                        {{ state.innerText }}
+                    </span>
                 </slot>
             </span>
-            <p-i v-if="!(styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)"
+            <p-badge v-if="props.appearanceType === APPEARANCE_TYPE.BADGE && state.selectedItems.length > 1"
+                     badge-type="subtle"
+                     style-type="blue300"
+                     class="appearance-badge"
+            >
+                + {{ state.selectedItems.length - 1 }}
+            </p-badge>
+            <p-i v-if="props.deleteButton && state.selectedItems.length > 0"
+                 name="ic_close"
+                 color="inherit"
+                 class="delete-button"
+                 style-type="tertiary"
+                 width="1rem"
+                 height="1rem"
+                 @click.stop="handleDeleteButtonClick"
+            />
+            <p-i v-if="!(props.styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && props.readOnly)"
                  :name="state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                  :activated="state.proxyVisibleMenu"
-                 :disabled="disabled"
+                 :disabled="props.disabled"
                  color="inherit"
                  class="dropdown-icon"
             />
         </button>
         <p-context-menu v-show="state.proxyVisibleMenu"
                         ref="contextMenuRef"
-                        :class="{ [menuPosition]: !useFixedMenuStyle }"
-                        :menu="items"
-                        :loading="loading"
-                        :invalid="invalid"
+                        :class="{ [props.menuPosition]: !props.useFixedMenuStyle }"
+                        :menu="props.items"
+                        :loading="props.loading"
+                        :invalid="props.invalid"
                         :style="{
                             ...contextMenuStyle,
-                            ...(styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
+                            ...(props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
                         }"
                         item-height-fixed
                         no-select-indication
@@ -234,28 +315,17 @@ const handlePressDownKey = () => {
 }
 
 .p-select-dropdown {
-    @apply rounded-md;
-    position: relative;
-    display: inline-block;
+    @apply relative inline-block rounded-md;
     min-width: 6.5rem;
 
-    &.icon-button {
-        min-width: unset;
-    }
-
     .dropdown-button {
-        @apply border border-solid border-gray-300 rounded-md;
-        min-width: unset;
+        @apply flex justify-between items-center font-normal text-left border border-solid rounded-md;
         width: 100%;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 0.25rem 0 0.5rem;
+        min-height: 2rem;
+        padding: 0 0.5rem;
         margin-right: -1px;
-        font-weight: normal;
         font-size: 0.875rem;
-        text-align: left;
-        height: 2rem;
+        gap: 0.25rem;
 
         .text {
             flex-grow: 1;
@@ -263,28 +333,36 @@ const handlePressDownKey = () => {
             padding: 0.25rem 0;
             line-height: 1.5;
             height: 100%;
+            .inner-label {
+                @apply text-label-md font-bold;
+            }
             &.placeholder {
-                @apply text-gray-600;
+                @apply text-gray-500;
             }
         }
-        .dropdown-icon {
-            flex-shrink: 0;
+        .delete-button {
+            @apply text-gray-400;
         }
-
-        &:focus, &:active {
-            @apply border-secondary text-secondary;
-            outline: none;
+        .dropdown-icon {
+            @apply text-gray-600;
+            flex-shrink: 0;
         }
     }
 
+    /* Style Type */
     &.default {
         .dropdown-button {
             @apply bg-white text-gray-900 border-gray-300;
         }
     }
-    &.secondary-button {
+    &.rounded {
         .dropdown-button {
-            @apply text-violet-800 border-violet-800;
+            @apply rounded-xl border-gray-200;
+        }
+        &.selected {
+            .dropdown-button {
+                @apply border-gray-400;
+            }
         }
     }
     &.transparent {
@@ -294,11 +372,135 @@ const handlePressDownKey = () => {
             padding-left: 0;
         }
     }
+    &.icon-button {
+        @apply flex items-center justify-center rounded-full;
+        width: 1.5rem;
+        height: 1.5rem;
+        min-width: unset;
+        margin: auto;
+        &.disabled {
+            @apply cursor-not-allowed;
+        }
+        .p-context-menu {
+            top: 2rem;
+        }
+    }
+
+    /* Appearance Type */
+    &.badge {
+        display: flex;
+        .appearance-badge {
+            @apply text-paragraph-sm;
+        }
+    }
+    &.stack {
+        .tags-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    /* hover */
+    &:not(.disabled):not(.read-only):not(.invalid) {
+        &:hover {
+            &.default {
+                .dropdown-button {
+                    @apply border-blue-600;
+                }
+                .dropdown-icon {
+                    @apply text-gray-900;
+                }
+            }
+            &.rounded {
+                .dropdown-button {
+                    @apply bg-gray-100;
+                }
+            }
+            &.transparent {
+                .dropdown-icon {
+                    @apply text-blue-600;
+                }
+            }
+            &.icon-button {
+                .only-icon-button {
+                    @apply cursor-pointer;
+                }
+                &:hover {
+                    @apply text-blue-600;
+                }
+            }
+        }
+    }
+
+    /* active */
+    &:not(.invalid):not(.disabled):not(.read-only).active {
+        &.default {
+            .dropdown-button {
+                @apply border-secondary bg-white;
+            }
+            .dropdown-icon {
+                @apply text-blue-600;
+            }
+        }
+        &.rounded {
+            .dropdown-button {
+                @apply bg-gray-100;
+            }
+        }
+        &.button {
+            .dropdown-button {
+                @apply border-secondary text-white bg-secondary;
+                .dropdown-icon {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+        &.transparent {
+            .dropdown-icon {
+                @apply text-secondary;
+            }
+        }
+        &.icon-button {
+            @apply bg-blue-300 text-secondary;
+            .context-menu {
+                margin-top: 0.5rem;
+            }
+        }
+        &.highlight-selection-state {
+            .dropdown-button {
+                @apply bg-blue-100;
+            }
+        }
+    }
+
+    /* selected */
+    &.selected {
+        .dropdown-button {
+            @apply font-medium;
+        }
+    }
+
+    /* disabled */
+    &.disabled {
+        @apply text-gray-300;
+        .dropdown-button {
+            @apply bg-gray-100 text-gray-300 cursor-not-allowed;
+        }
+        .dropdown-icon {
+            @apply text-gray-300;
+        }
+        &.transparent {
+            .dropdown-button {
+                @apply bg-transparent;
+            }
+        }
+    }
 
     /* read only */
     &.read-only {
         .dropdown-button {
-            cursor: default;
+            @apply border border-solid bg-white cursor-default;
             &:focus {
                 color: inherit;
             }
@@ -309,13 +511,56 @@ const handlePressDownKey = () => {
         &.icon-button {
             display: none;
         }
-        &.secondary-button {
-            @mixin read-only-style;
+    }
+
+    /* invalid */
+    &:not(.disabled):not(.read-only).invalid {
+        &.default, &.rounded {
+            .dropdown-button {
+                @apply border border-alert;
+            }
+            &.active {
+                .dropdown-button {
+                    @apply bg-red-100 ;
+                }
+            }
+            &:hover {
+                .dropdown-button {
+                    @apply bg-red-100 ;
+                }
+            }
+        }
+        &.transparent {
+            .dropdown-button {
+                @apply border-none;
+            }
+        }
+    }
+
+    /* highlight selection state */
+    &.highlight-selection-state {
+        &.rounded, &.default {
+            .dropdown-button {
+                @apply bg-blue-100 border-blue-300 text-blue-600;
+                .text {
+                    @apply text-blue-600;
+                }
+                .dropdown-icon {
+                    @apply text-blue-600;
+                }
+            }
+            &:not(.disabled):not(.read-only):not(.invalid),
+            &:not(.invalid):not(.disabled):not(.read-only).active {
+                .dropdown-button {
+                    @apply bg-blue-100;
+                }
+            }
         }
     }
 
     /* is-fixed-width */
     &.is-fixed-width {
+        display: initial;
         .dropdown-button {
             .text {
                 @apply truncate;
@@ -334,130 +579,17 @@ const handlePressDownKey = () => {
     }
 
     .p-context-menu {
-        position: absolute;
+        @apply absolute;
         margin-top: -1px;
         z-index: 1000;
         min-width: 100%;
         width: auto;
         &.left {
-            left: 0;
             right: unset;
         }
         &.right {
             left: unset;
-            right: 0;
-        }
-    }
-
-    /* disabled */
-    &.disabled {
-        @mixin disabled-style;
-        .dropdown-button {
-            cursor: not-allowed;
-        }
-        &.transparent {
-            .dropdown-button {
-                @apply bg-transparent;
-            }
-        }
-        &.secondary-button {
-            @mixin disabled-style-filled-bg;
-        }
-    }
-
-    /* invalid */
-    &:not(.disabled):not(.read-only).invalid {
-        .dropdown-button {
-            @apply border border-alert;
-            &:focus, &:active {
-                @apply border border-alert;
-            }
-        }
-    }
-
-    /* active */
-    &:not(.invalid):not(.disabled):not(.read-only).active {
-        &.default {
-            .dropdown-button {
-                @apply border-secondary text-secondary bg-white;
-            }
-        }
-        &.button {
-            .dropdown-button {
-                @apply border-secondary text-white bg-secondary;
-                .dropdown-icon {
-                    transform: rotate(180deg);
-                }
-            }
-        }
-        &.transparent {
-            .dropdown-button {
-                @apply text-secondary;
-            }
-        }
-        &.secondary-button {
-            .dropdown-button {
-                @apply border-secondary text-secondary bg-white;
-            }
-        }
-    }
-
-    /* hover */
-    &:not(.invalid):not(.disabled):not(.active):not(.read-only) {
-        &.default {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply border-blue-600;
-                        .dropdown-icon {
-                            @apply text-blue-600;
-                        }
-                    }
-                }
-            }
-        }
-        &.transparent {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply text-secondary;
-                        outline: none;
-                    }
-                }
-            }
-        }
-        &.secondary-button {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply bg-white text-secondary border-secondary;
-                    }
-                }
-            }
-        }
-    }
-
-    &:not(.disabled):not(.active).transparent {
-        &.default {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply text-secondary;
-                    }
-                }
-            }
-        }
-    }
-
-    /* size */
-    &.lg {
-        .dropdown-button {
-            font-size: 1rem;
-        }
-    }
-    &.md {
-        .dropdown-button {
-            font-size: 0.875rem;
+            right: -1px;
         }
     }
 }
