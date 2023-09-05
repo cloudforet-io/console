@@ -1,166 +1,9 @@
-<template>
-    <div ref="profileMenuRef"
-         v-click-outside="hideProfileMenu"
-         class="gnb-profile"
-         @keydown.esc="hideProfileMenu"
-    >
-        <span class="menu-button"
-              role="button"
-              tabindex="0"
-              @click.stop="handleProfileButtonClick"
-              @keydown.enter="openProfileMenu"
-        >
-            <p-i :name="userIcon"
-                 class="menu-icon"
-            />
-        </span>
-        <div v-if="visible"
-             class="profile-menu-wrapper"
-        >
-            <div class="user-info">
-                <p-i :name="userIcon" />
-                <span class="value">{{ userId }}</span>
-            </div>
-            <div class="info-wrapper">
-                <div class="info-menu">
-                    <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
-                    <span class="value">{{ domainId }}</span>
-                </div>
-                <div class="info-menu">
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ role }}</span>
-                </div>
-                <div v-click-outside="handleClickOutsideLanguageMenu"
-                     class="info-menu language"
-                     @click.stop="handleLanguageDropdownClick"
-                >
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
-                    <div class="value">
-                        <span>{{ language }}</span>
-                        <div v-if="languageMenuVisible"
-                             class="language-menu-wrapper"
-                        >
-                            <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in languageMenu"
-                                     :key="index"
-                                     class="sub-menu"
-                                     @click.stop="handleLanguageClick(item.name)"
-                                >
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p-i :name="languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         class="arrow-icon"
-                         width="1rem"
-                         height="1rem"
-                    />
-                </div>
-                <div v-click-outside="handleClickOutsideCurrencyMenu"
-                     class="info-menu currency"
-                     @click.stop="handleCurrencyDropdownClick"
-                >
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
-                    <div class="value">
-                        <span>{{ currency }}</span>
-                        <div v-if="currencyMenuVisible"
-                             class="currency-menu-wrapper"
-                        >
-                            <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in currencyMenuItems"
-                                     :key="index"
-                                     class="sub-menu"
-                                     @click.stop="handleCurrencyClick(item.name)"
-                                >
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p-i :name="currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         class="arrow-icon"
-                         width="1rem"
-                         height="1rem"
-                    />
-                </div>
-                <div class="info-menu">
-                    <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
-                    <span class="value">{{ timezone }}</span>
-                </div>
-                <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
-                                 @click.native="hideProfileMenu"
-                    >
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  class="my-page-button"
-                        >
-                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
-                        </p-button>
-                    </router-link>
-                </div>
-            </div>
-            <template v-if="hasPermission">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
-                                 @click.native="hideProfileMenu"
-                    >
-                        {{ $t('MENU.INFO_NOTICE') }}
-                    </router-link>
-                </div>
-            </template>
-            <template v-if="hasPermission && !isDomainOwner">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
-                                 @click.native="hideProfileMenu"
-                    >
-                        {{ $t('MENU.MY_PAGE_API_KEY') }}
-                    </router-link>
-                </div>
-            </template>
-            <p-divider />
-            <div class="sub-menu-wrapper">
-                <a v-for="{ link, label } in supportedMenu"
-                   :key="label"
-                   class="sub-menu support-menu"
-                   :href="link"
-                   target="_blank"
-                   @click="hideProfileMenu"
-                >
-                    <span>{{ label }}</span>
-                    <p-i name="ic_external-link"
-                         height="1em"
-                         width="1em"
-                         color="inherit"
-                         class="external-icon"
-                    />
-                </a>
-            </div>
-            <p-divider />
-            <div class="sub-menu-wrapper">
-                <div class="sub-menu"
-                     @click="handleClickSignOut"
-                >
-                    {{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive,
 } from 'vue';
-import type { DirectiveFunction, SetupContext } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
 
@@ -188,161 +31,283 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 interface Props {
     visible: boolean
 }
-export default defineComponent<Props>({
-    name: 'GNBProfile',
-    components: {
-        PDivider,
-        PI,
-        PButton,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
 
-        const state = reactive({
-            userIcon: computed(() => {
-                if (state.isDomainOwner) return 'img_avatar_root-account';
-                if (state.hasDomainRole) return 'img_avatar_admin';
-                return 'img_avatar_user';
-            }),
-            name: computed(() => store.state.user.name),
-            email: computed(() => store.state.user.email),
-            role: computed(() => {
-                const roleArray = store.getters['user/roleNames'];
-                return roleArray.join(', ');
-            }),
-            language: computed(() => store.getters['user/languageLabel']),
-            currency: computed(() => store.state.settings.currency),
-            timezone: computed(() => store.state.user.timezone),
-            domainId: computed(() => store.state.domain.domainId),
-            userId: computed(() => store.state.user.userId),
-            hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-            hasPermission: computed(() => store.getters['user/hasPermission']),
-            languageMenuVisible: false,
-            currencyMenuVisible: false,
-            supportedMenu: computed(() => {
-                const docsList = config.get('DOCS') ?? [];
-                const data = { lang: store.state.user.language };
-                return docsList.map((d) => ({
-                    label: ejs.render(d?.label ?? '', data),
-                    link: ejs.render(d?.link ?? '', data),
-                }));
-            }),
-            languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
-                label: v, name: k,
-            }))),
-            currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-            }))),
-            profileMenuRef: null as null|HTMLElement,
-        });
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
 
-        const setVisible = (visible: boolean) => {
-            emit('update:visible', visible);
-        };
-        const openProfileMenu = () => {
-            setVisible(true);
-        };
-        const hideProfileMenu = () => {
-            if (state.languageMenuVisible) state.languageMenuVisible = false;
-            setVisible(false);
-        };
-        const setLanguageMenuVisible = (visible: boolean) => {
-            state.languageMenuVisible = visible;
-        };
-        const setCurrencyMenuVisible = (visible: boolean) => {
-            state.currencyMenuVisible = visible;
-        };
-        const handleProfileButtonClick = () => {
-            setVisible(!props.visible);
-        };
-        const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
-            const profileMenuRef = state.profileMenuRef;
-            if (!profileMenuRef) return;
-            const target = e.target as HTMLElement;
-            setLanguageMenuVisible(false);
-            /*
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
+const vm = getCurrentInstance()?.proxy as Vue;
+
+const state = reactive({
+    userIcon: computed(() => {
+        if (state.isDomainOwner) return 'img_avatar_root-account';
+        if (state.hasDomainRole) return 'img_avatar_admin';
+        return 'img_avatar_user';
+    }),
+    name: computed(() => store.state.user.name),
+    email: computed(() => store.state.user.email),
+    role: computed(() => {
+        const roleArray = store.getters['user/roleNames'];
+        return roleArray.join(', ');
+    }),
+    language: computed(() => store.getters['user/languageLabel']),
+    currency: computed(() => store.state.settings.currency),
+    timezone: computed(() => store.state.user.timezone),
+    domainId: computed(() => store.state.domain.domainId),
+    userId: computed(() => store.state.user.userId),
+    hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
+    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+    hasPermission: computed(() => store.getters['user/hasPermission']),
+    languageMenuVisible: false,
+    currencyMenuVisible: false,
+    supportedMenu: computed(() => {
+        const docsList = config.get('DOCS') ?? [];
+        const data = { lang: store.state.user.language };
+        return docsList.map((d) => ({
+            label: ejs.render(d?.label ?? '', data),
+            link: ejs.render(d?.link ?? '', data),
+        }));
+    }),
+    languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
+        label: v, name: k,
+    }))),
+    currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
+    profileMenuRef: null as null|HTMLElement,
+});
+
+const setVisible = (visible: boolean) => {
+    emit('update:visible', visible);
+};
+const openProfileMenu = () => {
+    setVisible(true);
+};
+const hideProfileMenu = () => {
+    if (state.languageMenuVisible) state.languageMenuVisible = false;
+    setVisible(false);
+};
+const setLanguageMenuVisible = (visible: boolean) => {
+    state.languageMenuVisible = visible;
+};
+const setCurrencyMenuVisible = (visible: boolean) => {
+    state.currencyMenuVisible = visible;
+};
+const handleProfileButtonClick = () => {
+    setVisible(!props.visible);
+};
+const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
+    const profileMenuRef = state.profileMenuRef;
+    if (!profileMenuRef) return;
+    const target = e.target as HTMLElement;
+    setLanguageMenuVisible(false);
+    /*
                 v-on-click-outside directive stops click event bubbling.
                 So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
                 The code below closes the profile menu when the user clicks outside the profileMenuRef.
              */
-            if (!profileMenuRef.contains(target)) hideProfileMenu();
-        };
-        const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
-            const profileMenuRef = state.profileMenuRef;
-            if (!profileMenuRef) return;
-            const target = e.target as HTMLElement;
-            setCurrencyMenuVisible(false);
-            if (!profileMenuRef.contains(target)) hideProfileMenu();
-        };
-        const handleLanguageDropdownClick = () => {
-            setLanguageMenuVisible(!state.languageMenuVisible);
-        };
-        const handleCurrencyDropdownClick = () => {
-            setCurrencyMenuVisible(!state.currencyMenuVisible);
-        };
+    if (!profileMenuRef.contains(target)) hideProfileMenu();
+};
+const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
+    const profileMenuRef = state.profileMenuRef;
+    if (!profileMenuRef) return;
+    const target = e.target as HTMLElement;
+    setCurrencyMenuVisible(false);
+    if (!profileMenuRef.contains(target)) hideProfileMenu();
+};
+const handleLanguageDropdownClick = () => {
+    setLanguageMenuVisible(!state.languageMenuVisible);
+};
+const handleCurrencyDropdownClick = () => {
+    setCurrencyMenuVisible(!state.currencyMenuVisible);
+};
 
-        const handleLanguageClick = async (language) => {
-            try {
-                if (store.state.user.language === language) return;
+const handleLanguageClick = async (language) => {
+    try {
+        if (store.state.user.language === language) return;
 
-                await store.dispatch('user/setUser', {
-                    language,
-                    timezone: state.timezone,
-                });
+        await store.dispatch('user/setUser', {
+            language,
+            timezone: state.timezone,
+        });
 
-                setLanguageMenuVisible(false);
-                showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
-            }
-        };
-        const handleCurrencyClick = async (currency) => {
-            store.commit('settings/setCurrency', currency);
-            setCurrencyMenuVisible(false);
-            showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
-        };
-        const handleClickGoToMyPage = () => {
-            hideProfileMenu();
-            vm.$router.push({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME });
-        };
-        const handleClickSignOut = async () => {
-            const res: Location = {
-                name: AUTH_ROUTE.SIGN_OUT._NAME,
-                query: { nextPath: vm.$route.fullPath },
-            };
-            await vm.$router.push(res);
-        };
+        setLanguageMenuVisible(false);
+        showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
+    }
+};
+const handleCurrencyClick = async (currency) => {
+    store.commit('settings/setCurrency', currency);
+    setCurrencyMenuVisible(false);
+    showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
+};
 
-        return {
-            ...toRefs(state),
-            openProfileMenu,
-            hideProfileMenu,
-            handleProfileButtonClick,
-            handleClickOutsideLanguageMenu,
-            handleClickOutsideCurrencyMenu,
-            handleLanguageDropdownClick,
-            handleCurrencyDropdownClick,
-            handleClickGoToMyPage,
-            handleCurrencyClick,
-            handleLanguageClick,
-            handleClickSignOut,
-            MY_PAGE_ROUTE,
-            INFO_ROUTE,
-        };
-    },
-});
+const handleClickSignOut = async () => {
+    const res: Location = {
+        name: AUTH_ROUTE.SIGN_OUT._NAME,
+        query: { nextPath: vm.$route.fullPath },
+    };
+    await vm.$router.push(res);
+};
 </script>
+
+<template>
+    <div ref="profileMenuRef"
+         v-on-click-outside="hideProfileMenu"
+         class="gnb-profile"
+         @keydown.esc="hideProfileMenu"
+    >
+        <span class="menu-button"
+              role="button"
+              tabindex="0"
+              @click.stop="handleProfileButtonClick"
+              @keydown.enter="openProfileMenu"
+        >
+            <p-i :name="state.userIcon"
+                 class="menu-icon"
+            />
+        </span>
+        <div v-if="visible"
+             class="profile-menu-wrapper"
+        >
+            <div class="user-info">
+                <p-i :name="state.userIcon" />
+                <span class="value">{{ state.userId }}</span>
+            </div>
+            <div class="info-wrapper">
+                <div class="info-menu">
+                    <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
+                    <span class="value">{{ state.domainId }}</span>
+                </div>
+                <div class="info-menu">
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
+                    <span class="value">{{ state.role }}</span>
+                </div>
+                <div v-on-click-outside="handleClickOutsideLanguageMenu"
+                     class="info-menu language"
+                     @click.stop="handleLanguageDropdownClick"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
+                    <div class="value">
+                        <span>{{ state.language }}</span>
+                        <div v-if="state.languageMenuVisible"
+                             class="language-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.languageMenu"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleLanguageClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+                <div v-on-click-outside="handleClickOutsideCurrencyMenu"
+                     class="info-menu currency"
+                     @click.stop="handleCurrencyDropdownClick"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
+                    <div class="value">
+                        <span>{{ state.currency }}</span>
+                        <div v-if="state.currencyMenuVisible"
+                             class="currency-menu-wrapper"
+                        >
+                            <div class="sub-menu-wrapper">
+                                <div v-for="(item, index) in state.currencyMenuItems"
+                                     :key="index"
+                                     class="sub-menu"
+                                     @click.stop="handleCurrencyClick(item.name)"
+                                >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         class="arrow-icon"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+                <div class="info-menu">
+                    <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
+                    <span class="value">{{ state.timezone }}</span>
+                </div>
+                <div class="info-menu">
+                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
+                                 @click.native="hideProfileMenu"
+                    >
+                        <p-button style-type="secondary"
+                                  size="sm"
+                                  class="my-page-button"
+                        >
+                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                        </p-button>
+                    </router-link>
+                </div>
+            </div>
+            <template v-if="state.hasPermission">
+                <p-divider />
+                <div class="sub-menu-wrapper">
+                    <router-link class="sub-menu"
+                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 @click.native="hideProfileMenu"
+                    >
+                        {{ $t('MENU.INFO_NOTICE') }}
+                    </router-link>
+                </div>
+            </template>
+            <template v-if="state.hasPermission && !state.isDomainOwner">
+                <p-divider />
+                <div class="sub-menu-wrapper">
+                    <router-link class="sub-menu"
+                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
+                                 @click.native="hideProfileMenu"
+                    >
+                        {{ $t('MENU.MY_PAGE_API_KEY') }}
+                    </router-link>
+                </div>
+            </template>
+            <p-divider />
+            <div class="sub-menu-wrapper">
+                <a v-for="{ link, label } in state.supportedMenu"
+                   :key="label"
+                   class="sub-menu support-menu"
+                   :href="link"
+                   target="_blank"
+                   @click="hideProfileMenu"
+                >
+                    <span>{{ label }}</span>
+                    <p-i name="ic_external-link"
+                         height="1em"
+                         width="1em"
+                         color="inherit"
+                         class="external-icon"
+                    />
+                </a>
+            </div>
+            <p-divider />
+            <div class="sub-menu-wrapper">
+                <div class="sub-menu"
+                     @click="handleClickSignOut"
+                >
+                    {{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .gnb-profile {
