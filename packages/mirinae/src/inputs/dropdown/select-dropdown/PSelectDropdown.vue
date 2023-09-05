@@ -97,6 +97,8 @@ const state = reactive({
 });
 
 const containerRef = ref<HTMLElement|null>(null);
+const contextMenuRef = toRef(state, 'contextMenuRef');
+
 const hideMenu = () => {
     state.proxyVisibleMenu = false;
 };
@@ -128,7 +130,7 @@ const handleClick = (e: MouseEvent) => {
 const handlePressDownKey = () => {
     if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
     nextTick(() => {
-        if (state.contextMenuRef) {
+        if (contextMenuRef.value) {
             if (slots['menu-menu']) emit('focus-menu');
             else state.contextMenuRef.focus();
         }
