@@ -7,12 +7,10 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { managedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
-import type { DataSourceModel } from '@/services/cost-explorer/model';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 interface CostAnalysisLNBState {
     costQuerySetList: CostQuerySetModel[];
-    dataSourceList: DataSourceModel[];
     selectedQuerySetId?: string;
     selectedDataSourceId?: string;
 }
@@ -20,7 +18,6 @@ interface CostAnalysisLNBState {
 export const useCostQuerySetStore = defineStore('cost-query-set', {
     state: (): CostAnalysisLNBState => ({
         costQuerySetList: [],
-        dataSourceList: [],
         selectedQuerySetId: undefined,
         selectedDataSourceId: undefined,
     }),
@@ -31,15 +28,6 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
         },
     },
     actions: {
-        async listDataSources(): Promise<void> {
-            try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
-                this.dataSourceList = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                this.dataSourceList = [];
-            }
-        },
         async listCostQuerySets(): Promise<void> {
             try {
                 // TODO: apply v2
