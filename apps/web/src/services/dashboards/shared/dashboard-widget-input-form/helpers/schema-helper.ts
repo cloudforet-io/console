@@ -135,3 +135,4 @@ export const getRefinedWidgetInheritOptions = (widgetInfo: DashboardLayoutWidget
     }
     return inheritOptions;
 };
+

@@ -1,4 +1,4 @@
-import type { ReferenceType } from '@/store/modules/reference/type';
+import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 export const UNIT_MAP = {
     B: 'B',

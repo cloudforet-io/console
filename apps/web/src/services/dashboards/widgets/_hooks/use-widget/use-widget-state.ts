@@ -66,7 +66,7 @@ export function useWidgetState(props: WidgetProps) {
         currency: asyncComputed<Currency|undefined>(async () => {
             const dataSources = props.allReferenceTypeInfo.cost_data_source.referenceMap;
             if (!state.options?.cost_data_source) return undefined;
-            return dataSources[state.options.cost_data_source]?.data?.currency;
+            return dataSources[state.options.cost_data_source]?.data?.plugin_info?.metadata?.currency;
         }),
         // filters
         consoleFilters: computed<WidgetFilter[]>(() => {
