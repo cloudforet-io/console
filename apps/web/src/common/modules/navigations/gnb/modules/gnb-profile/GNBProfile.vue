@@ -10,13 +10,11 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import ejs from 'ejs';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -54,7 +52,6 @@ const state = reactive({
         return roleArray.join(', ');
     }),
     language: computed(() => store.getters['user/languageLabel']),
-    currency: computed(() => store.state.settings.currency),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
     userId: computed(() => store.state.user.userId),
@@ -62,7 +59,6 @@ const state = reactive({
     isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
     hasPermission: computed(() => store.getters['user/hasPermission']),
     languageMenuVisible: false,
-    currencyMenuVisible: false,
     supportedMenu: computed(() => {
         const docsList = config.get('DOCS') ?? [];
         const data = { lang: store.state.user.language };
@@ -73,10 +69,6 @@ const state = reactive({
     }),
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
-    }))),
-    currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-        name: currency,
-        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
     }))),
 });
 
@@ -95,9 +87,6 @@ const hideProfileMenu = () => {
 const setLanguageMenuVisible = (visible: boolean) => {
     state.languageMenuVisible = visible;
 };
-const setCurrencyMenuVisible = (visible: boolean) => {
-    state.currencyMenuVisible = visible;
-};
 const handleProfileButtonClick = () => {
     setVisible(!props.visible);
 };
@@ -112,17 +101,8 @@ const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
              */
     if (!profileMenuRef.value.contains(target)) hideProfileMenu();
 };
-const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
-    if (!profileMenuRef.value) return;
-    const target = e.target as HTMLElement;
-    setCurrencyMenuVisible(false);
-    if (!profileMenuRef.value.contains(target)) hideProfileMenu();
-};
 const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
-};
-const handleCurrencyDropdownClick = () => {
-    setCurrencyMenuVisible(!state.currencyMenuVisible);
 };
 
 const handleLanguageClick = async (language) => {
@@ -139,11 +119,6 @@ const handleLanguageClick = async (language) => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
     }
-};
-const handleCurrencyClick = async (currency) => {
-    store.commit('settings/setCurrency', currency);
-    setCurrencyMenuVisible(false);
-    showSuccessMessage(i18n.t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
 };
 
 const handleClickSignOut = async () => {
@@ -214,33 +189,33 @@ const handleClickSignOut = async () => {
                          height="1rem"
                     />
                 </div>
-                <div v-on-click-outside="handleClickOutsideCurrencyMenu"
-                     class="info-menu currency"
-                     @click.stop="handleCurrencyDropdownClick"
-                >
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>
-                    <div class="value">
-                        <span>{{ state.currency }}</span>
-                        <div v-if="state.currencyMenuVisible"
-                             class="currency-menu-wrapper"
-                        >
-                            <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in state.currencyMenuItems"
-                                     :key="index"
-                                     class="sub-menu"
-                                     @click.stop="handleCurrencyClick(item.name)"
-                                >
-                                    <span>{{ item.label }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         class="arrow-icon"
-                         width="1rem"
-                         height="1rem"
-                    />
-                </div>
+                <!--                <div v-on-click-outside="handleClickOutsideCurrencyMenu"-->
+                <!--                     class="info-menu currency"-->
+                <!--                     @click.stop="handleCurrencyDropdownClick"-->
+                <!--                >-->
+                <!--                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>-->
+                <!--                    <div class="value">-->
+                <!--                        <span>{{ state.currency }}</span>-->
+                <!--                        <div v-if="state.currencyMenuVisible"-->
+                <!--                             class="currency-menu-wrapper"-->
+                <!--                        >-->
+                <!--                            <div class="sub-menu-wrapper">-->
+                <!--                                <div v-for="(item, index) in state.currencyMenuItems"-->
+                <!--                                     :key="index"-->
+                <!--                                     class="sub-menu"-->
+                <!--                                     @click.stop="handleCurrencyClick(item.name)"-->
+                <!--                                >-->
+                <!--                                    <span>{{ item.label }}</span>-->
+                <!--                                </div>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <p-i :name="state.currencyMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"-->
+                <!--                         class="arrow-icon"-->
+                <!--                         width="1rem"-->
+                <!--                         height="1rem"-->
+                <!--                    />-->
+                <!--                </div>-->
                 <div class="info-menu">
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
