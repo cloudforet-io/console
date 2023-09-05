@@ -9,6 +9,7 @@ import { flattenDeep, isEmpty } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
@@ -65,8 +66,11 @@ export function useWidgetState(props: WidgetProps) {
         }),
         currency: asyncComputed<Currency|undefined>(async () => {
             const dataSources = props.allReferenceTypeInfo.cost_data_source.referenceMap;
-            if (!state.options?.cost_data_source) return undefined;
-            return dataSources[state.options.cost_data_source]?.data?.plugin_info?.metadata?.currency;
+            if (state.widgetConfig.labels?.includes('Cost')) {
+                if (!state.options?.cost_data_source) return CURRENCY.USD;
+                return dataSources[state.options.cost_data_source]?.data?.plugin_info?.metadata?.currency;
+            }
+            return undefined;
         }),
         // filters
         consoleFilters: computed<WidgetFilter[]>(() => {

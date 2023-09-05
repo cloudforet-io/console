@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
-    defineProps, nextTick, reactive, ref, toRef, toRefs,
+    defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -24,15 +22,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, red } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
 interface Data {
@@ -54,16 +49,19 @@ interface ChartData {
     }
 }
 
-const DATE_FORMAT = 'YYYY-MM';
-
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createDonutChart, createPieSeries,
     disposeRoot, refreshRoot, setChartColors, root,
 } = useAmcharts5(chartContext);
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    loading: true,
+    data: null as null|Data[],
     skeletons: [1, 2],
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
@@ -89,10 +87,6 @@ const state = reactive({
 
         return results;
     }),
-    dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
     totalBudget: computed<number|string>(() => {
         if (!state.data?.length) return '--';
         return state.data[0].total_budget;
@@ -119,11 +113,11 @@ const state = reactive({
         const value = state.totalBudget - state.totalSpent;
         if (value >= 0) {
             return {
-                label: `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`,
+                label: `${currencyMoneyFormatter(value, widgetState.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`,
             };
         }
         return {
-            label: `${currencyMoneyFormatter(Math.abs(value), state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`,
+            label: `${currencyMoneyFormatter(Math.abs(value), widgetState.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`,
             color: red[400],
         };
     }),
@@ -133,11 +127,9 @@ const state = reactive({
     }),
 });
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
-
 const [totalSpentPeriod] = useDateRangeFormatter({
-    start: computed(() => state.settings?.date_range?.start),
-    end: computed(() => state.settings?.date_range?.end),
+    start: computed(() => widgetState.settings?.date_range?.start),
+    end: computed(() => widgetState.settings?.date_range?.end),
 });
 
 /* Api */
@@ -145,12 +137,13 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
-        apiQueryHelper.setFilters(state.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.options.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.options.granularity,
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     total_spent: {
                         key: 'cost',
@@ -236,15 +229,12 @@ const refreshWidget = async (): Promise<Data[]> => {
     return state.data;
 };
 
-const handleRefresh = () => {
-    refreshWidget();
-};
-
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 
 defineExpose<WidgetExpose<Data[]>>({
@@ -257,7 +247,7 @@ defineExpose<WidgetExpose<Data[]>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   no-height-limit
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="budget-usage-summary">
             <div class="data-container">
@@ -273,7 +263,7 @@ defineExpose<WidgetExpose<Data[]>>({
                                    loader-type="skeleton"
                     >
                         <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalSpent, state.currency, props.currencyRates) }}
+                            {{ typeof state.totalSpent === 'number' ? currencyMoneyFormatter(state.totalSpent, widgetState.currency, props.currencyRates) : state.totalSpent }}
                         </div>
                         <div class="budget-info">
                             {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
@@ -304,7 +294,7 @@ defineExpose<WidgetExpose<Data[]>>({
                                    loader-type="skeleton"
                     >
                         <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
+                            {{ typeof state.totalBudget === 'number' ? currencyMoneyFormatter(state.totalBudget, widgetState.currency, props.currencyRates) : state.totalBudget }}
                         </div>
                         <div v-if="state.leftBudget"
                              class="budget-info"

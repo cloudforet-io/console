@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import {
     PProgressBar,
 } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -24,17 +22,15 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
@@ -42,8 +38,20 @@ type Data = BudgetDataModel;
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+        params: {},
+        query: {
+            filters: budgetQueryHelper.setFilters(widgetState.budgetConsoleFilters).rawQueryStrings,
+        },
+    })),
+});
 const state = reactive({
-    ...toRefs(useWidgetState<Data>(props)),
+    loading: true,
+    data: undefined as Data | undefined,
     tableFields: computed<Field[]>(() => [
         { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
         {
@@ -57,29 +65,19 @@ const state = reactive({
             label: 'Rate', name: 'budget_usage', textOptions: { type: 'percent' }, textAlign: 'right',
         },
     ]),
-    tableItems: computed<Partial<Data>>(() => state.data?.results?.map((d) => ({
+    tableItems: computed<WidgetTableData[]>(() => state.data?.results?.map((d) => ({
         ...d,
         target: d.project_id ?? d.project_group_id,
         progress: d.budget_usage,
     })) ?? []),
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
-    thisPage: 1,
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
-        query: {
-            filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
 });
+
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Util */
 const targetTextFormatter = (value: string): string => {
@@ -93,14 +91,16 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data> => {
     try {
-        apiQueryHelper.setFilters(state.budgetConsoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+        const groupBy = widgetState.groupBy ?? '';
         const { status, response } = await fetchBudgetUsageAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     total_spent: {
                         key: 'cost',
@@ -112,7 +112,7 @@ const fetchData = async (): Promise<Data> => {
                     },
                 },
                 select: {
-                    [state.groupBy]: state.groupBy,
+                    [groupBy]: groupBy,
                     [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
                     [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
                     total_spent: 'total_spent',
@@ -145,19 +145,19 @@ const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<Data> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
     state.loading = false;
     return state.data;
 };
 
 /* Event */
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
-    refreshWidget(thisPage);
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
+    refreshWidget(_thisPage);
 };
 
 (async () => {
@@ -171,7 +171,8 @@ useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 
 defineExpose<WidgetExpose<Data>>({
@@ -183,12 +184,12 @@ defineExpose<WidgetExpose<Data>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-usage-by-target"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
                            :items="state.tableItems"
-                           :currency="state.currency"
+                           :currency="widgetState.currency"
                            :currency-rates="props.currencyRates"
                            @update:thisPage="handleUpdateThisPage"
         >

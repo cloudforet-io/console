@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
     groupBy, isEqual, sum, uniqWith,
 } from 'lodash';
@@ -27,21 +25,19 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 type FullData = CostAnalyzeDataModel;
@@ -71,8 +67,13 @@ interface MapChartData {
 }
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
+
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    loading: true,
+    data: null as FullData | null,
     tableFields: computed<Field[]>(() => [
         {
             label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
@@ -87,28 +88,24 @@ const state = reactive({
     legends: [] as Legend[],
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
         query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
 });
-
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -125,7 +122,7 @@ const getCostDataByProvider = (results: FullData['results']): CostDataByProvider
         const providerGroupBy = groupBy(cItem, 'provider');
         Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
             if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => d.cost_sum));
+                const providerCost = sum(pItem.map((d) => (d as any).cost_sum));
                 if (result[continent]) result[continent][provider] = providerCost;
                 else result[continent] = { [provider]: providerCost };
             }
@@ -161,14 +158,15 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
     try {
-        apiQueryHelper.setFilters(state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy, COST_GROUP_BY.PROVIDER],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -193,7 +191,7 @@ const drawChart = (chartData: MapChartData[]) => {
     const pointSeries = chartHelper.createMapPointSeries();
     chart.series.push(pointSeries);
     pointSeries.bullets.push((root, series, dataItem) => {
-        const _chartData = dataItem?.dataContext?.data;
+        const _chartData = (dataItem?.dataContext as any)?.data;
         const pieChart = chartHelper.createPieChart({
             width: 32,
             height: 32,
@@ -209,7 +207,7 @@ const drawChart = (chartData: MapChartData[]) => {
         });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, state.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency, props.currencyRates);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         return chartHelper.createBullet({
@@ -236,10 +234,10 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
@@ -250,14 +248,10 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
     state.data = undefined;
-    refreshWidget(thisPage);
-};
-
-const handleRefresh = () => {
-    refreshWidget();
+    refreshWidget(_thisPage);
 };
 
 /* Init */
@@ -272,7 +266,8 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
         state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
@@ -291,7 +286,7 @@ defineExpose<WidgetExpose<FullData>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="cost-by-region"
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
@@ -319,11 +314,11 @@ defineExpose<WidgetExpose<FullData>>({
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
+                               :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
-                               :this-page="state.thisPage"
+                               :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                @update:thisPage="handleUpdateThisPage"
             />
