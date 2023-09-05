@@ -2,7 +2,6 @@
 import {
     onUnmounted, watch,
 } from 'vue';
-import type { Location } from 'vue-router';
 import { useRoute } from 'vue-router/composables';
 
 import { isEqual } from 'lodash';
@@ -53,18 +52,6 @@ const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQu
 
 const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
-/* Watchers */
-watch(() => costAnalysisPageStore.selectedQueryId, (selectedQueryId) => {
-    if (props.querySetId !== selectedQueryId) {
-        const location: Location = {
-            params: { querySetId: selectedQueryId as string },
-            query: {},
-        };
-
-        SpaceRouter.router.replace(location);
-    }
-});
-
 let unregisterStoreWatch;
 const registerStoreWatch = (currentQuery) => {
     unregisterStoreWatch = watch(() => costAnalysisPageStore.currentQuerySetOptions, (options: Partial<CostQuerySetOption>) => {
@@ -95,14 +82,14 @@ onUnmounted(() => {
 });
 
 watch(() => route.params, async (params) => {
-    const querySetId = params.querySetId;
+    const costQuerySetId = params.costQuerySetId;
 
-    if (querySetId === costAnalysisPageStore.selectedQueryId) return;
+    if (costQuerySetId === costAnalysisPageStore.selectedQueryId) return;
 
-    if (querySetId) {
-        const { options } = getQueryWithKey(querySetId);
+    if (costQuerySetId) {
+        const { options } = getQueryWithKey(costQuerySetId);
         await costAnalysisPageStore.setQueryOptions(options);
-        costAnalysisPageStore.selectQueryId(querySetId);
+        costAnalysisPageStore.selectQueryId(costQuerySetId);
     } else {
         await costAnalysisPageStore.setQueryOptions();
         costAnalysisPageStore.selectQueryId(undefined);
@@ -134,6 +121,7 @@ watch(() => route.params, async (params) => {
     // register store watch
     registerStoreWatch(currentQuery);
 })();
+
 </script>
 
 <template>

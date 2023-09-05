@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
-import { PI, PCollapsibleToggle } from '@spaceone/design-system';
+import {
+    PI, PCollapsibleToggle, PSelectDropdown, PLazyImg,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
@@ -11,6 +15,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -31,11 +36,15 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
+const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
+const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
+
+const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     loading: true,
@@ -58,15 +67,8 @@ const state = reactive({
             label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
         },
         {
-            type: MENU_ITEM_TYPE.DROPDOWN,
-            id: DATA_SOURCE_DROPDOWN_KEY,
-            selectOptions: {
-                items: costQuerySetState.dataSourceList.map((dataSource) => ({
-                    name: dataSource,
-                    label: dataSource,
-                })),
-                defaultSelected: state.selectedDataSource,
-            },
+            type: MENU_ITEM_TYPE.SLOT,
+            id: DATA_SOURCE_MENU_ID,
         },
         ...state.queryMenuSet,
         {
@@ -85,14 +87,15 @@ const state = reactive({
             to: {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 params: {
-                    querySetId: d.cost_query_set_id,
+                    dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                    costQuerySetId: d.cost_query_set_id,
                 },
             },
             favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
         }));
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
-            id: 'show-more',
+            id: SHOW_MORE_MENU_ID,
         }];
 
         return [
@@ -103,7 +106,15 @@ const state = reactive({
     showMoreQuerySetStatus: true,
     showFavoriteOnly: false,
 });
-
+const dataSourceState = reactive({
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    items: computed<MenuItem[]>(() => costQuerySetState.dataSourceList.map((dataSource) => ({
+        name: dataSource.data_source_id,
+        label: dataSource.name,
+        imageUrl: dataSourceState.plugins[dataSource.plugin_info?.plugin_id]?.icon,
+    }))),
+    selected: computed(() => costQuerySetState.selectedDataSourceId),
+});
 const relocateNotificationState = reactive({
     isShow: false,
     data: computed<LNBItem>(() => ({
@@ -134,8 +145,15 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
     return [];
 };
 
-const handleSelect = (id: string, selected: string) => {
-    if (id === DATA_SOURCE_DROPDOWN_KEY) costQuerySetStore.$patch({ selectedDataSource: selected });
+const handleSelectDataSource = (selected: string) => {
+    costQuerySetStore.$patch({ selectedDataSourceId: selected });
+    router.push({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {
+            dataSourceId: selected,
+            costQuerySetId: managedCostQuerySetIdList[0],
+        },
+    });
 };
 
 const handleLearnMoreRelocateNotification = () => {
@@ -167,7 +185,25 @@ onUnmounted(() => {
     costQuerySetStore.$reset();
 });
 
-costQuerySetStore.listCostQuerySets();
+
+watch(() => route.params, (params) => {
+    /*
+    * Both parameters are set in the route. (beforeEnter navigation in route.ts)
+    * */
+    if (params.dataSourceId && params.costQuerySetId) {
+        costQuerySetStore.$patch({
+            selectedDataSourceId: params.dataSourceId,
+            selectedQuerySetId: params.costQuerySetId,
+        });
+        costQuerySetStore.listCostQuerySets();
+    }
+}, { immediate: true });
+
+(async () => {
+    await store.dispatch('reference/loadAll');
+    await costQuerySetStore.listDataSources();
+    await costQuerySetStore.listCostQuerySets();
+})();
 
 </script>
 
@@ -176,7 +212,6 @@ costQuerySetStore.listCostQuerySets();
         <l-n-b :header="state.header"
                :menu-set="state.menuSet"
                :show-favorite-only.sync="state.showFavoriteOnly"
-               @select="handleSelect"
         >
             <template #default>
                 <l-n-b-router-menu-item :item="relocateNotificationState.data"
@@ -199,6 +234,29 @@ costQuerySetStore.listCostQuerySets();
             <template #slot-show-more>
                 <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus" />
             </template>
+            <template #slot-data-source-dropdown>
+                <p-select-dropdown class="select-options-dropdown"
+                                   :items="dataSourceState.items"
+                                   :selected="dataSourceState.selected"
+                                   use-fixed-menu-style
+                                   is-fixed-width
+                                   @update:selected="handleSelectDataSource"
+                >
+                    <template #default="{ item }">
+                        <div class="selected-wrapper">
+                            <p-lazy-img v-if="item && item.imageUrl"
+                                        class="left-icon"
+                                        :src="item.imageUrl"
+                                        width="1rem"
+                                        height="1rem"
+                            />
+                            <span class="selected-text">
+                                {{ item?.label }}
+                            </span>
+                        </div>
+                    </template>
+                </p-select-dropdown>
+            </template>
         </l-n-b>
         <relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
     </aside>
@@ -208,6 +266,22 @@ costQuerySetStore.listCostQuerySets();
 .sidebar-menu {
     .link-icon {
         margin-left: 0.25rem;
+    }
+    .select-options-dropdown {
+        @apply w-full;
+        .selected-wrapper {
+            @apply flex items-center w-full;
+            .left-icon {
+                margin-right: 0.25rem;
+                flex-shrink: 0;
+            }
+            .selected-text {
+                flex-grow: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
     }
 }
 </style>

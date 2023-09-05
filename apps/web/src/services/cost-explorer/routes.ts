@@ -1,5 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -30,15 +32,26 @@ const costExplorerRoutes: RouteConfig = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: ':querySetId?',
+                    path: ':dataSourceId?/:costQuerySetId?',
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     meta: {
-                        lnbVisible: true, label: ({ params }) => params.querySetId, copiable: true,
+                        lnbVisible: true,
+                        label: ({ params }) => params.costQuerySetId,
+                        copiable: true,
                     },
-                    beforeEnter: (to, from, next) => {
-                        if (to.params.querySetId) {
+                    beforeEnter: async (to, from, next) => {
+                        if (to.params.dataSourceId && to.params.costQuerySetId) {
                             next();
-                        } else next({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME, params: { querySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT } });
+                        } else {
+                            const { results } = await SpaceConnector.client.costAnalysis.dataSource.list();
+                            next({
+                                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                                params: {
+                                    dataSourceId: results[0].data_source_id,
+                                    costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+                                },
+                            });
+                        }
                     },
                     props: true,
                     component: CostAnalysisPage as any,
