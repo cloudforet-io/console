@@ -7,9 +7,8 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
