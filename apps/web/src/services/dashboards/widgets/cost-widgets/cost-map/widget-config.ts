@@ -24,7 +24,7 @@ const costMapWidgetConfig: WidgetConfig = {
     sizes: ['md', 'full'],
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
     },
     options_schema: {
         default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],

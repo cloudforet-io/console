@@ -77,10 +77,6 @@ const state = reactive({
     settingsByGranularity: computed<CustomRangeModalSettings>(() => {
         if (!props.granularity) return {};
         const customRangeModalSettingsByGranularity = {
-            [GRANULARITY.ACCUMULATED]: {
-                helpTextFrom: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS'),
-                dateType: 'yearToMonth',
-            },
             [GRANULARITY.DAILY]: {
                 helpTextTo: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_31_DAYS'),
                 dateType: 'yearToDate',
