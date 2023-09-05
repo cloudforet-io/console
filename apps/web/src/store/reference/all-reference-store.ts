@@ -78,7 +78,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             return store.getters['reference/projectGroupItems'] ?? {};
         }, {}),
         project_group: asyncComputed(async () => {
-            await store.dispatch('reference/project_group/load');
+            await store.dispatch('reference/projectGroup/load');
             return store.getters['reference/projectGroupItems'];
         }, {}),
         project: asyncComputed(async () => {
@@ -94,7 +94,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             return store.getters['reference/cloudServiceTypeItems'];
         }, {}),
         cloud_service_type: asyncComputed(async () => {
-            await store.dispatch('reference/cloud_service_type/load');
+            await store.dispatch('reference/cloudServiceType/load');
             return store.getters['reference/cloudServiceTypeItems'];
         }, {}),
         collector: asyncComputed(async () => {
@@ -122,7 +122,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             return store.getters['reference/serviceAccountItems'];
         }, {}),
         service_account: asyncComputed(async () => {
-            await store.dispatch('reference/service_account/load');
+            await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
         }, {}),
         user: asyncComputed(async () => {
