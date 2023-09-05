@@ -36,71 +36,103 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         allReferenceTypeInfo: asyncComputed(async () => {
             await actions.loadAll();
             return {
-                ...store.getters['reference/allReferenceTypeInfo'],
+                projectGroup: getters.projectGroup,
+                project_group: getters.project_group,
+                project: getters.project,
+                protocol: getters.protocol,
+                cloudServiceType: getters.cloudServiceType,
+                cloud_service_type: getters.cloud_service_type,
+                collector: getters.collector,
+                plugin: getters.plugin,
+                provider: getters.provider,
+                region: getters.region,
+                secret: getters.secret,
+                serviceAccount: getters.serviceAccount,
+                service_account: getters.service_account,
+                user: getters.user,
+                webHook: getters.webHook,
                 costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
                 cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
             };
+        }, {
+            projectGroup: {},
+            project_group: {},
+            project: {},
+            protocol: {},
+            cloudServiceType: {},
+            cloud_service_type: {},
+            collector: {},
+            plugin: {},
+            provider: {},
+            region: {},
+            secret: {},
+            serviceAccount: {},
+            service_account: {},
+            user: {},
+            webHook: {},
+            costDataSource: {},
+            cost_data_source: {},
         }),
         projectGroup: asyncComputed(async () => {
             await store.dispatch('reference/projectGroup/load');
-            return store.getters['reference/projectGroupItems'];
-        }),
+            return store.getters['reference/projectGroupItems'] ?? {};
+        }, {}),
         project_group: asyncComputed(async () => {
             await store.dispatch('reference/project_group/load');
             return store.getters['reference/projectGroupItems'];
-        }),
+        }, {}),
         project: asyncComputed(async () => {
             await store.dispatch('reference/project/load');
             return store.getters['reference/projectItems'];
-        }),
+        }, {}),
         protocol: asyncComputed(async () => {
             await store.dispatch('reference/protocol/load');
             return store.getters['reference/protocolItems'];
-        }),
+        }, {}),
         cloudServiceType: asyncComputed(async () => {
             await store.dispatch('reference/cloudServiceType/load');
             return store.getters['reference/cloudServiceTypeItems'];
-        }),
+        }, {}),
         cloud_service_type: asyncComputed(async () => {
             await store.dispatch('reference/cloud_service_type/load');
             return store.getters['reference/cloudServiceTypeItems'];
-        }),
+        }, {}),
         collector: asyncComputed(async () => {
             await store.dispatch('reference/collector/load');
             return store.getters['reference/collectorItems'];
-        }),
+        }, {}),
         plugin: asyncComputed(async () => {
             await store.dispatch('reference/plugin/load');
             return store.getters['reference/pluginItems'];
-        }),
+        }, {}),
         provider: asyncComputed(async () => {
             await store.dispatch('reference/provider/load');
             return store.getters['reference/providerItems'];
-        }),
+        }, {}),
         region: asyncComputed(async () => {
             await store.dispatch('reference/region/load');
             return store.getters['reference/regionItems'];
-        }),
+        }, {}),
         secret: asyncComputed(async () => {
             await store.dispatch('reference/secret/load');
             return store.getters['reference/secretItems'];
-        }),
+        }, {}),
         serviceAccount: asyncComputed(async () => {
             await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
-        }),
+        }, {}),
         service_account: asyncComputed(async () => {
             await store.dispatch('reference/service_account/load');
             return store.getters['reference/serviceAccountItems'];
-        }),
+        }, {}),
         user: asyncComputed(async () => {
             await store.dispatch('reference/user/load');
             return store.getters['reference/userItems'];
-        }),
+        }, {}),
         webHook: asyncComputed(async () => {
             await store.dispatch('reference/webHook/load');
             return store.getters['reference/webHookItems'];
-        }),
+        }, {}),
     });
 
     const actions = {
