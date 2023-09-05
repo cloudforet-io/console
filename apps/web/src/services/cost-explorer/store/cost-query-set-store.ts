@@ -42,6 +42,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
         },
         async listCostQuerySets(): Promise<void> {
             try {
+                // TODO: apply v2
                 const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
                     data_source_id: this.selectedDataSourceId,
                     query: {

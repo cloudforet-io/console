@@ -37,6 +37,8 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
+const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
+const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
@@ -66,7 +68,7 @@ const state = reactive({
         },
         {
             type: MENU_ITEM_TYPE.SLOT,
-            id: 'data-source-dropdown',
+            id: DATA_SOURCE_MENU_ID,
         },
         ...state.queryMenuSet,
         {
@@ -93,7 +95,7 @@ const state = reactive({
         }));
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
-            id: 'show-more',
+            id: SHOW_MORE_MENU_ID,
         }];
 
         return [
