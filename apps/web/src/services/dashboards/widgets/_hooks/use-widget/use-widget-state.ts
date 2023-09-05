@@ -1,4 +1,3 @@
-import { asyncComputed } from '@vueuse/core';
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive, toRefs,
@@ -64,7 +63,7 @@ export function useWidgetState(props: WidgetProps) {
             const start = dayjs.utc(state.settings?.date_range?.start).format(dateRangeFormat);
             return { start, end };
         }),
-        currency: asyncComputed<Currency|undefined>(async () => {
+        currency: computed<Currency|undefined>(() => {
             const dataSources = props.allReferenceTypeInfo.cost_data_source.referenceMap;
             if (state.widgetConfig.labels?.includes('Cost')) {
                 if (!state.options?.cost_data_source) return CURRENCY.USD;
