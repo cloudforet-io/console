@@ -187,6 +187,9 @@ onUnmounted(() => {
 
 
 watch(() => route.params, (params) => {
+    /*
+    * Both parameters are set in the route. (beforeEnter navigation in route.ts)
+    * */
     if (params.dataSourceId && params.costQuerySetId) {
         costQuerySetStore.$patch({
             selectedDataSourceId: params.dataSourceId,
