@@ -2,10 +2,10 @@
 
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, getCurrentInstance, reactive,
+    computed, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PI, PDivider, PButton,
@@ -37,7 +37,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
-const vm = getCurrentInstance()?.proxy as Vue;
+
+const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     userIcon: computed(() => {
@@ -76,8 +78,9 @@ const state = reactive({
         name: currency,
         label: `${CURRENCY_SYMBOL[currency]}${currency}`,
     }))),
-    profileMenuRef: null as null|HTMLElement,
 });
+
+const profileMenuRef = ref<HTMLElement|null>(null);
 
 const setVisible = (visible: boolean) => {
     emit('update:visible', visible);
@@ -99,8 +102,7 @@ const handleProfileButtonClick = () => {
     setVisible(!props.visible);
 };
 const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
-    const profileMenuRef = state.profileMenuRef;
-    if (!profileMenuRef) return;
+    if (!profileMenuRef.value) return;
     const target = e.target as HTMLElement;
     setLanguageMenuVisible(false);
     /*
@@ -108,14 +110,13 @@ const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
                 So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
                 The code below closes the profile menu when the user clicks outside the profileMenuRef.
              */
-    if (!profileMenuRef.contains(target)) hideProfileMenu();
+    if (!profileMenuRef.value.contains(target)) hideProfileMenu();
 };
 const handleClickOutsideCurrencyMenu = (e: PointerEvent) => {
-    const profileMenuRef = state.profileMenuRef;
-    if (!profileMenuRef) return;
+    if (!profileMenuRef.value) return;
     const target = e.target as HTMLElement;
     setCurrencyMenuVisible(false);
-    if (!profileMenuRef.contains(target)) hideProfileMenu();
+    if (!profileMenuRef.value.contains(target)) hideProfileMenu();
 };
 const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
@@ -148,9 +149,9 @@ const handleCurrencyClick = async (currency) => {
 const handleClickSignOut = async () => {
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: vm.$route.fullPath },
+        query: { nextPath: route.fullPath },
     };
-    await vm.$router.push(res);
+    await router.push(res);
 };
 </script>
 
