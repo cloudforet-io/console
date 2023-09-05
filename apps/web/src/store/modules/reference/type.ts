@@ -40,7 +40,7 @@ interface VuexStoreReferenceTypeInfo {
     name: string; // Project
     referenceMap: ReferenceMap;
 }
-export type VuexAllReferenceTypeInfo = Record<VuexStoreReferenceType, VuexStoreReferenceTypeInfo>;
+export type VuexStoreAllReferenceTypeInfo = Record<VuexStoreReferenceType, VuexStoreReferenceTypeInfo>;
 
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;

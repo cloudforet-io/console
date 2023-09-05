@@ -1,4 +1,3 @@
-import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -11,19 +10,19 @@ import type {
     ReferenceMap,
     ReferenceLoadOptions,
 } from '@/store/modules/reference/type';
-import type { Currency } from '@/store/modules/settings/type';
 import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { DataSourceModel } from '@/services/cost-explorer/model';
 
-interface DataSourceMetadata {
-    currency?: Currency;
-}
-type DataSourceItems = Required<Pick<ReferenceItem<DataSourceMetadata>, 'key'|'label'|'name'|'data'>>;
+
+type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'>;
+type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
 type DataSourceMap = ReferenceMap<DataSourceItems>;
+
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const lastLoadedTime = 0;
 
@@ -33,15 +32,10 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
     });
 
     const getters = reactive({
-        referenceMap: asyncComputed(async () => {
-            await actions.load();
-            return state.items ?? {};
-        }),
+        costDataSourceItems: computed(() => state.items ?? {}),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: COST_REFERENCE_TYPE_INFO.cost_data_source.type,
-            key: COST_REFERENCE_TYPE_INFO.cost_data_source.key,
-            name: COST_REFERENCE_TYPE_INFO.cost_data_source.name,
-            referenceMap: getters.referenceMap,
+            ...REFERENCE_TYPE_INFO.cost_data_source,
+            referenceMap: getters.costDataSourceItems,
         })),
     });
 
@@ -60,17 +54,17 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             try {
                 const { status, response } = await fetcher({
                     query: {
-                        only: ['data_source_id', 'name', 'plugin_info.metadata'],
+                        only: ['data_source_id', 'name', 'plugin_info'],
                     },
                 });
                 if (status === 'succeed') {
                     const items: DataSourceMap = {};
-                    response.results.forEach((item: any) => {
+                    response.results.forEach((item: DataSourceModel) => {
                         items[item.data_source_id] = {
                             key: item.data_source_id,
                             label: item.name,
                             name: item.name,
-                            data: item.plugin_info.metadata,
+                            data: item,
                         };
                     });
                     state.items = items;
@@ -84,10 +78,6 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
     actions.load();
 
     return {
-        $state: state,
-        $patch: (_state) => {
-            Object.assign(_state, state);
-        },
         getters,
         ...actions,
     };
