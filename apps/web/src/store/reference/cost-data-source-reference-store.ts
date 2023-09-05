@@ -1,4 +1,7 @@
-import { computed, reactive } from 'vue';
+import { asyncComputed } from '@vueuse/core';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -21,18 +24,21 @@ import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'>;
 type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
-type DataSourceMap = ReferenceMap<DataSourceItems>;
+export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
     const state = reactive({
-        items: null as DataSourceMap|null,
+        items: null as CostDataSourceReferenceMap|null,
     });
 
     const getters = reactive({
-        costDataSourceItems: computed(() => state.items ?? {}),
+        costDataSourceItems: asyncComputed<CostDataSourceReferenceMap>(async () => {
+            await actions.load();
+            return state.items ?? {};
+        }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
             ...REFERENCE_TYPE_INFO.cost_data_source,
             referenceMap: getters.costDataSourceItems,
@@ -58,7 +64,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                     },
                 });
                 if (status === 'succeed') {
-                    const items: DataSourceMap = {};
+                    const items: CostDataSourceReferenceMap = {};
                     response.results.forEach((item: DataSourceModel) => {
                         items[item.data_source_id] = {
                             key: item.data_source_id,
@@ -74,8 +80,6 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             }
         },
     };
-
-    actions.load();
 
     return {
         getters,

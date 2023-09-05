@@ -1,21 +1,31 @@
 import { asyncComputed } from '@vueuse/core';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { camelCase } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { store } from '@/store';
 
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type {
-    VuexStoreAllReferenceTypeInfo,
     ReferenceMap,
     VuexStoreReferenceType,
     ReferenceLoadOptions,
 } from '@/store/modules/reference/type';
-import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
-
-import type { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import {
+    useCostDataSourceReferenceStore,
+} from '@/store/reference/cost-data-source-reference-store';
 
 export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source';
 
@@ -25,114 +35,78 @@ export interface ReferenceTypeInfo {
     name: string; // Project
     referenceMap: ReferenceMap;
 }
-export interface AllReferenceTypeInfo extends VuexStoreAllReferenceTypeInfo {
-    [REFERENCE_TYPE_INFO.cost_data_source.type]: ReferenceTypeInfo;
-}
+export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
 
     const getters = reactive({
-        allReferenceTypeInfo: asyncComputed(async () => {
-            await actions.loadAll();
-            return {
-                projectGroup: getters.projectGroup,
-                project_group: getters.project_group,
-                project: getters.project,
-                protocol: getters.protocol,
-                cloudServiceType: getters.cloudServiceType,
-                cloud_service_type: getters.cloud_service_type,
-                collector: getters.collector,
-                plugin: getters.plugin,
-                provider: getters.provider,
-                region: getters.region,
-                secret: getters.secret,
-                serviceAccount: getters.serviceAccount,
-                service_account: getters.service_account,
-                user: getters.user,
-                webHook: getters.webHook,
-                costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
-                cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
-            };
-        }, {
-            projectGroup: {},
-            project_group: {},
-            project: {},
-            protocol: {},
-            cloudServiceType: {},
-            cloud_service_type: {},
-            collector: {},
-            plugin: {},
-            provider: {},
-            region: {},
-            secret: {},
-            serviceAccount: {},
-            service_account: {},
-            user: {},
-            webHook: {},
-            costDataSource: {},
-            cost_data_source: {},
-        }),
-        projectGroup: asyncComputed(async () => {
-            await store.dispatch('reference/projectGroup/load');
-            return store.getters['reference/projectGroupItems'] ?? {};
-        }, {}),
-        project_group: asyncComputed(async () => {
+        allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
+            ...store.getters['reference/allReferenceTypeInfo'],
+            costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
+            cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
+        })),
+        projectGroup: asyncComputed<ProjectGroupReferenceMap>(async () => {
             await store.dispatch('reference/projectGroup/load');
             return store.getters['reference/projectGroupItems'];
-        }, {}),
-        project: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        project_group: asyncComputed<ProjectGroupReferenceMap>(async () => {
+            await store.dispatch('reference/projectGroup/load');
+            return store.getters['reference/projectGroupItems'];
+        }, {}, { lazy: true }),
+        project: asyncComputed<ProjectReferenceMap>(async () => {
             await store.dispatch('reference/project/load');
             return store.getters['reference/projectItems'];
-        }, {}),
-        protocol: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        protocol: asyncComputed<ProtocolReferenceMap>(async () => {
             await store.dispatch('reference/protocol/load');
             return store.getters['reference/protocolItems'];
-        }, {}),
-        cloudServiceType: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        cloudServiceType: asyncComputed<CloudServiceTypeReferenceMap>(async () => {
             await store.dispatch('reference/cloudServiceType/load');
             return store.getters['reference/cloudServiceTypeItems'];
-        }, {}),
-        cloud_service_type: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        cloud_service_type: asyncComputed<CloudServiceTypeReferenceMap>(async () => {
             await store.dispatch('reference/cloudServiceType/load');
             return store.getters['reference/cloudServiceTypeItems'];
-        }, {}),
-        collector: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        collector: asyncComputed<CollectorReferenceMap>(async () => {
             await store.dispatch('reference/collector/load');
             return store.getters['reference/collectorItems'];
-        }, {}),
-        plugin: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        plugin: asyncComputed<PluginReferenceMap>(async () => {
             await store.dispatch('reference/plugin/load');
             return store.getters['reference/pluginItems'];
         }, {}),
-        provider: asyncComputed(async () => {
+        provider: asyncComputed<ProviderReferenceMap>(async () => {
             await store.dispatch('reference/provider/load');
             return store.getters['reference/providerItems'];
-        }, {}),
-        region: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        region: asyncComputed<RegionReferenceMap>(async () => {
             await store.dispatch('reference/region/load');
             return store.getters['reference/regionItems'];
-        }, {}),
-        secret: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        secret: asyncComputed<SecretReferenceMap>(async () => {
             await store.dispatch('reference/secret/load');
             return store.getters['reference/secretItems'];
-        }, {}),
-        serviceAccount: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        serviceAccount: asyncComputed<ServiceAccountReferenceMap>(async () => {
             await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
-        }, {}),
-        service_account: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        service_account: asyncComputed<ServiceAccountReferenceMap>(async () => {
             await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
-        }, {}),
-        user: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        user: asyncComputed<UserReferenceMap>(async () => {
             await store.dispatch('reference/user/load');
             return store.getters['reference/userItems'];
-        }, {}),
-        webHook: asyncComputed(async () => {
+        }, {}, { lazy: true }),
+        webHook: asyncComputed<UserReferenceMap>(async () => {
             await store.dispatch('reference/webHook/load');
             return store.getters['reference/webHookItems'];
-        }, {}),
+        }, {}, { lazy: true }),
+        costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
     });
 
     const actions = {
