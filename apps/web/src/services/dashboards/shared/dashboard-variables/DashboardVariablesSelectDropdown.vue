@@ -54,7 +54,7 @@ import { isEqual, xor } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -80,13 +80,15 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
+const allReferenceStore = useAllReferenceStore();
+
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
-    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
