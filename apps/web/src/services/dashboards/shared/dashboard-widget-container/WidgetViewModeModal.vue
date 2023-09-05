@@ -10,7 +10,8 @@ import {
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -47,13 +48,12 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
-
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     hasManagePermission: useManagePermissionState(),
     currencyRates: computed(() => store.state.settings.currencyRates),
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
-    component: null as ComponentPublicInstance|null,
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,

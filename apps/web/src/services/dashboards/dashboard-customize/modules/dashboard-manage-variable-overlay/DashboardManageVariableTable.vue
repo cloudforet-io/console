@@ -6,7 +6,8 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -23,10 +24,11 @@ interface EmitFn {
 
 const emit = defineEmits<EmitFn>();
 const { t } = useI18n();
-const store = useStore();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -52,7 +54,7 @@ const state = reactive({
         MANAGED: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
-    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
 });
 
 /* EVENT */

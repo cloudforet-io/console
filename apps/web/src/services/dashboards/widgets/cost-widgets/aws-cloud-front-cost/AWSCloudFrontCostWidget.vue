@@ -16,7 +16,7 @@ import {
 import type { ComputedRef } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
-import type { ReferenceType } from '@/store/modules/reference/type';
+import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -138,8 +138,7 @@ const fetchData = async (): Promise<FullData> => {
                 end: state.dateRange.end,
                 fields: {
                     cost_sum: {
-                        // TODO: Change to 'cost' after the cost analysis API is updated.
-                        key: 'usd_cost',
+                        key: 'cost',
                         operator: 'sum',
                     },
                     usage_quantity_sum: {

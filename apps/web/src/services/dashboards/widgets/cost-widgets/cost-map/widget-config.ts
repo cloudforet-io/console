@@ -24,15 +24,15 @@ const costMapWidgetConfig: WidgetConfig = {
     sizes: ['md', 'full'],
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
     },
     options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
-        fixed_properties: ['cost_group_by'],
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
+        fixed_properties: ['cost_data_source', 'cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
+                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -46,7 +46,7 @@ const costMapWidgetConfig: WidgetConfig = {
                     'cost_account',
                 ),
             },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
                 'service_account',

@@ -59,4 +59,10 @@ export const REFERENCE_TYPE_INFO = {
         key: 'webhook_id',
         name: 'Webhook',
     },
+    cost_data_source: {
+        type: 'cost_data_source',
+        key: 'data_source_id',
+        name: 'Data Source',
+        resourceType: 'cost_analysis.DataSource',
+    },
 } as const;

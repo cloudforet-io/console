@@ -22,7 +22,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         cost_group_by: 'budget_id',
     },
     options_schema: {

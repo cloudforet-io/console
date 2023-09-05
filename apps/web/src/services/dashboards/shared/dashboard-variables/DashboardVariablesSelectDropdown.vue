@@ -46,14 +46,14 @@
 </template>
 
 <script lang="ts" setup>
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -67,8 +67,6 @@ import DashboardVariablesMoreButton
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 
-
-
 interface Props {
     isManageable: boolean;
     disableSaveButton?: boolean;
@@ -78,19 +76,19 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     showOverlay: computed(() => route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
-    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];

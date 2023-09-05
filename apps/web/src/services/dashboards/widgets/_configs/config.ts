@@ -4,8 +4,8 @@ import type { defineAsyncComponent } from 'vue';
 
 import type { Tags } from '@/models';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 import type { CurrencyRates } from '@/store/modules/settings/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
@@ -24,7 +24,6 @@ export const WIDGET_SIZE = {
 } as const;
 
 export const GRANULARITY = {
-    ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
@@ -189,6 +188,7 @@ export interface SelectorOptions {
     type: 'cost-usage'|'days';
 }
 export interface CostWidgetOptions extends BaseWidgetOptions {
+    cost_data_source?: string;
     cost_group_by?: CostGroupBy | string;
     selector_options?: SelectorOptions;
 }

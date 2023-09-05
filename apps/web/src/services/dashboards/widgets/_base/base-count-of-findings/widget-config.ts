@@ -12,7 +12,7 @@ const baseCountOfFindingsWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.YEARLY,
         asset_group_by: ASSET_GROUP_BY.REGION,
         pagination_options: {
             enabled: true,

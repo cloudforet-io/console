@@ -13,7 +13,7 @@ import {
 } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
-import type { ReferenceType } from '@/store/modules/reference/type';
+import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -119,8 +119,7 @@ const fetchData = async (): Promise<Data> => {
                 end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
-                        // TODO: Change to 'cost' after the cost analysis API is updated.
-                        key: 'usd_cost',
+                        key: 'cost',
                         operator: 'sum',
                     },
                 },

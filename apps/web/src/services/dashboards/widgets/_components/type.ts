@@ -1,8 +1,4 @@
-
-import type { RouteLocationRaw } from 'vue-router';
-
-import type { ReferenceType } from '@/store/modules/reference/type';
-import type { Currency } from '@/store/modules/settings/type';
+import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
