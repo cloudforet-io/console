@@ -81,7 +81,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: widgetState.options.data_source,
+            data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
                 start: widgetState.dateRange.start,

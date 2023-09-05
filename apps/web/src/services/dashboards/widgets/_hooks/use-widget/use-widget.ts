@@ -7,7 +7,6 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { useDataSourceReferenceStore } from '@/services/cost-explorer/store/data-source-reference-store';
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrame } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-frame';
@@ -35,8 +34,7 @@ interface AdditionalState {
  });
  */
 export const useWidget = <T extends AdditionalState = AdditionalState>(props: WidgetProps, emit: WidgetEmit, additionalState: T) => {
-    const dataSourceReferenceStore = useDataSourceReferenceStore();
-    const state = useWidgetState(props, dataSourceReferenceStore);
+    const state = useWidgetState(props);
 
     const widgetState = reactive({
         ...toRefs(state),
