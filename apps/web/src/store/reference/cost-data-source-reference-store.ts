@@ -1,12 +1,23 @@
+import { asyncComputed } from '@vueuse/core';
+import { computed, reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { ReferenceItem, ReferenceMap, ReferenceLoadOptions } from '@/store/modules/reference/type';
+import type {
+    ReferenceItem,
+    ReferenceMap,
+    ReferenceLoadOptions,
+} from '@/store/modules/reference/type';
 import type { Currency } from '@/store/modules/settings/type';
+import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
+
+import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface DataSourceMetadata {
     currency?: Currency;
@@ -14,26 +25,33 @@ interface DataSourceMetadata {
 type DataSourceItems = Required<Pick<ReferenceItem<DataSourceMetadata>, 'key'|'label'|'name'|'data'>>;
 type DataSourceMap = ReferenceMap<DataSourceItems>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
-const lastLoadedTimes: Record<string, number> = {
-    dataSource: 0,
-};
+const lastLoadedTime = 0;
 
-export const useDataSourceReferenceStore = defineStore('cost-data-source-reference-store', {
-    state: () => ({
+export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
+    const state = reactive({
         items: null as DataSourceMap|null,
-    }),
-    getters: {
-        referenceMap(state) {
+    });
+
+    const getters = reactive({
+        referenceMap: asyncComputed(async () => {
+            await actions.load();
             return state.items ?? {};
-        },
-    },
-    actions: {
+        }),
+        costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
+            type: COST_REFERENCE_TYPE_INFO.cost_data_source.type,
+            key: COST_REFERENCE_TYPE_INFO.cost_data_source.key,
+            name: COST_REFERENCE_TYPE_INFO.cost_data_source.name,
+            referenceMap: getters.referenceMap,
+        })),
+    });
+
+    const actions = {
         async load(options?: ReferenceLoadOptions) {
             const currentTime = new Date().getTime();
 
             if (
-                ((lastLoadedTimes.dataSource !== 0 && currentTime - lastLoadedTimes.dataSource < LOAD_TTL)
-                    || (options?.lazyLoad && this.items)
+                ((lastLoadedTime !== 0 && currentTime - lastLoadedTime < LOAD_TTL)
+                    || (options?.lazyLoad && state.items)
                 ) && !options?.force
             ) return;
 
@@ -55,11 +73,22 @@ export const useDataSourceReferenceStore = defineStore('cost-data-source-referen
                             data: item.plugin_info.metadata,
                         };
                     });
-                    this.items = items;
+                    state.items = items;
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
-    },
+    };
+
+    actions.load();
+
+    return {
+        $state: state,
+        $patch: (_state) => {
+            Object.assign(_state, state);
+        },
+        getters,
+        ...actions,
+    };
 });

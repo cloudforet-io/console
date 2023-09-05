@@ -20,7 +20,7 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
-export type ReferenceType =
+export type VuexStoreReferenceType =
     'projectGroup'|'project_group' // supports both camel case and snake case
     |'project'
     |'cloudServiceType'|'cloud_service_type'
@@ -34,13 +34,13 @@ export type ReferenceType =
     |'user'
     |'webhook';
 
-interface ReferenceTypeInfo {
-    type: ReferenceType;
+interface VuexStoreReferenceTypeInfo {
+    type: VuexStoreReferenceType;
     key: string; // project_id
     name: string; // Project
     referenceMap: ReferenceMap;
 }
-export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
+export type VuexAllReferenceTypeInfo = Record<VuexStoreReferenceType, VuexStoreReferenceTypeInfo>;
 
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;

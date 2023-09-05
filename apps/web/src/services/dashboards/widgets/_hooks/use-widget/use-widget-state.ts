@@ -14,7 +14,6 @@ import type { Currency } from '@/store/modules/settings/type';
 import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { useDataSourceReferenceStore } from '@/services/cost-explorer/store/data-source-reference-store';
 import type { DateRange } from '@/services/dashboards/config';
 import type {
     WidgetProps,
@@ -46,7 +45,7 @@ export interface WidgetState extends WidgetBaseState {
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
 }
-export function useWidgetState(props: WidgetProps, dataSourceReferenceStore: ReturnType<typeof useDataSourceReferenceStore>) {
+export function useWidgetState(props: WidgetProps) {
     const state = useWidgetBaseState(props);
 
     return reactive<WidgetState>({
@@ -65,10 +64,9 @@ export function useWidgetState(props: WidgetProps, dataSourceReferenceStore: Ret
             return { start, end };
         }),
         currency: asyncComputed<Currency|undefined>(async () => {
-            await dataSourceReferenceStore.load();
-            const dataSources = dataSourceReferenceStore.referenceMap;
-            if (!state.options?.data_source) return undefined;
-            return dataSources[state.options.data_source]?.data?.currency;
+            const dataSources = props.allReferenceTypeInfo.cost_data_source.referenceMap;
+            if (!state.options?.cost_data_source) return undefined;
+            return dataSources[state.options.cost_data_source]?.data?.currency;
         }),
         // filters
         consoleFilters: computed<WidgetFilter[]>(() => {
