@@ -17,7 +17,7 @@ interface CostAnalysisPageState {
     granularity: Granularity;
     groupBy: Array<GroupBy|string>;
     chartGroupBy?: GroupBy|string;
-    period?: Period;
+    period: Period;
     periodType?: CostAnalysisPeriodType;
     filters: CostFiltersMap;
 }
