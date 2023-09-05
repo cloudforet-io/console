@@ -189,6 +189,7 @@ const handleClickSignOut = async () => {
                          height="1rem"
                     />
                 </div>
+                <!-- TODO: This code might need recovery in version 1.13.-->
                 <!--                <div v-on-click-outside="handleClickOutsideCurrencyMenu"-->
                 <!--                     class="info-menu currency"-->
                 <!--                     @click.stop="handleCurrencyDropdownClick"-->
