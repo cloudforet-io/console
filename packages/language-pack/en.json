@@ -456,6 +456,7 @@
 						"ACCOUNT": "Account",
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
+						"DATA_SOURCE": "Data Source",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
@@ -560,6 +561,7 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "Custom Date Range",
+					"LAST_12_MONTHS": "Last 12 Months",
 					"LAST_14_DAYS": "Last 14 Days",
 					"LAST_3_MONTHS": "Last 3 Months",
 					"LAST_6_MONTHS": "Last 6 Months",

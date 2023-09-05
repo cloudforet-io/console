@@ -6,8 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { computed, reactive, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { xor } from 'lodash';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -18,6 +17,8 @@ import { gray } from '@/styles/colors';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { GroupByItem } from '@/services/cost-explorer/type';
+import { useI18n } from 'vue-i18n';
+import {computed, reactive, watch } from 'vue';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -63,20 +64,27 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.groupBy = items.map((d) => d.name);
-    });
+const handleChangeDefaultGroupBy = async (selectedItems: GroupByItem[], isSelected: boolean) => {
+    if (isSelected && state.selectedGroupByItems.length >= 3) {
+        showErrorMessage('', t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+        return;
+    }
+    if (isSelected) {
+        const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = [addedGroupByName, ..._state.groupBy];
+        });
+    } else {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = selectedItems.map((d) => d.name);
+        });
+    }
 };
 const handleClickTagsButton = () => {
     state.tagsDropdownVisible = !state.tagsDropdownVisible;
 };
-const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu) => {
-    if (state.selectedGroupByItems.find((d) => d.name === selectedItem.name)) { // delete case
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.filter((d) => d !== selectedItem.name);
-        });
-    } else { // add case
+const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: boolean) => {
+    if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
             showErrorMessage('', t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
@@ -84,6 +92,10 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu) => {
         }
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = _state.groupBy.concat(selectedItem.name as string);
+        });
+    } else {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.groupBy = _state.groupBy.filter((d) => d !== selectedItem.name);
         });
     }
 };
@@ -112,7 +124,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                          multi-selectable
                          size="sm"
                          :predicate="predicate"
-                         @change="handleSelectGroupByItems"
+                         @change="handleChangeDefaultGroupBy"
         >
             {{ defaultGroupByItem.label }}
         </p-select-button>

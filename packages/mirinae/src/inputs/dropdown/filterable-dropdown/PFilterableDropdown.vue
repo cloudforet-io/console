@@ -1,106 +1,3 @@
-<template>
-    <div ref="containerRef"
-         class="p-filterable-dropdown"
-         :class="{ disabled, opened: proxyVisibleMenu, invalid }"
-    >
-        <div ref="targetRef"
-             class="dropdown-button"
-             :tabindex="(disabled || readonly) ? -1 : 0"
-             @keyup.down="focusOnContextMenu(undefined)"
-             @keyup.esc.capture.stop="hideMenu"
-             @keyup.enter.capture.stop="toggleMenu"
-             @click="toggleMenu"
-        >
-            <slot name="input-left-area" />
-            <div class="selection-display-wrapper">
-                <span v-if="displayValueOnDropdownButton === undefined"
-                      class="placeholder"
-                >
-                    {{ props.placeholder || t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
-                </span>
-                <span v-else-if="displayValueOnDropdownButton"
-                      class="selected-item"
-                >
-                    {{ displayValueOnDropdownButton }}
-                    <p-badge v-if="displayBadgeValueOnDropdownButton"
-                             :style-type="disabled ? 'gray200' : 'blue200'"
-                             :badge-type="disabled ? 'solid' : 'subtle'"
-                    >
-                        {{ displayBadgeValueOnDropdownButton }}
-                    </p-badge>
-                </span>
-                <div v-else-if="showTagsOnDropdownButton"
-                     class="tags-wrapper"
-                >
-                    <p-tag v-for="(item, idx) in proxySelected"
-                           :key="item.name"
-                           class="selected-tag"
-                           @delete="handleTagDelete(item, idx)"
-                    >
-                        {{ item.label || item.name }}
-                    </p-tag>
-                </div>
-                <span v-if="showDeleteAllButton"
-                      class="delete-all-button"
-                      @click.stop="handleClickDeleteAll"
-                >
-                    <p-i name="ic_close"
-                         width="1rem"
-                         height="1rem"
-                         color="inherit"
-                    />
-                </span>
-            </div>
-            <span class="arrow-button"
-                  @click.stop="toggleMenu"
-            >
-                <p-i :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                     width="1.5rem"
-                     height="1.5rem"
-                     color="inherit"
-                />
-            </span>
-        </div>
-        <p-context-menu v-show="proxyVisibleMenu"
-                        ref="menuRef"
-                        class="dropdown-context-menu"
-                        :search-text="proxySearchText"
-                        searchable
-                        :menu="refinedMenu"
-                        :loading="props.loading || loading"
-                        :readonly="props.readonly"
-                        :selected="proxySelected"
-                        :multi-selectable="props.multiSelectable"
-                        :show-select-header="props.showSelectHeader"
-                        :show-select-marker="props.showSelectMarker"
-                        show-clear-selection
-                        :style="contextMenuStyle"
-                        :class="{ default: !props.showSelectMarker }"
-                        :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
-                        @select="handleSelectMenuItem"
-                        @click-done="hideMenu"
-                        @click-show-more="handleClickShowMore"
-                        @clear-selection="handleClearSelection"
-                        @keyup:up:end="focusDropdownButton"
-                        @keyup:down:end="focusOnContextMenu()"
-                        @keyup:esc="hideMenu"
-                        @update:selected="handleUpdateSelected"
-                        @update:search-text="handleUpdateSearchText"
-        >
-            <template #header>
-                <slot name="context-menu-header" />
-            </template>
-            <template v-for="(_, slot) of menuSlots"
-                      #[slot]="scope"
-            >
-                <slot :name="`menu-${slot}`"
-                      v-bind="scope"
-                />
-            </template>
-        </p-context-menu>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { onClickOutside, useFocus } from '@vueuse/core';
 import { debounce, isEqual, reduce } from 'lodash';
@@ -167,7 +64,7 @@ const props = withDefaults(defineProps<FilterableDropdownProps>(), {
 const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
     (e: 'update:search-text', searchText: string): void;
     (e: 'update:selected', selected: FilterableDropdownMenuItem[]): void;
-    (e: 'select', item: FilterableDropdownMenuItem): void;
+    (e: 'select', item: FilterableDropdownMenuItem, isSelected: boolean): void;
     (e: 'delete-tag', item: FilterableDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
@@ -186,9 +83,9 @@ watch(() => props.selected, (selected) => {
         updateSelected(selected);
     }
 });
-const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
+const handleSelectMenuItem = (item: FilterableDropdownMenuItem, _, isSelected: boolean) => {
     if (!props.multiSelectable) hideMenu();
-    emit('select', item);
+    emit('select', item, isSelected);
 };
 const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
     updateSelected(selected);
@@ -313,6 +210,109 @@ const {
 /* ignore window arrow keydown event */
 useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="p-filterable-dropdown"
+         :class="{ disabled, opened: proxyVisibleMenu, invalid }"
+    >
+        <div ref="targetRef"
+             class="dropdown-button"
+             :tabindex="(disabled || readonly) ? -1 : 0"
+             @keyup.down="focusOnContextMenu(undefined)"
+             @keyup.esc.capture.stop="hideMenu"
+             @keyup.enter.capture.stop="toggleMenu"
+             @click="toggleMenu"
+        >
+            <slot name="input-left-area" />
+            <div class="selection-display-wrapper">
+                <span v-if="displayValueOnDropdownButton === undefined"
+                      class="placeholder"
+                >
+                    {{ props.placeholder || t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
+                </span>
+                <span v-else-if="displayValueOnDropdownButton"
+                      class="selected-item"
+                >
+                    {{ displayValueOnDropdownButton }}
+                    <p-badge v-if="displayBadgeValueOnDropdownButton"
+                             :style-type="disabled ? 'gray200' : 'blue200'"
+                             :badge-type="disabled ? 'solid' : 'subtle'"
+                    >
+                        {{ displayBadgeValueOnDropdownButton }}
+                    </p-badge>
+                </span>
+                <div v-else-if="showTagsOnDropdownButton"
+                     class="tags-wrapper"
+                >
+                    <p-tag v-for="(item, idx) in proxySelected"
+                           :key="item.name"
+                           class="selected-tag"
+                           @delete="handleTagDelete(item, idx)"
+                    >
+                        {{ item.label || item.name }}
+                    </p-tag>
+                </div>
+                <span v-if="showDeleteAllButton"
+                      class="delete-all-button"
+                      @click.stop="handleClickDeleteAll"
+                >
+                    <p-i name="ic_close"
+                         width="1rem"
+                         height="1rem"
+                         color="inherit"
+                    />
+                </span>
+            </div>
+            <span class="arrow-button"
+                  @click.stop="toggleMenu"
+            >
+                <p-i :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                     width="1.5rem"
+                     height="1.5rem"
+                     color="inherit"
+                />
+            </span>
+        </div>
+        <p-context-menu v-show="proxyVisibleMenu"
+                        ref="menuRef"
+                        class="dropdown-context-menu"
+                        :search-text="proxySearchText"
+                        searchable
+                        :menu="refinedMenu"
+                        :loading="props.loading || loading"
+                        :readonly="props.readonly"
+                        :selected="proxySelected"
+                        :multi-selectable="props.multiSelectable"
+                        :show-select-header="props.showSelectHeader"
+                        :show-select-marker="props.showSelectMarker"
+                        show-clear-selection
+                        :style="contextMenuStyle"
+                        :class="{ default: !props.showSelectMarker }"
+                        :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
+                        @select="handleSelectMenuItem"
+                        @click-done="hideMenu"
+                        @click-show-more="handleClickShowMore"
+                        @clear-selection="handleClearSelection"
+                        @keyup:up:end="focusDropdownButton"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @keyup:esc="hideMenu"
+                        @update:selected="handleUpdateSelected"
+                        @update:search-text="handleUpdateSearchText"
+        >
+            <template #header>
+                <slot name="context-menu-header" />
+            </template>
+            <template v-for="(_, slot) of menuSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`menu-${slot}`"
+                      v-bind="scope"
+                />
+            </template>
+        </p-context-menu>
+    </div>
+</template>
 
 <style lang="postcss">
 .p-filterable-dropdown {

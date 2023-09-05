@@ -1,3 +1,168 @@
+<script setup lang="ts">
+
+import { onClickOutside} from '@vueuse/core';
+import {
+    computed, reactive, ref,
+} from 'vue';
+
+import {
+    PI, PDivider, PButton,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import ejs from 'ejs';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { languages } from '@/store/modules/user/config';
+
+import config from '@/lib/config';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { INFO_ROUTE } from '@/services/info/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import {RouteLocationRaw, useRoute, useRouter} from "vue-router";
+import {useI18n} from "vue-i18n";
+import {useStore} from "vuex";
+
+interface Props {
+    visible: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
+
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
+
+const route = useRoute();
+const router = useRouter();
+const { t} = useI18n();
+const store = useStore();
+
+const state = reactive({
+    userIcon: computed(() => {
+        if (state.isDomainOwner) return 'img_avatar_root-account';
+        if (state.hasDomainRole) return 'img_avatar_admin';
+        return 'img_avatar_user';
+    }),
+    name: computed(() => store.state.user.name),
+    email: computed(() => store.state.user.email),
+    role: computed(() => {
+        const roleArray = store.getters['user/roleNames'];
+        return roleArray.join(', ');
+    }),
+    language: computed(() => store.getters['user/languageLabel']),
+    currency: computed(() => store.state.settings.currency),
+    timezone: computed(() => store.state.user.timezone),
+    domainId: computed(() => store.state.domain.domainId),
+    userId: computed(() => store.state.user.userId),
+    hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
+    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+    hasPermission: computed(() => store.getters['user/hasPermission']),
+    languageMenuVisible: false,
+    currencyMenuVisible: false,
+    supportedMenu: computed(() => {
+        const docsList = config.get('DOCS') ?? [];
+        const data = { lang: store.state.user.language };
+        return docsList.map((d) => ({
+            label: ejs.render(d?.label ?? '', data),
+            link: ejs.render(d?.link ?? '', data),
+        }));
+    }),
+    languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
+        label: v, name: k,
+    }))),
+    currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+    }))),
+});
+
+const profileMenuRef = ref<HTMLElement|null>(null);
+const languageInfoMenuRef = ref<HTMLElement|null>(null);
+const currencyInfoMenuRef = ref<HTMLElement|null>(null);
+
+const setVisible = (visible: boolean) => {
+    emit('update:visible', visible);
+};
+const openProfileMenu = () => {
+    setVisible(true);
+};
+const hideProfileMenu = () => {
+    if (state.languageMenuVisible) state.languageMenuVisible = false;
+    setVisible(false);
+};
+const setLanguageMenuVisible = (visible: boolean) => {
+    state.languageMenuVisible = visible;
+};
+const setCurrencyMenuVisible = (visible: boolean) => {
+    state.currencyMenuVisible = visible;
+};
+const handleProfileButtonClick = () => {
+    setVisible(!props.visible);
+};
+const handleClickOutsideLanguageMenu = <E = PointerEvent>(e: E) => {
+    if (!profileMenuRef.value) return;
+    const target = (e as unknown as MouseEvent).target as HTMLElement;
+    setLanguageMenuVisible(false);
+    /*
+                v-on-click-outside directive stops click event bubbling.
+                So when this function is called, hideProfileMenu function will never be called which is bound to profileMenuRef's v-on-click-outside directive.
+                The code below closes the profile menu when the user clicks outside the profileMenuRef.
+             */
+    if (!profileMenuRef.value.contains(target)) hideProfileMenu();
+};
+const handleClickOutsideCurrencyMenu = <E = PointerEvent>(e: E) => {
+    const _profileMenuRef = profileMenuRef.value;
+    if (!_profileMenuRef) return;
+    const target = (e as unknown as MouseEvent).target as HTMLElement;
+    setCurrencyMenuVisible(false);
+    if (!_profileMenuRef.contains(target)) hideProfileMenu();
+};
+const handleLanguageDropdownClick = () => {
+    setLanguageMenuVisible(!state.languageMenuVisible);
+};
+const handleCurrencyDropdownClick = () => {
+    setCurrencyMenuVisible(!state.currencyMenuVisible);
+};
+
+const handleLanguageClick = async (language) => {
+    try {
+        if (store.state.user.language === language) return;
+
+        await store.dispatch('user/setUser', {
+            language,
+            timezone: state.timezone,
+        });
+
+        setLanguageMenuVisible(false);
+        showSuccessMessage(t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
+    }
+};
+const handleCurrencyClick = async (currency) => {
+    store.commit('settings/setCurrency', currency);
+    setCurrencyMenuVisible(false);
+    showSuccessMessage(t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
+};
+
+const handleClickSignOut = async () => {
+    const res: RouteLocationRaw = {
+        name: AUTH_ROUTE.SIGN_OUT._NAME,
+        query: { nextPath: route.fullPath },
+    };
+    await router.push(res);
+};
+
+onClickOutside(profileMenuRef, hideProfileMenu);
+onClickOutside(languageInfoMenuRef, handleClickOutsideLanguageMenu);
+onClickOutside(currencyInfoMenuRef, handleClickOutsideCurrencyMenu);
+
+</script>
+
 <template>
     <div ref="profileMenuRef"
          class="gnb-profile"
@@ -151,168 +316,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts" setup>
-import {
-    PI, PDivider, PButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { onClickOutside } from '@vueuse/core';
-import ejs from 'ejs';
-import {
-    computed, reactive, ref,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-import type { RouteLocationRaw } from 'vue-router';
-import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import { languages } from '@/store/modules/user/config';
-
-import config from '@/lib/config';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { INFO_ROUTE } from '@/services/info/route-config';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-
-interface Props {
-    visible: boolean
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
-const { t } = useI18n();
-const store = useStore();
-const router = useRouter();
-const route = useRoute();
-
-const state = reactive({
-    userIcon: computed(() => {
-        if (state.isDomainOwner) return 'img_avatar_root-account';
-        if (state.hasDomainRole) return 'img_avatar_admin';
-        return 'img_avatar_user';
-    }),
-    name: computed(() => store.state.user.name),
-    email: computed(() => store.state.user.email),
-    role: computed(() => {
-        const roleArray = store.getters['user/roleNames'];
-        return roleArray.join(', ');
-    }),
-    language: computed(() => store.getters['user/languageLabel']),
-    currency: computed(() => store.state.settings.currency),
-    timezone: computed(() => store.state.user.timezone),
-    domainId: computed(() => store.state.domain.domainId),
-    userId: computed(() => store.state.user.userId),
-    hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
-    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-    hasPermission: computed(() => store.getters['user/hasPermission']),
-    languageMenuVisible: false,
-    currencyMenuVisible: false,
-    supportedMenu: computed(() => {
-        const docsList = config.get('DOCS') ?? [];
-        const data = { lang: store.state.user.language };
-        return docsList.map((d) => ({
-            label: ejs.render(d?.label ?? '', data),
-            link: ejs.render(d?.link ?? '', data),
-        }));
-    }),
-    languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
-        label: v, name: k,
-    }))),
-    currencyMenuItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-        name: currency,
-        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-    }))),
-});
-const profileMenuRef = ref<HTMLElement|null>(null);
-const languageInfoMenuRef = ref<HTMLElement|null>(null);
-const currencyInfoMenuRef = ref<HTMLElement|null>(null);
-
-const setVisible = (visible: boolean) => {
-    emit('update:visible', visible);
-};
-const openProfileMenu = () => {
-    setVisible(true);
-};
-const hideProfileMenu = () => {
-    if (state.languageMenuVisible) state.languageMenuVisible = false;
-    setVisible(false);
-};
-const setLanguageMenuVisible = (visible: boolean) => {
-    state.languageMenuVisible = visible;
-};
-const setCurrencyMenuVisible = (visible: boolean) => {
-    state.currencyMenuVisible = visible;
-};
-const handleProfileButtonClick = () => {
-    setVisible(!props.visible);
-};
-const handleClickOutsideLanguageMenu = <E = PointerEvent>(e: E) => {
-    if (!profileMenuRef.value) return;
-    const target = (e as MouseEvent).target as HTMLElement;
-    setLanguageMenuVisible(false);
-    /* NOTE:
-        onClickOutside stops click event bubbling.
-        So when this function is called, hideProfileMenu function will never be called.
-        The code below closes the profile menu when the user clicks outside the profileMenuRef.
-     */
-    if (!profileMenuRef.value.contains(target)) hideProfileMenu();
-};
-
-const handleClickOutsideCurrencyMenu = <E = PointerEvent>(e: E) => {
-    const _profileMenuRef = profileMenuRef.value;
-    if (!_profileMenuRef) return;
-    const target = (e as MouseEvent).target as HTMLElement;
-    setCurrencyMenuVisible(false);
-    if (!_profileMenuRef.contains(target)) hideProfileMenu();
-};
-const handleLanguageDropdownClick = () => {
-    setLanguageMenuVisible(!state.languageMenuVisible);
-};
-const handleCurrencyDropdownClick = () => {
-    setCurrencyMenuVisible(!state.currencyMenuVisible);
-};
-
-const handleLanguageClick = async (language) => {
-    try {
-        if (store.state.user.language === language) return;
-
-        await store.dispatch('user/setUser', {
-            language,
-            timezone: state.timezone,
-        });
-
-        setLanguageMenuVisible(false);
-        showSuccessMessage(t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'));
-    }
-};
-const handleCurrencyClick = async (currency) => {
-    store.commit('settings/setCurrency', currency);
-    setCurrencyMenuVisible(false);
-    showSuccessMessage(t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE_CURRENCY'), '');
-};
-const handleClickSignOut = async () => {
-    const res = {
-        name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: route.fullPath },
-    } as RouteLocationRaw;
-    await router.push(res);
-};
-const handleClickOutsideProfileMenu = () => {
-    if (props.visible) hideProfileMenu();
-};
-
-onClickOutside(profileMenuRef, handleClickOutsideProfileMenu);
-onClickOutside(languageInfoMenuRef, handleClickOutsideLanguageMenu);
-onClickOutside(currencyInfoMenuRef, handleClickOutsideCurrencyMenu);
-
-</script>
 
 <style lang="postcss" scoped>
 .gnb-profile {

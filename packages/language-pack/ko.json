@@ -456,6 +456,7 @@
 						"ACCOUNT": "계정",
 						"ALL": "모두",
 						"BASE_INFORMATION": "기본 정보",
+						"DATA_SOURCE": "",
 						"LABEL_COST_TYPE": "비용 발생 기준",
 						"LABEL_CURRENCY": "통화",
 						"LABEL_NAME": "이름",
@@ -560,6 +561,7 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "상세 기간 선택",
+					"LAST_12_MONTHS": "지난 12개월",
 					"LAST_14_DAYS": "최근 2주일",
 					"LAST_3_MONTHS": "지난 3개월",
 					"LAST_6_MONTHS": "지난 6개월",

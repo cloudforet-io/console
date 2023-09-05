@@ -12,6 +12,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
@@ -52,6 +53,7 @@ const state = reactive({
             label: `${t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
+    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId as string)),
 });
 
 const {
@@ -125,9 +127,8 @@ const handleUpdateQuery = (updatedQueryId: string) => {
                 />
             </div>
             <div class="right-part">
-                <template v-if="costAnalysisPageStore.selectedQueryId">
-                    <p-button v-if="costAnalysisPageStore.selectedQueryId"
-                              class="save-button"
+                <template v-if="!state.isManagedQuerySet">
+                    <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
                               @click="handleSaveQuerySet"

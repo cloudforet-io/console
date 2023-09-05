@@ -11,6 +11,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
+import BudgetDataSourceSelect from '@/services/cost-explorer/budget/shared/BudgetDataSourceSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/type';
 
@@ -86,6 +87,7 @@ watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid
                               @update:value="setForm('name', $event)"
                 />
             </p-field-group>
+            <budget-data-source-select @update="handleUpdateTarget" />
 
             <budget-target-select @update="handleUpdateTarget" />
 

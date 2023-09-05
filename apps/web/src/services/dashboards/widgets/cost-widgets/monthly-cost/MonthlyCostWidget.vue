@@ -21,15 +21,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { XYChartData, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -39,72 +38,75 @@ const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 const { t } = useI18n();
 
 type Data = CostAnalyzeDataModel['results'];
-const state = reactive({
-    ...toRefs(useWidgetState<Data>(props)),
-    skeletons: [1, 2],
-    chartData: computed(() => getRefinedXYChartData(state.data)),
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    settingsDateRange: computed<DateRange>(() => {
-        if (!state.settings?.date_range) return {};
-        return state.settings.date_range;
-    }),
-    selectedMonth: computed(() => (dayjs.utc(state.dateRange.end))),
-    previousMonth: computed(() => (dayjs.utc(state.dateRange.end).subtract(1, 'month'))),
-    currentMonthlyCost: computed(() => getMonthlyCost(state.selectedMonth)),
-    previousMonthlyCost: computed(() => getMonthlyCost(state.previousMonth)),
-    differenceCost: computed(() => {
-        const cost = state.currentMonthlyCost - state.previousMonthlyCost;
+});
+const state = reactive({
+    loading: true,
+    data: null as Data|null,
+    skeletons: [1, 2],
+    chartData: computed(() => getRefinedXYChartData(state.data)),
+});
+
+const dateState = reactive({
+    selectedMonth: computed(() => (dayjs.utc(widgetState.dateRange.end))),
+    previousMonth: computed(() => (dayjs.utc(widgetState.dateRange.end).subtract(1, 'month'))),
+    currentMonthlyCost: computed(() => getMonthlyCost(dateState.selectedMonth)),
+    previousMonthlyCost: computed(() => getMonthlyCost(dateState.previousMonth)),
+});
+const [formattedCurrentMonth] = useDateRangeFormatter({
+    start: computed(() => widgetState.dateRange.end),
+    end: computed(() => widgetState.dateRange.end),
+});
+const [formattedPreviousMonth] = useDateRangeFormatter({
+    start: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
+    end: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
+});
+
+const displayState = reactive({
+    differenceCost: computed<string|number>(() => {
+        const cost = dateState.currentMonthlyCost - dateState.previousMonthlyCost;
         if (Number.isNaN(cost)) return '--';
         return cost;
     }),
-    differenceCostRate: computed(() => {
-        let previousMonthlyCost = state.previousMonthlyCost;
-        if (typeof state.differenceCost !== 'number') return '--';
-        if (state.currentMonthlyCost === 0) previousMonthlyCost = 1;
-        return (state.differenceCost / previousMonthlyCost * 100).toFixed(2);
+    differenceCostRate: computed<string|number>(() => {
+        let previousMonthlyCost = dateState.previousMonthlyCost;
+        if (typeof displayState.differenceCost !== 'number') return '--';
+        if (dateState.currentMonthlyCost === 0) previousMonthlyCost = 1;
+        return (displayState.differenceCost / previousMonthlyCost * 100).toFixed(2);
     }),
     isDecreased: computed<boolean|undefined>(() => {
-        if (typeof state.differenceCost === 'number') {
-            if (state.differenceCost === 0) return undefined;
-            return state.differenceCost < 0;
+        if (typeof displayState.differenceCost === 'number') {
+            if (displayState.differenceCost === 0) return undefined;
+            return displayState.differenceCost < 0;
         }
         return undefined;
     }),
-});
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
-
-const [formattedCurrentMonth] = useDateRangeFormatter({
-    start: computed(() => state.dateRange.end),
-    end: computed(() => state.dateRange.end),
-});
-
-const [formattedPreviousMonth] = useDateRangeFormatter({
-    start: computed(() => dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
-    end: computed(() => dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
 });
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Data> => {
-    apiQueryHelper.setFilters(state.consoleFilters);
+    apiQueryHelper.setFilters(widgetState.consoleFilters);
     try {
         const { status, response } = await fetchCostAnalyze({
             query: {
-                granularity: state.options.granularity,
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.options.granularity,
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
-                        // TODO: Change to 'cost' after the cost analysis API is updated.
-                        key: 'usd_cost',
+                        key: 'cost',
                         operator: 'sum',
                     },
                 },
@@ -131,7 +133,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
 const drawChart = (chartData: XYChartData[]) => {
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     const yRendered = yAxis.get('renderer');
     yRendered.grid.template.setAll({ strokeOpacity: 0 });
@@ -155,13 +157,13 @@ const drawChart = (chartData: XYChartData[]) => {
 
     series.columns.template.adapters.add('fillOpacity', (fillOpacity, target) => {
         const targetMonth = dayjs.utc(target.dataItem?.dataContext?.[DATE_FIELD_NAME]).format(DATE_FORMAT);
-        if (targetMonth === state.previousMonth.format(DATE_FORMAT)) return 1;
-        if (targetMonth === state.selectedMonth.format(DATE_FORMAT)) return 0.2;
+        if (targetMonth === dateState.previousMonth.format(DATE_FORMAT)) return 1;
+        if (targetMonth === dateState.selectedMonth.format(DATE_FORMAT)) return 0.2;
         return fillOpacity;
     });
 
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSingleTooltipText(chart, tooltip, state.currency, props.currencyRates);
+    chartHelper.setXYSingleTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
     series.set('tooltip', tooltip);
     series.data.processor = chartHelper.createDataProcessor({
         dateFormat: DATE_FORMAT,
@@ -189,15 +191,12 @@ const refreshWidget = async (): Promise<Data> => {
     return state.data;
 };
 
-const handleRefresh = () => {
-    refreshWidget();
-};
-
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
         chartHelper.refreshRoot();
@@ -214,7 +213,7 @@ defineExpose<WidgetExpose<Data>>({
 
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="monthly-cost">
             <div class="cost">
@@ -229,23 +228,23 @@ defineExpose<WidgetExpose<Data>>({
                                loader-type="skeleton"
                 >
                     <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency, props.currencyRates) }}
+                        {{ currencyMoneyFormatter(dateState.currentMonthlyCost, widgetState.currency, props.currencyRates) }}
                     </div>
                     <div class="cost-info">
-                        <p-i v-if="typeof state.isDecreased === 'boolean'"
-                             :name="state.isDecreased ? 'ic_caret-down-filled-alt' : 'ic_caret-up-filled-alt'"
+                        <p-i v-if="typeof displayState.isDecreased === 'boolean'"
+                             :name="displayState.isDecreased ? 'ic_caret-down-filled-alt' : 'ic_caret-up-filled-alt'"
                              fill
                              width="1rem"
                              height="1rem"
-                             :color="state.isDecreased ? green[700] : red[500]"
+                             :color="displayState.isDecreased ? green[700] : red[500]"
                              original
                         />
-                        {{ currencyMoneyFormatter(state.differenceCost, state.currency, props.currencyRates) }}
-                        <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
-                                 :badge-type="state.isDecreased ? 'subtle' : 'solid'"
+                        {{ typeof displayState.differenceCost === 'number' ? currencyMoneyFormatter(displayState.differenceCost, widgetState.currency, props.currencyRates) : '--' }}
+                        <p-badge :style-type="displayState.isDecreased === undefined ? 'gray200' : displayState.isDecreased ? 'green200' : 'alert'"
+                                 :badge-type="displayState.isDecreased ? 'subtle' : 'solid'"
                                  shape="square"
                         >
-                            {{ state.differenceCostRate }} %
+                            {{ displayState.differenceCostRate }} %
                         </p-badge>
                     </div>
                     <template #loader>
@@ -275,10 +274,10 @@ defineExpose<WidgetExpose<Data>>({
                                loader-type="skeleton"
                 >
                     <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency, props.currencyRates) }}
+                        {{ currencyMoneyFormatter(dateState.previousMonthlyCost, widgetState.currency, props.currencyRates) }}
                     </div>
                     <div class="cost-info">
-                        {{ state.previousMonth.format('MMM YYYY') }}
+                        {{ dateState.previousMonth.format('MMM YYYY') }}
                     </div>
                     <template #loader>
                         <div class="skeleton-wrapper">

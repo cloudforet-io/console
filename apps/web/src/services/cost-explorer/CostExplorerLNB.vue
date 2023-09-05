@@ -115,6 +115,7 @@ const relocateNotificationState = reactive({
                 filters: ['[["Cost"],"label","="]'],
             },
         },
+        // TODO: may be isUpdated?
         isNew: true,
         hideFavorite: true,
     })),

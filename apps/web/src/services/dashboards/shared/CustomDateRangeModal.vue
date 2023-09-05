@@ -7,9 +7,9 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';
 import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 
 interface CustomRangeModalSettings {
     helpTextFrom?: string;

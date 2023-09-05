@@ -456,6 +456,7 @@
 						"ACCOUNT": "アカウント",
 						"ALL": "すべて",
 						"BASE_INFORMATION": "基本情報",
+						"DATA_SOURCE": "",
 						"LABEL_COST_TYPE": "コストタイプ",
 						"LABEL_CURRENCY": "通貨",
 						"LABEL_NAME": "名前",
@@ -560,6 +561,7 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "日付範囲",
+					"LAST_12_MONTHS": "過去12ヶ月間",
 					"LAST_14_DAYS": "過去14日間",
 					"LAST_3_MONTHS": "過去3ヶ月間",
 					"LAST_6_MONTHS": "過去6ヶ月間",

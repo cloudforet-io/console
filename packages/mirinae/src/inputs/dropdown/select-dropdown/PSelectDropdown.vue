@@ -1,3 +1,143 @@
+<script setup lang="ts">
+import {
+    computed,
+    reactive,
+    nextTick,
+    toRef,
+    ref,
+    useSlots,
+} from 'vue';
+
+import { onClickOutside } from '@vueuse/core';
+import { groupBy, reduce } from 'lodash';
+
+import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
+import type { SelectDropdownSize } from '@/inputs/dropdown/select-dropdown/type';
+import {
+    SELECT_DROPDOWN_STYLE_TYPE,
+    CONTEXT_MENU_POSITION,
+    SELECT_DROPDOWN_SIZE,
+} from '@/inputs/dropdown/select-dropdown/type';
+
+
+interface Props {
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
+    invalid?: boolean;
+    loading?: boolean;
+    items?: MenuItem[];
+    selected?: string | number | MenuItem[];
+    disabled?: boolean;
+    indexMode?: boolean;
+    placeholder?: string;
+    styleType?: SELECT_DROPDOWN_STYLE_TYPE;
+    buttonIcon?: string;
+    menuPosition?: CONTEXT_MENU_POSITION;
+    readOnly?: boolean;
+    size?: SelectDropdownSize;
+    isFixedWidth?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    useFixedMenuStyle: false,
+    visibleMenu: undefined,
+    isFixedWidth: false,
+    styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
+    disabled: false,
+    readOnly: false,
+    invalid: false,
+    loading: false,
+    menuPosition: CONTEXT_MENU_POSITION.LEFT,
+    placeholder: '',
+    items: () => [],
+    selected: undefined,
+    indexMode: false,
+    size: SELECT_DROPDOWN_SIZE.md,
+    buttonIcon: undefined,
+});
+
+const emit = defineEmits<{(e: 'update:selected', value?: string | number): void;
+    (e: 'select', value?: string | number): void;
+    (e: 'update:visible-menu', value?: boolean): void;
+    (e: 'focus-menu'): void;
+    (e: 'click-delete'): void;
+}>();
+
+const slots = useSlots();
+
+const state = reactive({
+    proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
+    contextMenuRef: null as null|any,
+    proxySelected: useProxyValue('selected', props, emit),
+    selectedItem: computed<MenuItem|null>(() => {
+        if (!Array.isArray(props.items)) return null;
+
+        if (props.indexMode) return props.items[state.proxySelected ?? ''] || null;
+
+        const data = groupBy(props.items, 'name')[state.proxySelected ?? ''];
+        if (Array.isArray(data)) return data[0] || null;
+
+        return null;
+    }),
+    menuSlots: computed(() => reduce(slots, (res, d, name) => {
+        if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+        return res;
+    }, {})),
+    buttonSlots: computed(() => reduce(slots, (res, d, name) => {
+        if (name.startsWith('button-') || name === 'button-default') {
+            res[`${name.substring(7)}`] = d;
+        }
+        return res;
+    }, {})),
+});
+
+const containerRef = ref<HTMLElement|null>(null);
+const contextMenuRef = toRef(state, 'contextMenuRef');
+
+const hideMenu = () => {
+    state.proxyVisibleMenu = false;
+};
+onClickOutside(containerRef, hideMenu);
+
+const {
+    targetRef, contextMenuStyle,
+} = useContextMenuFixedStyle({
+    useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+    visibleMenu: toRef(state, 'proxyVisibleMenu'),
+});
+
+/* Event Handlers */
+const onSelectMenu = (item: MenuItem, index) => {
+    if (props.indexMode) {
+        emit('select', index);
+        state.proxySelected = index;
+    } else {
+        emit('select', item.name);
+        state.proxySelected = item.name;
+    }
+    state.proxyVisibleMenu = false;
+};
+const handleClick = (e: MouseEvent) => {
+    if (props.readOnly || props.disabled) return;
+    state.proxyVisibleMenu = !state.proxyVisibleMenu;
+    e.stopPropagation();
+};
+const handlePressDownKey = () => {
+    if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
+    nextTick(() => {
+        if (contextMenuRef.value) {
+            if (slots['menu-menu']) emit('focus-menu');
+            else state.contextMenuRef.focus();
+        }
+    });
+};
+</script>
+
 <template>
     <div ref="containerRef"
          class="p-select-dropdown"
@@ -36,8 +176,8 @@
                 >
                     {{
                         state.selectedItem ?
-                            (state.selectedItem?.label || state.selectedItem?.name || '') :
-                            (placeholder || t('COMPONENT.SELECT_DROPDOWN.SELECT'))
+                            (state.selectedItem.label || state.selectedItem.name || '') :
+                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
                     }}
                 </slot>
             </span>
@@ -73,142 +213,6 @@
         </p-context-menu>
     </div>
 </template>
-
-<script setup lang="ts">
-import { onClickOutside } from '@vueuse/core';
-import { groupBy, reduce } from 'lodash';
-import {
-    computed, ref, reactive,
-    nextTick, toRef, useSlots,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-
-import PI from '@/foundation/icons/PI.vue';
-import { useProxyValue } from '@/hooks';
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SelectDropdownSize } from '@/inputs/dropdown/select-dropdown/type';
-import {
-    SELECT_DROPDOWN_STYLE_TYPE,
-    CONTEXT_MENU_POSITION, SELECT_DROPDOWN_SIZE,
-} from '@/inputs/dropdown/select-dropdown/type';
-
-interface Props {
-    /* context menu fixed style props */
-    useFixedMenuStyle: boolean;
-    visibleMenu?: boolean;
-    /* context menu props */
-    invalid: boolean;
-    loading: boolean;
-    /* select dropdown props */
-    items: MenuItem[];
-    selected?: string | number;
-    disabled: boolean;
-    indexMode: boolean;
-    placeholder: string;
-    styleType: SELECT_DROPDOWN_STYLE_TYPE;
-    buttonIcon?: string;
-    menuPosition: CONTEXT_MENU_POSITION;
-    readOnly: boolean;
-    size: SelectDropdownSize;
-    isFixedWidth: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    useFixedMenuStyle: false,
-    visibleMenu: undefined,
-    invalid: false,
-    loading: false,
-    items: () => [],
-    selected: undefined,
-    disabled: false,
-    indexMode: false,
-    placeholder: '',
-    styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
-    buttonIcon: undefined,
-    menuPosition: CONTEXT_MENU_POSITION.LEFT,
-    readOnly: false,
-    size: SELECT_DROPDOWN_SIZE.md,
-    isFixedWidth: false,
-});
-const emit = defineEmits<{(e: 'update:selected', value?: string | number): void;
-    (e: 'select', value?: string | number): void;
-    (e: 'update:visible-menu', value?: boolean): void;
-    (e: 'focus-menu'): void;
-}>();
-const { t } = useI18n();
-const slots = useSlots();
-
-const state = reactive({
-    proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-    contextMenuRef: null as null|any,
-    proxySelected: useProxyValue<string|number|undefined>('selected', props, emit),
-    selectedItem: computed<MenuItem|null>(() => {
-        if (!Array.isArray(props.items)) return null;
-
-        if (props.indexMode) return props.items[state.proxySelected ?? ''] || null;
-
-        const data = groupBy(props.items, 'name')[state.proxySelected ?? ''];
-        if (Array.isArray(data)) return data[0] || null;
-
-        return null;
-    }),
-    menuSlots: computed(() => reduce(slots, (res, d, name) => {
-        if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
-        return res;
-    }, {})),
-    buttonSlots: computed(() => reduce(slots, (res, d, name) => {
-        if (name.startsWith('button-') || name === 'button-default') {
-            res[`${name.substring(7)}`] = d;
-        }
-        return res;
-    }, {})),
-});
-const containerRef = ref<HTMLElement|null>(null);
-const contextMenuRef = toRef(state, 'contextMenuRef');
-
-const {
-    targetRef, contextMenuStyle,
-} = useContextMenuFixedStyle({
-    useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-    visibleMenu: toRef(state, 'proxyVisibleMenu'),
-});
-
-/* Event Handlers */
-const onSelectMenu = (item: MenuItem, index) => {
-    console.debug('onSelectMenu', item, index);
-    if (props.indexMode) {
-        emit('select', index);
-        state.proxySelected = index;
-    } else {
-        emit('select', item.name);
-        state.proxySelected = item.name;
-    }
-    state.proxyVisibleMenu = false;
-};
-const handleClick = (e: MouseEvent) => {
-    if (props.readOnly || props.disabled) return;
-    state.proxyVisibleMenu = !state.proxyVisibleMenu;
-    e.stopPropagation();
-};
-const handlePressDownKey = () => {
-    if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
-    nextTick(() => {
-        if (contextMenuRef.value) {
-            if (slots['menu-menu']) emit('focus-menu');
-            else state.contextMenuRef.value.focus();
-        }
-    });
-};
-
-const hideMenu = () => {
-    state.proxyVisibleMenu = false;
-};
-onClickOutside(containerRef, hideMenu);
-
-</script>
 
 <style lang="postcss">
 @define-mixin disabled-style {
