@@ -175,9 +175,9 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             await store.dispatch('reference/user/load');
             return store.getters['reference/userItems'];
         }, {}, { lazy: true }),
-        webHook: asyncComputed<UserReferenceMap>(async () => {
-            await store.dispatch('reference/webHook/load');
-            return store.getters['reference/webHookItems'];
+        webhook: asyncComputed<UserReferenceMap>(async () => {
+            await store.dispatch('reference/webhook/load');
+            return store.getters['reference/webhookItems'];
         }, {}, { lazy: true }),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
     });

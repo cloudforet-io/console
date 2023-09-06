@@ -59,18 +59,6 @@ export interface Legend {
     disabled?: boolean;
 }
 
-export interface TreemapChartData {
-    name: string;
-    value?: any;
-    children: Array<{
-        [groupBy: string]: string | any;
-        cost_sum: number;
-        label?: string;
-        background_color?: string;
-        font_color?: string;
-    }>;
-}
-
 export interface PieChartData {
     [groupBy: string]: string | any;
     cost_sum?: number;
