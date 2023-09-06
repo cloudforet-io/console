@@ -313,13 +313,13 @@ watch(() => props.disabled, (disabled) => {
             flex-grow: 1;
             width: 100%;
             > .placeholder {
-                @apply text-label-md text-gray-600;
+                @apply text-label-md text-gray-500;
                 flex-grow: 1;
                 line-height: 1.5;
                 padding: 0.25rem 0.5rem;
             }
             > .selected-item {
-                @apply text-label-md text-gray-900;
+                @apply text-label-md text-gray-800;
                 flex-grow: 1;
                 line-height: 1.5;
                 padding: 0.25rem 0.5rem;
@@ -341,7 +341,7 @@ watch(() => props.disabled, (disabled) => {
             }
         }
         .arrow-button {
-            @apply inline-flex items-center text-gray-900 cursor-pointer;
+            @apply inline-flex items-center text-gray-600 cursor-pointer;
             flex-shrink: 0;
             max-height: 2rem;
             width: 1.75rem;
@@ -357,16 +357,8 @@ watch(() => props.disabled, (disabled) => {
     &.disabled {
         > .dropdown-button {
             @apply bg-gray-100 border-gray-300 cursor-not-allowed;
-            > .selection-display-wrapper {
-                > .selected-item {
-                    @apply text-gray-300;
-                }
-                > .delete-all-button {
-                    @apply cursor-not-allowed;
-                }
-            }
             > .arrow-button {
-                @apply text-gray-300 cursor-not-allowed;
+                @apply text-gray-300;
             }
         }
     }
@@ -375,7 +367,7 @@ watch(() => props.disabled, (disabled) => {
         > .dropdown-button {
             @apply text-gray-300 border-gray-300 cursor-default;
             .selected-item {
-                @apply text-gray-500;
+                @apply text-gray-800;
             }
             > .arrow-button {
                 @apply text-gray-300;
@@ -383,14 +375,9 @@ watch(() => props.disabled, (disabled) => {
         }
     }
 
-    &.opened {
+    &.opened:not(.invalid) {
         > .dropdown-button {
             @apply border-secondary;
-            > .selection-display-wrapper {
-                > .selected-item {
-                    @apply text-secondary;
-                }
-            }
             > .arrow-button {
                 @apply text-secondary;
             }
@@ -405,7 +392,7 @@ watch(() => props.disabled, (disabled) => {
 
     @media (hover: hover) {
         &:not(.disabled, .readonly):hover {
-            > .dropdown-button .arrow-button {
+            > .dropdown-button {
                 @apply text-secondary;
             }
             &:not(.invalid) {
