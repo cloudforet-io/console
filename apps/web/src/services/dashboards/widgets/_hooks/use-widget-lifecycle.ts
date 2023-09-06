@@ -20,10 +20,10 @@ import type {
 import {
     validateWidgetByVariablesSchemaUpdate,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
-import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-state';
 
 
-interface UseWidgetLifecycleOptions<T extends WidgetBaseState = WidgetBaseState> {
+interface UseWidgetLifecycleOptions<T extends WidgetState = WidgetState> {
     props: WidgetProps;
     emit: WidgetEmit;
     widgetState: UnwrapRef<T>;
@@ -88,8 +88,14 @@ export const useWidgetLifecycle = ({
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndEmitEvent();
-            } else if (onCurrencyUpdate && current?.currency?.value !== previous?.currency?.value) {
-                onCurrencyUpdate();
+            }
+        });
+    }
+
+    if (onCurrencyUpdate) {
+        watch(() => widgetState.currency, (current, previous) => {
+            if (current !== previous) {
+                onCurrencyUpdate(current, previous);
             }
         });
     }

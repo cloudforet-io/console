@@ -17,7 +17,7 @@ import { i18n } from '@/translations';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { DataSourceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -52,7 +52,7 @@ const router = useRouter();
 
 const state = reactive({
     loading: true,
-    header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
+    header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
         ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
@@ -113,7 +113,7 @@ const state = reactive({
 const dataSourceState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     items: computed<MenuItem[]>(() => {
-        const dataSourceMap: DataSourceMap = allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap;
+        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
@@ -208,7 +208,6 @@ watch(() => route.params, (params) => {
 }, { immediate: true });
 
 (async () => {
-    await allReferenceStore.load('plugin');
     await costQuerySetStore.listCostQuerySets();
 })();
 

@@ -2,7 +2,7 @@
 import { vIntersectionObserver } from '@vueuse/components';
 import type { ComponentPublicInstance } from 'vue';
 import {
-    reactive, ref, onMounted, watch, computed, toRef,
+    reactive, ref, watch, computed, toRef,
 } from 'vue';
 
 import {
@@ -202,13 +202,6 @@ const handleDeleteModalConfirm = () => {
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
-
-/* init */
-onMounted(async () => {
-    await store.dispatch('reference/loadAll');
-    // for PDF export
-    // emit('rendered', widgetRef.value);
-});
 
 </script>
 
