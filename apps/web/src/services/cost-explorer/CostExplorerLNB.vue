@@ -118,6 +118,7 @@ const dataSourceState = reactive({
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
+        console.debug('dataSourceMap', dataSourceMap);
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
@@ -281,6 +282,12 @@ watch(() => route.params, async (params) => {
                             </span>
                         </div>
                     </template>
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item">
+                            <!--TODO: Currency should be changed to real data.-->
+                            <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                        </div>
+                    </template>
                 </p-select-dropdown>
             </template>
         </l-n-b>
@@ -307,6 +314,9 @@ watch(() => route.params, async (params) => {
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
+        }
+        .selected-item-postfix {
+            @apply text-gray-400;
         }
     }
 }
