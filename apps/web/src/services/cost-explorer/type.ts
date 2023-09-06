@@ -41,7 +41,7 @@ export interface GroupByItem {
 }
 
 
-export interface CostAnalyzeResponse<Result> {
+export interface CostAnalyzeResponse<CostAnalyzeRawData> {
     more?: boolean;
-    results: Result[];
+    results: CostAnalyzeRawData[];
 }

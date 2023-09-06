@@ -38,7 +38,7 @@ import type {
 } from '@/services/cost-explorer/type';
 
 
-type CostAnalyzeResult = {
+type CostAnalyzeRawData = {
     [groupBy: string]: string | any;
     cost_sum?: Array<{
         date: string;
@@ -61,9 +61,9 @@ const state = reactive({
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeResult>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeResult>> => {
+const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
@@ -96,8 +96,8 @@ const setChartData = debounce(async () => {
     state.loading = true;
 
     const rawData = await listCostAnalysisData();
-    state.legends = getLegends<CostAnalyzeResult>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
-    state.chartData = getXYChartData<CostAnalyzeResult>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
+    state.legends = getLegends<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
+    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
     state.loading = false;
 }, 300);
 
