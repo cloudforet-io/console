@@ -235,12 +235,13 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
             },
         });
         if (status === 'succeed') return response;
+        return { more: false, results: [] };
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { more: false, results: [] };
     } finally {
         tableState.loading = false;
     }
-    return { more: false, results: [] };
 };
 
 /* event */
