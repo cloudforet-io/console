@@ -40,7 +40,7 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-an
 import type { CostAnalyzeResponse } from '@/services/cost-explorer/type';
 
 
-type CostAnalyzeResult = {
+type CostAnalyzeRawData = {
     [groupBy: string]: string | any;
     cost_sum?: Array<{
         date: string;
@@ -111,12 +111,12 @@ const tableState = reactive({
     })),
     costFields: [] as DataTableFieldType[],
     fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
-    items: [] as CostAnalyzeResult[],
+    items: [] as CostAnalyzeRawData[],
     more: false,
 });
 
 /* util */
-const getLink = (item: CostAnalyzeResult, fieldName: string) => {
+const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     const queryHelper = new QueryHelper();
     const query: Location['query'] = {};
     if (item.region_code) {
@@ -179,7 +179,7 @@ const getLink = (item: CostAnalyzeResult, fieldName: string) => {
         },
     };
 };
-const getIsRaised = (item: CostAnalyzeResult, fieldName: string): boolean => {
+const getIsRaised = (item: CostAnalyzeRawData, fieldName: string): boolean => {
     const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04 -> 2022-01-04
     const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
     const currValue: number|undefined = item.cost_sum?.find(({ date }) => date === currDate)?.value;
@@ -207,9 +207,9 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeResult>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const costApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeResult>> => {
+const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
         const _convertedFilters = getConvertedFilter(costAnalysisPageState.filters);
@@ -248,7 +248,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    tableState.items = getRefinedChartTableData<CostAnalyzeResult>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
 const handleExcelDownload = async () => {
@@ -290,7 +290,7 @@ watch(
     ],
     async () => {
         const { results, more } = await listCostAnalysisTableData();
-        tableState.items = getRefinedChartTableData<CostAnalyzeResult>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+        tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
         tableState.more = more;
         tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
     },
