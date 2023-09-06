@@ -50,11 +50,11 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
             },
         });
         if (status === 'succeed') return response.results;
+        return undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
         return undefined;
     }
-    return undefined;
 };
 
 /* util */
