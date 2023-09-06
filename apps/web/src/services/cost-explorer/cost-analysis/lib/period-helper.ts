@@ -1,66 +1,36 @@
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { COST_ANALYSIS_PERIOD_TYPE } from '@/services/cost-explorer/cost-analysis/config';
-import type { CostAnalysisPeriodType } from '@/services/cost-explorer/cost-analysis/type';
+import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type { Period, Granularity } from '@/services/cost-explorer/type';
+import type { Granularity, Period } from '@/services/cost-explorer/type';
 
 
-export const getPeriod = (granularity: Granularity, periodType: CostAnalysisPeriodType, period: Period): { start?: Dayjs; end?: Dayjs; } => {
+export const convertRelativePeriodToPeriod = (relativePeriod: RelativePeriod): { start: string; end: string; } => {
     const today = dayjs.utc();
-    if (periodType === COST_ANALYSIS_PERIOD_TYPE.CUSTOM || granularity === GRANULARITY.DAILY) return period;
-
-    // monthly case
-    if (periodType === COST_ANALYSIS_PERIOD_TYPE.THIS_MONTH) {
+    if (relativePeriod.unit === 'month') {
         return {
-            start: today.startOf('month'),
-            end: today.endOf('month'),
+            start: today.subtract(relativePeriod.value, 'month').format('YYYY-MM'),
+            end: today.subtract(relativePeriod.exclude_today ? 1 : 0, 'month').format('YYYY-MM'),
         };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_MONTH) {
+    } if (relativePeriod.unit === 'year') {
         return {
-            start: today.subtract(1, 'month').startOf('month'),
-            end: today.subtract(1, 'month').endOf('month'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_3_MONTHS) {
-        return {
-            start: today.subtract(2, 'month').startOf('month'),
-            end: today.endOf('month'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_6_MONTHS) {
-        return {
-            start: today.subtract(5, 'month').startOf('month'),
-            end: today.endOf('month'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_12_MONTHS) {
-        return {
-            start: today.subtract(11, 'month').startOf('month'),
-            end: today.endOf('month'),
+            start: today.subtract(relativePeriod.value, 'year').format('YYYY'),
+            end: today.subtract(relativePeriod.exclude_today ? 1 : 0, 'year').format('YYYY'),
         };
     }
-
-    // yearly case
-    if (periodType === COST_ANALYSIS_PERIOD_TYPE.THIS_YEAR) {
-        return {
-            start: today.startOf('year'),
-            end: today.endOf('year'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_YEAR) {
-        return {
-            start: today.subtract(1, 'year').startOf('year'),
-            end: today.subtract(1, 'year').endOf('year'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_3_YEARS) {
-        return {
-            start: today.subtract(2, 'year').startOf('year'),
-            end: today.endOf('year'),
-        };
-    } if (periodType === COST_ANALYSIS_PERIOD_TYPE.LAST_5_YEARS) {
-        return {
-            start: today.subtract(4, 'year').startOf('year'),
-            end: today.endOf('year'),
-        };
+    return {
+        start: today.format('YYYY-MM'),
+        end: today.format('YYYY-MM'),
+    };
+};
+export const initiatePeriodByGranularity = (granularity?: Granularity): [Period, RelativePeriod|undefined] => {
+    if (granularity === GRANULARITY.DAILY) {
+        const thisMonthRelativePeriod:RelativePeriod = { unit: 'month', value: 0, exclude_today: true };
+        return [convertRelativePeriodToPeriod(thisMonthRelativePeriod), undefined];
+    } if (granularity === GRANULARITY.YEARLY) {
+        const thisYearRelativePeriod:RelativePeriod = { unit: 'year', value: 0, exclude_today: true };
+        return [convertRelativePeriodToPeriod(thisYearRelativePeriod), thisYearRelativePeriod];
     }
-
-    return period;
+    const last6MonthsRelativePeriod:RelativePeriod = { unit: 'month', value: 5, exclude_today: true };
+    return [convertRelativePeriodToPeriod(last6MonthsRelativePeriod), last6MonthsRelativePeriod];
 };
