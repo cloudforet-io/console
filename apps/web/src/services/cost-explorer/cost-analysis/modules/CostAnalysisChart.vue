@@ -86,10 +86,11 @@ const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRe
             },
         });
         if (status === 'succeed') return response;
+        return { more: false, results: [] };
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { more: false, results: [] };
     }
-    return { more: false, results: [] };
 };
 const setChartData = debounce(async () => {
     state.loading = true;
