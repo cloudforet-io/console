@@ -7,10 +7,10 @@ import {
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { AssetGroupBy, CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData, PieChartData,
+    CostAnalyzeDataModel, XYChartData, Legend, PieChartData,
 } from '@/services/dashboards/widgets/type';
 
 
@@ -116,35 +116,6 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
         max: end.valueOf(),
     };
 };
-
-
-/**
- * @name getRefinedTreemapChartData
- * @description Convert raw data to TreemapChart data.
- */
-export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: AssetGroupBy|CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
-    const chartData: TreemapChartData[] = [{
-        name: 'Root',
-        value: '',
-        children: [],
-    }];
-    if (!rawData || !groupBy) return [];
-
-    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy)?.referenceMap;
-    rawData.forEach((d) => {
-        const _name = d[groupBy];
-        let _label = d[groupBy];
-        if (_name) _label = referenceMap?.[_name]?.label ?? referenceMap?.[_name]?.name ?? _name;
-        else if (!_name) _label = 'Unknown';
-
-        chartData[0].children.push({
-            ...d,
-            value: _label,
-        });
-    });
-    return chartData;
-};
-
 
 /**
  * @name getRefinedPieChartData
