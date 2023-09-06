@@ -199,7 +199,7 @@ onUnmounted(() => {
 });
 
 watch(() => route.params, async (params) => {
-    // Budget page case
+    // Case - Directly access Budget Page
     if (!costQuerySetState.selectedDataSourceId) {
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
         try {
