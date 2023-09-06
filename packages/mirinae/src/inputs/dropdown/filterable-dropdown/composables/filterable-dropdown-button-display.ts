@@ -3,12 +3,12 @@ import { computed } from 'vue';
 
 import type {
     FilterableDropdownAppearanceType,
-    FilterableDropdownMenuItem,
+    DropdownMenuItem,
 } from '@/inputs/dropdown/filterable-dropdown/type';
 
 interface UseDropdownButtonDisplay {
     multiSelectable: Ref<boolean|undefined>;
-    selected: Ref<FilterableDropdownMenuItem[]>;
+    selected: Ref<DropdownMenuItem[]>;
     appearanceType: Ref<FilterableDropdownAppearanceType|undefined>;
 }
 export const useFilterableDropdownButtonDisplay = ({

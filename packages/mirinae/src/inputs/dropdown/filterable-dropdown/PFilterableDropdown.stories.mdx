@@ -34,7 +34,7 @@ export const Template = (args, { argTypes }) => ({
             :readonly="readonly"
             :show-select-header="showSelectHeader"
             :show-select-marker="showSelectMarker"
-            :visible-menu.sync="proxyVisibleMenu"
+            :visible-menu="proxyVisibleMenu"
             :use-fixed-menu-style="useFixedMenuStyle"
             :placeholder="placeholder"
             :invalid="invalid"
@@ -488,6 +488,30 @@ If you don't want to use this feature, give true to the disableHandler prop.
                 <br/>
                 <p class="text-label-lg font-bold my-3">Custom placeholder</p>
                 <p-filterable-dropdown :menu="menu" placeholder="Please Select One 😄" />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Delete All Button
+
+<Canvas>
+    <Story name="Show Delete All Button" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-filterable-dropdown :menu="menu"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show delete all button</p>
+                <p-filterable-dropdown :menu="menu" :show-delete-all-button="false" />
                 <br/>
             </div>
 `,

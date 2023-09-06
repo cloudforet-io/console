@@ -188,6 +188,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    showDeleteAllButton: {
+        name: 'showDeleteAllButton',
+        type: { name: 'boolean' },
+        description: 'Whether to show delete all button or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* events */
     onHideMenu: {
         name: 'hide-menu',
