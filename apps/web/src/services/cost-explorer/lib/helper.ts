@@ -6,10 +6,11 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { FILTER } from '@/services/cost-explorer/lib/config';
 import type {
     Period, Granularity, CostFiltersMap,
 } from '@/services/cost-explorer/type';
+
 
 export const getConvertedFilter = (filters: CostFiltersMap): ConsoleFilter[] => {
     const results: ConsoleFilter[] = [];
@@ -78,11 +79,7 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
     const end = dayjs.utc(period.end);
 
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
-    let dateFormat = 'YYYY-MM-DD';
-    if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
-    if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
 
-    const nameDateFormat = dateFormat;
     let labelDateFormat = 'M/D';
     if (timeUnit === 'month') {
         labelDateFormat = 'MMM';
@@ -91,14 +88,16 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
     }
 
     let now = start;
+    let index = 0;
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
-            name: `cost.${now.format(nameDateFormat)}`,
+            name: `cost_sum.${index}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             sortable: true,
         });
         now = now.add(1, timeUnit);
+        index += 1;
     }
     return dateFields;
 };

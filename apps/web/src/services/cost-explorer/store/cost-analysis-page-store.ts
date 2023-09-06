@@ -17,7 +17,7 @@ interface CostAnalysisPageState {
     granularity: Granularity;
     groupBy: Array<GroupBy|string>;
     chartGroupBy?: GroupBy|string;
-    period?: Period;
+    period: Period;
     periodType?: CostAnalysisPeriodType;
     filters: CostFiltersMap;
 }
@@ -38,13 +38,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
-        currentQuerySetOptions: (state): Partial<CostQuerySetOption> => ({
-            granularity: state.granularity,
-            group_by: state.groupBy,
-            period: state.period,
-            period_type: state.periodType,
-            filters: state.filters,
-        }),
+        selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
     },
     actions: {
         async initState() {
