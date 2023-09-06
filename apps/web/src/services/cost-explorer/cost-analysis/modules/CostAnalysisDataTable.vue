@@ -37,10 +37,17 @@ import {
 } from '@/services/cost-explorer/lib/config';
 import { getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostAnalyzeModel } from '@/services/cost-explorer/type';
+import type { CostAnalyzeResponse } from '@/services/cost-explorer/type';
 
 
-type CostAnalyzeResult = CostAnalyzeModel['results'][0];
+type CostAnalyzeResult = {
+    [groupBy: string]: string | any;
+    cost_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+};
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -104,7 +111,7 @@ const tableState = reactive({
     })),
     costFields: [] as DataTableFieldType[],
     fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
-    items: [] as CostAnalyzeModel['results'],
+    items: [] as CostAnalyzeResult[],
     more: false,
 });
 
@@ -200,9 +207,9 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeResult>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const costApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisTableData = async (): Promise<CostAnalyzeModel> => {
+const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeResult>> => {
     try {
         tableState.loading = true;
         const _convertedFilters = getConvertedFilter(costAnalysisPageState.filters);
@@ -240,7 +247,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeModel> => {
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    tableState.items = getRefinedChartTableData<CostAnalyzeResult>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
 const handleExcelDownload = async () => {
@@ -282,7 +289,7 @@ watch(
     ],
     async () => {
         const { results, more } = await listCostAnalysisTableData();
-        tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+        tableState.items = getRefinedChartTableData<CostAnalyzeResult>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
         tableState.more = more;
         tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
     },

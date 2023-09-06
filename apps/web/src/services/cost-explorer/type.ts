@@ -41,14 +41,7 @@ export interface GroupByItem {
 }
 
 
-export interface CostAnalyzeModel {
+export interface CostAnalyzeResponse<Result> {
     more?: boolean;
-    results: Array<{
-        [groupBy: string]: string | any; // product: 'AmazonCloudFront'
-        cost_sum?: Array<{
-            [field_group: string]: any;
-            value: number
-        }>;
-        _total_cost_sum?: number;
-    }>;
+    results: Result[];
 }

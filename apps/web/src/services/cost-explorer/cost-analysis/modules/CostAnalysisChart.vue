@@ -34,9 +34,18 @@ import {
 } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
-    CostAnalyzeModel,
+    CostAnalyzeResponse,
 } from '@/services/cost-explorer/type';
 
+
+type CostAnalyzeResult = {
+    [groupBy: string]: string | any;
+    cost_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+};
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -52,9 +61,9 @@ const state = reactive({
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeResult>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisData = async (): Promise<CostAnalyzeModel> => {
+const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
@@ -86,8 +95,8 @@ const setChartData = debounce(async () => {
     state.loading = true;
 
     const rawData = await listCostAnalysisData();
-    state.legends = getLegends(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
-    state.chartData = getXYChartData(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
+    state.legends = getLegends<CostAnalyzeResult>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
+    state.chartData = getXYChartData<CostAnalyzeResult>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
     state.loading = false;
 }, 300);
 

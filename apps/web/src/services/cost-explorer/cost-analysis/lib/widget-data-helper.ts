@@ -14,7 +14,7 @@ import type {
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type {
-    Period, Granularity, GroupBy, CostAnalyzeModel,
+    Period, Granularity, GroupBy, CostAnalyzeResponse,
 } from '@/services/cost-explorer/type';
 
 
@@ -48,7 +48,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = (rawData: CostAnalyzeModel, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
+export const getLegends = <CostAnalyzeResult>(rawData: CostAnalyzeResponse<CostAnalyzeResult>, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         // Parsing to match api data (ex. tags.Name -> tags_Name)
@@ -126,7 +126,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (rawData: CostAnalyzeModel, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
+export const getXYChartData = <CostAnalyzeResult>(rawData: CostAnalyzeResponse<CostAnalyzeResult>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
@@ -215,12 +215,12 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
 };
 
-export const getRefinedChartTableData = (results: CostAnalyzeModel['results'], granularity: Granularity, period: Period): CostAnalyzeModel['results'] => {
+export const getRefinedChartTableData = <CostAnalyzeResult>(results: CostAnalyzeResult[], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
 
-    const _results: CostAnalyzeModel['results'] = cloneDeep(results);
-    const refinedTableData: CostAnalyzeModel['results'] = [];
+    const _results: CostAnalyzeResult[] = cloneDeep(results);
+    const refinedTableData: CostAnalyzeResult[] = [];
     _results.forEach((d) => {
         let _costSum = cloneDeep(d.cost_sum);
         let now = dayjs.utc(period.start).clone();
