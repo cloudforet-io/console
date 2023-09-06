@@ -1,6 +1,6 @@
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
-import type { CostAnalysisPeriodType } from '@/services/cost-explorer/cost-analysis/type';
+import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 
@@ -24,8 +24,8 @@ export type CostFiltersMap = Record<Filter, FilterItem[]>;
 export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
-    period: Period;
-    period_type?: CostAnalysisPeriodType;
+    period?: Period;
+    relative_period?: RelativePeriod;
     filters?: CostFiltersMap;
 }
 
