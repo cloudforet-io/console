@@ -24,7 +24,7 @@ export type CostFiltersMap = Record<Filter, FilterItem[]>;
 export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
-    period?: Period;
+    period: Period;
     period_type?: CostAnalysisPeriodType;
     filters?: CostFiltersMap;
 }
@@ -38,4 +38,10 @@ export interface CostQuerySetModel {
 export interface GroupByItem {
     name: string;
     label: string;
+}
+
+
+export interface CostAnalyzeResponse<Result> {
+    more?: boolean;
+    results: Result[];
 }

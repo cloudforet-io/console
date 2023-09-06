@@ -36,9 +36,6 @@ export interface XYChartData {
     aggregation?: number;
     [key: string]: any;
 }
-interface Cost {
-    [key: string]: number;
-}
 export interface Legend {
     name: string;
     label: string | TranslateResult;
@@ -46,12 +43,6 @@ export interface Legend {
     disabled?: boolean;
 }
 
-export interface CostAnalyzeModel {
-    total_cost?: number;
-    cost: Cost | number;
-    is_others?: boolean;
-    [key: string]: any;
-}
 
 export type CostAnalysisPeriodType = typeof COST_ANALYSIS_PERIOD_TYPE[keyof typeof COST_ANALYSIS_PERIOD_TYPE];
 

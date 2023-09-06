@@ -36,6 +36,7 @@ const props = defineProps<Props>();
 const route = useRoute();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
 
 /* util */
 const setQueryOptions = (options?: CostQuerySetOption) => {
@@ -54,7 +55,7 @@ const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (c
 
 let unregisterStoreWatch;
 const registerStoreWatch = (currentQuery) => {
-    unregisterStoreWatch = watch(() => costAnalysisPageStore.currentQuerySetOptions, (options: Partial<CostQuerySetOption>) => {
+    unregisterStoreWatch = watch(() => costAnalysisPageState, (options: Partial<CostQuerySetOption>) => {
         if (props.querySetId) return;
 
         const newQuery: CostAnalysisPageUrlQuery = {

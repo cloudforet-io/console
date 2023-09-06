@@ -40,7 +40,7 @@ interface Props {
     currencyRates: CurrencyRates;
     //
     loading: boolean;
-    chart: any; // TODO
+    chart: null | any; // TODO: type
     chartData: XYChartData[];
     legends: Legend[];
     granularity: Granularity;
@@ -50,7 +50,7 @@ const DATE_FIELD_NAME = 'date';
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
-    chart: () => ({}),
+    chart: null,
     chartData: () => ([]),
     legends: () => ([]),
     granularity: GRANULARITY.DAILY,
