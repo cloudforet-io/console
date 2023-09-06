@@ -331,7 +331,6 @@ watch(() => state.proxySelected, (proxySelected) => {
             flex-grow: 1;
             flex-shrink: 0;
             line-height: 1.5;
-            height: 100%;
             .inner-label {
                 @apply text-label-md font-bold;
             }
