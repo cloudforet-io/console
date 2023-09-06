@@ -27,6 +27,8 @@ import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source';
 
 export interface ReferenceTypeInfo {
@@ -42,7 +44,78 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
-            ...store.getters['reference/allReferenceTypeInfo'],
+            projectGroup: {
+                ...REFERENCE_TYPE_INFO.project_group,
+                referenceMap: getters.projectGroup,
+            },
+            project_group: {
+                ...REFERENCE_TYPE_INFO.project_group,
+                referenceMap: getters.projectGroup,
+            },
+            //
+            project: {
+                ...REFERENCE_TYPE_INFO.project,
+                referenceMap: getters.project,
+            },
+            //
+            protocol: {
+                ...REFERENCE_TYPE_INFO.protocol,
+                referenceMap: getters.protocol,
+            },
+            //
+            cloudServiceType: {
+                ...REFERENCE_TYPE_INFO.cloud_service_type,
+                referenceMap: getters.cloudServiceType,
+            },
+            cloud_service_type: {
+                ...REFERENCE_TYPE_INFO.cloud_service_type,
+                referenceMap: getters.cloudServiceType,
+            },
+            //
+            collector: {
+                ...REFERENCE_TYPE_INFO.collector,
+                referenceMap: getters.collector,
+            },
+            //
+            plugin: {
+                ...REFERENCE_TYPE_INFO.plugin,
+                referenceMap: getters.plugin,
+            },
+            //
+            provider: {
+                ...REFERENCE_TYPE_INFO.provider,
+                referenceMap: getters.provider,
+            },
+            //
+            region: {
+                ...REFERENCE_TYPE_INFO.region,
+                referenceMap: getters.region,
+            },
+            //
+            secret: {
+                ...REFERENCE_TYPE_INFO.secret,
+                referenceMap: getters.secret,
+            },
+            //
+            serviceAccount: {
+                ...REFERENCE_TYPE_INFO.service_account,
+                referenceMap: getters.serviceAccount,
+            },
+            service_account: {
+                ...REFERENCE_TYPE_INFO.service_account,
+                referenceMap: getters.serviceAccount,
+            },
+            //
+            user: {
+                ...REFERENCE_TYPE_INFO.user,
+                referenceMap: getters.user,
+            },
+            //
+            webhook: {
+                ...REFERENCE_TYPE_INFO.webhook,
+                referenceMap: getters.webhook,
+            },
+            //
             costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
             cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
         })),
