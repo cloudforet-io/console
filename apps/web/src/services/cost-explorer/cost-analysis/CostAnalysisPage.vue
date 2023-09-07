@@ -100,8 +100,6 @@ watch(() => route.params, async (params) => {
 /* Page Init */
 (async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
-    // list cost query sets
-    await costAnalysisPageStore.getCostQueryList();
 
     // init states
     if (props.querySetId) {

@@ -10,6 +10,8 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -23,6 +25,7 @@ import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
@@ -89,7 +92,7 @@ const state = reactive({
                 color: gray[500],
             } : undefined,
             to: {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
                     dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                     costQuerySetId: d.cost_query_set_id,
@@ -112,8 +115,9 @@ const state = reactive({
 });
 const dataSourceState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
     items: computed<MenuItem[]>(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
+        const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
@@ -121,7 +125,7 @@ const dataSourceState = reactive({
         }));
         return dataSourceMenuItemList;
     }),
-    selected: computed(() => costQuerySetState.selectedDataSourceId),
+    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
 });
 const relocateNotificationState = reactive({
     isShow: false,
@@ -156,12 +160,12 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 const handleSelectDataSource = (selected: string) => {
     costQuerySetStore.$patch({ selectedDataSourceId: selected });
     router.push({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
             costQuerySetId: managedCostQuerySetIdList[0],
         },
-    });
+    }).catch(() => {});
 };
 
 const handleLearnMoreRelocateNotification = () => {
@@ -181,6 +185,7 @@ const handleDismissRelocateNotification = () => {
 
 
 onMounted(() => {
+    // Relocate dashboard notification
     const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
     if (!settings.costExplorer?.hideRelocateDashboardNotification) {
         relocateNotificationState.isModalVisible = true;
@@ -193,23 +198,38 @@ onUnmounted(() => {
     costQuerySetStore.$reset();
 });
 
+watch(() => route.params, async (params) => {
+    // Case - Directly access Budget Page
+    if (!costQuerySetState.selectedDataSourceId) {
+        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
+        try {
+            const { status, response } = await fetcher({
+                query: {
+                    only: ['data_source_id'],
+                },
+            });
+            if (status === 'succeed') {
+                const dataSourceId = response.results[0].data_source_id;
+                costQuerySetStore.$patch({
+                    selectedDataSourceId: dataSourceId,
+                });
+            }
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+    }
 
-watch(() => route.params, (params) => {
     /*
-    * Both parameters are set in the route. (beforeEnter navigation in route.ts)
+    * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
     * */
     if (params.dataSourceId && params.costQuerySetId) {
         costQuerySetStore.$patch({
             selectedDataSourceId: params.dataSourceId,
             selectedQuerySetId: params.costQuerySetId,
         });
-        costQuerySetStore.listCostQuerySets();
     }
-}, { immediate: true });
-
-(async () => {
     await costQuerySetStore.listCostQuerySets();
-})();
+}, { immediate: true });
 
 </script>
 
@@ -261,6 +281,12 @@ watch(() => route.params, (params) => {
                             </span>
                         </div>
                     </template>
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item">
+                            <!--TODO: Currency should be changed to real data.-->
+                            <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                        </div>
+                    </template>
                 </p-select-dropdown>
             </template>
         </l-n-b>
@@ -287,6 +313,9 @@ watch(() => route.params, (params) => {
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
+        }
+        .selected-item-postfix {
+            @apply text-gray-400;
         }
     }
 }
