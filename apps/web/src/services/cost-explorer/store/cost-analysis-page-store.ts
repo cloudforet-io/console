@@ -31,12 +31,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         granularity: GRANULARITY.MONTHLY,
         groupBy: [],
         chartGroupBy: undefined,
-        period: convertRelativePeriodToPeriod({ unit: 'month', value: 5, exclude_today: true }),
-        relativePeriod: {
-            unit: 'month',
-            value: 5,
-            exclude_today: true,
-        },
+        period: undefined,
+        relativePeriod: undefined,
         filters: {},
     }),
     getters: {
@@ -57,12 +53,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.granularity = GRANULARITY.MONTHLY;
             this.groupBy = [];
             this.chartGroupBy = undefined;
-            this.period = convertRelativePeriodToPeriod({ unit: 'month', value: 5, exclude_today: true });
-            this.relativePeriod = {
-                unit: 'month',
-                value: 5,
-                exclude_today: true,
-            };
+            this.period = undefined;
+            this.relativePeriod = undefined;
             this.filters = {};
         },
         async setQueryOptions(options?: CostQuerySetOption) {

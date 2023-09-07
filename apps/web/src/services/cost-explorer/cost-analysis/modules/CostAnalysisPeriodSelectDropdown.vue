@@ -2,11 +2,10 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { Dayjs } from 'dayjs';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -21,21 +20,18 @@ import {
 import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Period, Granularity } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
 
 const today = dayjs.utc();
-interface PeriodItem {
-    name: string;
-    label: TranslateResult|Dayjs;
+interface PeriodItem extends SelectDropdownMenu {
     period: {
         start: string
         end: string;
     };
     relativePeriod?: RelativePeriod;
-    enabled: Granularity[];
 }
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -57,47 +53,45 @@ const state = reactive({
             enabled: [GRANULARITY.DAILY],
         };
     }))),
-    periodItems: computed<PeriodItem[]>(() => ([
-        ...state.dailyPeriodItems,
+    monthlyPeriodItems: [
         {
             name: 'thisMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
             relativePeriod: { unit: 'month', value: 0 },
-            enabled: [GRANULARITY.MONTHLY],
         },
         {
             name: 'lastMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
             relativePeriod: { unit: 'month', value: 1, exclude_today: true },
-            enabled: [GRANULARITY.MONTHLY],
         },
         {
             name: 'last3Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
             relativePeriod: { unit: 'month', value: 2 },
-            enabled: [GRANULARITY.MONTHLY],
         },
         {
             name: 'last6Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
             relativePeriod: { unit: 'month', value: 5 },
-            enabled: [GRANULARITY.MONTHLY],
-        },
+        }],
+    yearlyPeriodItems: [
         {
             name: 'thisYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_YEAR'),
             relativePeriod: { unit: 'year', value: 0 },
-            enabled: [GRANULARITY.YEARLY],
         },
         {
             name: 'lastYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_YEAR'),
             relativePeriod: { unit: 'year', value: 1, exclude_today: true },
-            enabled: [GRANULARITY.YEARLY],
         },
-    ])),
+    ],
     periodMenuItems: computed<MenuItem[]>(() => {
-        const menuItems = state.periodItems.filter((d) => d.enabled.includes(costAnalysisPageState.granularity));
+        const menuItems = [
+            ...((costAnalysisPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodItems : []),
+            ...((costAnalysisPageState.granularity === GRANULARITY.MONTHLY) ? state.monthlyPeriodItems : []),
+            ...((costAnalysisPageState.granularity === GRANULARITY.YEARLY) ? state.yearlyPeriodItems : []),
+        ];
         const customItem = (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) ? [{
             type: 'divider',
         }, {
