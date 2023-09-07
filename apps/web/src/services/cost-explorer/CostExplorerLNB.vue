@@ -18,6 +18,7 @@ import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -132,8 +133,7 @@ const relocateNotificationState = reactive({
     data: computed<LNBItem>(() => ({
         type: 'item',
         id: MENU_ID.DASHBOARDS,
-        // TODO: translation
-        label: i18n.t('Go to Dashboard'),
+        label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
         to: {
             name: DASHBOARDS_ROUTE._NAME,
             query: {
@@ -148,6 +148,10 @@ const relocateNotificationState = reactive({
     isModalVisible: false,
     userId: computed(() => store.state.user.userId),
 });
+
+const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
+
+const getCurrencySymbol = (currency: string): string => CURRENCY_SYMBOL[currency];
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
     const pagePermission = store.getters['user/pagePermissionMap'];
@@ -283,8 +287,10 @@ watch(() => route.params, async (params) => {
                     </template>
                     <template #menu-item--format="{item}">
                         <div class="menu-item">
-                            <!--TODO: Currency should be changed to real data.-->
-                            <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                            <span>{{ item.label }}</span>
+                            <span class="selected-item-postfix">
+                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrencySymbol(getCurrenctCurrency(item.name)) }}{{ getCurrenctCurrency(item.name) }})
+                            </span>
                         </div>
                     </template>
                 </p-select-dropdown>
