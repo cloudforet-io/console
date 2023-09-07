@@ -16,7 +16,7 @@ import {
     useFilterableDropdownButtonDisplay,
 } from '@/inputs/dropdown/filterable-dropdown/composables/filterable-dropdown-button-display';
 import type {
-    DropdownMenuItem,
+    FilterableDropdownMenuItem,
 
     AutocompleteHandler,
     FilterableDropdownAppearanceType,
@@ -42,9 +42,9 @@ interface FilterableDropdownProps {
     useFixedMenuStyle?: boolean;
 
     /* context menu props */
-    menu?: DropdownMenuItem[];
+    menu?: FilterableDropdownMenuItem[];
     loading?: boolean;
-    selected?: DropdownMenuItem[];
+    selected?: FilterableDropdownMenuItem[];
     multiSelectable?: boolean;
     searchText?: string;
     readonly?: boolean;
@@ -80,9 +80,9 @@ const props = withDefaults(defineProps<FilterableDropdownProps>(), {
 /* event emits */
 const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
     (e: 'update:search-text', searchText: string): void;
-    (e: 'update:selected', selected: DropdownMenuItem[]): void;
-    (e: 'select', item: DropdownMenuItem, isSelected: boolean): void;
-    (e: 'delete-tag', item: DropdownMenuItem, index: number): void;
+    (e: 'update:selected', selected: FilterableDropdownMenuItem[]): void;
+    (e: 'select', item: FilterableDropdownMenuItem, isSelected: boolean): void;
+    (e: 'delete-tag', item: FilterableDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
 }>();
@@ -91,7 +91,7 @@ const slots = useSlots();
 
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean>('visibleMenu', props, emit),
-    proxySelectedItem: useProxyValue<DropdownMenuItem[]>('selected', props, emit),
+    proxySelectedItem: useProxyValue<FilterableDropdownMenuItem[]>('selected', props, emit),
     proxySearchText: useProxyValue('searchText', props, emit),
     showDeleteAllButton: computed(() => {
         if (!props.showDeleteAllButton) return false;
@@ -169,7 +169,7 @@ const handleClickDropdownButton = () => {
     if (state.proxyVisibleMenu) hideMenu();
     else showMenu();
 };
-const handleSelectMenuItem = (item: DropdownMenuItem, _, isSelected: boolean) => {
+const handleSelectMenuItem = (item: FilterableDropdownMenuItem, _, isSelected: boolean) => {
     if (!props.multiSelectable) hideMenu();
     emit('select', item, isSelected);
 };
@@ -187,13 +187,13 @@ const handleClickDeleteAll = () => {
         updateSelected([]);
     }
 };
-const handleTagDelete = (item: DropdownMenuItem, idx: number) => {
+const handleTagDelete = (item: FilterableDropdownMenuItem, idx: number) => {
     const selectedClone = [...state.proxySelectedItem];
     selectedClone.splice(idx, 1);
     updateSelected(selectedClone);
     emit('delete-tag', item, idx);
 };
-const updateSelected = (selected: DropdownMenuItem[]) => {
+const updateSelected = (selected: FilterableDropdownMenuItem[]) => {
     state.proxySelectedItem = selected;
 };
 const updateSearchText = debounce(async (searchText: string) => {

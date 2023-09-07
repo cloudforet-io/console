@@ -1,9 +1,9 @@
 import type { MenuItem } from '@/inputs/context-menu/type';
 
-export type DropdownMenuItem = MenuItem;
+export type FilterableDropdownMenuItem = MenuItem;
 
 interface HandlerRes {
-    results: DropdownMenuItem[];
+    results: FilterableDropdownMenuItem[];
     totalCount?: number;
     more?: boolean;
 }
