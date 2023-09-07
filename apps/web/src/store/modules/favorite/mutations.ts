@@ -60,3 +60,14 @@ export const removeDashboardItem = (state: FavoriteState, favorite: Partial<Favo
 export const setDashboardItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.dashboardItems = favorite;
 };
+
+/* CostAnalysis Type */
+export const addCostAnalysisItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    if (state.costAnalysisItems) state.costAnalysisItems.unshift(favorite);
+};
+export const removeCostAnalysisItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.costAnalysisItems = state.costAnalysisItems?.filter((d) => d.itemId !== favorite.itemId) ?? null;
+};
+export const setCostAnalysisItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.costAnalysisItems = favorite;
+};

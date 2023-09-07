@@ -38,6 +38,7 @@ export interface FavoriteState {
     projectGroupItems: FavoriteConfig[]|null;
     cloudServiceItems: FavoriteConfig[]|null;
     dashboardItems: FavoriteConfig[]|null;
+    costAnalysisItems: FavoriteConfig[]|null;
     isLoading: FavoriteHasLoaded;
 }
 

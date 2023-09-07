@@ -11,12 +11,14 @@ const state: FavoriteState = {
     projectGroupItems: null,
     cloudServiceItems: null,
     dashboardItems: null,
+    costAnalysisItems: null,
     isLoading: {
         [FAVORITE_TYPE.MENU]: false,
         [FAVORITE_TYPE.CLOUD_SERVICE]: false,
         [FAVORITE_TYPE.PROJECT]: false,
         [FAVORITE_TYPE.PROJECT_GROUP]: false,
         [FAVORITE_TYPE.DASHBOARD]: false,
+        [FAVORITE_TYPE.COST_ANALYSIS]: false,
     },
 };
 
