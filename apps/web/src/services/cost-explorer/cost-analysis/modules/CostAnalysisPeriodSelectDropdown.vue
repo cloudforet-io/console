@@ -53,7 +53,7 @@ const state = reactive({
             enabled: [GRANULARITY.DAILY],
         };
     }))),
-    monthlyPeriodItems: [
+    monthlyPeriodItems: computed(() => ([
         {
             name: 'thisMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
@@ -73,8 +73,8 @@ const state = reactive({
             name: 'last6Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
             relativePeriod: { unit: 'month', value: 5 },
-        }],
-    yearlyPeriodItems: [
+        }])),
+    yearlyPeriodItems: computed(() => ([
         {
             name: 'thisYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_YEAR'),
@@ -85,7 +85,12 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_YEAR'),
             relativePeriod: { unit: 'year', value: 1, exclude_today: true },
         },
-    ],
+    ])),
+    allPeriodItems: computed(() => ([
+        ...state.dailyPeriodItems,
+        ...state.monthlyPeriodItems,
+        ...state.yearlyPeriodItems,
+    ])),
     periodMenuItems: computed<MenuItem[]>(() => {
         const menuItems = [
             ...((costAnalysisPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodItems : []),
@@ -124,7 +129,7 @@ const handleSelectPeriod = (periodMenuName) => {
     state.selectedPeriod = periodMenuName;
     if (periodMenuName === 'custom') state.customRangeModalVisible = true;
     else {
-        const selectedPeriodItem: PeriodItem = state.periodItems.find((d) => d.name === periodMenuName);
+        const selectedPeriodItem: PeriodItem = state.allPeriodItems.find((d) => d.name === periodMenuName);
         state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : selectedPeriodItem.period;
         costAnalysisPageStore.$patch((_state) => {
             _state.period = state.period;

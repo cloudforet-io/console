@@ -30,7 +30,7 @@ import type {
 
 
 interface Props {
-    querySetId?: string;
+    costQuerySetId?: string;
 }
 const props = defineProps<Props>();
 const route = useRoute();
@@ -56,7 +56,7 @@ const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (c
 let unregisterStoreWatch;
 const registerStoreWatch = (currentQuery) => {
     unregisterStoreWatch = watch(() => costAnalysisPageState, (options: Partial<CostQuerySetOption>) => {
-        if (props.querySetId) return;
+        if (props.costQuerySetId) return;
 
         const newQuery: CostAnalysisPageUrlQuery = {
             granularity: primitiveToQueryString(options.granularity),
@@ -82,10 +82,10 @@ onUnmounted(() => {
     costAnalysisPageStore.$reset();
 });
 
-watch(() => route.params, async (params) => {
-    const costQuerySetId = params.costQuerySetId;
+watch(() => route.params, async (after, before) => {
+    const costQuerySetId = after.costQuerySetId;
 
-    if (costQuerySetId === costAnalysisPageStore.selectedQueryId) return;
+    if (costQuerySetId === before?.costQuerySetId) return;
 
     if (costQuerySetId) {
         const { options } = getQueryWithKey(costQuerySetId);
@@ -102,11 +102,12 @@ watch(() => route.params, async (params) => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
 
     // init states
-    if (props.querySetId) {
-        const { name, options } = getQueryWithKey(props.querySetId);
+    if (props.costQuerySetId) {
+        await costAnalysisPageStore.getCostQueryList();
+        const { name, options } = getQueryWithKey(props.costQuerySetId);
         if (name) {
             setQueryOptions(options);
-            costAnalysisPageStore.selectQueryId(props.querySetId);
+            costAnalysisPageStore.selectQueryId(props.costQuerySetId);
         } else {
             costAnalysisPageStore.selectQueryId(undefined);
         }

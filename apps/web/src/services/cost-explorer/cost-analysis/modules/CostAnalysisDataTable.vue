@@ -54,7 +54,7 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
     component: computed(() => PToolboxTable),
-    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period.start), dayjs.utc(costAnalysisPageState.period.end))),
+    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period?.start), dayjs.utc(costAnalysisPageState.period?.end))),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) return 'YYYY';
@@ -221,8 +221,8 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
             query: {
                 granularity: costAnalysisPageState.granularity,
                 group_by: costAnalysisPageState.groupBy,
-                start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
+                start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
+                end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -248,7 +248,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
 const handleExcelDownload = async () => {
@@ -290,9 +290,11 @@ watch(
     ],
     async () => {
         const { results, more } = await listCostAnalysisTableData();
-        tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
-        tableState.more = more;
-        tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
+        if (costAnalysisPageState.period) {
+            tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+            tableState.more = more;
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
+        }
     },
     { immediate: true, deep: true },
 );
