@@ -20,6 +20,7 @@
                         :has-permission="hasPermission"
                         :is-opened="openedMenu === menu.id"
                         :is-selected="selectedMenu === menu.id"
+                        :highlight-tag="menu.highlightTag"
                         @open-menu="handleOpenMenu"
                         @hide-menu="hideMenu"
             />
