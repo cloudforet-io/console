@@ -46,12 +46,3 @@ export const BADGE_STYLE_TYPE = {
 
 export type BadgeStyleType = typeof BADGE_STYLE_TYPE[keyof typeof BADGE_STYLE_TYPE];
 export type BadgeShape = typeof BADGE_SHAPE[keyof typeof BADGE_SHAPE];
-
-export interface BadgeProps {
-    badgeType: BadgeType;
-    styleType: BadgeStyleType;
-    textColor?: string;
-    backgroundColor?: string;
-    outlineColor?: string;
-    shape: BadgeShape;
-}
