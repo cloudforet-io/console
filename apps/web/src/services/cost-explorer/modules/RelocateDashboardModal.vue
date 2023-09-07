@@ -63,40 +63,30 @@ const handleRouteToDashboard = () => {
                     <div class="main-content-wrapper">
                         <div class="update-badge">
                             <p class="text">
-                                <!--TODO: translation-->
-                                {{ $t('FEATURE UPDATED') }}
+                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FEATURE_UDATED') }}
                             </p>
                         </div>
                         <div class="title">
-                            <!--TODO: translation-->
-                            <p>{{ $t('We are thrilled to introduce a significant enhancement to your cost dashboard!') }}</p>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_TITLE') }}</p>
                         </div>
                         <div class="description">
-                            <!--TODO: translation-->
-                            <p>
-                                We have integrated the previous Cost Explore's Dashboard feature into a brand new standalone service called "Dashboards".
-                                Therefore, the old dashboards are no longer supported.
-                                Go to "Dashboards" menu and explore expanded widget options, advanced variables with much better visuals.
-                            </p>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION') }}</p>
                         </div>
                         <p-button style-type="tertiary"
                                   icon-right="ic_arrow-right-up"
                                   @click="handleRouteToDashboard"
                         >
-                            <!--TODO: translation-->
-                            {{ $t('Go to Dashboard') }}
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL') }}
                         </p-button>
                         <p-divider class="divider" />
                         <div class="footer">
                             <p-button style-type="tertiary"
                                       @click="handleReject"
                             >
-                                <!--TODO: translation-->
-                                {{ $t("Don't show me again") }}
+                                {{ $t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DISMISS_TEXT") }}
                             </p-button>
                             <p-button @click="handleClose">
-                                <!--TODO: translation-->
-                                {{ $t('Got it') }}
+                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_CONFIRM_TEXT') }}
                             </p-button>
                         </div>
                     </div>
