@@ -1,69 +1,56 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { FILTERABLE_DROPDOWN_APPEARANCE_TYPES } from '@/inputs/dropdown/filterable-dropdown/type';
+import {
+    FILTERABLE_DROPDOWN_APPEARANCE_TYPES,
+    FILTERABLE_DROPDOWN_STYLE_TYPES,
+} from '@/inputs/dropdown/filterable-dropdown/type';
 
 
 const extraArgTypes: ArgTypes = {
     /* props */
-    visibleMenu: {
-        name: 'visibleMenu',
-        type: { name: 'boolean' },
-        description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    useFixedMenuStyle: {
-        name: 'useFixedMenuStyle',
-        type: { name: 'boolean' },
-        description: 'Whether to use position fixed style on menu or not. ',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    placeholder: {
-        name: 'placeholder',
+    styleType: {
+        name: 'styleType',
         type: { name: 'string' },
-        description: 'Search input placeholder.',
-        defaultValue: undefined,
+        description: 'Style type to display selected items.',
+        defaultValue: FILTERABLE_DROPDOWN_STYLE_TYPES[0],
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'undefined',
+                summary: `'${FILTERABLE_DROPDOWN_STYLE_TYPES[0]}'`,
             },
         },
         control: {
-            type: 'text',
+            type: 'select',
+            options: FILTERABLE_DROPDOWN_STYLE_TYPES,
         },
     },
-    invalid: {
-        name: 'invalid',
+    appearanceType: {
+        name: 'appearanceType',
+        type: { name: 'string' },
+        description: 'Appearance type to display selected items.',
+        defaultValue: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `'${FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0]}'`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: FILTERABLE_DROPDOWN_APPEARANCE_TYPES,
+        },
+    },
+    visibleMenu: {
+        name: 'visibleMenu',
         type: { name: 'boolean' },
-        description: 'Whether to apply invalid style or not.',
+        description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
         defaultValue: false,
         table: {
             type: {
@@ -96,6 +83,133 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    placeholder: {
+        name: 'placeholder',
+        type: { name: 'string' },
+        description: 'Search input placeholder.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    selectionLabel: {
+        name: 'selectionLabel',
+        type: { name: 'string' },
+        description: 'Label to display selected items.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'string',
+        },
+    },
+    selectionHighlight: {
+        name: 'selectionHighlight',
+        type: { name: 'boolean' },
+        description: 'Whether to highlight or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showAlertDot: {
+        name: 'showAlertDot',
+        type: { name: 'boolean' },
+        description: 'Whether to show alert or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showDeleteAllButton: {
+        name: 'showDeleteAllButton',
+        type: { name: 'boolean' },
+        description: 'Whether to show delete all button or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    useFixedMenuStyle: {
+        name: 'useFixedMenuStyle',
+        type: { name: 'boolean' },
+        description: 'Whether to use position fixed style on menu or not. ',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+
     handler: {
         name: 'handler',
         type: { name: 'function' },
@@ -130,25 +244,6 @@ const extraArgTypes: ArgTypes = {
         },
         control: {
             type: 'boolean',
-        },
-    },
-    appearanceType: {
-        name: 'appearanceType',
-        type: { name: 'string' },
-        description: 'Appearance type to display selected items.',
-        defaultValue: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: `'${FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0]}'`,
-            },
-        },
-        control: {
-            type: 'select',
-            options: FILTERABLE_DROPDOWN_APPEARANCE_TYPES,
         },
     },
     pageSize: {
@@ -188,6 +283,7 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+
     /* events */
     onHideMenu: {
         name: 'hide-menu',
