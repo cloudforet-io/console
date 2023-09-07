@@ -10,6 +10,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { managedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
+const fetcher = getCancellableFetcher(SpaceConnector.client.costAnalysis.costQuerySet.list);
+
 interface CostAnalysisLNBState {
     costQuerySetList: CostQuerySetModel[];
     selectedQuerySetId?: string;
@@ -31,7 +33,6 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
     actions: {
         async listCostQuerySets(): Promise<void> {
             // TODO: apply v2
-            const fetcher = getCancellableFetcher(SpaceConnector.client.costAnalysis.costQuerySet.list);
             try {
                 const { status, response } = await fetcher({
                     data_source_id: this.selectedDataSourceId,
@@ -41,6 +42,8 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
                 });
                 if (status === 'succeed') {
                     this.costQuerySetList = [...managedCostQuerySets, ...response.results];
+                } else {
+                    this.costQuerySetList = [...managedCostQuerySets];
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);

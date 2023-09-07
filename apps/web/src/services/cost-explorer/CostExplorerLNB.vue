@@ -118,7 +118,6 @@ const dataSourceState = reactive({
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
-        console.debug('dataSourceMap', dataSourceMap);
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
