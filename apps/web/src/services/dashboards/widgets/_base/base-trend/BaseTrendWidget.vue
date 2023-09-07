@@ -105,13 +105,19 @@ const state = reactive({
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'cost' });
         const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+
+        // set width of table fields
+        const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
+        const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
+
         return [
             {
                 label: groupByLabel,
                 name: widgetState.groupBy,
                 textOptions: { type: 'reference', referenceType },
+                width: groupByFieldWidth,
             },
-            ...refinedFields,
+            ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
     legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor)),
