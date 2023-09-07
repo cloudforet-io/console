@@ -67,6 +67,7 @@ const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRa
     try {
         analyzeApiQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        if (!costAnalysisPageState.period) throw new Error('period is not defined');
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
@@ -96,8 +97,9 @@ const setChartData = debounce(async () => {
     state.loading = true;
 
     const rawData = await listCostAnalysisData();
-    state.legends = getLegends<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
-    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
+    const { period, granularity, chartGroupBy } = costAnalysisPageState;
+    state.legends = getLegends<CostAnalyzeRawData>(rawData, granularity, chartGroupBy);
+    state.chartData = period ? getXYChartData<CostAnalyzeRawData>(rawData, granularity, period, chartGroupBy) : [];
     state.loading = false;
 }, 300);
 
