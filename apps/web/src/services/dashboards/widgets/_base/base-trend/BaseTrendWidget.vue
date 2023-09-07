@@ -107,7 +107,7 @@ const state = reactive({
             ...refinedFields,
         ];
     }),
-    legends: [] as Legend[],
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor)),
     disableReferenceColor: computed<boolean>(() => !!props.theme),
 });
 
@@ -200,7 +200,6 @@ const drawChart = (chartData: XYChartData[]) => {
 const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
@@ -212,7 +211,6 @@ const refreshWidget = async (_thisPage = 1): Promise<Data> => {
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -242,7 +240,6 @@ useWidgetLifecycle({
     widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -290,7 +287,7 @@ defineExpose<WidgetExpose<Data>>({
                                :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
+                               :legends="state.legends"
                                :color-set="colorSet"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
