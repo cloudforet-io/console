@@ -2,11 +2,13 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/cost-analysis/lib/period-helper';
 import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
@@ -23,6 +25,12 @@ interface CostAnalysisPageState {
     filters: CostFiltersMap;
 }
 
+interface GroupByItem {
+    name: GroupBy|string;
+    label: string;
+}
+
+const allReferenceStore = useAllReferenceStore();
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
 
@@ -39,14 +47,21 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
-        currentQuerySetOptions: (state): Partial<CostQuerySetOption> => ({
-            granularity: state.granularity,
-            group_by: state.groupBy,
-            period: state.period,
-            relative_period: state.relativePeriod,
-            filters: state.filters,
-        }),
         selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
+        defaultGroupByItems: (): GroupByItem[] => {
+            let additionalInfoGroupBy: GroupByItem[] = [];
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId];
+                const additionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
+                if (targetDataSource && additionalInfoKeys?.length) {
+                    additionalInfoGroupBy = additionalInfoKeys.map((d) => ({
+                        name: `additional_info.${d}`,
+                        label: d,
+                    }));
+                }
+            }
+            return [...Object.values(GROUP_BY_ITEM_MAP), ...additionalInfoGroupBy];
+        },
     },
     actions: {
         async initState() {

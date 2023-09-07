@@ -21,14 +21,17 @@ import { gray } from '@/styles/colors';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { GroupByItem } from '@/services/cost-explorer/type';
 
+
+interface GroupBySelectButtonItem {
+    name: string;
+    label: string;
+}
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    defaultGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
     selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
@@ -65,7 +68,7 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleChangeDefaultGroupBy = async (selectedItems: GroupByItem[], isSelected: boolean) => {
+const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
     if (isSelected && state.selectedGroupByItems.length >= 3) {
         showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
         return;
@@ -118,7 +121,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     <div class="cost-analysis-group-by-filter">
         <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}:</b>
         <span class="count-text">{{ state.selectedGroupByItems.length }}/3</span>
-        <p-select-button v-for="defaultGroupByItem in state.defaultGroupByItems"
+        <p-select-button v-for="defaultGroupByItem in costAnalysisPageStore.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
                          :selected="state.selectedGroupByItems"

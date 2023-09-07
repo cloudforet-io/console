@@ -22,7 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 
-type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'>;
+type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;
 type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
 export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
 
@@ -60,7 +60,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             try {
                 const { status, response } = await fetcher({
                     query: {
-                        only: ['data_source_id', 'name', 'plugin_info'],
+                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys'],
                     },
                 });
                 if (status === 'succeed') {
