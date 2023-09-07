@@ -35,6 +35,7 @@ import {
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
     CostAnalyzeResponse,
+    Period,
 } from '@/services/cost-explorer/type';
 
 
@@ -63,7 +64,7 @@ const state = reactive({
 /* api */
 const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
+const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
@@ -72,8 +73,8 @@ const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRa
             query: {
                 granularity: costAnalysisPageState.granularity,
                 group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
-                start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
+                start: dayjs.utc(period.start).format(dateFormat),
+                end: dayjs.utc(period.end).format(dateFormat),
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -92,12 +93,13 @@ const listCostAnalysisData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRa
         return { more: false, results: [] };
     }
 };
-const setChartData = debounce(async () => {
+const setChartData = debounce(async (period:Period) => {
     state.loading = true;
 
-    const rawData = await listCostAnalysisData();
-    state.legends = getLegends<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.chartGroupBy);
-    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, costAnalysisPageState.granularity, costAnalysisPageState.period, costAnalysisPageState.chartGroupBy);
+    const rawData = await listCostAnalysisData(period);
+    const { granularity, chartGroupBy } = costAnalysisPageState;
+    state.legends = getLegends<CostAnalyzeRawData>(rawData, granularity, chartGroupBy);
+    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, granularity, period, chartGroupBy);
     state.loading = false;
 }, 300);
 
@@ -118,7 +120,7 @@ watch([
     () => costAnalysisPageStore.selectedDataSourceId,
     () => costAnalysisPageStore.selectedQueryId,
 ], () => {
-    setChartData();
+    if (costAnalysisPageState.period) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });
 </script>
 
