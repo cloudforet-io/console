@@ -13,8 +13,6 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,25 +28,10 @@ interface GroupBySelectButtonItem {
     label: string;
 }
 
-const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    defaultGroupByItems: computed<GroupBySelectButtonItem[]>(() => {
-        let additionalInfoGroupBy: GroupBySelectButtonItem[] = [];
-        if (costAnalysisPageStore.selectedDataSourceId) {
-            const targetDataSource = allReferenceStore.getters.costDataSource[costAnalysisPageStore.selectedDataSourceId];
-            const additionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
-            if (targetDataSource && additionalInfoKeys?.length) {
-                additionalInfoGroupBy = additionalInfoKeys.map((d) => ({
-                    name: `additional_info.${d}`,
-                    label: d,
-                }));
-            }
-        }
-        return [...Object.values(GROUP_BY_ITEM_MAP), ...additionalInfoGroupBy];
-    }),
     selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
@@ -138,7 +121,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     <div class="cost-analysis-group-by-filter">
         <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}:</b>
         <span class="count-text">{{ state.selectedGroupByItems.length }}/3</span>
-        <p-select-button v-for="defaultGroupByItem in state.defaultGroupByItems"
+        <p-select-button v-for="defaultGroupByItem in costAnalysisPageStore.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
                          :selected="state.selectedGroupByItems"
