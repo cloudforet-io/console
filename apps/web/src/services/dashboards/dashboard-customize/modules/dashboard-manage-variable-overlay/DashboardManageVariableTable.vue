@@ -36,7 +36,7 @@
                                      is-collapsed
                                      :line-clamp="1"
                 >
-                    {{ value }}
+                    {{ $t(value) }}
                 </p-collapsible-panel>
             </template>
             <template #col-managable-format="{ value }">
@@ -74,6 +74,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
@@ -157,6 +158,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
+                description: managedDashboardVariablesSchema.properties[d].description ?? properties[d].description ?? '',
             };
         }
         return {
