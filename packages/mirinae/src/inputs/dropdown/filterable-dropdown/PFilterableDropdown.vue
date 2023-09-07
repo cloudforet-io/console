@@ -114,7 +114,9 @@ const hideMenu = () => {
 };
 const showMenu = () => {
     if (props.readonly || props.disabled || state.proxyVisibleMenu) return;
-    initiateMenu();
+    if (!props.disableHandler) {
+        initiateMenu();
+    }
     focusOnContextMenu();
 };
 
