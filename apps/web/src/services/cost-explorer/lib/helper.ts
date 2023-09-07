@@ -66,12 +66,6 @@ export const getTimeUnitByPeriod = (granularity: Granularity, start: Dayjs, end:
     return 'year';
 };
 
-export const getInitialDates = (): Period => {
-    const start = dayjs.utc().subtract(5, 'month').startOf('month').format(); // 6 months ago
-    const end = dayjs.utc().endOf('month').format();
-    return { start, end };
-};
-
 /* data table field */
 const getDataTableDateFields = (granularity: Granularity, period: Period): DataTableFieldType[] => {
     const dateFields: DataTableFieldType[] = [];
