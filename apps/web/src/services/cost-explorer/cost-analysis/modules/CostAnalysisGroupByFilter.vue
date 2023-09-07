@@ -13,6 +13,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -21,14 +23,32 @@ import { gray } from '@/styles/colors';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { GroupByItem } from '@/services/cost-explorer/type';
 
 
+interface GroupBySelectButtonItem {
+    name: string;
+    label: string;
+}
+
+const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    defaultGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
+    defaultGroupByItems: computed<GroupBySelectButtonItem[]>(() => {
+        let additionalInfoGroupBy: GroupBySelectButtonItem[] = [];
+        if (costAnalysisPageStore.selectedDataSourceId) {
+            const targetDataSource = allReferenceStore.getters.costDataSource[costAnalysisPageStore.selectedDataSourceId];
+            const additionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
+            if (targetDataSource && additionalInfoKeys?.length) {
+                additionalInfoGroupBy = additionalInfoKeys.map((d) => ({
+                    name: `additional_info.${d}`,
+                    label: d,
+                }));
+            }
+        }
+        return [...Object.values(GROUP_BY_ITEM_MAP), ...additionalInfoGroupBy];
+    }),
     selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
@@ -65,7 +85,7 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
 /* event */
-const handleChangeDefaultGroupBy = async (selectedItems: GroupByItem[], isSelected: boolean) => {
+const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
     if (isSelected && state.selectedGroupByItems.length >= 3) {
         showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
         return;
