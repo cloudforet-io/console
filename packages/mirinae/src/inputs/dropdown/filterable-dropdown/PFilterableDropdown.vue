@@ -351,7 +351,6 @@ watch(() => props.disabled, (disabled) => {
             .placeholder {
                 @apply text-label-md text-gray-500;
                 flex-grow: 1;
-                line-height: 1.5;
                 padding: 0.25rem 0.5rem;
             }
             .selection-wrapper {
@@ -359,9 +358,6 @@ watch(() => props.disabled, (disabled) => {
                 flex-grow: 1;
                 padding: 0.25rem 0.5rem;
                 gap: 0.25rem;
-                .selected-item {
-                    line-height: 1.5;
-                }
                 .tags-wrapper {
                     @apply flex flex-wrap;
                     gap: 0.5rem;
