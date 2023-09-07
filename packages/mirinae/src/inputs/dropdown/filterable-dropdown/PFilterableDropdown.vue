@@ -173,9 +173,6 @@ const handleSelectMenuItem = (item: DropdownMenuItem, _, isSelected: boolean) =>
     if (!props.multiSelectable) hideMenu();
     emit('select', item, isSelected);
 };
-const handleUpdateSelected = (selected: DropdownMenuItem[]) => {
-    state.proxySelectedItem = selected;
-};
 const handleClickShowMore = async () => {
     if (!props.disableHandler) {
         await showMoreMenu();
@@ -185,23 +182,26 @@ const handleClickShowMore = async () => {
 const handleClearSelection = () => {
     emit('clear-selection');
 };
-const handleUpdateSearchText = debounce(async (searchText: string) => {
-    state.proxySearchText = searchText;
-    if (!props.disableHandler) {
-        await reloadMenu();
-    }
-}, 200);
 const handleClickDeleteAll = () => {
     if (state.proxySelectedItem.length) {
-        handleUpdateSelected([]);
+        updateSelected([]);
     }
 };
 const handleTagDelete = (item: DropdownMenuItem, idx: number) => {
     const selectedClone = [...state.proxySelectedItem];
     selectedClone.splice(idx, 1);
-    handleUpdateSelected(selectedClone);
+    updateSelected(selectedClone);
     emit('delete-tag', item, idx);
 };
+const updateSelected = (selected: DropdownMenuItem[]) => {
+    state.proxySelectedItem = selected;
+};
+const updateSearchText = debounce(async (searchText: string) => {
+    state.proxySearchText = searchText;
+    if (!props.disableHandler) {
+        await reloadMenu();
+    }
+}, 200);
 
 /* ignore window arrow keydown event */
 useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
@@ -318,8 +318,8 @@ watch(() => props.disabled, (disabled) => {
                         @keyup:up:end="focusDropdownButton"
                         @keyup:down:end="focusOnContextMenu()"
                         @keyup:esc="hideMenu"
-                        @update:selected="handleUpdateSelected"
-                        @update:search-text="handleUpdateSearchText"
+                        @update:selected="updateSelected"
+                        @update:search-text="updateSearchText"
         >
             <template #header>
                 <slot name="context-menu-header" />
