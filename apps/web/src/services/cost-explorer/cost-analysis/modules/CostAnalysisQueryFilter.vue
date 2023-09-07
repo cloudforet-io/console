@@ -20,7 +20,6 @@ import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config'
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
@@ -44,6 +43,11 @@ const state = reactive({
             type: 'item',
             name: GRANULARITY.MONTHLY,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
+        },
+        {
+            type: 'item',
+            name: GRANULARITY.YEARLY,
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
         },
     ])),
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
@@ -72,17 +76,7 @@ onClickOutside(contextMenuRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    if (granularity !== costAnalysisPageState.granularity) {
-        costAnalysisPageStore.$patch((_state) => {
-            _state.period = getInitialDates();
-        });
-    }
     costAnalysisPageStore.$patch({ granularity });
-};
-const handleSelectedDates = (period) => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.period = period;
-    });
 };
 const handleSaveQuerySet = async () => {
     try {
@@ -123,9 +117,7 @@ const handleUpdateQuery = (updatedQueryId: string) => {
                                    class="granularity-select-dropdown"
                                    @select="handleSelectGranularity"
                 />
-                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
-                                                      @update="handleSelectedDates"
-                />
+                <cost-analysis-period-select-dropdown />
             </div>
             <div class="right-part">
                 <template v-if="!state.isManagedQuerySet">

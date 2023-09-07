@@ -1,10 +1,11 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { OpUnitType } from 'dayjs';
+
 import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-import type { COST_ANALYSIS_PERIOD_TYPE } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
 import type {
     Period, Granularity, CostFiltersMap,
@@ -44,7 +45,11 @@ export interface Legend {
 }
 
 
-export type CostAnalysisPeriodType = typeof COST_ANALYSIS_PERIOD_TYPE[keyof typeof COST_ANALYSIS_PERIOD_TYPE];
+export type RelativePeriod = {
+    unit: OpUnitType;
+    value: number;
+    exclude_today: boolean;
+};
 
 /* component props */
 export interface WidgetProps<Options = any> {

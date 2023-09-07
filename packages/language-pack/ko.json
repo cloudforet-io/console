@@ -568,7 +568,8 @@
 					"LAST_7_DAYS": "최근 1주일",
 					"LAST_MONTH": "지난 달",
 					"LAST_YEAR": "지난 해",
-					"THIS_MONTH": "이번 달"
+					"THIS_MONTH": "이번 달",
+					"THIS_YEAR": "올 해"
 				},
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",

@@ -4,9 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CostAnalysisPeriodType } from '@/services/cost-explorer/cost-analysis/type';
+import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/cost-analysis/lib/period-helper';
+import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { convertFiltersInToNewType, getInitialDates } from '@/services/cost-explorer/lib/helper';
+import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
     CostFiltersMap, CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, Period,
@@ -17,8 +18,8 @@ interface CostAnalysisPageState {
     granularity: Granularity;
     groupBy: Array<GroupBy|string>;
     chartGroupBy?: GroupBy|string;
-    period: Period;
-    periodType?: CostAnalysisPeriodType;
+    period?: Period;
+    relativePeriod?: RelativePeriod;
     filters: CostFiltersMap;
 }
 
@@ -30,14 +31,21 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         granularity: GRANULARITY.MONTHLY,
         groupBy: [],
         chartGroupBy: undefined,
-        period: getInitialDates(),
-        periodType: undefined,
+        period: undefined,
+        relativePeriod: undefined,
         filters: {},
     }),
     getters: {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
+        currentQuerySetOptions: (state): Partial<CostQuerySetOption> => ({
+            granularity: state.granularity,
+            group_by: state.groupBy,
+            period: state.period,
+            relative_period: state.relativePeriod,
+            filters: state.filters,
+        }),
         selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
     },
     actions: {
@@ -45,8 +53,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.granularity = GRANULARITY.MONTHLY;
             this.groupBy = [];
             this.chartGroupBy = undefined;
-            this.period = getInitialDates();
-            this.periodType = undefined;
+            this.period = undefined;
+            this.relativePeriod = undefined;
             this.filters = {};
         },
         async setQueryOptions(options?: CostQuerySetOption) {
@@ -60,10 +68,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.groupBy = options.group_by ?? [];
             this.chartGroupBy = options.group_by?.[0];
 
-            if (options.period_type) {
-                this.periodType = options.period_type;
-            }
-            if (options.period) {
+            if (options.relative_period) {
+                this.relativePeriod = options.relative_period;
+                this.period = convertRelativePeriodToPeriod(options.relative_period);
+            } else if (options.period) {
                 this.period = { start: options.period.start, end: options.period.end };
             }
             if (options.filters) {
@@ -74,7 +82,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             const options: CostQuerySetOption = {
                 granularity: this.granularity,
                 period: this.period,
-                period_type: this.periodType,
+                relative_period: this.relativePeriod,
                 group_by: this.groupBy,
                 filters: this.filters,
             };

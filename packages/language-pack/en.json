@@ -568,7 +568,8 @@
 					"LAST_7_DAYS": "Last 7 Days",
 					"LAST_MONTH": "Last Month",
 					"LAST_YEAR": "Last Year",
-					"THIS_MONTH": "This Month"
+					"THIS_MONTH": "This Month",
+					"THIS_YEAR": "This Year"
 				},
 				"PRIVATE": "Private",
 				"PROJECT": "Project",

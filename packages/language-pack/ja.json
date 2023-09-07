@@ -568,7 +568,8 @@
 					"LAST_7_DAYS": "直近7日間",
 					"LAST_MONTH": "直近の月",
 					"LAST_YEAR": "昨年",
-					"THIS_MONTH": "今月"
+					"THIS_MONTH": "今月",
+					"THIS_YEAR": ""
 				},
 				"PRIVATE": "非公開",
 				"PROJECT": "プロジェクト",
