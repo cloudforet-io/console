@@ -32,26 +32,31 @@ const costExplorerRoutes: RouteConfig = {
             component: { template: '<router-view />' },
             children: [
                 {
-                    path: ':dataSourceId?/:costQuerySetId?',
+                    path: '/',
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                    meta: {
-                        lnbVisible: true,
-                        label: ({ params }) => params.costQuerySetId,
-                        copiable: true,
-                    },
+                    meta: { lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         if (to.params.dataSourceId && to.params.costQuerySetId) {
                             next();
                         } else {
                             const { results } = await SpaceConnector.client.costAnalysis.dataSource.list();
                             next({
-                                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                                 params: {
                                     dataSourceId: results[0].data_source_id,
                                     costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
                                 },
                             });
                         }
+                    },
+                },
+                {
+                    path: ':dataSourceId/:costQuerySetId',
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    meta: {
+                        lnbVisible: true,
+                        label: ({ params }) => params.costQuerySetId,
+                        copiable: true,
                     },
                     props: true,
                     component: CostAnalysisPage as any,

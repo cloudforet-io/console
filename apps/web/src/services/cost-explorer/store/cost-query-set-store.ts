@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 
@@ -8,6 +9,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { managedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+
+const fetcher = getCancellableFetcher(SpaceConnector.client.costAnalysis.costQuerySet.list);
 
 interface CostAnalysisLNBState {
     costQuerySetList: CostQuerySetModel[];
@@ -29,15 +32,19 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
     },
     actions: {
         async listCostQuerySets(): Promise<void> {
+            // TODO: apply v2
             try {
-                // TODO: apply v2
-                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
+                const { status, response } = await fetcher({
                     data_source_id: this.selectedDataSourceId,
                     query: {
                         filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
                     },
                 });
-                this.costQuerySetList = [...managedCostQuerySets, ...results];
+                if (status === 'succeed') {
+                    this.costQuerySetList = [...managedCostQuerySets, ...response.results];
+                } else {
+                    this.costQuerySetList = [...managedCostQuerySets];
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.costQuerySetList = [...managedCostQuerySets];
