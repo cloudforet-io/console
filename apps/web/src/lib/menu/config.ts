@@ -1,6 +1,4 @@
 // Menu Ids' Rule: All menu ids are dot-delimited in depth, up to two depths.
-import type { HighlightTagType } from '@/store/modules/display/type';
-
 export const MENU_ID = Object.freeze({
     HOME_DASHBOARD: 'home-dashboard',
     DASHBOARDS: 'dashboards',
@@ -47,6 +45,7 @@ export interface Menu {
 export interface MenuInfo {
     translationId: string;
     icon?: string;
-    highlightTag?: HighlightTagType;
+    isNew?: boolean;
+    isBeta?: boolean;
     needPermissionByRole?: boolean;
 }

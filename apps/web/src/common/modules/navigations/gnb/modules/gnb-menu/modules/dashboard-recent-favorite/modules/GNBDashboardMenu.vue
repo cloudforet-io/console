@@ -24,7 +24,8 @@
                         >
                             <g-n-b-sub-menu :label="subMenu.label"
                                             :to="subMenu.to"
-                                            :higlight-tag="subMenu.highlightTag"
+                                            :is-beta="subMenu.isBeta"
+                                            :is-new="subMenu.isNew"
                                             @navigate="hideMenu"
                             />
                         </div>
