@@ -16,6 +16,13 @@
                   @keydown.enter="handleMenu"
             >
                 <span>{{ label }}</span>
+                <span v-if="highlightTag"
+                      class="mark"
+                >
+                    <new-mark v-if="highlightTag === 'new'" />
+                    <update-mark v-else-if="highlightTag === 'update'" />
+                    <beta-mark v-else-if="highlightTag === 'beta'" />
+                </span>
                 <p-i v-if="isMenuWithAdditionalMenu"
                      class="arrow-button"
                      :name="isOpened ? 'ic_chevron-small-up' : 'ic_chevron-small-down'"
@@ -46,8 +53,7 @@
                                 :label="subMenu.label"
                                 :to="subMenu.to"
                                 :href="subMenu.href"
-                                :is-beta="subMenu.isBeta"
-                                :is-new="subMenu.isNew"
+                                :highlight-tag="subMenu.highlightTag"
                                 @navigate="hideMenu"
                 />
             </div>
@@ -69,12 +75,15 @@ import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
-import type { DisplayMenu } from '@/store/modules/display/type';
+import type { DisplayMenu, HighlightTagType } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
@@ -96,10 +105,14 @@ interface Props {
     isOpened: boolean;
     isSelected: boolean;
     subMenuList: SubMenu[];
+    highlightTag?: HighlightTagType;
 }
 export default defineComponent<Props>({
     name: 'GNBMenu',
     components: {
+        BetaMark,
+        UpdateMark,
+        NewMark,
         IntegrationSubMenu,
         GNBDashboardMenu,
         PI,
@@ -144,6 +157,10 @@ export default defineComponent<Props>({
         subMenuList: {
             type: Array as PropType<SubMenu[]>,
             default: () => [],
+        },
+        highlightTag: {
+            type: String as PropType<HighlightTagType>,
+            default: undefined,
         },
     },
     setup(props, { emit }: SetupContext) {
@@ -192,8 +209,13 @@ export default defineComponent<Props>({
         text-transform: capitalize;
 
         .button-label {
-            display: inline-block;
+            @apply inline-block flex items-center;
             height: 100%;
+
+            .mark {
+                height: 1.5rem;
+                line-height: normal;
+            }
         }
 
         &.opened, &:hover {
