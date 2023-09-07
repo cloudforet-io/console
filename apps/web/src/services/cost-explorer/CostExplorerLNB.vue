@@ -16,7 +16,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { FavoriteConfig } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -101,19 +102,33 @@ const state = reactive({
             },
             favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
         }));
+
+        const currenctQueryMenuListFilterdByFavoriteState = filterFavoriteItems(currentQueryMenuList);
+
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
             id: SHOW_MORE_MENU_ID,
         }];
 
         return [
-            ...(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
+            ...(state.showMoreQuerySetStatus ? currenctQueryMenuListFilterdByFavoriteState.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currenctQueryMenuListFilterdByFavoriteState),
             ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
+    }),
+    favoriteItemMap: computed(() => {
+        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.COST_ANALYSIS];
+        const result: Record<string, FavoriteConfig> = {};
+        if (stateName) {
+            store.state.favorite[stateName]?.forEach((d) => {
+                result[d.itemId] = d;
+            });
+        }
+        return result;
     }),
     showMoreQuerySetStatus: true,
     showFavoriteOnly: false,
 });
+
 const dataSourceState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
@@ -148,6 +163,19 @@ const relocateNotificationState = reactive({
     isModalVisible: false,
     userId: computed(() => store.state.user.userId),
 });
+
+const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
+    if (!state.showFavoriteOnly) return menuItems;
+    const result = [] as LNBMenu[];
+    menuItems.forEach((d) => {
+        if (Array.isArray(d)) {
+            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+            const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
+            if (hasProject) result.push(filtered);
+        } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
+    });
+    return result;
+};
 
 const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
 
