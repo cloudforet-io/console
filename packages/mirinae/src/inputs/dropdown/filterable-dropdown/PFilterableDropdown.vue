@@ -256,7 +256,7 @@ watch(() => props.disabled, (disabled) => {
                     <span v-if="displayValueOnDropdownButton"
                           class="selected-item"
                     >
-                        {{ displayValueOnDropdownButton }}
+                        <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                         <p-badge v-if="displayBadgeValueOnDropdownButton"
                                  :style-type="disabled ? 'gray200' : 'blue200'"
                                  :badge-type="disabled ? 'solid' : 'subtle'"
@@ -360,6 +360,9 @@ watch(() => props.disabled, (disabled) => {
                 flex-grow: 1;
                 padding: 0.25rem 0.5rem;
                 gap: 0.25rem;
+                .selected-item-text {
+                    @apply font-medium;
+                }
                 .tags-wrapper {
                     @apply flex flex-wrap;
                     gap: 0.5rem;
