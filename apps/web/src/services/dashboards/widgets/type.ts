@@ -56,7 +56,7 @@ export interface Legend {
     name: string;
     label?: TranslateResult;
     color?: string;
-    disabled?: boolean;
+    disabled?: boolean; // this is used only in widget data table
 }
 
 export interface PieChartData {
@@ -77,3 +77,8 @@ export const CHART_TYPE = Object.freeze({
     TABLE: 'TABLE',
 } as const);
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export interface CostAnalyzeResponse<Result> {
+    more?: boolean;
+    results: Result[];
+}

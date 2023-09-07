@@ -70,10 +70,10 @@ export const getRefinedXYChartData = (
  * @name getXYChartLegends
  * @description Extract legends from raw data.
  */
-export const getXYChartLegends = (
-    rawData: CostAnalyzeDataModel['results'],
-    groupBy: CostGroupBy,
-    allReferenceTypeInfo: AllReferenceTypeInfo,
+export const getXYChartLegends = <T = Record<string, any>>(
+    rawData?: T[],
+    groupBy?: CostGroupBy,
+    allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
     if (!rawData || !groupBy || !allReferenceTypeInfo) return [];

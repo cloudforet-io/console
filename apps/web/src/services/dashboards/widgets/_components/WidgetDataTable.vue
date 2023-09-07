@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
-    defineProps, reactive, ref,
+    defineProps, reactive, ref, watch,
 } from 'vue';
 
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
-import { cloneDeep, throttle } from 'lodash';
+import { throttle } from 'lodash';
 
 import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: string, value: any): void}>();
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
-    proxyLegend: useProxyValue('legends', props, emit),
+    disabledLegends: {} as Record<number, boolean>,
 });
 
 const labelRef = ref<HTMLElement[]|null>(null);
@@ -164,17 +164,18 @@ const getTooltipContents = (item, field:Field):string => {
 };
 
 /* event */
-const handleClickLegend = (index) => {
+const handleClickLegend = (index: number) => {
     // if (props.printMode) return;
-    const _legends = cloneDeep(props.legends);
-    _legends[index].disabled = !_legends[index].disabled;
-    state.proxyLegend = _legends;
+    state.disabledLegends[index] = !state.disabledLegends[index];
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
     // if (props.printMode) return;
     emit('click-row', rowData);
 };
+watch(() => props.legends, () => {
+    state.disabledLegends = {};
+});
 </script>
 
 <template>
@@ -260,7 +261,7 @@ const handleClickRow = (rowData) => {
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
                                         <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : ''"
                                         >
                                             <div class="detail-item-wrapper">
                                                 <span ref="labelRef"
