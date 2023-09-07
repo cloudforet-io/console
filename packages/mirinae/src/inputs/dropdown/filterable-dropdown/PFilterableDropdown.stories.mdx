@@ -28,7 +28,7 @@ export const Template = (args, { argTypes }) => ({
         <p-filterable-dropdown
             :menu="menu"
             :loading="loading"
-            :selected.sync="proxySelected"
+            :selected="proxySelected"
             :multi-selectable="multiSelectable"
             :search-text="proxySearchText"
             :readonly="readonly"
@@ -44,6 +44,10 @@ export const Template = (args, { argTypes }) => ({
             :appearance-type="appearanceType"
             :page-size="pageSize"
             :reset-selected-on-unmounted="resetSelectedOnUnmounted"
+            :show-alert-dot="showAlertDot"
+            :style-type="styleType"
+            :selection-highlight="selectionHighlight"
+            :selection-label="selectionLabel"
             @update:visible-menu="onUpdateVisibleMenu"
             @update:search-text="onUpdateSearchText"
             @update:selected="onUpdateSelected"
@@ -89,29 +93,32 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Show Select Marker
+## Style Type
 
 <Canvas>
-    <Story name="Show Select Marker" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+    <Story name="Style Type" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
         <div>
-            <p class="text-label-lg font-bold my-3">Single select without marker</p>
+            <p class="text-label-lg font-bold my-3">Multi select with 'basic' style type</p>
             <p-filterable-dropdown :menu="menu" />
             <br/>
-            <p class="text-label-lg font-bold my-3">Single select with marker</p>
-            <p-filterable-dropdown :menu="menu" show-select-marker />
-            <br/>
-            <p class="text-label-lg font-bold my-3">Multi select without marker</p>
-            <p-filterable-dropdown :menu="menu" multi-selectable />
-            <br/>
-            <p class="text-label-lg font-bold my-3">Multi select with marker</p>
-            <p-filterable-dropdown :menu="menu" multi-selectable show-select-marker />
+            <p class="text-label-lg font-bold my-3">Multi select with 'rounded' style type</p>
+            <p-filterable-dropdown :menu="menu" style-type="rounded" />
             <br/>
         </div>
 `,
+            setup(props) {
+                const state = reactive({
+                    singleSelected: [props.menu.find(d => !d.type || d.type === 'item')],
+                    multiSelected: props.menu.filter(d => !d.type || d.type === 'item').splice(0, 15),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>
@@ -129,7 +136,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <div>
             <p class="text-label-lg font-bold my-3">Single select with 'basic', 'badge', 'stack' appearance type</p>
-            <p-filterable-dropdown :menu="menu" :selected.sync="singleSelected" />
+            <p-filterable-dropdown :menu="menu" :selected="singleSelected" />
             <br/>
             <p class="text-label-lg font-bold my-3">Single selected: </p>
             <pre>{{ singleSelected }}</pre>
@@ -137,13 +144,13 @@ export const Template = (args, { argTypes }) => ({
             <hr/>
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'basic' appearance type</p>
-            <p-filterable-dropdown :menu="menu":selected.sync="multiSelected"  multi-selectable />
+            <p-filterable-dropdown :menu="menu":selected="multiSelected"  multi-selectable />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'badge' appearance type</p>
-            <p-filterable-dropdown :menu="menu" :selected.sync="multiSelected" multi-selectable appearance-type="badge" />
+            <p-filterable-dropdown :menu="menu" :selected="multiSelected" multi-selectable appearance-type="badge" />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi select with 'stack' appearance type</p>
-            <p-filterable-dropdown :menu="menu" :selected.sync="multiSelected" multi-selectable appearance-type="stack" />
+            <p-filterable-dropdown :menu="menu" :selected="multiSelected" multi-selectable appearance-type="stack" />
             <br/>
             <p class="text-label-lg font-bold my-3">Multi selected: </p>
             <pre>{{ multiSelected }}</pre>
@@ -166,24 +173,274 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-
-## Show Select Header
+## Readonly & Disabled
 
 <Canvas>
-    <Story name="Show Select Header" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
+    <Story name="Readonly & Disabled" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Normal</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Disabled</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" disabled />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="badge" disabled />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="stack" disabled />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected="selected" disabled style-type="rounded" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Readonly</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" readonly />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected="selected" readonly style-type="rounded" />
+                <br/>
+            </div>
+`,
+            setup(props) {
+                const state = reactive({
+                    selected: props.menu.filter(d => !d.type || d.type === 'item').slice(0, 2),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Normal</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Invalid</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" invalid />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected="selected" invalid style-type="rounded" />
+                <br/>
+            </div>
+`,
+            setup(props) {
+                const state = reactive({
+                    selected: [props.menu.find(d => !d.type || d.type === 'item')],
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Placeholder
+
+<Canvas>
+    <Story name="Placeholder" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default placeholder for single select</p>
+                <p-filterable-dropdown :menu="menu" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Default placeholder for multi select</p>
+                <p-filterable-dropdown :menu="menu" multi-selectable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Custom placeholder</p>
+                <p-filterable-dropdown :menu="menu" placeholder="Please Select One 😄" />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Selection Label
+
+<Canvas>
+    <Story name="Selection Label" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-filterable-dropdown :menu="menu" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Selection Label</p>
+                <p-filterable-dropdown :menu="menu" selection-label="Label" />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Selection Highlight
+
+<Canvas>
+    <Story name="Selection Highlight" args={{menu: getFilterableDropdownMenu()}} height={'500px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+                <div>
+                <p class="text-label-lg font-bold my-3">Normal</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" selection-highlight />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at badge type</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="badge" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at badge type with selection label</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="badge" selection-label="Label" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at stack type</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="stack" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at stack type with selection label</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable appearance-type="stack" selection-label="Label" selection-highlight/>
+                <br/>
+                </div>
+            `,
+            setup(props) {
+                const state = reactive({
+                    selected: props.menu.filter(d => !d.type || d.type === 'item').slice(0, 2),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Alert Dot
+
+<Canvas>
+    <Story name="Show Alert Dot" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown, PButton },
             template: `
             <div>
-                <p class="text-label-lg font-bold my-3">Multi select without select header</p>
-                <p-filterable-dropdown :menu="menu"  multi-selectable />
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-filterable-dropdown :menu="menu"  />
                 <br/>
-                <p class="text-label-lg font-bold my-3">Multi select with select header</p>
-                <p-filterable-dropdown :menu="menu" multi-selectable show-select-header />
+                <p class="text-label-lg font-bold my-3">Show Alert Dot</p>
+                <p-filterable-dropdown :menu="menu" show-alert-dot />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show Alert Dot and Selection Highlight at Badge Type</p>
+                <p-filterable-dropdown :menu="menu" :selected="selected" multi-selectable show-alert-dot selection-highlight appearance-type="badge"/>
                 <br/>
             </div>
 `,
+            setup(props) {
+                const state = reactive({
+                    selected: props.menu.filter(d => !d.type || d.type === 'item').slice(0, 2),
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Delete All Button
+
+<Canvas>
+    <Story name="Show Delete All Button" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-filterable-dropdown :menu="menu"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show delete all button</p>
+                <p-filterable-dropdown :menu="menu" :show-delete-all-button="false" />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Use Fixed Menu Style
+
+<Canvas>
+    <Story name="Use Fixed Menu Style">
+        {{
+            components: { PFilterableDropdown, PToggleButton },
+            template: `
+        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
+            <div style="height: 500px;">
+                <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
+                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
+                    The menu's style position will be set 'fixed'.<br/>
+                    Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
+                    When you scroll parent elements, the menu will be automatically hidden.
+                </p>
+                <p-filterable-dropdown v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
+            </div>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    menu: getFilterableDropdownMenu(30, 50),
+                    useFixedMenuStyle: true,
+                    show: true
+                })
+                const onChange = () => {
+                    state.show = false;
+                    state.useFixedMenuStyle = !state.useFixedMenuStyle;
+                    setTimeout(() => {
+                        state.show = true;
+                    }, 300)
+                }
+                return {
+                    ...toRefs(state),
+                    onChange
+                }
+            }
         }}
     </Story>
 </Canvas>
@@ -272,6 +529,87 @@ interface AutocompleteHandler {
 <br/>
 <br/>
 
+## Show Select Header
+
+<Canvas>
+    <Story name="Show Select Header" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Multi select without select header</p>
+                <p-filterable-dropdown :menu="menu"  multi-selectable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with select header</p>
+                <p-filterable-dropdown :menu="menu" multi-selectable show-select-header />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Show Select Marker
+
+<Canvas>
+    <Story name="Show Select Marker" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
+            template: `
+        <div>
+            <p class="text-label-lg font-bold my-3">Single select without marker</p>
+            <p-filterable-dropdown :menu="menu" />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Single select with marker</p>
+            <p-filterable-dropdown :menu="menu" show-select-marker />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select without marker</p>
+            <p-filterable-dropdown :menu="menu" multi-selectable />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select with marker</p>
+            <p-filterable-dropdown :menu="menu" multi-selectable show-select-marker />
+            <br/>
+        </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disable Handler
+
+As you enter values into the search input, the menu is filtered by default handler. <br/>
+If you don't want to use this feature, give true to the disableHandler prop.
+
+<Canvas>
+    <Story name="Disable Handler" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">With default handler </p>
+                <p-filterable-dropdown :menu="menu" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Disable handler </p>
+                <p-filterable-dropdown :menu="menu" disable-handler />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Show More & Page Size
 
 When using the `handler` prop, the first argument of the handler is the input text, the second argument is the pageStart value, and the third argument is the pageLimit. <br/>
@@ -322,199 +660,6 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
                     simpleHandler,
                 }
             }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Disable Handler
-
-As you enter values into the search input, the menu is filtered by default handler. <br/>
-If you don't want to use this feature, give true to the disableHandler prop.
-
-<Canvas>
-    <Story name="Disable Handler" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
-        {{
-            props: Object.keys(getFilterableDropdownArgTypes()),
-            components: { PFilterableDropdown, PButton },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">With default handler </p>
-                <p-filterable-dropdown :menu="menu" />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Disable handler </p>
-                <p-filterable-dropdown :menu="menu" disable-handler />
-                <br/>
-            </div>
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Readonly & Disabled
-
-<Canvas>
-    <Story name="Readonly & Disabled" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
-        {{
-            props: Object.keys(getFilterableDropdownArgTypes()),
-            components: { PFilterableDropdown },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">Normal</p>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected"  />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Disabled</p>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected" disabled />
-                <br/>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected" multi-selectable appearance-type="badge" disabled />
-                <br/>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected" multi-selectable appearance-type="stack" disabled />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Readonly</p>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected" readonly />
-                <br/>
-            </div>
-`,
-            setup(props) {
-                const state = reactive({
-                    selected: props.menu.filter(d => !d.type || d.type === 'item').slice(0, 2),
-                })
-                return {
-                    ...toRefs(state)
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Use Fixed Menu Style
-
-<Canvas>
-    <Story name="Use Fixed Menu Style">
-        {{
-            components: { PFilterableDropdown, PToggleButton },
-            template: `
-        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
-            <div style="height: 500px;">
-                <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
-                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
-                    The menu's style position will be set 'fixed'.<br/>
-                    Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
-                    When you scroll parent elements, the menu will be automatically hidden.
-                </p>
-                <p-filterable-dropdown v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
-            </div>
-        </div>
-`,
-            setup() {
-                const state = reactive({
-                    menu: getFilterableDropdownMenu(30, 50),
-                    useFixedMenuStyle: true,
-                    show: true
-                })
-                const onChange = () => {
-                    state.show = false;
-                    state.useFixedMenuStyle = !state.useFixedMenuStyle;
-                    setTimeout(() => {
-                        state.show = true;
-                    }, 300)
-                }
-                return {
-                    ...toRefs(state),
-                    onChange
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Invalid
-
-<Canvas>
-    <Story name="Invalid" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
-        {{
-            props: Object.keys(getFilterableDropdownArgTypes()),
-            components: { PFilterableDropdown },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">Normal</p>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected"  />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Invalid</p>
-                <p-filterable-dropdown :menu="menu" :selected.sync="selected" invalid />
-                <br/>
-            </div>
-`,
-            setup(props) {
-                const state = reactive({
-                    selected: [props.menu.find(d => !d.type || d.type === 'item')],
-                })
-                return {
-                    ...toRefs(state)
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Placeholder
-
-<Canvas>
-    <Story name="Placeholder" args={{menu: getFilterableDropdownMenu()}} height={'400px'}>
-        {{
-            props: Object.keys(getFilterableDropdownArgTypes()),
-            components: { PFilterableDropdown },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">Default placeholder for single select</p>
-                <p-filterable-dropdown :menu="menu" />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Default placeholder for multi select</p>
-                <p-filterable-dropdown :menu="menu" multi-selectable />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Custom placeholder</p>
-                <p-filterable-dropdown :menu="menu" placeholder="Please Select One 😄" />
-                <br/>
-            </div>
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Show Delete All Button
-
-<Canvas>
-    <Story name="Show Delete All Button" args={{menu: getFilterableDropdownMenuWithMultiTypes()}} height={'400px'}>
-        {{
-            props: Object.keys(getFilterableDropdownArgTypes()),
-            components: { PFilterableDropdown, PButton },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">Default</p>
-                <p-filterable-dropdown :menu="menu"  />
-                <br/>
-                <p class="text-label-lg font-bold my-3">Show delete all button</p>
-                <p-filterable-dropdown :menu="menu" :show-delete-all-button="false" />
-                <br/>
-            </div>
-`,
         }}
     </Story>
 </Canvas>

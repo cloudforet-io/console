@@ -16,13 +16,31 @@ import {
     useFilterableDropdownButtonDisplay,
 } from '@/inputs/dropdown/filterable-dropdown/composables/filterable-dropdown-button-display';
 import type {
-    AutocompleteHandler, FilterableDropdownAppearanceType,
     DropdownMenuItem,
-} from '@/inputs/dropdown/filterable-dropdown/type';
-import { FILTERABLE_DROPDOWN_APPEARANCE_TYPES } from '@/inputs/dropdown/filterable-dropdown/type';
 
-/* props */
+    AutocompleteHandler,
+    FilterableDropdownAppearanceType,
+    FilterableDropdownStyleType,
+} from '@/inputs/dropdown/filterable-dropdown/type';
+import {
+    FILTERABLE_DROPDOWN_APPEARANCE_TYPES,
+    FILTERABLE_DROPDOWN_STYLE_TYPES,
+} from '@/inputs/dropdown/filterable-dropdown/type';
+
 interface FilterableDropdownProps {
+    /* dropdown button */
+    styleType?: FilterableDropdownStyleType;
+    appearanceType?: FilterableDropdownAppearanceType;
+    visibleMenu?: boolean;
+    disabled?: boolean;
+    invalid?: boolean;
+    placeholder?: string;
+    selectionLabel?: string;
+    selectionHighlight?: boolean;
+    showAlertDot?: boolean;
+    showDeleteAllButton?: boolean;
+    useFixedMenuStyle?: boolean;
+
     /* context menu props */
     menu?: DropdownMenuItem[];
     loading?: boolean;
@@ -32,31 +50,31 @@ interface FilterableDropdownProps {
     readonly?: boolean;
     showSelectHeader?: boolean;
     showSelectMarker?: boolean;
+
     /* others */
-    visibleMenu?: boolean;
-    useFixedMenuStyle?: boolean;
-    placeholder?: string;
-    invalid?: boolean;
-    disabled?: boolean;
     // eslint-disable-next-line vue/require-default-prop
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
-    appearanceType?: FilterableDropdownAppearanceType;
     // eslint-disable-next-line vue/require-default-prop
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
-    showDeleteAllButton?: boolean;
 }
+
 const props = withDefaults(defineProps<FilterableDropdownProps>(), {
+    /* dropdown button */
+    styleType: FILTERABLE_DROPDOWN_STYLE_TYPES[0],
+    appearanceType: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
+    selected: () => [],
+    placeholder: undefined,
+    selectionLabel: undefined,
+    showDeleteAllButton: true,
+    /* context menu props */
+    visibleMenu: undefined,
     menu: () => [],
     loading: false,
-    selected: () => [],
     searchText: '',
-    visibleMenu: undefined,
-    placeholder: undefined,
-    appearanceType: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
+    /* others */
     resetSelectedOnUnmounted: true,
-    showDeleteAllButton: true,
 });
 
 /* event emits */
@@ -200,7 +218,11 @@ watch(() => props.disabled, (disabled) => {
          :class="{
              disabled: props.disabled,
              readonly: props.readonly,
-             opened: state.proxyVisibleMenu, invalid
+             opened: state.proxyVisibleMenu,
+             selected: state.proxySelectedItem.length > 0,
+             invalid,
+             [props.styleType]: true,
+             'selection-highlight': props.selectionHighlight && state.proxySelectedItem.length > 0,
          }"
     >
         <div ref="targetRef"
@@ -211,35 +233,47 @@ watch(() => props.disabled, (disabled) => {
              @keyup.enter.capture.stop="handleClickDropdownButton"
              @click="handleClickDropdownButton"
         >
+            <span v-if="props.showAlertDot"
+                  class="show-alert-dot"
+            />
             <slot name="input-left-area" />
             <div class="selection-display-wrapper">
                 <span v-if="displayValueOnDropdownButton === undefined"
                       class="placeholder"
                 >
-                    {{ props.placeholder || $t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
+                    {{ props.selectionLabel
+                        ? props.selectionLabel
+                        : props.placeholder || $t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
                 </span>
-                <span v-else-if="displayValueOnDropdownButton"
-                      class="selected-item"
+                <span v-else
+                      class="selection-wrapper"
                 >
-                    {{ displayValueOnDropdownButton }}
-                    <p-badge v-if="displayBadgeValueOnDropdownButton"
-                             :style-type="disabled ? 'gray200' : 'blue200'"
-                             :badge-type="disabled ? 'solid' : 'subtle'"
+                    <b v-if="props.selectionLabel">
+                        {{ props.selectionLabel }}:
+                    </b>
+                    <span v-if="displayValueOnDropdownButton"
+                          class="selected-item"
                     >
-                        {{ displayBadgeValueOnDropdownButton }}
-                    </p-badge>
+                        {{ displayValueOnDropdownButton }}
+                        <p-badge v-if="displayBadgeValueOnDropdownButton"
+                                 :style-type="disabled ? 'gray200' : 'blue200'"
+                                 :badge-type="disabled ? 'solid' : 'subtle'"
+                        >
+                            {{ displayBadgeValueOnDropdownButton }}
+                        </p-badge>
+                    </span>
+                    <div v-else-if="showTagsOnDropdownButton"
+                         class="tags-wrapper"
+                    >
+                        <p-tag v-for="(item, idx) in state.proxySelectedItem"
+                               :key="item.name"
+                               class="selected-tag"
+                               @delete="handleTagDelete(item, idx)"
+                        >
+                            {{ item.label || item.name }}
+                        </p-tag>
+                    </div>
                 </span>
-                <div v-else-if="showTagsOnDropdownButton"
-                     class="tags-wrapper"
-                >
-                    <p-tag v-for="(item, idx) in state.proxySelectedItem"
-                           :key="item.name"
-                           class="selected-tag"
-                           @delete="handleTagDelete(item, idx)"
-                    >
-                        {{ item.label || item.name }}
-                    </p-tag>
-                </div>
                 <span v-if="state.showDeleteAllButton"
                       class="delete-all-button"
                       @click.stop="handleClickDeleteAll"
@@ -304,36 +338,39 @@ watch(() => props.disabled, (disabled) => {
 <style lang="postcss">
 .p-filterable-dropdown {
     @apply relative w-full;
-    > .dropdown-button {
+
+    /* style type - default */
+    .dropdown-button {
         @apply flex items-center bg-white border rounded-md border-gray-300 cursor-pointer;
         width: 100%;
         min-height: 2rem;
-        > .selection-display-wrapper {
+        .selection-display-wrapper {
             @apply flex;
             flex-grow: 1;
             width: 100%;
-            > .placeholder {
+            .placeholder {
                 @apply text-label-md text-gray-500;
                 flex-grow: 1;
                 line-height: 1.5;
                 padding: 0.25rem 0.5rem;
             }
-            > .selected-item {
-                @apply text-label-md text-gray-800;
+            .selection-wrapper {
+                @apply flex items-center text-label-md text-gray-800;
                 flex-grow: 1;
-                line-height: 1.5;
                 padding: 0.25rem 0.5rem;
-            }
-            > .tags-wrapper {
-                @apply flex flex-wrap;
-                flex-grow: 1;
-                gap: 0.5rem;
-                padding: 0.375rem 0.5rem;
-                > .selected-tag {
-                    margin: 0;
+                gap: 0.25rem;
+                .selected-item {
+                    line-height: 1.5;
+                }
+                .tags-wrapper {
+                    @apply flex flex-wrap;
+                    gap: 0.5rem;
+                    > .selected-tag {
+                        margin: 0;
+                    }
                 }
             }
-            > .delete-all-button {
+            .delete-all-button {
                 @apply inline-flex items-center text-gray-400 cursor-pointer;
                 flex-shrink: 0;
                 max-height: 2rem;
@@ -346,60 +383,138 @@ watch(() => props.disabled, (disabled) => {
             max-height: 2rem;
             width: 1.75rem;
         }
+        .show-alert-dot {
+            @apply absolute bg-blue-500 rounded-full border border-2 border-white;
+            top: -0.25rem;
+            right: -0.063rem;
+            width: 0.625rem;
+            height: 0.625rem;
+        }
     }
-    > .dropdown-context-menu {
+    .dropdown-context-menu {
         @apply absolute;
         z-index: 1000;
         min-width: 100%;
         width: 100%;
     }
 
+    /* style type - rounded */
+    &.rounded {
+        .dropdown-button {
+            @apply border-gray-200 rounded-xl;
+        }
+        &.selected:not(.disabled, .readonly, .invalid) {
+            .dropdown-button {
+                @apply border-gray-400;
+            }
+        }
+    }
+
+    /* hover */
+    &:not(.disabled, .readonly, .invalid):hover {
+        .dropdown-button {
+            @apply border-secondary;
+        }
+        &.rounded {
+            .dropdown-button {
+                @apply bg-gray-100 border-gray-200;
+            }
+            &.selected {
+                .dropdown-button {
+                    @apply border-gray-400;
+                }
+            }
+        }
+        &.selection-highlight {
+            .dropdown-button {
+                @apply bg-blue-200 border-blue-300;
+            }
+        }
+    }
+
+    /* context menu opened */
+    &.opened {
+        .dropdown-button {
+            @apply border-secondary;
+            .arrow-button {
+                @apply text-secondary;
+            }
+        }
+        &.rounded {
+            .dropdown-button {
+                @apply bg-gray-100 border-gray-200;
+            }
+            .arrow-button {
+                @apply text-gray-600;
+            }
+            &.selected {
+                .dropdown-button {
+                    @apply border-gray-400;
+                }
+            }
+        }
+    }
+
     &.disabled {
-        > .dropdown-button {
+        .dropdown-button {
             @apply bg-gray-100 border-gray-300 cursor-not-allowed;
-            > .arrow-button {
+            .arrow-button {
                 @apply text-gray-300;
             }
         }
     }
 
     &.readonly {
-        > .dropdown-button {
+        .dropdown-button {
             @apply text-gray-300 border-gray-300 cursor-default;
             .selected-item {
                 @apply text-gray-800;
             }
-            > .arrow-button {
+            .arrow-button {
                 @apply text-gray-300;
             }
         }
     }
 
-    &.opened:not(.invalid) {
-        > .dropdown-button {
-            @apply border-secondary;
-            > .arrow-button {
-                @apply text-secondary;
-            }
-        }
-    }
-
     &.invalid {
-        > .dropdown-button {
+        .dropdown-button {
             @apply border-alert;
         }
-    }
-
-    @media (hover: hover) {
-        &:not(.disabled, .readonly):hover {
-            > .dropdown-button {
-                @apply text-secondary;
+        &.opened {
+            .dropdown-button {
+                @apply border-alert;
             }
-            &:not(.invalid) {
-                > .dropdown-button {
-                    @apply border-secondary;
+            .arrow-button {
+                @apply text-gray-600;
+            }
+        }
+        &.rounded {
+            &:hover {
+                .dropdown-button {
+                    @apply bg-red-100;
                 }
             }
+            &.opened {
+                .dropdown-button {
+                    @apply bg-red-100 border-alert;
+                }
+                .arrow-button {
+                    @apply text-gray-600;
+                }
+            }
+        }
+    }
+
+    /* Selection Highlight */
+    &.selection-highlight {
+        .dropdown-button {
+            @apply bg-blue-100 border-blue-300;
+            .selection-wrapper {
+                @apply text-secondary;
+            }
+        }
+        .arrow-button {
+            @apply text-secondary;
         }
     }
 }

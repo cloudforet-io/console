@@ -12,4 +12,8 @@ export interface AutocompleteHandler {
 }
 
 export const FILTERABLE_DROPDOWN_APPEARANCE_TYPES = ['basic', 'stack', 'badge'] as const;
+export const FILTERABLE_DROPDOWN_STYLE_TYPES = ['basic', 'rounded'] as const;
+
+
 export type FilterableDropdownAppearanceType = typeof FILTERABLE_DROPDOWN_APPEARANCE_TYPES[number];
+export type FilterableDropdownStyleType = typeof FILTERABLE_DROPDOWN_STYLE_TYPES[number];
