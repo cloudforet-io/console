@@ -12,7 +12,6 @@ import {getTextHighlightRegex} from "@/utils/helpers";
 import {contextMenuSlots, getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems, longMenuItems, getContextMenuItems} from '@/inputs/context-menu/mock';
 
-
 <Meta title='Inputs/Context Menu' parameters={{
     design: {
         type: 'figma',
@@ -20,13 +19,13 @@ import {menuItems, longMenuItems, getContextMenuItems} from '@/inputs/context-me
     }
 }} argTypes={getContextMenuArgTypes()}/>
 
-
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PContextMenu },
     template: `
     <div class="h-full overflow p-8">
         <p-context-menu
+            :title="title"
             :menu="menu"
             :loading="loading"
             :selected="selected"
@@ -46,7 +45,6 @@ export const Template = (args, { argTypes }) => ({
         return {}
     }
 });
-
 
 # Context Menu
 <br/>
@@ -103,7 +101,6 @@ Each `MenuItem` has the following type to represent it:
 </Canvas>
 
 <br/>
-<br/>
 
 ## Loading
 
@@ -120,7 +117,6 @@ Each `MenuItem` has the following type to represent it:
 </Canvas>
 
 <br/>
-<br/>
 
 ## No Data
 
@@ -136,7 +132,6 @@ Each `MenuItem` has the following type to represent it:
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ## Multi Selectable & Show Select Marker
@@ -176,8 +171,22 @@ Each `MenuItem` has the following type to represent it:
 </Canvas>
 
 <br/>
-<br/>
 
+## Title
+
+<Canvas>
+    <Story name="Title" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" title="Title" />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
 
 ## Slots
 
@@ -215,7 +224,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
 
 ### No Data Slot
 
@@ -239,7 +247,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ### Menu Slot
@@ -292,7 +299,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
 
 ### Item Slots
 
@@ -341,8 +347,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
-
 
 ### Header Slots
 
@@ -391,7 +395,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
 
 ### Bottom Slot
 
@@ -414,7 +417,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ### Search Slots
@@ -456,8 +458,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
-
 
 ## Items Height Fixed
 
@@ -473,7 +473,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ## Highlight Term & Item Text List Slot
@@ -518,7 +517,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 </Canvas>
 
 <br/>
-<br/>
 
 ## Show Selection Header
 
@@ -537,8 +535,6 @@ It works only in multi select case.
 </Canvas>
 
 <br/>
-<br/>
-
 
 ## Show Clear Selection
 
@@ -556,7 +552,6 @@ It works only in multi select case.
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ## Show More
@@ -616,7 +611,6 @@ It works only in multi select case.
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ## Searchable
@@ -684,7 +678,6 @@ It works only in multi select case.
     </Story>
 </Canvas>
 
-<br/>
 <br/>
 
 ## Playground
