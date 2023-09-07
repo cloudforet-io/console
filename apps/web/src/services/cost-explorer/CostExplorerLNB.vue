@@ -103,15 +103,13 @@ const state = reactive({
             favoriteType: FAVORITE_TYPE.COST_ANALYSIS,
         }));
 
-        const currenctQueryMenuListFilterdByFavoriteState = filterFavoriteItems(currentQueryMenuList);
-
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
             id: SHOW_MORE_MENU_ID,
         }];
 
         return [
-            ...(state.showMoreQuerySetStatus ? currenctQueryMenuListFilterdByFavoriteState.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currenctQueryMenuListFilterdByFavoriteState),
+            ...filterFavoriteItems(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
             ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
     }),
@@ -164,17 +162,9 @@ const relocateNotificationState = reactive({
     userId: computed(() => store.state.user.userId),
 });
 
-const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
+const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
     if (!state.showFavoriteOnly) return menuItems;
-    const result = [] as LNBMenu[];
-    menuItems.forEach((d) => {
-        if (Array.isArray(d)) {
-            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
-            const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
-            if (hasProject) result.push(filtered);
-        } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
-    });
-    return result;
+    return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
 };
 
 const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
