@@ -1312,6 +1312,7 @@
 				"DESCRIPTION_ACCOUNT": "The account IDs assigned by AWS during account creation",
 				"DESCRIPTION_ASSET_ACCOUNT": "The account IDs assigned by AWS during account creation",
 				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "List of compliance frameworks for cloud security and regulatory compliance",
+				"DESCRIPTION_DATA_SOURCE": "This is cost data source",
 				"DESCRIPTION_GROUP_BY": "It’s used to group data together and see overall trends or patterns based on a specific option",
 				"DESCRIPTION_PRODUCT": "The cloud computing products and services provided by each cloud provider",
 				"DESCRIPTION_PROJECT": "The collections of cloud resources and services that are grouped together for a specific purpose",

@@ -9,6 +9,17 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 
 export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
     properties: {
+        [REFERENCE_TYPE_INFO.cost_data_source.type]: {
+            name: REFERENCE_TYPE_INFO.cost_data_source.name,
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'SINGLE',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE'),
+            options: {
+                type: 'REFERENCE_RESOURCE',
+                reference_key: REFERENCE_TYPE_INFO.cost_data_source.type,
+            },
+        },
         [REFERENCE_TYPE_INFO.project.type]: {
             name: REFERENCE_TYPE_INFO.project.name,
             variable_type: 'MANAGED',
@@ -20,17 +31,18 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
                 reference_key: REFERENCE_TYPE_INFO.project.type,
             },
         },
-        [REFERENCE_TYPE_INFO.provider.type]: {
-            name: REFERENCE_TYPE_INFO.provider.name,
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'MULTI',
-            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER'),
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.provider.type,
-            },
-        },
+        // Provider is deprecated
+        // [REFERENCE_TYPE_INFO.provider.type]: {
+        //     name: REFERENCE_TYPE_INFO.provider.name,
+        //     variable_type: 'MANAGED',
+        //     use: true,
+        //     selection_type: 'MULTI',
+        //     description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER'),
+        //     options: {
+        //         type: 'REFERENCE_RESOURCE',
+        //         reference_key: REFERENCE_TYPE_INFO.provider.type,
+        //     },
+        // },
         [REFERENCE_TYPE_INFO.service_account.type]: {
             name: REFERENCE_TYPE_INFO.service_account.name,
             variable_type: 'MANAGED',
@@ -105,8 +117,9 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         },
     },
     order: [
+        REFERENCE_TYPE_INFO.cost_data_source.type,
         REFERENCE_TYPE_INFO.project.type,
-        REFERENCE_TYPE_INFO.provider.type,
+        // REFERENCE_TYPE_INFO.provider.type,
         REFERENCE_TYPE_INFO.service_account.type,
         REFERENCE_TYPE_INFO.region.type,
         COST_REFERENCE_TYPE_INFO.cost_product.type,
