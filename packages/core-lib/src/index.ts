@@ -2,7 +2,7 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { isEmpty, flatten } from 'lodash';
+import { isEmpty, flatten, sortBy } from 'lodash';
 
 dayjs.extend(tz);
 dayjs.extend(utc);
@@ -119,4 +119,36 @@ export const getRGBFromHex = (hex: string): { r: number, g: number, b: number } 
     const b = parseInt(hex.slice(5, 7), 16);
 
     return { r, g, b };
+};
+
+
+interface RawData {
+    [key: string]: any
+}
+
+/** @function
+ * @name sortArrayInObjectArray
+ * @description Sort array in object array
+ * @param rawData raw data to sort
+ * @param sortKey key to sort target array
+ * @param targetArrayFieldKeys target array field keys
+ */
+export const sortArrayInObjectArray = <Data extends RawData = RawData>(
+    rawData: Data[],
+    sortKey: string,
+    targetArrayFieldKeys: string[],
+): Data[] => {
+    const results: Data[] = [];
+    rawData.forEach((d) => {
+        targetArrayFieldKeys.forEach((targetArrayFieldKey) => {
+            const targetArray = d[targetArrayFieldKey];
+            if (Array.isArray(targetArray)) {
+                results.push({
+                    ...d,
+                    [targetArrayFieldKey]: sortBy(targetArray, sortKey),
+                });
+            }
+        });
+    });
+    return results;
 };

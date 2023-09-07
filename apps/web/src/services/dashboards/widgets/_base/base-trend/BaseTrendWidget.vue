@@ -4,11 +4,13 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
+import type { Series } from '@amcharts/amcharts5';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import { sortArrayInObjectArray } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -42,7 +44,7 @@ import {
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import {
-    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields, sortTableData,
+    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
@@ -52,10 +54,15 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 
-type Data = CostAnalyzeDataModel;
+interface Data {
+    cost_sum: { date: string; value: number }[];
+    _total_cost_sum: number;
+    [groupBy: string]: any;
+}
+type Response = CostAnalyzeResponse<Data>;
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
@@ -90,7 +97,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 });
 const state = reactive({
     loading: true,
-    data: null as Data | null,
+    data: null as Response | null,
     chart: null as null | XYChart,
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, widgetState.groupBy)),
     tableFields: computed<Field[]>(() => {
@@ -98,16 +105,22 @@ const state = reactive({
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'cost' });
         const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+
+        // set width of table fields
+        const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
+        const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
+
         return [
             {
                 label: groupByLabel,
                 name: widgetState.groupBy,
                 textOptions: { type: 'reference', referenceType },
+                width: groupByFieldWidth,
             },
-            ...refinedFields,
+            ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
-    legends: [] as Legend[],
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor)),
     disableReferenceColor: computed<boolean>(() => !!props.theme),
 });
 
@@ -119,8 +132,8 @@ const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
@@ -143,76 +156,92 @@ const fetchData = async (): Promise<Data> => {
             },
         });
         if (status === 'succeed') {
+            const refinedData = getRefinedDateTableData(response.results, widgetState.dateRange);
             return {
-                results: sortTableData(getRefinedDateTableData(response.results, widgetState.dateRange)),
+                results: sortArrayInObjectArray(refinedData, 'date', ['cost_sum']),
                 more: response.more,
             };
         }
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { results: [], more: false };
     }
-    return { results: [], more: false };
 };
 
 /* Util */
 const drawChart = (chartData: XYChartData[]) => {
+    const isLineChart = widgetState.chartType === CHART_TYPE.LINE;
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
+
+    // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
+
+    // set chart colors
     chartHelper.setChartColors(chart, colorSet.value);
 
-    if (widgetState.chartType === CHART_TYPE.LINE) {
+    // set cursor if line chart
+    if (isLineChart) {
         chart.get('cursor')?.lineX.setAll({
             visible: true,
         });
     }
 
-    let legend;
-    if (widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'chart') {
-        legend = chartHelper.createLegend({
-            nameField: 'name',
-        });
-        chart.children.push(legend);
-    }
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
 
-    state.legends.forEach((l) => {
+    // set series
+    state.legends.forEach((legend) => {
         const seriesSettings = {
-            name: l.label,
-            valueYField: l.name,
+            name: legend.label,
+            valueYField: legend.name,
         };
-        const series = widgetState.chartType === CHART_TYPE.LINE
+
+        // create series
+        const series = isLineChart
             ? chartHelper.createXYLineSeries(chart, seriesSettings)
             : chartHelper.createXYColumnSeries(chart, { ...seriesSettings, stacked: true });
         chart.series.push(series);
-        // set data processor
+
+        // set data processor on series
         series.data.processor = chartHelper.createDataProcessor({
             dateFormat: DATE_FORMAT,
             dateFields: [DATE_FIELD_NAME],
         });
-        const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
-        series.set('tooltip', tooltip);
+
+        // set tooltip on series
+        (series as Series).set('tooltip', tooltip);
+
+        // set data on series
         series.data.setAll(cloneDeep(chartData));
     });
-    if (legend) legend.data.setAll(chart.series.values);
+
+    // set chart legends if enabled
+    if (widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'chart') {
+        const chartLegends = chartHelper.createLegend({
+            nameField: 'name',
+        });
+        chart.children.push(chartLegends);
+        chartLegends.data.setAll(chart.series.values);
+    }
     state.chart = chart;
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (_thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<Response> => {
     await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -225,7 +254,7 @@ const handleSelectSelectorType = (selected: SelectorType) => {
     selectedSelectorType.value = selected;
     refreshWidget();
 };
-const handleToggleLegend = (index) => {
+const handleToggleLegend = (index: number) => {
     chartHelper.toggleSeries(state.chart, index);
 };
 const handleUpdateThisPage = (_thisPage: number) => {
@@ -242,14 +271,13 @@ useWidgetLifecycle({
     widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
     },
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<Response>>({
     initWidget,
     refreshWidget,
 });
@@ -290,7 +318,7 @@ defineExpose<WidgetExpose<Data>>({
                                :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
+                               :legends="state.legends"
                                :color-set="colorSet"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
