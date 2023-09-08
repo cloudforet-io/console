@@ -10,6 +10,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { LNBMenu, LNBIcon } from '@/common/modules/navigations/lnb/type';
 
@@ -74,8 +75,9 @@ const getIconName = (icon: LNBIcon): string => {
             <slot name="after-text"
                   v-bind="{...props, item, index: idx}"
             />
-            <new-mark v-if="item.isNew" />
-            <beta-mark v-if="item.isBeta" />
+            <new-mark v-if="item.hightlightTag === 'new'" />
+            <update-mark v-else-if="item.hightlightTag === 'update'" />
+            <beta-mark v-else-if="item.hightlightTag === 'beta'" />
         </div>
         <slot name="right-extra"
               v-bind="{...props, item, index: idx}"

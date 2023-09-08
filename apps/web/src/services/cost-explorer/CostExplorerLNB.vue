@@ -155,7 +155,7 @@ const relocateNotificationState = reactive({
             },
         },
         // TODO: may be isUpdated?
-        isNew: true,
+        hightlightTag: 'update',
         hideFavorite: true,
     })),
     isModalVisible: false,

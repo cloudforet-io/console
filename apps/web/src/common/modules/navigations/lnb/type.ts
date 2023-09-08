@@ -24,6 +24,7 @@ export interface SelectOptions {
 }
 
 export type LNBIcon = string | { name: string; color?: string; };
+export type hightlightTagType = 'new' | 'beta' | 'update';
 
 export interface LNBItem {
     type: MenuItemType;
@@ -31,8 +32,7 @@ export interface LNBItem {
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: Location;
-    isNew?: boolean;
-    isBeta?: boolean;
+    hightlightTag?: hightlightTagType;
     hideFavorite?: boolean;
     favoriteType?: FavoriteType;
     icon?: LNBIcon;
