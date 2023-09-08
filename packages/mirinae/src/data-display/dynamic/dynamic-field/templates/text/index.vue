@@ -60,9 +60,9 @@ export default defineComponent<TextDynamicFieldProps>({
             if (props.options.link) {
                 return {
                     href: props.options?.link,
-                    target: '_blank',
                     text: text.value,
                     showIcon: !!text.value,
+                    newTab: true,
                 };
             }
             return {};

@@ -76,7 +76,7 @@ export default {
 
         if (props.options.link) {
             sizeEl = h(PLink, {
-                attrs: { href: (props.options as SizeOptions).link, target: '_blank' },
+                attrs: { href: (props.options as SizeOptions).link, newTab: true },
                 props: { value, showIcon: !!formattedValue },
             }, [sizeEl]);
         }
