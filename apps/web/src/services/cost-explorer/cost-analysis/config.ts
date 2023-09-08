@@ -24,7 +24,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: true,
+                exclude_today: false,
             },
         },
     },
@@ -37,7 +37,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: true,
+                exclude_today: false,
             },
         },
     },
@@ -50,7 +50,7 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: true,
+                exclude_today: false,
             },
         },
     },

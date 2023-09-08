@@ -110,7 +110,7 @@ export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], gro
 
 export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
     const start = dayjs.utc(dateRange.start);
-    const end = dayjs.utc(dateRange.end);
+    const end = dayjs.utc(dateRange.end).add(1, 'month'); // 1 month added because of `max` property bug
     return {
         min: start.valueOf(),
         max: end.valueOf(),
