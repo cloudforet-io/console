@@ -62,7 +62,8 @@ const state = reactive({
             label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
-    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId as string)),
+    selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
+    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
     filtersPopoverVisible: false,
 });
 
