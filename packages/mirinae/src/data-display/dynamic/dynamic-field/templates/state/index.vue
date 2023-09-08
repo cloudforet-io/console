@@ -2,7 +2,7 @@
     <span>
         <p-link v-if="options.link"
                 :href="options.link"
-                target="_blank"
+                new-tab
         >
             <p-status v-bind="statusProps" />
         </p-link>

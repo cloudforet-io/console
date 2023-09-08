@@ -75,7 +75,7 @@ export default {
         if (options.link) {
             datetimeEl = h(PLink, {
                 ...attrs,
-                attrs: { href: props.options.link, target: '_blank' },
+                attrs: { href: props.options.link, newTab: true },
             }, [datetimeEl]);
         }
 

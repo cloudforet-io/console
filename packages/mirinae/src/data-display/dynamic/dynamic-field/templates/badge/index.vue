@@ -58,7 +58,7 @@ export default {
 
         if (options.link) {
             badgeEl = [h(PLink, {
-                attrs: { href: options.link, target: '_blank' },
+                attrs: { href: options.link, newTab: true },
             }, badgeEl)];
         }
 
