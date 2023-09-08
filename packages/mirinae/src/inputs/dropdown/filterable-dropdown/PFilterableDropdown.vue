@@ -114,7 +114,9 @@ const hideMenu = () => {
 };
 const showMenu = () => {
     if (props.readonly || props.disabled || state.proxyVisibleMenu) return;
-    initiateMenu();
+    if (!props.disableHandler) {
+        initiateMenu();
+    }
     focusOnContextMenu();
 };
 
@@ -254,7 +256,7 @@ watch(() => props.disabled, (disabled) => {
                     <span v-if="displayValueOnDropdownButton"
                           class="selected-item"
                     >
-                        {{ displayValueOnDropdownButton }}
+                        <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                         <p-badge v-if="displayBadgeValueOnDropdownButton"
                                  :style-type="disabled ? 'gray200' : 'blue200'"
                                  :badge-type="disabled ? 'solid' : 'subtle'"
@@ -345,19 +347,18 @@ watch(() => props.disabled, (disabled) => {
         width: 100%;
         min-height: 2rem;
         .selection-display-wrapper {
-            @apply flex;
-            flex-grow: 1;
+            @apply flex flex-grow;
             width: 100%;
+            padding: 0.25rem 0.5rem;
             .placeholder {
-                @apply text-label-md text-gray-500;
-                flex-grow: 1;
-                padding: 0.25rem 0.5rem;
+                @apply flex-grow text-label-md text-gray-500;
             }
             .selection-wrapper {
-                @apply flex items-center text-label-md text-gray-800;
-                flex-grow: 1;
-                padding: 0.25rem 0.5rem;
+                @apply flex flex-grow items-center text-label-md text-gray-800;
                 gap: 0.25rem;
+                .selected-item-text {
+                    @apply font-medium;
+                }
                 .tags-wrapper {
                     @apply flex flex-wrap;
                     gap: 0.5rem;
@@ -394,19 +395,17 @@ watch(() => props.disabled, (disabled) => {
         width: 100%;
     }
 
-    /* style type - rounded */
     &.rounded {
         .dropdown-button {
             @apply border-gray-200 rounded-xl;
         }
-        &.selected:not(.disabled, .readonly, .invalid) {
+        &.selected:not(.disabled, .readonly, .invalid, .selection-highlight) {
             .dropdown-button {
                 @apply border-gray-400;
             }
         }
     }
 
-    /* hover */
     &:not(.disabled, .readonly, .invalid):hover {
         .dropdown-button {
             @apply border-secondary;
@@ -419,6 +418,11 @@ watch(() => props.disabled, (disabled) => {
                 .dropdown-button {
                     @apply border-gray-400;
                 }
+                &.selection-highlight {
+                    .dropdown-button {
+                        @apply bg-blue-200 border-blue-300;
+                    }
+                }
             }
         }
         &.selection-highlight {
@@ -428,7 +432,6 @@ watch(() => props.disabled, (disabled) => {
         }
     }
 
-    /* context menu opened */
     &.opened {
         .dropdown-button {
             @apply border-secondary;
@@ -446,6 +449,14 @@ watch(() => props.disabled, (disabled) => {
             &.selected {
                 .dropdown-button {
                     @apply border-gray-400;
+                }
+                &.selection-highlight {
+                    .dropdown-button {
+                        @apply bg-blue-100 border-blue-300;
+                    }
+                    .arrow-button {
+                        @apply text-secondary;
+                    }
                 }
             }
         }
@@ -501,7 +512,6 @@ watch(() => props.disabled, (disabled) => {
         }
     }
 
-    /* Selection Highlight */
     &.selection-highlight {
         .dropdown-button {
             @apply bg-blue-100 border-blue-300;
