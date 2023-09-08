@@ -44,5 +44,5 @@ export interface Legend {
 export type RelativePeriod = {
     unit: OpUnitType;
     value: number;
-    exclude_today: boolean;
+    include_today: boolean;
 };
