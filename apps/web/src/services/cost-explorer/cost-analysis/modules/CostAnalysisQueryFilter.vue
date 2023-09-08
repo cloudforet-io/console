@@ -83,6 +83,7 @@ onClickOutside(contextMenuRef, hideContextMenu);
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
     costAnalysisPageStore.$patch({ granularity });
+    state.paramsForSelectedPeriod = { granularity };
 };
 const handleSaveQuerySet = async () => {
     try {

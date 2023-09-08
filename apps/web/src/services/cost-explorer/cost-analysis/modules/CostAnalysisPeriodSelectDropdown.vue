@@ -7,7 +7,7 @@ import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import { isEqual, range } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -20,18 +20,28 @@ import {
 import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Granularity, Period } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
 const today = dayjs.utc();
 interface PeriodItem extends SelectDropdownMenu {
-    period: {
+    period?: {
         start: string
         end: string;
     };
     relativePeriod?: RelativePeriod;
 }
+
+export interface ParamsForSelectedPeriod {
+    relativePeriod?: RelativePeriod;
+    period?: Period;
+    granularity?: Granularity;
+}
+
+const props = defineProps<{
+    paramsForSelectedPeriod?: ParamsForSelectedPeriod;
+}>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -112,6 +122,38 @@ const state = reactive({
 });
 
 /* Util */
+const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
+const setSelectedItemByOptions = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
+    console.log('setSelectedItemByOptions', { relativePeriod, period, granularity });
+    if (!relativePeriod && !period && granularity) {
+        const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
+        costAnalysisPageStore.$patch((_state) => {
+            _state.period = defaultPeriod;
+            _state.relativePeriod = defaultRelativePeriod;
+        });
+        if (granularity === GRANULARITY.DAILY) {
+            state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
+        } else {
+            console.log('어때', getPeriodItemNameByRelativePeriod(defaultRelativePeriod), defaultRelativePeriod);
+            state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
+        }
+        return;
+    }
+    if (granularity) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.granularity = granularity;
+        });
+    }
+    if (relativePeriod) {
+        console.log('setSelectedItemByOptions', getPeriodItemNameByRelativePeriod(relativePeriod), relativePeriod);
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(relativePeriod);
+    } else if (granularity === GRANULARITY.DAILY) {
+        const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item) => isEqual(item.period, period));
+        state.selectedPeriod = selectedPeriodItem?.name;
+    } else {
+        state.selectedPeriod = 'custom';
+    }
+};
 const setPeriodMenuItemWithPeriod = (period?: Period) => {
     const start = dayjs.utc(period?.start).format('YYYY-MM');
     const end = dayjs.utc(period?.end).format('YYYY-MM');
@@ -143,19 +185,32 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
-watch(() => costAnalysisPageState.granularity, (granularity) => {
-    const [period, relativePeriod] = initiatePeriodByGranularity(granularity);
-    costAnalysisPageStore.$patch((_state) => {
-        _state.period = period;
-        _state.relativePeriod = relativePeriod;
+// watch(() => costAnalysisPageState.granularity, (granularity) => {
+//     const [period, relativePeriod] = initiatePeriodByGranularity(granularity);
+//     costAnalysisPageStore.$patch((_state) => {
+//         _state.period = period;
+//         _state.relativePeriod = relativePeriod;
+//     });
+//     if (granularity === GRANULARITY.DAILY) {
+//         state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
+//     } else if (granularity === GRANULARITY.MONTHLY) {
+//         state.selectedPeriod = 'last6Month';
+//     } else {
+//         state.selectedPeriod = 'thisYear';
+//     }
+// });
+watch(() => props.paramsForSelectedPeriod, (params) => {
+    if (params) setSelectedItemByOptions(params);
+});
+
+watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuery) => {
+    setSelectedItemByOptions({
+        relativePeriod: selectedQuery?.options?.relative_period,
+        period: selectedQuery?.options?.period,
+        granularity: selectedQuery?.options?.granularity,
     });
-    if (granularity === GRANULARITY.DAILY) {
-        state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
-    } else if (granularity === GRANULARITY.MONTHLY) {
-        state.selectedPeriod = 'last6Month';
-    } else {
-        state.selectedPeriod = 'thisYear';
-    }
+}, {
+    immediate: true,
 });
 watch(() => costAnalysisPageState.period, (period) => {
     if (period && !costAnalysisPageState.relativePeriod) {
