@@ -49,43 +49,42 @@ const state = reactive({
                 start: start.format('YYYY-MM'),
                 end: end.format('YYYY-MM'),
             },
-            enabled: [GRANULARITY.DAILY],
         };
     }))),
-    monthlyPeriodItems: computed(() => ([
+    monthlyPeriodItems: computed<PeriodItem[]>(() => ([
         {
             name: 'thisMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
-            relativePeriod: { unit: 'month', value: 0 },
+            relativePeriod: { unit: 'month', value: 0, include_today: true },
         },
         {
             name: 'lastMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
-            relativePeriod: { unit: 'month', value: 1, exclude_today: true },
+            relativePeriod: { unit: 'month', value: 1, include_today: false },
         },
         {
             name: 'last3Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
-            relativePeriod: { unit: 'month', value: 2 },
+            relativePeriod: { unit: 'month', value: 2, include_today: true },
         },
         {
             name: 'last6Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
-            relativePeriod: { unit: 'month', value: 5 },
+            relativePeriod: { unit: 'month', value: 5, include_today: true },
         }])),
-    yearlyPeriodItems: computed(() => ([
+    yearlyPeriodItems: computed<PeriodItem[]>(() => ([
         {
             name: 'thisYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_YEAR'),
-            relativePeriod: { unit: 'year', value: 0 },
+            relativePeriod: { unit: 'year', value: 0, include_today: true },
         },
         {
             name: 'lastYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_YEAR'),
-            relativePeriod: { unit: 'year', value: 1, exclude_today: true },
+            relativePeriod: { unit: 'year', value: 1, include_today: false },
         },
     ])),
-    allPeriodItems: computed(() => ([
+    allPeriodItems: computed<PeriodItem[]>(() => ([
         ...state.dailyPeriodItems,
         ...state.monthlyPeriodItems,
         ...state.yearlyPeriodItems,
