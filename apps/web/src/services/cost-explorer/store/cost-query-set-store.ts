@@ -32,6 +32,10 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
     },
     actions: {
         async listCostQuerySets(): Promise<void> {
+            if (!this.selectedDataSourceId) {
+                this.costQuerySetList = [...managedCostQuerySets];
+                return;
+            }
             try {
                 const { status, response } = await fetcher({
                     data_source_id: this.selectedDataSourceId,
@@ -39,7 +43,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
                         filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
                     },
                 });
-                if (status === 'succeed') {
+                if (status === 'succeed' && response?.results) {
                     this.costQuerySetList = [...managedCostQuerySets, ...response.results];
                 } else {
                     this.costQuerySetList = [...managedCostQuerySets];
