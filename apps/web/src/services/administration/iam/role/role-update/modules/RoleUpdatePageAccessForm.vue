@@ -45,15 +45,11 @@ import {
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
-import { store } from '@/store';
-
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
-import config from '@/lib/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
@@ -165,10 +161,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const allowedDomainIds = Array.isArray(config.get('DASHBOARD_ENABLED')) ? config.get('DASHBOARD_ENABLED') : [];
-        const currentDomainId = store.state.domain.domainId;
-        const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
-
         const formState = reactive({
             menuItems: getPageAccessMenuList([{
                 id: 'all',
@@ -176,12 +168,7 @@ export default {
                 isViewed: false,
                 isManaged: false,
                 hideMenu: false,
-            }]).filter((menu) => {
-                if (menu.id === MENU_ID.DASHBOARDS) {
-                    return isDashboardMenuEnabled;
-                }
-                return true;
-            }),
+            }]),
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
