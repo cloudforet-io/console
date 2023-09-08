@@ -28,8 +28,8 @@
                             >
                                 {{ label }}
                             </div>
-                            <beta-mark v-if="isBeta" />
-                            <new-mark v-if="isNew" />
+                            <beta-mark v-if="higlightTag === 'beta'" />
+                            <new-mark v-else-if="higlightTag === 'new'" />
                         </div>
                         <div class="contents-right">
                             <slot name="extra-mark" />
@@ -51,6 +51,8 @@ import type { Route } from 'vue-router';
 
 import { PI, PTooltip } from '@spaceone/design-system';
 
+import type { HighlightTagType } from '@/store/modules/display/type';
+
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
@@ -59,9 +61,8 @@ interface Props {
     label: string|undefined|TranslateResult;
     to?: Route;
     href?: string;
-    isBeta?: boolean;
-    isNew?: boolean;
     isDraggable?: boolean;
+    higlightTag?: HighlightTagType;
 }
 
 export default defineComponent<Props>({
@@ -86,13 +87,9 @@ export default defineComponent<Props>({
             type: String as PropType<string|undefined|TranslateResult>,
             default: '',
         },
-        isBeta: {
-            type: Boolean,
-            default: false,
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
+        higlightTag: {
+            type: String as PropType<HighlightTagType>,
+            default: undefined,
         },
         isDraggable: {
             type: Boolean,
