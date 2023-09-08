@@ -136,7 +136,7 @@ const state = reactive({
     <router-link :to="state.linkLocation"
                  class="budget-list-card"
     >
-        <div v-if="budgetLoading"
+        <div v-if="props.budgetLoading"
              class="skeleton-wrapper"
         >
             <div class="top">
@@ -177,7 +177,7 @@ const state = reactive({
                     </span>
                 </div>
                 <p class="budget-name">
-                    {{ budgetUsage.name }}
+                    {{ props.budgetUsage.name }}
                 </p>
             </div>
             <p-divider />
