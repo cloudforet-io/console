@@ -213,6 +213,7 @@ export default defineComponent<Props>({
             height: 100%;
 
             .mark {
+                text-transform: none;
                 height: 1.5rem;
                 line-height: normal;
             }
