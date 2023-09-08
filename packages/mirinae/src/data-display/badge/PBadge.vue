@@ -1,106 +1,86 @@
-<template>
-    <span class="p-badge"
-          :class="[`badge-${shape}`, ...badgeClassList]"
-          :style="[inlineStyles]"
-    >
-        <slot />
-    </span>
-</template>
-
-<script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
-import type { PropType } from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 
 import { get } from 'lodash';
 
-import type { BadgeProps, BadgeStyleType, BadgeType } from '@/data-display/badge/type';
+import type { BadgeStyleType, BadgeType, BadgeShape } from '@/data-display/badge/type';
 import { BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
 
 import colors from '@/styles/colors.cjs';
 
-export default defineComponent<BadgeProps>({
-    name: 'PBadge',
-    props: {
-        badgeType: {
-            type: String as PropType<BadgeType>,
-            default: BADGE_TYPE.SOLID,
-        },
-        styleType: {
-            type: String as PropType<BadgeStyleType>,
-            default: 'primary',
-        },
-        textColor: {
-            type: String,
-            default: undefined,
-        },
-        backgroundColor: {
-            type: String,
-            default: undefined,
-        },
-        outlineColor: {
-            type: String,
-            default: undefined,
-        },
-        shape: {
-            type: String,
-            default: BADGE_SHAPE.ROUND,
-        },
-    },
-    setup(props: BadgeProps) {
-        const state = reactive({
-            badgeClassList: computed<string[]>(() => {
-                if (!props.backgroundColor || !props.textColor) {
-                    return [`badge-${props.badgeType}`, `badge-${props.styleType}`];
-                }
-                return [];
-            }),
-            inlineStyles: computed(() => {
-                // custom case
-                if (props.backgroundColor || props.textColor || props.outlineColor) {
-                    const inlineStyle = {} as {[prop: string]: string};
-                    if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
-                    if (props.textColor) inlineStyle.color = getColor(props.textColor);
-                    if (props.outlineColor) {
-                        inlineStyle.borderColor = getColor(props.outlineColor);
-                        inlineStyle.borderWidth = '1px';
-                    }
-                    return inlineStyle;
-                }
-                // static case
-                const styleTypeNum = props.styleType.match(/\d{3}/)?.[0];
-                let badgeColor = getColor(props.styleType);
-                if (styleTypeNum) {
-                    // coral600 -> coral[600]
-                    const colStr = props.styleType.match(/[a-z]+/)?.[0];
-                    const color = get(colors, `${colStr}[${styleTypeNum}]`);
-                    if (color) badgeColor = color;
-                }
-                if (props.badgeType === BADGE_TYPE.SOLID) {
-                    return {
-                        backgroundColor: badgeColor,
-                        color: getColor('white'),
-                    };
-                } if (props.badgeType === BADGE_TYPE.SOLID_OUTLINE) {
-                    return {
-                        backgroundColor: getColor('white'),
-                        color: badgeColor,
-                        borderColor: badgeColor,
-                        borderWidth: '1px',
-                    };
-                }
-                return [];
-            }),
-        });
+export interface BadgeProps {
+    badgeType: BadgeType;
+    styleType: BadgeStyleType;
+    textColor?: string;
+    backgroundColor?: string;
+    outlineColor?: string;
+    shape: BadgeShape;
+}
 
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<BadgeProps>(), {
+    badgeType: BADGE_TYPE.SOLID,
+    styleType: 'primary',
+    textColor: undefined,
+    backgroundColor: undefined,
+    outlineColor: undefined,
+    shape: BADGE_SHAPE.ROUND,
+});
+
+const state = reactive({
+    badgeClassList: computed<string[]>(() => {
+        if (!props.backgroundColor || !props.textColor) {
+            return [`badge-${props.badgeType}`, `badge-${props.styleType}`];
+        }
+        return [];
+    }),
+    inlineStyles: computed(() => {
+        // custom case
+        if (props.backgroundColor || props.textColor || props.outlineColor) {
+            const inlineStyle = {} as {[prop: string]: string};
+            if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
+            if (props.textColor) inlineStyle.color = getColor(props.textColor);
+            if (props.outlineColor) {
+                inlineStyle.borderColor = getColor(props.outlineColor);
+                inlineStyle.borderWidth = '1px';
+            }
+            return inlineStyle;
+        }
+        // static case
+        const styleTypeNum = props.styleType.match(/\d{3}/)?.[0];
+        let badgeColor = getColor(props.styleType);
+        if (styleTypeNum) {
+            // coral600 -> coral[600]
+            const colStr = props.styleType.match(/[a-z]+/)?.[0];
+            const color = get(colors, `${colStr}[${styleTypeNum}]`);
+            if (color) badgeColor = color;
+        }
+        if (props.badgeType === BADGE_TYPE.SOLID) {
+            return {
+                backgroundColor: badgeColor,
+                color: getColor('white'),
+            };
+        } if (props.badgeType === BADGE_TYPE.SOLID_OUTLINE) {
+            return {
+                backgroundColor: getColor('white'),
+                color: badgeColor,
+                borderColor: badgeColor,
+                borderWidth: '1px',
+            };
+        }
+        return [];
+    }),
 });
 </script>
+
+<template>
+    <span class="p-badge"
+          :class="[`badge-${props.shape}`, ...state.badgeClassList]"
+          :style="[state.inlineStyles]"
+    >
+        <slot />
+    </span>
+</template>
 
 <style lang="postcss">
 .p-badge {
