@@ -32,6 +32,8 @@ export const useBreadcrumbs = () => {
                     location.path = path;
                 }
 
+                const copiable = typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable;
+
                 if (d.meta.breadcrumbs && typeof d.meta.breadcrumbs === 'function') {
                     const breadcrumbsFunctionResults = d.meta.breadcrumbs(vm.$route);
                     results.push(...breadcrumbsFunctionResults);
@@ -43,14 +45,14 @@ export const useBreadcrumbs = () => {
                             results.push({
                                 name: labelResult,
                                 to: location,
-                                copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                                copiable,
                             });
                         }
                     } else {
                         results.push({
                             name: label,
                             to: location,
-                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                            copiable,
                         });
                     }
                 } else if (d.meta.translationId) {
@@ -61,14 +63,14 @@ export const useBreadcrumbs = () => {
                             results.push({
                                 name: i18n.t(translationIdResult),
                                 to: location,
-                                copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                                copiable,
                             });
                         }
                     } else {
                         results.push({
                             name: i18n.t(translationId),
                             to: location,
-                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                            copiable,
                         });
                     }
                 } else if (d.meta.menuId) {
@@ -77,7 +79,7 @@ export const useBreadcrumbs = () => {
                         results.push({
                             name: i18n.t(menuInfo.translationId),
                             to: location,
-                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                            copiable,
                         });
                     }
                 }
