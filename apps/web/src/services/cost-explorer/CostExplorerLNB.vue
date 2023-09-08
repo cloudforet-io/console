@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PI, PCollapsibleToggle, PSelectDropdown, PLazyImg,
@@ -10,8 +10,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -27,7 +25,6 @@ import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
@@ -52,7 +49,6 @@ const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
 const allReferenceStore = useAllReferenceStore();
 
-const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
@@ -214,44 +210,6 @@ onMounted(() => {
         relocateNotificationState.isShow = true;
     }
 });
-
-onUnmounted(() => {
-    costQuerySetStore.$dispose();
-    costQuerySetStore.$reset();
-});
-
-watch(() => route.params, async (params) => {
-    // Case - Directly access Budget Page
-    if (!costQuerySetState.selectedDataSourceId) {
-        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
-        try {
-            const { status, response } = await fetcher({
-                query: {
-                    only: ['data_source_id'],
-                },
-            });
-            if (status === 'succeed') {
-                const dataSourceId = response.results[0].data_source_id;
-                costQuerySetStore.$patch({
-                    selectedDataSourceId: dataSourceId,
-                });
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    }
-
-    /*
-    * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
-    * */
-    if (params.dataSourceId && params.costQuerySetId) {
-        costQuerySetStore.$patch({
-            selectedDataSourceId: params.dataSourceId,
-            selectedQuerySetId: params.costQuerySetId,
-        });
-    }
-    await costQuerySetStore.listCostQuerySets();
-}, { immediate: true });
 
 </script>
 

@@ -103,7 +103,6 @@ watch(() => route.params, async (after, before) => {
 
     // init states
     if (props.costQuerySetId) {
-        await costAnalysisPageStore.getCostQueryList();
         const { name, options } = getQueryWithKey(props.costQuerySetId);
         if (name) {
             setQueryOptions(options);

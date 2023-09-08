@@ -39,7 +39,7 @@ const costExplorerRoutes: RouteConfig = {
                         if (to.params.dataSourceId && to.params.costQuerySetId) {
                             next();
                         } else {
-                            const { results } = await SpaceConnector.client.costAnalysis.dataSource.list();
+                            const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
                             next({
                                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                                 params: {
