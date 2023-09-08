@@ -29,9 +29,6 @@ import type {
 import {
     GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
-import {
-    getConvertedFilter,
-} from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
     CostAnalyzeResponse,
@@ -66,7 +63,7 @@ const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRa
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
-        analyzeApiQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
+        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,

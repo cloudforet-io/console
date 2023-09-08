@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, useElementSize } from '@vueuse/core';
 import { computed, reactive, ref } from 'vue';
 
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, useContextMenuController,
+    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover,
+    useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -17,6 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
+import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
@@ -29,8 +31,10 @@ const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-a
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const filtersPopperRef = ref<any|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
+const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const state = reactive({
     queryFormModalVisible: false,
     granularityItems: computed<MenuItem[]>(() => ([
@@ -59,6 +63,7 @@ const state = reactive({
         },
     ])),
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId as string)),
+    filtersPopoverVisible: false,
 });
 
 const {
@@ -106,18 +111,40 @@ const handleUpdateQuery = (updatedQueryId: string) => {
     costAnalysisPageStore.getCostQueryList();
     costAnalysisPageStore.selectQueryId(updatedQueryId);
 };
+const handleClickFilter = () => {
+    state.filtersPopoverVisible = !state.filtersPopoverVisible;
+};
 </script>
 
 <template>
     <div class="cost-analysis-query-filter">
-        <div class="filter-wrapper">
+        <div class="filter-wrapper"
+             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
+        >
             <div class="left-part">
                 <p-select-dropdown :items="state.granularityItems"
                                    :selected="costAnalysisPageState.granularity"
-                                   class="granularity-select-dropdown"
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown />
+                <p-popover :is-visible="state.filtersPopoverVisible"
+                           ignore-outside-click
+                           trigger="click"
+                           relative-style
+                           position="bottom-start"
+                >
+                    <p-button style-type="tertiary"
+                              icon-left="ic_filter"
+                              @click="handleClickFilter"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
+                    </p-button>
+                    <template #content>
+                        <cost-analysis-filters-popper ref="filtersPopperRef"
+                                                      class="filters-popper"
+                        />
+                    </template>
+                </p-popover>
             </div>
             <div class="right-part">
                 <template v-if="!state.isManagedQuerySet">
@@ -166,19 +193,18 @@ const handleUpdateQuery = (updatedQueryId: string) => {
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
     .filter-wrapper {
+        position: relative;
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
         .left-part {
             display: flex;
-            align-items: center;
-            .granularity-select-dropdown {
-                margin-right: 0.5rem;
-            }
+            align-items: flex-start;
+            gap: 0.5rem;
         }
         .right-part {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
 
             .save-button {
                 border-top-right-radius: 0;
@@ -198,6 +224,19 @@ const handleUpdateQuery = (updatedQueryId: string) => {
                     min-width: 9rem;
                 }
             }
+        }
+
+        /* custom design-system component - p-popover */
+        :deep(.p-popover) {
+            .popper {
+                width: 100%;
+                max-width: 100%;
+                left: 2rem;
+                transform: translate(0, 3rem) !important;
+            }
+        }
+        .filters-popper {
+            width: 100%;
         }
     }
 }

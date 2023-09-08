@@ -55,14 +55,14 @@ const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (c
 
 let unregisterStoreWatch;
 const registerStoreWatch = (currentQuery) => {
-    unregisterStoreWatch = watch(() => costAnalysisPageState, (options: Partial<CostQuerySetOption>) => {
+    unregisterStoreWatch = watch(() => costAnalysisPageState, () => {
         if (props.costQuerySetId) return;
 
         const newQuery: CostAnalysisPageUrlQuery = {
-            granularity: primitiveToQueryString(options.granularity),
-            group_by: arrayToQueryString(options.group_by),
-            period: objectToQueryString(options.period),
-            filters: objectToQueryString(options.filters),
+            granularity: primitiveToQueryString(costAnalysisPageState.granularity),
+            group_by: arrayToQueryString(costAnalysisPageState.groupBy),
+            period: objectToQueryString(costAnalysisPageState.period),
+            filters: objectToQueryString(costAnalysisPageStore.filters),
         };
 
 
