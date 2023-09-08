@@ -3,19 +3,22 @@ import { computed, reactive } from 'vue';
 
 import { get } from 'lodash';
 
-import type { BadgeStyleType, BadgeType, BadgeShape } from '@/data-display/badge/type';
-import { BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
+import type {
+    BadgeShape, BadgeStyleType, BadgeType, BadgeFontWeight,
+} from '@/data-display/badge/type';
+import { BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
 
 import colors from '@/styles/colors.cjs';
 
-export interface BadgeProps {
-    badgeType: BadgeType;
-    styleType: BadgeStyleType;
+interface BadgeProps {
+    badgeType?: BadgeType;
+    styleType?: BadgeStyleType;
     textColor?: string;
     backgroundColor?: string;
     outlineColor?: string;
-    shape: BadgeShape;
+    shape?: BadgeShape;
+    fontWeight?: BadgeFontWeight;
 }
 
 const props = withDefaults(defineProps<BadgeProps>(), {
@@ -25,6 +28,7 @@ const props = withDefaults(defineProps<BadgeProps>(), {
     backgroundColor: undefined,
     outlineColor: undefined,
     shape: BADGE_SHAPE.ROUND,
+    fontWeight: BADGE_FONT_WEIGHT.REGULAR,
 });
 
 const state = reactive({
@@ -75,7 +79,7 @@ const state = reactive({
 
 <template>
     <span class="p-badge"
-          :class="[`badge-${props.shape}`, ...state.badgeClassList]"
+          :class="[`badge-${props.shape}`, ...state.badgeClassList, props.fontWeight]"
           :style="[state.inlineStyles]"
     >
         <slot />
@@ -102,6 +106,9 @@ const state = reactive({
     }
     &.badge-square {
         @apply rounded-md;
+    }
+    &.medium {
+        @apply font-medium;
     }
 
     @define-mixin subtle $theme, $bg-color, $text-color {
