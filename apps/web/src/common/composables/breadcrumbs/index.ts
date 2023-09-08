@@ -39,22 +39,46 @@ export const useBreadcrumbs = () => {
                     const label = d.meta.label;
                     if (typeof label === 'function') {
                         const labelResult = label(vm.$route);
-                        if (labelResult) results.push({ name: labelResult, to: location, copiable: d.meta.copiable });
+                        if (labelResult) {
+                            results.push({
+                                name: labelResult,
+                                to: location,
+                                copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                            });
+                        }
                     } else {
-                        results.push({ name: label, to: location, copiable: d.meta.copiable });
+                        results.push({
+                            name: label,
+                            to: location,
+                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                        });
                     }
                 } else if (d.meta.translationId) {
                     const translationId = d.meta.translationId;
                     if (typeof translationId === 'function') {
                         const translationIdResult = translationId(vm.$route);
-                        if (translationIdResult) results.push({ name: i18n.t(translationIdResult), to: location, copiable: d.meta.copiable });
+                        if (translationIdResult) {
+                            results.push({
+                                name: i18n.t(translationIdResult),
+                                to: location,
+                                copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                            });
+                        }
                     } else {
-                        results.push({ name: i18n.t(translationId), to: location, copiable: d.meta.copiable });
+                        results.push({
+                            name: i18n.t(translationId),
+                            to: location,
+                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                        });
                     }
                 } else if (d.meta.menuId) {
                     const menuInfo = MENU_INFO_MAP[d.meta.menuId];
                     if (menuInfo) {
-                        results.push({ name: i18n.t(menuInfo.translationId), to: location, copiable: d.meta.copiable });
+                        results.push({
+                            name: i18n.t(menuInfo.translationId),
+                            to: location,
+                            copiable: typeof d.meta.copiable === 'function' ? d.meta.copiable(vm.$route) : d.meta.copiable,
+                        });
                     }
                 }
 
