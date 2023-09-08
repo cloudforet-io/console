@@ -104,7 +104,7 @@ const tableState = reactive({
             };
         }
         return {
-            name: d.replace('.', '_'), // tags.Name -> tags_Name
+            name: d.split('.')[1], // tags.Name -> Name
             label: d.split('.')[1], // tags.Name -> Name
             sortable: false,
         };
