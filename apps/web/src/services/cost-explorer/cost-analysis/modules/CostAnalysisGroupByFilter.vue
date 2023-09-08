@@ -77,6 +77,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = [addedGroupByName, ..._state.groupBy];
+            _state.chartGroupBy = addedGroupByName;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
@@ -95,7 +96,8 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: b
             return;
         }
         costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.concat(selectedItem.name as string);
+            _state.groupBy = [selectedItem.name as string, ..._state.groupBy];
+            _state.chartGroupBy = selectedItem.name;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
