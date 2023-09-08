@@ -83,7 +83,6 @@ export default {
                     selectedQuerySetId: params.costQuerySetId,
                 });
             }
-            console.debug('[Cost Explorer]', costQuerySetState.selectedDataSourceId);
             await costQuerySetStore.listCostQuerySets();
         }, { immediate: true });
 
