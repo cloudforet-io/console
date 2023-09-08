@@ -66,6 +66,12 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
     return { results: results ? results.map((d) => ({ name: `tags.${d.key}`, label: d.name })) : [] };
 };
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
+const setSelectedTagsMenu = (groupBy?: string[]) => {
+    if (!groupBy) return;
+    state.selectedTagsMenu = groupBy
+        .filter((d) => d.startsWith('tags.'))
+        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+};
 
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
@@ -112,10 +118,7 @@ const handleClearTagsGroupBy = () => {
 };
 
 watch(() => costAnalysisPageState.groupBy, (groupBy) => {
-    if (!groupBy) return;
-    state.selectedTagsMenu = groupBy
-        .filter((d) => d.startsWith('tags.'))
-        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+    setSelectedTagsMenu(groupBy);
 });
 </script>
 
