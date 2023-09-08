@@ -25,7 +25,7 @@ import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modu
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
-    CostQuerySetModel, CostQuerySetOption, Granularity,
+    CostQuerySetModel, Granularity,
 } from '@/services/cost-explorer/type';
 
 
@@ -39,12 +39,12 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 /* util */
-const setQueryOptions = (options?: CostQuerySetOption) => {
+const setQueryOptions = (options?: CostQuerySetModel['options']) => {
     if (options) costAnalysisPageStore.setQueryOptions(options);
     else costAnalysisPageStore.initState();
 };
 
-const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
+const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
     granularity: queryStringToString(urlQuery.granularity) as Granularity,
     group_by: queryStringToArray(urlQuery.group_by),
     period: queryStringToObject(urlQuery.period) ?? {},

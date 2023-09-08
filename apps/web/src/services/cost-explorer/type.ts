@@ -15,7 +15,7 @@ export type Filter = typeof FILTER[keyof typeof FILTER];
 
 export type CostFiltersMap = Record<string, ConsoleFilter[]>;
 
-export interface CostQuerySetOption {
+interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
     period?: Period;
