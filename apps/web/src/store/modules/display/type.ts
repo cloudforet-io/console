@@ -5,12 +5,13 @@ import type { SidebarType } from '@/store/modules/display/config';
 
 import type { Menu } from '@/lib/menu/config';
 
+export type HighlightTagType = 'new' | 'beta' | 'update';
+
 export interface DisplayMenu extends Menu {
     show?: boolean;
     label: TranslateResult;
     icon?: string;
-    isNew?: boolean;
-    isBeta?: boolean;
+    highlightTag?: HighlightTagType;
     to: Location;
     subMenuList?: DisplayMenu[];
 }

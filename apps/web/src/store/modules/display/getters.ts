@@ -87,8 +87,7 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
         ...d,
         label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
-        isNew: menuInfo.isNew,
-        isBeta: menuInfo.isBeta,
+        highlightTag: menuInfo.highlightTag,
         to: { name: d.id },
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
     } as DisplayMenu;
