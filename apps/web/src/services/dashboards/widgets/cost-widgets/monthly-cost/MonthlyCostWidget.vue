@@ -54,7 +54,11 @@ const state = reactive({
     loading: true,
     data: null as Data|null,
     skeletons: [1, 2],
-    chartData: computed(() => getRefinedXYChartData(state.data)),
+    chartData: computed(() => getRefinedXYChartData(state.data, {
+        arrayDataKey: 'cost_sum',
+        categoryKey: DATE_FIELD_NAME,
+        valueKey: 'value',
+    })),
 });
 
 const dateState = reactive({
