@@ -26188,6 +26188,27 @@
                                 <name>MONTHLY_COST</name>
                                 <children>
                                     <concept_node>
+                                        <name>CURRENT_MONTH</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>DESC</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -26209,7 +26230,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>TOTAL_SPENT_IN</name>
+                                        <name>PREVIOUS_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
