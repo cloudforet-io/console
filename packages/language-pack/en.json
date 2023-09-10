@@ -1439,12 +1439,12 @@
 				"DESC": "Displays the top 200 highest budget usage during the selected period."
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"AVAILABLE": "available",
-				"BUDGETS": "Budgets",
+				"BUDGETED": "{count} budgeted",
+				"BUDGET_USAGE_IN": "budget usage in {period}",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
-				"EXCEEDED": "exceeded",
-				"TOTAL_BUDGET": "Total budget",
-				"TOTAL_BUDGET_USAGE_IN": "Total budget usage in {period}"
+				"EXCEED": "{value} exceed",
+				"LEFT": "{value} left",
+				"OUT_OF": "out of {value}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "

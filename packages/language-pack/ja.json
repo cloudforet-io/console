@@ -1439,12 +1439,12 @@
 				"DESC": "選択した期間中の予算使用量の上位 200 件を表示します。"
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"AVAILABLE": "使用可能",
-				"BUDGETS": "バジェット",
+				"BUDGETED": "",
+				"BUDGET_USAGE_IN": "{period}の予算使用額",
 				"DESC": "総コスト、予算、使用率とともに、総予算消費の概要を表示します。",
-				"EXCEEDED": "を超えました",
-				"TOTAL_BUDGET": "総予算",
-				"TOTAL_BUDGET_USAGE_IN": "{period}の予算使用額"
+				"EXCEED": "",
+				"LEFT": "",
+				"OUT_OF": ""
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "選択した期間中のプロジェクトごとの予算使用量と不足予測値を表示します。"
