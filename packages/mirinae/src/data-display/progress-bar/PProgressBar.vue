@@ -2,16 +2,25 @@
     <div class="progress-bar"
          :class="size"
     >
-        <label v-if="label || $scopedSlots.label" class="label">
+        <label v-if="label || $scopedSlots.label"
+               class="label"
+        >
             <slot name="label">
                 {{ label }}
             </slot>
         </label>
-        <div ref="backgroundBar" class="background-bar" />
-        <transition appear @before-appear="beforeEnter"
+        <div ref="backgroundBar"
+             class="background-bar"
+             :style="{ height }"
+        />
+        <transition appear
+                    @before-appear="beforeEnter"
                     @after-appear="enter"
         >
-            <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
+            <div ref="progressBar"
+                 class="tracker-bar"
+                 :style="progressBarStyle"
+            />
         </transition>
     </div>
 </template>
@@ -55,6 +64,10 @@ export default defineComponent<ProgressBarProps>({
             type: Boolean,
             default: false,
         },
+        height: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
@@ -66,6 +79,8 @@ export default defineComponent<ProgressBarProps>({
                 background: props.gradient ? linearGradientProperty
                     : (props.color ?? defaultTrackerBarColor),
                 transition: props.disableAnimation ? undefined : 'width 0.5s linear',
+                height: props.height,
+                marginTop: props.height ? `-${props.height}` : undefined,
             })),
         });
 

@@ -24,6 +24,7 @@ export const Template = (args,{argTypes})=>({
         :color="color"
         :gradient="gradient"
         :disable-animation="disableAnimation"
+        :height="height"
         :style="'width: 10rem;'"
     >
         <template #label>
@@ -120,6 +121,46 @@ export const Template = (args,{argTypes})=>({
                     :style="'width: 10rem;'"
                 />
             </div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Height
+<Canvas>
+    <Story name="Custom Height">
+        {{
+            components:{ PProgressBar },
+            template: `
+            <div style="display:flex; flex-direction: column; row-gap: 1.5rem;">
+                <p class="font-bold text-lg text-gray-600">Without custom height</p>
+                <div style="display:flex; flex-wrap: wrap; gap: 1rem;">
+                    <p-progress-bar v-for="size in sizes" :key="size" :size="size"
+                        :percentage="40"
+                        :label="size"
+                        :style="'width: 10rem;'"
+                    />
+                </div>
+                <p class="font-bold text-lg mt-4">With custom height - 1.5rem</p>
+                <div style="display:flex; flex-wrap: wrap; gap: 1rem;">
+                    <p-progress-bar v-for="size in sizes" :key="size" :size="size"
+                        :percentage="40"
+                        :label="size"
+                        height="1.5rem"
+                        :style="'width: 10rem;'"
+                    />
+                </div>
+            </div>`,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(PROGRESS_BAR_SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>
