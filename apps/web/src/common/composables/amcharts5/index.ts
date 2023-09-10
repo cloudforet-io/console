@@ -176,5 +176,8 @@ export const useAmcharts5 = (
         toggleSeries,
         hideAllSeries,
         showAllSeries,
+        // amcharts5 utils
+        percent: am5.percent,
+        color: am5.color,
     };
 };
