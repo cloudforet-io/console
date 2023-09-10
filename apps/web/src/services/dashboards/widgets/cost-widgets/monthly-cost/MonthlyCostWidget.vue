@@ -25,11 +25,10 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNe
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { XYChartData, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -41,7 +40,19 @@ const DATE_FIELD_NAME = 'date';
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-type Data = CostAnalyzeDataModel['results'];
+interface SubData {
+    date: string;
+    value: number;
+}
+interface Data {
+    cost_sum: SubData[];
+    _total_cost_sum: number;
+}
+type FullData = CostAnalyzeResponse<Data>;
+interface ChartData {
+    date: string;
+    value: number;
+}
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
@@ -52,9 +63,9 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 });
 const state = reactive({
     loading: true,
-    data: null as Data|null,
+    data: null as FullData|null,
     skeletons: [1, 2],
-    chartData: computed(() => getRefinedXYChartData(state.data, {
+    chartData: computed<ChartData[]>(() => getRefinedXYChartData<Data, ChartData>(state.data, {
         arrayDataKey: 'cost_sum',
         categoryKey: DATE_FIELD_NAME,
         valueKey: 'value',
@@ -99,8 +110,8 @@ const displayState = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<FullData> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     try {
         const { status, response } = await fetchCostAnalyze({
@@ -119,11 +130,14 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') return response;
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return {
+            results: [],
+        };
     }
-    return [];
 };
 
 /* Util */
@@ -137,7 +151,7 @@ const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
-const drawChart = (chartData: XYChartData[]) => {
+const drawChart = (chartData: ChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     const yRendered = yAxis.get('renderer');
@@ -176,7 +190,7 @@ const drawChart = (chartData: XYChartData[]) => {
     series.data.setAll(chartData);
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -185,7 +199,7 @@ const initWidget = async (data?: Data): Promise<Data> => {
     return state.data;
 };
 
-const refreshWidget = async (): Promise<Data> => {
+const refreshWidget = async (): Promise<FullData> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
@@ -210,7 +224,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });
