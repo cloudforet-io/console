@@ -104,6 +104,7 @@ const fetchData = async (): Promise<Data> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     try {
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.options.granularity,
                 start: widgetState.dateRange.start,
@@ -167,7 +168,7 @@ const drawChart = (chartData: XYChartData[]) => {
     });
 
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSingleTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
+    chartHelper.setXYSingleTooltipText(chart, tooltip, widgetState.currency);
     series.set('tooltip', tooltip);
     series.data.processor = chartHelper.createDataProcessor({
         dateFormat: DATE_FORMAT,
