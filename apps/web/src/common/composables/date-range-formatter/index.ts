@@ -25,6 +25,7 @@ export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
         end: computed<string>(() => state._end ?? currentDateRange.end),
         isStartEndTheSameMonth: computed(() => dateFormatter(state.start, 'M') === dateFormatter(state.end, 'M')),
         isStartEndTheSameYear: computed(() => dateFormatter(state.start, 'YYYY') === dateFormatter(state.end, 'YYYY')),
+        isEndThisMonth: computed<boolean>(() => dateFormatter(currentDateRange.end, 'M') === dateFormatter(state.end, 'M')),
     });
 
     const formattedDate = computed<string>(() => {
@@ -33,7 +34,8 @@ export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
 
         if (state.isStartEndTheSameYear) {
             if (state.isStartEndTheSameMonth) {
-                return `${dateFormatter(start, 'MMM')} ${dateFormatter(start, 'YYYY')}`;
+                if (state.isEndThisMonth) return `${dateFormatter(currentDateRange.end, 'MMM D, YYYY')}`;
+                return `${dateFormatter(start, 'MMM, YYYY')}`;
             }
 
             return `${dateFormatter(start, 'MMM')} ~ ${dateFormatter(end, 'MMM')} ${dateFormatter(end, 'YYYY')}`;
