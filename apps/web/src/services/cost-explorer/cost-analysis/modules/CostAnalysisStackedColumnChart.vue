@@ -5,11 +5,12 @@ import {
 
 import { color } from '@amcharts/amcharts5';
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
+import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
@@ -30,8 +31,8 @@ import type {
     Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity, Period } from '@/services/cost-explorer/type';
-import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 
 
 interface Props {
@@ -40,7 +41,7 @@ interface Props {
     currencyRates: CurrencyRates;
     //
     loading: boolean;
-    chart: null | any; // TODO: type
+    chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
     granularity: Granularity;
@@ -62,6 +63,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
 
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
@@ -71,7 +75,7 @@ const state = reactive({
 });
 
 /* Util */
-const drawChart = (period: Period) => {
+const drawChart = () => {
     let timeUnit: TimeUnit = 'month';
     if (props.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (props.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
@@ -79,7 +83,10 @@ const drawChart = (period: Period) => {
     const usdChartData = cloneDeep(props.chartData);
     state.usdChartData = usdChartData;
 
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(period));
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, {
+        min: dayjs.utc(costAnalysisPageState.period?.start).valueOf(),
+        max: dayjs.utc(costAnalysisPageState.period?.end).add(1, timeUnit).valueOf(),
+    });
     xAxis.get('baseInterval').timeUnit = timeUnit;
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
@@ -89,13 +96,15 @@ const drawChart = (period: Period) => {
         return text;
     });
 
-    props.legends.forEach((l) => {
-        const series = chartHelper.createXYColumnSeries(chart, {
-            name: l.label as string,
-            valueYField: l.name,
+    props.legends.forEach((legend) => {
+        const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
+            name: legend.label as string,
+            valueYField: legend.name,
             stacked: true,
             stroke: undefined,
-        });
+        };
+        if (legend.color) seriesSettings.fill = chartHelper.color(legend.color);
+        const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         chart.series.push(series);
 
         // set data processor
@@ -118,8 +127,9 @@ const drawChart = (period: Period) => {
         });
         const seriesColor = series.get('fill')?.toString();
         tooltip.label.adapters.add('text', (text, target) => {
-            if (target?.dataItem?.dataContext) {
-                let value = target.dataItem?.dataContext?.[l.name];
+            const dataContext = target?.dataItem?.dataContext;
+            if (dataContext) {
+                let value = dataContext[legend.name];
                 value = currencyMoneyFormatter(value, props.currency, undefined, true);
                 return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
@@ -139,11 +149,11 @@ const drawChart = (period: Period) => {
     return chart;
 };
 
-watch([() => chartContext.value, () => props.loading, () => props.period], async ([_chartContext, loading, period]) => {
-    if (_chartContext && !loading && !isEmpty(period)) {
+watch([() => chartContext.value, () => props.loading, () => props.chartData], async ([_chartContext, loading, chartData]) => {
+    if (_chartContext && !loading && chartData.length) {
         chartHelper.refreshRoot();
         await nextTick();
-        const chart = drawChart(period);
+        const chart = drawChart();
         emit('update:chart', chart);
     }
 }, { immediate: false });
