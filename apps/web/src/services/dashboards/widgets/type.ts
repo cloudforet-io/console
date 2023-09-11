@@ -55,19 +55,7 @@ export interface Legend {
     name: string;
     label?: string;
     color?: string;
-    disabled?: boolean;
-}
-
-export interface TreemapChartData {
-    name: string;
-    value?: any;
-    children: Array<{
-        [groupBy: string]: string | any;
-        cost_sum: number;
-        label?: string;
-        background_color?: string;
-        font_color?: string;
-    }>;
+    disabled?: boolean; // this is used only in widget data table
 }
 
 export interface PieChartData {
@@ -88,3 +76,8 @@ export const CHART_TYPE = Object.freeze({
     TABLE: 'TABLE',
 } as const);
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export interface CostAnalyzeResponse<Result> {
+    more?: boolean;
+    results: Result[];
+}

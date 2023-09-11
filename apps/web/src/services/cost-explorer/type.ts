@@ -1,7 +1,7 @@
-import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-
 
 
 export interface Period {
@@ -9,23 +9,18 @@ export interface Period {
     end?: string;
 }
 
-export interface FilterItem {
-    k: string | Filter;
-    v: string;
-    o: ConsoleFilterOperator;
-}
-
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
-export type CostFiltersMap = Record<Filter, FilterItem[]>;
+export type CostFiltersMap = Record<string, ConsoleFilter[]>;
 
 export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
-    period: Period;
-    filters?: CostFiltersMap;
+    period?: Period;
+    relative_period?: RelativePeriod;
+    filters?: ConsoleFilter[];
 }
 
 export interface CostQuerySetModel {
@@ -34,7 +29,7 @@ export interface CostQuerySetModel {
     options?: CostQuerySetOption;
 }
 
-export interface GroupByItem {
-    name: string;
-    label: string;
+export interface CostAnalyzeResponse<CostAnalyzeRawData> {
+    more?: boolean;
+    results: CostAnalyzeRawData[];
 }

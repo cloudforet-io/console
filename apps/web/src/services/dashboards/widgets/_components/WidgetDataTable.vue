@@ -5,10 +5,9 @@ import {
 } from '@spaceone/design-system';
 import { useResizeObserver } from '@vueuse/core';
 import bytes from 'bytes';
-import { cloneDeep, throttle } from 'lodash';
-import type { MaybeRef } from 'vue';
+import { throttle } from 'lodash';
 import {
-    defineProps, reactive, ref,
+    defineProps, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -28,11 +27,6 @@ import type {
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
 import type { Legend } from '@/services/dashboards/widgets/type';
-
-interface RowData {
-    rowIndex: number;
-    item: WidgetTableData | any;
-}
 
 interface Props {
     loading: boolean;
@@ -67,16 +61,14 @@ const props = withDefaults(defineProps<Props>(), {
     colorSet: () => [],
     disableEllipsis: false,
 });
-const emit = defineEmits<{(e: 'thisPage', value: number): void;
-    (e: 'legends', value: Legend[]): void;
+const emit = defineEmits<{(e: string, value: any): void;
     (e: 'toggle-legend', value: number): void;
-    (e: 'click-row', value: RowData): void;
+    (e: 'click-row', value: { rowIndex: number, item: WidgetTableData }): void;
 }>();
 const { t } = useI18n();
-
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
-    proxyLegend: useProxyValue('legends', props, emit),
+    disabledLegends: {} as Record<number, boolean>,
 });
 
 const labelRef = ref<HTMLElement[]|null>(null);
@@ -161,10 +153,9 @@ const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
         return (labelElement?.offsetWidth < labelElement?.scrollWidth);
     } return false;
 };
-
 const tableRef = ref<null|HTMLElement>(null);
 const tableWidth = ref<number>(0);
-useResizeObserver(tableRef as MaybeRef, throttle((entries) => {
+useResizeObserver(tableRef, throttle((entries) => {
     const entry = entries[0];
     const { width } = entry.contentRect;
     tableWidth.value = width;
@@ -176,17 +167,18 @@ const getTooltipContents = (item, field:Field):string => {
 };
 
 /* event */
-const handleClickLegend = (index) => {
+const handleClickLegend = (index: number) => {
     // if (props.printMode) return;
-    const _legends = cloneDeep(props.legends);
-    _legends[index].disabled = !_legends[index].disabled;
-    state.proxyLegend = _legends;
+    state.disabledLegends[index] = !state.disabledLegends[index];
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
     // if (props.printMode) return;
     emit('click-row', rowData);
 };
+watch(() => props.legends, () => {
+    state.disabledLegends = {};
+});
 </script>
 
 <template>
@@ -272,7 +264,7 @@ const handleClickRow = (rowData) => {
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
                                         <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : ''"
                                         >
                                             <div class="detail-item-wrapper">
                                                 <span ref="labelRef"

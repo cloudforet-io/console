@@ -6,6 +6,8 @@ import {
 import type { RouteLocationNormalized } from 'vue-router';
 
 
+import type { HighlightTagType } from '@/store/modules/display/type';
+
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
@@ -14,9 +16,8 @@ interface Props {
     label: string|undefined;
     to?: RouteLocationNormalized;
     href?: string;
-    isBeta?: boolean;
-    isNew?: boolean;
     isDraggable?: boolean;
+    higlightTag?: HighlightTagType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     isBeta: false,
     isNew: false,
     isDraggable: false,
+    higlightTag: undefined,
 });
 const emit = defineEmits<{(e: 'navigate'): void}>();
 const slots = useSlots();
@@ -76,8 +78,8 @@ const handleClickAnchor = (navigateFn, event: Event) => {
                         >
                             {{ label }}
                         </div>
-                        <beta-mark v-if="isBeta" />
-                        <new-mark v-if="isNew" />
+                        <beta-mark v-if="higlightTag === 'beta'" />
+                        <new-mark v-else-if="higlightTag === 'new'" />
                     </div>
                     <div class="contents-right">
                         <slot name="extra-mark" />

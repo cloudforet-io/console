@@ -1,19 +1,17 @@
 <script setup lang="ts">
+
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
-    groupBy, isEqual, sum, uniqWith,
+    isEqual, uniqWith,
 } from 'lodash';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { ComputedRef } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -24,54 +22,39 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
-import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+import type {
+    Data,
+    MapChartData,
+} from '@/services/dashboards/widgets/cost-widgets/cost-by-region/cost-by-region-data-hleper';
+import {
+    getRefinedMapChartData,
+} from '@/services/dashboards/widgets/cost-widgets/cost-by-region/cost-by-region-data-hleper';
+import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-type FullData = CostAnalyzeDataModel;
-interface CostDataByProvider {
-    [continent: string]: {
-        [provider: string]: number;
-    }
-}
-interface PieChartData {
-    category: string;
-    color: string;
-    provider: string;
-    value: number;
-    pieSettings: {
-        fill: string;
-        stroke: string;
-    }
-}
-interface MapChartData {
-    title: string;
-    continent_code?: string;
-    latitude: number;
-    longitude: number;
-    height: number;
-    width: number;
-    pieChartData: PieChartData[];
-}
+
+type FullData = CostAnalyzeResponse<Data>;
+
 
 const props = defineProps<WidgetProps>();
-const store = useStore();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
 
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    loading: true,
+    data: null as FullData | null,
     tableFields: computed<Field[]>(() => [
         {
             label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
@@ -83,91 +66,46 @@ const state = reactive({
             label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
-    legends: [] as Legend[],
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
-    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
+    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
     widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
         query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-});
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => props.allReferenceTypeInfo.provider.referenceMap as ProviderReferenceMap),
+    regions: computed<RegionReferenceMap>(() => props.allReferenceTypeInfo.region.referenceMap as RegionReferenceMap),
+});
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-/* Util */
-const getCostDataByProvider = (results: FullData['results']): CostDataByProvider => {
-    const data = results.map((d) => ({
-        ...d,
-        continent_code: storeState.regions[d.region_code]?.continent?.continent_code,
-    }));
-    const continentGroupBy = groupBy(data, 'continent_code');
-    const result = {};
-    Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
-        const providerGroupBy = groupBy(cItem, 'provider');
-        Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
-            if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => d.cost_sum));
-                if (result[continent]) result[continent][provider] = providerCost;
-                else result[continent] = { [provider]: providerCost };
-            }
-        });
-    });
-    return result;
-};
-const getRefinedMapChartData = (results?: FullData['results']): MapChartData[] => {
-    if (!results?.length) return [];
-    const costDataByProvider = getCostDataByProvider(results);
-    return Object.keys(costDataByProvider).map((continent) => ({
-        title: CONTINENT_INFO[continent]?.continent_label,
-        continent_code: CONTINENT_INFO[continent]?.continent_code,
-        latitude: CONTINENT_INFO[continent]?.latitude,
-        longitude: CONTINENT_INFO[continent]?.longitude,
-        width: 48,
-        height: 48,
-        pieChartData: Object.entries(costDataByProvider[continent]).map(([provider, cost]) => ({
-            category: storeState.providers[provider]?.label || provider,
-            color: storeState.providers[provider]?.color || '',
-            provider,
-            value: cost as number,
-            pieSettings: {
-                fill: storeState.providers[provider]?.color || '',
-                stroke: storeState.providers[provider]?.color || '',
-            },
-        })),
-    }));
-};
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
     try {
-        apiQueryHelper.setFilters(state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy, COST_GROUP_BY.PROVIDER],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -179,10 +117,11 @@ const fetchData = async (): Promise<FullData> => {
             },
         });
         if (status === 'succeed') return response;
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { results: [], more: false };
     }
-    return { results: [], more: false };
 };
 
 const drawChart = (chartData: MapChartData[]) => {
@@ -208,7 +147,7 @@ const drawChart = (chartData: MapChartData[]) => {
         });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, state.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency, props.currencyRates);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         return chartHelper.createBullet({
@@ -228,19 +167,17 @@ const drawChart = (chartData: MapChartData[]) => {
 const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -249,32 +186,20 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
-    state.data = undefined;
-    refreshWidget(thisPage);
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
+    state.data = null;
+    refreshWidget(_thisPage);
 };
-
-const handleRefresh = () => {
-    refreshWidget();
-};
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
-    ]);
-})();
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
         chartHelper.clearChildrenOfRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -290,7 +215,7 @@ defineExpose<WidgetExpose<FullData>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="cost-by-region"
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
@@ -315,14 +240,14 @@ defineExpose<WidgetExpose<FullData>>({
                     </span>
                 </div>
             </p-data-loader>
-            <widget-data-table v-model:legends="state.legends"
-                               :loading="state.loading"
+            <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
+                               :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :this-page="state.thisPage"
+                               :legends="state.legends"
+                               :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                @update:this-page="handleUpdateThisPage"
             />

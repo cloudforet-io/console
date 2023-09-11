@@ -1,20 +1,16 @@
 <script lang="ts" setup>
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
-import type { PropType } from 'vue';
 import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
-import config from '@/lib/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
@@ -105,26 +101,17 @@ const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType)
     return results;
 };
 
-const props = defineProps({
-    initialPagePermissions: {
-        type: Array as PropType<RawPagePermission[]>,
-        default: () => ([]),
-    },
-    roleType: {
-        type: String as PropType<RoleType>,
-        default: ROLE_TYPE.PROJECT,
-        validator(roleType: RoleType) {
-            return Object.values(ROLE_TYPE).includes(roleType);
-        },
-    },
+interface Props {
+    initialPagePermissions: RawPagePermission[];
+    roleType: RoleType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    initialPagePermissions: () => [],
+    roleType: ROLE_TYPE.PROJECT,
 });
 const emit = defineEmits(['update-form']);
-const store = useStore();
 const { t } = useI18n();
-
-const allowedDomainIds = Array.isArray(config.get('DASHBOARD_ENABLED')) ? config.get('DASHBOARD_ENABLED') : [];
-const currentDomainId = store.state.domain.domainId;
-const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
 
 const formState = reactive({
     menuItems: getPageAccessMenuList([{
@@ -133,12 +120,7 @@ const formState = reactive({
         isViewed: false,
         isManaged: false,
         hideMenu: false,
-    }]).filter((menu) => {
-        if (menu.id === MENU_ID.DASHBOARDS) {
-            return isDashboardMenuEnabled;
-        }
-        return true;
-    }),
+    }]),
 });
 const state = reactive({
     hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),

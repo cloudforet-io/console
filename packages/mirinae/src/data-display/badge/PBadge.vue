@@ -1,31 +1,34 @@
-<template>
-    <span class="p-badge"
-          :class="[`badge-${shape}`, ...state.badgeClassList]"
-          :style="[state.inlineStyles]"
-    >
-        <slot />
-    </span>
-</template>
-
 <script setup lang="ts">
 import { get } from 'lodash';
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
-
-import type { BadgeProps } from '@/data-display/badge/type';
-import { BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
+import type {
+    BadgeShape, BadgeStyleType, BadgeType, BadgeFontWeight,
+} from '@/data-display/badge/type';
+import { BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
 
 import colors from '@/styles/colors';
 
+interface BadgeProps {
+    badgeType?: BadgeType;
+    styleType?: BadgeStyleType;
+    textColor?: string;
+    backgroundColor?: string;
+    outlineColor?: string;
+    shape?: BadgeShape;
+    fontWeight?: BadgeFontWeight;
+}
+
 const props = withDefaults(defineProps<BadgeProps>(), {
     badgeType: BADGE_TYPE.SOLID,
     styleType: 'primary',
+    textColor: undefined,
+    backgroundColor: undefined,
+    outlineColor: undefined,
     shape: BADGE_SHAPE.ROUND,
+    fontWeight: BADGE_FONT_WEIGHT.REGULAR,
 });
-
 
 const state = reactive({
     badgeClassList: computed<string[]>(() => {
@@ -71,8 +74,16 @@ const state = reactive({
         return [];
     }),
 });
-
 </script>
+
+<template>
+    <span class="p-badge"
+          :class="[`badge-${props.shape}`, ...state.badgeClassList, props.fontWeight]"
+          :style="[state.inlineStyles]"
+    >
+        <slot />
+    </span>
+</template>
 
 <style lang="postcss">
 .p-badge {
@@ -94,6 +105,9 @@ const state = reactive({
     }
     &.badge-square {
         @apply rounded-md;
+    }
+    &.medium {
+        @apply font-medium;
     }
 
     @define-mixin subtle $theme, $bg-color, $text-color {

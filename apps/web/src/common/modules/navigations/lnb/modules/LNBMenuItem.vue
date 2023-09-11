@@ -7,6 +7,7 @@ import { useStore } from 'vuex';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
@@ -66,8 +67,9 @@ const handleSelect = (id: string, selected: string) => {
                 <slot name="title-right"
                       v-bind="props"
                 />
-                <new-mark v-if="item.isNew" />
-                <beta-mark v-if="item.isBeta" />
+                <new-mark v-if="item.hightlightTag === 'new'" />
+                <update-mark v-else-if="item.hightlightTag === 'update'" />
+                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
                 <span v-if="item.foldable"
                       class="toggle-button"
                       @click="handleFoldableToggle"

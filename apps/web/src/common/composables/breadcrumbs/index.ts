@@ -16,10 +16,12 @@ export const useBreadcrumbs = () => ({
         return matched.reduce((results, d) => {
             if (d.name === 'root') return results;
 
-            const location = {
+            const location: RouteLocationRaw = {
                 path: d.path,
                 params: route.params,
-            } as RouteLocationRaw;
+            };
+
+            const copiable = typeof d.meta.copiable === 'function' ? d.meta.copiable(route) : d.meta.copiable;
 
             if (d.meta.breadcrumbs && typeof d.meta.breadcrumbs === 'function') {
                 const breadcrumbsFunctionResults = d.meta.breadcrumbs(route);
@@ -28,24 +30,17 @@ export const useBreadcrumbs = () => ({
                 const label = d.meta.label;
                 if (typeof label === 'function') {
                     const labelResult = label(route);
-                    if (labelResult) results.push({ name: labelResult, to: location, copiable: d.meta.copiable });
-                } else {
-                    results.push({ name: label, to: location, copiable: d.meta.copiable });
-                }
+                    if (labelResult) results.push({ name: labelResult, to: location, copiable });
+                } else results.push({ name: label, to: location, copiable });
             } else if (d.meta.translationId) {
                 const translationId = d.meta.translationId;
                 if (typeof translationId === 'function') {
-                    const translationIdResult = translationId(route);
-                    // TODO: translationId's result can be an array of translationId, this need to be refactored
-                    if (translationIdResult && !Array.isArray(translationIdResult)) results.push({ name: i18n.global.t(translationIdResult), to: location, copiable: d.meta.copiable });
-                } else {
-                    results.push({ name: i18n.global.t(translationId), to: location, copiable: d.meta.copiable });
-                }
+                    const translationIdResult = translationId(route) as string;
+                    if (translationIdResult) results.push({ name: i18n.global.t(translationIdResult), to: location, copiable });
+                } else results.push({ name: i18n.global.t(translationId), to: location, copiable });
             } else if (d.meta.menuId) {
                 const menuInfo = MENU_INFO_MAP[d.meta.menuId];
-                if (menuInfo) {
-                    results.push({ name: i18n.global.t(menuInfo.translationId), to: location, copiable: d.meta.copiable });
-                }
+                if (menuInfo) results.push({ name: i18n.global.t(menuInfo.translationId), to: location, copiable });
             }
 
             return results;

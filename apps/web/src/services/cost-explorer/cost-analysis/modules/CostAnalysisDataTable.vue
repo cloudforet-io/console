@@ -4,6 +4,7 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
     PButtonModal, PI, PLink, PToolboxTable,
@@ -29,14 +30,23 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import type { CostAnalyzeModel } from '@/services/cost-explorer/cost-analysis/type';
+import { getRefinedChartTableData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import { getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import { getCancellableFetcher } from '@cloudforet/core-lib/src/space-connector/cancallable-fetcher';
+import type { CostAnalyzeResponse } from '@/services/cost-explorer/type';
 
+
+type CostAnalyzeRawData = {
+    [groupBy: string]: string | any;
+    cost_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+};
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -46,7 +56,7 @@ const store = useStore();
 
 const state = reactive({
     component: computed(() => PToolboxTable),
-    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period.start), dayjs.utc(costAnalysisPageState.period.end))),
+    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period?.start), dayjs.utc(costAnalysisPageState.period?.end))),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) return 'YYYY';
@@ -103,26 +113,27 @@ const tableState = reactive({
     })),
     costFields: [] as DataTableFieldType[],
     fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
-    items: [] as CostAnalyzeModel[],
-    totalCount: 0,
+    items: [] as CostAnalyzeRawData[],
+    more: false,
 });
 
 /* util */
-const getLink = (item: CostAnalyzeModel, fieldName: string) => {
+const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     const queryHelper = new QueryHelper();
     const query: LocationQueryRaw = {};
     if (item.region_code) {
         query.region = arrayToQueryString([item.region_code]);
-    } else if (costAnalysisPageState.filters.region_code?.length) {
+    } else if (costAnalysisPageState.filters?.region_code?.length) {
         query.region = arrayToQueryString(costAnalysisPageState.filters.region_code);
     }
     if (item.provider) {
         query.provider = primitiveToQueryString(item.provider);
-    } else if (costAnalysisPageState.filters.provider?.length) {
-        query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0].v);
+    } else if (costAnalysisPageState.filters?.provider?.length) {
+        query.provider = primitiveToQueryString(costAnalysisPageState.filters.provider[0]);
     }
 
-    const date = fieldName.split('.')[1]; // cost.2022-01-04
+    const dateIndex = Number(fieldName.split('.')[1]);
+    const date = item.cost_sum?.[dateIndex].date;
     const _period = { start: date, end: date };
     if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
         _period.start = dayjs.utc(date).format('YYYY-MM-01');
@@ -133,32 +144,26 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {
         filters.push({ k: 'project_id', v: item.project_id, o: '=' });
-    } else if (costAnalysisPageState.filters.project_id?.length) {
-        filters.push({ k: 'project_id', v: costAnalysisPageState.filters.project_id.map(({ v }) => v), o: '=' });
+    } else if (costAnalysisPageState.filters?.project_id?.length) {
+        filters.push({ k: 'project_id', v: costAnalysisPageState.filters.project_id, o: '=' });
     }
 
     if (typeof item.project_group_id === 'string') {
         filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
-    } else if (costAnalysisPageState.filters.project_group_id?.length) {
-        filters.push({ k: 'project_group_id', v: costAnalysisPageState.filters.project_group_id.map(({ v }) => v), o: '=' });
+    } else if (costAnalysisPageState.filters?.project_group_id?.length) {
+        filters.push({ k: 'project_group_id', v: costAnalysisPageState.filters.project_group_id, o: '=' });
     }
 
     if (typeof item.service_account_id === 'string') {
         filters.push({ k: 'collection_info.service_account_id', v: item.service_account_id, o: '=' });
-    } else if (costAnalysisPageState.filters.service_account_id?.length) {
-        filters.push({ k: 'collection_info.service_account_id', v: costAnalysisPageState.filters.service_account_id.map(({ v }) => v), o: '=' });
-    }
-
-    if (typeof item.account === 'string') {
-        filters.push({ k: 'account', v: item.account, o: '=' });
-    } else if (costAnalysisPageState.filters.account?.length) {
-        filters.push({ k: 'account', v: costAnalysisPageState.filters.account.map(({ v }) => v), o: '=' });
+    } else if (costAnalysisPageState.filters?.service_account_id?.length) {
+        filters.push({ k: 'collection_info.service_account_id', v: costAnalysisPageState.filters.service_account_id, o: '=' });
     }
 
     if (typeof item.product === 'string') {
         filters.push({ k: 'service_code', v: item.product, o: '=' });
-    } else if (costAnalysisPageState.filters.product?.length) {
-        filters.push({ k: 'service_code', v: costAnalysisPageState.filters.product.map(({ v }) => v), o: '=' });
+    } else if (costAnalysisPageState.filters?.product?.length) {
+        filters.push({ k: 'service_code', v: costAnalysisPageState.filters.product, o: '=' });
     }
 
     return {
@@ -170,11 +175,11 @@ const getLink = (item: CostAnalyzeModel, fieldName: string) => {
         },
     };
 };
-const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
-    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04
+const getIsRaised = (item: CostAnalyzeRawData, fieldName: string): boolean => {
+    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04 -> 2022-01-04
     const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-    const currValue: number|undefined = item.cost[currDate];
-    const prevValue: number|undefined = item.cost[prevDate];
+    const currValue: number|undefined = item.cost_sum?.find(({ date }) => date === currDate)?.value;
+    const prevValue: number|undefined = item.cost_sum?.find(({ date }) => date === prevDate)?.value;
 
     if (prevValue === undefined || currValue === undefined) return false;
     if (currValue < prevValue) return false;
@@ -198,41 +203,36 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 /* api */
-// HACK: add response type after the cost analysis API is updated.
-const fetchCostAnalyze = getCancellableFetcher(SpaceConnector.client.costAnalysis.cost.analyze);
-const costApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('total_cost', true);
-const listCostAnalysisTableData = async (granularity, groupBy, period, filters) => {
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
+const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
-        const _convertedFilters = getConvertedFilter(filters);
-        costApiQueryHelper.setFilters(_convertedFilters);
-
-        const query = costApiQueryHelper.data;
-
+        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { status, response } = await fetchCostAnalyze({
-            granularity,
-            group_by: groupBy,
-            start: dayjs.utc(period.start).format(dateFormat),
-            end: dayjs.utc(period.end).format(dateFormat),
-            ...query,
+            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            query: {
+                granularity: costAnalysisPageState.granularity,
+                group_by: costAnalysisPageState.groupBy,
+                start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
+                end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
+                fields: {
+                    cost_sum: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+                field_group: ['date'],
+                sort: [{ key: '_total_cost_sum', desc: true }],
+                ...analyzeApiQueryHelper.data,
+            },
         });
-        // TODO: Remove conversion process after the cost analysis API is updated.
-        if (status === 'succeed') {
-            tableState.items = response.results.map((d) => ({
-                ...d,
-                cost: d.usd_cost,
-                total_cost: d.total_usd_cost,
-            }));
-            tableState.totalCount = response?.total_count; // HACK: total_count will be deprecated after the cost analysis API is updated.
-        }
+        if (status === 'succeed') return response;
+        return { more: false, results: [] };
     } catch (e) {
-        tableState.items = [];
-        tableState.totalCount = 0;
         ErrorHandler.handleError(e);
+        return { more: false, results: [] };
     } finally {
         tableState.loading = false;
     }
@@ -240,31 +240,26 @@ const listCostAnalysisTableData = async (granularity, groupBy, period, filters) 
 
 /* event */
 const handleChange = async (options: any = {}) => {
-    setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
-    await listCostAnalysisTableData(
-        costAnalysisPageStore.currentQuerySetOptions.granularity,
-        costAnalysisPageStore.currentQuerySetOptions.group_by,
-        costAnalysisPageStore.currentQuerySetOptions.period,
-        costAnalysisPageStore.currentQuerySetOptions.filters,
-    );
+    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
+    const { results, more } = await listCostAnalysisTableData();
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    tableState.more = more;
 };
 const handleExcelDownload = async () => {
     try {
-        const _convertedFilters = getConvertedFilter(costAnalysisPageState.filters);
-        costApiQueryHelper.setFilters(_convertedFilters);
-
+        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
 
 
         await store.dispatch('file/downloadExcel', {
             url: '/cost-analysis/cost/analyze',
             param: {
-                granularity: costAnalysisPageStore.currentQuerySetOptions.granularity,
-                group_by: costAnalysisPageStore.currentQuerySetOptions.group_by,
-                start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
-                filter: costApiQueryHelper.data.filter,
-                query: costApiQueryHelper.data,
+                granularity: costAnalysisPageState.granularity,
+                group_by: costAnalysisPageState.groupBy,
+                start: dayjs.utc(costAnalysisPageState?.period?.start).format(dateFormat),
+                end: dayjs.utc(costAnalysisPageState?.period?.end).format(dateFormat),
+                filter: analyzeApiQueryHelper.data.filter,
+                query: analyzeApiQueryHelper.data,
             },
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
@@ -275,21 +270,23 @@ const handleExcelDownload = async () => {
         state.visibleExcelNotiModal = false;
     }
 };
-
 const handleExport = async () => {
     await handleExcelDownload();
 };
 
 watch(
     [
-        () => costAnalysisPageState.granularity,
-        () => costAnalysisPageState.groupBy,
-        () => costAnalysisPageState.period,
-        () => costAnalysisPageState.filters,
+        () => costAnalysisPageState,
+        () => costAnalysisPageStore.selectedDataSourceId,
+        () => costAnalysisPageStore.selectedQueryId,
     ],
-    async ([granularity, groupBy, period, filters]) => {
-        await listCostAnalysisTableData(granularity, groupBy, period, filters);
-        tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
+    async () => {
+        const { results, more } = await listCostAnalysisTableData();
+        if (costAnalysisPageState.period) {
+            tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+            tableState.more = more;
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
+        }
     },
     { immediate: true, deep: true },
 );
@@ -311,7 +308,6 @@ watch(
                      :loading="tableState.loading"
                      :fields="tableState.fields"
                      :items="tableState.items"
-                     :total-count="tableState.totalCount"
                      :searchable="false"
                      row-height-fixed
                      exportable

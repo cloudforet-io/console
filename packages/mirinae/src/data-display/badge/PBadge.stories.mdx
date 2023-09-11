@@ -22,6 +22,7 @@ export const Template = (args,{argTypes})=>({
                 :background-color="backgroundColor"
                 :outline-color="outlineColor"
                 :shape="shape"
+                :font-weight="fontWeight"
             >{{$props.defaultSlot}}</p-badge>
         </div>`,
 })
@@ -80,6 +81,25 @@ export const Template = (args,{argTypes})=>({
                     </p-badge>
                     <p-badge shape="square" style="margin-left: 20px">
                         <div>square</div>
+                    </p-badge>
+                </div>`
+        }}
+    </Story>
+</Canvas>
+
+## Font Weight
+
+<Canvas>
+    <Story name="Font Weight" height="100px">
+        {{
+            components: {PBadge},
+            template: `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100px">
+                    <p-badge shape="round">
+                        <div>Regular</div>
+                    </p-badge>
+                    <p-badge shape="round" style="margin-left: 20px" font-weight="medium">
+                        <div>Medium</div>
                     </p-badge>
                 </div>`
         }}

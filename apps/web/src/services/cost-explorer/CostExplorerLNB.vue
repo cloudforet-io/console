@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-import { PI, PCollapsibleToggle } from '@spaceone/design-system';
 import {
-    computed, onMounted, onUnmounted, reactive,
+    PI, PCollapsibleToggle, PSelectDropdown, PLazyImg,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import {
+    computed, onMounted, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+
+import { store } from '@/store';
+
+import type { FavoriteConfig } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -26,18 +38,22 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const DATA_SOURCE_DROPDOWN_KEY = 'data-source';
+
+
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
+const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
+const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
+const router = useRouter();
 const { t } = useI18n();
-const store = useStore();
 
 const state = reactive({
     loading: true,
-    header: computed(() => t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
+    header: computed<string>(() => t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
         ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
@@ -56,15 +72,8 @@ const state = reactive({
             label: t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
         },
         {
-            type: MENU_ITEM_TYPE.DROPDOWN,
-            id: DATA_SOURCE_DROPDOWN_KEY,
-            selectOptions: {
-                items: costQuerySetState.dataSourceList.map((dataSource) => ({
-                    name: dataSource,
-                    label: dataSource,
-                })),
-                defaultSelected: state.selectedDataSource,
-            },
+            type: MENU_ITEM_TYPE.SLOT,
+            id: DATA_SOURCE_MENU_ID,
         },
         ...state.queryMenuSet,
         {
@@ -81,33 +90,58 @@ const state = reactive({
                 color: gray[500],
             } : undefined,
             to: {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
-                    querySetId: d.cost_query_set_id,
+                    dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                    costQuerySetId: d.cost_query_set_id,
                 },
             },
         }));
+
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
-            id: 'show-more',
+            id: SHOW_MORE_MENU_ID,
         }];
 
         return [
-            ...(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
+            ...filterFavoriteItems(state.showMoreQuerySetStatus ? currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : currentQueryMenuList),
             ...(currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
+    }),
+    favoriteItemMap: computed(() => {
+        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.COST_ANALYSIS];
+        const result: Record<string, FavoriteConfig> = {};
+        if (stateName) {
+            store.state.favorite[stateName]?.forEach((d) => {
+                result[d.itemId] = d;
+            });
+        }
+        return result;
     }),
     showMoreQuerySetStatus: true,
     showFavoriteOnly: false,
 });
 
+const dataSourceState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
+    items: computed<MenuItem[]>(() => {
+        const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
+        const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
+            name: key,
+            label: value.name,
+            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon,
+        }));
+        return dataSourceMenuItemList;
+    }),
+    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
+});
 const relocateNotificationState = reactive({
     isShow: false,
     data: computed<LNBItem>(() => ({
         type: 'item',
         id: MENU_ID.DASHBOARDS,
-        // TODO: translation
-        label: t('Go to Dashboard'),
+        label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
         to: {
             name: DASHBOARDS_ROUTE._NAME,
             query: {
@@ -116,12 +150,21 @@ const relocateNotificationState = reactive({
             },
         },
         // TODO: may be isUpdated?
-        isNew: true,
+        hightlightTag: 'update',
         hideFavorite: true,
     })),
     isModalVisible: false,
     userId: computed(() => store.state.user.userId),
 });
+
+const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
+    if (!state.showFavoriteOnly) return menuItems;
+    return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+};
+
+const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
+
+const getCurrencySymbol = (currency: string): string => CURRENCY_SYMBOL[currency];
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
     const pagePermission = store.getters['user/pagePermissionMap'];
@@ -131,8 +174,15 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
     return [];
 };
 
-const handleSelect = (id: string, selected: string) => {
-    if (id === DATA_SOURCE_DROPDOWN_KEY) costQuerySetStore.$patch({ selectedDataSource: selected });
+const handleSelectDataSource = (selected: string) => {
+    costQuerySetStore.$patch({ selectedDataSourceId: selected });
+    router.push({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: selected,
+            costQuerySetId: managedCostQuerySetIdList[0],
+        },
+    }).catch(() => {});
 };
 
 const handleLearnMoreRelocateNotification = () => {
@@ -152,19 +202,13 @@ const handleDismissRelocateNotification = () => {
 
 
 onMounted(() => {
+    // Relocate dashboard notification
     const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
     if (!settings.costExplorer?.hideRelocateDashboardNotification) {
         relocateNotificationState.isModalVisible = true;
         relocateNotificationState.isShow = true;
     }
 });
-
-onUnmounted(() => {
-    costQuerySetStore.$dispose();
-    costQuerySetStore.$reset();
-});
-
-costQuerySetStore.listCostQuerySets();
 
 </script>
 
@@ -173,7 +217,6 @@ costQuerySetStore.listCostQuerySets();
         <l-n-b v-model:show-favorite-only="state.showFavoriteOnly"
                :header="state.header"
                :menu-set="state.menuSet"
-               @select="handleSelect"
         >
             <template #default>
                 <l-n-b-router-menu-item :item="relocateNotificationState.data"
@@ -196,6 +239,37 @@ costQuerySetStore.listCostQuerySets();
             <template #slot-show-more>
                 <p-collapsible-toggle v-model:is-collapsed="state.showMoreQuerySetStatus" />
             </template>
+            <template #slot-data-source-dropdown>
+                <p-select-dropdown class="select-options-dropdown"
+                                   :items="dataSourceState.items"
+                                   :selected="dataSourceState.selected"
+                                   use-fixed-menu-style
+                                   is-fixed-width
+                                   @update:selected="handleSelectDataSource"
+                >
+                    <template #default="{ item }">
+                        <div class="selected-wrapper">
+                            <p-lazy-img v-if="item && item.imageUrl"
+                                        class="left-icon"
+                                        :src="item.imageUrl"
+                                        width="1rem"
+                                        height="1rem"
+                            />
+                            <span class="selected-text">
+                                {{ item?.label }}
+                            </span>
+                        </div>
+                    </template>
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item">
+                            <span>{{ item.label }}</span>
+                            <span class="selected-item-postfix">
+                                ({{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrencySymbol(getCurrenctCurrency(item.name)) }}{{ getCurrenctCurrency(item.name) }})
+                            </span>
+                        </div>
+                    </template>
+                </p-select-dropdown>
+            </template>
         </l-n-b>
         <relocate-dashboard-modal v-model:visible="relocateNotificationState.isModalVisible" />
     </aside>
@@ -205,6 +279,25 @@ costQuerySetStore.listCostQuerySets();
 .sidebar-menu {
     .link-icon {
         margin-left: 0.25rem;
+    }
+    .select-options-dropdown {
+        @apply w-full;
+        .selected-wrapper {
+            @apply flex items-center w-full;
+            .left-icon {
+                margin-right: 0.25rem;
+                flex-shrink: 0;
+            }
+            .selected-text {
+                flex-grow: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+        .selected-item-postfix {
+            @apply text-gray-400;
+        }
     }
 }
 </style>

@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import type { SerialChart } from '@amcharts/amcharts5';
-import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { XYChart } from '@amcharts/amcharts5/xy';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
 import {
@@ -25,15 +26,21 @@ import type {
 import {
     GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
-import {
-    getConvertedFilter,
-} from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
-    Period, Granularity, GroupBy,
+    CostAnalyzeResponse,
+    Period,
 } from '@/services/cost-explorer/type';
-import type { CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
-import { getCancellableFetcher } from '@cloudforet/core-lib/src/space-connector/cancallable-fetcher';
+
+
+type CostAnalyzeRawData = {
+    [groupBy: string]: string | any;
+    cost_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+};
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -47,67 +54,69 @@ const state = reactive({
     loading: true,
     legends: [] as Legend[],
     chartData: [] as XYChartData[],
-    chart: null as SerialChart | null,
+    chart: null as XYChart | null,
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.client.costAnalysis.cost.analyze);
-const costQueryHelper = new QueryHelper();
-const listCostAnalysisData = async () => {
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
+const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
-        costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
+        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-        // TODO: Change to clientV2 after the cost analysis API is updated.
         const { status, response } = await fetchCostAnalyze({
-            include_others: !!costAnalysisPageState.chartGroupBy,
-            granularity: costAnalysisPageState.granularity,
-            group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
-            start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
-            end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
-            limit: 15,
-            ...costQueryHelper.apiQuery,
+            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            query: {
+                granularity: costAnalysisPageState.granularity,
+                group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
+                start: dayjs.utc(period.start).format(dateFormat),
+                end: dayjs.utc(period.end).format(dateFormat),
+                fields: {
+                    cost_sum: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+                field_group: ['date'],
+                sort: [{ key: '_total_cost_sum', desc: true }],
+                ...analyzeApiQueryHelper.data,
+            },
         });
-        // TODO: Remove conversion process after the cost analysis API is updated.
-        if (status === 'succeed') {
-            return response.results.map((d) => ({
-                ...d,
-                cost: d.usd_cost,
-                total_cost: d.total_usd_cost,
-            }));
-        }
+        if (status === 'succeed') return response;
+        return { more: false, results: [] };
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { more: false, results: [] };
     }
-    return [];
 };
-const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy | string) => {
+const setChartData = debounce(async (period:Period) => {
     state.loading = true;
 
-    const rawData = await listCostAnalysisData();
-    state.legends = getLegends(rawData, granularity, groupBy);
-    state.chartData = getXYChartData(rawData, granularity, period, groupBy);
+    const rawData = await listCostAnalysisData(period);
+    const { granularity, chartGroupBy } = costAnalysisPageState;
+    state.legends = getLegends<CostAnalyzeRawData>(rawData, granularity, chartGroupBy);
+    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, granularity, period, chartGroupBy);
     state.loading = false;
 }, 300);
 
 /* event */
 const handleToggleSeries = (index) => {
-    toggleSeries(state.chart as SerialChart, index);
+    toggleSeries(state.chart as XYChart, index);
 };
 const handleAllSeries = (type) => {
     if (type === 'show') {
-        showAllSeries(state.chart as SerialChart);
+        showAllSeries(state.chart as XYChart);
     } else {
-        hideAllSeries(state.chart as SerialChart);
+        hideAllSeries(state.chart as XYChart);
     }
 };
 
 watch([
-    () => costAnalysisPageState.granularity,
-    () => costAnalysisPageState.period,
-    () => costAnalysisPageState.chartGroupBy,
-    () => costAnalysisPageState.filters,
-], ([granularity, period, groupBy]) => {
-    setChartData(granularity, period, groupBy);
+    () => costAnalysisPageState,
+    () => costAnalysisPageStore.selectedDataSourceId,
+    () => costAnalysisPageStore.selectedQueryId,
+], () => {
+    if (costAnalysisPageState.period) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });
 </script>
 

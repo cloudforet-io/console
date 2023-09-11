@@ -5,8 +5,9 @@ import {
 } from 'lodash';
 import type { ComponentPublicInstance } from 'vue';
 import {
-    reactive, ref, onMounted, watch, computed, toRef,
+    reactive, ref, watch, computed, toRef,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<{
     reusePreviousData: false,
 });
 const store = useStore();
+const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -200,13 +202,6 @@ const handleDeleteModalConfirm = () => {
     widgetDeleteState.visibleModal = false;
     widgetDeleteState.targetWidget = null;
 };
-
-/* init */
-onMounted(async () => {
-    await store.dispatch('reference/loadAll');
-    // for PDF export
-    // emit('rendered', state.widgetRef);
-});
 
 </script>
 
