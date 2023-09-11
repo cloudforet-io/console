@@ -211,6 +211,7 @@ const handleClickViewModeButton = () => {
                 <div class="footer-right">
                     <slot name="footer-right">
                         <p-link v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
+                                new-tab
                                 :href="props.widgetLink"
                                 :to="props.widgetLocation"
                                 :action-icon="ACTION_ICON.INTERNAL_LINK"

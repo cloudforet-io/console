@@ -95,8 +95,10 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            // TODO: after hook refactor, add params
+        },
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),

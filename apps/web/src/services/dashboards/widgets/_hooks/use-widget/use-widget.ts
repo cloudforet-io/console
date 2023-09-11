@@ -24,7 +24,7 @@ interface AdditionalState {
  * @example
  const { widgetState, widgetFrameProps } = useWidget(props, {
     widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
     })),
     dateRange: computed<DateRange>(() => {
         const end = widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
