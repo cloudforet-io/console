@@ -70,7 +70,8 @@ const handleRouteToDashboard = () => {
                             <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_TITLE') }}</p>
                         </div>
                         <div class="description">
-                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION') }}</p>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION_FIRST') }}</p>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION_SECOND') }}</p>
                         </div>
                         <p-button style-type="tertiary"
                                   icon-right="ic_arrow-right-up"
@@ -131,7 +132,7 @@ const handleRouteToDashboard = () => {
                 margin-bottom: 1rem;
             }
             .description {
-                @apply text-label-lg text-gray-900;
+                @apply text-label-md text-gray-900 flex flex-col gap-2;
                 margin-bottom: 1rem;
             }
 
