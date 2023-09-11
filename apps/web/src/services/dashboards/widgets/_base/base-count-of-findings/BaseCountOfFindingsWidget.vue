@@ -14,12 +14,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
@@ -35,11 +36,11 @@ import type { Legend } from '@/services/dashboards/widgets/type';
 
 
 interface Data extends CloudServiceStatsModel {
-    [groupBy: string]: string | any;
+    [groupBy: string]: string | null | any;
     value: { key: string, value: number }[];
 }
 interface ChartData {
-    [key: string]: number;
+    [key: string]: string | number;
     fail_finding_count: number;
     pass_finding_count: number;
 }
@@ -72,6 +73,10 @@ const state = reactive({
         }
         return widgetState.groupBy;
     }),
+    groupByReferenceMap: computed<ReferenceMap>(() => {
+        if (!state.groupByKey || !props.allReferenceTypeInfo) return {};
+        return Object.values(props.allReferenceTypeInfo).find((info) => info.key === state.groupByKey)?.referenceMap ?? {};
+    }),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
             return [
@@ -83,7 +88,8 @@ const state = reactive({
             { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
         ];
     }),
-    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, props.allReferenceTypeInfo)),
+    noData: computed(() => !state.data?.length),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, state.groupByReferenceMap)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
@@ -129,16 +135,17 @@ const fetchData = async (): Promise<Data[]> => {
 };
 
 /* Util */
-const refineChartData = (data: Data[], groupByKey?: string, allReferenceTypeInfo?: AllReferenceTypeInfo): ChartData[] => {
+const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMap: ReferenceMap): ChartData[] => {
     if (!data?.length || !groupByKey) return [];
+
     const refinedChartData: ChartData[] = [];
-    const referenceMap = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
     data.forEach((d) => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
         const rawValue = d[groupByKey];
-        let refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
-        if (state.groupBy === ASSET_GROUP_BY.REGION) refinedValue = referenceMap?.[rawValue]?.name ?? rawValue;
+        let refinedValue: string|null|undefined; // google_cloud -> Google Cloud
+        if (groupByKey === ASSET_GROUP_BY.REGION) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
+        else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
         refinedChartData.push({
             [groupByKey]: refinedValue ?? `no_${groupByKey}`,
             fail_finding_count,
@@ -148,36 +155,48 @@ const refineChartData = (data: Data[], groupByKey?: string, allReferenceTypeInfo
     return refinedChartData;
 };
 const drawChart = (chartData: ChartData[]) => {
-    if (!state.groupByKey || !state.legends) return;
+    if (!state.groupByKey) {
+        console.error(new Error('groupByKey is undefined'));
+        return;
+    }
+
+    // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupByKey);
     yAxis.data.setAll(cloneDeep(chartData));
 
-    const legend = chartHelper.createLegend({
+    // create legends
+    const legends = chartHelper.createLegend({
         nameField: 'name',
         clickTarget: 'none',
     });
-    chart.children.push(legend);
 
-    state.legends.forEach((_legend) => {
+    // add legends to chart
+    chart.children.push(legends);
+
+    // set series for each legend
+    state.legends.forEach((legend: Legend) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: _legend.label,
-            valueXField: _legend.name,
+            name: legend.label as string,
+            valueXField: legend.name,
             categoryYField: state.groupByKey,
             xAxis,
             yAxis,
             baseAxis: yAxis,
             stacked: true,
-            fill: _legend.color,
-            stroke: _legend.color,
+            fill: chartHelper.color(legend.color as string),
+            stroke: chartHelper.color(legend.color as string),
+            opacity: state.noData ? 0 : 1,
         };
+
+        // create series
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
-        series.columns.template.setAll({
-            height: 20,
-        });
+
+        // add bullets to series
+        series.bullets.clear();
         series.bullets.push(() => {
             const label = chartHelper.createLabel({
-                text: `{${_legend.name}}`,
+                text: `{${legend.name}}`,
                 populateText: true,
                 textAlign: 'end',
                 centerY: percent(50),
@@ -190,6 +209,11 @@ const drawChart = (chartData: ChartData[]) => {
                 dynamic: true,
             });
         });
+
+        // set series style
+        series.columns.template.setAll({
+            height: 20,
+        });
         series.columns.template.onPrivate(('width'), (width, target) => {
             array.each(target?.dataItem?.bullets ?? [], (bullet) => {
                 if ((width !== undefined) && width < 30) {
@@ -197,19 +221,33 @@ const drawChart = (chartData: ChartData[]) => {
                 }
             });
         });
+
+        // set tooltip if showPassFindings is true
         if (state.showPassFindings) {
             const tooltip = chartHelper.createTooltip();
             setXYSharedTooltipTextWithRate(chart, tooltip);
             series.set('tooltip', tooltip);
         }
+
+        // add series to chart
         chart.series.push(series);
-        series.data.setAll(cloneDeep(chartData));
+
+        // set data to series
+        const data: ChartData[] = state.noData ? [
+            { fail_finding_count: 90, pass_finding_count: 0 },
+        ] : cloneDeep(chartData);
+        series.data.setAll(data);
     });
-    legend.data.setAll(chart.series.values);
+
+
+
+    // set series values to legends data
+    legends.data.setAll(chart.series.values);
 };
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
@@ -259,10 +297,12 @@ defineExpose<WidgetExpose<Data[]>>({
                                loader-type="skeleton"
                                :loader-backdrop-opacity="1"
                                show-data-from-scratch
+                               disable-empty-case
                 >
                     <div ref="chartContext"
                          class="chart"
                     />
+                    <widget-chart-no-data-overlay v-if="state.noData && !state.loading" />
                 </p-data-loader>
             </div>
             <div class="table-pagination-wrapper">
@@ -279,6 +319,7 @@ defineExpose<WidgetExpose<Data[]>>({
         </div>
     </widget-frame>
 </template>
+
 
 <style lang="postcss" scoped>
 .count-of-findings-widget {
