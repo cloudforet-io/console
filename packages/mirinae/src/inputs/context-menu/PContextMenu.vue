@@ -17,6 +17,7 @@ import PSearch from '@/inputs/search/search/PSearch.vue';
 const FOCUS_GROUP_ID = 'context-item';
 
 interface ContextMenuProps {
+    title?: string;
     menu: MenuItem[];
     loading?: boolean;
     selected?: MenuItem[];
@@ -47,6 +48,7 @@ interface ContextMenuEmits {
     (e: 'clear-selection'): void,
 }
 const props = withDefaults(defineProps<ContextMenuProps>(), {
+    title: undefined,
     menu: () => [],
     selected: () => [],
     highlightTerm: '',
@@ -180,7 +182,13 @@ defineExpose({
     <div class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
-        <slot name="header" />
+        <slot name="header">
+            <p v-if="title"
+               class="context-menu-title"
+            >
+                {{ props.title }}
+            </p>
+        </slot>
         <div class="menu-container">
             <slot v-show="props.menu.length > 0"
                   name="menu"
@@ -223,7 +231,7 @@ defineExpose({
                 <p-text-button v-if="props.showClearSelection && props.multiSelectable"
                                class="clear-all-wrapper"
                                style-type="highlight"
-                               size="sm"
+                               size="md"
                                :readonly="readonly"
                                @click.stop="handleClickClearSelection"
                 >
@@ -346,6 +354,13 @@ defineExpose({
     border-style: solid;
     user-select: none;
     overflow: hidden;
+    .context-menu-title {
+        @apply text-label-xl;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
     > .menu-container {
         min-height: inherit;
         max-height: inherit;
@@ -362,11 +377,11 @@ defineExpose({
             padding: 0.5rem;
         }
         > .clear-all-wrapper {
-            padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+            padding: 0.375rem 0.5rem 0.25rem 0.5rem;
         }
         > .context-header {
             @apply text-gray-500;
-            margin-top: 0.875rem;
+            margin-top: 0.5rem;
             margin-bottom: 0.25rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
