@@ -22,6 +22,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -51,7 +52,21 @@ type FullData = CostAnalyzeResponse<Data>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: widgetState.options.cost_data_source,
+            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+        },
+        query: {
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+        },
+    })),
+});
 
 const state = reactive({
     loading: true,
@@ -70,16 +85,6 @@ const state = reactive({
     legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
