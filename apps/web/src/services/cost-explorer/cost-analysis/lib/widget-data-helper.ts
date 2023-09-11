@@ -51,9 +51,8 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
 export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
-        // Parsing to match api data (ex. tags.Name -> tags_Name)
         if (groupBy.includes('.')) {
-            _groupBy = groupBy.replace('.', '_');
+            _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
         }
         const _providers = store.getters['reference/providerItems'];
         const _serviceAccounts = store.getters['reference/serviceAccountItems'];
@@ -132,9 +131,8 @@ export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<
     const dateFormat = DATE_FORMAT[timeUnit];
 
     let _groupBy: string | undefined = groupBy;
-    // Parsing to match api data (ex. tags.Name -> tags_Name)
     if (groupBy?.includes('.')) {
-        _groupBy = groupBy.replace('.', '_');
+        _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
     }
 
     let now = dayjs.utc(period.start).clone();

@@ -13,7 +13,7 @@ import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
-    CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, Period,
+    CostQuerySetModel, Granularity, GroupBy, Period,
 } from '@/services/cost-explorer/type';
 
 
@@ -93,7 +93,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.relativePeriod = undefined;
             this.filters = {};
         },
-        async setQueryOptions(options?: CostQuerySetOption) {
+        async setQueryOptions(options?: CostQuerySetModel['options']) {
             if (!options) {
                 await this.initState();
                 return;
@@ -113,7 +113,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.filters = getRefinedFilters(options.filters);
         },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
-            const options: CostQuerySetOption = {
+            const options: CostQuerySetModel['options'] = {
                 granularity: this.granularity,
                 period: this.period,
                 relative_period: this.relativePeriod,

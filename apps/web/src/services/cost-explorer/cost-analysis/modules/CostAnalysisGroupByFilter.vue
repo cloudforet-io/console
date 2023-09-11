@@ -66,6 +66,12 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
     return { results: results ? results.map((d) => ({ name: `tags.${d.key}`, label: d.name })) : [] };
 };
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
+const setSelectedTagsMenu = (groupBy?: string[]) => {
+    if (!groupBy) return;
+    state.selectedTagsMenu = groupBy
+        .filter((d) => d.startsWith('tags.'))
+        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+};
 
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
@@ -77,6 +83,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = [addedGroupByName, ..._state.groupBy];
+            _state.chartGroupBy = addedGroupByName;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
@@ -95,7 +102,8 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: b
             return;
         }
         costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.concat(selectedItem.name as string);
+            _state.groupBy = [selectedItem.name as string, ..._state.groupBy];
+            _state.chartGroupBy = selectedItem.name;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
@@ -110,10 +118,7 @@ const handleClearTagsGroupBy = () => {
 };
 
 watch(() => costAnalysisPageState.groupBy, (groupBy) => {
-    if (!groupBy) return;
-    state.selectedTagsMenu = groupBy
-        .filter((d) => d.startsWith('tags.'))
-        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+    setSelectedTagsMenu(groupBy);
 });
 </script>
 
