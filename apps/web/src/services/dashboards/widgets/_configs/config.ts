@@ -9,8 +9,8 @@ import type { Tags } from '@/models';
 import type { CurrencyRates } from '@/store/modules/settings/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -39,11 +39,12 @@ export const COST_GROUP_BY = {
     PROJECT_GROUP: REFERENCE_TYPE_INFO.project_group.key,
     REGION: REFERENCE_TYPE_INFO.region.key,
     // cost reference
-    CATEGORY: COST_REFERENCE_TYPE_INFO.cost_category.key,
-    RESOURCE_GROUP: COST_REFERENCE_TYPE_INFO.cost_resource_group.key,
-    TYPE: COST_REFERENCE_TYPE_INFO.cost_type.key,
-    PRODUCT: COST_REFERENCE_TYPE_INFO.cost_product.key,
-    ACCOUNT: COST_REFERENCE_TYPE_INFO.cost_account.key,
+    DATA_SOURCE: COST_VARIABLE_TYPE_INFO.cost_data_source.key,
+    CATEGORY: COST_VARIABLE_TYPE_INFO.cost_category.key,
+    RESOURCE_GROUP: COST_VARIABLE_TYPE_INFO.cost_resource_group.key,
+    TYPE: COST_VARIABLE_TYPE_INFO.cost_type.key,
+    PRODUCT: COST_VARIABLE_TYPE_INFO.cost_product.key,
+    ACCOUNT: COST_VARIABLE_TYPE_INFO.cost_account.key,
 } as const;
 
 export const ASSET_GROUP_BY = {
@@ -53,9 +54,9 @@ export const ASSET_GROUP_BY = {
     REGION: REFERENCE_TYPE_INFO.region.key,
     // asset reference
     // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
-    SERVICE: ASSET_REFERENCE_TYPE_INFO.asset_service.key,
+    SERVICE: ASSET_VARIABLE_TYPE_INFO.asset_service.key,
     COMPLIANCE_TYPE: 'cloud_service_type',
-    ACCOUNT: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
+    ACCOUNT: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
 };
 
 export const CHART_TYPE = {
@@ -133,14 +134,15 @@ const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.cloud_service_type.type,
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
-    COST_REFERENCE_TYPE_INFO.cost_category.type,
-    COST_REFERENCE_TYPE_INFO.cost_resource_group.type,
-    COST_REFERENCE_TYPE_INFO.cost_product.type,
-    COST_REFERENCE_TYPE_INFO.cost_type.type,
-    COST_REFERENCE_TYPE_INFO.cost_account.type,
+    COST_VARIABLE_TYPE_INFO.cost_data_source.type,
+    COST_VARIABLE_TYPE_INFO.cost_category.type,
+    COST_VARIABLE_TYPE_INFO.cost_resource_group.type,
+    COST_VARIABLE_TYPE_INFO.cost_product.type,
+    COST_VARIABLE_TYPE_INFO.cost_type.type,
+    COST_VARIABLE_TYPE_INFO.cost_account.type,
     // asset reference
-    ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type,
-    ASSET_REFERENCE_TYPE_INFO.asset_account.type,
+    ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
+    ASSET_VARIABLE_TYPE_INFO.asset_account.type,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
