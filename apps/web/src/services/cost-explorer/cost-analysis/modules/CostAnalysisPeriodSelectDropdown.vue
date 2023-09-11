@@ -124,7 +124,7 @@ const state = reactive({
 /* Util */
 const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
 
-const setSelectedItemByGranularity = (granularity) => {
+const setSelectedItemByGranularity = (granularity:Granularity) => {
     if (granularity) {
         const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
         costAnalysisPageStore.$patch((_state) => {
@@ -139,15 +139,10 @@ const setSelectedItemByGranularity = (granularity) => {
     }
 };
 const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
-    if (granularity) {
-        costAnalysisPageStore.$patch((_state) => {
-            _state.granularity = granularity;
-        });
-    }
     if (relativePeriod) {
         state.selectedPeriod = getPeriodItemNameByRelativePeriod(relativePeriod);
     } else if (granularity === GRANULARITY.DAILY) {
-        const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item) => isEqual(item.period, period));
+        const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item:PeriodItem) => isEqual(item.period, period));
         state.selectedPeriod = selectedPeriodItem?.name;
     } else {
         state.selectedPeriod = 'custom';
@@ -197,11 +192,6 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuery) => {
 }, {
     immediate: true,
 });
-watch(() => costAnalysisPageState.period, (period) => {
-    if (period && !costAnalysisPageState.relativePeriod) {
-        state.selectedPeriod = 'custom';
-    }
-}, { immediate: true });
 </script>
 
 <template>
