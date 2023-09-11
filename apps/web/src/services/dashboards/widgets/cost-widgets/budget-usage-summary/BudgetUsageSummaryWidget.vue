@@ -123,6 +123,7 @@ const displayState = reactive({
 
 const [recentSpentPeriod] = useDateRangeFormatter({
     end: computed(() => widgetState.dateRange.end),
+    showTildeIfEndThisMonth: true,
 });
 
 /* Api */

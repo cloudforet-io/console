@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const monthlyCostWidgetConfig: WidgetConfig = {
@@ -26,10 +26,15 @@ const monthlyCostWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account'),
+        default_properties: [
+            'cost_data_source',
+            ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account'),
+        ],
+        fixed_properties: ['cost_data_source'],
         schema: {
             type: 'object',
             properties: {
+                ...getWidgetOptionsSchema('cost_data_source'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -43,18 +48,20 @@ const monthlyCostWidgetConfig: WidgetConfig = {
                     'cost_account',
                 ),
             },
-            order: getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_type',
-                'cost_account',
-            ),
+            order: [
+                'cost_data_source',
+                ...getWidgetFilterSchemaPropertyNames(
+                    'provider',
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'cost_category',
+                    'cost_resource_group',
+                    'cost_product',
+                    'region',
+                    'cost_type',
+                    'cost_account',
+                )],
         },
     },
 };

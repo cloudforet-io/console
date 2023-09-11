@@ -1499,7 +1499,8 @@
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "非継承オプションのリスト:",
 			"MONTHLY_COST": {
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
-				"TOTAL_SPENT_IN": "{period}の総支出額"
+				"PREVIOUS_MONTH": "前月",
+				"SELECTED_MONTH": "選択した月"
 			},
 			"NO_DATA": "データがありません",
 			"PROJECT_ACTIVITY_SUMMARY": {

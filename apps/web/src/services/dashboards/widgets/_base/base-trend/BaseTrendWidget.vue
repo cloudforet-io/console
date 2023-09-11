@@ -197,7 +197,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
     // create tooltip
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
+    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency);
 
     // set series
     state.legends.forEach((legend) => {
