@@ -134,7 +134,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         <div class="tags-button-wrapper">
             <p-filterable-dropdown :handler="tagsMenuHandler"
                                    :selected.sync="state.selectedTagsMenu"
-                                   :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TAGS')"
+                                   selection-label="Tags"
                                    appearance-type="badge"
                                    :show-delete-all-button="false"
                                    multi-selectable
