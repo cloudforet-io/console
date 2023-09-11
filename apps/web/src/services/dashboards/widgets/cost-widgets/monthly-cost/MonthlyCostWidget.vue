@@ -108,12 +108,10 @@ const dateState = reactive({
     previousMonth: computed<Dayjs>(() => (dayjs.utc(widgetState.dateRange.end).subtract(1, 'month'))),
 });
 const [formattedCurrentMonth] = useDateRangeFormatter({
-    start: computed(() => dayjs.utc(dateState.selectedMonth).format('YYYY-MM-DD')),
-    end: computed(() => dayjs.utc(dateState.selectedMonth).format('YYYY-MM-DD')),
-    showTildeIfStartAndEndThisMonth: true,
+    end: computed(() => dayjs.utc(dateState.selectedMonth).format('YYYY-MM')),
+    showTildeIfEndThisMonth: true,
 });
 const [formattedPreviousMonth] = useDateRangeFormatter({
-    start: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
     end: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),
 });
 

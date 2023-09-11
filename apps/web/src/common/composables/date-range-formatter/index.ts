@@ -8,7 +8,7 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 interface DateRangeFormatterOptions {
     start?: string|Ref<string|undefined>|ComputedRef<string|undefined>;
     end?: string|Ref<string|undefined>|ComputedRef<string|undefined>;
-    showTildeIfStartAndEndThisMonth?: boolean; // show tilde if start and end are the same year and month, and end month is this month.
+    showTildeIfEndThisMonth?: boolean; // show tilde if start and end are the same year and month, and end month is this month.
 }
 
 /**
@@ -18,25 +18,35 @@ interface DateRangeFormatterOptions {
  * formattedDate: The formatted date range.
  * isEndThisMonth: Whether the end date is this month.
  * @example
- // With the same year and month, it will be displayed in the format of "Aug, 2023".
+ // 1. With the same year and month, or if start is not given, it will be displayed in the format of "Aug, 2023".
  const [formattedDate] = useDateRangeFormatter({
     start: '2023-08',
     end: '2023-08',
 });
- // With the same year and different month, it will be displayed in the format of "Aug ~ Sep, 2023".
+ const [formattedDate] = useDateRangeFormatter({
+    end: '2023-08',
+ });
+
+ // 2. With the same year and different month, it will be displayed in the format of "Aug ~ Sep, 2023".
  const [formattedDate] = useDateRangeFormatter({
      start: '2023-08',
      end: '2023-09',
  });
-// With the different year to the start and end, it will be displayed in the format of "Aug 2022 ~ Aug 2023".
+
+// 3. With the different year to the start and end, it will be displayed in the format of "Aug 2022 ~ Aug 2023".
  const [formattedDate] = useDateRangeFormatter({
      start: '2022-08',
      end: '2023-08',
  });
- // If end is this month, it will be displayed in the format of "Sep 11, 2023".
+
+ // 4. If end is this month, it will be displayed in the format of "Sep 11, 2023".
  const [formattedDate, isEndThisMonth] = useDateRangeFormatter({
-     start: '2023-09',
      end: '2023-09',
+ });
+
+ // 5. If end is this month and showTildeIfEndThisMonth is true, it will be displayed in the format of "~Sep 11, 2023".
+ const [formattedDate, isEndThisMonth] = useDateRangeFormatter({
+ end: '2023-09',
  });
 
  */
@@ -52,7 +62,7 @@ export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
     const state = reactive({
         _start: options.start,
         _end: options.end,
-        start: computed<string>(() => state._start ?? currentDateRange.start),
+        start: computed<string>(() => state._start ?? state._end ?? currentDateRange.start),
         end: computed<string>(() => state._end ?? currentDateRange.end),
         isStartEndTheSameMonth: computed(() => dateFormatter(state.start, 'M') === dateFormatter(state.end, 'M')),
         isStartEndTheSameYear: computed(() => dateFormatter(state.start, 'YYYY') === dateFormatter(state.end, 'YYYY')),
@@ -67,7 +77,7 @@ export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
             if (state.isStartEndTheSameMonth) {
                 if (state.isEndThisMonth) {
                     const formatted = `${dateFormatter(currentDateRange.end, 'MMM D, YYYY')}`;
-                    if (options.showTildeIfStartAndEndThisMonth) return `~${formatted}`;
+                    if (options.showTildeIfEndThisMonth) return `~${formatted}`;
                     return formatted;
                 }
                 return `${dateFormatter(start, 'MMM, YYYY')}`;
