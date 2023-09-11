@@ -20,26 +20,22 @@ const handleMenuDismiss = () => {
     <div class="relocate-dashboard-notification">
         <div class="relocate-notification-wrapper">
             <p class="notification-title">
-                <!--TODO: translation-->
-                {{ t('Looking for your cost dashboards?') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_NOTI_TITLE') }}
             </p>
             <span class="notification-description">
-                <!--TODO: translation-->
-                {{ t('You can now create enhanced cost dashboards within the new Dashboards menu.') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_NOTI_DESCRIPTION') }}
             </span>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleLearnMore"
             >
-                <!--TODO: translation-->
-                {{ t('Learn more') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_NOTI_LEARN_MORE') }}
             </p-text-button>
             <p-text-button style-type="highlight"
                            class="notification-text-button"
                            @click="handleMenuDismiss"
             >
-                <!--TODO: translation-->
-                {{ t('Dismiss') }}
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_NOTI_DISMISS') }}
             </p-text-button>
         </div>
     </div>

@@ -1,5 +1,6 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
+import { cloneDeep, find, sortBy } from 'lodash';
 
 import { store } from '@/store';
 
@@ -8,11 +9,13 @@ import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import type {
-    ChartData, CostAnalyzeModel, Legend, XYChartData,
+    ChartData, Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
-import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
+import type {
+    Period, Granularity, GroupBy, CostAnalyzeResponse,
+} from '@/services/cost-explorer/type';
 
 
 const DATE_FORMAT = Object.freeze({
@@ -45,7 +48,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
+export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         // Parsing to match api data (ex. tags.Name -> tags_Name)
@@ -59,8 +62,8 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
         const _regions = store.getters['reference/regionItems'];
 
         const legends: Legend[] = [];
-        rawData.forEach((d) => {
-            if (Object.keys(d.cost).length) {
+        rawData.results.forEach((d) => {
+            if (d.cost_sum) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 let _color;
@@ -77,13 +80,8 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
                     _color = _providers[_name]?.color;
                 }
                 if (!_name) {
-                    if (d.is_others) {
-                        _name = 'aggregation';
-                        _label = 'Etc.';
-                    } else {
-                        _name = `no_${_groupBy}`;
-                        _label = 'Unknown';
-                    }
+                    _name = `no_${_groupBy}`;
+                    _label = 'Unknown';
                 }
                 legends.push({
                     name: _name,
@@ -95,7 +93,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
         });
         return legends;
     }
-    if (rawData.length) {
+    if (rawData.results.length) {
         return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
     }
     return [];
@@ -128,7 +126,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'cost'): XYChartData[] => {
+export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
@@ -143,16 +141,15 @@ export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granula
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         const _date = now.format(dateFormat);
         const chartDataByDate: XYChartData = { date: _date };
-        rawData.forEach((d) => {
+        rawData.results.forEach((d) => {
             if (_groupBy) {
                 let groupByName = d[_groupBy];
                 if (!groupByName) {
-                    if (d.is_others) groupByName = 'aggregation';
-                    else groupByName = `no_${_groupBy}`;
+                    groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d[valueKey]?.[_date] ?? 0;
+                chartDataByDate[groupByName] = d.cost_sum?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCost = d[valueKey]?.[_date] ?? 0;
+                chartDataByDate.totalCost = d.cost_sum?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);
@@ -216,4 +213,25 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
         return `{${categoryKey}}: [bold]${money}[/]`;
     }
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
+};
+
+export const getRefinedChartTableData = <CostAnalyzeRawData>(results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
+    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const dateFormat = DATE_FORMAT[timeUnit];
+
+    const _results: CostAnalyzeRawData[] = cloneDeep(results);
+    const refinedTableData: CostAnalyzeRawData[] = [];
+    _results.forEach((d) => {
+        let _costSum = cloneDeep(d.cost_sum);
+        let now = dayjs.utc(period.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (!find(_costSum, { date: now.format(dateFormat) })) {
+                _costSum?.push({ date: now.format(dateFormat), value: 0 });
+            }
+            now = now.add(1, timeUnit);
+        }
+        _costSum = sortBy(_costSum, ['date']);
+        refinedTableData.push({ ...d, cost_sum: _costSum });
+    });
+    return refinedTableData;
 };

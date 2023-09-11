@@ -1,4 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { defineStore } from 'pinia';
 
 
@@ -9,19 +10,19 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { managedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
+const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
+
 interface CostAnalysisLNBState {
     costQuerySetList: CostQuerySetModel[];
-    dataSourceList: string[];
     selectedQuerySetId?: string;
-    selectedDataSource?: string;
+    selectedDataSourceId?: string;
 }
 
 export const useCostQuerySetStore = defineStore('cost-query-set', {
     state: (): CostAnalysisLNBState => ({
         costQuerySetList: [],
-        dataSourceList: [],
         selectedQuerySetId: undefined,
-        selectedDataSource: undefined,
+        selectedDataSourceId: undefined,
     }),
     getters: {
         selectedQuerySet: (state): CostQuerySetModel|undefined => {
@@ -32,12 +33,17 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
     actions: {
         async listCostQuerySets(): Promise<void> {
             try {
-                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
+                const { status, response } = await fetcher({
+                    data_source_id: this.selectedDataSourceId,
                     query: {
                         filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
                     },
                 });
-                this.costQuerySetList = [...managedCostQuerySets, ...results];
+                if (status === 'succeed') {
+                    this.costQuerySetList = [...managedCostQuerySets, ...response.results];
+                } else {
+                    this.costQuerySetList = [...managedCostQuerySets];
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.costQuerySetList = [...managedCostQuerySets];

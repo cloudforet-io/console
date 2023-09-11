@@ -97,6 +97,7 @@ onMounted(() => {
                         :has-permission="state.hasPermission"
                         :is-opened="state.openedMenu === menu.id"
                         :is-selected="state.selectedMenu === menu.id"
+                        :highlight-tag="menu.highlightTag"
                         @open-menu="handleOpenMenu"
                         @hide-menu="hideMenu"
             />

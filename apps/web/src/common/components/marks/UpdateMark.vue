@@ -2,8 +2,9 @@
 </script>
 
 <template>
-    <span class="new-mark">new</span>
+    <span class="new-mark">update</span>
 </template>
+
 
 <style lang="postcss">
 .new-mark {

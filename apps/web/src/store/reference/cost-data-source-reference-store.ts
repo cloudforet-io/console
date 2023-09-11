@@ -2,8 +2,11 @@
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { asyncComputed } from '@vueuse/core';
 import { defineStore } from 'pinia';
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import type {
     ReferenceItem,
@@ -19,20 +22,23 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 
-type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'>;
+type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;
 type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
-type DataSourceMap = ReferenceMap<DataSourceItems>;
+export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
     const state = reactive({
-        items: null as DataSourceMap|null,
+        items: null as CostDataSourceReferenceMap|null,
     });
 
     const getters = reactive({
-        costDataSourceItems: computed(() => state.items ?? {}),
+        costDataSourceItems: asyncComputed<CostDataSourceReferenceMap>(async () => {
+            await actions.load();
+            return state.items ?? {};
+        }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
             ...REFERENCE_TYPE_INFO.cost_data_source,
             referenceMap: getters.costDataSourceItems,
@@ -54,11 +60,11 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             try {
                 const { status, response } = await fetcher({
                     query: {
-                        only: ['data_source_id', 'name', 'plugin_info'],
+                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys'],
                     },
                 });
                 if (status === 'succeed') {
-                    const items: DataSourceMap = {};
+                    const items: CostDataSourceReferenceMap = {};
                     response.results.forEach((item: DataSourceModel) => {
                         items[item.data_source_id] = {
                             key: item.data_source_id,
@@ -74,8 +80,6 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             }
         },
     };
-
-    actions.load();
 
     return {
         getters,

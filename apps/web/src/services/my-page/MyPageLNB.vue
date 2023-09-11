@@ -62,7 +62,7 @@ const state = reactive({
                 label: t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId),
                 id: MENU_ID.MY_PAGE_NOTIFICATIONS,
                 to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
-                isBeta: true,
+                hightlightTag: 'beta',
             },
         ];
         return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);

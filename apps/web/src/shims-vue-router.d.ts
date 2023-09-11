@@ -1,4 +1,4 @@
-import type { _RouteLocationBase } from 'vue-router';
+import type { _RouteLocationBase, Route } from 'vue-router';
 
 import type { AccessInfo } from '@/lib/access-control/config';
 
@@ -30,6 +30,9 @@ declare module 'vue-router' {
     interface RouteBreadcrumbsFormatter {
         (route: _RouteLocationBase | RouteLocationNormalizedLoaded): Breadcrumb[];
     }
+    interface RouteCopiableFormatter {
+        (route: Route): boolean;
+    }
     interface RouteMeta {
         lnbVisible?: boolean;
         centeredLayout?: boolean;
@@ -37,7 +40,7 @@ declare module 'vue-router' {
         label?: string|RouteLabelFormatter;
         translationId?: string|RouteTranslationIdFormatter;
         breadcrumbs?: RouteBreadcrumbsFormatter;
-        copiable?: boolean; // for breadcrumbs
+        copiable?: boolean|RouteCopiableFormatter; // for breadcrumbs
         isSignInPage?: boolean;
         accessLevel?: AccessLevel;
         accessInfo?: AccessInfo;

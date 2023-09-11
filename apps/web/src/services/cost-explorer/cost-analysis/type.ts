@@ -1,18 +1,17 @@
-import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+import type { OpUnitType } from 'dayjs';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
-import type {
-    Period, Granularity, CostFiltersMap,
-} from '@/services/cost-explorer/type';
+import type { Granularity, Period } from '@/services/cost-explorer/type';
+
 
 export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>;
 
 export interface CostAnalysisPageQueryValue {
     period?: Period;
     group_by?: string[];
-    filters?: CostFiltersMap;
+    filters?: Record<string, string[]>;
     granularity?: Granularity;
 }
 
@@ -32,31 +31,16 @@ export interface XYChartData {
     aggregation?: number;
     [key: string]: any;
 }
-interface Cost {
-    [key: string]: number;
-}
 export interface Legend {
     name: string;
-    label: string | string;
+    label: string;
     color?: string;
     disabled?: boolean;
 }
 
-export interface CostAnalyzeModel {
-    total_cost?: number;
-    cost: Cost | number;
-    is_others?: boolean;
-    [key: string]: any;
-}
 
-/* component props */
-export interface WidgetProps<Options = any> {
-    widgetId?: string;
-    name?: string;
-    options: Options;
-    period: Period;
-    filters: CostFiltersMap;
-    currency: Currency;
-    currencyRates: CurrencyRates;
-    printMode?: boolean;
-}
+export type RelativePeriod = {
+    unit: OpUnitType;
+    value: number;
+    exclude_today: boolean;
+};

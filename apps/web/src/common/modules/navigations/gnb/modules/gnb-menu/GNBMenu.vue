@@ -7,12 +7,15 @@ import {
 import type { RouteLocation } from 'vue-router';
 import { useRouter, useRoute } from 'vue-router';
 
-import type { DisplayMenu } from '@/store/modules/display/type';
+import type { DisplayMenu, HighlightTagType } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
@@ -37,6 +40,7 @@ interface Props {
     isOpened: boolean;
     isSelected: boolean;
     subMenuList: SubMenu[];
+    highlightTag?: HighlightTagType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,6 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
     isOpened: false,
     isSelected: false,
     subMenuList: () => [],
+    highlightTag: undefined,
 });
 const emit = defineEmits<{(e: 'hide-menu'): void;
     (e: 'open-menu', value: MenuId): void;
@@ -102,6 +107,13 @@ onClickOutside(containerRef, handleClickOutside);
                   @keydown.enter="handleMenu"
             >
                 <span>{{ label }}</span>
+                <span v-if="highlightTag"
+                      class="mark"
+                >
+                    <new-mark v-if="highlightTag === 'new'" />
+                    <update-mark v-else-if="highlightTag === 'update'" />
+                    <beta-mark v-else-if="highlightTag === 'beta'" />
+                </span>
                 <p-i v-if="state.isMenuWithAdditionalMenu"
                      class="arrow-button"
                      :name="isOpened ? 'ic_chevron-small-up' : 'ic_chevron-small-down'"
@@ -132,8 +144,7 @@ onClickOutside(containerRef, handleClickOutside);
                                 :label="subMenu.label"
                                 :to="subMenu.to"
                                 :href="subMenu.href"
-                                :is-beta="subMenu.isBeta"
-                                :is-new="subMenu.isNew"
+                                :highlight-tag="subMenu.highlightTag"
                                 @navigate="hideMenu"
                 />
             </div>
@@ -156,8 +167,14 @@ onClickOutside(containerRef, handleClickOutside);
         text-transform: capitalize;
 
         .button-label {
-            display: inline-block;
+            @apply inline-block flex items-center;
             height: 100%;
+
+            .mark {
+                text-transform: none;
+                height: 1.5rem;
+                line-height: normal;
+            }
         }
 
         &.opened, &:hover {

@@ -114,8 +114,7 @@ const handleOverflown = (isOverflown: boolean) => {
                         >
                             <g-n-b-sub-menu :label="subMenu.label"
                                             :to="subMenu.to"
-                                            :is-beta="subMenu.isBeta"
-                                            :is-new="subMenu.isNew"
+                                            :higlight-tag="subMenu.highlightTag"
                                             @navigate="hideMenu"
                             />
                         </div>

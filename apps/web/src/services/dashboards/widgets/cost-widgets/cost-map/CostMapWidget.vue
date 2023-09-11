@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -10,38 +12,36 @@ import {
 } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
-
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    gray, palette, transparent, white,
-} from '@/styles/colors';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, CostGroupBy,
+} from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import type { CostAnalyzeDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
+
+
+import type {
+    AnalyzeRawData, TreemapChartData,
+} from './costmap-chart-data-helper';
+import {
+    getRefinedTreemapChartData,
+} from './costmap-chart-data-helper';
+import { setThemeColorsToTreemapData } from './costmap-draw-chart-helper';
 
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
 
-interface CostMapData {
-    [groupBy: string]: string | any;
-    value: number;
-    background_color?: string;
-    font_color?: string;
-}
+
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -64,14 +64,17 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 
 const state = reactive({
     loading: true,
-    data: null as CostAnalyzeDataModel['results'] | null,
-    chartData: computed(() => getRefinedTreemapChartData(state.data, widgetState.groupBy, props.allReferenceTypeInfo)),
+    data: null as AnalyzeRawData[] | null,
+    chartData: computed<TreemapChartData[]>(() => {
+        if (!state.data) return [];
+        return getRefinedTreemapChartData(state.data, widgetState.groupBy as CostGroupBy, props.allReferenceTypeInfo);
+    }),
 });
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<TreemapChartData[]> => {
+const fetchData = async (): Promise<AnalyzeRawData[]|null> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
@@ -94,71 +97,30 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
             },
         });
         if (status === 'succeed') return response.results;
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return [];
     }
-    return [];
 };
 
-const drawChart = (chartData) => {
+
+const drawChart = (chartData: TreemapChartData[]) => {
+    if (!chartData[0]) return;
+
     const seriesSettings = {
         valueField: 'cost_sum',
         categoryField: 'value',
         nodePaddingInner: 4,
     };
     const series = chartHelper.createTreeMapSeries(seriesSettings);
-
-    const setColorData = (rawData): CostMapData[] => {
-        const themeColorName: WidgetTheme = props.theme || 'violet';
-        const results: CostMapData[] = [];
-
-        rawData.forEach((d, idx) => {
-            let backgroundColor = palette[themeColorName][200];
-            let fontColor;
-
-            switch (true) {
-            case [0].includes(idx):
-                backgroundColor = palette[themeColorName][700];
-                fontColor = white;
-                break;
-            case [1].includes(idx):
-                backgroundColor = palette[themeColorName][500];
-                fontColor = gray[900];
-                break;
-            case [2].includes(idx):
-                backgroundColor = palette[themeColorName][400];
-                fontColor = gray[900];
-                break;
-            case [3].includes(idx):
-                backgroundColor = palette[themeColorName][300];
-                fontColor = gray[900];
-                break;
-            case [4, 5, 6, 7].includes(idx):
-                backgroundColor = palette[themeColorName][300];
-                fontColor = transparent;
-                break;
-            default:
-                backgroundColor = palette[themeColorName][200];
-                fontColor = transparent;
-                break;
-            }
-
-            results.push({
-                ...d,
-                background_color: backgroundColor,
-                font_color: fontColor,
-            });
-        });
-        return results;
-    };
-    chartData[0].children = setColorData(chartData[0].children);
+    chartData[0].children = setThemeColorsToTreemapData(chartData[0].children, props.theme);
     series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
     chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
-
-    setTreemapLabelText(series, {
+    chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
     series.labels.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[TEXT_COLOR_FIELD_NAME]);
@@ -166,7 +128,7 @@ const drawChart = (chartData) => {
     series.data.setAll(chartData);
 };
 
-const initWidget = async (data?: TreemapChartData['children']): Promise<TreemapChartData['children']> => {
+const initWidget = async (data?: AnalyzeRawData[]): Promise<AnalyzeRawData[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -175,7 +137,7 @@ const initWidget = async (data?: TreemapChartData['children']): Promise<TreemapC
     return state.data;
 };
 
-const refreshWidget = async (): Promise<TreemapChartData['children']> => {
+const refreshWidget = async (): Promise<AnalyzeRawData[]> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
@@ -200,7 +162,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<TreemapChartData['children']>>({
+defineExpose<WidgetExpose<AnalyzeRawData[]>>({
     initWidget,
     refreshWidget,
 });

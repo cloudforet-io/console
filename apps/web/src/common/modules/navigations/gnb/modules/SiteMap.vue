@@ -107,8 +107,8 @@ onClickOutside(containerRef as MaybeRef, hideSiteMap);
                                                @keydown.enter="navigateToMenu(navigate, $event)"
                                             >
                                                 {{ subMenu.label }}
-                                                <new-mark v-if="subMenu.isNew" />
-                                                <beta-mark v-if="subMenu.isBeta" />
+                                                <new-mark v-if="subMenu.highlightTag === 'new'" />
+                                                <beta-mark v-else-if="subMenu.highlightTag === 'beta'" />
                                             </a>
                                         </template>
                                     </router-link>

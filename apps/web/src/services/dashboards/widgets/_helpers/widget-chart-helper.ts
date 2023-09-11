@@ -7,10 +7,10 @@ import {
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { AssetGroupBy, CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData, PieChartData,
+    CostAnalyzeDataModel, XYChartData, Legend, PieChartData,
 } from '@/services/dashboards/widgets/type';
 
 
@@ -70,10 +70,10 @@ export const getRefinedXYChartData = (
  * @name getXYChartLegends
  * @description Extract legends from raw data.
  */
-export const getXYChartLegends = (
-    rawData: CostAnalyzeDataModel['results'],
-    groupBy: CostGroupBy,
-    allReferenceTypeInfo: AllReferenceTypeInfo,
+export const getXYChartLegends = <T = Record<string, any>>(
+    rawData?: T[],
+    groupBy?: CostGroupBy,
+    allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
     if (!rawData || !groupBy || !allReferenceTypeInfo) return [];
@@ -110,41 +110,12 @@ export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], gro
 
 export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
     const start = dayjs.utc(dateRange.start);
-    const end = dayjs.utc(dateRange.end);
+    const end = dayjs.utc(dateRange.end).add(1, 'month'); // 1 month added because of `max` property bug
     return {
         min: start.valueOf(),
         max: end.valueOf(),
     };
 };
-
-
-/**
- * @name getRefinedTreemapChartData
- * @description Convert raw data to TreemapChart data.
- */
-export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: AssetGroupBy|CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
-    const chartData: TreemapChartData[] = [{
-        name: 'Root',
-        value: '',
-        children: [],
-    }];
-    if (!rawData || !groupBy) return [];
-
-    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy)?.referenceMap;
-    rawData.forEach((d) => {
-        const _name = d[groupBy];
-        let _label = d[groupBy];
-        if (_name) _label = referenceMap?.[_name]?.label ?? referenceMap?.[_name]?.name ?? _name;
-        else if (!_name) _label = 'Unknown';
-
-        chartData[0].children.push({
-            ...d,
-            value: _label,
-        });
-    });
-    return chartData;
-};
-
 
 /**
  * @name getRefinedPieChartData
