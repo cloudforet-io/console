@@ -75,11 +75,13 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         consoleFilters: (state): ConsoleFilter[] => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
-                results.push({
-                    k: category,
-                    v: filterItems,
-                    o: '=',
-                });
+                if (filterItems.length) {
+                    results.push({
+                        k: category,
+                        v: filterItems,
+                        o: '=',
+                    });
+                }
             });
             return results;
         },

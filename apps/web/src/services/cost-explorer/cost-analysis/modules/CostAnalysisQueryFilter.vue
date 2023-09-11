@@ -92,10 +92,9 @@ const handleSaveQuerySet = async () => {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
                 group_by: costAnalysisPageState.groupBy,
-                filters: costAnalysisPageState.filters,
+                filters: costAnalysisPageStore.consoleFilters,
             },
         });
-        await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
