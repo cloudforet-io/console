@@ -15,7 +15,6 @@ abstract class Authenticator {
             userId,
         });
         await Promise.allSettled([
-            store.dispatch('domain/setBillingEnabled'),
             // INIT REFERENCE STORE
             store.dispatch('reference/loadAll', { force: true }),
             setI18nLocale(store.state.user.language),
@@ -32,7 +31,6 @@ abstract class Authenticator {
                 await store.dispatch('display/hideSignInErrorMessage');
                 LocalStorageAccessor.removeItem('hideNotificationEmailModal');
                 await store.dispatch('error/resetErrorState');
-                await store.dispatch('domain/resetBillingEnabled');
             }
         } catch (e: unknown) {
             console.error('user sign out failed', e);
