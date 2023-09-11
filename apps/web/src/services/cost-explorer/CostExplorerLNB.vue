@@ -17,7 +17,7 @@ import { i18n } from '@/translations';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -163,9 +163,15 @@ const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
     return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
 };
 
-const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
+const getCurrentCurrencySet = (dataSourceKey: string): string => {
+    const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
 
-const getCurrencySymbol = (currency: string): string => CURRENCY_SYMBOL[currency];
+    const currentCurrency: string = dataSourceState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency;
+    const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
+    const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
+
+    return result || defaultCurrencySet;
+};
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
     const pagePermission = store.getters['user/pagePermissionMap'];
@@ -265,7 +271,7 @@ onMounted(() => {
                         <div class="menu-item">
                             <span>{{ item.label }}</span>
                             <span class="selected-item-postfix">
-                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrencySymbol(getCurrenctCurrency(item.name)) }}{{ getCurrenctCurrency(item.name) }})
+                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
                             </span>
                         </div>
                     </template>
