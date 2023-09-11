@@ -115,8 +115,8 @@ watch([
     () => costAnalysisPageState,
     () => costAnalysisPageStore.selectedDataSourceId,
     () => costAnalysisPageStore.selectedQueryId,
-], () => {
-    if (costAnalysisPageState.period) setChartData(costAnalysisPageState.period);
+], ([, selectedDataSourceId]) => {
+    if (costAnalysisPageState.period && selectedDataSourceId) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });
 </script>
 

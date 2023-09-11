@@ -277,7 +277,8 @@ watch(
         () => costAnalysisPageStore.selectedDataSourceId,
         () => costAnalysisPageStore.selectedQueryId,
     ],
-    async () => {
+    async ([, selectedDataSourceId]) => {
+        if (!selectedDataSourceId) return;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
