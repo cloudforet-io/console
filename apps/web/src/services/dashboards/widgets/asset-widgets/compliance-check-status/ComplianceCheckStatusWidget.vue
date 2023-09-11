@@ -17,7 +17,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { i18n } from '@/translations';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
@@ -73,7 +72,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as Data[]|null,
-    chart: null as null|ReturnType<typeof createPieChart>,
+    noData: computed(() => !state.data?.length),
     outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
         status: status.label,
         value: state.checkCount?.[status.name],
@@ -247,7 +246,9 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
 
-    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+    if (!state.noData) {
+        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+    }
 };
 
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
@@ -337,8 +338,8 @@ defineExpose<WidgetExpose<Data[]>>({
                 <div class="chart-wrapper">
                     <p-data-loader class="chart-loader"
                                    :loading="state.loading"
+                                   :data="state.data"
                                    loader-type="skeleton"
-                                   disable-empty-case
                                    :loader-backdrop-opacity="1"
                                    show-data-from-scratch
                     >
@@ -376,6 +377,7 @@ defineExpose<WidgetExpose<Data[]>>({
             justify-content: space-between;
             margin: 0;
             padding-bottom: 2rem;
+            min-height: 7.375rem;
             .left-wrapper, .right-wrapper {
                 flex: 1 1 auto;
                 position: relative;
