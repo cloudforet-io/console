@@ -22,7 +22,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
