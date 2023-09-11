@@ -156,13 +156,17 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createLabel(state.root as Root, settings);
         },
-        createCircle: (settings: am5.ICircleSettings, circleTemplate: am5.Template<am5.Circle>): am5.Circle => {
+        createCircle: (settings: am5.ICircleSettings, circleTemplate?: am5.Template<am5.Circle>): am5.Circle => {
             if (!state.root) throw new Error('No root');
             return createCircle(state.root as Root, settings, circleTemplate);
         },
         createDataProcessor: (settings: am5.IDataProcessorSettings): am5.DataProcessor => {
             if (!state.root) throw new Error('No root');
             return createDataProcessor(state.root as Root, settings);
+        },
+        createLinearGradient: (settings: am5.ILinearGradientSettings): am5.LinearGradient => {
+            if (!state.root) throw new Error('No root');
+            return am5.LinearGradient.new(state.root as Root, settings);
         },
         setXYSharedTooltipText,
         setXYSharedTooltipTextByUsage,

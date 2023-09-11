@@ -44,7 +44,7 @@ describe('Date Range Formatter Composable', () => {
 
     const wrapper = shallowMount(mockComponent as any, { localVue });
 
-    it('Should be displayed in the format of "Jan 2023" when the start and end dates are in the same year and month.', async () => {
+    it('Should be displayed in the format of "Jan, 2023" when the start and end dates are in the same year and month.', async () => {
         await wrapper.setProps({
             dateRange: {
                 start: '2023-01-01',
@@ -52,8 +52,19 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan 2023');
+        expect(dateEl.text()).toBe('Jan, 2023');
     });
+
+    // it('Should be displayed in the format of "Jan 11, 2023" when the start and end dates are in the same year and month, and end month is this month.', async () => {
+    //     await wrapper.setProps({
+    //         dateRange: {
+    //             start: '2023-09',
+    //             end: '2023-09',
+    //         },
+    //     });
+    //     const dateEl = wrapper.find('#date');
+    //     expect(dateEl.text()).toBe('Sep 11, 2023');
+    // });
 
     it('Should be displayed in the format of "Jan ~ Feb 2023" when the start and end dates are in the same year but different months.', async () => {
         await wrapper.setProps({

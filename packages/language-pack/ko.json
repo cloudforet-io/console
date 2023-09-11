@@ -1499,7 +1499,8 @@
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "비상속 옵션 목록:",
 			"MONTHLY_COST": {
 				"DESC": "조회기간의 최근월 비용 및 전월 동일 기간과의 비교 데이터를 보여주는 위젯.",
-				"TOTAL_SPENT_IN": "{period} 총 사용 금액 "
+				"PREVIOUS_MONTH": "이전 월",
+				"SELECTED_MONTH": "지정 월"
 			},
 			"NO_DATA": "데이터가 없습니다.",
 			"PROJECT_ACTIVITY_SUMMARY": {
