@@ -103,7 +103,7 @@ const drawChart = () => {
             stacked: true,
             stroke: undefined,
         };
-        if (legend.color) seriesSettings.fill = color(legend.color);
+        if (legend.color) seriesSettings.fill = chartHelper.color(legend.color);
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         chart.series.push(series);
 
@@ -127,8 +127,9 @@ const drawChart = () => {
         });
         const seriesColor = series.get('fill')?.toString();
         tooltip.label.adapters.add('text', (text, target) => {
-            if (target?.dataItem?.dataContext) {
-                let value = target.dataItem?.dataContext?.[legend.name];
+            const dataContext = target?.dataItem?.dataContext;
+            if (dataContext) {
+                let value = dataContext[legend.name];
                 value = currencyMoneyFormatter(value, props.currency, undefined, true);
                 return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
