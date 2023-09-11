@@ -142,10 +142,14 @@ const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMa
     data.forEach((d) => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
+
         const rawValue = d[groupByKey];
-        let refinedValue: string|null|undefined; // google_cloud -> Google Cloud
+        let refinedValue: string|null|undefined;
+
+        // google_cloud -> Google Cloud
         if (groupByKey === ASSET_GROUP_BY.REGION) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
         else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
+
         refinedChartData.push({
             [groupByKey]: refinedValue ?? `no_${groupByKey}`,
             fail_finding_count,
