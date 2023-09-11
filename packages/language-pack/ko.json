@@ -1439,12 +1439,12 @@
 				"DESC": "조회 기간동안의 상위 200개의 예산 사용률을 보여주는 위젯. "
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"AVAILABLE": "사용가능",
-				"BUDGETS": "Budgets",
+				"BUDGETED": "{count}개 예산",
+				"BUDGET_USAGE_IN": "{period}에 사용한 총 예산 ",
 				"DESC": "조회 기간동안의 전체 발생 비용, 예산 사용상태에 대한 요약 데이터를 나타내주는 위젯.",
-				"EXCEEDED": "초과",
-				"TOTAL_BUDGET": "총 예산",
-				"TOTAL_BUDGET_USAGE_IN": "{period} 예산 사용 금액 "
+				"EXCEED": "{value} 초과됨",
+				"LEFT": "{value} 남음",
+				"OUT_OF": "총 예산 {value}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "조회 기간동안의 프로젝트별 예산 사용상태를 예산 고갈 예측과 함께 보여주는 위젯. "
