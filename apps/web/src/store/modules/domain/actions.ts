@@ -42,23 +42,6 @@ export const load = async ({ commit }, name: string): Promise<void|Error> => {
     }
 };
 
-export const setBillingEnabled: Action<DomainState, any> = async ({ commit, rootState }) => {
-    try {
-        if (!rootState.user.isSessionExpired) {
-            const { total_count } = await SpaceConnector.client.costAnalysis.dataSource.list();
-            commit('setBillingEnabled', total_count > 0);
-        } else {
-            commit('setBillingEnabled', false);
-        }
-    } catch (e) {
-        commit('setBillingEnabled', false);
-    }
-};
-
-export const resetBillingEnabled: Action<DomainState, any> = async ({ commit }) => {
-    commit('setBillingEnabled', false);
-};
-
 export const loadExtraMenu: Action<DomainState, any> = async ({ commit, state }) => {
     if (state.extraMenu) return;
     try {
