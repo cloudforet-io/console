@@ -23,6 +23,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
@@ -85,8 +86,11 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         return { start, end };
     }),
     widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: widgetState.options.cost_data_source,
+            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+        },
         query: {
             granularity: primitiveToQueryString(widgetState.granularity),
             group_by: arrayToQueryString([widgetState.groupBy]),

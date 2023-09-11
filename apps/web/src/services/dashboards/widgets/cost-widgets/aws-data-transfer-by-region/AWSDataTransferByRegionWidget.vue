@@ -96,8 +96,10 @@ const state = reactive({
         end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            // TODO: after hook refactor, add params
+        },
         query: {
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
