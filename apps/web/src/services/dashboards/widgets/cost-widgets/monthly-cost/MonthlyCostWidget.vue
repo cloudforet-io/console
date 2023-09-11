@@ -104,13 +104,13 @@ const { colorSet } = useWidgetColorSet({
 
 const dateState = reactive({
     today: computed<string>(() => (dayjs.utc().format(DATE_FORMAT))),
-    isSelectedMonthThisMonth: computed<boolean>(() => (dayjs.utc(widgetState.dateRange.end).format(DATE_FORMAT) === dateState.today)),
     selectedMonth: computed<Dayjs>(() => (dayjs.utc(widgetState.dateRange.end))),
     previousMonth: computed<Dayjs>(() => (dayjs.utc(widgetState.dateRange.end).subtract(1, 'month'))),
 });
 const [formattedCurrentMonth] = useDateRangeFormatter({
     start: computed(() => dayjs.utc(dateState.selectedMonth).format('YYYY-MM-DD')),
     end: computed(() => dayjs.utc(dateState.selectedMonth).format('YYYY-MM-DD')),
+    showTildeIfStartAndEndThisMonth: true,
 });
 const [formattedPreviousMonth] = useDateRangeFormatter({
     start: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT)),

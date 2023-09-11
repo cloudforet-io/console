@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from 'vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, toRef } from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -8,7 +8,38 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 interface DateRangeFormatterOptions {
     start?: string|Ref<string|undefined>|ComputedRef<string|undefined>;
     end?: string|Ref<string|undefined>|ComputedRef<string|undefined>;
+    showTildeIfStartAndEndThisMonth?: boolean; // show tilde if start and end are the same year and month, and end month is this month.
 }
+
+/**
+ * @param options
+ * @description This composable is used to format the date range.
+ * @returns [formattedDate, isEndThisMonth]
+ * formattedDate: The formatted date range.
+ * isEndThisMonth: Whether the end date is this month.
+ * @example
+ // With the same year and month, it will be displayed in the format of "Aug, 2023".
+ const [formattedDate] = useDateRangeFormatter({
+    start: '2023-08',
+    end: '2023-08',
+});
+ // With the same year and different month, it will be displayed in the format of "Aug ~ Sep, 2023".
+ const [formattedDate] = useDateRangeFormatter({
+     start: '2023-08',
+     end: '2023-09',
+ });
+// With the different year to the start and end, it will be displayed in the format of "Aug 2022 ~ Aug 2023".
+ const [formattedDate] = useDateRangeFormatter({
+     start: '2022-08',
+     end: '2023-08',
+ });
+ // If end is this month, it will be displayed in the format of "Sep 11, 2023".
+ const [formattedDate, isEndThisMonth] = useDateRangeFormatter({
+     start: '2023-09',
+     end: '2023-09',
+ });
+
+ */
 export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
     const { i18nDayjs } = useI18nDayjs();
     const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
@@ -34,15 +65,21 @@ export const useDateRangeFormatter = (options: DateRangeFormatterOptions) => {
 
         if (state.isStartEndTheSameYear) {
             if (state.isStartEndTheSameMonth) {
-                if (state.isEndThisMonth) return `${dateFormatter(currentDateRange.end, 'MMM D, YYYY')}`;
+                if (state.isEndThisMonth) {
+                    const formatted = `${dateFormatter(currentDateRange.end, 'MMM D, YYYY')}`;
+                    if (options.showTildeIfStartAndEndThisMonth) return `~${formatted}`;
+                    return formatted;
+                }
                 return `${dateFormatter(start, 'MMM, YYYY')}`;
             }
 
-            return `${dateFormatter(start, 'MMM')} ~ ${dateFormatter(end, 'MMM')} ${dateFormatter(end, 'YYYY')}`;
+            if (state.isEndThisMonth) return `${dateFormatter(start, 'MMM')} ~ ${dateFormatter(end, 'MMM D, YYYY')}`;
+            return `${dateFormatter(start, 'MMM')} ~ ${dateFormatter(end, 'MMM YYYY')}`;
         }
 
-        return `${dateFormatter(start, 'MMM')} ${dateFormatter(start, 'YYYY')} ~ ${dateFormatter(end, 'MMM')} ${dateFormatter(end, 'YYYY')}`;
+        if (state.isEndThisMonth) return `${dateFormatter(start, 'MMM YYYY')} ~ ${dateFormatter(end, 'MMM D, YYYY')}`;
+        return `${dateFormatter(start, 'MMM YYYY')} ~ ${dateFormatter(end, 'MMM YYYY')}`;
     });
 
-    return [formattedDate];
+    return [formattedDate, toRef(state, 'isEndThisMonth')];
 };
