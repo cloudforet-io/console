@@ -86,7 +86,7 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
                   icon-left="ic_plus_bold"
                   @click="handleClickAddMore"
         >
-            Add More
+            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADD_MORE') }}
         </p-button>
         <p-context-menu v-show="visibleMenu"
                         ref="contextMenuRef"

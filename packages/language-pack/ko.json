@@ -509,7 +509,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적 데이터",
 				"ADDITIONAL_INFO": "추가 정보",
-				"ADD_MORE": "그룹 추가",
+				"ADD_MORE": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "누적 데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
 				"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",

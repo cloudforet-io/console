@@ -509,7 +509,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
-				"ADD_MORE": "グループ追加",
+				"ADD_MORE": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 				"ALT_E_DELETE_QUERY": "クエリの削除に失敗しました",
