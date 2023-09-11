@@ -306,8 +306,8 @@ defineExpose<WidgetExpose<Data[]>>({
         <div class="monthly-cost">
             <div class="current-month-cost-wrapper">
                 <p class="cost-label">
-                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
-                    <strong>({{ dateState.isSelectedMonthThisMonth ? '~' : '' }}{{ formattedCurrentMonth }})</strong>
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.SELECTED_MONTH') }}
+                    <strong>({{ formattedCurrentMonth }})</strong>
                 </p>
                 <p-data-loader class="data-loader"
                                :loading="state.loading"
