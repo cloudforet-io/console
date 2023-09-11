@@ -185,10 +185,12 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
+/* NOTE: Case for changing granularity dropdown */
 watch(() => props.localGranularity, (granularity) => {
     if (granularity) setSelectedItemByGranularity(granularity);
 });
 
+/* NOTE: Case for changing query set(LNB, Dynamic Link) */
 watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
     setSelectedItemByQuerySet({
         relativePeriod: selectedQuerySet?.options?.relative_period,
