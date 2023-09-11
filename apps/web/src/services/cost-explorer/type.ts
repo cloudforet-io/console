@@ -23,6 +23,12 @@ interface CostQuerySetOption {
     filters?: ConsoleFilter[];
 }
 
+export interface CostQuerySetOptionForPeriod {
+    granularity: Granularity;
+    period?: Period;
+    relativePeriod: RelativePeriod;
+}
+
 export interface CostQuerySetModel {
     cost_query_set_id: string;
     name: string;

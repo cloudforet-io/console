@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { OpUnitType } from 'dayjs';
+import type { ManipulateType } from 'dayjs';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
@@ -42,7 +42,7 @@ export interface Legend {
 
 
 export type RelativePeriod = {
-    unit: OpUnitType;
+    unit: ManipulateType;
     value: number;
     include_today: boolean;
 };

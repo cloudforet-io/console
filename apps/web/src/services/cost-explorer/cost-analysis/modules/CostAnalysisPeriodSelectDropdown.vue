@@ -49,21 +49,9 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const { i18nDayjs } = useI18nDayjs();
 const state = reactive({
     period: initiatePeriodByGranularity(GRANULARITY.MONTHLY)[0],
-    dailyPeriodItems: computed<PeriodItem[]>(() => (range(12).map((i) => {
-        const start = today.subtract(i, 'month');
-        const end = today.subtract(i, 'month');
-        return {
-            name: start.format('YYYY-MM'),
-            label: i18nDayjs.value(start).format('MMMM, YYYY'),
-            period: {
-                start: start.format('YYYY-MM'),
-                end: end.format('YYYY-MM'),
-            },
-        };
-    }))),
-    monthlyPeriodItems: computed<PeriodItem[]>(() => ([
+    dailyPeriodItems: computed<PeriodItem[]>(() => [
         {
-            name: 'thisMonth',
+            name: 'ThisMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
             relativePeriod: { unit: 'month', value: 0, include_today: true },
         },
@@ -72,6 +60,19 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
             relativePeriod: { unit: 'month', value: 1, include_today: false },
         },
+        ...(range(12).map((i) => {
+            const start = today.subtract(i, 'month');
+            const end = today.subtract(i, 'month');
+            return {
+                name: start.format('YYYY-MM'),
+                label: i18nDayjs.value(start).format('MMMM, YYYY'),
+                period: {
+                    start: start.format('YYYY-MM'),
+                    end: end.format('YYYY-MM'),
+                },
+            };
+        }))]),
+    monthlyPeriodItems: computed<PeriodItem[]>(() => ([
         {
             name: 'last3Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
@@ -81,10 +82,14 @@ const state = reactive({
             name: 'last6Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
             relativePeriod: { unit: 'month', value: 5, include_today: true },
-        }])),
-    yearlyPeriodItems: computed<PeriodItem[]>(() => ([
+        },
         {
-            name: 'thisYear',
+            name: 'last12Months',
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_12_MONTHS'),
+            relativePeriod: { unit: 'month', value: 11, include_today: true },
+        },
+        {
+            name: 'ThisYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_YEAR'),
             relativePeriod: { unit: 'year', value: 0, include_today: true },
         },
@@ -92,6 +97,12 @@ const state = reactive({
             name: 'lastYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_YEAR'),
             relativePeriod: { unit: 'year', value: 1, include_today: false },
+        }])),
+    yearlyPeriodItems: computed<PeriodItem[]>(() => ([
+        {
+            name: 'last3Years',
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_YEARS'),
+            relativePeriod: { unit: 'year', value: 2, include_today: true },
         },
     ])),
     allPeriodItems: computed<PeriodItem[]>(() => ([
@@ -131,11 +142,7 @@ const setSelectedItemByGranularity = (granularity:Granularity) => {
             _state.period = defaultPeriod;
             _state.relativePeriod = defaultRelativePeriod;
         });
-        if (granularity === GRANULARITY.DAILY) {
-            state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
-        } else {
-            state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
-        }
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
     }
 };
 const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
@@ -164,7 +171,10 @@ const handleSelectPeriod = (periodMenuName) => {
     if (periodMenuName === 'custom') state.customRangeModalVisible = true;
     else {
         const selectedPeriodItem: PeriodItem = state.allPeriodItems.find((d) => d.name === periodMenuName);
-        state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : selectedPeriodItem.period;
+        state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod({
+            relativePeriod: selectedPeriodItem.relativePeriod,
+            granularity: costAnalysisPageState.granularity,
+        }) : selectedPeriodItem.period;
         costAnalysisPageStore.$patch((_state) => {
             _state.period = state.period;
             _state.relativePeriod = selectedPeriodItem.relativePeriod;
