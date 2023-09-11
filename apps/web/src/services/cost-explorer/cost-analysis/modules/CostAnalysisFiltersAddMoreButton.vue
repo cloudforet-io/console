@@ -25,6 +25,7 @@ const state = reactive({
     searchText: '',
 });
 
+const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const {
@@ -42,7 +43,7 @@ const {
     selected: toRef(state, 'selectedItems'),
     searchText: toRef(state, 'searchText'),
 });
-onClickOutside(contextMenuRef, hideContextMenu);
+onClickOutside(containerRef, hideContextMenu);
 
 const handleClickAddMore = () => {
     if (visibleMenu.value) {
@@ -77,7 +78,9 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
 </script>
 
 <template>
-    <div class="cost-analysis-add-more-button">
+    <div ref="containerRef"
+         class="cost-analysis-add-more-button"
+    >
         <p-button ref="targetRef"
                   style-type="transparent"
                   icon-left="ic_plus_bold"
