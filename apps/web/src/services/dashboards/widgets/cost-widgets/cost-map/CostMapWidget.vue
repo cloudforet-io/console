@@ -24,8 +24,7 @@ import type {
     WidgetExpose, WidgetProps, WidgetEmit, CostGroupBy,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';

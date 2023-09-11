@@ -36,13 +36,10 @@ import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/v
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';

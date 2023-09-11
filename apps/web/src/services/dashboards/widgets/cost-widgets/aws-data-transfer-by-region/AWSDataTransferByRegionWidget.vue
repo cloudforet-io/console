@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -25,23 +19,25 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type {
+    WidgetExpose, WidgetProps, SelectorType, WidgetEmit,
+} from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import {
+    useCostWidgetFrameHeaderDropdown,
+} from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { CostAnalyzeDataModel, Legend } from '@/services/dashboards/widgets/type';
 
 
@@ -67,10 +63,32 @@ const USAGE_SOURCE_UNIT = 'GB';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            // TODO: after hook refactor, add params
+        },
+        query: {
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
+            filters: objectToQueryString({
+                ...getWidgetLocationFilters(widgetState.options.filters),
+                provider: ['aws'],
+                product: ['AWSDataTransfer'],
+            }),
+        },
+    })),
+});
+
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
-    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost' : 'usage_quantity')),
-    legends: [] as Legend[],
+    loading: true,
+    data: null as FullData | null,
+    fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
     chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results)),
     tableFields: computed<Field[]>(() => {
         const textOptions: Field['textOptions'] = {
@@ -90,32 +108,14 @@ const state = reactive({
             },
         ];
     }),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            // TODO: after hook refactor, add params
-        },
-        query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString({
-                ...getWidgetLocationFilters(state.options.filters),
-                provider: ['aws'],
-                product: ['AWSDataTransfer'],
-            }),
-        },
-    })),
 });
-const storeState = reactive({
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
+
+const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
+    selectorOptions: computed(() => widgetState.options?.selector_options),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Util */
 const { colorSet } = useWidgetColorSet({
@@ -124,15 +124,19 @@ const { colorSet } = useWidgetColorSet({
 });
 const getRefinedCircleData = (results?: Data): CircleData[] => {
     if (!results?.length) return [];
-    return results.map((d, idx) => ({
-        ...d,
-        region_code: d.region_code,
-        longitude: parseFloat(storeState.regions[d.region_code]?.longitude ?? 0),
-        latitude: parseFloat(storeState.regions[d.region_code]?.latitude ?? 0),
-        circleSettings: {
-            fill: colorSet.value[idx],
-        },
-    }));
+    const regionMap = props.allReferenceTypeInfo.region ?? {};
+    return results.map((d, idx) => {
+        const regionInfo = regionMap[d.region_code] ?? {};
+        return {
+            ...d,
+            region_code: d.region_code,
+            longitude: parseFloat(regionInfo.longitude ?? 0),
+            latitude: parseFloat(regionInfo.latitude ?? 0),
+            circleSettings: {
+                fill: colorSet.value[idx],
+            },
+        };
+    });
 };
 
 /* Api */
@@ -145,14 +149,15 @@ const fetchData = async (): Promise<FullData> => {
             { k: 'product', v: 'AWSDataTransfer', o: '=' },
             { k: 'usage_type', v: null, o: '!=' },
         ]);
-        apiQueryHelper.addFilter(...state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        apiQueryHelper.addFilter(...widgetState.consoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, COST_GROUP_BY.TYPE],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy, COST_GROUP_BY.TYPE],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -216,19 +221,17 @@ const drawChart = (chartData: CircleData[]) => {
 const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getPieChartLegends(state.data.results, state.groupBy);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getPieChartLegends(state.data.results, state.groupBy);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -237,33 +240,26 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleSelectSelectorType = async (selected: string) => {
-    state.selectedSelectorType = selected;
+const handleSelectSelectorType = async (selected: SelectorType) => {
+    selectedSelectorType.value = selected;
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
 };
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
     state.data = undefined;
-    refreshWidget(thisPage);
+    refreshWidget(_thisPage);
 };
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/region/load'),
-    ]);
-})();
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getPieChartLegends(state.data.results, state.groupBy);
         chartHelper.clearChildrenOfRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -279,11 +275,11 @@ defineExpose<WidgetExpose<FullData>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-data-transfer-by-region"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <template #header-right>
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
+            <widget-frame-header-dropdown :items="selectorItems"
+                                          :selected="selectedSelectorType"
                                           @select="handleSelectSelectorType"
             />
         </template>
@@ -305,10 +301,10 @@ defineExpose<WidgetExpose<FullData>>({
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
+                               :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :this-page="state.thisPage"
+                               :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                :legends="state.legends"
                                :color-set="colorSet"
