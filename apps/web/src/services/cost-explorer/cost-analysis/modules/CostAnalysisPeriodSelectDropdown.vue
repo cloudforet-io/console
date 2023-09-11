@@ -40,7 +40,7 @@ export interface ParamsForSelectedPeriod {
 }
 
 const props = defineProps<{
-    paramsForSelectedPeriod?: ParamsForSelectedPeriod;
+    localGranularity?: Granularity;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -123,9 +123,9 @@ const state = reactive({
 
 /* Util */
 const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
-const setSelectedItemByOptions = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
-    console.log('setSelectedItemByOptions', { relativePeriod, period, granularity });
-    if (!relativePeriod && !period && granularity) {
+
+const setSelectedItemByGranularity = (granularity) => {
+    if (granularity) {
         const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
         costAnalysisPageStore.$patch((_state) => {
             _state.period = defaultPeriod;
@@ -134,18 +134,17 @@ const setSelectedItemByOptions = ({ relativePeriod, period, granularity }:Params
         if (granularity === GRANULARITY.DAILY) {
             state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
         } else {
-            console.log('어때', getPeriodItemNameByRelativePeriod(defaultRelativePeriod), defaultRelativePeriod);
             state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
         }
-        return;
     }
+};
+const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
     if (granularity) {
         costAnalysisPageStore.$patch((_state) => {
             _state.granularity = granularity;
         });
     }
     if (relativePeriod) {
-        console.log('setSelectedItemByOptions', getPeriodItemNameByRelativePeriod(relativePeriod), relativePeriod);
         state.selectedPeriod = getPeriodItemNameByRelativePeriod(relativePeriod);
     } else if (granularity === GRANULARITY.DAILY) {
         const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item) => isEqual(item.period, period));
@@ -185,26 +184,12 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
-// watch(() => costAnalysisPageState.granularity, (granularity) => {
-//     const [period, relativePeriod] = initiatePeriodByGranularity(granularity);
-//     costAnalysisPageStore.$patch((_state) => {
-//         _state.period = period;
-//         _state.relativePeriod = relativePeriod;
-//     });
-//     if (granularity === GRANULARITY.DAILY) {
-//         state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
-//     } else if (granularity === GRANULARITY.MONTHLY) {
-//         state.selectedPeriod = 'last6Month';
-//     } else {
-//         state.selectedPeriod = 'thisYear';
-//     }
-// });
-watch(() => props.paramsForSelectedPeriod, (params) => {
-    if (params) setSelectedItemByOptions(params);
+watch(() => props.localGranularity, (granularity) => {
+    if (granularity) setSelectedItemByGranularity(granularity);
 });
 
 watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuery) => {
-    setSelectedItemByOptions({
+    setSelectedItemByQuerySet({
         relativePeriod: selectedQuery?.options?.relative_period,
         period: selectedQuery?.options?.period,
         granularity: selectedQuery?.options?.granularity,
