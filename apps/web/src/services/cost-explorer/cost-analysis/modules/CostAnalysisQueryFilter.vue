@@ -65,6 +65,7 @@ const state = reactive({
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
     filtersPopoverVisible: false,
+    granularity: undefined as Granularity|undefined,
 });
 
 const {
@@ -83,6 +84,7 @@ onClickOutside(contextMenuRef, hideContextMenu);
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
     costAnalysisPageStore.$patch({ granularity });
+    state.granularity = granularity;
 };
 const handleSaveQuerySet = async () => {
     try {
@@ -126,7 +128,7 @@ const handleClickFilter = () => {
                                    :selected="costAnalysisPageState.granularity"
                                    @select="handleSelectGranularity"
                 />
-                <cost-analysis-period-select-dropdown />
+                <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
                 <p-popover :is-visible="state.filtersPopoverVisible"
                            ignore-outside-click
                            trigger="click"
