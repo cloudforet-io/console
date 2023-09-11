@@ -33,12 +33,6 @@ interface PeriodItem extends SelectDropdownMenu {
     relativePeriod?: RelativePeriod;
 }
 
-export interface ParamsForSelectedPeriod {
-    relativePeriod?: RelativePeriod;
-    period?: Period;
-    granularity?: Granularity;
-}
-
 const props = defineProps<{
     localGranularity?: Granularity;
 }>();
@@ -136,16 +130,18 @@ const state = reactive({
 const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
 
 const setSelectedItemByGranularity = (granularity:Granularity) => {
-    if (granularity) {
-        const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
-        costAnalysisPageStore.$patch((_state) => {
-            _state.period = defaultPeriod;
-            _state.relativePeriod = defaultRelativePeriod;
-        });
-        state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
-    }
+    const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
+    costAnalysisPageStore.$patch((_state) => {
+        _state.period = defaultPeriod;
+        _state.relativePeriod = defaultRelativePeriod;
+    });
+    state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
 };
-const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:ParamsForSelectedPeriod) => {
+const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:{
+    relativePeriod?: RelativePeriod;
+    period?: Period;
+    granularity?: Granularity;
+}) => {
     if (relativePeriod) {
         state.selectedPeriod = getPeriodItemNameByRelativePeriod(relativePeriod);
     } else if (granularity === GRANULARITY.DAILY) {
@@ -193,11 +189,11 @@ watch(() => props.localGranularity, (granularity) => {
     if (granularity) setSelectedItemByGranularity(granularity);
 });
 
-watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuery) => {
+watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
     setSelectedItemByQuerySet({
-        relativePeriod: selectedQuery?.options?.relative_period,
-        period: selectedQuery?.options?.period,
-        granularity: selectedQuery?.options?.granularity,
+        relativePeriod: selectedQuerySet?.options?.relative_period,
+        period: selectedQuerySet?.options?.period,
+        granularity: selectedQuerySet?.options?.granularity,
     });
 }, {
     immediate: true,
