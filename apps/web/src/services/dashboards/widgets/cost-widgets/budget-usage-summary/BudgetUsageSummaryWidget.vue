@@ -7,7 +7,6 @@ import {
 import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -310,13 +309,14 @@ defineExpose<WidgetExpose<Data[]>>({
                     </div>
                     <div class="row-wrapper">
                         <span class="spent-cost">
-                            <span class="currency-symbol">{{ displayState.currencySymbol }}</span>{{ commaFormatter(displayState.recentSpent) }}
+                            <span class="currency-symbol">{{ displayState.currencySymbol }}</span>{{ currencyMoneyFormatter(displayState.recentSpent, undefined, undefined, true) }}
                         </span>
                         <i18n path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.OUT_OF"
                               class="recent-budget"
                         >
                             <template #value>
-                                <span class="currency-symbol">{{ displayState.currencySymbol }}</span><span class="value">{{ commaFormatter(displayState.recentBudget) }}</span>
+                                <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
+                                <span class="value">{{ currencyMoneyFormatter(displayState.recentBudget, undefined, undefined, true) }}</span>
                             </template>
                         </i18n>
                     </div>
@@ -329,9 +329,9 @@ defineExpose<WidgetExpose<Data[]>>({
                             </template>
                         </i18n>
                         <span class="budget-left">
-                            ({{ displayState.currencySymbol }}{{ displayState.isSpentOverBudget ?
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEED', { value: commaFormatter(displayState.recentBudgetLeft) }) :
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.LEFT', { value: commaFormatter(displayState.recentBudgetLeft) })
+                            ({{ displayState.isSpentOverBudget ?
+                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEED', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) }) :
+                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.LEFT', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) })
                             }})
                         </span>
                     </div>
