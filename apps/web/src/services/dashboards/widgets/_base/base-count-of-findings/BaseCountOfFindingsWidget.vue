@@ -14,19 +14,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
@@ -45,7 +44,6 @@ interface ChartData {
     pass_finding_count: number;
 }
 
-const DATE_FORMAT = 'YYYY-MM';
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -53,8 +51,9 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    dateRange: computed(() => ({
+        start: dayjs(widgetState.settings?.date_range?.start).format('YYYY-MM-DD'),
+        end: dayjs(widgetState.settings?.date_range?.end).format('YYYY-MM'),
     })),
 });
 
@@ -66,12 +65,12 @@ const state = reactive({
     groupByKey: computed<string|undefined>(() => {
         // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
         // ex. additional_info.service -> service
-        if (!state.groupBy) return undefined;
-        const dotIndex = state.groupBy.indexOf('.');
+        if (!widgetState.groupBy) return undefined;
+        const dotIndex = widgetState.groupBy.indexOf('.');
         if (dotIndex !== -1) {
-            return state.groupBy.slice(dotIndex + 1);
+            return widgetState.groupBy.slice(dotIndex + 1);
         }
-        return state.groupBy;
+        return widgetState.groupBy;
     }),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
@@ -84,7 +83,7 @@ const state = reactive({
             { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
         ];
     }),
-    chartData: computed(() => refineChartData(state.data)),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, props.allReferenceTypeInfo)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
@@ -122,32 +121,33 @@ const fetchData = async (): Promise<Data[]> => {
             },
         });
         if (status === 'succeed') return response.results;
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        return [];
     }
-    return [];
 };
 
 /* Util */
-const refineChartData = (data: Data[]): ChartData[] => {
-    if (!data?.length) return [];
+const refineChartData = (data: Data[], groupByKey?: string, allReferenceTypeInfo?: AllReferenceTypeInfo): ChartData[] => {
+    if (!data?.length || !groupByKey) return [];
     const refinedChartData: ChartData[] = [];
-    const referenceMap = Object.values(props.allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
+    const referenceMap = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
     data.forEach((d) => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
-        const rawValue = d[state.groupByKey];
+        const rawValue = d[groupByKey];
         let refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
         if (state.groupBy === ASSET_GROUP_BY.REGION) refinedValue = referenceMap?.[rawValue]?.name ?? rawValue;
         refinedChartData.push({
-            [state.groupByKey]: refinedValue ?? `no_${state.groupByKey}`,
+            [groupByKey]: refinedValue ?? `no_${groupByKey}`,
             fail_finding_count,
             pass_finding_count,
         });
     });
     return refinedChartData;
 };
-const drawChart = (chartData) => {
+const drawChart = (chartData: ChartData[]) => {
     if (!state.groupByKey || !state.legends) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupByKey);
