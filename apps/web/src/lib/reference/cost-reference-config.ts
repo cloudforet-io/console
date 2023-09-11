@@ -24,4 +24,10 @@ export const COST_REFERENCE_TYPE_INFO = {
         key: 'account',
         name: 'AWS Account ID (Cost)',
     },
+    cost_data_source: {
+        type: 'cost_data_source',
+        key: 'data_source_id',
+        name: 'Data Source',
+        resourceType: 'cost_analysis.DataSource',
+    },
 } as const;

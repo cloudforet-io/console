@@ -7,17 +7,6 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 
 export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
     properties: {
-        [REFERENCE_TYPE_INFO.cost_data_source.type]: {
-            name: REFERENCE_TYPE_INFO.cost_data_source.name,
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'SINGLE',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.cost_data_source.type,
-            },
-        },
         [REFERENCE_TYPE_INFO.project.type]: {
             name: REFERENCE_TYPE_INFO.project.name,
             variable_type: 'MANAGED',
@@ -88,6 +77,17 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
                 resource_key: COST_REFERENCE_TYPE_INFO.cost_account.key,
             },
         },
+        [COST_REFERENCE_TYPE_INFO.cost_data_source.type]: {
+            name: COST_REFERENCE_TYPE_INFO.cost_data_source.name,
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'SINGLE',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
+            options: {
+                type: 'REFERENCE_RESOURCE',
+                reference_key: COST_REFERENCE_TYPE_INFO.cost_data_source.type,
+            },
+        },
         // Variable for Asset
         [ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type]: {
             name: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name,
@@ -115,7 +115,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         },
     },
     order: [
-        REFERENCE_TYPE_INFO.cost_data_source.type,
+        COST_REFERENCE_TYPE_INFO.cost_data_source.type,
         REFERENCE_TYPE_INFO.project.type,
         // REFERENCE_TYPE_INFO.provider.type,
         REFERENCE_TYPE_INFO.service_account.type,
