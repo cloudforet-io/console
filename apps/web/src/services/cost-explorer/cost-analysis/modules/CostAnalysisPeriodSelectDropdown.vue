@@ -24,7 +24,6 @@ import type { Period } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
-
 const today = dayjs.utc();
 interface PeriodItem extends SelectDropdownMenu {
     period: {
@@ -159,6 +158,11 @@ watch(() => costAnalysisPageState.granularity, (granularity) => {
         state.selectedPeriod = 'thisYear';
     }
 });
+watch(() => costAnalysisPageState.period, (period) => {
+    if (period && !costAnalysisPageState.relativePeriod) {
+        state.selectedPeriod = 'custom';
+    }
+}, { immediate: true });
 </script>
 
 <template>
