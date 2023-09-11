@@ -99,7 +99,15 @@ const state = reactive({
     loading: true,
     data: null as Response | null,
     chart: null as null | XYChart,
-    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, widgetState.groupBy)),
+    chartData: computed<XYChartData[]>(() => {
+        const data = getRefinedXYChartData(state.data?.results, {
+            groupBy: widgetState.groupBy,
+            arrayDataKey: 'cost_sum',
+            categoryKey: DATE_FIELD_NAME,
+            valueKey: 'value',
+        });
+        return data;
+    }),
     tableFields: computed<Field[]>(() => {
         if (!widgetState.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'cost' });

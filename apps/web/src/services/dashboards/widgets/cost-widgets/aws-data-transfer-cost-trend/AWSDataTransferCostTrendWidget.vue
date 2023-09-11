@@ -67,8 +67,13 @@ const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost_sum' : 'usage_quantity_sum')),
     chartData: computed<XYChartData[]>(() => {
-        const valueKey = state.fieldsKey;
-        return getRefinedXYChartData(state.data, state.groupBy, DATE_FIELD_NAME, valueKey);
+        const dataKey = state.fieldsKey;
+        return getRefinedXYChartData(state.data, {
+            groupBy: state.groupBy,
+            arrayDataKey: dataKey,
+            categoryKey: DATE_FIELD_NAME,
+            valueKey: 'value',
+        });
     }),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];

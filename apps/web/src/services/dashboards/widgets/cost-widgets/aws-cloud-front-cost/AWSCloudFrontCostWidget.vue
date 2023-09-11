@@ -36,7 +36,10 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
-import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import {
+    getRefinedXYChartData,
+    getXYChartLegends,
+} from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
@@ -74,8 +77,15 @@ const state = reactive({
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed(() => {
-        const valueKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, COST_GROUP_BY.TYPE, valueKey, true, props.allReferenceTypeInfo);
+        const dataKey = `${state.fieldsKey}_sum`;
+        const _chartData = getRefinedXYChartData(state.data?.results, {
+            groupBy: state.groupBy,
+            allReferenceTypeInfo: props.allReferenceTypeInfo,
+            arrayDataKey: dataKey,
+            categoryKey: COST_GROUP_BY.TYPE,
+            valueKey: 'value',
+            isHorizontal: true,
+        });
         return _chartData.reverse();
     }),
     tableFields: computed<Field[]>(() => {

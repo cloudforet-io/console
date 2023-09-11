@@ -23,7 +23,7 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     },
     sizes: ['sm', 'full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
     },
     options_schema: {
         default_properties: [
