@@ -165,9 +165,11 @@ const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
 
 const getCurrentCurrencySet = (dataSourceKey: string): string => {
     const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
-    const currentCurrency = dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency ?? '';
-    const currentSymbol = CURRENCY_SYMBOL[currentCurrency] ?? '';
-    const result = `${currentSymbol}${currentCurrency}`;
+
+    const currentCurrency: string = dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
+    const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
+    const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
+
     return result || defaultCurrencySet;
 };
 
