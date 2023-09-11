@@ -5,6 +5,7 @@ import {
 
 import { color } from '@amcharts/amcharts5';
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
+import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
@@ -40,7 +41,7 @@ interface Props {
     currencyRates: CurrencyRates;
     //
     loading: boolean;
-    chart: null | any; // TODO: type
+    chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
     granularity: Granularity;
@@ -95,13 +96,15 @@ const drawChart = () => {
         return text;
     });
 
-    props.legends.forEach((l) => {
-        const series = chartHelper.createXYColumnSeries(chart, {
-            name: l.label as string,
-            valueYField: l.name,
+    props.legends.forEach((legend) => {
+        const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
+            name: legend.label as string,
+            valueYField: legend.name,
             stacked: true,
             stroke: undefined,
-        });
+        };
+        if (legend.color) seriesSettings.fill = color(legend.color);
+        const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         chart.series.push(series);
 
         // set data processor
@@ -125,7 +128,7 @@ const drawChart = () => {
         const seriesColor = series.get('fill')?.toString();
         tooltip.label.adapters.add('text', (text, target) => {
             if (target?.dataItem?.dataContext) {
-                let value = target.dataItem?.dataContext?.[l.name];
+                let value = target.dataItem?.dataContext?.[legend.name];
                 value = currencyMoneyFormatter(value, props.currency, undefined, true);
                 return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
