@@ -10,7 +10,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    CostAnalyzeDataModel, Legend, PieChartData,
+    Legend,
 } from '@/services/dashboards/widgets/type';
 
 
@@ -137,7 +137,7 @@ export const getXYChartLegends = <T = Record<string, any>>(
     return legends;
 };
 
-export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy?: string): Legend[] => {
+export const getPieChartLegends = (rawData: RawData[], groupBy?: string): Legend[] => {
     if (!rawData || !groupBy) return [];
     return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
 };
@@ -151,20 +151,24 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
     };
 };
 
+
+type AppendedData<T> = T & {
+    [groupBy: string]: string | any;
+};
 /**
  * @name getRefinedPieChartData
  * @description Convert raw data to XYDateChart data.
  * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
  * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
  */
-export const getRefinedPieChartData = (
-    rawData: CostAnalyzeDataModel['results'],
+export const getRefinedPieChartData = <T extends RawData = RawData>(
+    rawData: T[],
     groupBy: CostGroupBy,
     allReferenceTypeInfo: AllReferenceTypeInfo,
-): PieChartData[] => {
+): AppendedData<T>[] => {
     if (!rawData || !groupBy) return [];
 
-    const chartData: PieChartData[] = [];
+    const chartData: AppendedData<T>[] = [];
     rawData.forEach((d) => {
         let _name = d[groupBy];
         const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
@@ -177,7 +181,7 @@ export const getRefinedPieChartData = (
         chartData.push({
             ...d,
             [groupBy]: _name,
-        } as PieChartData);
+        } as AppendedData<T>);
     });
     return chartData;
 };
