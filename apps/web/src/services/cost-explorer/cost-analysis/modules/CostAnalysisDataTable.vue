@@ -9,7 +9,7 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { byteFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -27,7 +27,6 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -289,7 +288,7 @@ const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|s
     if (item.usage_unit === 'Bytes') {
         return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
     }
-    return usageQuantity.toFixed(2);
+    return numberFormatter(usageQuantity);
 };
 
 /* event */
@@ -405,7 +404,7 @@ watch(
                             class="!align-middle"
                     >
                         <template v-if="getIsRaised(item, field.name)">
-                            <span class="cell-text raised">{{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}</span>
+                            <span class="cell-text raised">{{ numberFormatter(value) }}</span>
                             <p-i name="ic_arrow-up-bold-alt"
                                  width="0.75rem"
                                  height="0.75rem"
@@ -413,7 +412,7 @@ watch(
                         </template>
                         <template v-else>
                             <span class="usage-wrapper">
-                                {{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}
+                                {{ numberFormatter(value) }}
                                 <p-divider v-if="state.isIncludedUsageTypeInGroupBy"
                                            vertical
                                            class="divider"
