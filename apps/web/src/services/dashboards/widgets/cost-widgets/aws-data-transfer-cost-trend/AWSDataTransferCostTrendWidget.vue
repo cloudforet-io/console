@@ -223,11 +223,6 @@ const drawChart = (chartData: XYChartData[]) => {
     if (widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'chart') {
         legend = chartHelper.createLegend({
             nameField: 'name',
-            layout: chartHelper.root.value?.horizontalLayout as any,
-            verticalScrollbar: chartHelper.createScrollbar({
-                orientation: 'horizontal',
-                minHeight: 50,
-            }),
         });
         chart.children.push(legend);
     }
