@@ -135,8 +135,7 @@ const onClickMenu = (item: MenuItem, index) => {
             state.proxySelected.splice(indexOfSelected, 1);
             state.proxySelected = [...state.proxySelected];
         } else {
-            state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
-            state.proxySelected = [...state.proxySelected];
+            state.proxySelected = [...state.proxySelected, item];
         }
     } else {
         state.proxySelected = [item];

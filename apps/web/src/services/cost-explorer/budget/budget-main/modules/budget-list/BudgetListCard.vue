@@ -17,8 +17,8 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import BudgetUsageProgressBar from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetUsageProgressBar.vue';
 import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
-import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 interface Props {
