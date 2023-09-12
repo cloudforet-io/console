@@ -137,7 +137,7 @@ export const getXYChartLegends = <T = Record<string, any>>(
     return legends;
 };
 
-export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: CostGroupBy): Legend[] => {
+export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy?: string): Legend[] => {
     if (!rawData || !groupBy) return [];
     return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
 };

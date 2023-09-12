@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
@@ -40,11 +40,21 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'cost_account'),
+        default_properties: [
+            'cost_data_source',
+            ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'cost_account'),
+        ],
+        fixed_properties: ['cost_data_source'],
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
-            order: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account'),
+            properties: {
+                ...getWidgetOptionsSchema('cost_data_source'),
+                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+            },
+            order: [
+                'cost_data_source',
+                ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account'),
+            ],
         },
     },
 };

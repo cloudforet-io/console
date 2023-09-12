@@ -99,6 +99,8 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
+        state.loading = true;
+
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
@@ -126,10 +128,14 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            state.loading = false;
+            return response.results;
+        }
         return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.loading = false;
         return [];
     }
 };
@@ -249,23 +255,18 @@ const drawChart = (chartData: ChartData[]) => {
     legends.data.setAll(chart.series.values);
 };
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
-    state.loading = true;
     state.data = data ?? await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 const refreshWidget = async (_thisPage = 1): Promise<Data[]> => {
-    await nextTick();
-    state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 
