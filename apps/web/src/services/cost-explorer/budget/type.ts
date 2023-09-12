@@ -3,6 +3,9 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
+import type { Granularity } from '@/services/cost-explorer/type';
+
+
 export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>;
 
 export interface BudgetPageQueryValue {
@@ -16,13 +19,15 @@ export interface BudgetUsageRange {
 }
 
 export interface BudgetUsageAnalyzeRequestParam {
-	include_budget_count?: boolean;
-	group_by?: string[];
-	start?: string;
-	end?: string;
-	usage_range?: BudgetUsageRange;
-	sort?: Query['sort'];
-	page?: Query['page'];
-	filter?: Query['filter'];
-	keyword?: Query['keyword'];
+	query: {
+		group_by?: string[];
+		granularity?: Granularity;
+		start?: string;
+		end?: string;
+		fields?: Record<string, any>;
+		select?: Record<string, any>;
+		sort?: Array<Query['sort']>;
+		page?: Query['page'];
+		filter?: Query['filter'];
+	}
 }
