@@ -42,15 +42,29 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'cost_account')],
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'project',
+            'service_account',
+            'region',
+        )],
         fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetOptionsSchema('cost_group_by'),
-                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+                ...getWidgetFilterOptionsSchema(
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
             },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account')],
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+                'project',
+                'service_account',
+                'project_group',
+                'region',
+            )],
         },
     },
 };
