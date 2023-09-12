@@ -22,10 +22,11 @@ interface RefineOptions {
     groupBy?: string; // if given, set the value to the groupBy property. { [groupBy]: valueData }
     allReferenceTypeInfo?: AllReferenceTypeInfo; // if both this and groupBy are given, get groupBy label and set the value to the label property. { [groupByLabel]: valueData }
     arrayDataKey: string|string[]; // = 'cost_sum' or ['cost_sum', 'budget_sum']
-    categoryKey: string; // 'date'
+    categoryKey: string; // merge by this key.  = 'date' pr ['date', 'Usage Type Details']
     valueKey: string // 'value'
     useDataKeyAsRefinedValue?: boolean; // only works for vertical chart.
     isHorizontal?: boolean;
+    additionalIncludeKeys?: string[]; // it will be included in the result. it is the keys of the target array data.
 }
 /**
  * @name getRefinedXYChartData
@@ -53,24 +54,30 @@ export const getRefinedXYChartData = <T extends RawData = RawData, S extends Rec
 };
 const mergeRefinedXYChartData = <S = RawData>(chartData: S[], data: RawData, options: RefineOptions, groupByLabel: string|undefined): S[] => {
     const {
-        arrayDataKey, categoryKey, valueKey, useDataKeyAsRefinedValue,
+        arrayDataKey, categoryKey, valueKey, useDataKeyAsRefinedValue, additionalIncludeKeys,
     } = options;
     const arrayDataKeys = typeof arrayDataKey === 'string' ? [arrayDataKey] : arrayDataKey;
     let mergedChartData = chartData;
     arrayDataKeys.forEach((arrDataKey, i) => { // [{date: '2022-11', value: 34}, ...]
         const arrayData = data[arrDataKey];
         const valueSetKey = useDataKeyAsRefinedValue ? arrayDataKeys[i] : groupByLabel ?? valueKey;
-        const refinedList: RawData[] = arrayData?.map((valueSet) => ({
-            [categoryKey]: valueSet[categoryKey],
-            [valueSetKey]: valueSet[valueKey],
-        })) ?? [];
+        const refinedList: S[] = arrayData?.map((valueSet) => {
+            const refined = {
+                [valueSetKey]: valueSet[valueKey],
+                [categoryKey]: valueSet[categoryKey],
+            };
+            additionalIncludeKeys?.forEach((key) => {
+                refined[key] = valueSet[key];
+            });
+            return refined;
+        }) ?? [];
         mergedChartData = mergeByKey(mergedChartData, refinedList, categoryKey) as S[];
     });
     return mergedChartData;
 };
-const mergeByKey = (arrA, arrB, key) => {
+const mergeByKey = <S = RawData>(arrA: S[], arrB: S[], key: string): S[] => {
     const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
-    return values(merged);
+    return values(merged) as S[];
 };
 const mergeRefinedHorizontalXYChartData = <S = RawData>(chartData: S[], data: RawData, options: RefineOptions, groupByLabel: string|undefined): S[] => {
     const {
@@ -80,7 +87,7 @@ const mergeRefinedHorizontalXYChartData = <S = RawData>(chartData: S[], data: Ra
     let mergedChartData = chartData;
     arrayDataKeys.forEach((arrDataKey) => { // [{date: '2022-11', value: 34}, ...]
         const arrayData = data[arrDataKey];
-        const refinedList: RawData[] = arrayData?.map((valueSet) => {
+        const refinedList: S[] = arrayData?.map((valueSet) => {
             const result = {
                 [valueSet[categoryKey] as string]: valueSet[valueKey],
             };
