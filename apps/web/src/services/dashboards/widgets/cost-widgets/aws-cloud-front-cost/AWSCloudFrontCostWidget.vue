@@ -42,7 +42,9 @@ import {
     getXYChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
-import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import {
+    getReferenceTypeOfGroupBy,
+} from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
@@ -117,7 +119,7 @@ const state = reactive({
     loading: true,
     data: null as Response | null,
     fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
-    legends: [] as Legend[],
+    legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo) : [])),
     chartData: computed(() => {
         const dataKey = `${state.fieldsKey}_sum`;
         const _chartData = getRefinedXYChartData(state.data?.results, {
@@ -149,6 +151,7 @@ const state = reactive({
             type: state.fieldsKey === 'cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
+
         const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
             label: d[USAGE_TYPE_VALUE_KEY],
             name: d[USAGE_TYPE_VALUE_KEY],
@@ -156,11 +159,20 @@ const state = reactive({
             textAlign: 'right',
         })) ?? [];
 
+        // set width of table fields
+        const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
+        const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
+
         const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
         return [
-            { name: widgetState.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
-            ...dynamicTableFields,
+            {
+                name: widgetState.groupBy,
+                label: groupByLabel,
+                textOptions: { type: 'reference', referenceType },
+                width: groupByFieldWidth,
+            },
+            ...dynamicTableFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
 });
@@ -221,10 +233,10 @@ const drawChart = (chartData) => {
     });
     chart.children.push(legend);
 
-    state.data.results[0].cost_sum.forEach((d) => {
+    state.tableFields.slice(1).forEach((d) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: d[USAGE_TYPE_VALUE_KEY],
-            valueXField: d[USAGE_TYPE_VALUE_KEY],
+            name: d.label,
+            valueXField: d.label,
             categoryYField: widgetState.groupBy,
             xAxis,
             yAxis,
@@ -243,7 +255,7 @@ const drawChart = (chartData) => {
                 if (value === undefined) value = '--';
                 if (fieldName === 'data-transfer.out') {
                     if (selectedSelectorType.value === 'cost') {
-                        if (state.currency) value = currencyMoneyFormatter(value, widgetState.currency, props.currencyRates);
+                        if (state.currency) value = currencyMoneyFormatter(value, widgetState.currency);
                     } else {
                         value = bytes.parse(`${value}${USAGE_SOURCE_UNIT}`);
                         value = byteFormatter(value);
@@ -262,7 +274,7 @@ const drawChart = (chartData) => {
 const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
@@ -274,7 +286,6 @@ const refreshWidget = async (_thisPage = 1): Promise<Response> => {
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -301,7 +312,6 @@ useWidgetLifecycle({
     widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -346,9 +356,8 @@ defineExpose<WidgetExpose<Response>>({
                                :fields="state.tableFields"
                                :items="state.tableData"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
+                               :legends="state.legends"
                                :color-set="colorSet"
                                :this-page="state.thisPage"
                                :show-next-page="state.data ? state.data.more : false"
