@@ -71,16 +71,16 @@ const state = reactive({
 const labelRef = ref<HTMLElement[]|null>(null);
 
 /* util */
-const getLegendIconColor = (index): string => {
+const getLegendIconColor = (index: number): string => {
     const legend = props.legends[index];
-    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.disabled || state.disabledLegends[index]) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
     if (props.colorSet) return props.colorSet[index];
     return DEFAULT_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];
-    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.disabled || state.disabledLegends[index]) return DISABLED_LEGEND_COLOR;
     return null;
 };
 const getHeadSlotProps = (field, colIndex) => ({
@@ -166,7 +166,7 @@ const getTooltipContents = (item, field:Field):string => {
 /* event */
 const handleClickLegend = (index: number) => {
     // if (props.printMode) return;
-    state.disabledLegends[index] = !state.disabledLegends[index];
+    state.disabledLegends = { ...state.disabledLegends, [index]: !state.disabledLegends[index] };
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
