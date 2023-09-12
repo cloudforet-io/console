@@ -3,14 +3,14 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PDivider,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -334,7 +334,7 @@ const handleExport = async () => {
 };
 const handleUpdateThisPage = async () => {
     const { results, more } = await listCostAnalysisTableData();
-    tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     tableState.more = more;
 };
 
