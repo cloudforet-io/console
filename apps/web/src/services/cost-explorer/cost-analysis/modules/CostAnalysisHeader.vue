@@ -36,7 +36,7 @@ const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
     dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
-    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? !managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
+    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
     currencySymbol: computed(() => store.getters['settings/currencySymbol']),
@@ -93,11 +93,11 @@ const handleDeleteQueryConfirm = async () => {
                                          :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
                                          scale="0.8"
                         />
-                        <p-icon-button v-if="state.isManagedCostQuerySet"
+                        <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_edit-text"
                                        @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
                         />
-                        <p-icon-button v-if="state.isManagedCostQuerySet"
+                        <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_delete"
                                        @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
                         />
