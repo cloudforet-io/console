@@ -47,7 +47,7 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
                 'cost_product',
                 'region',
                 'cost_type',
-                'cost_cost_account',
+                'cost_account',
             )],
         },
     },
