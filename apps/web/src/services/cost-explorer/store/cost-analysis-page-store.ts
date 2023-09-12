@@ -95,6 +95,13 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             });
             return results;
         },
+        dataSourceImageUrl: () => {
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId];
+                return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
+            }
+            return '';
+        },
     },
     actions: {
         async initState() {
