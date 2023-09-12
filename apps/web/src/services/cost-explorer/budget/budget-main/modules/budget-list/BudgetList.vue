@@ -4,11 +4,12 @@ import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
 
-import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 
@@ -17,14 +18,17 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
-import type { Pagination } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
-import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
-import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import type {
-    BudgetUsageAnalyzeRequestParam,
-    BudgetUsageRange,
-} from '@/services/cost-explorer/budget/type';
+    Pagination,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
+import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
+import type { BudgetUsageAnalyzeModel } from '@/services/cost-explorer/budget/model';
+import type { BudgetUsageAnalyzeRequestParam } from '@/services/cost-explorer/budget/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';
+
+
+const BUDGET_USAGE_ANALYZE_GROUP_BY_LIST = ['budget_id', 'name', 'project_id', 'project_group_id', 'data_source_id', 'provider_filter'];
 
 interface Props {
     filters: ConsoleFilter[];
@@ -36,40 +40,72 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:filters', filters:ConsoleFilter[]): void;
 }>();
 
-
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
-
 const state = reactive({
-    budgetUsages: [] as BudgetUsageModel[],
+    budgetUsages: [] as BudgetUsageAnalyzeModel[],
     loading: false,
     // query
-    range: {} as BudgetUsageRange,
     pageStart: 1,
     pageLimit: 24,
-    totalCount: 0,
+    more: false,
     queryStoreFilters: props.filters as ConsoleFilter[],
     period: {} as Period,
     // api request params
     sort: {
-        key: 'usage',
+        key: 'budget_usage',
         desc: true,
-    },
+    } as Query['sort'],
     budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
-        const param = {
-            group_by: ['budget_id'],
-            include_budget_info: true,
-            ...budgetUsageApiQueryHelper.setFilters(state.queryStoreFilters)
-                .setPage(state.pageStart, state.pageLimit)
-                .setSort(state.sort.key, state.sort.desc)
-                .data,
-        } as BudgetUsageAnalyzeRequestParam;
+        budgetUsageApiQueryHelper
+            .setFilters(state.queryStoreFilters)
+            .setPage(state.pageStart, state.pageLimit);
 
-        if (state.period.start) param.start = dayjs.utc(state.period.start).format('YYYY-MM');
-        if (state.period.end) param.end = dayjs.utc(state.period.end).format('YYYY-MM');
+        const _selectMap: Record<string, string> = {};
+        BUDGET_USAGE_ANALYZE_GROUP_BY_LIST.forEach((groupBy) => {
+            _selectMap[groupBy] = groupBy;
+        });
 
-        if (state.range.min || state.range.max) param.usage_range = state.range;
+        const query: BudgetUsageAnalyzeRequestParam['query'] = {
+            group_by: BUDGET_USAGE_ANALYZE_GROUP_BY_LIST,
+            fields: {
+                total_spent: {
+                    key: 'cost',
+                    operator: 'sum',
+                },
+                total_budget: {
+                    key: 'limit',
+                    operator: 'sum',
+                },
+            },
+            select: {
+                ..._selectMap,
+                total_spent: 'total_spent',
+                total_budget: 'total_budget',
+                budget_usage: {
+                    operator: 'multiply',
+                    fields: [
+                        {
+                            operator: 'divide',
+                            fields: [
+                                'total_spent',
+                                'total_budget',
+                            ],
+                        },
+                        100,
+                    ],
+                },
+            },
+            sort: [state.sort],
+            ...budgetUsageApiQueryHelper.data,
+        };
 
-        return param;
+        if (!isEmpty(state.period)) {
+            query.granularity = GRANULARITY.MONTHLY;
+            query.start = state.period.start;
+            query.end = state.period.end;
+        }
+
+        return { query };
     }),
 });
 
@@ -78,38 +114,26 @@ const setFilters = (filters: ConsoleFilter[]) => {
     emit('update:filters', filters);
 };
 
-const fetchBudgetUsages = async () => {
+const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeModel[]}> => {
     try {
-        const { results, total_count } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-        // TODO: Remove conversion process after the cost analysis API is updated.
-        state.budgetUsages = results.map((budgetUsage: any) => ({
-            ...budgetUsage,
-            cost: budgetUsage.usd_cost,
-        }));
-        state.totalCount = total_count;
+        state.loading = true;
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.budgetUsages = [];
-        state.totalCount = 0;
+        return { more: false, results: [] };
+    } finally {
+        state.loading = false;
     }
 };
 
 const listBudgets = async () => {
     if (state.loading) return;
-
-    state.loading = true;
-
-    await fetchBudgetUsages();
-
-    state.loading = false;
+    const { more, results } = await fetchBudgetUsages();
+    state.budgetUsages = results;
+    state.more = more;
 };
 
 /* Handlers */
-const handleUpdateRange = (range: BudgetUsageRange) => {
-    state.range = range;
-    listBudgets();
-};
-
 const handleUpdatePagination = ({ pageStart, pageLimit }: Pagination) => {
     state.pageStart = pageStart;
     state.pageLimit = pageLimit;
@@ -171,8 +195,7 @@ const handleUpdateSort = (sort) => {
 <template>
     <div class="budget-list">
         <budget-toolbox :filters="state.queryStoreFilters"
-                        :total-count="state.totalCount"
-                        @update-range="handleUpdateRange"
+                        :more="state.more"
                         @update-pagination="handleUpdatePagination"
                         @update-period="handleUpdatePeriod"
                         @update-filters="handleUpdateFilters"
