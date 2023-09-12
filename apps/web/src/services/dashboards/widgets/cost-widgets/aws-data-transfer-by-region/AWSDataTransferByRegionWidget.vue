@@ -174,11 +174,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
     try {
-        apiQueryHelper.setFilters([
-            { k: 'product', v: 'AWSDataTransfer', o: '=' },
-        ]);
-        apiQueryHelper.addFilter(...widgetState.consoleFilters);
-
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
         const { status, response } = await fetchCostAnalyze({
