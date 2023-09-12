@@ -43,10 +43,19 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { Legend, CostAnalyzeDataModel, PieChartData } from '@/services/dashboards/widgets/type';
+import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-
-type Data = CostAnalyzeDataModel;
+interface Data {
+    cost_sum?: Array<{
+        [field_group: string]: any;
+        value: number
+    }>
+    _total_cost_sum?: number;
+}
+type FullData = CostAnalyzeResponse<Data>;
+interface ChartData extends Data {
+    [groupBy: string]: string | any;
+}
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -83,10 +92,10 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 const state = reactive({
     loading: true,
-    data: null as Data|null,
+    data: null as FullData|null,
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
-    chartData: computed<PieChartData[]>(() => {
+    chartData: computed<ChartData[]>(() => {
         if (!state.data?.results?.length) return [];
         return getRefinedPieChartData(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
     }),
@@ -113,8 +122,8 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<FullData> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
@@ -134,14 +143,16 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            return response;
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
     return { results: [], more: false };
 };
 
-const drawChart = (chartData: PieChartData[]) => {
+const drawChart = (chartData: ChartData[]) => {
     let chart;
     if (widgetState.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
     else chart = chartHelper.createPieChart();
@@ -175,7 +186,7 @@ const drawChart = (chartData: PieChartData[]) => {
     state.series = series;
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
@@ -185,7 +196,7 @@ const initWidget = async (data?: Data): Promise<Data> => {
     return state.data;
 };
 
-const refreshWidget = async (_thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
@@ -223,7 +234,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });

@@ -327,7 +327,6 @@ defineExpose<WidgetExpose<Response>>({
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends="state.legends"
                                :color-set="colorSet"

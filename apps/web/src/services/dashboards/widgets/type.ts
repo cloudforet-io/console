@@ -1,5 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
+// TODO: remove this type after refactoring
 export interface CostAnalyzeDataModel {
     more?: boolean;
     results: Array<{
@@ -17,26 +18,7 @@ export interface CostAnalyzeDataModel {
     }>;
 }
 
-export interface AnalyzeDataModel {
-    more?: boolean;
-    results: Array<{
-        [groupBy: string]: string | any; // product: 'AmazonCloudFront'
-        // cost-analysis/analyze
-        cost_sum?: Array<{
-            [field_group: string]: any;
-            value: number
-        }> | number;
-        usage_quantity_sum?: Array<{
-            [field_group: string]: any;
-            value: number
-        }> | number;
-        _total_cost_sum?: number;
-        _total_usage_quantity_sum?: number;
-        // cloud-service/stats
-        value?: Array<{ date: string; value: number }>;
-    }>;
-}
-
+// TODO: remove this type after refactoring
 export interface BudgetDataModel {
     more?: boolean;
     results: Array<{
@@ -59,11 +41,6 @@ export interface Legend {
     disabled?: boolean; // this is used only in widget data table
 }
 
-export interface PieChartData {
-    [groupBy: string]: string | any;
-    cost_sum?: number;
-    usage_quantity_sum?: number;
-}
 
 export const CHART_TYPE = Object.freeze({
     CARD: 'CARD',
