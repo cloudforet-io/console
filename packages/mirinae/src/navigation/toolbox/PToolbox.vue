@@ -24,7 +24,11 @@
                 <div v-if="paginationVisible"
                      class="tool"
                 >
-                    <p-text-pagination :this-page="proxyState.thisPage"
+                    <div v-if="$scopedSlots['pagination-area']">
+                        <slot name="pagination-area" />
+                    </div>
+                    <p-text-pagination v-else
+                                       :this-page="proxyState.thisPage"
                                        :all-page="allPage"
                                        @pageChange="onChangeThisPage"
                     />

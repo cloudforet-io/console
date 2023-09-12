@@ -3,13 +3,14 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PDivider,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PDivider,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -121,6 +122,8 @@ const tableState = reactive({
     costFields: [] as DataTableFieldType[],
     fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
     items: [] as CostAnalyzeRawData[],
+    thisPage: 1,
+    pageSize: 15,
     more: false,
 });
 
@@ -246,7 +249,9 @@ const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
-        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        analyzeApiQueryHelper
+            .setFilters(costAnalysisPageStore.consoleFilters)
+            .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
@@ -285,7 +290,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
     const dateIndex = Number(fieldName.split('.')[1]);
     const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
-    if (!usageQuantity) return 'unknown';
+    if (!usageQuantity) return '--';
     if (item.usage_unit === 'Bytes') {
         return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
     }
@@ -327,6 +332,11 @@ const handleExcelDownload = async () => {
 const handleExport = async () => {
     await handleExcelDownload();
 };
+const handleUpdateThisPage = async () => {
+    const { results, more } = await listCostAnalysisTableData();
+    tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    tableState.more = more;
+};
 
 watch(
     [
@@ -336,6 +346,7 @@ watch(
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;
+        tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
@@ -365,12 +376,24 @@ watch(
                          :fields="tableState.fields"
                          :items="tableState.items"
                          :searchable="false"
+                         :page-size.sync="tableState.pageSize"
                          row-height-fixed
                          exportable
                          @change="handleChange"
                          @refresh="handleChange()"
                          @export="handleExport"
         >
+            <template #pagination-area>
+                <p-text-pagination :this-page.sync="tableState.thisPage"
+                                   :disable-next-page="!tableState.more || tableState.loading"
+                                   @update:thisPage="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ tableState.thisPage }}</span>
+                        <span v-if="tableState.more"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </template>
             <template #th-format="{field}">
                 {{ field.label }}
                 <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
