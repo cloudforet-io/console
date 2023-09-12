@@ -4,9 +4,6 @@ import { cloneDeep, find, sortBy } from 'lodash';
 
 import { store } from '@/store';
 
-import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
-
-import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import type {
     ChartData, Legend, XYChartData,
@@ -181,30 +178,6 @@ export const getStackedChartData = (chartData: XYChartData[], period: Period, ti
     }
     return accumulatedChartData;
 };
-
-/**
- * @name getCurrencyAppliedChartData
- * @description Set currency rate to chart data. If the value is a number, it's unconditionally multiplied by the currency rate.
- * @example [{ date: '2021-01', aws: 1, lineDash: '5,5' }, { date: '2021-02', aws: 10 }] : USD
- *       => [{ date: '2021-01', aws: 1200, lineDash: '5,5' }, { date: '2021-02', aws: 12000 }] : KRW
- * @usage CostAnalysisDynamicWidget, CostTrendByProduct, CostTrendByProject, BudgetSummaryChart, LastMonthTotalSpend
- */
-export const getCurrencyAppliedChartData = (
-    chartData: ChartData[],
-    currency: Currency,
-    currencyRates: CurrencyRates,
-): ChartData[] => chartData.map((dataObj) => {
-    const results = {};
-    Object.keys(dataObj).forEach((key) => {
-        const data = dataObj[key];
-        results[key] = typeof data === 'number' ? convertUSDToCurrency(
-            data ?? 0,
-            currency,
-            currencyRates,
-        ).toFixed(2) : data;
-    });
-    return results;
-});
 
 export const getTooltipText = (categoryKey, valueKey, money, disablePercentage = true) => {
     if (disablePercentage) {
