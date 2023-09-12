@@ -5,15 +5,16 @@ import { reactive, watch } from 'vue';
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap, DataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DataSourceModel } from '@/services/cost-explorer/model';
-
 const emit = defineEmits<{(e: 'update', dataSource: string|null, isValid: boolean): void; }>();
+const allReferenceStore = useAllReferenceStore();
 
 const {
     forms: {
@@ -35,14 +36,25 @@ watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, is
     emit('update', dataSource, isValid);
 }, { immediate: true });
 
+const getCurrencyFromDataSource = (dataSourceId: string) => {
+    const dataSourceItem:DataSourceItems = allReferenceStore.getters.costDataSource[dataSourceId];
+    const currency = dataSourceItem.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
+    return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
+};
+
 const fetchDataSource = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+        await Promise.allSettled([
+            allReferenceStore.load('plugin'),
+            allReferenceStore.load('costDataSource'),
+        ]);
+        const dataSourceList:CostDataSourceReferenceMap = await allReferenceStore.getters.costDataSource;
+        const pluginList:PluginReferenceMap = await allReferenceStore.getters.plugin;
 
-        const dataSourceItems: MenuItem[] = results.map((dataSource:DataSourceModel) => ({
-            name: dataSource.data_source_id,
-            label: dataSource.name,
-            imageUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
+        const dataSourceItems: MenuItem[] = Object.entries(dataSourceList).map(([key, dataSource]) => ({
+            name: key,
+            label: dataSource.label,
+            imageUrl: pluginList[dataSource.data.plugin_info.plugin_id]?.icon ? pluginList[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
         }));
 
         state.dataSourceItems = dataSourceItems;
@@ -76,15 +88,16 @@ const fetchDataSource = async () => {
                 <!--TODO: Currency should be changed to real data.-->
                 <div class="selected-input">
                     <p-lazy-img :src="item.imageUrl"
+                                class="left-icon"
                                 width="1rem"
                                 height="1rem"
-                    /><span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                    /><span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item.name) }})</span>
                 </div>
             </template>
             <template #menu-item--format="{item}">
                 <div class="menu-item">
                     <!--TODO: Currency should be changed to real data.-->
-                    <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: ₩KRW)</span>
+                    <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item.name) }})</span>
                 </div>
             </template>
         </p-select-dropdown>
@@ -102,6 +115,9 @@ const fetchDataSource = async () => {
         }
         .selected-item-postfix {
             @apply text-gray-400;
+        }
+        .left-icon {
+            flex-shrink: 0;
         }
     }
 }

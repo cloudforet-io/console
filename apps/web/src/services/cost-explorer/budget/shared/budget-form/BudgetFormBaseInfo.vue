@@ -40,6 +40,7 @@ const state = reactive({
     target: undefined as string|undefined,
     isTargetValid: false,
     costTypes: undefined as CostTypes|undefined,
+    dataSourceId: undefined as string|undefined,
     isCostTypesValid: false,
     budgetInfo: computed<BudgetBaseInfo>(() => {
         const isProjectGroup = state.target?.startsWith('pg-');
@@ -48,6 +49,7 @@ const state = reactive({
             name: name.value,
             [isProjectGroup ? 'project_group_id' : 'project_id']: state.target,
             cost_types: state.costTypes,
+            data_source_id: state.dataSourceId,
         };
 
         return budgetInfo;

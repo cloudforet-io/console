@@ -23,7 +23,7 @@ import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 
 type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;
-type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
+export type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
 export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
