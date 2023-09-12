@@ -91,8 +91,10 @@ const handleSaveQuerySet = async () => {
             options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
+                relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
                 filters: costAnalysisPageStore.consoleFilters,
+                metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');

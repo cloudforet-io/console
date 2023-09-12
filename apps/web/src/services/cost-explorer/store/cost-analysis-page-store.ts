@@ -24,6 +24,7 @@ interface CostAnalysisPageState {
     period?: Period;
     relativePeriod?: RelativePeriod;
     filters?: Record<string, string[]> // {provider: ['aws', 'gcp'], product: ['AmazonEC2']}
+    enabledFiltersProperties?: string[];
 }
 
 interface GroupByItem {
@@ -52,6 +53,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         period: undefined,
         relativePeriod: undefined,
         filters: {},
+        enabledFiltersProperties: undefined,
     }),
     getters: {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
@@ -94,6 +96,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.period = undefined;
             this.relativePeriod = undefined;
             this.filters = {};
+            this.enabledFiltersProperties = undefined;
         },
         async setQueryOptions(options?: CostQuerySetModel['options']) {
             if (!options) {
@@ -113,6 +116,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 this.period = { start: options.period.start, end: options.period.end };
             }
             this.filters = getRefinedFilters(options.filters);
+            if (options.metadata?.filters_schema?.enabled_properties?.length) {
+                this.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+            }
         },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
             const options: CostQuerySetModel['options'] = {
@@ -121,6 +127,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 relative_period: this.relativePeriod,
                 group_by: this.groupBy,
                 filters: this.consoleFilters,
+                metadata: { filters_schema: { enabled_properties: this.enabledFiltersProperties ?? [] } },
             };
             let createdData;
             try {

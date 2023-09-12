@@ -27,6 +27,11 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
                 value: 5,
                 exclude_today: false,
             },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
+            },
         },
     },
     {
@@ -40,6 +45,11 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
                 value: 5,
                 exclude_today: false,
             },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
+            },
         },
     },
     {
@@ -52,6 +62,11 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
                 unit: 'month',
                 value: 5,
                 exclude_today: false,
+            },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
             },
         },
     },

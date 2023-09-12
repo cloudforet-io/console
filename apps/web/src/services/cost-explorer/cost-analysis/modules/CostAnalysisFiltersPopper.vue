@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {
-    reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
     PFilterableDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type {
     AutocompleteHandler, FilterableDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
@@ -16,14 +17,24 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CostAnalysisFiltersAddMoreButton
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersAddMoreButton.vue';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
     loading: true,
-    selectedItems: {} as Record<string, FilterableDropdownMenuItem[]>,
+    enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
+    selectedFilterableItemsMap: computed<Record<string, FilterableDropdownMenuItem[]>>(() => {
+        const _selectedItems = {} as Record<string, FilterableDropdownMenuItem[]>;
+        Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
+            _selectedItems[groupBy] = items.map((d) => ({ name: d, label: d }));
+        });
+        return _selectedItems;
+    }),
 });
 
 const resourceApiQueryHelper = new ApiQueryHelper();
@@ -59,23 +70,36 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (value: stri
     return { results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [] };
 };
 
-const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
-    state.selectedItems[groupBy] = selectedItems;
+const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
     costAnalysisPageStore.$patch((_state) => {
-        _state.filters[groupBy] = selectedItems.map((d) => d.name as string);
-        _state.filters = { ..._state.filters };
+        _state.filters = {
+            ..._state.filters,
+            [groupBy]: selectedItems.map((d) => d.name as string),
+        };
     });
+};
+const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
+    if (all) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.filters = {};
+        });
+    } else if (disabledFilter) {
+        costAnalysisPageStore.$patch((_state) => {
+            delete _state.filters?.[disabledFilter];
+            _state.filters = { ..._state.filters };
+        });
+    }
 };
 </script>
 
 <template>
     <div class="cost-analysis-filters-popper">
         <p-filterable-dropdown
-            v-for="groupBy in costAnalysisPageStore.defaultGroupByItems"
+            v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}`"
             :group-by="groupBy.name"
             :handler="menuHandler(groupBy.name)"
-            :selected="state.selectedItems[groupBy.name] ?? []"
+            :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
             :loading="state.loading"
             multi-selectable
             style-type="rounded"
@@ -83,7 +107,10 @@ const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdown
             show-select-marker
             selection-highlight
             :selection-label="groupBy.label"
-            @update:selected="handleUpdateSelected(groupBy.name, $event)"
+            @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
+        />
+        <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
+                                               @disable-all-filters="handleDisabledFilters(true, $event)"
         />
     </div>
 </template>
@@ -96,8 +123,11 @@ const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdown
         width: auto;
         max-width: 22.5rem;
         padding: 0.25rem;
+        .dropdown-button {
+            height: 1.5rem;
+        }
         .dropdown-context-menu {
-            min-width: 10rem;
+            min-width: 12rem;
         }
     }
 }
