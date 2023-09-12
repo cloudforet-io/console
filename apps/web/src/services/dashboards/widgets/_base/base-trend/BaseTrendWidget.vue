@@ -42,8 +42,7 @@ import {
     getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';

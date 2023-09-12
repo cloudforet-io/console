@@ -29,20 +29,17 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';

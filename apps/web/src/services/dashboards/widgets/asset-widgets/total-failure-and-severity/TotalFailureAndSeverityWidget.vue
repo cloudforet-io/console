@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
     PI, PDivider, PDataLoader,
@@ -11,7 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 
-import { getRGBFromHex, commaFormatter } from '@cloudforet/core-lib';
+import { getRGBFromHex, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -24,17 +22,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
@@ -60,27 +56,32 @@ const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => 1),
 });
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
-    chartData: computed<XYChartData[]>(() => state.data?.trendData),
+    loading: true,
+    data: null as FullData|null,
+    chartData: computed<XYChartData[]>(() => state.data?.trendData ?? []),
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
+        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
     severityData: computed<SeverityData[]>(() => {
         if (!state.data?.realtimeData) return [];
         const results: SeverityData[] = [];
-        const prevMonth = dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
+        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         const failFindingCountDataList = state.data.realtimeData.filter((d) => d.key === 'fail_finding_count');
         SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((status) => {
-            const currValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === state.dateRange.end)?.value;
+            const currValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === widgetState.dateRange.end)?.value;
             const prevValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === prevMonth)?.value;
             results.push({
                 name: status.name,
@@ -93,50 +94,43 @@ const state = reactive({
         });
         return results;
     }),
-    prevTotalFailureCount: computed<number|undefined>(() => {
-        if (!state.data?.realtimeData) return undefined;
-        const prevMonth = dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
+    prevTotalFailureCount: computed<number>(() => {
+        if (!state.data?.realtimeData) return 0;
+        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth && d.key === 'fail_finding_count') ?? [];
         return sum(targetDataList.map((d) => d.value));
     }),
-    totalFailureCount: computed<number|undefined>(() => {
-        if (!state.data?.realtimeData) return undefined;
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === state.dateRange.end && d.key === 'fail_finding_count') ?? [];
+    totalFailureCount: computed<number>(() => {
+        if (!state.data?.realtimeData) return 0;
+        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end && d.key === 'fail_finding_count') ?? [];
         return sum(targetDataList.map((d) => d.value));
     }),
-    totalFailureComparingMessage: computed<TranslateResult|undefined>(() => {
-        if (state.totalFailureCount === undefined
-            || state.prevTotalFailureCount === undefined
-            || state.totalFailureCount === state.prevTotalFailureCount
-        ) return undefined;
+    totalFailureComparingMessage: computed<string|undefined>(() => {
+        if (state.totalFailureCount === state.prevTotalFailureCount) return undefined;
         if (state.prevTotalFailureCount < state.totalFailureCount) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH') as string;
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH') as string;
     }),
-    prevFailureRate: computed<number|undefined>(() => {
-        if (!state.data?.realtimeData.length) return undefined;
-        const prevMonth = dayjs.utc(state.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
+    prevFailureRate: computed<number>(() => {
+        if (!state.data?.realtimeData?.length) return 0;
+        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth) ?? [];
         return getFailureRate(targetDataList);
     }),
-    failureRate: computed<number|undefined>(() => {
-        if (!state.data?.realtimeData.length) return undefined;
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === state.dateRange.end) ?? [];
+    failureRate: computed<number>(() => {
+        if (!state.data?.realtimeData?.length) return 0;
+        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end) ?? [];
         return getFailureRate(targetDataList);
     }),
-    failureRateComparingMessage: computed<TranslateResult|undefined>(() => {
-        if (state.failureRate === undefined
-            || state.prevFailureRate === undefined
-            || state.failureRate === state.prevFailureRate
-        ) return undefined;
+    failureRateComparingMessage: computed<string|undefined>(() => {
+        if (state.failureRate === state.prevFailureRate) return undefined;
         if (state.prevFailureRate < state.failureRate) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH');
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH') as string;
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH');
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH') as string;
     }),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* API */
 const trendDataApiQueryHelper = new ApiQueryHelper();
@@ -146,14 +140,14 @@ const fetchRealtimeDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceC
 const fetchTrendData = async (): Promise<Data[]> => {
     try {
         trendDataApiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         const { status, response } = await fetchTrendDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 group_by: ['key', 'unit'],
                 fields: {
                     value: {
@@ -168,24 +162,27 @@ const fetchTrendData = async (): Promise<Data[]> => {
                 ...trendDataApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            return response.results;
+        }
+        return state.data?.trendData ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
+        return [];
     }
-    return [];
 };
 const fetchRealtimeData = async (): Promise<Data[]> => {
     try {
         realtimeDataApiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
+        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchRealtimeDataAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
-                end: state.dateRange.end,
+                end: widgetState.dateRange.end,
                 group_by: ['key', 'unit', 'additional_info.severity'],
                 fields: {
                     value: {
@@ -196,11 +193,14 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
                 ...realtimeDataApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            return response.results;
+        }
+        return state.data?.realtimeData ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
+        return [];
     }
-    return [];
 };
 
 /* Util */
@@ -212,7 +212,7 @@ const getFailureRate = (targetDataList: Data[]): number => {
 };
 const drawChart = (chartData: XYChartData[]) => {
     if (!chartData?.length) return;
-    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
+    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     chartHelper.setChartColors(chart, colorSet.value);
     chart.get('cursor')?.lineX.setAll({
@@ -239,27 +239,27 @@ const drawChart = (chartData: XYChartData[]) => {
 };
 
 const initWidget = async (data?: FullData): Promise<FullData> => {
-    state.loading = true;
     if (data) {
         state.data = data;
     } else {
+        state.loading = true;
         const [trendData, realtimeData] = await Promise.all([fetchTrendData(), fetchRealtimeData()]);
         state.data = { trendData, realtimeData };
+        state.loading = false;
     }
-    await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
-    return state.data;
-};
-const refreshWidget = async (): Promise<FullData> => {
-    await nextTick();
-    state.loading = true;
-    const [trendData, realtimeData] = await Promise.all([fetchTrendData(), fetchRealtimeData()]);
-    state.data = { trendData, realtimeData };
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
+    return state.data;
+};
+const refreshWidget = async (): Promise<FullData> => {
+    state.loading = true;
+    const [trendData, realtimeData] = await Promise.all([fetchTrendData(), fetchRealtimeData()]);
+    state.data = { trendData, realtimeData };
     state.loading = false;
+    chartHelper.refreshRoot();
+    await nextTick();
+    if (chartHelper.root.value) drawChart(state.chartData);
     return state.data;
 };
 
@@ -267,7 +267,8 @@ useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 defineExpose<WidgetExpose>({
     initWidget,
@@ -278,7 +279,7 @@ defineExpose<WidgetExpose>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="total-failure-and-severity"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <div class="summary-wrapper">
@@ -287,7 +288,7 @@ defineExpose<WidgetExpose>({
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
                     </p>
                     <p class="value">
-                        {{ state.totalFailureCount === undefined ? '--' : commaFormatter(state.totalFailureCount) }}
+                        {{ numberFormatter(state.totalFailureCount) }}
                     </p>
                     <div v-if="state.totalFailureComparingMessage"
                          class="diff-wrapper"
@@ -295,7 +296,7 @@ defineExpose<WidgetExpose>({
                         <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
                         />
-                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
+                        <span class="diff-value">{{ numberFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
                         <span class="diff-text">{{ state.totalFailureComparingMessage }}</span>
                     </div>
                 </div>
@@ -305,7 +306,7 @@ defineExpose<WidgetExpose>({
                         {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
                     </p>
                     <p class="value">
-                        {{ state.failureRate === undefined ? '--' : commaFormatter(state.failureRate) }}%
+                        {{ commaFormatter(state.failureRate) }}%
                     </p>
                     <div v-if="state.failureRateComparingMessage"
                          class="diff-wrapper"
@@ -323,9 +324,7 @@ defineExpose<WidgetExpose>({
                                :loading="state.loading"
                                :data="state.chartData"
                                loader-type="skeleton"
-                               disable-empty-case
                                :loader-backdrop-opacity="1"
-                               show-data-from-scratch
                 >
                     <div ref="chartContext"
                          class="chart"
@@ -347,7 +346,7 @@ defineExpose<WidgetExpose>({
                                 {{ data.label }}
                             </p>
                             <p class="status-content">
-                                <span class="status-value">{{ data.value }}</span>
+                                <span class="status-value">{{ numberFormatter(data.value, 1) }}</span>
                                 <span v-if="data.diff"
                                       class="status-rate"
                                 >
@@ -356,7 +355,7 @@ defineExpose<WidgetExpose>({
                                          width="1.5rem"
                                          height="1.5rem"
                                     />
-                                    <span class="status-rate-value">{{ Math.abs(data.diff) }}</span>
+                                    <span class="status-rate-value">{{ numberFormatter(Math.abs(data.diff)) }}</span>
                                 </span>
                             </p>
                         </div>
@@ -439,6 +438,7 @@ defineExpose<WidgetExpose>({
                     .status-content {
                         display: flex;
                         align-items: flex-end;
+                        flex-wrap: wrap;
                         .status-value {
                             @apply text-display-md;
                             padding-right: 0.25rem;

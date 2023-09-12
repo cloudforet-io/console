@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, reactive, toRefs,
+    computed, defineExpose, defineProps, reactive,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -15,17 +14,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type {
     CloudServiceStatsModel, ComplianceStatus, Severity,
 } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
 interface Data extends CloudServiceStatsModel {
@@ -47,11 +44,17 @@ Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.prio
 const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
-const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+        end: dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT),
     })),
+});
+
+const state = reactive({
+    loading: true,
+    data: null as Data[] | null,
     boxWidth: computed<number>(() => {
         if (!props.width) return BOX_MIN_WIDTH;
         const widgetPadding = 24;
@@ -61,8 +64,6 @@ const state = reactive({
     }),
     refinedData: computed<RefinedData[]>(() => refineData(state.data)),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
-
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
@@ -70,16 +71,16 @@ const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(S
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
+        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 group_by: ['key', 'unit', 'additional_info.service'],
                 granularity: 'MONTHLY',
                 start: prevMonth,
-                end: state.dateRange.end,
+                end: widgetState.dateRange.end,
                 fields: {
                     value: {
                         key: 'value',
@@ -167,7 +168,8 @@ useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 defineExpose<WidgetExpose>({
     initWidget,
@@ -178,7 +180,7 @@ defineExpose<WidgetExpose>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="severity-status-by-service"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <p-data-loader class="chart-wrapper"

@@ -4,7 +4,6 @@ import { mergeWith } from 'lodash';
 
 import type {
     BaseConfigInfo, WidgetConfig,
-    WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
@@ -73,32 +72,4 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
     return widgetComponent;
-};
-
-/**
- * @name getWidgetLocationFilters
- * @param widgetFilters
- * @example { provider: [{k: 'provider', v: ['aws', 'google'], o: '='}] }
- * => { provider: [{k: 'provider', v: 'aws', o: '='}, {k: 'provider', v: 'google', o: '='}] }
- * @description This helper is used to sync with the cost analysis page. Will be deprecated soon.
- */
-export const getWidgetLocationFilters = (widgetFilters?: WidgetFiltersMap): WidgetFiltersMap => {
-    const result: WidgetFiltersMap = {};
-    Object.entries(widgetFilters ?? {}).forEach(([filterKey, filterItems]) => {
-        result[filterKey] = [];
-        filterItems.forEach((filterItem) => {
-            if (Array.isArray(filterItem.v)) {
-                filterItem.v.forEach((d) => {
-                    result[filterKey].push({
-                        k: filterKey, o: filterItem.o, v: d,
-                    });
-                });
-            } else {
-                result[filterKey].push({
-                    k: filterKey, o: filterItem.o, v: filterItem.v,
-                });
-            }
-        });
-    });
-    return result;
 };
