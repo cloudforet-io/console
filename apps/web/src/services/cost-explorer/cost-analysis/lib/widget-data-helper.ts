@@ -1,6 +1,5 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
-import { cloneDeep, find, sortBy } from 'lodash';
 
 import { store } from '@/store';
 
@@ -15,7 +14,7 @@ import type {
 } from '@/services/cost-explorer/type';
 
 
-const DATE_FORMAT = Object.freeze({
+export const DATE_FORMAT = Object.freeze({
     day: 'YYYY-MM-DD',
     month: 'YYYY-MM',
     year: 'YYYY',
@@ -184,25 +183,4 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
         return `{${categoryKey}}: [bold]${money}[/]`;
     }
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
-};
-
-export const getRefinedChartTableData = <CostAnalyzeRawData>(results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
-    const dateFormat = DATE_FORMAT[timeUnit];
-
-    const _results: CostAnalyzeRawData[] = cloneDeep(results);
-    const refinedTableData: CostAnalyzeRawData[] = [];
-    _results.forEach((d) => {
-        let _costSum = cloneDeep(d.cost_sum);
-        let now = dayjs.utc(period.start).clone();
-        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
-            if (!find(_costSum, { date: now.format(dateFormat) })) {
-                _costSum?.push({ date: now.format(dateFormat), value: 0 });
-            }
-            now = now.add(1, timeUnit);
-        }
-        _costSum = sortBy(_costSum, ['date']);
-        refinedTableData.push({ ...d, cost_sum: _costSum });
-    });
-    return refinedTableData;
 };

@@ -7,6 +7,7 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
+import { cloneDeep, find, sortBy } from 'lodash';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -31,13 +32,13 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { getRefinedChartTableData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
 import { getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostAnalyzeResponse } from '@/services/cost-explorer/type';
+import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/type';
 
 
 type CostAnalyzeRawData = {
@@ -200,6 +201,28 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     return '';
 };
 
+const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
+    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const dateFormat = DATE_FORMAT[timeUnit];
+
+    const _results: CostAnalyzeRawData[] = cloneDeep(results);
+    const refinedTableData: CostAnalyzeRawData[] = [];
+    _results.forEach((d) => {
+        let _costSum = cloneDeep(d.cost_sum);
+        let now = dayjs.utc(period.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (!find(_costSum, { date: now.format(dateFormat) })) {
+                _costSum?.push({ date: now.format(dateFormat), value: 0 });
+            }
+            now = now.add(1, timeUnit);
+        }
+        _costSum = sortBy(_costSum, ['date']);
+        refinedTableData.push({ ...d, cost_sum: _costSum });
+    });
+    return refinedTableData;
+};
+
+
 /* api */
 const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
@@ -239,7 +262,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
 const handleExcelDownload = async () => {
@@ -281,7 +304,7 @@ watch(
         if (!selectedDataSourceId) return;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
-            tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+            tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more;
             tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
         }
