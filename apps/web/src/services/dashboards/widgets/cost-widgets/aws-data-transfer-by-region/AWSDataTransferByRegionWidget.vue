@@ -128,15 +128,26 @@ const state = reactive({
             type: state.fieldsKey === 'cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
+
         const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
             label: d[USAGE_TYPE_VALUE_KEY],
             name: d[USAGE_TYPE_VALUE_KEY],
             textOptions,
             textAlign: 'right',
         })) ?? [];
+
+        // set width of table fields
+        const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
+        const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
+
         return [
-            { label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
-            ...dynamicTableFields,
+            {
+                label: 'Region',
+                name: COST_GROUP_BY.REGION,
+                textOptions: { type: 'reference', referenceType: 'region' },
+                width: groupByFieldWidth,
+            },
+            ...dynamicTableFields.map((d) => ({ ...d, width: otherFieldWidth })),
         ];
     }),
 });
