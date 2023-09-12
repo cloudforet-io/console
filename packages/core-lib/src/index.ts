@@ -137,18 +137,12 @@ export const sortArrayInObjectArray = <Data extends RawData = RawData>(
     rawData: Data[],
     sortKey: string,
     targetArrayFieldKeys: string[],
-): Data[] => {
-    const results: Data[] = [];
-    rawData.forEach((d) => {
+): Data[] => rawData.map((d) => {
+        const result: any = { ...d };
         targetArrayFieldKeys.forEach((targetArrayFieldKey) => {
             const targetArray = d[targetArrayFieldKey];
-            if (Array.isArray(targetArray)) {
-                results.push({
-                    ...d,
-                    [targetArrayFieldKey]: sortBy(targetArray, sortKey),
-                });
-            }
+            if (!Array.isArray(targetArray)) return;
+            result[targetArrayFieldKey] = sortBy(targetArray, sortKey);
         });
+        return result;
     });
-    return results;
-};
