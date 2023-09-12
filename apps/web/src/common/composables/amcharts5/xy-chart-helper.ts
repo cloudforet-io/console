@@ -73,11 +73,12 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         },
         renderer: xRenderer,
         dateFormats: {
-            day: 'M/dd',
+            day: 'M/d',
             month: 'MMM',
             year: 'yyyy',
         },
         periodChangeDateFormats: {
+            day: 'M/d',
             month: 'MMM',
         },
         ...dateAxisSettings,

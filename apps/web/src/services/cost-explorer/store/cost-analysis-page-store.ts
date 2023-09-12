@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -60,6 +61,13 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
         selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
+        currency: (): Currency => {
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId];
+                return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
+            }
+            return 'USD';
+        },
         defaultGroupByItems: () => {
             let additionalInfoGroupBy: GroupByItem[] = [];
             if (costQuerySetState.selectedDataSourceId) {
