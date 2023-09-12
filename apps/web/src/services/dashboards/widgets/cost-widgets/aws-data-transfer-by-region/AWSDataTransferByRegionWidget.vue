@@ -13,13 +13,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
@@ -29,7 +31,6 @@ import type {
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
-import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
@@ -38,17 +39,31 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { CostAnalyzeDataModel, Legend } from '@/services/dashboards/widgets/type';
+import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
+const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
+const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
+const USAGE_SOURCE_UNIT = 'GB';
+
+interface SubData { [USAGE_TYPE_VALUE_KEY]: string; value: number }
+interface Data {
+    date: string;
+    cost_sum: SubData[];
+    usage_quantity_sum: SubData[];
+    _total_cost_sum: number;
+    _total_usage_quantity_sum: number;
+    [COST_GROUP_BY.REGION]: string;
 }
 
+interface TableData extends WidgetTableData {
+    [COST_GROUP_BY.REGION]: string;
+}
+
+type FullData = CostAnalyzeResponse<Data>;
+
 interface CircleData {
-    region_code: string;
+    [COST_GROUP_BY.REGION]: string;
     latitude: number;
     longitude: number;
     _total_cost_sum?: number;
@@ -58,14 +73,19 @@ interface CircleData {
     }
 }
 
-const USAGE_SOURCE_UNIT = 'GB';
-
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed(() => {
+        const { end } = widgetState.settings?.date_range ?? {};
+        return {
+            start: end,
+            end,
+        };
+    }),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
@@ -89,23 +109,34 @@ const state = reactive({
     data: null as FullData | null,
     fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
-    chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results)),
+    chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap)),
+    tableData: computed<TableData[]>(() => {
+        if (!state.data?.results?.length) return [];
+        const tableData: TableData[] = state.data.results.map((d: Data) => {
+            const row: TableData = {
+                [COST_GROUP_BY.REGION]: d.region_code,
+            };
+            d[`${state.fieldsKey}_sum`]?.forEach((subData: SubData) => {
+                row[subData[USAGE_TYPE_VALUE_KEY]] = subData.value;
+            });
+            return row;
+        });
+        return tableData;
+    }),
     tableFields: computed<Field[]>(() => {
         const textOptions: Field['textOptions'] = {
             type: state.fieldsKey === 'cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
+        const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
+            label: d[USAGE_TYPE_VALUE_KEY],
+            name: d[USAGE_TYPE_VALUE_KEY],
+            textOptions,
+            textAlign: 'right',
+        })) ?? [];
         return [
             { label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
-            {
-                name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions, textAlign: 'right',
-            },
-            {
-                name: `${state.fieldsKey}_sum.1.value`, label: 'Transfer-in', textOptions, textAlign: 'right',
-            },
-            {
-                name: `${state.fieldsKey}_sum.2.value`, label: 'etc.', textOptions, textAlign: 'right',
-            },
+            ...dynamicTableFields,
         ];
     }),
 });
@@ -122,9 +153,8 @@ const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => state.data?.results?.length ?? 0),
 });
-const getRefinedCircleData = (results?: Data): CircleData[] => {
+const getRefinedCircleData = (results?: Data[], regionMap: RegionReferenceMap = {}): CircleData[] => {
     if (!results?.length) return [];
-    const regionMap = props.allReferenceTypeInfo.region ?? {};
     return results.map((d, idx) => {
         const regionInfo = regionMap[d.region_code] ?? {};
         return {
@@ -145,17 +175,17 @@ const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2
 const fetchData = async (): Promise<FullData> => {
     try {
         apiQueryHelper.setFilters([
-            { k: 'usage_type', v: ['data-transfer.out', 'data-transfer.in', 'data-transfer.etc'], o: '' },
             { k: 'product', v: 'AWSDataTransfer', o: '=' },
-            { k: 'usage_type', v: null, o: '!=' },
         ]);
         apiQueryHelper.addFilter(...widgetState.consoleFilters);
+
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, COST_GROUP_BY.TYPE],
+                group_by: [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -168,14 +198,14 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                field_group: [COST_GROUP_BY.TYPE],
+                field_group: [USAGE_TYPE_VALUE_KEY],
                 sort: [{ key: '_total_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
         if (status === 'succeed') {
             return {
-                results: sortTableData(response.results, COST_GROUP_BY.TYPE),
+                results: response.results,
                 more: response.more,
             };
         }
@@ -300,7 +330,7 @@ defineExpose<WidgetExpose<FullData>>({
             </div>
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
+                               :items="state.tableData"
                                :currency="widgetState.currency"
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
