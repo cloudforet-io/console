@@ -96,7 +96,7 @@ const mergeRefinedHorizontalXYChartData = <S = RawData>(chartData: S[], data: Ra
             }
             return result;
         }) ?? [];
-        mergedChartData = mergeByKey(mergedChartData, refinedList, categoryKey) as S[];
+        mergedChartData = mergeByKey(mergedChartData, refinedList, groupBy || categoryKey) as S[];
     });
     return mergedChartData;
 };

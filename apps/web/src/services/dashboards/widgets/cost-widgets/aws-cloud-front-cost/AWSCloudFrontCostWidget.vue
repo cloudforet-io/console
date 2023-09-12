@@ -248,7 +248,7 @@ const drawChart = (chartData) => {
         const tooltip = chartHelper.createTooltip();
         tooltip.label.adapters.add('text', (text, target) => {
             // let _text = `[${gray[700]}]{valueX}[/]`;
-            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[state.groupBy]}[/]`;
+            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[COST_GROUP_BY.PROJECT]}[/]`;
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
                 let value = target.dataItem?.dataContext?.[fieldName];
