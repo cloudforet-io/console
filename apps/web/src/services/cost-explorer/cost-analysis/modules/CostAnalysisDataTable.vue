@@ -346,6 +346,7 @@ watch(
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;
+        tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
