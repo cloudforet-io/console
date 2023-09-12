@@ -1,4 +1,6 @@
-export const COST_REFERENCE_TYPE_INFO = {
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
+export const COST_VARIABLE_TYPE_INFO = {
     cost_product: {
         type: 'cost_product',
         key: 'product',
@@ -24,4 +26,5 @@ export const COST_REFERENCE_TYPE_INFO = {
         key: 'account',
         name: 'AWS Account ID (Cost)',
     },
+    cost_data_source: REFERENCE_TYPE_INFO.cost_data_source,
 } as const;

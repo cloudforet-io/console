@@ -1,4 +1,4 @@
-export const ASSET_REFERENCE_TYPE_INFO = {
+export const ASSET_VARIABLE_TYPE_INFO = {
     asset_compliance_type: {
         type: 'asset_compliance_type',
         key: 'name',

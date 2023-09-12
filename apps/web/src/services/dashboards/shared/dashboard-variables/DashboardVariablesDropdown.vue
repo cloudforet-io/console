@@ -80,7 +80,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -194,9 +194,9 @@ const loadSearchResourceOptions = async () => {
     if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
         // NOTE: Some variables(asset) require specific API filters.
         const apiQueryHelper = new ApiQueryHelper();
-        if (state.variableProperty.name === ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name) {
+        if (state.variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
             apiQueryHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
-        } else if (state.variableProperty.name === ASSET_REFERENCE_TYPE_INFO.asset_account.name) {
+        } else if (state.variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
             apiQueryHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
         }
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
