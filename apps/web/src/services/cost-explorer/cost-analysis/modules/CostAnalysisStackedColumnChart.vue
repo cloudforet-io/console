@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    nextTick, reactive, ref, watch,
+    nextTick, ref, watch,
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
@@ -14,37 +14,25 @@ import { cloneDeep } from 'lodash';
 
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
-
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import {
-    getCurrencyAppliedChartData,
-} from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import type {
     Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Granularity, Period } from '@/services/cost-explorer/type';
 
 
 interface Props {
-    period: Period;
-    currency: Currency;
-    currencyRates: CurrencyRates;
-    //
     loading: boolean;
     chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
-    granularity: Granularity;
 }
 
 const DATE_FIELD_NAME = 'date';
@@ -54,11 +42,6 @@ const props = withDefaults(defineProps<Props>(), {
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
-    granularity: GRANULARITY.DAILY,
-    period: () => ({}),
-    currency: CURRENCY.USD,
-    currencyRates: () => ({}) as CurrencyRates,
-    printMode: false,
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -69,25 +52,21 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const state = reactive({
-    proxyChart: useProxyValue('chart', props, emit),
-    usdChartData: [] as XYChartData[],
-});
-
-/* Util */
 const drawChart = () => {
     let timeUnit: TimeUnit = 'month';
-    if (props.granularity === GRANULARITY.DAILY) timeUnit = 'day';
-    else if (props.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
-
-    const usdChartData = cloneDeep(props.chartData);
-    state.usdChartData = usdChartData;
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
+    else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, {
         min: dayjs.utc(costAnalysisPageState.period?.start).valueOf(),
         max: dayjs.utc(costAnalysisPageState.period?.end).add(1, timeUnit).valueOf(),
     });
+
+    // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;
+    // set distance of xAxis
+    xAxis.get('renderer').set('minGridDistance', 30);
+    // set label adapter of yAxis
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
@@ -96,7 +75,14 @@ const drawChart = () => {
         return text;
     });
 
+    // get stacked chart data of daily chart
+    let _chartData = cloneDeep(props.chartData);
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.period ?? {}, timeUnit);
+    }
+
     props.legends.forEach((legend) => {
+        // create series
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: legend.label as string,
             valueYField: legend.name,
@@ -108,7 +94,7 @@ const drawChart = () => {
         chart.series.push(series);
 
         // set data processor
-        let dateFormat = 'YYYY-MM-DD';
+        let dateFormat = 'yyyy-MM-dd';
         if (timeUnit === 'month') dateFormat = 'YYYY-MM';
         else if (timeUnit === 'year') dateFormat = 'YYYY';
         series.data.processor = chartHelper.createDataProcessor({
@@ -117,7 +103,7 @@ const drawChart = () => {
         });
 
         // set data
-        series.data.setAll(usdChartData);
+        series.data.setAll(_chartData);
 
         // set tooltip
         const tooltip = chartHelper.createTooltip();
@@ -130,17 +116,18 @@ const drawChart = () => {
             const dataContext = target?.dataItem?.dataContext;
             if (dataContext) {
                 let value = dataContext[legend.name];
-                value = currencyMoneyFormatter(value, props.currency, undefined, true);
+                value = currencyMoneyFormatter(value, costAnalysisPageStore.currency, undefined, true);
                 return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;
         });
         series.set('tooltip', tooltip);
 
-
+        // set opacity if today / this month / this year
         const today = dayjs.utc();
         series.columns.template.adapters.add('fillOpacity', (fillOpacity, target) => {
-            if (today.isSame(dayjs.utc(target.dataItem?.dataContext?.date), timeUnit)) {
+            const _targetData = target.dataItem?.dataContext?.date;
+            if (_targetData && today.isSame(dayjs.utc(_targetData), timeUnit)) {
                 return 0.5;
             }
             return fillOpacity;
@@ -157,12 +144,6 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         emit('update:chart', chart);
     }
 }, { immediate: false });
-
-watch([() => props.currency, () => state.usdChartData], ([currency]) => {
-    if (state.proxyChart) {
-        state.proxyChart.data = getCurrencyAppliedChartData(state.usdChartData, currency, props.currencyRates);
-    }
-});
 </script>
 
 <template>

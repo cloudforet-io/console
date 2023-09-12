@@ -42,15 +42,15 @@ export const convertRelativePeriodToPeriod = (costQueryOption: CostQuerySetOptio
     if (includeToday) {
         return {
             start: today.subtract(costQueryOption?.relativePeriod.value, 'month').startOf('month')
-                .format('YYYY-MM'),
-            end: today.startOf('month').format('YYYY-MM'),
+                .format('YYYY-MM-DD'),
+            end: today.format('YYYY-MM-DD'),
         };
     }
     return {
         start: today.subtract(costQueryOption?.relativePeriod.value, costQueryOption?.relativePeriod.unit).startOf('month')
-            .format('YYYY-MM'),
+            .format('YYYY-MM-DD'),
         end: today.subtract(costQueryOption?.relativePeriod.value, costQueryOption?.relativePeriod.unit).endOf('month')
-            .format('YYYY-MM'),
+            .format('YYYY-MM-DD'),
     };
 };
 export const initiatePeriodByGranularity = (granularity?: Granularity): [Period, RelativePeriod|undefined] => {
