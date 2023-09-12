@@ -328,7 +328,6 @@ defineExpose<WidgetExpose<FullData>>({
                                :fields="state.tableFields"
                                :items="state.tableData"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
