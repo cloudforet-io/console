@@ -1,341 +1,568 @@
 import type { ArgTypes } from '@storybook/addons';
-import { camelCase } from 'lodash';
 
-import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import {
-    SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
-    SELECT_DROPDOWN_SIZE,
+    SELECT_DROPDOWN_APPEARANCE_TYPE,
+    SELECT_DROPDOWN_STYLE_TYPE,
 } from '@/inputs/dropdown/select-dropdown/type';
 
-export const getSelectDropdownArgTypes = (): ArgTypes => {
-    const contextMenuArgTypes = getContextMenuArgTypes();
 
-    const contextMenuSlots = {};
+const extraArgTypes: ArgTypes = {
+    /* props */
+    styleType: {
+        name: 'styleType',
+        type: { name: 'string' },
+        description: 'Style type to display selected items.',
+        defaultValue: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `'${SELECT_DROPDOWN_STYLE_TYPE.DEFAULT}'`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: SELECT_DROPDOWN_STYLE_TYPE,
+        },
+    },
+    appearanceType: {
+        name: 'appearanceType',
+        type: { name: 'string' },
+        description: 'Appearance type to display selected items.',
+        defaultValue: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `'${SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC}'`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: SELECT_DROPDOWN_APPEARANCE_TYPE,
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable selection or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    placeholder: {
+        name: 'placeholder',
+        type: { name: 'string' },
+        description: 'Search input placeholder.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    selectionLabel: {
+        name: 'selectionLabel',
+        type: { name: 'string' },
+        description: 'Label to display selected items.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'string',
+        },
+    },
+    selectionHighlight: {
+        name: 'selectionHighlight',
+        type: { name: 'boolean' },
+        description: 'Whether to highlight or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showAlertDot: {
+        name: 'showAlertDot',
+        type: { name: 'boolean' },
+        description: 'Whether to show alert or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showDeleteAllButton: {
+        name: 'showDeleteAllButton',
+        type: { name: 'boolean' },
+        description: 'Whether to show delete all button or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    useFixedMenuStyle: {
+        name: 'useFixedMenuStyle',
+        type: { name: 'boolean' },
+        description: 'Whether to use position fixed style on menu or not. ',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    buttonIcon: {
+        name: 'buttonIcon',
+        type: { name: 'string' },
+        description: 'Icons for dropdown right button. Useful when `type` props is `icon-button`.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    isFixedWidth: {
+        name: 'isFixedWidth',
+        type: { name: 'boolean' },
+        description: 'Whether to fix width.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    isFilterable: {
+        name: 'isFilterable',
+        type: { name: 'boolean' },
+        description: 'Whether to be filterable or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    visibleMenu: {
+        name: 'visibleMenu',
+        type: { name: 'boolean' },
+        description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    menuPosition: {
+        name: 'menuPosition',
+        type: { name: 'string' },
+        description: 'Position of Context menu',
+        defaultValue: CONTEXT_MENU_POSITION.LEFT,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: CONTEXT_MENU_POSITION.LEFT,
+            },
+        },
+        control: {
+            type: 'select',
+            options: [...Object.values(CONTEXT_MENU_POSITION)],
+        },
+    },
+    handler: {
+        name: 'handler',
+        type: { name: 'function' },
+        description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'function',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: null,
+        },
+    },
+    disableHandler: {
+        name: 'disableHandler',
+        type: { name: 'boolean' },
+        description: 'Whether to execute handler automatically or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    pageSize: {
+        name: 'pageSize',
+        type: { name: 'number' },
+        description: 'Page size to show items.',
+        defaultValue: 10,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'number',
+            options: { min: 0 },
+        },
+    },
+    resetSelectedOnUnmounted: {
+        name: 'resetSelectedOnUnmounted',
+        type: { name: 'boolean' },
+        description: 'Whether to reset selected items when unmounted or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+
+    /* events */
+    onHideMenu: {
+        name: 'hide-menu',
+        description: 'Emitted when the menu starts to hide.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    onShowMenu: {
+        name: 'show-menu',
+        description: 'Emitted when the menu starts to show.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    onFocusMenu: {
+        name: 'focus-menu',
+        description: 'Emitted when menu is focused.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    onSelectMenu: {
+        name: 'select-menu',
+        description: 'Emitted when menu item is selected.',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    /* slots */
+    'selected-radio-label': {
+        name: 'selected-radio-label',
+        description: 'This is a slot that allows you to customize the label of the selected value when the selected value is a radio button type.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    selectedExtraSlot: {
+        name: 'selected-extra',
+        description: 'This is a slot for right space of selected items.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    contextMenuHeader: {
+        name: 'context-menu-header',
+        description: 'This is a slot for the header of the PContextMenu.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    inputLeftArea: {
+        name: 'input-left-area',
+        description: 'This is a slot for the left area of the input.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    /* events */
+    onUpdateVisibleMenu: {
+        name: 'update:visible-menu',
+        description: 'Event emitted when menu visibility is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateSearchText: {
+        name: 'update:search-text',
+        description: 'Event emitted when search text is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateSelected: {
+        name: 'update:selected',
+        description: 'Event emitted when selected is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onSelect: {
+        name: 'select',
+        description: 'Event emitted when an item is selected.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onDeleteTag: {
+        name: 'delete-tag',
+        description: 'Event emitted when a tag is deleted. It works only when the multiSelectable is true and appearanceType is \'stack\'',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClickShowMore: {
+        name: 'click-show-more',
+        description: 'Event emitted when \'show more\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClearSelection: {
+        name: 'clear-selection',
+        description: 'Event emitted when \'clear selection\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+};
+
+const initContextMenuArgTypes = (): ArgTypes => {
+    const contextMenuArgTypes = getContextMenuArgTypes();
+    const argTypes: ArgTypes = {
+        menu: contextMenuArgTypes.menu,
+        loading: contextMenuArgTypes.loading,
+        selected: contextMenuArgTypes.selected,
+        multiSelectable: contextMenuArgTypes.multiSelectable,
+        searchText: contextMenuArgTypes.searchText,
+        readonly: contextMenuArgTypes.readonly,
+        showSelectHeader: contextMenuArgTypes.showSelectHeader,
+        showSelectMarker: contextMenuArgTypes.showSelectMarker,
+    };
     Object.keys(contextMenuArgTypes).forEach((k) => {
-        const argType = contextMenuArgTypes[k];
-        if (argType.table?.category === 'slots') {
-            argType.name = `menu-${argType.name}`;
-            contextMenuSlots[`menu${camelCase(k)}`] = argType;
+        const item = contextMenuArgTypes[k];
+        if (item.table?.category === 'slots') {
+            argTypes[`menu-${k}`] = { ...item, name: `menu-${contextMenuArgTypes[k]?.name}` };
         }
     });
-    return {
-        /* context menu fixed style props */
-        useFixedMenuStyle: {
-            name: 'useFixedMenuStyle',
-            type: { name: 'boolean' },
-            description: 'Whether to use position fixed style on menu or not. ',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
-        visibleMenu: {
-            name: 'visibleMenu',
-            type: { name: 'boolean' },
-            description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
-            defaultValue: undefined,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'undefined',
-                },
-            },
-            control: {
-                type: null,
-            },
-        },
-        //
-        invalid: contextMenuArgTypes.invalid,
-        loading: contextMenuArgTypes.loading,
-        items: {
-            name: 'items',
-            type: { name: 'array' },
-            description: 'Dropdown menu items. It is the same as the menu format of the context menu component.',
-            defaultValue: menuItems,
-            table: {
-                type: {
-                    summary: 'array',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: '[]',
-                },
-            },
-            control: {
-                type: 'object',
-            },
-        },
-        selected: {
-            name: 'selected',
-            type: { name: 'string, number' },
-            description: 'Selected item\'s name or index(when `indexMode` props is `true`. Two way binding with `sync` is available.',
-            defaultValue: undefined,
-            table: {
-                type: {
-                    summary: 'string, number',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'undefined',
-                },
-            },
-            control: {
-                type: 'object',
-            },
-        },
-        disabled: {
-            name: 'disabled',
-            type: { name: 'boolean' },
-            description: 'Whether to disable dropdown selection or not.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
-        indexMode: {
-            name: 'indexMode',
-            type: { name: 'boolean' },
-            description: 'Whether to `selected` props works with item\'s index or not.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
-        placeholder: {
-            name: 'placeholder',
-            type: { name: 'string' },
-            description: 'Placeholder for dropdown button.',
-            defaultValue: '',
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: '""',
-                },
-            },
-            control: {
-                type: 'text',
-            },
-        },
-        readOnly: {
-            name: 'readOnly',
-            type: { name: 'boolean' },
-            description: 'Whether to make readonly or not.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
-        styleType: {
-            name: 'styleType',
-            type: { name: 'string' },
-            description: `Select dropdown style Types. ${
-                [...Object.values(SELECT_DROPDOWN_STYLE_TYPE)].map((d) => `\`${d}\``)} are available.`,
-            defaultValue: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'default',
-                },
-            },
-            control: {
-                type: 'select',
-                options: [undefined, ...Object.values(SELECT_DROPDOWN_STYLE_TYPE)],
-            },
-        },
-        size: {
-            name: 'size',
-            type: { name: 'string' },
-            description: `Select size. ${
-                [...Object.values(SELECT_DROPDOWN_SIZE)].map((d) => `\`${d}\``)} are available.`,
-            defaultValue: SELECT_DROPDOWN_SIZE.md,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: SELECT_DROPDOWN_SIZE.md,
-                },
-            },
-            control: {
-                type: 'select',
-                options: [undefined, ...Object.values(SELECT_DROPDOWN_SIZE)],
-            },
-        },
-        buttonIcon: {
-            name: 'buttonIcon',
-            type: { name: 'string' },
-            description: 'Icons for dropdown right button. Useful when `type` props is `icon-button`.',
-            defaultValue: undefined,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'undefined',
-                },
-            },
-            control: {
-                type: 'text',
-            },
-        },
-        menuPosition: {
-            name: 'menuPosition',
-            type: { name: 'string' },
-            description: 'Position of Context menu',
-            defaultValue: CONTEXT_MENU_POSITION.LEFT,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: CONTEXT_MENU_POSITION.LEFT,
-                },
-            },
-            control: {
-                type: 'select',
-                options: [...Object.values(CONTEXT_MENU_POSITION)],
-            },
-        },
-        isFixedWidth: {
-            name: 'isFixedWidth',
-            type: { name: 'boolean' },
-            description: 'Whether to fix width.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
-        /* model */
-        'v-model': {
-            name: 'v-model',
-            type: { name: 'string, number' },
-            description: 'Two way binding for `selected` props with `update:selected` event.',
-            defaultValue: undefined,
-            table: {
-                type: {
-                    summary: 'string, number',
-                },
-                category: 'model',
-                defaultValue: {
-                    summary: 'undefined',
-                },
-            },
-            control: null,
-        },
-        /* slots */
-        ...contextMenuSlots,
-        defaultSlot: {
-            name: 'default',
-            description: 'Slot for dropdown button text. Default value is placeholder or selected item\'s label. Selected item will be given as slot props.',
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'slots',
-            },
-        },
-        /* events */
-        onSelect: {
-            name: 'select',
-            description: 'Event emitted when menu item was selected.',
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'events',
-            },
-        },
-        onUpdateSelected: {
-            name: 'update:selected',
-            description: 'Event emitted when menu item was selected. works with `selected` props sync.',
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'events',
-            },
-        },
-        onFocusMenu: {
-            name: 'focus-menu',
-            description: 'Event emitted when menu must be focused, but there are no menu items to focus because `menu-menu` slot was given.',
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'events',
-            },
-        },
-    };
+    return argTypes;
 };
+
+export const getSelectDropdownArgTypes = (): ArgTypes => ({
+    ...extraArgTypes,
+    ...initContextMenuArgTypes(),
+});
