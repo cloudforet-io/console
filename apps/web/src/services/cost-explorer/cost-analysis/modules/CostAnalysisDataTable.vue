@@ -3,12 +3,13 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable,
+    PButtonModal, PI, PLink, PToolboxTable, PDivider,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
+import { byteFormatter } from '@cloudforet/core-lib';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -47,7 +48,13 @@ type CostAnalyzeRawData = {
         date: string;
         value: number
     }>;
+    usage_quantity_sum?: Array<{
+        date: string;
+        value: number|null;
+    }>;
+    usage_unit?: string;
     _total_cost_sum?: number;
+    _total_usage_quantity_sum?: number;
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -78,6 +85,8 @@ const state = reactive({
         [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
     })),
     visibleExcelNotiModal: false,
+    isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes('usage_type')),
+
 });
 const tableState = reactive({
     loading: true,
@@ -209,15 +218,24 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
     const refinedTableData: CostAnalyzeRawData[] = [];
     _results.forEach((d) => {
         let _costSum = cloneDeep(d.cost_sum);
+        let _usageQuantitySum = cloneDeep(d?.usage_quantity_sum);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
             if (!find(_costSum, { date: now.format(dateFormat) })) {
                 _costSum?.push({ date: now.format(dateFormat), value: 0 });
             }
+            if (!find(_usageQuantitySum, { date: now.format(dateFormat) })) {
+                _usageQuantitySum?.push({ date: now.format(dateFormat), value: null });
+            }
             now = now.add(1, timeUnit);
         }
         _costSum = sortBy(_costSum, ['date']);
-        refinedTableData.push({ ...d, cost_sum: _costSum });
+        _usageQuantitySum = sortBy(_usageQuantitySum, ['date']);
+        refinedTableData.push({
+            ...d,
+            cost_sum: _costSum,
+            ...(state.isIncludedUsageTypeInGroupBy && { usage_quantity_sum: _usageQuantitySum }),
+        });
     });
     return refinedTableData;
 };
@@ -235,7 +253,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
-                group_by: costAnalysisPageState.groupBy,
+                group_by: [...costAnalysisPageState.groupBy, 'usage_unit'],
                 start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
                 end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
                 fields: {
@@ -243,6 +261,12 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
                         key: 'cost',
                         operator: 'sum',
                     },
+                    ...(state.isIncludedUsageTypeInGroupBy && {
+                        usage_quantity_sum: {
+                            key: 'usage_quantity',
+                            operator: 'sum',
+                        },
+                    }),
                 },
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
@@ -256,6 +280,16 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
     } finally {
         tableState.loading = false;
     }
+};
+
+const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
+    const dateIndex = Number(fieldName.split('.')[1]);
+    const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
+    if (!usageQuantity) return 'unknown';
+    if (item.usage_unit === 'Bytes') {
+        return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
+    }
+    return usageQuantity.toFixed(2);
 };
 
 /* event */
@@ -378,7 +412,16 @@ watch(
                             />
                         </template>
                         <template v-else>
-                            {{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}
+                            <span class="usage-wrapper">
+                                {{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}
+                                <p-divider v-if="state.isIncludedUsageTypeInGroupBy"
+                                           vertical
+                                           class="divider"
+                                />
+                                <span v-if="state.isIncludedUsageTypeInGroupBy">
+                                    {{ getUsageQuantity(item, field.name) }}
+                                </span>
+                            </span>
                         </template>
                     </p-link>
                 </span>
@@ -411,6 +454,15 @@ watch(
     .cell-text {
         &.raised {
             @apply text-alert;
+        }
+    }
+    .usage-wrapper {
+        display: inline-flex;
+        align-items: center;
+        .divider {
+            @apply text-gray-200 inline-block;
+            height: 1rem;
+            margin: 0 0.25rem;
         }
     }
 }
