@@ -17,6 +17,7 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -27,10 +28,8 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import BudgetToolboxUsageRange
-    from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
-import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 export interface Pagination {
     pageStart: number;
@@ -41,19 +40,17 @@ type I18nSelectDropdownMenu = SelectDropdownMenu | {
     label: string | TranslateResult;
 };
 
-type Sort = BudgetUsageAnalyzeRequestParam['sort'];
+type Sort = Query['sort'];
 
 interface Props {
     filters: ConsoleFilter[];
-    totalCount: number;
+    more?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     filters: () => [],
-    totalCount: 0,
 });
 const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
-    (e: 'update-range', range: BudgetUsageRange): void;
     (e: 'update-pagination', pagination: Pagination): void;
     (e: 'update-period', period: Period): void;
     (e: 'update-sort', sort: Sort): void;
@@ -78,10 +75,6 @@ const handlerState = reactive({
             { name: 'project_id', label: 'Project', valueSet: storeState.projects },
             { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
             { name: 'time_unit', label: 'Time Unit' },
-            { name: 'cost_types.provider', label: '[Cost Type] Provider' },
-            { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account', valueSet: storeState.serviceAccounts },
-            { name: 'cost_types.region_code', label: '[Cost Type] Region' },
-            { name: 'cost_types.product', label: '[Cost Type] Product' },
         ],
     }]),
     valueHandlerMap: {
@@ -90,10 +83,6 @@ const handlerState = reactive({
         project_id: makeReferenceValueHandler('identity.Project'),
         project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
-        'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
-        'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
-        'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
-        'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
     } as ValueHandlerMap,
 });
 
@@ -111,7 +100,6 @@ const state = reactive({
     pageStart: 1,
     pageLimit: 24,
     // query
-    range: {} as BudgetUsageRange,
     pagination: computed<Pagination>(() => ({
         pageStart: state.pageStart,
         pageLimit: state.pageLimit,
@@ -141,10 +129,6 @@ const state = reactive({
 });
 
 /* Handlers */
-const handleUpdateUsageRange = (range: BudgetUsageRange) => {
-    state.range = range;
-};
-
 const handleSelectStatus = (selected: string[]) => {
     state.selectedPeriod = selected;
 };
@@ -160,9 +144,6 @@ const handleSortType = () => {
 };
 
 /* Watchers */
-watch(() => state.range, (range) => {
-    emit('update-range', range);
-});
 watch(() => state.pagination, (pagination) => {
     emit('update-pagination', pagination);
 });
@@ -193,8 +174,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 <template>
     <div class="budget-toolbox">
         <div class="top">
-            <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
-            <p-divider :vertical="true" />
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in state.periodList"
@@ -216,7 +195,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                    filters-visible
                    :page-size-options="pageSizeOptions"
                    :page-size="state.pageLimit"
-                   :total-count="props.totalCount"
                    :query-tags="state.queryTags"
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
