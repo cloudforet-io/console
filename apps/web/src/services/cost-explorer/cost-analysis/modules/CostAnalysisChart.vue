@@ -64,7 +64,9 @@ const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        let dateFormat = 'YYYY-MM-DD';
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
@@ -78,6 +80,7 @@ const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<
                         operator: 'sum',
                     },
                 },
+                sort: [{ key: '_total_cost_sum', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },
@@ -126,10 +129,6 @@ watch([
                                             :chart.sync="state.chart"
                                             :chart-data="state.chartData"
                                             :legends="state.legends"
-                                            :granularity="costAnalysisPageState.granularity"
-                                            :period="costAnalysisPageState.period"
-                                            :currency="state.currency"
-                                            :currency-rates="state.currencyRates"
                                             class="cost-analysis-stacked-column-chart"
         />
         <cost-analysis-chart-legends :loading="state.loading"
