@@ -106,7 +106,7 @@ const getGroupByLabel = <T extends Record<string, any>>(data: T, groupBy: string
  */
 export const getXYChartLegends = <T = Record<string, any>>(
     rawData?: T[],
-    groupBy?: CostGroupBy,
+    groupBy?: string,
     allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
