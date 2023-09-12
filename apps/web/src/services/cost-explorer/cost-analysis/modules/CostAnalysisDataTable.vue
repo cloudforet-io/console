@@ -84,7 +84,7 @@ const state = reactive({
         [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
     })),
     visibleExcelNotiModal: false,
-    isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes('usage_type')),
+    isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE)),
 
 });
 const tableState = reactive({
@@ -248,11 +248,12 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         tableState.loading = true;
         analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
-                group_by: [...costAnalysisPageState.groupBy, 'usage_unit'],
+                group_by: groupBy,
                 start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
                 end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
                 fields: {
