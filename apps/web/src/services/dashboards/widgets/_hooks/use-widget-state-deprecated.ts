@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
@@ -120,7 +120,7 @@ const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFil
     Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
         if (!filterItems?.length) return;
         // HACK: This is temporary code for cloud_service_type filter
-        if ((filterKey === ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type)) {
+        if ((filterKey === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type)) {
             filterItems.forEach((d) => {
                 const key = 'cloud_service_type';
                 results.push({

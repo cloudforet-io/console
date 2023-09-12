@@ -1,5 +1,5 @@
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import { ASSET_GROUP_BY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
@@ -29,63 +29,67 @@ export const RESOURCE_REFERENCE_SCHEMA = {
 } as const;
 
 export const COST_REFERENCE_SCHEMA = {
-    [COST_REFERENCE_TYPE_INFO.cost_category.type]: {
-        title: COST_REFERENCE_TYPE_INFO.cost_category.name,
+    [COST_VARIABLE_TYPE_INFO.cost_data_source.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_data_source.name,
+        type: 'array',
+    },
+    [COST_VARIABLE_TYPE_INFO.cost_category.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_category.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_REFERENCE_TYPE_INFO.cost_category.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_category.key,
         },
     },
-    [COST_REFERENCE_TYPE_INFO.cost_resource_group.type]: {
-        title: COST_REFERENCE_TYPE_INFO.cost_resource_group.name,
+    [COST_VARIABLE_TYPE_INFO.cost_resource_group.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_resource_group.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_REFERENCE_TYPE_INFO.cost_resource_group.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_resource_group.key,
         },
     },
-    [COST_REFERENCE_TYPE_INFO.cost_product.type]: {
-        title: COST_REFERENCE_TYPE_INFO.cost_product.name,
+    [COST_VARIABLE_TYPE_INFO.cost_product.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_product.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_REFERENCE_TYPE_INFO.cost_product.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
         },
     },
-    [COST_REFERENCE_TYPE_INFO.cost_type.type]: {
-        title: COST_REFERENCE_TYPE_INFO.cost_type.name,
+    [COST_VARIABLE_TYPE_INFO.cost_type.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_type.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_REFERENCE_TYPE_INFO.cost_type.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_type.key,
         },
     },
-    [COST_REFERENCE_TYPE_INFO.cost_account.type]: {
-        title: COST_REFERENCE_TYPE_INFO.cost_account.name,
+    [COST_VARIABLE_TYPE_INFO.cost_account.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_account.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_REFERENCE_TYPE_INFO.cost_account.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_account.key,
         },
     },
 } as const;
 
 export const ASSET_REFERENCE_SCHEMA = {
-    [ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type]: {
-        title: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name,
+    [ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type]: {
+        title: ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name,
         type: 'array',
         reference: {
             resource_type: 'inventory.CloudServiceType',
-            reference_key: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
+            reference_key: ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.key,
         },
     },
-    [ASSET_REFERENCE_TYPE_INFO.asset_account.type]: {
-        title: ASSET_REFERENCE_TYPE_INFO.asset_account.name,
+    [ASSET_VARIABLE_TYPE_INFO.asset_account.type]: {
+        title: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
         type: 'array',
         reference: {
             resource_type: 'inventory.CloudService',
-            reference_key: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
+            reference_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
         },
     },
 };
