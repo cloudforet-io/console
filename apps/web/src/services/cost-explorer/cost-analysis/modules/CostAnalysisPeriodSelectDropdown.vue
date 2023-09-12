@@ -7,7 +7,7 @@ import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import { isEqual, range } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -20,18 +20,22 @@ import {
 import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Granularity, Period } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
 const today = dayjs.utc();
 interface PeriodItem extends SelectDropdownMenu {
-    period: {
+    period?: {
         start: string
         end: string;
     };
     relativePeriod?: RelativePeriod;
 }
+
+const props = defineProps<{
+    localGranularity?: Granularity;
+}>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
@@ -39,53 +43,63 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const { i18nDayjs } = useI18nDayjs();
 const state = reactive({
     period: initiatePeriodByGranularity(GRANULARITY.MONTHLY)[0],
-    dailyPeriodItems: computed<PeriodItem[]>(() => (range(12).map((i) => {
-        const start = today.subtract(i, 'month');
-        const end = today.subtract(i, 'month');
-        return {
-            name: start.format('YYYY-MM'),
-            label: i18nDayjs.value(start).format('MMMM, YYYY'),
-            period: {
-                start: start.format('YYYY-MM'),
-                end: end.format('YYYY-MM'),
-            },
-            enabled: [GRANULARITY.DAILY],
-        };
-    }))),
-    monthlyPeriodItems: computed(() => ([
+    dailyPeriodItems: computed<PeriodItem[]>(() => [
         {
-            name: 'thisMonth',
+            name: 'ThisMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
-            relativePeriod: { unit: 'month', value: 0 },
+            relativePeriod: { unit: 'month', value: 0, include_today: true },
         },
         {
             name: 'lastMonth',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
-            relativePeriod: { unit: 'month', value: 1, exclude_today: true },
+            relativePeriod: { unit: 'month', value: 1, include_today: false },
         },
+        ...(range(12).map((i) => {
+            const start = today.subtract(i, 'month');
+            const end = today.subtract(i, 'month');
+            return {
+                name: start.format('YYYY-MM'),
+                label: i18nDayjs.value(start).format('MMMM, YYYY'),
+                period: {
+                    start: start.format('YYYY-MM'),
+                    end: end.format('YYYY-MM'),
+                },
+            };
+        }))]),
+    monthlyPeriodItems: computed<PeriodItem[]>(() => ([
         {
             name: 'last3Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_MONTHS'),
-            relativePeriod: { unit: 'month', value: 2 },
+            relativePeriod: { unit: 'month', value: 2, include_today: true },
         },
         {
             name: 'last6Month',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_6_MONTHS'),
-            relativePeriod: { unit: 'month', value: 5 },
-        }])),
-    yearlyPeriodItems: computed(() => ([
+            relativePeriod: { unit: 'month', value: 5, include_today: true },
+        },
         {
-            name: 'thisYear',
+            name: 'last12Months',
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_12_MONTHS'),
+            relativePeriod: { unit: 'month', value: 11, include_today: true },
+        },
+        {
+            name: 'ThisYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_YEAR'),
-            relativePeriod: { unit: 'year', value: 0 },
+            relativePeriod: { unit: 'year', value: 0, include_today: true },
         },
         {
             name: 'lastYear',
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_YEAR'),
-            relativePeriod: { unit: 'year', value: 1, exclude_today: true },
+            relativePeriod: { unit: 'year', value: 1, include_today: false },
+        }])),
+    yearlyPeriodItems: computed<PeriodItem[]>(() => ([
+        {
+            name: 'last3Years',
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_3_YEARS'),
+            relativePeriod: { unit: 'year', value: 2, include_today: true },
         },
     ])),
-    allPeriodItems: computed(() => ([
+    allPeriodItems: computed<PeriodItem[]>(() => ([
         ...state.dailyPeriodItems,
         ...state.monthlyPeriodItems,
         ...state.yearlyPeriodItems,
@@ -113,6 +127,30 @@ const state = reactive({
 });
 
 /* Util */
+const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
+
+const setSelectedItemByGranularity = (granularity:Granularity) => {
+    const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
+    costAnalysisPageStore.$patch((_state) => {
+        _state.period = defaultPeriod;
+        _state.relativePeriod = defaultRelativePeriod;
+    });
+    state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
+};
+const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:{
+    relativePeriod?: RelativePeriod;
+    period?: Period;
+    granularity?: Granularity;
+}) => {
+    if (relativePeriod) {
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(relativePeriod);
+    } else if (granularity === GRANULARITY.DAILY) {
+        const selectedPeriodItem:PeriodItem|undefined = state.dailyPeriodItems.find((item:PeriodItem) => isEqual(item.period, period));
+        state.selectedPeriod = selectedPeriodItem?.name;
+    } else {
+        state.selectedPeriod = 'custom';
+    }
+};
 const setPeriodMenuItemWithPeriod = (period?: Period) => {
     const start = dayjs.utc(period?.start).format('YYYY-MM');
     const end = dayjs.utc(period?.end).format('YYYY-MM');
@@ -129,7 +167,10 @@ const handleSelectPeriod = (periodMenuName) => {
     if (periodMenuName === 'custom') state.customRangeModalVisible = true;
     else {
         const selectedPeriodItem: PeriodItem = state.allPeriodItems.find((d) => d.name === periodMenuName);
-        state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod(selectedPeriodItem.relativePeriod) : selectedPeriodItem.period;
+        state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod({
+            relativePeriod: selectedPeriodItem.relativePeriod,
+            granularity: costAnalysisPageState.granularity,
+        }) : selectedPeriodItem.period;
         costAnalysisPageStore.$patch((_state) => {
             _state.period = state.period;
             _state.relativePeriod = selectedPeriodItem.relativePeriod;
@@ -144,25 +185,21 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
-watch(() => costAnalysisPageState.granularity, (granularity) => {
-    const [period, relativePeriod] = initiatePeriodByGranularity(granularity);
-    costAnalysisPageStore.$patch((_state) => {
-        _state.period = period;
-        _state.relativePeriod = relativePeriod;
-    });
-    if (granularity === GRANULARITY.DAILY) {
-        state.selectedPeriod = today.subtract(0, 'month').format('YYYY-MM');
-    } else if (granularity === GRANULARITY.MONTHLY) {
-        state.selectedPeriod = 'last6Month';
-    } else {
-        state.selectedPeriod = 'thisYear';
-    }
+/* NOTE: Case for changing granularity dropdown */
+watch(() => props.localGranularity, (granularity) => {
+    if (granularity) setSelectedItemByGranularity(granularity);
 });
-watch(() => costAnalysisPageState.period, (period) => {
-    if (period && !costAnalysisPageState.relativePeriod) {
-        state.selectedPeriod = 'custom';
-    }
-}, { immediate: true });
+
+/* NOTE: Case for changing query set(LNB, Dynamic Link) */
+watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
+    setSelectedItemByQuerySet({
+        relativePeriod: selectedQuerySet?.options?.relative_period,
+        period: selectedQuerySet?.options?.period,
+        granularity: selectedQuerySet?.options?.granularity,
+    });
+}, {
+    immediate: true,
+});
 </script>
 
 <template>

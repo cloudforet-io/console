@@ -111,7 +111,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
 
             if (options.relative_period) {
                 this.relativePeriod = options.relative_period;
-                this.period = convertRelativePeriodToPeriod(options.relative_period);
+                this.period = convertRelativePeriodToPeriod({
+                    relativePeriod: options.relative_period,
+                    granularity: options.granularity,
+                });
             } else if (options.period) {
                 this.period = { start: options.period.start, end: options.period.end };
             }
