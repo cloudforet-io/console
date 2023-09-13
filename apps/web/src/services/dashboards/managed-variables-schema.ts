@@ -63,6 +63,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
                 type: 'REFERENCE_RESOURCE',
                 reference_key: COST_VARIABLE_TYPE_INFO.cost_data_source.type,
             },
+            required: true,
         },
         [COST_VARIABLE_TYPE_INFO.cost_product.type]: {
             name: COST_VARIABLE_TYPE_INFO.cost_product.name,

@@ -124,6 +124,7 @@ export interface DashboardVariableSchemaProperty {
     description?: string;
     disabled?: boolean;
     options?: VariableOptions;
+    required?: boolean;
 }
 export interface DashboardVariablesSchema {
     properties: {
