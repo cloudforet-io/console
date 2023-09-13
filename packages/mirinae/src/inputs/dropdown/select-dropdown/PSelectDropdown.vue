@@ -98,10 +98,7 @@ const state = reactive({
     selectedItems: computed<SelectDropdownMenuItem[]>(() => {
         if (!state.proxySelectedItem) return [];
         if (Array.isArray(state.proxySelectedItem)) return state.proxySelectedItem;
-        return [{
-            label: state.proxySelectedItem,
-            value: state.proxySelectedItem,
-        }];
+        return props.menu.filter((m) => m.name === state.proxySelectedItem);
     }),
     proxySearchText: useProxyValue('searchText', props, emit),
     showDeleteAllButton: computed(() => {
@@ -205,11 +202,8 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
-    if (props.multiSelectable) {
-        state.proxySelectedItem = selected;
-    } else {
-        state.proxySelectedItem = selected[0]?.name;
-    }
+    console.log(selected);
+    state.proxySelectedItem = selected;
 };
 const updateSearchText = debounce(async (searchText: string) => {
     state.proxySearchText = searchText;
