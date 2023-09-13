@@ -15,7 +15,7 @@ import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import BudgetCostTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { CostTypes } from '@/services/cost-explorer/budget/model';
+import type { CostTypes, BudgetModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
@@ -39,6 +39,7 @@ const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     costTypeKey: computed(() => {
         if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
         return getKeyOfCostType(budgetPageState.budgetData.cost_types);
@@ -77,18 +78,18 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <div v-if="!budgetPageState.loading"
                  class="flex justify-between"
             >
-                <p v-if="budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                <p v-if="state.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <p v-else
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content"
-                                              :budget-data="budgetPageState.budgetData"
+                                              :budget-data="state.budgetData"
                 >
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
@@ -99,12 +100,12 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                <p-link v-if="state.budgetData?.project_group_id || state.budgetData?.project_id"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         :to="referenceRouter(
-                            (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
-                            { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                            (state.budgetData?.project_id || state.budgetData?.project_group_id) ?? '',
+                            { resource_type: state.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
                     {{ getTargetLabel(state.projects) }}
                 </p-link>
