@@ -9,12 +9,10 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const getApi = ({ propertyName, schemaProperty }: ReferenceHandlerOptions) => {
-    const referenceType = propertyName;
+const getApi = ({ schemaProperty }: ReferenceHandlerOptions) => {
     const referenceKey = schemaProperty.reference?.reference_key;
 
-    const reference = REFERENCE_TYPE_INFO[referenceType];
-    if (referenceKey && reference?.key === referenceKey) {
+    if (referenceKey) {
         return SpaceConnector.client.addOns.autocomplete.distinct;
     }
     return SpaceConnector.client.addOns.autocomplete.resource;
