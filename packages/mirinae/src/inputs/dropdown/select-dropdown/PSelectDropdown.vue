@@ -44,7 +44,7 @@ interface SelectDropdownProps {
     visibleMenu?: boolean;
     menu?: SelectDropdownMenuItem[];
     loading?: boolean;
-    selected?: SelectDropdownMenuItem[];
+    selected?: SelectDropdownMenuItem[]|string|number;
     multiSelectable?: boolean;
     searchText?: string;
     readonly?: boolean;
@@ -63,7 +63,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     /* dropdown button */
     styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
     appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
-    selected: () => [],
+    selected: undefined,
     placeholder: undefined,
     selectionLabel: undefined,
     showDeleteAllButton: false,
@@ -94,7 +94,15 @@ const slots = useSlots();
 
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean>('visibleMenu', props, emit),
-    proxySelectedItem: useProxyValue<SelectDropdownMenuItem[]>('selected', props, emit),
+    proxySelectedItem: useProxyValue<SelectDropdownMenuItem[]|string|number>('selected', props, emit),
+    selectedItems: computed<SelectDropdownMenuItem[]>(() => {
+        if (!state.proxySelectedItem) return [];
+        if (Array.isArray(state.proxySelectedItem)) return state.proxySelectedItem;
+        return [{
+            label: state.proxySelectedItem,
+            value: state.proxySelectedItem,
+        }];
+    }),
     proxySearchText: useProxyValue('searchText', props, emit),
     showDeleteAllButton: computed(() => {
         if (!props.showDeleteAllButton) return false;
@@ -151,7 +159,7 @@ const {
     useMenuFiltering: true,
     useReorderBySelection: true,
     searchText: toRef(state, 'proxySearchText'),
-    selected: toRef(state, 'proxySelectedItem'),
+    selected: props.isFilterable ? toRef(state, 'selectedItems') : [],
     handler: toRef(props, 'handler'),
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
@@ -237,7 +245,7 @@ watch(() => props.disabled, (disabled) => {
                          :is-visible-menu="state.proxyVisibleMenu"
                          :readonly="props.readonly"
                          :multi-selectable="props.multiSelectable"
-                         :selected-items="state.proxySelectedItem"
+                         :selected-items="state.selectedItems"
                          @enter-key="handleEnterKey"
                          @click-delete="handleClickDelete"
                          @click-dropdown-button="handleClickDropdownButton"
@@ -257,7 +265,7 @@ watch(() => props.disabled, (disabled) => {
                         }"
                         :item-height-fixed="!props.isFilterable"
                         :no-select-indication="!props.isFilterable"
-                        :selected="state.proxySelectedItem"
+                        :selected="state.selectedItems"
                         :multi-selectable="props.multiSelectable"
                         :search-text="state.proxySearchText"
                         :searchable="props.isFilterable"
