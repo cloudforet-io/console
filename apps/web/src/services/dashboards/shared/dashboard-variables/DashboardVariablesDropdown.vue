@@ -75,14 +75,17 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { DashboardVariableSchemaProperty, SearchResourceOptions } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
@@ -129,6 +132,12 @@ const state = reactive({
             result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
         return result ?? [];
+    }),
+    autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
+        const api = state.variableProperty.options?.resource_key
+            ? SpaceConnector.client.addOns.autocomplete.distinct
+            : SpaceConnector.client.addOns.autocomplete.resource;
+        return getCancellableFetcher(api);
     }),
 });
 
@@ -190,23 +199,39 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 
+const filtersHelper = new QueryHelper();
+
+const getFilters = (variableProperty: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
+    filtersHelper.setFilters([]);
+
+    // NOTE: Some variables(asset) require specific API filters.
+    if (variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
+        filtersHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
+    } else if (variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
+        filtersHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
+    }
+
+    const filters = filtersHelper.apiQuery.filter;
+    if (filters.length) return filters;
+    return undefined;
+};
 const loadSearchResourceOptions = async () => {
-    if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
-        // NOTE: Some variables(asset) require specific API filters.
-        const apiQueryHelper = new ApiQueryHelper();
-        if (state.variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
-            apiQueryHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
-        } else if (state.variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
-            apiQueryHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
+    try {
+        const options = state.variableProperty.options as SearchResourceOptions|undefined;
+        if (options?.type === 'SEARCH_RESOURCE') {
+            const { status, response } = await state.autocompleteApi({
+                resource_type: options.resource_type ?? 'cost_analysis.Cost',
+                distinct_key: options.resource_key,
+                options: {
+                    filter: getFilters(state.variableProperty),
+                },
+            });
+            if (status === 'succeed') {
+                state.searchResourceOptions = response.results.map((d) => ({ name: d.name, label: d.name }));
+            }
         }
-        const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
-            resource_type: state.variableProperty.options.resource_type ?? 'cost_analysis.Cost',
-            distinct_key: state.variableProperty.options.resource_key,
-            options: {
-                ...apiQueryHelper.data,
-            },
-        });
-        state.searchResourceOptions = results.map((d) => ({ name: d.name, label: d.name }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 
@@ -216,8 +241,12 @@ watch(visibleMenu, (_visibleMenu) => {
     } else state.searchText = '';
 }, { immediate: true });
 
-onMounted(() => {
-    loadSearchResourceOptions();
+onMounted(async () => {
+    await loadSearchResourceOptions();
+    if (state.variableProperty.required) {
+        const firstOption = state.searchResourceOptions[0];
+        if (firstOption) changeVariables([firstOption]);
+    }
 });
 
 const {
