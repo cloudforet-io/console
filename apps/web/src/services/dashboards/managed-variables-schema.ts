@@ -76,18 +76,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
                 resource_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
             },
         },
-        [COST_VARIABLE_TYPE_INFO.cost_account.type]: {
-            name: COST_VARIABLE_TYPE_INFO.cost_account.name,
-            variable_type: 'MANAGED',
-            use: false,
-            selection_type: 'MULTI',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ACCOUNT',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'cost_analysis.Cost',
-                resource_key: COST_VARIABLE_TYPE_INFO.cost_account.key,
-            },
-        },
         // Variable for Asset
         [ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type]: {
             name: ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name,
@@ -121,7 +109,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         REFERENCE_TYPE_INFO.service_account.type,
         REFERENCE_TYPE_INFO.region.type,
         COST_VARIABLE_TYPE_INFO.cost_product.type,
-        COST_VARIABLE_TYPE_INFO.cost_account.type,
         ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
         ASSET_VARIABLE_TYPE_INFO.asset_account.type,
     ],

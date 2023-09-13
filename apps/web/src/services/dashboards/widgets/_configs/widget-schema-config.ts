@@ -33,22 +33,6 @@ export const COST_REFERENCE_SCHEMA = {
         title: COST_VARIABLE_TYPE_INFO.cost_data_source.name,
         type: 'array',
     },
-    [COST_VARIABLE_TYPE_INFO.cost_category.type]: {
-        title: COST_VARIABLE_TYPE_INFO.cost_category.name,
-        type: 'array',
-        reference: {
-            resource_type: 'cost_analysis.Cost',
-            reference_key: COST_VARIABLE_TYPE_INFO.cost_category.key,
-        },
-    },
-    [COST_VARIABLE_TYPE_INFO.cost_resource_group.type]: {
-        title: COST_VARIABLE_TYPE_INFO.cost_resource_group.name,
-        type: 'array',
-        reference: {
-            resource_type: 'cost_analysis.Cost',
-            reference_key: COST_VARIABLE_TYPE_INFO.cost_resource_group.key,
-        },
-    },
     [COST_VARIABLE_TYPE_INFO.cost_product.type]: {
         title: COST_VARIABLE_TYPE_INFO.cost_product.name,
         type: 'array',
@@ -57,20 +41,12 @@ export const COST_REFERENCE_SCHEMA = {
             reference_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
         },
     },
-    [COST_VARIABLE_TYPE_INFO.cost_type.type]: {
-        title: COST_VARIABLE_TYPE_INFO.cost_type.name,
+    [COST_VARIABLE_TYPE_INFO.cost_usage_type.type]: {
+        title: COST_VARIABLE_TYPE_INFO.cost_usage_type.name,
         type: 'array',
         reference: {
             resource_type: 'cost_analysis.Cost',
-            reference_key: COST_VARIABLE_TYPE_INFO.cost_type.key,
-        },
-    },
-    [COST_VARIABLE_TYPE_INFO.cost_account.type]: {
-        title: COST_VARIABLE_TYPE_INFO.cost_account.name,
-        type: 'array',
-        reference: {
-            resource_type: 'cost_analysis.Cost',
-            reference_key: COST_VARIABLE_TYPE_INFO.cost_account.key,
+            reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key,
         },
     },
 } as const;
