@@ -208,7 +208,7 @@ const updateSelected = (selected: SelectDropdownMenuItem[]) => {
     if (props.multiSelectable) {
         state.proxySelectedItem = selected;
     } else {
-        state.proxySelectedItem = selected[0]?.label;
+        state.proxySelectedItem = selected[0]?.name;
     }
 };
 const updateSearchText = debounce(async (searchText: string) => {
