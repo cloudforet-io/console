@@ -226,6 +226,7 @@ watch(() => props.disabled, (disabled) => {
 <template>
     <div ref="containerRef"
          :class="{
+             [props.styleType]: true,
              'p-select-dropdown': true,
              'is-fixed-width': props.isFixedWidth,
          }"
@@ -255,14 +256,12 @@ watch(() => props.disabled, (disabled) => {
                         :class="{
                             'dropdown-context-menu': true,
                             default: !props.showSelectMarker,
-                            [menuPosition]: props.styleType !== SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && !useFixedMenuStyle }"
+                            [menuPosition]: !useFixedMenuStyle
+                        }"
                         :menu="refinedMenu"
                         :loading="props.loading || loading"
                         :readonly="props.readonly"
-                        :style="{
-                            ...contextMenuStyle,
-                            ...(props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
-                        }"
+                        :style="contextMenuStyle"
                         :item-height-fixed="!props.isFilterable"
                         :no-select-indication="!props.isFilterable"
                         :selected="state.selectedItems"
@@ -322,6 +321,10 @@ watch(() => props.disabled, (disabled) => {
 
     &.is-fixed-width {
         display: initial;
+    }
+
+    &.icon-button {
+        min-width: unset;
     }
 }
 </style>

@@ -297,10 +297,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     }
     &.icon-button {
         @apply flex items-center justify-center text-gray-600 cursor-pointer;
-        min-width: unset;
         width: 2rem;
         height: 2rem;
-        margin: auto;
         .dropdown-icon-button-wrapper {
             @apply flex items-center justify-center rounded-full;
             width: 2rem;
