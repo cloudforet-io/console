@@ -37,7 +37,7 @@ import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-d
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import { getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getDataTableCostFields, getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/type';
 
@@ -62,7 +62,7 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
     component: computed(() => PToolboxTable),
-    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period?.start), dayjs.utc(costAnalysisPageState.period?.end))),
+    timeUnit: computed(() => getTimeUnitByGranularity(costAnalysisPageState.granularity)),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) return 'YYYY';
@@ -213,7 +213,7 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
 
     const _results: CostAnalyzeRawData[] = cloneDeep(results);

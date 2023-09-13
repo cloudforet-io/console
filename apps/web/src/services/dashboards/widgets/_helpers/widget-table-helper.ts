@@ -5,7 +5,7 @@ import { sortArrayInObjectArray } from '@cloudforet/core-lib';
 
 import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
 
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
@@ -26,7 +26,7 @@ export const getWidgetTableDateFields = (
     const start = dayjs.utc(dateRange.start);
     const end = dayjs.utc(dateRange.end);
 
-    const timeUnit = getTimeUnitByPeriod(granularity, start, end);
+    const timeUnit = getTimeUnitByGranularity(granularity);
     let labelDateFormat = 'M/D';
     if (timeUnit === 'month') {
         labelDateFormat = 'MMM';
