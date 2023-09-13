@@ -105,7 +105,7 @@ export interface EnumOptions {
 export interface SearchResourceOptions {
     type: 'SEARCH_RESOURCE';
     resource_type: string;
-    resource_key: string;
+    resource_key?: string;
 }
 export interface ReferenceResourceOptions {
     type: 'REFERENCE_RESOURCE',
@@ -124,6 +124,7 @@ export interface DashboardVariableSchemaProperty {
     description?: string;
     disabled?: boolean;
     options?: VariableOptions;
+    required?: boolean;
 }
 export interface DashboardVariablesSchema {
     properties: {

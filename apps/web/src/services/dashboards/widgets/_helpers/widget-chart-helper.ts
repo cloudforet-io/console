@@ -77,8 +77,6 @@ const mergeRefinedXYChartData = <S = RawData>(chartData: S[], data: RawData, opt
     return mergedChartData;
 };
 const mergeByKey = <S = RawData>(arrA: S[], arrB: S[], key: string): S[] => {
-    console.debug('mergeByKey', keyBy(arrB, key));
-
     const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
     return values(merged) as S[];
 };
