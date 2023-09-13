@@ -9,7 +9,7 @@ import PButton from "@/inputs/buttons/button/PButton";
 import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
 import PHeading from '@/data-display/heading/PHeading.vue';
 import {
-     getJsonSchemaFormArgTypes,
+    getJsonSchemaFormArgTypes,
 } from '@/inputs/forms/json-schema-form/story-helper';
 import {
     getDefaultFormData, getDefaultSchema, getJsonInputSchema, getReferenceHandler
@@ -144,30 +144,30 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="flex gap-4">
-    <div class="bg-blue-100 p-4">
-        <p-heading>Json Schema Form</p-heading>
-        <p-json-schema-form :schema="schema"
-                            :form-data.sync="formData"
-                            :language="$i18n.locale"
-                            :reference-handler="handler"
-        />
-    </div>
-    <div class="bg-coral-100 p-4">
-        <p-heading>Schema</p-heading>
-        <p-text-editor :code="JSON.stringify(schema, null, 2)"
-                       mode="readOnly"
-                       folded
-                       style="height: auto"
-        />
-        <p-heading>Form Data</p-heading>
-        <p-text-editor :code="JSON.stringify(formData, null, 2)"
-                       mode="readOnly"
-                       style="height: auto"
-        />
-    </div>
-</div>
-`,
+                <div class="flex gap-4">
+                <div class="bg-blue-100 p-4">
+                    <p-heading>Json Schema Form</p-heading>
+                    <p-json-schema-form :schema="schema"
+                                        :form-data.sync="formData"
+                                        :language="$i18n.locale"
+                                        :reference-handler="handler"
+                    />
+                </div>
+                <div class="bg-coral-100 p-4">
+                    <p-heading>Schema</p-heading>
+                    <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                                   mode="readOnly"
+                                   folded
+                                   style="height: auto"
+                    />
+                    <p-heading>Form Data</p-heading>
+                    <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                                   mode="readOnly"
+                                   style="height: auto"
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getDefaultSchema(),
@@ -192,22 +192,22 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         {{
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown },
             template: `
-<div class="flex gap-4">
-    <p-json-schema-form
-        :schema="schema"
-        :form-data="formData"
-        :language="language"
-    />
-    <div>
-        <p-select-dropdown class="mb-4"
-                           :selected.sync="language" :items="languages" />
-        <p-text-editor :code="JSON.stringify(schema, null, 2)"
-                       mode="readOnly"
-                       folded
-        />
-    </div>
-</div>
-`,
+                <div class="flex gap-4">
+                <p-json-schema-form
+                    :schema="schema"
+                    :form-data="formData"
+                    :language="language"
+                />
+                <div>
+                    <p-select-dropdown class="mb-4"
+                                       :selected="language" :menu="languages" />
+                    <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                                   mode="readOnly"
+                                   folded
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getDefaultSchema(),
@@ -235,25 +235,25 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PButton },
             i18n: I18nConnector.i18n,
             template: `
-<div class="flex gap-4">
-    <p-json-schema-form
-        :schema="schema"
-        :form-data="formData"
-        :language="$i18n.locale"
-    />
-    <div>
-        <p-button class="mb-4"
-                  @click="resetSchema">Reset Schema</p-button>
-        <p-button style-type="highlight"
-                  class="mb-4"
-                  @click="changeFormData">Change Form Data</p-button>
-        <p-text-editor :code="JSON.stringify(schema, null, 2)"
-                       mode="readOnly"
-                       folded
-        />
-    </div>
-</div>
-`,
+                <div class="flex gap-4">
+                <p-json-schema-form
+                    :schema="schema"
+                    :form-data="formData"
+                    :language="$i18n.locale"
+                />
+                <div>
+                    <p-button class="mb-4"
+                              @click="resetSchema">Reset Schema</p-button>
+                    <p-button style-type="highlight"
+                              class="mb-4"
+                              @click="changeFormData">Change Form Data</p-button>
+                    <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                                   mode="readOnly"
+                                   folded
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getDefaultSchema(),
@@ -286,30 +286,30 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="flex gap-4">
-    <p-json-schema-form
-        :schema="schema"
-        :form-data.sync="formData"
-        :validation-mode="validationMode"
-        :language="$i18n.locale"
-    />
-    <div>
-        <span class="font-lg font-bold mb-2">Validation Mode: </span>
-        <p-select-dropdown class="mb-4"
-            :selected.sync="validationMode" :items="validationModes" />
-        <p-heading>Schema</p-heading>
-        <p-text-editor :code="JSON.stringify(schema, null, 2)"
-                       mode="readOnly"
-                       folded
-        />
-        <p-heading>Form Data</p-heading>
-        <p-text-editor :code="JSON.stringify(formData, null, 2)"
-                       mode="readOnly"
-                       style="height: auto"
-        />
-    </div>
-</div>
-`,
+                <div class="flex gap-4">
+                <p-json-schema-form
+                    :schema="schema"
+                    :form-data.sync="formData"
+                    :validation-mode="validationMode"
+                    :language="$i18n.locale"
+                />
+                <div>
+                    <span class="font-lg font-bold mb-2">Validation Mode: </span>
+                    <p-select-dropdown class="mb-4"
+                                       :selected="validationMode" :menu="validationModes" />
+                    <p-heading>Schema</p-heading>
+                    <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                                   mode="readOnly"
+                                   folded
+                    />
+                    <p-heading>Form Data</p-heading>
+                    <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                                   mode="readOnly"
+                                   style="height: auto"
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getDefaultSchema(),
@@ -336,29 +336,29 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="grid gap-4 grid-cols-12">
-    <div class="col-span-6 bg-blue-100 p-4">
-        <p-heading>Json Schema Form</p-heading>
-        <p-json-schema-form :schema="schema"
-                            :form-data.sync="formData"
-                            :language="$i18n.locale"
-        />
-    </div>
-    <div class="col-span-6 bg-coral-100 p-4">
-        <p-heading>Schema</p-heading>
-        <p-text-editor :code="JSON.stringify(schema, null, 2)"
-                       mode="readOnly"
-                       folded
-                       style="height: auto"
-        />
-        <p-heading>Form Data</p-heading>
-        <p-text-editor :code="JSON.stringify(formData, null, 2)"
-                       mode="readOnly"
-                       style="height: auto"
-        />
-    </div>
-</div>
-`,
+                <div class="grid gap-4 grid-cols-12">
+                <div class="col-span-6 bg-blue-100 p-4">
+                    <p-heading>Json Schema Form</p-heading>
+                    <p-json-schema-form :schema="schema"
+                                        :form-data.sync="formData"
+                                        :language="$i18n.locale"
+                    />
+                </div>
+                <div class="col-span-6 bg-coral-100 p-4">
+                    <p-heading>Schema</p-heading>
+                    <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                                   mode="readOnly"
+                                   folded
+                                   style="height: auto"
+                    />
+                    <p-heading>Form Data</p-heading>
+                    <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                                   mode="readOnly"
+                                   style="height: auto"
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getJsonInputSchema(),
@@ -384,19 +384,19 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
             components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n: I18nConnector.i18n,
             template: `
-<div class="flex gap-4">
-    <div class="bg-blue-100 p-4">
-        <p-heading>Json Schema Form</p-heading>
-        <p-json-schema-form :schema="schema"
-                            :form-data.sync="formData"
-                            :language="$i18n.locale"
-                            :reference-handler="handler"
-                            uniform-width
-                            style="width: 100%"
-        />
-    </div>
-</div>
-`,
+                <div class="flex gap-4">
+                <div class="bg-blue-100 p-4">
+                    <p-heading>Json Schema Form</p-heading>
+                    <p-json-schema-form :schema="schema"
+                                        :form-data.sync="formData"
+                                        :language="$i18n.locale"
+                                        :reference-handler="handler"
+                                        uniform-width
+                                        style="width: 100%"
+                    />
+                </div>
+                </div>
+            `,
             setup(props) {
                 const state = reactive({
                     schema: getDefaultSchema(),
