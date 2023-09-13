@@ -205,7 +205,11 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
-    state.proxySelectedItem = selected;
+    if (props.multiSelectable) {
+        state.proxySelectedItem = selected;
+    } else {
+        state.proxySelectedItem = selected[0]?.label;
+    }
 };
 const updateSearchText = debounce(async (searchText: string) => {
     state.proxySearchText = searchText;
@@ -221,6 +225,15 @@ useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
 watch(() => props.disabled, (disabled) => {
     if (disabled) hideMenu();
 });
+
+/* init */
+(async () => {
+    if (!props.multiSelectable) return;
+    if (!props.selected) return;
+    if (Array.isArray(props.selected)) return;
+
+    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be array.');
+})();
 </script>
 
 <template>
