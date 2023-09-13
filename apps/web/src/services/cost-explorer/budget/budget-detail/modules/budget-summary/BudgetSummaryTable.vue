@@ -8,15 +8,17 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/settings/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import type { CostType, BudgetTimeUnit, BudgetUsageModel } from '@/services/cost-explorer/budget/model';
+import type {
+    BudgetTimeUnit, BudgetUsageModel, BudgetModel,
+} from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -24,7 +26,6 @@ import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-
 import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
-    currency?: string;
     currencyRates?: Record<string, number>;
 }
 
@@ -38,9 +39,6 @@ const firstColumnData = {
     ratio: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SPENT'),
 };
 
-const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
-
 interface EnrichedBudgetUsageData {
     date: string;
     limit: number|string;
@@ -49,17 +47,14 @@ interface EnrichedBudgetUsageData {
     link?: Location | string;
 }
 
-interface BudgetCostType {
-    key: string;
-    value?: string[]|null;
-}
 
 interface BudgetTarget {
     projectId?: string;
     projectGroupId?: string;
 }
+
+type Providers = BudgetModel['provider_filter']['providers'];
 const props = withDefaults(defineProps<Props>(), {
-    currency: CURRENCY.USD,
     currencyRates: () => ({}),
 });
 const budgetPageStore = useBudgetDetailPageStore();
@@ -73,9 +68,9 @@ const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit)
         : `${Math.round((usdCost / monthlyLimit) * 100)}%`;
 };
 
-const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, costType: BudgetCostType, budgetTarget: BudgetTarget) => {
+const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, providers: Providers, budgetTarget: BudgetTarget) => {
     const costTypeFilters = {
-        [costType.key]: costType.value,
+        provider: providers,
     };
     let targetFilters = {};
     if (budgetTarget.projectGroupId) targetFilters = { project_group_id: [budgetTarget.projectGroupId] };
@@ -89,7 +84,11 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
         // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.cost / totalBudgetLimit) * 100)}%`
         //     : `${Math.round((d.cost / d.limit) * 100)}%`;
         const link = {
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: state.budgetData?.data_source_id,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                 group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
@@ -108,7 +107,7 @@ const getEnrichedBudgetUsageData = (
     period: Period,
     budgetTimeUnit: BudgetTimeUnit,
     totalBudgetLimit: number,
-    costType: BudgetCostType,
+    providers: Providers,
     budgetTarget: BudgetTarget,
 ): EnrichedBudgetUsageData[] => {
     const _budgetUsageData = cloneDeep(budgetUsageData);
@@ -117,24 +116,21 @@ const getEnrichedBudgetUsageData = (
         accumulatedBudgetData,
         budgetTimeUnit,
         totalBudgetLimit,
-        costType,
+        providers,
         budgetTarget,
     );
     return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
 };
 
 const state = reactive({
-    budgetUsageData: computed(() => budgetPageState.budgetUsageData),
-    budgetData: computed(() => budgetPageState.budgetData),
+    budgetUsageData: computed<BudgetUsageModel|null>(() => budgetPageState.budgetUsageData),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     budgetTimeUnit: computed<BudgetTimeUnit>(() => state.budgetData?.time_unit),
     budgetPeriod: computed<Period>(() => ({
         start: state.budgetData?.start,
         end: state.budgetData?.end,
     })),
-    budgetCostType: computed<BudgetCostType|null>(() => ({
-        key: getKeyOfCostType(state.budgetData.cost_types ?? {}),
-        value: getValueOfCostType(state.budgetData.cost_types ?? {}, getKeyOfCostType(state.budgetData.cost_types ?? {})),
-    })),
+    providers: computed<Providers>(() => state.budgetData?.provider_filter?.providers ?? []),
     budgetTarget: computed<BudgetTarget>(() => ({
         projectId: state.budgetData?.project_id,
         projectGroupId: state.budgetData?.project_group_id,
@@ -146,7 +142,7 @@ const state = reactive({
             state.budgetPeriod,
             state.budgetTimeUnit,
             state.totalBudgetLimit,
-            state.budgetCostType,
+            state.providers,
             state.budgetTarget,
         ),
     ),
@@ -200,8 +196,8 @@ setTableKeysAndItems();
             <template #col-format="{field, value}">
                 <span v-if="field.name && value.path === 'limit'">
                     {{
-                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], props.currency, props.currencyRates)
-                        : currencyMoneyFormatter(value[value.path], props.currency, props.currencyRates, false, 1000000000)
+                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates)
+                        : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates, false, 1000000000)
                     }}
                 </span>
                 <span v-else-if="field.name && value.path === 'cost'"
@@ -211,8 +207,8 @@ setTableKeysAndItems();
                                  class="link-text"
                     >
                         {{
-                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], props.currency, props.currencyRates)
-                            : currencyMoneyFormatter(value[value.path], props.currency, props.currencyRates, false, 1000000000)
+                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates)
+                            : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates, false, 1000000000)
                         }}
                     </router-link>
                 </span>
