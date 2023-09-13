@@ -22,7 +22,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -38,7 +38,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const budgetPageStore = useBudgetPageStore();
+        const budgetPageStore = useBudgetDetailPageStore();
         const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({

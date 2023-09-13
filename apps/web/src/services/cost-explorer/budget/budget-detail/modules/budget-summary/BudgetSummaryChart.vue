@@ -18,15 +18,16 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 
+import type { BudgetModel, BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 
 const categoryKey = 'date';
 const columnChartValueName = 'cost';
 
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const chartRef = ref<HTMLElement|null>(null);
@@ -37,8 +38,8 @@ const state = reactive({
     limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
     chartData: [] as any,
     loading: true,
-    budgetUsageData: computed(() => budgetPageState.budgetUsageData),
-    budgetData: computed(() => budgetPageState.budgetData),
+    budgetUsageData: computed<BudgetUsageModel|null>(() => budgetPageState.budgetUsageData),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
 });
 
 const getChartData = () => {
