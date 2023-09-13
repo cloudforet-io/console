@@ -27,10 +27,10 @@ interface Props {
     showDeleteAllButton?: boolean;
     isFixedWidth?: boolean;
     selectionHighlight?: boolean;
-    visibleMenu?: boolean;
+    isVisibleMenu?: boolean;
     readonly?: boolean;
     multiSelectable?: boolean;
-    selectedItem?: SelectDropdownMenuItem[];
+    selectedItems?: SelectDropdownMenuItem[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,8 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
     selectionLabel: undefined,
     showDeleteAllButton: false,
     buttonIcon: undefined,
-    visibleMenu: undefined,
-    selectedItem: undefined,
+    isVisibleMenu: undefined,
+    selectedItems: undefined,
 });
 
 /* event emits */
@@ -57,12 +57,12 @@ const {
     displayBadgeValueOnDropdownButton,
 } = useSelectDropdownButtonDisplay({
     multiSelectable: toRef(props, 'multiSelectable'),
-    selected: toRef(props, 'selectedItem'),
+    selected: toRef(props, 'selectedItems'),
     appearanceType: toRef(props, 'appearanceType'),
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItem.length) {
+    if (props.selectedItems.length) {
         emit('click-delete');
     }
 };
@@ -78,16 +78,16 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         invalid: props.invalid,
         disabled: props.disabled,
         readonly: props.readonly,
-        opened: props.visibleMenu,
-        selected: props.selectedItem.length > 0,
+        opened: props.isVisibleMenu,
+        selected: props.selectedItems.length > 0,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && props.selectedItem.length > 0,
+        'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
     }"
     >
         <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
               class="dropdown-icon-button-wrapper"
         >
-            <p-i :name="props.buttonIcon || (props.visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
+            <p-i :name="props.buttonIcon || (props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
                  color="inherit"
                  width="1.5rem"
                  height="1.5rem"
@@ -136,7 +136,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                     <div v-else-if="showTagsOnDropdownButton"
                          class="tags-wrapper"
                     >
-                        <p-tag v-for="(item, idx) in props.selectedItem"
+                        <p-tag v-for="(item, idx) in props.selectedItems"
                                :key="item.name"
                                class="selected-tag"
                                @delete="handleTagDelete(item, idx)"
@@ -147,7 +147,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 </span>
             </div>
             <div class="extra-button-wrapper">
-                <span v-if="props.showDeleteAllButton && props.selectedItem.length > 0"
+                <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
                       class="delete-all-button"
                       @click.stop="handleClickDeleteAll"
                 >
@@ -160,7 +160,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 <span class="arrow-button"
                       @click.stop="emit('click-dropdown-button')"
                 >
-                    <p-i :name="props.visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                    <p-i :name="props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                          width="1.5rem"
                          height="1.5rem"
                          color="inherit"
