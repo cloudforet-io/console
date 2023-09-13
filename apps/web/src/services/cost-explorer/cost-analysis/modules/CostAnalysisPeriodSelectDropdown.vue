@@ -54,15 +54,15 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
             relativePeriod: { unit: 'month', value: 1, include_today: false },
         },
-        ...(range(12).map((i) => {
-            const start = today.subtract(i, 'month');
-            const end = today.subtract(i, 'month');
+        ...(range(2, 12).map((i) => {
+            const start = today.subtract(i, 'month').startOf('month');
+            const end = today.subtract(i, 'month').endOf('month');
             return {
                 name: start.format('YYYY-MM'),
                 label: i18nDayjs.value(start).format('MMMM, YYYY'),
                 period: {
-                    start: start.format('YYYY-MM'),
-                    end: end.format('YYYY-MM'),
+                    start: start.format('YYYY-MM-DD'),
+                    end: end.format('YYYY-MM-DD'),
                 },
             };
         }))]),

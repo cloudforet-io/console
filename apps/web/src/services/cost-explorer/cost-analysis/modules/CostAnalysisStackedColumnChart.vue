@@ -57,10 +57,7 @@ const drawChart = () => {
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, {
-        min: dayjs.utc(costAnalysisPageState.period?.start).valueOf(),
-        max: dayjs.utc(costAnalysisPageState.period?.end).add(1, timeUnit).valueOf(),
-    });
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;

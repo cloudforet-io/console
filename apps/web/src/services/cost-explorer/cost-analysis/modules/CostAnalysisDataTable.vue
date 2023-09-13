@@ -252,7 +252,9 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageStore.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        let dateFormat = 'YYYY-MM-DD';
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
