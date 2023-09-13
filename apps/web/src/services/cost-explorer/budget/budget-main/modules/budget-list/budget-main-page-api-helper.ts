@@ -5,7 +5,8 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';
 
-interface BudgetUsageAnalyzeResult {
+
+export interface BudgetUsageAnalyzeResult {
     budget_id: string;
     budget_usage: number;
     total_budget: number;

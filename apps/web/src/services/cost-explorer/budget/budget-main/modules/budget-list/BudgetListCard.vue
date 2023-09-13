@@ -19,13 +19,15 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import type {
+    BudgetUsageAnalyzeResult,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetUsageProgressBar from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetUsageProgressBar.vue';
-import type { BudgetUsageAnalyzeModel } from '@/services/cost-explorer/budget/model';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 
 interface Props {
-    budgetUsage: BudgetUsageAnalyzeModel;
+    budgetUsage: BudgetUsageAnalyzeResult;
     budgetLoading: boolean;
 }
 

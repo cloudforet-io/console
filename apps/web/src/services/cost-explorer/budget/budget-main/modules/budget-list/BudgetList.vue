@@ -15,15 +15,15 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { BudgetUsageAnalyzeResult } from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import {
     getBudgetUsageAnalyzeRequestQuery,
-} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-usage-analyze-api-helper';
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
 import type {
     Pagination,
 } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
-import type { BudgetUsageAnalyzeModel } from '@/services/cost-explorer/budget/model';
 import type { Period } from '@/services/cost-explorer/type';
 
 
@@ -39,7 +39,7 @@ const emit = defineEmits<{(e: 'update:filters', filters:ConsoleFilter[]): void;
 
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
 const state = reactive({
-    budgetUsages: [] as BudgetUsageAnalyzeModel[],
+    budgetUsages: [] as BudgetUsageAnalyzeResult[],
     loading: false,
     // query
     pageStart: 1,
@@ -68,7 +68,7 @@ const setFilters = (filters: ConsoleFilter[]) => {
     emit('update:filters', filters);
 };
 
-const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeModel[]}> => {
+const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
     try {
         state.loading = true;
         return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParams);
