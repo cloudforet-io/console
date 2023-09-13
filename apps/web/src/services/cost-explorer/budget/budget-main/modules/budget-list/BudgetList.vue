@@ -4,8 +4,6 @@ import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
 
-import { isEmpty } from 'lodash';
-
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -17,18 +15,17 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    getBudgetUsageAnalyzeRequestQuery,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-usage-analyze-api-helper';
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
 import type {
     Pagination,
 } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import type { BudgetUsageAnalyzeModel } from '@/services/cost-explorer/budget/model';
-import type { BudgetUsageAnalyzeRequestParam } from '@/services/cost-explorer/budget/type';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';
 
-
-const BUDGET_USAGE_ANALYZE_GROUP_BY_LIST = ['budget_id', 'name', 'project_id', 'project_group_id', 'data_source_id', 'provider_filter'];
 
 interface Props {
     filters: ConsoleFilter[];
@@ -55,57 +52,14 @@ const state = reactive({
         key: 'budget_usage',
         desc: true,
     } as Query['sort'],
-    budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
+    budgetUsageParams: computed(() => {
         budgetUsageApiQueryHelper
             .setFilters(state.queryStoreFilters)
             .setPage(state.pageStart, state.pageLimit);
-
-        const _selectMap: Record<string, string> = {};
-        BUDGET_USAGE_ANALYZE_GROUP_BY_LIST.forEach((groupBy) => {
-            _selectMap[groupBy] = groupBy;
-        });
-
-        const query: BudgetUsageAnalyzeRequestParam['query'] = {
-            group_by: BUDGET_USAGE_ANALYZE_GROUP_BY_LIST,
-            fields: {
-                total_spent: {
-                    key: 'cost',
-                    operator: 'sum',
-                },
-                total_budget: {
-                    key: 'limit',
-                    operator: 'sum',
-                },
-            },
-            select: {
-                ..._selectMap,
-                total_spent: 'total_spent',
-                total_budget: 'total_budget',
-                budget_usage: {
-                    operator: 'multiply',
-                    fields: [
-                        {
-                            operator: 'divide',
-                            fields: [
-                                'total_spent',
-                                'total_budget',
-                            ],
-                        },
-                        100,
-                    ],
-                },
-            },
-            sort: [state.sort],
-            ...budgetUsageApiQueryHelper.data,
+        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
+        return {
+            query: { ..._query, ...budgetUsageApiQueryHelper.data },
         };
-
-        if (!isEmpty(state.period)) {
-            query.granularity = GRANULARITY.MONTHLY;
-            query.start = state.period.start;
-            query.end = state.period.end;
-        }
-
-        return { query };
     }),
 });
 
@@ -117,7 +71,7 @@ const setFilters = (filters: ConsoleFilter[]) => {
 const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeModel[]}> => {
     try {
         state.loading = true;
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParams);
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
@@ -163,15 +117,11 @@ const handleExport = async () => {
         { key: 'cost', name: 'USD Cost' },
         { key: 'limit', name: 'Limit' },
         { key: 'usage', name: 'Usage (%)' },
-        { key: 'cost_types.service_account_id', name: 'Cost Type (Service Account)', reference: { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' } },
-        { key: 'cost_types.region_code', name: 'Cost Type (Region)', reference: { reference_key: 'region_code', resource_type: 'inventory.Region' } },
-        { key: 'cost_types.product', name: 'Cost Type (Product)' },
-        { key: 'cost_types.provider', name: 'Cost Type (Provider)', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
     ];
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
-            ...state.budgetUsageParam,
+            ...state.budgetUsageParams,
             query: budgetUsageApiQueryHelper.data,
         },
         fields: excelFields,
