@@ -111,9 +111,11 @@ const handleExport = async () => {
         { key: 'name', name: 'Budget Name' },
         { key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } },
         { key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } },
-        { key: 'cost', name: 'USD Cost' },
-        { key: 'limit', name: 'Limit' },
-        { key: 'usage', name: 'Usage (%)' },
+        { key: 'data_source_id', name: 'Data Source ID' },
+        { key: 'provider_filter.providers', name: 'Providers' },
+        { key: 'total_spent', name: 'Total Spent' },
+        { key: 'total_budget', name: 'Total Budget' },
+        { key: 'budget_usage', name: 'Usage (%)' },
     ];
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',

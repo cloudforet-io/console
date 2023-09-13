@@ -106,12 +106,12 @@ const state = reactive({
         return period;
     }),
     sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
-        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
-        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'cost' },
+        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'budget_usage' },
+        { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'total_spent' },
         { label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
     ])),
     sortDesc: true,
-    selectedSortKey: 'usage',
+    selectedSortKey: 'budget_usage',
     sort: computed<Query['sort']>(() => ({
         key: state.selectedSortKey,
         desc: state.sortDesc,
