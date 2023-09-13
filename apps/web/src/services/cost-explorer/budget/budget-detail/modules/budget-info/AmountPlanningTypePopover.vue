@@ -1,39 +1,6 @@
-<template>
-    <p-popover class="amount-planning-type-popover"
-               position="bottom-end"
-    >
-        <slot />
-        <template #content>
-            <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
-                 class="total-wrapper"
-            >
-                <p class="total-data">
-                    {{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates, false, 1000000000) }}
-                </p>
-            </div>
-            <template v-else>
-                <div class="monthly-wrapper">
-                    <p v-for="{ date, limit } in budgetData.planned_limits"
-                       :key="date"
-                       class="monthly-data"
-                    >
-                        <span>
-                            <span class="date">
-                                {{ dateFormatter(date) }}
-                            </span>
-                            <br>
-                            <span>{{ currencyMoneyFormatter(limit, currency, currencyRates, false, 1000000000) }}</span>
-                        </span>
-                    </p>
-                </div>
-            </template>
-        </template>
-    </p-popover>
-</template>
+<script setup lang="ts">
 
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -45,33 +12,52 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 
-export default {
-    name: 'AmountPlanningTypePopover',
-    components: {
-        PPopover,
-    },
-    props: {
-        budgetData: {
-            type: Object as () => BudgetModel,
-            default: () => ({}),
-        },
-    },
+interface Props {
+    budgetData: Partial<BudgetModel>;
+}
+const props = withDefaults(defineProps<Props>(), {
+    budgetData: () => ({}),
+});
+const state = reactive({
+    currency: computed(() => store.state.settings.currency),
+    currencyRates: computed(() => store.state.settings.currencyRates),
+});
+const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 
-    setup() {
-        const state = reactive({
-            currency: computed(() => store.state.settings.currency),
-            currencyRates: computed(() => store.state.settings.currencyRates),
-        });
-        const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
-        return {
-            ...toRefs(state),
-            BUDGET_TIME_UNIT,
-            dateFormatter,
-            currencyMoneyFormatter,
-        };
-    },
-};
 </script>
+
+<template>
+    <p-popover class="amount-planning-type-popover"
+               position="bottom-end"
+    >
+        <slot />
+        <template #content>
+            <div v-if="props.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                 class="total-wrapper"
+            >
+                <p class="total-data">
+                    {{ currencyMoneyFormatter(props.budgetData.limit, state.currency, state.currencyRates, false, 1000000000) }}
+                </p>
+            </div>
+            <template v-else>
+                <div class="monthly-wrapper">
+                    <p v-for="{ date, limit } in props.budgetData.planned_limits"
+                       :key="date"
+                       class="monthly-data"
+                    >
+                        <span>
+                            <span class="date">
+                                {{ dateFormatter(date) }}
+                            </span>
+                            <br>
+                            <span>{{ currencyMoneyFormatter(limit, state.currency, state.currencyRates, false, 1000000000) }}</span>
+                        </span>
+                    </p>
+                </div>
+            </template>
+        </template>
+    </p-popover>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-popover */
