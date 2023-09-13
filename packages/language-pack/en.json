@@ -491,6 +491,7 @@
 					"CREATE_BULK_BUDGET": "Create Bulk Budget",
 					"DATA_SOURCE": "Data Source",
 					"DESC": "Desc",
+					"NO_BUDGET": "No Budget",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
 					"PROVIDER": "Provider",
