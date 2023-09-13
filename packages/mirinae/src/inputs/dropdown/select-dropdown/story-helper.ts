@@ -117,7 +117,7 @@ const extraArgTypes: ArgTypes = {
             },
         },
         control: {
-            type: 'string',
+            type: 'text',
         },
     },
     selectionHighlight: {
