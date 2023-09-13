@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
@@ -37,7 +37,7 @@ export interface Pagination {
     pageLimit: number;
 }
 
-type I18nSelectDropdownMenu = SelectDropdownMenu | {
+type I18nSelectDropdownMenu = SelectDropdownMenuItem | {
     label: string | TranslateResult;
 };
 

@@ -129,7 +129,7 @@ import {
     PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { isEmpty } from 'lodash';
@@ -199,7 +199,7 @@ export default defineComponent<Props>({
             providerData: {} as ProviderModel,
             showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
-            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map((d) => ({
+            trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
                 name: d.service_account_id,
                 label: d.name,
             }))),

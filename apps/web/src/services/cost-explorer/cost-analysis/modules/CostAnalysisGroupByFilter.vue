@@ -5,7 +5,7 @@ import {
     PSelectButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -30,11 +30,11 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
+    selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
     })),
-    selectedTagsMenu: [] as SelectDropdownMenu[],
+    selectedTagsMenu: [] as SelectDropdownMenuItem[],
 });
 
 /* fetcher */
@@ -88,7 +88,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         });
     }
 };
-const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: boolean) => {
+const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
             showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
