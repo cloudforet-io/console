@@ -1,7 +1,7 @@
 import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type {
-    ComponentName, InnerJsonSchema, JsonSchema, JsonSchemaFormProps, TextInputType,
+    ComponentName, JsonSchema, JsonSchemaFormProps, TextInputType,
 } from '@/inputs/forms/json-schema-form/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 
@@ -76,7 +76,7 @@ export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
 };
 
 export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): object => {
-    const { properties } = schema ?? {};
+    const { properties } = schema ?? {} as JsonSchema;
 
     const result = {};
     if (!properties) return {};
@@ -138,7 +138,7 @@ export const initRefinedFormData = (schema?: JsonSchema, formData?: any, isRoot?
     return result;
 };
 
-export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema): ComponentName => {
+export const getComponentNameBySchemaProperty = (schemaProperty: JsonSchema): ComponentName => {
     if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
@@ -146,16 +146,16 @@ export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema
     return 'PTextInput';
 };
 
-export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema): TextInputType => {
+export const getInputTypeBySchemaProperty = (schemaProperty: JsonSchema): TextInputType => {
     if (schemaProperty.format === 'password') return 'password';
     if (schemaProperty.type === 'string') return 'text';
     if (NUMERIC_TYPES.includes(schemaProperty.type)) return 'number';
     return 'text';
 };
 
-export const getInputPlaceholderBySchemaProperty = (schemaProperty: InnerJsonSchema) => schemaProperty.examples?.[0] ?? '';
+export const getInputPlaceholderBySchemaProperty = (schemaProperty: JsonSchema) => schemaProperty.examples?.[0] ?? '';
 
-export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): SelectDropdownMenu[]|undefined => {
+export const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): SelectDropdownMenu[]|undefined => {
     if (schemaProperty.reference) return undefined;
     // get menu items from menuItems
     if (Array.isArray(schemaProperty.menuItems) && schemaProperty.menuItems.length) {
@@ -169,14 +169,14 @@ export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): S
     return undefined;
 };
 
-export const getMultiInputMode = (schemaProperty: InnerJsonSchema): boolean => {
+export const getMultiInputMode = (schemaProperty: JsonSchema): boolean => {
     if (schemaProperty.type !== 'array') return false;
     return schemaProperty?.maxItems !== 1;
 };
 
-export const getUseAutoComplete = (schemaProperty: InnerJsonSchema): boolean => schemaProperty.type === 'array';
+export const getUseAutoComplete = (schemaProperty: JsonSchema): boolean => schemaProperty.type === 'array';
 
-export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppearanceType|undefined => {
+export const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceType|undefined => {
     if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
         if (schemaProperty.type === 'array') return 'badge';
@@ -189,7 +189,7 @@ export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppeara
     return undefined;
 };
 
-export const getReferenceHandler = (schemaProperty: InnerJsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
+export const getReferenceHandler = (schemaProperty: JsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
     if (!schemaProperty.reference) return undefined;
 
     const handler = props.referenceHandler;

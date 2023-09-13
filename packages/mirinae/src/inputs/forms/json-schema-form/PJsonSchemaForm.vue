@@ -11,7 +11,7 @@
             <p-text-editor :code="jsonInputData"
                            disable-auto-reformat
                            :read-only="schema.disabled"
-                           @update:code="handleUpdateJsonData(schema, ...arguments)"
+                           @update:code="handleUpdateJsonData(schema, $event)"
             />
             <template #invalid>
                 <span v-for="invalidMessage in invalidMessages"
