@@ -4,6 +4,10 @@ import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
 
+import {
+    PDataLoader,
+} from '@spaceone/design-system';
+
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -153,21 +157,31 @@ const handleUpdateSort = (sort) => {
                         @export="handleExport"
                         @update-sort="handleUpdateSort"
         />
-        <div class="budget-list-card-box">
-            <budget-list-card v-for="(budgetUsage, i) in state.budgetUsages"
-                              :key="`${budgetUsage.budget_id}-${i}`"
-                              :budget-usage="budgetUsage"
-                              :budget-loading="state.loading"
-            />
-        </div>
+        <p-data-loader :data="state.budgetUsages"
+                       :loading="state.loading"
+        >
+            <div class="budget-list-card-box">
+                <budget-list-card v-for="(budgetUsage, i) in state.budgetUsages"
+                                  :key="`${budgetUsage.budget_id}-${i}`"
+                                  :budget-usage="budgetUsage"
+                />
+            </div>
+            <template #no-data>
+                <div class="no-budget-wrapper">
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.NO_BUDGET') }}
+                </div>
+            </template>
+        </p-data-loader>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .budget-list {
-    .budget-stat {
-        @apply border border-gray-200;
-        padding: 1.125rem 0;
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
+        .no-data-wrapper {
+            min-height: 20rem;
+        }
     }
     .budget-list-card-box {
         @apply grid grid-cols-2 gap-4;
