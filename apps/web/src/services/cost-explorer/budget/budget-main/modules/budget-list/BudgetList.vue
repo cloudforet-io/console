@@ -4,11 +4,10 @@ import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
 
-import dayjs from 'dayjs';
-
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 
@@ -16,15 +15,17 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { BudgetUsageAnalyzeResult } from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
+import {
+    getBudgetUsageAnalyzeRequestQuery,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
-import type { Pagination } from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
-import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
-import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import type {
-    BudgetUsageAnalyzeRequestParam,
-    BudgetUsageRange,
-} from '@/services/cost-explorer/budget/type';
+    Pagination,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
+import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 interface Props {
     filters: ConsoleFilter[];
@@ -36,40 +37,29 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:filters', filters:ConsoleFilter[]): void;
 }>();
 
-
 const budgetUsageApiQueryHelper = new ApiQueryHelper();
-
 const state = reactive({
-    budgetUsages: [] as BudgetUsageModel[],
+    budgetUsages: [] as BudgetUsageAnalyzeResult[],
     loading: false,
     // query
-    range: {} as BudgetUsageRange,
     pageStart: 1,
     pageLimit: 24,
-    totalCount: 0,
+    more: false,
     queryStoreFilters: props.filters as ConsoleFilter[],
     period: {} as Period,
     // api request params
     sort: {
-        key: 'usage',
+        key: 'budget_usage',
         desc: true,
-    },
-    budgetUsageParam: computed<BudgetUsageAnalyzeRequestParam>(() => {
-        const param = {
-            group_by: ['budget_id'],
-            include_budget_info: true,
-            ...budgetUsageApiQueryHelper.setFilters(state.queryStoreFilters)
-                .setPage(state.pageStart, state.pageLimit)
-                .setSort(state.sort.key, state.sort.desc)
-                .data,
-        } as BudgetUsageAnalyzeRequestParam;
-
-        if (state.period.start) param.start = dayjs.utc(state.period.start).format('YYYY-MM');
-        if (state.period.end) param.end = dayjs.utc(state.period.end).format('YYYY-MM');
-
-        if (state.range.min || state.range.max) param.usage_range = state.range;
-
-        return param;
+    } as Query['sort'],
+    budgetUsageParams: computed(() => {
+        budgetUsageApiQueryHelper
+            .setFilters(state.queryStoreFilters)
+            .setPage(state.pageStart, state.pageLimit);
+        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
+        return {
+            query: { ..._query, ...budgetUsageApiQueryHelper.data },
+        };
     }),
 });
 
@@ -78,38 +68,26 @@ const setFilters = (filters: ConsoleFilter[]) => {
     emit('update:filters', filters);
 };
 
-const fetchBudgetUsages = async () => {
+const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
     try {
-        const { results, total_count } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze(state.budgetUsageParam);
-        // TODO: Remove conversion process after the cost analysis API is updated.
-        state.budgetUsages = results.map((budgetUsage: any) => ({
-            ...budgetUsage,
-            cost: budgetUsage.usd_cost,
-        }));
-        state.totalCount = total_count;
+        state.loading = true;
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParams);
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.budgetUsages = [];
-        state.totalCount = 0;
+        return { more: false, results: [] };
+    } finally {
+        state.loading = false;
     }
 };
 
 const listBudgets = async () => {
     if (state.loading) return;
-
-    state.loading = true;
-
-    await fetchBudgetUsages();
-
-    state.loading = false;
+    const { more, results } = await fetchBudgetUsages();
+    state.budgetUsages = results;
+    state.more = more;
 };
 
 /* Handlers */
-const handleUpdateRange = (range: BudgetUsageRange) => {
-    state.range = range;
-    listBudgets();
-};
-
 const handleUpdatePagination = ({ pageStart, pageLimit }: Pagination) => {
     state.pageStart = pageStart;
     state.pageLimit = pageLimit;
@@ -139,15 +117,11 @@ const handleExport = async () => {
         { key: 'cost', name: 'USD Cost' },
         { key: 'limit', name: 'Limit' },
         { key: 'usage', name: 'Usage (%)' },
-        { key: 'cost_types.service_account_id', name: 'Cost Type (Service Account)', reference: { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' } },
-        { key: 'cost_types.region_code', name: 'Cost Type (Region)', reference: { reference_key: 'region_code', resource_type: 'inventory.Region' } },
-        { key: 'cost_types.product', name: 'Cost Type (Product)' },
-        { key: 'cost_types.provider', name: 'Cost Type (Provider)', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
     ];
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
-            ...state.budgetUsageParam,
+            ...state.budgetUsageParams,
             query: budgetUsageApiQueryHelper.data,
         },
         fields: excelFields,
@@ -171,8 +145,7 @@ const handleUpdateSort = (sort) => {
 <template>
     <div class="budget-list">
         <budget-toolbox :filters="state.queryStoreFilters"
-                        :total-count="state.totalCount"
-                        @update-range="handleUpdateRange"
+                        :more="state.more"
                         @update-pagination="handleUpdatePagination"
                         @update-period="handleUpdatePeriod"
                         @update-filters="handleUpdateFilters"

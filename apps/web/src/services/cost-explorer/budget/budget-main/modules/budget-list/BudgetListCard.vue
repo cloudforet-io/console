@@ -13,36 +13,29 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import type {
+    BudgetUsageAnalyzeResult,
+} from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetUsageProgressBar from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetUsageProgressBar.vue';
-import type { BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
+
 interface Props {
-    budgetUsage: BudgetUsageModel;
+    budgetUsage: BudgetUsageAnalyzeResult;
     budgetLoading: boolean;
 }
-
-type ResourceItemMap = {
-    label: string;
-    items: ReferenceMap;
-};
-
-type CostTypeResourceItemMap = Record<string, ResourceItemMap>;
-
-type CostTypeResourceListMap = Record<string, {
-    costTypeLabel: string;
-    resourceList: string[];
-}>;
-
 
 const props = withDefaults(defineProps<Props>(), {
     budgetLoading: true,
 });
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
@@ -75,47 +68,39 @@ const state = reactive({
         }
         return projects;
     }),
-    resourceItemMap: computed<CostTypeResourceItemMap>(() => ({
-        provider: {
-            label: 'Provider',
-            items: storeState.providers,
-        },
-        region_code: {
-            label: 'Region',
-            items: storeState.regions,
-        },
-        service_account_id: {
-            label: 'Service Account',
-            items: storeState.serviceAccounts,
-        },
-    })),
-    costTypeResourceListMap: computed<CostTypeResourceListMap>(() => {
-        const costTypes = props.budgetUsage.cost_types;
-
-        if (!costTypes) return {};
-
-        const costTypeResourceListMap: CostTypeResourceListMap = {};
-        Object.entries(costTypes).forEach(([costType, resources]) => {
-            if (Array.isArray(resources) && resources.length) {
-                const resource = state.resourceItemMap[costType];
-
-                costTypeResourceListMap[costType] = {
-                    costTypeLabel: resource?.label ?? costType,
-                    resourceList: resources.map((d) => (resource?.items[d]?.name ?? d)),
-                };
-            }
-        });
-
-        return costTypeResourceListMap;
+    cost: computed<number>(() => props.budgetUsage.total_spent ?? 0),
+    limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
+    percentage: computed<number>(() => props.budgetUsage.budget_usage ?? 0),
+    currency: computed<Currency>(() => {
+        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
+        return currentCurrency ?? CURRENCY.USD;
     }),
-    cost: computed<number>(() => props.budgetUsage.cost ?? 0),
-    limit: computed<number>(() => props.budgetUsage.limit ?? 0),
-    percentage: computed<number>(() => props.budgetUsage.usage ?? 0),
     progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
         if (state.percentage >= 100) return 'overspent';
         if (state.percentage >= 90) return 'warning';
         if (state.percentage === 0) return 'unused';
         return 'common';
+    }),
+    dataSourceText: computed<string>(() => {
+        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        return targetDataSource?.label ?? '';
+    }),
+    providerText: computed<string>(() => {
+        const providerFilter = props.budgetUsage.provider_filter;
+        if (!providerFilter) return '';
+        if (providerFilter.providers?.length && providerFilter.state === 'ENABLED') {
+            return providerFilter.providers.map((providerId) => {
+                const targetProvider = storeState.providers[providerId];
+                return targetProvider?.label ?? providerId;
+            }).join(', ');
+        }
+        return 'All';
+    }),
+    currencyText: computed<string>(() => {
+        const currentSymbol: string = CURRENCY_SYMBOL[state.currency];
+        const result = (state.currency && currentSymbol) && `${currentSymbol}${state.currency}`;
+        return result || `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
     }),
 });
 
@@ -191,7 +176,7 @@ const state = reactive({
                             <div class="amount-used-wrapper"
                                  :class="state.progressStatus"
                             >
-                                <span class="cost">{{ currencyMoneyFormatter(state.cost, storeState.currency, storeState.currencyRates) }}</span>
+                                <span class="cost">{{ currencyMoneyFormatter(state.cost, state.currency) }}</span>
                                 <span class="percent">(<template v-if="state.percentage < 0">0.00</template>
                                     <template v-else>{{ state.percentage.toFixed(2) }}</template>%)</span>
                             </div>
@@ -201,25 +186,21 @@ const state = reactive({
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
-                                {{ currencyMoneyFormatter(state.limit, storeState.currency, storeState.currencyRates) }}
+                                {{ currencyMoneyFormatter(state.limit, state.currency) }}
                             </div>
                         </div>
                     </div>
                     <budget-usage-progress-bar :usage-rate="state.percentage" />
                 </div>
                 <div class="budget-description">
-                    <div class="cost-type-wrapper">
-                        <div class="label">
-                            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
-                        </div>
-                        <div class="cost-type">
-                            <span v-for="({resourceList, costTypeLabel}) in state.costTypeResourceListMap"
-                                  :key="costTypeLabel"
-                                  class="truncate"
-                            >
-                                {{ costTypeLabel }}: {{ resourceList.join(', ') }}
-                            </span>
-                        </div>
+                    <div class="description-wrapper">
+                        <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DATA_SOURCE') }}</span>
+                        <span class="text">{{ state.dataSourceText }}</span>
+                        <span class="currency-text">({{ state.currencyText }})</span>
+                    </div>
+                    <div class="description-wrapper">
+                        <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PROVIDER') }}</span>
+                        <span class="text">{{ state.providerText }}</span>
                     </div>
                 </div>
             </div>
@@ -307,15 +288,19 @@ const state = reactive({
                 margin-bottom: 1.25rem;
             }
             .budget-description {
-                @apply flex flex-wrap gap-2 justify-between align-middle;
+                @apply text-paragraph-sm text-gray-700;
+                display: block;
+                width: 100%;
 
-                .cost-type-wrapper {
-                    @apply flex flex-wrap gap-1 align-middle w-full;
-                    line-height: 1.5;
-                    .cost-type {
-                        @apply text-gray-700 truncate;
-                        width: 70.1%;
-                        font-size: 0.75rem;
+                .description-wrapper {
+                    display: block;
+                    .sub-title {
+                        font-weight: bold;
+                        padding-right: 0.25rem;
+                    }
+                    .currency-text {
+                        @apply text-gray-400;
+                        padding-left: 0.25rem;
                     }
                 }
             }
