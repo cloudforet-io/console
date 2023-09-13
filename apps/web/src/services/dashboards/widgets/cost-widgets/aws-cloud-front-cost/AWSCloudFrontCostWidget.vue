@@ -35,7 +35,6 @@ import type {
     UsageType, WidgetEmit, WidgetExpose, WidgetProps,
     SelectorType,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getRefinedXYChartData,
@@ -78,7 +77,7 @@ interface Data {
 type Response = CostAnalyzeResponse<Data>;
 interface SubData { [USAGE_TYPE_VALUE_KEY]: string; value: number }
 interface TableData extends WidgetTableData {
-    [COST_GROUP_BY.PROJECT]: string;
+    [groupBy: string]: string | any;
 }
 
 
@@ -123,7 +122,7 @@ const state = reactive({
     chartData: computed(() => {
         const dataKey = `${state.fieldsKey}_sum`;
         const _chartData = getRefinedXYChartData(state.data?.results, {
-            groupBy: COST_GROUP_BY.PROJECT,
+            groupBy: widgetState.groupBy,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: dataKey,
             categoryKey: USAGE_TYPE_VALUE_KEY,
@@ -133,10 +132,11 @@ const state = reactive({
         return _chartData.reverse();
     }),
     tableData: computed<TableData[]>(() => {
-        if (!state.data?.results?.length) return [];
+        const groupBy = widgetState.groupBy;
+        if (!state.data?.results?.length || !groupBy) return [];
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
-                [COST_GROUP_BY.PROJECT]: d.project_id,
+                [groupBy]: d[groupBy],
             };
             d[`${state.fieldsKey}_sum`]?.forEach((subData: SubData) => {
                 row[subData[USAGE_TYPE_VALUE_KEY]] = subData.value;
@@ -191,7 +191,7 @@ const fetchData = async (): Promise<Response> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [COST_GROUP_BY.PROJECT, USAGE_TYPE_QUERY_KEY],
+                group_by: [widgetState.groupBy, USAGE_TYPE_QUERY_KEY],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -222,10 +222,11 @@ const fetchData = async (): Promise<Response> => {
 };
 
 const drawChart = (chartData) => {
-    if (!widgetState.groupBy) return;
+    const groupBy = widgetState.groupBy;
+    if (!groupBy) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     chartHelper.setChartColors(chart, colorSet.value);
-    yAxis.set('categoryField', COST_GROUP_BY.PROJECT);
+    yAxis.set('categoryField', groupBy);
     yAxis.data.setAll(cloneDeep(chartData));
     // legend
     const legend = chartHelper.createLegend({
@@ -237,7 +238,7 @@ const drawChart = (chartData) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: d.label,
             valueXField: d.label,
-            categoryYField: widgetState.groupBy,
+            categoryYField: groupBy,
             xAxis,
             yAxis,
             baseAxis: yAxis,
@@ -248,7 +249,7 @@ const drawChart = (chartData) => {
         const tooltip = chartHelper.createTooltip();
         tooltip.label.adapters.add('text', (text, target) => {
             // let _text = `[${gray[700]}]{valueX}[/]`;
-            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[COST_GROUP_BY.PROJECT]}[/]`;
+            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[groupBy]}[/]`;
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
                 let value = target.dataItem?.dataContext?.[fieldName];

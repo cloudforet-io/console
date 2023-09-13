@@ -43,7 +43,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'region', 'cost_account')],
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'region')],
         fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
             type: 'object',
@@ -53,9 +53,9 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
                     ...COST_REFERENCE_SCHEMA.cost_product,
                     default: ['AmazonCloudFront'],
                 },
-                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region'),
             },
-            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'project_group', 'region', 'cost_account')],
+            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'project_group', 'region')],
         },
     },
 };
