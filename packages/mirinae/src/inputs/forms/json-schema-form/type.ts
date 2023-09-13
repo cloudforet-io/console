@@ -1,5 +1,3 @@
-import type { JSONSchemaType } from 'ajv';
-
 import type { AutocompleteHandler, FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
@@ -12,17 +10,26 @@ const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelec
 export type ComponentName = typeof COMPONENTS[number];
 
 interface Reference {
-    resource_type: string;
-    reference_key?: string;
+    resource_type: string; // 'identity.ServiceAccount'
+    reference_key?: string; // 'service_account_id' (auto-complete/resource api, must not given) // 'project_id' (auto-complete/distinct api, must given)
 }
-export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
+export interface JsonSchema {
+    type: 'object'|'array'|'string'|'number'|'integer'|'boolean';
+    properties?: Record<string, JsonSchema>;
+    required?: string[];
+    default?: any;
+    examples?: any[];
+    format?: string;
+    maxItems?: number;
+    enum?: string[];
+    items?: JsonSchema|JsonSchema[];
     title?: string;
     order?: string[];
     disabled?: boolean;
     json?: boolean;
     menuItems?: SelectDropdownMenu[];
     reference?: Reference;
-};
+}
 
 export const VALIDATION_MODES = ['input', 'all', 'none'] as const;
 export type ValidationMode = typeof VALIDATION_MODES[number];
@@ -45,8 +52,16 @@ export interface HandlerRes {
     results: FilterableDropdownMenuItem[];
     more?: boolean;
 }
+
+interface ReferenceHandlerOptions {
+    propertyName?: string;
+    schemaProperty: JsonSchema;
+    pageStart?: number;
+    pageSize?: number;
+    filters?: FilterableDropdownMenuItem[]
+}
 export interface ReferenceHandler {
-    (inputText: string, schema: InnerJsonSchema, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+    (inputText: string, referenceOptions: ReferenceHandlerOptions): Promise<HandlerRes>|HandlerRes;
 }
 
 
