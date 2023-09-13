@@ -275,7 +275,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             multiInputMode: getMultiInputMode(schemaProperty),
                             useAutoComplete: getUseAutoComplete(schemaProperty),
                             appearanceType: getAppearanceType(schemaProperty),
-                            referenceHandler: getReferenceHandler(schemaProperty, props),
+                            referenceHandler: getReferenceHandler(k, schemaProperty, props),
                         };
                         return refined;
                     }).sort((a, b) => {

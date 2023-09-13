@@ -52,8 +52,16 @@ export interface HandlerRes {
     results: FilterableDropdownMenuItem[];
     more?: boolean;
 }
+
+interface ReferenceHandlerOptions {
+    propertyName?: string;
+    schemaProperty: JsonSchema;
+    pageStart?: number;
+    pageSize?: number;
+    filters?: FilterableDropdownMenuItem[]
+}
 export interface ReferenceHandler {
-    (inputText: string, schema: InnerJsonSchema, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+    (inputText: string, referenceOptions: ReferenceHandlerOptions): Promise<HandlerRes>|HandlerRes;
 }
 
 

@@ -198,11 +198,13 @@ export const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceTy
     return undefined;
 };
 
-export const getReferenceHandler = (schemaProperty: JsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
+export const getReferenceHandler = (propertyName: string, schemaProperty: JsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
     if (!schemaProperty.reference) return undefined;
 
     const handler = props.referenceHandler;
     if (!handler) return undefined;
 
-    return (inputText, pageStart, pageSize) => handler(inputText, schemaProperty, pageStart, pageSize);
+    return (inputText, pageStart, pageSize, filters) => handler(inputText, {
+        propertyName, schemaProperty, pageStart, pageSize, filters,
+    });
 };
