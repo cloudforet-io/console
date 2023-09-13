@@ -8,7 +8,12 @@ interface HandlerRes {
     more?: boolean;
 }
 export interface AutocompleteHandler {
-    (inputText: string, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+    (
+     inputText: string,
+     pageStart?: number,
+     pageLimit?: number,
+     filters?: FilterableDropdownMenuItem[] // this is for refining selected items by calling handler on initiation.
+    ): Promise<HandlerRes>|HandlerRes;
 }
 
 export const FILTERABLE_DROPDOWN_APPEARANCE_TYPES = ['basic', 'stack', 'badge'] as const;

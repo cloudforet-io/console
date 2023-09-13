@@ -212,6 +212,20 @@ useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
 watch(() => props.disabled, (disabled) => {
     if (disabled) hideMenu();
 });
+
+/* Init */
+(async () => {
+    if (props.handler && !props.disableHandler) {
+        // this is to refine selected items by handler's results whose label is fully set.
+        const { results } = await props.handler('', undefined, undefined, state.proxySelectedItem);
+        const refinedSelected = state.proxySelectedItem.map((item) => {
+            const found = results.find((d) => d.name === item.name);
+            if (found) return found;
+            return item;
+        });
+        state.proxySelectedItem = refinedSelected;
+    }
+})();
 </script>
 
 <template>

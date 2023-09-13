@@ -11,7 +11,7 @@
             <p-text-editor :code="jsonInputData"
                            disable-auto-reformat
                            :read-only="schema.disabled"
-                           @update:code="handleUpdateJsonData(schema, ...arguments)"
+                           @update:code="handleUpdateJsonData(schema, $event)"
             />
             <template #invalid>
                 <span v-for="invalidMessage in invalidMessages"
@@ -275,7 +275,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             multiInputMode: getMultiInputMode(schemaProperty),
                             useAutoComplete: getUseAutoComplete(schemaProperty),
                             appearanceType: getAppearanceType(schemaProperty),
-                            referenceHandler: getReferenceHandler(schemaProperty, props),
+                            referenceHandler: getReferenceHandler(k, schemaProperty, props),
                         };
                         return refined;
                     }).sort((a, b) => {
