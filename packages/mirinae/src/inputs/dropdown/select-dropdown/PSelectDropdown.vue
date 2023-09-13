@@ -1,88 +1,106 @@
 <script setup lang="ts">
 import {
-    computed,
-    reactive,
-    nextTick,
-    toRef,
-    ref,
-    useSlots,
+    computed, watch, useSlots, ref, toRef, reactive,
 } from 'vue';
 
-import { onClickOutside } from '@vueuse/core';
-import { groupBy, reduce } from 'lodash';
+import { onClickOutside, useFocus } from '@vueuse/core';
+import { debounce, reduce } from 'lodash';
 
-import PI from '@/foundation/icons/PI.vue';
-import { useProxyValue } from '@/hooks';
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
-import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { useContextMenuController, useProxyValue } from '@/hooks';
+import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/ignore-window-arrow-keydown-events';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SelectDropdownSize } from '@/inputs/dropdown/select-dropdown/type';
+import DropdownButton from '@/inputs/dropdown/select-dropdown/components/dropdown-button.vue';
+import type {
+    AutocompleteHandler,
+    SelectDropdownAppearanceType,
+    SelectDropdownMenuItem,
+    SelectDropdownStyleType,
+    ContextMenuPosition,
+} from '@/inputs/dropdown/select-dropdown/type';
 import {
-    SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
-    SELECT_DROPDOWN_SIZE,
+    SELECT_DROPDOWN_APPEARANCE_TYPE,
+    SELECT_DROPDOWN_STYLE_TYPE,
 } from '@/inputs/dropdown/select-dropdown/type';
 
 
-interface Props {
-    useFixedMenuStyle?: boolean;
-    visibleMenu?: boolean;
-    invalid?: boolean;
-    loading?: boolean;
-    items?: MenuItem[];
-    selected?: string | number | MenuItem[];
+interface SelectDropdownProps {
+    /* dropdown button */
+    styleType?: SelectDropdownStyleType;
+    appearanceType?: SelectDropdownAppearanceType;
     disabled?: boolean;
-    indexMode?: boolean;
+    invalid?: boolean;
     placeholder?: string;
-    styleType?: SELECT_DROPDOWN_STYLE_TYPE;
+    selectionLabel?: string;
+    selectionHighlight?: boolean;
+    showAlertDot?: boolean;
+    showDeleteAllButton?: boolean;
+    useFixedMenuStyle?: boolean;
     buttonIcon?: string;
-    menuPosition?: CONTEXT_MENU_POSITION;
-    readOnly?: boolean;
-    size?: SelectDropdownSize;
     isFixedWidth?: boolean;
+
+    /* context menu props */
+    isFilterable?: boolean;
+    visibleMenu?: boolean;
+    menu?: SelectDropdownMenuItem[];
+    loading?: boolean;
+    selected?: SelectDropdownMenuItem[];
+    multiSelectable?: boolean;
+    searchText?: string;
+    readonly?: boolean;
+    showSelectHeader?: boolean;
+    showSelectMarker?: boolean;
+    menuPosition?: ContextMenuPosition;
+
+    /* others */
+    handler?: AutocompleteHandler;
+    disableHandler?: boolean;
+    pageSize?: number;
+    resetSelectedOnUnmounted?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    useFixedMenuStyle: false,
-    visibleMenu: undefined,
-    isFixedWidth: false,
+const props = withDefaults(defineProps<SelectDropdownProps>(), {
+    /* dropdown button */
     styleType: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
-    disabled: false,
-    readOnly: false,
-    invalid: false,
-    loading: false,
-    menuPosition: CONTEXT_MENU_POSITION.LEFT,
-    placeholder: '',
-    items: () => [],
-    selected: undefined,
-    indexMode: false,
-    size: SELECT_DROPDOWN_SIZE.md,
+    appearanceType: SELECT_DROPDOWN_APPEARANCE_TYPE.BASIC,
+    selected: () => [],
+    placeholder: undefined,
+    selectionLabel: undefined,
+    showDeleteAllButton: false,
     buttonIcon: undefined,
+    /* context menu props */
+    visibleMenu: undefined,
+    menu: () => [],
+    loading: false,
+    searchText: '',
+    menuPosition: CONTEXT_MENU_POSITION.LEFT,
+    /* others */
+    handler: undefined,
+    pageSize: undefined,
+    resetSelectedOnUnmounted: true,
 });
 
-const emit = defineEmits<{(e: 'update:selected', value?: string | number): void;
-    (e: 'select', value?: string | number): void;
-    (e: 'update:visible-menu', value?: boolean): void;
-    (e: 'focus-menu'): void;
-    (e: 'click-delete'): void;
+/* event emits */
+const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
+    (e: 'update:search-text', searchText: string): void;
+    (e: 'update:selected', selected: SelectDropdownMenuItem[]): void;
+    (e: 'select', item: SelectDropdownMenuItem, isSelected: boolean): void;
+    (e: 'delete-tag', item: SelectDropdownMenuItem, index: number): void;
+    (e: 'click-show-more'): void;
+    (e: 'clear-selection'): void;
 }>();
 
 const slots = useSlots();
 
 const state = reactive({
-    proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-    contextMenuRef: null as null|any,
-    proxySelected: useProxyValue('selected', props, emit),
-    selectedItem: computed<MenuItem|null>(() => {
-        if (!Array.isArray(props.items)) return null;
-
-        if (props.indexMode) return props.items[state.proxySelected ?? ''] || null;
-
-        const data = groupBy(props.items, 'name')[state.proxySelected ?? ''];
-        if (Array.isArray(data)) return data[0] || null;
-
-        return null;
+    proxyVisibleMenu: useProxyValue<boolean>('visibleMenu', props, emit),
+    proxySelectedItem: useProxyValue<SelectDropdownMenuItem[]>('selected', props, emit),
+    proxySearchText: useProxyValue('searchText', props, emit),
+    showDeleteAllButton: computed(() => {
+        if (!props.showDeleteAllButton) return false;
+        if (props.disabled) return false;
+        if (props.readonly) return false;
+        return !!state.proxySelectedItem.length;
     }),
     menuSlots: computed(() => reduce(slots, (res, d, name) => {
         if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
@@ -96,113 +114,170 @@ const state = reactive({
     }, {})),
 });
 
-const containerRef = ref<HTMLElement|null>(null);
-const contextMenuRef = toRef(state, 'contextMenuRef');
-
+/* menu visibility */
 const hideMenu = () => {
-    state.proxyVisibleMenu = false;
+    if (state.proxyVisibleMenu) {
+        state.proxyVisibleMenu = false;
+        state.proxySearchText = '';
+    }
 };
+const showMenu = () => {
+    if (props.readonly || props.disabled || state.proxyVisibleMenu) return;
+    if (!props.disableHandler) {
+        initiateMenu();
+    }
+    focusOnContextMenu();
+};
+
+const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideMenu);
 
+/* context menu controller */
+const menuRef = ref<any|null>(null);
+const targetRef = ref<HTMLElement|null>(null);
 const {
-    targetRef, contextMenuStyle,
-} = useContextMenuFixedStyle({
-    useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+    contextMenuStyle,
+    loading,
+    refinedMenu,
+    focusOnContextMenu,
+    initiateMenu,
+    reloadMenu,
+    showMoreMenu,
+} = useContextMenuController({
+    useFixedStyle: computed(() => props.useFixedMenuStyle),
+    targetRef,
+    contextMenuRef: menuRef,
     visibleMenu: toRef(state, 'proxyVisibleMenu'),
+    useMenuFiltering: true,
+    useReorderBySelection: true,
+    searchText: toRef(state, 'proxySearchText'),
+    selected: toRef(state, 'proxySelectedItem'),
+    handler: toRef(props, 'handler'),
+    menu: toRef(props, 'menu'),
+    pageSize: toRef(props, 'pageSize'),
 });
 
-/* Event Handlers */
-const onSelectMenu = (item: MenuItem, index) => {
-    if (props.indexMode) {
-        emit('select', index);
-        state.proxySelected = index;
-    } else {
-        emit('select', item.name);
-        state.proxySelected = item.name;
+/* focusing */
+const { focused: focusedOnDropdownButton } = useFocus(targetRef);
+const focusDropdownButton = () => {
+    if (focusedOnDropdownButton.value) return;
+    focusedOnDropdownButton.value = true;
+};
+
+/* event handler */
+const handleClickDropdownButton = () => {
+    if (props.readonly || props.disabled) return;
+    if (state.proxyVisibleMenu) hideMenu();
+    else showMenu();
+};
+const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boolean) => {
+    if (!props.multiSelectable) hideMenu();
+    emit('select', item, isSelected);
+};
+const handleClickShowMore = async () => {
+    if (!props.disableHandler) {
+        await showMoreMenu();
     }
-    state.proxyVisibleMenu = false;
+    emit('click-show-more');
 };
-const handleClick = (e: MouseEvent) => {
-    if (props.readOnly || props.disabled) return;
-    state.proxyVisibleMenu = !state.proxyVisibleMenu;
-    e.stopPropagation();
+const handleClearSelection = () => {
+    emit('clear-selection');
 };
-const handlePressDownKey = () => {
-    if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
-    nextTick(() => {
-        if (contextMenuRef.value) {
-            if (slots['menu-menu']) emit('focus-menu');
-            else state.contextMenuRef.focus();
-        }
-    });
+const handleClickDelete = (item?: SelectDropdownMenuItem, idx?: number) => {
+    if (item !== undefined && idx !== undefined) {
+        const selectedClone = [...state.proxySelectedItem];
+        selectedClone.splice(idx, 1);
+        updateSelected(selectedClone);
+        emit('delete-tag', item, idx);
+    } else {
+        updateSelected([]);
+    }
 };
+const handleEnterKey = () => {
+    focusOnContextMenu(undefined);
+};
+const updateSelected = (selected: SelectDropdownMenuItem[]) => {
+    state.proxySelectedItem = selected;
+};
+const updateSearchText = debounce(async (searchText: string) => {
+    state.proxySearchText = searchText;
+    if (!props.disableHandler) {
+        await reloadMenu();
+    }
+}, 200);
+
+/* ignore window arrow keydown event */
+useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
+
+/* watcher */
+watch(() => props.disabled, (disabled) => {
+    if (disabled) hideMenu();
+});
 </script>
 
 <template>
     <div ref="containerRef"
-         class="p-select-dropdown"
          :class="{
-             [styleType] : true,
-             invalid,
-             disabled,
-             'read-only': readOnly,
-             active: state.proxyVisibleMenu && !readOnly,
-             [size] : true,
-             'is-fixed-width': isFixedWidth,
+             'p-select-dropdown': true,
+             'is-fixed-width': props.isFixedWidth,
          }"
     >
-        <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
-                       ref="targetRef"
-                       :name="buttonIcon || (state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
-                       :activated="state.proxyVisibleMenu"
-                       :disabled="disabled"
-                       color="inherit"
-                       class="icon-button"
-                       @click="handleClick"
-                       @keydown.down="handlePressDownKey"
+        <dropdown-button ref="targetRef"
+                         :style-type="props.styleType"
+                         :appearance-type="props.appearanceType"
+                         :button-icon="props.buttonIcon"
+                         :invalid="props.invalid"
+                         :disabled="props.disabled"
+                         :placeholder="props.placeholder"
+                         :selection-label="props.selectionLabel"
+                         :show-alert-dot="props.showAlertDot"
+                         :show-delete-all-button="showDeleteAllButton"
+                         :is-fixed-width="props.isFixedWidth"
+                         :selection-highlight="props.selectionHighlight"
+                         :is-visible-menu="state.proxyVisibleMenu"
+                         :readonly="props.readonly"
+                         :multi-selectable="props.multiSelectable"
+                         :selected-items="state.proxySelectedItem"
+                         @enter-key="handleEnterKey"
+                         @click-delete="handleClickDelete"
+                         @click-dropdown-button="handleClickDropdownButton"
         />
-        <button v-else
-                ref="targetRef"
-                class="dropdown-button"
-                :class="{'text-only': (styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)}"
-                @click="handleClick"
-                @keydown.down="handlePressDownKey"
-        >
-            <span class="text"
-                  :class="{placeholder: !state.selectedItem}"
-            >
-                <slot name="default"
-                      v-bind="{item: state.selectedItem}"
-                >
-                    {{
-                        state.selectedItem ?
-                            (state.selectedItem.label || state.selectedItem.name || '') :
-                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
-                    }}
-                </slot>
-            </span>
-            <p-i v-if="!(styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)"
-                 :name="state.proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                 :activated="state.proxyVisibleMenu"
-                 :disabled="disabled"
-                 color="inherit"
-                 class="dropdown-icon"
-            />
-        </button>
         <p-context-menu v-show="state.proxyVisibleMenu"
-                        ref="contextMenuRef"
-                        :class="{ [menuPosition]: !useFixedMenuStyle }"
-                        :menu="items"
-                        :loading="loading"
-                        :invalid="invalid"
+                        ref="menuRef"
+                        :class="{
+                            'dropdown-context-menu': true,
+                            default: !props.showSelectMarker,
+                            [menuPosition]: props.styleType !== SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && !useFixedMenuStyle }"
+                        :menu="refinedMenu"
+                        :loading="props.loading || loading"
+                        :readonly="props.readonly"
                         :style="{
                             ...contextMenuStyle,
-                            ...(styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
+                            ...(props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON && {width: 'auto'}),
                         }"
-                        item-height-fixed
-                        no-select-indication
-                        @select="onSelectMenu"
+                        :item-height-fixed="!props.isFilterable"
+                        :no-select-indication="!props.isFilterable"
+                        :selected="state.proxySelectedItem"
+                        :multi-selectable="props.multiSelectable"
+                        :search-text="state.proxySearchText"
+                        :searchable="props.isFilterable"
+                        :show-select-header="props.showSelectHeader"
+                        :show-select-marker="props.showSelectMarker"
+                        :show-clear-selection="props.isFilterable"
+                        :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
+                        @select="handleSelectMenuItem"
+                        @click-done="hideMenu"
+                        @click-show-more="handleClickShowMore"
+                        @clear-selection="handleClearSelection"
+                        @keyup:up:end="focusDropdownButton"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @keyup:esc="hideMenu"
+                        @update:selected="updateSelected"
+                        @update:search-text="updateSearchText"
         >
+            <template #header>
+                <slot name="context-menu-header" />
+            </template>
             <template v-for="(_, slot) of state.menuSlots"
                       #[slot]="scope"
             >
@@ -215,250 +290,30 @@ const handlePressDownKey = () => {
 </template>
 
 <style lang="postcss">
-@define-mixin disabled-style {
-    .dropdown-button {
-        @apply bg-gray-100 text-gray-300;
-    }
-}
-
-@define-mixin disabled-style-filled-bg {
-    .dropdown-button {
-        @apply bg-gray-200 text-gray-400 border-none;
-    }
-}
-
-@define-mixin read-only-style {
-    .dropdown-button {
-        @apply border border-solid border-gray-300 text-gray-900 bg-white;
-    }
-}
-
 .p-select-dropdown {
-    @apply rounded-md;
-    position: relative;
-    display: inline-block;
+    @apply relative inline-block;
     min-width: 6.5rem;
 
-    &.icon-button {
-        min-width: unset;
-    }
-
-    .dropdown-button {
-        @apply border border-solid border-gray-300 rounded-md;
-        min-width: unset;
-        width: 100%;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 0.25rem 0 0.5rem;
-        margin-right: -1px;
-        font-weight: normal;
-        font-size: 0.875rem;
-        text-align: left;
-        height: 2rem;
-
-        .text {
-            flex-grow: 1;
-            flex-shrink: 0;
-            padding: 0.25rem 0;
-            line-height: 1.5;
-            height: 100%;
-            &.placeholder {
-                @apply text-gray-600;
-            }
-        }
-        .dropdown-icon {
-            flex-shrink: 0;
-        }
-
-        &:focus, &:active {
-            @apply border-secondary text-secondary;
-            outline: none;
-        }
-    }
-
-    &.default {
-        .dropdown-button {
-            @apply bg-white text-gray-900 border-gray-300;
-        }
-    }
-    &.secondary-button {
-        .dropdown-button {
-            @apply text-violet-800 border-violet-800;
-        }
-    }
-    &.transparent {
-        min-width: unset;
-        .dropdown-button {
-            @apply border-transparent bg-transparent text-gray-900;
-            padding-left: 0;
-        }
-    }
-
-    /* read only */
-    &.read-only {
-        .dropdown-button {
-            cursor: default;
-            &:focus {
-                color: inherit;
-            }
-            .dropdown-icon {
-                @apply text-gray-300;
-            }
-        }
-        &.icon-button {
-            display: none;
-        }
-        &.secondary-button {
-            @mixin read-only-style;
-        }
-    }
-
-    /* is-fixed-width */
-    &.is-fixed-width {
-        .dropdown-button {
-            .text {
-                @apply truncate;
-                width: calc(100% - 1.5rem);
-            }
-            &.text-only {
-                .text {
-                    width: 100%;
-                }
-            }
-        }
-    }
-
-    &.none {
-        display: none;
-    }
-
-    .p-context-menu {
-        position: absolute;
+    .dropdown-context-menu {
+        @apply absolute;
         margin-top: -1px;
         z-index: 1000;
         min-width: 100%;
         width: auto;
+
+        /* menu position */
         &.left {
             left: 0;
             right: unset;
         }
         &.right {
             left: unset;
-            right: 0;
+            right: -1px;
         }
     }
 
-    /* disabled */
-    &.disabled {
-        @mixin disabled-style;
-        .dropdown-button {
-            cursor: not-allowed;
-        }
-        &.transparent {
-            .dropdown-button {
-                @apply bg-transparent;
-            }
-        }
-        &.secondary-button {
-            @mixin disabled-style-filled-bg;
-        }
-    }
-
-    /* invalid */
-    &:not(.disabled):not(.read-only).invalid {
-        .dropdown-button {
-            @apply border border-alert;
-            &:focus, &:active {
-                @apply border border-alert;
-            }
-        }
-    }
-
-    /* active */
-    &:not(.invalid):not(.disabled):not(.read-only).active {
-        &.default {
-            .dropdown-button {
-                @apply border-secondary text-secondary bg-white;
-            }
-        }
-        &.button {
-            .dropdown-button {
-                @apply border-secondary text-white bg-secondary;
-                .dropdown-icon {
-                    transform: rotate(180deg);
-                }
-            }
-        }
-        &.transparent {
-            .dropdown-button {
-                @apply text-secondary;
-            }
-        }
-        &.secondary-button {
-            .dropdown-button {
-                @apply border-secondary text-secondary bg-white;
-            }
-        }
-    }
-
-    /* hover */
-    &:not(.invalid):not(.disabled):not(.active):not(.read-only) {
-        &.default {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply border-blue-600;
-                        .dropdown-icon {
-                            @apply text-blue-600;
-                        }
-                    }
-                }
-            }
-        }
-        &.transparent {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply text-secondary;
-                        outline: none;
-                    }
-                }
-            }
-        }
-        &.secondary-button {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply bg-white text-secondary border-secondary;
-                    }
-                }
-            }
-        }
-    }
-
-    &:not(.disabled):not(.active).transparent {
-        &.default {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply text-secondary;
-                    }
-                }
-            }
-        }
-    }
-
-    /* size */
-    &.lg {
-        .dropdown-button {
-            font-size: 1rem;
-        }
-    }
-    &.md {
-        .dropdown-button {
-            font-size: 0.875rem;
-        }
+    &.is-fixed-width {
+        display: initial;
     }
 }
 </style>

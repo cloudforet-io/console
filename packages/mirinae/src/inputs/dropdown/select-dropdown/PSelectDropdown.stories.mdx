@@ -1,57 +1,77 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from 'vue';
-
-import { I18nConnector } from '@/translations';
-
-import PSelectDropdown from './PSelectDropdown.vue';
+import Fuse from 'fuse.js'
+import PButton from '@/inputs/buttons/button/PButton';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
-
-import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
-import {menuItems} from '@/inputs/context-menu/mock';
+import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown.vue";
+import { menuItems } from '@/inputs/context-menu/mock';
+import { useProxyValue } from "@/hooks/proxy-state";
 import {
-    SELECT_DROPDOWN_SIZE, SELECT_DROPDOWN_STYLE_TYPE
+    getSelectDropdownArgTypes
+} from "@/inputs/dropdown/select-dropdown/story-helper";
+import {
+    APPEARANCE_TYPE,
+    SELECT_DROPDOWN_STYLE_TYPE
 } from "@/inputs/dropdown/select-dropdown/type";
-import { useProxyValue } from '@/hooks';
+import {
+    getSelectDropdownMenu,
+    getSelectDropdownMenuWithMultiTypes
+} from "@/inputs/dropdown/select-dropdown/mock";
 
 <Meta title='Inputs/Dropdown/Select Dropdown' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
-    }
+    },
 }} argTypes={getSelectDropdownArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    i18n: I18nConnector.i18n,
     components: { PSelectDropdown },
     template: `
-    <div class="h-full w-full overflow p-8">
         <p-select-dropdown
-            :use-fixed-menu-style="useFixedMenuStyle"
-            :visible-menu="proxyVisibleMenu"
-            :invalid="invalid"
-            :loading="loading"
-            :items="items"
-            :selected.sync="proxySelected"
-            :disabled="disabled"
-            :index-mode="indexMode"
-            :placeholder="placeholder"
-            :read-only="readOnly"
             :style-type="styleType"
+            :appearance-type="appearanceType"
+            :disabled="disabled"
+            :invalid="invalid"
+            :placeholder="placeholder"
+            :selection-label="selectionLabel"
+            :selection-highlight="selectionHighlight"
+            :show-alert-dot="showAlertDot"
+            :show-delete-all-button="showDeleteAllButton"
+            :use-fixed-menu-style="useFixedMenuStyle"
             :button-icon="buttonIcon"
-            :menu-position="menuPosition"
             :is-fixed-width="isFixedWidth"
-            @select="onSelect"
+            :is-filterable="isFilterable"
+            :visible-menu="proxyVisibleMenu"
+            :menu="menu"
+            :loading="loading"
+            :selected="proxySelected"
+            :multi-selectable="multiSelectable"
+            :search-text="proxySearchText"
+            :readonly="readonly"
+            :show-select-header="showSelectHeader"
+            :show-select-marker="showSelectMarker"
+            :menu-position="menuPosition"
+            :handler="handler"
+            :disable-handler="disableHandler"
+            :page-size="pageSize"
+            :reset-selected-on-unmounted="resetSelectedOnUnmounted"
+            @update:visible-menu="onUpdateVisibleMenu"
+            @update:search-text="onUpdateSearchText"
             @update:selected="onUpdateSelected"
-            @focus-menu="onFocusMenu"
-        ></p-select-dropdown>
-    </div>
+            @select="onSelect"
+            @delete-tag="onDeleteTag"
+            @click-show-more="onClickShowMore"
+        >
+        </p-select-dropdown>
     `,
-    setup(props, { emit }) {
+    setup(props, {emit}) {
         const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit),
+            proxySearchText: useProxyValue('searchText', props, emit),
             proxyVisibleMenu: useProxyValue('visibleMenu', props, emit),
-            proxySelected: useProxyValue('selected', props, emit)
         })
         return {
             ...toRefs(state)
@@ -59,26 +79,97 @@ export const Template = (args, { argTypes }) => ({
     }
 });
 
-# PSelectDropdown
 
-<br />
-<br />
+# Select Dropdown
+<br/>
+<br/>
 
-## Default
+## Basic
 
 <Canvas>
-    <Story name="Basic" height={'500px'}>
+    <Story name="Basic" height={'300px'}>
         {{
-            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems"></p-select-dropdown>
+    <div class="h-full w-full overflow">
+        <p-select-dropdown :menu="menuItems"></p-select-dropdown>
     </div>
     `,
             setup() {
                 return {
                     menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Style Type
+
+<Canvas>
+    <Story name="Style Type" height={'300px'}>
+        {{
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>rounded</th>
+                            <th>transparent</th>
+                            <th>icon-button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
+                                <p-select-dropdown :menu="menuItems" :styleType="styleType" class="m-2"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Appearance Type
+
+<Canvas>
+    <Story name="Appearance Type" height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown },
+            template: `
+        <div>
+            <p class="text-label-lg font-bold my-3">Single select with 'basic', 'badge', 'stack' appearance type</p>
+            <p-select-dropdown :menu="menuItems" :selected="singleSelected" />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select with 'basic' appearance type</p>
+            <p-select-dropdown :menu="menuItems" :selected="multiSelected"  multi-selectable />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select with 'badge' appearance type</p>
+            <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="badge" />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select with 'stack' appearance type</p>
+            <p-select-dropdown :menu="menuItems" :selected="multiSelected" multi-selectable appearance-type="stack" />
+            <br/>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    singleSelected: [menuItems.find(d => !d.type || d.type === 'item')],
+                    multiSelected: menuItems.filter(d => !d.type || d.type === 'item').splice(0, 15),
+                })
+                return {
+                    menuItems,
+                    ...toRefs(state)
                 }
             }
         }}
@@ -90,121 +181,30 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Disabled">
         {{
-            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems" disabled></p-select-dropdown>
-    </div>
-    `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-## Invalid
-
-<Canvas>
-    <Story name="Invalid" height={'500px'}>
-        {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems" invalid></p-select-dropdown>
-    </div>
-    `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-## Button Style Type
-
-<Canvas>
-    <Story name="Button Style Type" height={'500px'}>
-        {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-                <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
-                            <th>default</th>
-                            <th>icon-button</th>
-                            <th>transparent</th>
-                            <th>secondary-button</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :items="menuItems" :styleType="styleType" class="m-2"/>
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
-            `,
+                            <table class="w-full border-separate border-spacing-1">
+                                <thead>
+                                    <tr>
+                                        <th>default</th>
+                                        <th>rounded</th>
+                                        <th>transparent</th>
+                                        <th>icon-button</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th v-for="styleType in styleTypes" :key="styleType">
+                                            <p-select-dropdown :menu="menuItems" :styleType="styleType" class="m-2" disabled/>
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `,
             setup() {
                 return {
                     menuItems,
                     styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-## Size
-
-<Canvas>
-    <Story name="Size" height={'500px'}>
-        {{
-            i18n: I18nConnector.i18n,
-            components: { PSelectDropdown },
-            template: `
-                <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
-                            <th class="w-24"></th>
-                            <th>default</th>
-                            <th>icon-button</th>
-                            <th>transparent</th>
-                            <th>secondary-button</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>md</th>
-                            <th v-for="styleType in styleTypes" :key="styleType" >
-                                <p-select-dropdown size="md" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
-                            </th>
-                        </tr>
-                        <tr>
-                            <th>lg</th>
-                            <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown size="lg" :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
-            `,
-            setup() {
-                const state = reactive({
-                    sizes: Object.values(SELECT_DROPDOWN_SIZE)
-                })
-                return {
-                    ...toRefs(state),
-                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
-                    menuItems,
                 }
             }
         }}
@@ -214,9 +214,8 @@ export const Template = (args, { argTypes }) => ({
 ## Read Only
 
 <Canvas>
-    <Story name="Read Only" height={'500px'}>
+    <Story name="Read Only" height={'300px'}>
         {{
-            i18n: I18nConnector.i18n,
             components: { PSelectDropdown },
             template: `
                 <table class="w-full border-separate border-spacing-1">
@@ -224,22 +223,22 @@ export const Template = (args, { argTypes }) => ({
                         <tr>
                             <th></th>
                             <th>default</th>
-                            <th>icon-button</th>
+                            <th>rounded</th>
                             <th>transparent</th>
-                            <th>secondary-button</th>
+                            <th>icon-button</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <th>default</th>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown :items="menuItems" :styleType="styleType" class="m-2 w-6/12"/>
+                                <p-select-dropdown :menu="menuItems" :styleType="styleType" class="m-2"/>
                             </th>
                         </tr>
                         <tr>
                             <th>readOnly</th>
                             <th v-for="styleType in styleTypes" :key="styleType">
-                                <p-select-dropdown read-only :items="menuItems" :styleType="styleType" class="m-2 w-6/12" />
+                                <p-select-dropdown readonly :menu="menuItems" :styleType="styleType" class="m-2" />
                             </th>
                         </tr>
                     </tbody>
@@ -255,62 +254,61 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Icon Button Type
+## Invalid
 
 <Canvas>
-    <Story name="Icon Button Type" height={'500px'}>
+    <Story name="Invalid" height={'300px'}>
         {{
-            i18n: I18nConnector.i18n,
-            components: {
-                PSelectDropdown
-            },
-            template: `
-                <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
-                            <th class="w-2/12">icon / variations</th>
-                            <th>default</th>
-                            <th>disabled</th>
-                            <th>invalid</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>default</th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" disabled /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" invalid /></th>
-                        </tr>
-                        <tr>
-                            <th>custom</th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" disabled /></th>
-                            <th><p-select-dropdown :items="menuItems" style-type="icon-button" button-icon="ic_settings" invalid /></th>
-                        </tr>
-                    </tbody>
-                </table>
-            `,
-            setup() {
-                return {
-                    menuItems
-                };
-            }
-        }}
+                    components: { PSelectDropdown },
+                    template: `
+                                    <table class="w-full border-separate border-spacing-1">
+                                        <thead>
+                                            <tr>
+                                                <th>default</th>
+                                                <th>rounded</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-6/12" invalid/>
+                                                </th>
+                                                <th>
+                                                    <p-select-dropdown :menu="menuItems" styleType="rounded" class="m-2 mx-auto w-6/12" invalid/>
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                `,
+                    setup() {
+                        return {
+                            menuItems,
+                        }
+                    }
+                }}
     </Story>
 </Canvas>
 
-## Is Fixed Width
+## Placeholder
 
 <Canvas>
-    <Story name="Is Fixed Width" height={'500px'}>
+    <Story name="Placeholder" height={'400px'}>
         {{
-            i18n: I18nConnector.i18n,
+            props: Object.keys(getSelectDropdownArgTypes()),
             components: { PSelectDropdown },
             template: `
-                <div class="h-full w-full overflow p-8">
-                    <p-select-dropdown :items="menuItems" is-fixed-width class="w-52" placeholder="long long long long long long long long long long long placeholder"></p-select-dropdown>
-                </div>
-            `,
+            <div>
+                <p class="text-label-lg font-bold my-3">Default placeholder for single select</p>
+                <p-select-dropdown :menu="menuItems" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Default placeholder for multi select</p>
+                <p-select-dropdown :menu="menuItems" multi-selectable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Custom placeholder</p>
+                <p-select-dropdown :menu="menuItems" placeholder="Please Select One 😄" />
+                <br/>
+            </div>
+`,
             setup() {
                 return {
                     menuItems
@@ -320,20 +318,126 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Default Slot
+## Selection Label
 
 <Canvas>
-    <Story name="Default Slot" height={'500px'}>
+    <Story name="Selection Label" height={'400px'}>
         {{
-            i18n: I18nConnector.i18n,
+            props: Object.keys(getSelectDropdownArgTypes()),
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems">
-            Actions
-        </p-select-dropdown>
-    </div>
-    `,
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-select-dropdown :menu="menuItems" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Selection Label</p>
+                <p-select-dropdown :menu="menuItems" selection-label="Label" />
+                <br/>
+            </div>
+`,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Selection Highlight
+
+<Canvas>
+    <Story name="Selection Highlight" height={'500px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown },
+            template: `
+                <div>
+                <p class="text-label-lg font-bold my-3">Normal</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" selection-highlight />
+                <br/>
+                <p-select-dropdown :menu="menuItems" :selected="selected" selection-highlight style-type="rounded" class="mt-2"/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at badge type</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" multi-selectable appearance-type="badge" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at badge type with selection label</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" multi-selectable appearance-type="badge" selection-label="Label" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at stack type</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" multi-selectable appearance-type="stack" selection-highlight/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show selection highlight at stack type with selection label</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" multi-selectable appearance-type="stack" selection-label="Label" selection-highlight/>
+                <br/>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    selected: menuItems.filter(d => !d.type || d.type === 'item').slice(0, 2),
+                })
+                return {
+                    menuItems,
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Show Alert Dot
+
+<Canvas>
+    <Story name="Show Alert Dot" height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-select-dropdown :menu="menuItems"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show Alert Dot</p>
+                <p-select-dropdown :menu="menuItems" show-alert-dot />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show Alert Dot and Selection Highlight at Badge Type</p>
+                <p-select-dropdown :menu="menuItems" :selected="selected" multi-selectable show-alert-dot selection-highlight appearance-type="badge"/>
+                <br/>
+            </div>
+`,
+            setup() {
+                const state = reactive({
+                    selected: menuItems.filter(d => !d.type || d.type === 'item').slice(0, 2),
+                })
+                return {
+                    menuItems,
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Show Delete All Button
+
+<Canvas>
+    <Story name="Show Delete All Button" height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-select-dropdown :menu="menuItems"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Show delete all button</p>
+                <p-select-dropdown :menu="menuItems" show-delete-all-button />
+                <br/>
+            </div>
+`,
             setup() {
                 return {
                     menuItems
@@ -358,12 +462,13 @@ export const Template = (args, { argTypes }) => ({
                     Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
                     When you scroll parent elements, the menu will be automatically hidden.
                 </p>
-                <p-select-dropdown v-if="show" :items="menuItems" :use-fixed-menu-style="useFixedMenuStyle"/>
+                <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" />
             </div>
         </div>
 `,
             setup() {
                 const state = reactive({
+                    menu: getSelectDropdownMenu(30, 50),
                     useFixedMenuStyle: true,
                     show: true
                 })
@@ -375,9 +480,328 @@ export const Template = (args, { argTypes }) => ({
                     }, 300)
                 }
                 return {
-                    ...toRefs(state),
                     menuItems,
+                    ...toRefs(state),
                     onChange
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Button Icon Type
+
+<Canvas>
+    <Story name="Button Icon Type" height={'300px'}>
+        {{
+            components: {
+                PSelectDropdown
+            },
+            template: `
+                <table class="w-5/12 border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>default</th>
+                            <th>custom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr >
+                            <th><p-select-dropdown :menu="menuItems" style-type="icon-button" /></th>
+                            <th><p-select-dropdown :menu="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Is Fixed Width
+
+<Canvas>
+    <Story name="Is Fixed Width" height={'300px'}>
+        {{
+            components: { PSelectDropdown },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-select-dropdown class="w-96" :menu="menuItems" is-fixed-width placeholder="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long placeholder "></p-select-dropdown>
+                </div>
+            `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Is Filterable
+
+<Canvas>
+    <Story name="Is Filterable" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Default</p>
+                <p-select-dropdown :menu="menuItems"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Filterable</p>
+                <p-select-dropdown :menu="menu" is-filterable />
+                <br/>
+            </div>
+`,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Using Custom Handler & Loading
+
+Use a handler to show the menu with the return value. <br/>
+So with custom handler, there is no need to give menu prop. <br/>
+
+You can control loading manually by loading prop. <br/>
+If you don't give loading prop, loading UI will be displayed automatically when handler is running. <br/>
+
+Handler type:
+
+```typescript
+interface HandlerRes {
+    results: MenuItem[]; // this is context menu items
+    totalCount?: number; // will be deprecated
+    more?: boolean; // Whether to show 'show more' item on the bottom or not
+}
+interface AutocompleteHandler {
+    (inputText: string, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+}
+```
+
+
+<Canvas>
+    <Story name="Using Custom Handler & Loading" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Without custom handler(use default handler internally)</p>
+                <p-select-dropdown :loading="loading" :menu="menu"  />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler</p>
+                <p-select-dropdown :handler="simpleHandler" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler and loading</p>
+                <p-select-dropdown :loading="loading" :handler="simpleHandler" />
+                <br/>
+            </div>
+`,
+            setup() {
+                const state = reactive({
+                    loading: false,
+                })
+                const menu = getSelectDropdownMenuWithMultiTypes()
+                let allResults = []
+                const simpleHandler = async (inputText) => {
+                    state.loading = true;
+                    allResults = await new Promise(resolve => {
+                        setTimeout(() => {
+                            let filtered;
+                            const trimmed = inputText.trim();
+                            if (trimmed) {
+                                filtered = new Fuse(menu, {
+                                    keys: ['label'],
+                                    distance: 100,
+                                    threshold: 0.1,
+                                    ignoreLocation: true,
+                                }).search(trimmed);
+                            } else {
+                                filtered = [...menu]
+                            }
+                            resolve(filtered)
+                        }, 500)
+                    })
+                    state.loading = false;
+                    const results = allResults.slice(0, 5)
+                    return { results, more: allResults.length > results.length }
+                }
+                return {
+                    ...toRefs(state),
+                    simpleHandler
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Show Select Header
+
+<Canvas>
+    <Story name="Show Select Header" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Multi select without select header</p>
+                <p-select-dropdown :menu="menu"  multi-selectable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with select header</p>
+                <p-select-dropdown :menu="menu" multi-selectable show-select-header />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+## Show Select Marker
+
+<Canvas>
+    <Story name="Show Select Marker" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown },
+            template: `
+        <div>
+            <p class="text-label-lg font-bold my-3">Single select without marker</p>
+            <p-select-dropdown :menu="menu" />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Single select with marker</p>
+            <p-select-dropdown :menu="menu" show-select-marker />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select without marker</p>
+            <p-select-dropdown :menu="menu" multi-selectable />
+            <br/>
+            <p class="text-label-lg font-bold my-3">Multi select with marker</p>
+            <p-select-dropdown :menu="menu" multi-selectable show-select-marker />
+            <br/>
+        </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+## Menu Position
+
+<Canvas>
+    <Story name="Menu Position" height={'300px'}>
+        {{
+            components: { PSelectDropdown },
+            template: `
+                <table class="w-full border-separate border-spacing-1">
+                    <thead>
+                        <tr>
+                            <th>left</th>
+                            <th>right</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>
+                                <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-24"  />
+                            </th>
+                            <th>
+                                <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-24" menu-position="right"/>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                return {
+                    menuItems,
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Disable Handler
+
+As you enter values into the search input, the menu is filtered by default handler. <br/>
+If you don't want to use this feature, give true to the disableHandler prop.
+
+<Canvas>
+    <Story name="Disable Handler" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">With default handler </p>
+                <p-select-dropdown :menu="menu" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Disable handler </p>
+                <p-select-dropdown :menu="menu" disable-handler />
+                <br/>
+            </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+## Show More & Page Size
+
+When using the `handler` prop, the first argument of the handler is the input text, the second argument is the pageStart value, and the third argument is the pageLimit. <br/>
+pageStart and pageLimit are calculated based on the value given to the `pageSize` prop. <br/>
+
+For example, if `pageSize` is 5, pageStart is initially given 1 and pageLimit is given 5. <br/>
+If the value of more in the result of executing the handler is true, the show more button is displayed. <br/>
+When the user presses the show more button, the handler runs again. <br/>
+At this time, 6 is given as the value of the pageStart argument and 10 is given as the value of the pageLimit argument. <br/>
+
+<Canvas>
+    <Story name="Show More & Page Size" args={{menu: getSelectDropdownMenu(11, 22)}} height={'400px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton },
+            template: `
+            <div style="width: 90%;">
+                <p class="text-label-lg font-bold my-3">Without custom handler, single select, with page size 5</p>
+                <p-select-dropdown :menu="menu" :page-size="5" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler, single select, with page size 5</p>
+                <p-select-dropdown :handler="simpleHandler" :page-size="5" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Without custom handler, multi select, with page size 5</p>
+                <p-select-dropdown :menu="menu" multi-selectable :page-size="5" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler, multi select, with page size 5</p>
+                <p-select-dropdown :handler="simpleHandler" multi-selectable :page-size="5" />
+                <br/>
+            </div>
+`,
+            setup() {
+                const state = reactive({
+                    loading: false,
+                })
+                const simpleHandler = async (inputText, pageStart, pageLimit) => {
+                    state.loading = true;
+                    const results = await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve(getSelectDropdownMenu(5, 5, inputText))
+                        }, 500)
+                    })
+                    state.loading = false;
+                    return { results, more: pageLimit < 15 }
+                }
+                return {
+                    ...toRefs(state),
+                    simpleHandler,
                 }
             }
         }}
@@ -387,9 +811,10 @@ export const Template = (args, { argTypes }) => ({
 ## Playground
 
 <Canvas>
-    <Story name="Playground">
+    <Story name="Playground" args={{menu: getSelectDropdownMenu()}} height={'400px'}>
         {Template.bind({})}
     </Story>
 </Canvas>
 
 <ArgsTable story="Playground"/>
+
