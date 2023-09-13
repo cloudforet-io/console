@@ -1,51 +1,9 @@
-<template>
-    <div>
-        <section class="page-title-wrapper">
-            <p-heading :show-back-button="!loading"
-                       :title="loading ? '' : budgetPageState.budgetData?.name"
-                       @click-back-button="$router.go(-1)"
-            >
-                <template v-if="!loading"
-                          #title-right-extra
-                >
-                    <div class="title-button-group">
-                        <p-icon-button name="ic_delete"
-                                       :disabled="!hasManagePermission"
-                                       @click="handleClickDelete"
-                        />
-                    </div>
-                </template>
-            </p-heading>
-        </section>
-        <section class="content">
-            <budget-detail-info class="summary"
-                                :currency="currency"
-                                :currency-rates="currencyRates"
-            />
-            <budget-summary :budget-loading="loading"
-                            :currency="currency"
-                            :currency-rates="currencyRates"
-                            class="summary"
-            />
-            <budget-notifications class="alert"
-                                  :manage-disabled="!hasManagePermission"
-            />
-            <!--            <budget-billing-admin class="budget" />-->
-        </section>
-        <budget-delete-modal v-if="!loading"
-                             :visible="checkDeleteState.visible"
-                             @update="handleUpdateDelete"
-                             @confirm="handleConfirmDelete"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PHeading, PIconButton } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -61,75 +19,99 @@ import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/mod
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 
+interface Props {
+    budgetId: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    budgetId: '',
+});
 
-export default {
-    name: 'BudgetDetailPage',
-    components: {
-        BudgetDeleteModal,
-        PHeading,
-        PIconButton,
-        BudgetDetailInfo,
-        BudgetSummary,
-        BudgetNotifications,
-    },
-    props: {
-        budgetId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.$state;
+const router = useRouter();
 
-        const state = reactive({
-            loading: true,
-            currency: computed(() => store.state.settings.currency),
-            currencyRates: computed(() => store.state.settings.currencyRates),
-            hasManagePermission: useManagePermissionState(),
-        });
+const budgetPageStore = useBudgetPageStore();
+const budgetPageState = budgetPageStore.$state;
 
-        const checkDeleteState = reactive({
-            visible: false,
-        });
+const state = reactive({
+    loading: true,
+    currency: computed(() => store.state.settings.currency),
+    currencyRates: computed(() => store.state.settings.currencyRates),
+    hasManagePermission: useManagePermissionState(),
+});
 
-        const handleClickDelete = () => {
-            checkDeleteState.visible = true;
-        };
+const checkDeleteState = reactive({
+    visible: false,
+});
 
-        const handleUpdateDelete = (visible) => {
-            checkDeleteState.visible = visible;
-        };
-
-        const handleConfirmDelete = () => {
-            SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.BUDGET._NAME });
-        };
-
-        (async () => {
-            state.loading = true;
-            try {
-                await Promise.allSettled([
-                    budgetPageStore.getBudgetData(props.budgetId),
-                    budgetPageStore.getBudgetUsageData(props.budgetId),
-                ]);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        })();
-
-        return {
-            ...toRefs(state),
-            budgetPageState,
-            checkDeleteState,
-            handleClickDelete,
-            handleUpdateDelete,
-            handleConfirmDelete,
-        };
-    },
+const handleClickDelete = () => {
+    checkDeleteState.visible = true;
 };
+
+const handleUpdateDelete = (visible) => {
+    checkDeleteState.visible = visible;
+};
+
+const handleConfirmDelete = () => {
+    router.push({ name: COST_EXPLORER_ROUTE.BUDGET._NAME });
+};
+
+(async () => {
+    state.loading = true;
+    try {
+        await Promise.allSettled([
+            budgetPageStore.getBudgetData(props.budgetId),
+            budgetPageStore.getBudgetUsageData(props.budgetId),
+        ]);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+})();
+
 </script>
+
+<template>
+    <div>
+        <section class="page-title-wrapper">
+            <p-heading :show-back-button="!state.loading"
+                       :title="state.loading ? '' : budgetPageState.budgetData?.name"
+                       @click-back-button="$router.go(-1)"
+            >
+                <template v-if="!state.loading"
+                          #title-right-extra
+                >
+                    <div class="title-button-group">
+                        <p-icon-button name="ic_delete"
+                                       :disabled="!state.hasManagePermission"
+                                       @click="handleClickDelete"
+                        />
+                    </div>
+                </template>
+            </p-heading>
+        </section>
+        <section class="content">
+            <budget-detail-info class="summary"
+                                :currency="state.currency"
+                                :currency-rates="state.currencyRates"
+            />
+            <budget-summary :budget-loading="state.loading"
+                            :currency="state.currency"
+                            :currency-rates="state.currencyRates"
+                            class="summary"
+            />
+            <budget-notifications class="alert"
+                                  :manage-disabled="!state.hasManagePermission"
+            />
+            <!--            <budget-billing-admin class="budget" />-->
+        </section>
+        <budget-delete-modal v-if="!state.loading"
+                             :visible="checkDeleteState.visible"
+                             @update="handleUpdateDelete"
+                             @confirm="handleConfirmDelete"
+        />
+    </div>
+</template>
+
 
 <style lang="postcss" scoped>
 .content {
