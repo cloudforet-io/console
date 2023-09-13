@@ -5,12 +5,13 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
+    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
+import { getPageStart, getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
@@ -31,16 +32,9 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import type { Period } from '@/services/cost-explorer/type';
 
 
-export interface Pagination {
-    pageStart: number;
-    pageLimit: number;
-}
-
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
     label: string | TranslateResult;
 };
-
-type Sort = Query['sort'];
 
 interface Props {
     filters: ConsoleFilter[];
@@ -51,9 +45,9 @@ const props = withDefaults(defineProps<Props>(), {
     filters: () => [],
 });
 const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
-    (e: 'update-pagination', pagination: Pagination): void;
+    (e: 'update-pagination', pageStart: number, pageLimit: number): void;
     (e: 'update-period', period: Period): void;
-    (e: 'update-sort', sort: Sort): void;
+    (e: 'update-sort', sort: Query['sort']): void;
     (e: 'refresh'): void;
     (e: 'export'): void;
 }>();
@@ -99,17 +93,14 @@ const state = reactive({
     ]),
     pageStart: 1,
     pageLimit: 24,
+    thisPage: computed(() => getThisPage(state.pageStart, state.pageLimit)),
     // query
-    pagination: computed<Pagination>(() => ({
-        pageStart: state.pageStart,
-        pageLimit: state.pageLimit,
-    })),
     period: computed<Period>(() => {
         const period: Period = {};
 
         if (state.selectedPeriod[0] === 'thisMonth') {
             period.start = dayjs.utc().format('YYYY-MM');
-            period.end = dayjs.utc().format('YYYY-MM-DD');
+            period.end = dayjs.utc().format('YYYY-MM');
         }
 
         return period;
@@ -121,7 +112,7 @@ const state = reactive({
     ])),
     sortDesc: true,
     selectedSortKey: 'usage',
-    sort: computed<Sort>(() => ({
+    sort: computed<Query['sort']>(() => ({
         key: state.selectedSortKey,
         desc: state.sortDesc,
     })),
@@ -135,7 +126,10 @@ const handleSelectStatus = (selected: string[]) => {
 
 const handleChangeToolbox = async (options: ToolboxOptions) => {
     if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.pageLimit !== undefined) {
+        state.pageLimit = options.pageLimit;
+        state.pageStart = 1;
+    }
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
 
@@ -143,9 +137,13 @@ const handleSortType = () => {
     state.sortDesc = !state.sortDesc;
 };
 
+const handleUpdateThisPage = (thisPage: number) => {
+    state.pageStart = getPageStart(thisPage, state.pageLimit);
+};
+
 /* Watchers */
-watch(() => state.pagination, (pagination) => {
-    emit('update-pagination', pagination);
+watch([() => state.pageStart, () => state.pageLimit], ([pageStart, pageLimit]) => {
+    emit('update-pagination', pageStart, pageLimit);
 });
 watch(() => state.period, (period) => {
     emit('update-period', period);
@@ -202,6 +200,17 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                    @refresh="emit('refresh')"
                    @export="emit('export')"
         >
+            <template #pagination-area>
+                <p-text-pagination :this-page="state.thisPage"
+                                   :disable-next-page="!props.more"
+                                   @update:thisPage="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ state.thisPage }}</span>
+                        <span v-if="props.more"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </template>
             <template #left-area>
                 <div class="left-area">
                     <p-select-dropdown
@@ -233,7 +242,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             }
         }
         .period-box {
-            @apply relative inline-flex gap-4 items-center pl-4;
+            @apply relative inline-flex gap-4 items-center;
             height: 1.25rem;
             font-size: 0.875rem;
 

@@ -24,9 +24,6 @@ import {
     getBudgetUsageAnalyzeRequestQuery,
 } from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
-import type {
-    Pagination,
-} from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
@@ -45,10 +42,10 @@ const budgetUsageApiQueryHelper = new ApiQueryHelper();
 const state = reactive({
     budgetUsages: [] as BudgetUsageAnalyzeResult[],
     loading: false,
+    more: false,
     // query
     pageStart: 1,
     pageLimit: 24,
-    more: false,
     queryStoreFilters: props.filters as ConsoleFilter[],
     period: {} as Period,
     // api request params
@@ -66,11 +63,6 @@ const state = reactive({
         };
     }),
 });
-
-const setFilters = (filters: ConsoleFilter[]) => {
-    state.queryStoreFilters = filters;
-    emit('update:filters', filters);
-};
 
 const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
     try {
@@ -92,7 +84,7 @@ const listBudgets = async () => {
 };
 
 /* Handlers */
-const handleUpdatePagination = ({ pageStart, pageLimit }: Pagination) => {
+const handleUpdatePagination = (pageStart: number, pageLimit: number) => {
     state.pageStart = pageStart;
     state.pageLimit = pageLimit;
     listBudgets();
@@ -104,7 +96,8 @@ const handleUpdatePeriod = (period: Period) => {
 };
 
 const handleUpdateFilters = (filters: ConsoleFilter[]) => {
-    setFilters(filters);
+    state.queryStoreFilters = filters;
+    emit('update:filters', filters);
     listBudgets();
 };
 
