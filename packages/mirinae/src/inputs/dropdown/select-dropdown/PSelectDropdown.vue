@@ -227,12 +227,12 @@ watch(() => props.disabled, (disabled) => {
 });
 
 /* init */
-(async () => {
+(() => {
     if (!props.multiSelectable) return;
     if (!props.selected) return;
     if (Array.isArray(props.selected)) return;
 
-    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be array.');
+    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
 })();
 </script>
 
