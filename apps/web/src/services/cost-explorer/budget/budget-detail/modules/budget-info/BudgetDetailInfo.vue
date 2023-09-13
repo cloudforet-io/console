@@ -19,7 +19,7 @@ import type { CostTypes } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 
 const getKeyOfCostType = (costType: CostTypes): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
@@ -33,7 +33,7 @@ const costTypeMap = {
 };
 
 
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({

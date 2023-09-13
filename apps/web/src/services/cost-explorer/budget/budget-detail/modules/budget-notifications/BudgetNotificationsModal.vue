@@ -101,7 +101,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const NOTIFICATION_UNIT = Object.freeze({
@@ -143,7 +143,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const budgetPageStore = useBudgetPageStore();
+        const budgetPageStore = useBudgetDetailPageStore();
         const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({

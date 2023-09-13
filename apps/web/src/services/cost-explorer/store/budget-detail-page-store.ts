@@ -7,7 +7,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { BudgetUsageModel, BudgetNotifications, BudgetModel } from '@/services/cost-explorer/budget/model';
 
 
-export const useBudgetPageStore = defineStore('budget-page', {
+export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
     state: () => ({
         loading: true,
         budgetData: null as BudgetModel|null,
@@ -17,7 +17,7 @@ export const useBudgetPageStore = defineStore('budget-page', {
         async getBudgetData(budgetId: string): Promise<void> {
             this.loading = true;
             try {
-                this.budgetData = await SpaceConnector.client.costAnalysis.budget.get({
+                this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.get({
                     budget_id: budgetId,
                 });
             } catch (e) {
@@ -28,7 +28,7 @@ export const useBudgetPageStore = defineStore('budget-page', {
         },
         async updateBudgetData(params: { budgetId: string; updateParams: any }): Promise<void> {
             try {
-                this.budgetData = await SpaceConnector.client.costAnalysis.budget.update({
+                this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.update({
                     ...params.updateParams,
                     budget_id: params.budgetId,
                 });
@@ -38,7 +38,7 @@ export const useBudgetPageStore = defineStore('budget-page', {
         },
         async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetNotifications[] }): Promise<void> {
             try {
-                this.budgetData = await SpaceConnector.client.costAnalysis.budget.setNotification({
+                this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.setNotification({
                     notifications: params.notifications,
                     budget_id: params.budgetId,
                 });
@@ -48,14 +48,10 @@ export const useBudgetPageStore = defineStore('budget-page', {
         },
         async getBudgetUsageData(budgetId: string): Promise<void> {
             try {
-                const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.list({
+                const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.list({
                     budget_id: budgetId,
                 });
-                // TODO: Remove conversion process after the cost analysis API is updated.
-                this.budgetUsageData = results.map((budgetUsage: any) => ({
-                    ...budgetUsage,
-                    cost: budgetUsage.usd_cost,
-                }));
+                this.budgetUsageData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
