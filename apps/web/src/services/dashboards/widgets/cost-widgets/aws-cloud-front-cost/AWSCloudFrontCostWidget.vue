@@ -81,7 +81,7 @@ const state = reactive({
             groupBy: state.groupBy,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: dataKey,
-            categoryKey: COST_GROUP_BY.TYPE,
+            categoryKey: COST_GROUP_BY.USAGE_TYPE,
             valueKey: 'value',
             isHorizontal: true,
         });

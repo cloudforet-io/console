@@ -28,7 +28,13 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     options_schema: {
         default_properties: [
             'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account'),
+            ...getWidgetFilterSchemaPropertyNames(
+                'provider',
+                'project',
+                'service_account',
+                'region',
+                'cost_product',
+            ),
         ],
         fixed_properties: ['cost_data_source'],
         schema: {
@@ -40,12 +46,9 @@ const monthlyCostWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'project_group',
-                    'cost_category',
-                    'cost_resource_group',
                     'cost_product',
                     'region',
-                    'cost_type',
-                    'cost_account',
+                    'cost_usage_type',
                 ),
             },
             order: [
@@ -55,12 +58,9 @@ const monthlyCostWidgetConfig: WidgetConfig = {
                     'project',
                     'service_account',
                     'project_group',
-                    'cost_category',
-                    'cost_resource_group',
                     'cost_product',
                     'region',
-                    'cost_type',
-                    'cost_account',
+                    'cost_usage_type',
                 )],
         },
     },

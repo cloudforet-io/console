@@ -39,12 +39,8 @@ export const COST_GROUP_BY = {
     PROJECT_GROUP: REFERENCE_TYPE_INFO.project_group.key,
     REGION: REFERENCE_TYPE_INFO.region.key,
     // cost reference
-    DATA_SOURCE: COST_VARIABLE_TYPE_INFO.cost_data_source.key,
-    CATEGORY: COST_VARIABLE_TYPE_INFO.cost_category.key,
-    RESOURCE_GROUP: COST_VARIABLE_TYPE_INFO.cost_resource_group.key,
-    TYPE: COST_VARIABLE_TYPE_INFO.cost_type.key,
+    USAGE_TYPE: COST_VARIABLE_TYPE_INFO.cost_usage_type.key,
     PRODUCT: COST_VARIABLE_TYPE_INFO.cost_product.key,
-    ACCOUNT: COST_VARIABLE_TYPE_INFO.cost_account.key,
 } as const;
 
 export const ASSET_GROUP_BY = {
@@ -135,11 +131,8 @@ const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
     COST_VARIABLE_TYPE_INFO.cost_data_source.type,
-    COST_VARIABLE_TYPE_INFO.cost_category.type,
-    COST_VARIABLE_TYPE_INFO.cost_resource_group.type,
     COST_VARIABLE_TYPE_INFO.cost_product.type,
-    COST_VARIABLE_TYPE_INFO.cost_type.type,
-    COST_VARIABLE_TYPE_INFO.cost_account.type,
+    COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
     ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
     ASSET_VARIABLE_TYPE_INFO.asset_account.type,
