@@ -9,7 +9,6 @@ import BudgetSummaryTable
 
 interface Props {
     budgetLoading: boolean;
-    currencyRates: Record<string, number>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,11 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SUMMARY') }}
             </div>
         </template>
-        <budget-summary-chart v-if="!props.budgetLoading"
-                              :currency-rates="props.currencyRates"
-        />
-        <budget-summary-table v-if="!props.budgetLoading"
-                              :currency-rates="props.currencyRates"
-        />
+        <budget-summary-chart v-if="!props.budgetLoading" />
+        <budget-summary-table v-if="!props.budgetLoading" />
     </p-card>
 </template>

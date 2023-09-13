@@ -25,10 +25,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 
-interface Props {
-    currencyRates?: Record<string, number>;
-}
-
 const defaultTableKey = [{ name: 'Actual Cost', path: 'cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
 
@@ -54,9 +50,7 @@ interface BudgetTarget {
 }
 
 type Providers = BudgetModel['provider_filter']['providers'];
-const props = withDefaults(defineProps<Props>(), {
-    currencyRates: () => ({}),
-});
+
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
@@ -196,8 +190,8 @@ setTableKeysAndItems();
             <template #col-format="{field, value}">
                 <span v-if="field.name && value.path === 'limit'">
                     {{
-                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates)
-                        : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates, false, 1000000000)
+                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency)
+                        : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, undefined, false, 1000000000)
                     }}
                 </span>
                 <span v-else-if="field.name && value.path === 'cost'"
@@ -207,8 +201,8 @@ setTableKeysAndItems();
                                  class="link-text"
                     >
                         {{
-                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates)
-                            : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, props.currencyRates, false, 1000000000)
+                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency)
+                            : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, undefined, false, 1000000000)
                         }}
                     </router-link>
                 </span>
