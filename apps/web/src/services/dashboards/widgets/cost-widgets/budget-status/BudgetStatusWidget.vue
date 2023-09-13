@@ -87,7 +87,7 @@ const fetchData = async (): Promise<Data> => {
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: widgetState.granularity,
+                // granularity: widgetState.granularity,
                 group_by: [widgetState.groupBy, 'name'],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,

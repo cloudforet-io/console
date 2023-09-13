@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
-import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
@@ -27,99 +25,80 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type {
+    UsageType, WidgetEmit, WidgetExpose, WidgetProps,
+    SelectorType,
+} from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getRefinedXYChartData,
     getXYChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
-import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import {
+    getReferenceTypeOfGroupBy,
+} from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import {
+    useCostWidgetFrameHeaderDropdown,
+} from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
-import type { CostAnalyzeDataModel, Legend } from '@/services/dashboards/widgets/type';
-
-
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 const USAGE_SOURCE_UNIT = 'GB';
-const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'requests.http'|'requests.https'>, string> = {
-    'data-transfer.out': 'Transfer-out',
-    'requests.http': 'Requests (HTTP)',
-    'requests.https': 'Requests (HTTPS)',
-};
+const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
+const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
+
+interface Data {
+    [groupBy: string]: string | any; // product: 'AmazonCloudFront'
+    cost_sum?: Array<{
+        [field_group: string]: any;
+        value: number
+    }>;
+    date: string;
+    usage_quantity_sum?: Array<{
+        [field_group: string]: any;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+    _total_usage_quantity_sum?: number;
+}
+type Response = CostAnalyzeResponse<Data>;
+interface SubData { [USAGE_TYPE_VALUE_KEY]: string; value: number }
+interface TableData extends WidgetTableData {
+    [groupBy: string]: string | any;
+}
+
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const { colorSet } = useWidgetColorSet({
-    theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.chartData?.length ?? 0),
-});
-const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
-    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'cost' : 'usage_quantity')),
-    legends: [] as Legend[],
-    chartData: computed(() => {
-        const dataKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, {
-            groupBy: state.groupBy,
-            allReferenceTypeInfo: props.allReferenceTypeInfo,
-            arrayDataKey: dataKey,
-            categoryKey: COST_GROUP_BY.USAGE_TYPE,
-            valueKey: 'value',
-            isHorizontal: true,
-        });
-        return _chartData.reverse();
-    }),
-    tableFields: computed<Field[]>(() => {
-        if (!state.groupBy) return [];
-        const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'size',
-            sourceUnit: USAGE_SOURCE_UNIT,
-        };
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
-        return [
-            { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
-            {
-                name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions, textAlign: 'right',
-            },
-            { name: `${state.fieldsKey}_sum.1.value`, label: 'Requests (HTTP)', textAlign: 'right' },
-            { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)', textAlign: 'right' },
-        ];
-    }),
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
-    thisPage: 1,
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
-            // TODO: after hook refactor, add params
+            dataSourceId: widgetState.options.cost_data_source,
+            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
+            granularity: primitiveToQueryString(widgetState.granularity),
+            group_by: arrayToQueryString([widgetState.groupBy]),
+            period: objectToQueryString(widgetState.dateRange),
             filters: objectToQueryString({
-                ...getWidgetLocationFilters(state.options.filters),
+                ...getWidgetLocationFilters(widgetState.options.filters),
                 provider: ['aws'],
                 product: ['AmazonCloudFront'],
             }),
@@ -127,27 +106,94 @@ const state = reactive({
     })),
 });
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
+const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
+    selectorOptions: computed(() => widgetState.options?.selector_options),
+});
+
+const state = reactive({
+    loading: true,
+    data: null as Response | null,
+    fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo) : [])),
+    chartData: computed(() => {
+        const dataKey = `${state.fieldsKey}_sum`;
+        const _chartData = getRefinedXYChartData(state.data?.results, {
+            groupBy: widgetState.groupBy,
+            allReferenceTypeInfo: props.allReferenceTypeInfo,
+            arrayDataKey: dataKey,
+            categoryKey: USAGE_TYPE_VALUE_KEY,
+            valueKey: 'value',
+            isHorizontal: true,
+        });
+        return _chartData.reverse();
+    }),
+    tableData: computed<TableData[]>(() => {
+        const groupBy = widgetState.groupBy;
+        if (!state.data?.results?.length || !groupBy) return [];
+        const tableData: TableData[] = state.data.results.map((d: Data) => {
+            const row: TableData = {
+                [groupBy]: d[groupBy],
+            };
+            d[`${state.fieldsKey}_sum`]?.forEach((subData: SubData) => {
+                row[subData[USAGE_TYPE_VALUE_KEY]] = subData.value;
+            });
+            return row;
+        });
+        return tableData;
+    }),
+    tableFields: computed<Field[]>(() => {
+        if (!widgetState.groupBy) return [];
+        const textOptions: Field['textOptions'] = {
+            type: state.fieldsKey === 'cost' ? 'cost' : 'size',
+            sourceUnit: USAGE_SOURCE_UNIT,
+        };
+
+        const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
+            label: d[USAGE_TYPE_VALUE_KEY],
+            name: d[USAGE_TYPE_VALUE_KEY],
+            textOptions,
+            textAlign: 'right',
+        })) ?? [];
+
+        // set width of table fields
+        const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
+        const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
+
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+        return [
+            {
+                name: widgetState.groupBy,
+                label: groupByLabel,
+                textOptions: { type: 'reference', referenceType },
+                width: groupByFieldWidth,
+            },
+            ...dynamicTableFields.map((field) => ({ ...field, width: otherFieldWidth })),
+        ];
+    }),
+});
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<FullData> => {
-    if (!state.groupBy) return { results: [], more: false };
-    apiQueryHelper.setFilters([
-        { k: 'usage_type', v: ['data-transfer.out', 'requests.http', 'requests.https'], o: '' },
-        { k: 'product', v: 'AmazonCloudFront', o: '=' },
-        { k: 'usage_type', v: null, o: '!=' },
-    ]);
-    apiQueryHelper.addFilter(...state.consoleFilters);
-    if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<Response> => {
+    if (!widgetState.groupBy) return { results: [], more: false };
+    apiQueryHelper.setFilters(widgetState.consoleFilters);
+    if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
     try {
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, 'usage_type'],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy, USAGE_TYPE_QUERY_KEY],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     cost_sum: {
                         key: 'cost',
@@ -159,13 +205,13 @@ const fetchData = async (): Promise<FullData> => {
                     },
                 },
                 sort: [{ key: '_total_cost_sum', desc: true }],
-                field_group: ['usage_type'],
+                field_group: [USAGE_TYPE_VALUE_KEY],
                 ...apiQueryHelper.data,
             },
         });
         if (status === 'succeed') {
             return {
-                results: sortTableData(response.results, 'usage_type'),
+                results: response.results,
                 more: response.more,
             };
         }
@@ -176,10 +222,11 @@ const fetchData = async (): Promise<FullData> => {
 };
 
 const drawChart = (chartData) => {
-    if (!state.groupBy) return;
+    const groupBy = widgetState.groupBy;
+    if (!groupBy) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     chartHelper.setChartColors(chart, colorSet.value);
-    yAxis.set('categoryField', state.groupBy);
+    yAxis.set('categoryField', groupBy);
     yAxis.data.setAll(cloneDeep(chartData));
     // legend
     const legend = chartHelper.createLegend({
@@ -187,11 +234,11 @@ const drawChart = (chartData) => {
     });
     chart.children.push(legend);
 
-    Object.entries(USAGE_TYPE_LABEL_MAP).forEach(([name, label]) => {
+    state.tableFields.slice(1).forEach((d) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: label,
-            valueXField: name,
-            categoryYField: state.groupBy,
+            name: d.label,
+            valueXField: d.label,
+            categoryYField: groupBy,
             xAxis,
             yAxis,
             baseAxis: yAxis,
@@ -202,14 +249,14 @@ const drawChart = (chartData) => {
         const tooltip = chartHelper.createTooltip();
         tooltip.label.adapters.add('text', (text, target) => {
             // let _text = `[${gray[700]}]{valueX}[/]`;
-            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[state.groupBy]}[/]`;
+            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[groupBy]}[/]`;
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
                 let value = target.dataItem?.dataContext?.[fieldName];
                 if (value === undefined) value = '--';
                 if (fieldName === 'data-transfer.out') {
-                    if (state.selectedSelectorType === 'cost') {
-                        if (state.currency) value = currencyMoneyFormatter(value, state.currency, props.currencyRates);
+                    if (selectedSelectorType.value === 'cost') {
+                        if (state.currency) value = currencyMoneyFormatter(value, widgetState.currency);
                     } else {
                         value = bytes.parse(`${value}${USAGE_SOURCE_UNIT}`);
                         value = byteFormatter(value);
@@ -225,22 +272,21 @@ const drawChart = (chartData) => {
     if (legend) legend.data.setAll(chart.series.values);
 };
 
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+const refreshWidget = async (_thisPage = 1): Promise<Response> => {
     await nextTick();
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -249,35 +295,31 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleSelectSelectorType = (selected: string) => {
-    state.selectedSelectorType = selected;
+const handleSelectSelectorType = (selected?: SelectorType) => {
+    selectedSelectorType.value = selected;
     refreshWidget();
 };
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
     state.data = undefined;
-    refreshWidget(thisPage);
-};
-
-const handleRefresh = () => {
-    refreshWidget();
+    refreshWidget(_thisPage);
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
     },
 });
 
-defineExpose<WidgetExpose<FullData>>({
+defineExpose<WidgetExpose<Response>>({
     initWidget,
     refreshWidget,
 });
@@ -286,13 +328,13 @@ defineExpose<WidgetExpose<FullData>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-cloud-front-cost"
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
-        <template v-if="state.selectorItems.length"
+        <template v-if="selectorItems.length"
                   #header-right
         >
-            <widget-frame-header-dropdown :items="state.selectorItems"
-                                          :selected="state.selectedSelectorType"
+            <widget-frame-header-dropdown :items="selectorItems"
+                                          :selected="selectedSelectorType"
                                           @select="handleSelectSelectorType"
             />
         </template>
@@ -313,15 +355,14 @@ defineExpose<WidgetExpose<FullData>>({
 
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
+                               :items="state.tableData"
+                               :currency="widgetState.currency"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
+                               :legends="state.legends"
                                :color-set="colorSet"
                                :this-page="state.thisPage"
                                :show-next-page="state.data ? state.data.more : false"
-                               @update:thisPage="handleUpdateThisPage"
+                               @update:this-page="handleUpdateThisPage"
             />
         </div>
     </widget-frame>
