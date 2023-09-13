@@ -82,7 +82,16 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): 
     if (!properties) return {};
     Object.keys(properties).forEach((key) => {
         const property = properties[key];
+        const componentName = getComponentNameBySchemaProperty(property);
+
+        // set value with default value or undefined
         result[key] = formData?.[key] ?? property.default ?? undefined;
+
+        // refine value for component spec
+        if (componentName === 'PFilterableDropdown' && typeof result[key] === 'string') {
+            result[key] = [{ name: result[key], label: result[key] }];
+        }
+
         if (property.type === 'array' && result[key]) { // array type needs conversion for component.
             if (!Array.isArray(result[key])) {
                 result[key] = undefined;
