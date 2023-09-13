@@ -18,7 +18,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PSelectDropdown,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -48,16 +48,16 @@ export default {
         const state = reactive({
             proxySelectedYear: useProxyValue('selectedYear', props, emit),
             proxySelectedMonth: useProxyValue('selectedMonth', props, emit),
-            yearMenuItems: computed<SelectDropdownMenu[]>(() => {
+            yearMenuItems: computed<SelectDropdownMenuItem[]>(() => {
                 const currYear = dayjs.utc();
-                const menuItems: SelectDropdownMenu[] = [];
+                const menuItems: SelectDropdownMenuItem[] = [];
                 range(4).forEach((i) => {
                     const date = currYear.subtract(i, 'year').format('YYYY');
                     menuItems.push({ name: date, label: date });
                 });
                 return menuItems;
             }),
-            monthMenuItems: computed<SelectDropdownMenu[]>(() => {
+            monthMenuItems: computed<SelectDropdownMenuItem[]>(() => {
                 const months = i18nDayjs.value.months();
                 const menuItems = [
                     { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.ALL_MONTH') },
