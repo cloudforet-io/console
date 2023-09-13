@@ -176,6 +176,7 @@ const handleSelect = (id: string, selected: string) => {
     .slot-menu-wrapper {
         @apply flex items-center;
         height: 2rem;
+        margin-bottom: 0.5rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;

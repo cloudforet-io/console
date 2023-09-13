@@ -491,6 +491,7 @@
 					"CREATE_BULK_BUDGET": "予算一括追加",
 					"DATA_SOURCE": "データソース",
 					"DESC": "降順",
+					"NO_BUDGET": "",
 					"OVERSPENT": "予算超過",
 					"PERIOD": "期間",
 					"PROVIDER": "プロバイダー",
