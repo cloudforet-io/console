@@ -60,8 +60,8 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
             options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: COST_VARIABLE_TYPE_INFO.cost_data_source.type,
+                type: 'SEARCH_RESOURCE',
+                resource_type: 'cost_analysis.DataSource',
             },
             required: true,
         },
