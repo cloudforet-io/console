@@ -17,7 +17,7 @@ import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 interface Props {
     budgetId: string;
@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({

@@ -20,7 +20,7 @@ import {
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
@@ -62,7 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
     currency: CURRENCY.USD,
     currencyRates: () => ({}),
 });
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
