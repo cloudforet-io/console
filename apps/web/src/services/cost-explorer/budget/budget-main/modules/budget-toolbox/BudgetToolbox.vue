@@ -66,6 +66,7 @@ const handlerState = reactive({
         items: [
             { name: 'budget_id', label: 'Budget ID' },
             { name: 'name', label: 'Name' },
+            { name: 'data_source_id', label: 'Data Source' },
             { name: 'project_id', label: 'Project', valueSet: storeState.projects },
             { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
             { name: 'time_unit', label: 'Time Unit' },
@@ -74,6 +75,7 @@ const handlerState = reactive({
     valueHandlerMap: {
         budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
         name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+        data_source_id: makeReferenceValueHandler('cost_analysis.DataSource'),
         project_id: makeReferenceValueHandler('identity.Project'),
         project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
