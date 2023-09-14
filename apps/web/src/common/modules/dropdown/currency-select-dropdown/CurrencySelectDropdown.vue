@@ -1,5 +1,5 @@
 <template>
-    <p-select-dropdown :items="currencyItems"
+    <p-select-dropdown :menu="currencyItems"
                        :selected="currency"
                        style-type="transparent"
                        class="currency-select-dropdown"

@@ -18,7 +18,7 @@
                         </p>
                         <p-select-dropdown style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
-                                           :items="menuItems"
+                                           :menu="menuItems"
                                            menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"

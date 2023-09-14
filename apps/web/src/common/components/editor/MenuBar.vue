@@ -37,9 +37,6 @@
         />
 
         <div class="text-align-wrapper">
-            <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
-                 color="inherit"
-            />
             <p-select-dropdown :selected="selectedTextAlign"
                                class="menu-dropdown"
                                style-type="icon-button"
@@ -49,6 +46,11 @@
                 <template #menu-item--format="{item}">
                     <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
                     {{ item.label }}
+                </template>
+                <template #button-item>
+                    <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
+                         color="inherit"
+                    />
                 </template>
             </p-select-dropdown>
         </div>

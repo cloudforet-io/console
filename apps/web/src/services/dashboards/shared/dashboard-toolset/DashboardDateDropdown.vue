@@ -2,7 +2,7 @@
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
             style-type="transparent"
-            :items="monthMenuItems"
+            :menu="monthMenuItems"
             :selected="selectedMonthMenuIndex"
             index-mode
             menu-position="right"
@@ -177,9 +177,7 @@ export default defineComponent({
 </script>
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        min-width: auto;
-    }
+    @apply relative flex items-center justify-center;
+    min-height: 2rem;
 }
 </style>

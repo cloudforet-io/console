@@ -48,8 +48,8 @@
                        :label="$t('COMMON.PROFILE.LANGUAGE')"
                        class="input-form"
         >
-            <p-select-dropdown v-model="formState.language"
-                               :items="state.languages"
+            <p-select-dropdown :selected.sync="formState.language"
+                               :menu="state.languages"
                                is-fixed-width
             />
         </p-field-group>

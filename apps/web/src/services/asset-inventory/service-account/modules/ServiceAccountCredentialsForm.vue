@@ -50,7 +50,7 @@
                          class="yes-dropdown"
                     >
                         <p-select-dropdown :selected="formState.attachedTrustedAccountId"
-                                           :items="trustedAccountMenuItems"
+                                           :menu="trustedAccountMenuItems"
                                            :disabled="!formState.attachTrustedAccount"
                                            @select="handleChangeAttachedTrustedAccountId"
                         />

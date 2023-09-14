@@ -50,8 +50,8 @@
                     >
                         {{ urgency.label }}
                     </p-radio>
-                    <p-select-dropdown v-model="selectedUrgency"
-                                       :items="urgencyList"
+                    <p-select-dropdown :selected.sync="selectedUrgency"
+                                       :menu="urgencyList"
                     />
                 </div>
             </div>

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <p-select-dropdown v-model="proxySelectedMonth"
+        <p-select-dropdown :selected.sync="proxySelectedMonth"
                            class="month-select-dropdown"
-                           :items="monthMenuItems"
+                           :menu="monthMenuItems"
         />
-        <p-select-dropdown v-model="proxySelectedYear"
+        <p-select-dropdown :selected.sync="proxySelectedYear"
                            class="year-select-dropdown"
-                           :items="yearMenuItems"
+                           :menu="yearMenuItems"
         />
     </div>
 </template>

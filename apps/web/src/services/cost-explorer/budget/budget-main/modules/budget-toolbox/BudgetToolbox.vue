@@ -227,7 +227,8 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             <template #left-area>
                 <div class="left-area">
                     <p-select-dropdown
-                        :items="state.sortKeyList"
+                        class="sort-key-select-dropdown"
+                        :menu="state.sortKeyList"
                         :selected.sync="state.selectedSortKey"
                     />
                     <p-button class="sort-box"
@@ -281,6 +282,9 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     .left-area {
         @apply flex flex-wrap gap-4;
+        .sort-key-select-dropdown {
+            @apply relative;
+        }
     }
 }
 </style>

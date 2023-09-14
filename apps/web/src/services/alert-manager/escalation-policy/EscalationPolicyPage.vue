@@ -27,12 +27,11 @@
                     </p-button>
                     <p-select-dropdown
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                        :items="actionItems"
+                        :menu="actionItems"
+                        :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :disabled="!selectedItem || !hasManagePermission"
                         @select="onSelectAction"
-                    >
-                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
-                    </p-select-dropdown>
+                    />
                 </template>
             </p-toolbox>
             <escalation-policy-data-table

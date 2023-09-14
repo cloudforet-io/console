@@ -53,7 +53,7 @@ const handleUpdateFilters = (filters: ConsoleFilter[]) => {
                 <!--                <p-select-dropdown-->
                 <!--                    class="create-budget-box"-->
                 <!--                    use-fixed-menu-style-->
-                <!--                    :items="createButtonItemList"-->
+                <!--                    :menu="createButtonItemList"-->
                 <!--                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"-->
                 <!--                    type="outline-button"-->
                 <!--                    @select="handleCreateBudgetSelect"-->

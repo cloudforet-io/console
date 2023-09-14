@@ -204,7 +204,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 
 <template>
     <div class="cost-analysis-period-select-dropdown">
-        <p-select-dropdown :items="state.periodMenuItems"
+        <p-select-dropdown :menu="state.periodMenuItems"
                            :selected="state.selectedPeriod"
                            @select="handleSelectPeriod"
         />

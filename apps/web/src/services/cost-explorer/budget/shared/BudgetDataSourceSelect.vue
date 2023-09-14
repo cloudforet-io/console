@@ -67,7 +67,7 @@ const fetchDataSource = async () => {
                    class="budget-data-source-select-field"
     >
         <p-select-dropdown class="data-source-dropdown"
-                           :items="state.dataSourceItems"
+                           :menu="state.dataSourceItems"
                            :selected="selectedDataSource"
                            is-fixed-width
                            @update:selected="setForm('selectedDataSource', $event)"
