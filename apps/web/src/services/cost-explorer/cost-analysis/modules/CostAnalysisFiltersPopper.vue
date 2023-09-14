@@ -19,6 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersAddMoreButton.vue';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
@@ -37,7 +38,12 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
+    enabledFilters: computed<MenuItem[]>(() => {
+        if (costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS) {
+            return costAnalysisPageStore.defaultGroupByItems;
+        }
+        return costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name));
+    }),
     selectedFilterableItemsMap: computed<Record<string, FilterableDropdownMenuItem[]>>(() => {
         const _selectedItems = {} as Record<string, FilterableDropdownMenuItem[]>;
         Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
@@ -66,7 +72,7 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
             },
             ...resourceApiQueryHelper.data,
         });
-        if (status) return response.results;
+        if (status) return response?.results;
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
