@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import {
     cloneDeep, isEmpty, isEqual,
 } from 'lodash';
@@ -74,8 +73,8 @@ const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     settings: {
         date_range: {
-            start: dayjs.utc().format('YYYY-MM-01'),
-            end: dayjs.utc().format('YYYY-MM-DD'),
+            start: undefined,
+            end: undefined,
             enabled: false,
         },
         currency: {
@@ -179,8 +178,8 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             this.settings = {
                 date_range: {
                     enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
-                    start: _dashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
-                    end: _dashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
+                    start: _dashboardInfo.settings?.date_range?.start,
+                    end: _dashboardInfo.settings?.date_range?.end,
                 },
                 currency: {
                     enabled: _dashboardInfo.settings?.currency?.enabled ?? false,
