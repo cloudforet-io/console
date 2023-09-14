@@ -2,7 +2,10 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const budgetUsageSummaryConfig: WidgetConfig = {
@@ -25,21 +28,47 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     options: {
         granularity: GRANULARITY.MONTHLY,
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'region',
+            'cost_product',
+        ),
+    },
     options_schema: {
         default_properties: [
             'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
+            ...getWidgetFilterSchemaPropertyNames(
+                'provider',
+                'project',
+                'region',
+                'cost_product',
+            ),
         ],
         fixed_properties: ['cost_data_source'],
         schema: {
             type: 'object',
             properties: {
                 ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'cost_product', 'region'),
+                ...getWidgetFilterOptionsSchema(
+                    'provider',
+                    'project',
+                    'service_account',
+                    'cost_product',
+                    'region',
+                ),
             },
             order: [
                 'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'cost_product', 'region'),
+                ...getWidgetFilterSchemaPropertyNames(
+                    'provider',
+                    'project',
+                    'service_account',
+                    'cost_product',
+                    'region',
+                ),
             ],
         },
     },

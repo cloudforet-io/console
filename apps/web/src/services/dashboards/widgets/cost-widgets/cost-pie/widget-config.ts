@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -18,19 +18,29 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
     options: {
         chart_type: CHART_TYPE.PIE,
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        ),
+    },
     options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
             'provider',
             'project',
             'service_account',
             'region',
             'cost_product',
         )],
-        fixed_properties: ['cost_group_by'],
+        fixed_properties: ['cost_data_source', 'cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
+                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'provider',
                     'project',
@@ -41,7 +51,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
                     'cost_usage_type',
                 ),
             },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
                 'service_account',

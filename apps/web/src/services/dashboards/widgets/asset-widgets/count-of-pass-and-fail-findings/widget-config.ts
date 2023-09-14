@@ -1,7 +1,10 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
@@ -26,8 +29,23 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
             page_size: 8,
         },
     },
+    inherit_options: {
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'region',
+            'asset_compliance_type',
+            'asset_account',
+        ),
+    },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'provider',
+            'project',
+            'region',
+            'asset_compliance_type',
+            'asset_account',
+        )],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',

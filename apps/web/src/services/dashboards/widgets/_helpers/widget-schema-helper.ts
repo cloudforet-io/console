@@ -3,7 +3,6 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type {
-    WidgetConfig,
     WidgetFilterKey,
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
@@ -65,14 +64,22 @@ export const getWidgetOptionsSchemaPropertyName = (property: WidgetOptionsSchema
     return property;
 };
 
-export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
+export const getWidgetInheritOptions = (...properties: WidgetOptionsSchemaProperty[]): InheritOptions => {
     const inheritOptions: InheritOptions = {};
-    const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
-    const fixedProperties = widgetConfig.options_schema?.fixed_properties ?? [];
-    defaultProperties.filter((d) => !fixedProperties.includes(d)).forEach((propertyName) => {
+    properties.forEach((propertyName) => {
         inheritOptions[propertyName] = {
             enabled: true,
-            variable_info: { key: propertyName.replace('filters.', '') },
+            variable_info: { key: propertyName },
+        };
+    });
+    return inheritOptions;
+};
+export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[]): InheritOptions => {
+    const inheritOptions: InheritOptions = {};
+    properties.forEach((propertyName) => {
+        inheritOptions[`filters.${propertyName}`] = {
+            enabled: true,
+            variable_info: { key: propertyName },
         };
     });
     return inheritOptions;
