@@ -11,7 +11,7 @@ export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
     state: () => ({
         loading: true,
         budgetData: null as BudgetModel|null,
-        budgetUsageData: null as BudgetUsageModel|null,
+        budgetUsageData: null as BudgetUsageModel[]|null,
     }),
     actions: {
         async getBudgetData(budgetId: string): Promise<void> {
