@@ -4,49 +4,38 @@ import { computed, reactive } from 'vue';
 import { PPaneLayout, PLink } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { store } from '@/store';
-
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
-import type { CostTypes, BudgetModel } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
+const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
 
-const getKeyOfCostType = (costType: CostTypes): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: CostTypes, costTypeKey: string) => costType[costTypeKey];
-
-const costTypeMap = {
-    region_code: 'Region',
-    service_account_id: 'Service Account',
-    provider: 'Provider',
-    product: 'Product',
-};
-
+const allReferenceStore = useAllReferenceStore();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    costTypeKey: computed(() => {
-        if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
-        return getKeyOfCostType(budgetPageState.budgetData.cost_types);
+    processedProviderValue: computed(() => {
+        const providerList = budgetPageState.budgetData?.provider_filter?.providers ?? [];
+        if (!budgetPageState.budgetData || !providerList.length) return [];
+        return changeToLabelList(providerList);
     }),
-    costTypeValue: computed(() => {
-        if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return [];
-        return getValueOfCostType(budgetPageState.budgetData.cost_types, state.costTypeKey);
-    }),
-    processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
     buttonRef: null as HTMLElement | null,
 });
 
@@ -59,8 +48,9 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
+        allReferenceStore.load('project'),
+        allReferenceStore.load('projectGroup'),
+        allReferenceStore.load('plugin'),
     ]);
 })();
 </script>
@@ -110,15 +100,11 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
-            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!budgetPageState.loading"
-                      class="text-gray-900 font-normal"
-                >{{ costTypeMap[state.costTypeKey] }}</span>
-            </span>
+            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PROVIDER') }}</span>
             <p v-if="!budgetPageState.loading"
                class="summary-content cost-type"
             >
-                <span class="cost-type-content">{{ state.processedCostTypeValue }}</span>
+                <span class="cost-type-content">{{ state.processedProviderValue }}</span>
             </p>
         </p-pane-layout>
     </section>
