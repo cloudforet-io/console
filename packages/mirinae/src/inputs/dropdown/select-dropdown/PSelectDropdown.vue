@@ -85,7 +85,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
 /* event emits */
 const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
     (e: 'update:search-text', searchText: string): void;
-    (e: 'update:selected', selected: SelectDropdownMenuItem[]): void;
+    (e: 'update:selected', selected: SelectDropdownMenuItem[]|string|number): void;
     (e: 'select', item: SelectDropdownMenuItem|number|string, isSelected: boolean): void;
     (e: 'delete-tag', item: SelectDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
@@ -97,9 +97,10 @@ const slots = useSlots();
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean>('visibleMenu', props, emit),
     proxySelectedItem: useProxyValue<SelectDropdownMenuItem[]|string|number>('selected', props, emit),
+    selectedIndex: typeof props.selected === 'number' ? props.selected : undefined,
     selectedItems: computed<SelectDropdownMenuItem[]>(() => {
-        if (!state.proxySelectedItem) return [];
-        if (props.indexMode) return props.menu[state.proxySelectedItem ?? ''] || null;
+        if (state.proxySelectedItem === undefined) return [];
+        if (props.indexMode) return [props.menu[state.selectedIndex || 0]];
         if (Array.isArray(state.proxySelectedItem)) return state.proxySelectedItem;
         return props.menu.filter((m) => m.name === state.proxySelectedItem);
     }),
@@ -181,7 +182,11 @@ const handleClickDropdownButton = () => {
 const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boolean) => {
     if (!props.multiSelectable) {
         hideMenu();
-        emit('select', item.name || '', isSelected);
+        if (!props.indexMode) {
+            emit('select', item.name || '', isSelected);
+        } else {
+            emit('select', state.selectedIndex, isSelected);
+        }
     } else {
         emit('select', item, isSelected);
     }
@@ -212,6 +217,7 @@ const updateSelected = (selected: SelectDropdownMenuItem[]) => {
     if (props.multiSelectable) {
         state.proxySelectedItem = selected;
     } else {
+        state.selectedIndex = props.menu.findIndex((data) => data.name === selected[0]?.name);
         state.proxySelectedItem = selected[0]?.name;
     }
 };
@@ -243,8 +249,8 @@ watch(() => props.disabled, (disabled) => {
 <template>
     <div ref="containerRef"
          :class="{
-             [props.styleType]: true,
              'p-select-dropdown': true,
+             [props.styleType]: true,
              'is-fixed-width': props.isFixedWidth,
          }"
     >
@@ -267,7 +273,15 @@ watch(() => props.disabled, (disabled) => {
                          @enter-key="handleEnterKey"
                          @click-delete="handleClickDelete"
                          @click-dropdown-button="handleClickDropdownButton"
-        />
+        >
+            <template v-for="(_, slot) of state.buttonSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`button-${slot}`"
+                      v-bind="scope"
+                />
+            </template>
+        </dropdown-button>
         <p-context-menu v-show="state.proxyVisibleMenu"
                         ref="menuRef"
                         :class="{
@@ -337,7 +351,8 @@ watch(() => props.disabled, (disabled) => {
     }
 
     &.is-fixed-width {
-        display: initial;
+        @apply relative inline-block;
+        width: 100%;
     }
 
     &.icon-button {

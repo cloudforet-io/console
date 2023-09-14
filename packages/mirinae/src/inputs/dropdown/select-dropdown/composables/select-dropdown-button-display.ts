@@ -5,14 +5,14 @@ import type { SelectDropdownAppearanceType, SelectDropdownMenuItem } from '@/inp
 
 interface UseDropdownButtonDisplay {
     multiSelectable: Ref<boolean|undefined>;
-    selected: Ref<SelectDropdownMenuItem[]>;
+    selected: Ref<SelectDropdownMenuItem[]|string|number>;
     appearanceType: Ref<SelectDropdownAppearanceType|undefined>;
 }
 export const useSelectDropdownButtonDisplay = ({
     multiSelectable, selected, appearanceType,
 }: UseDropdownButtonDisplay) => {
     const displayValueOnDropdownButton = computed(() => {
-        if (multiSelectable.value) {
+        if (multiSelectable.value && Array.isArray(selected.value)) {
             if (appearanceType.value === 'badge') {
                 if (selected.value[0]) return selected.value[0].label || selected.value[0].name;
                 return undefined;
@@ -31,7 +31,7 @@ export const useSelectDropdownButtonDisplay = ({
     });
     const showTagsOnDropdownButton = computed(() => multiSelectable.value && appearanceType.value === 'stack');
     const displayBadgeValueOnDropdownButton = computed(() => {
-        if (multiSelectable.value && appearanceType.value === 'badge') {
+        if (multiSelectable.value && appearanceType.value === 'badge' && Array.isArray(selected.value)) {
             if (selected.value.length > 1) return `+${selected.value.length - 1}`;
             return undefined;
         }
