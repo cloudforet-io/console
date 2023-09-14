@@ -1,11 +1,6 @@
 <script setup lang="ts">
-
-import { computed, reactive } from 'vue';
-
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-
-import { store } from '@/store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -17,10 +12,6 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     budgetData: () => ({}),
-});
-const state = reactive({
-    currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
 });
 const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 
@@ -36,12 +27,12 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                  class="total-wrapper"
             >
                 <p class="total-data">
-                    {{ currencyMoneyFormatter(props.budgetData.limit, state.currency, state.currencyRates, false, 1000000000) }}
+                    {{ currencyMoneyFormatter(props.budgetData.limit, props.budgetData?.currency, undefined, false, 1000000000) }}
                 </p>
             </div>
             <template v-else>
                 <div class="monthly-wrapper">
-                    <p v-for="{ date, limit } in props.budgetData.planned_limits"
+                    <p v-for="{ date, limit } in props.budgetData?.planned_limits"
                        :key="date"
                        class="monthly-data"
                     >
@@ -50,7 +41,7 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                                 {{ dateFormatter(date) }}
                             </span>
                             <br>
-                            <span>{{ currencyMoneyFormatter(limit, state.currency, state.currencyRates, false, 1000000000) }}</span>
+                            <span>{{ currencyMoneyFormatter(limit, props.budgetData?.currency, undefined, false, 1000000000) }}</span>
                         </span>
                     </p>
                 </div>
