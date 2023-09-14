@@ -277,6 +277,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
                         },
                     }),
                 },
+                sort: [{ key: '_total_cost_sum', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },
