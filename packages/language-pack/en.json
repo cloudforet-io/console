@@ -545,6 +545,7 @@
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
 				},
 				"HIDE_ALL": "Hide all",
+				"INVALID_PERIOD_TEXT": "No data found for previously selected period",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
 				"LABEL_COST_ANALYSIS_NAME": "Cost Analysis Name",
