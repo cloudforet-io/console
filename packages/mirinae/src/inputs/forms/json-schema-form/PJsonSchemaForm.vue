@@ -75,10 +75,9 @@
                             <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                                :key="`PSelectDropdown-${schemaProperty.propertyName}`"
                                                :selected="rawFormData[schemaProperty.propertyName]"
-                                               :items="schemaProperty.menuItems"
+                                               :menu="schemaProperty.menuItems"
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
-                                               :button-text-ellipsis="uniformWidth"
                                                is-fixed-width
                                                class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
@@ -322,7 +321,6 @@ export default defineComponent<JsonSchemaFormProps>({
         const initFormData = () => {
             if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
             else state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
-
             if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
         };
         const reset = () => {
@@ -331,7 +329,6 @@ export default defineComponent<JsonSchemaFormProps>({
             inputOccurredMap.value = {};
             jsonInputOccurred.value = false;
         };
-
 
         /* Event Handlers */
         // form input case

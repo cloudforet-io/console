@@ -26,23 +26,23 @@ export const Template = (args, { argTypes }) => {
         components: { PDatetimePicker },
         i18n: I18nConnector.i18n,
         template: `
-    <div class="h-full overflow p-8">
-        <p>select mode: {{ selectMode }}</p><br>
-        <p-datetime-picker
-            :selected-dates.sync="proxySelectedDates"
-            :style-type="styleType"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :select-mode="selectMode"
-            :data-type="dataType"
-            :invalid="invalid"
-            @update:selectedDates="onUpdateSelectedDates"
-            @close="onClose"
-        />
-        <br>
-        <p>Selected Dates: {{ proxySelectedDates }}</p>
-    </div>
-    `,
+            <div class="h-full overflow p-8">
+            <p>select mode: {{ selectMode }}</p><br>
+            <p-datetime-picker
+                :selected-dates.sync="proxySelectedDates"
+                :style-type="styleType"
+                :min-date="minDate"
+                :max-date="maxDate"
+                :select-mode="selectMode"
+                :data-type="dataType"
+                :invalid="invalid"
+                @update:selectedDates="onUpdateSelectedDates"
+                @close="onClose"
+            />
+            <br>
+            <p>Selected Dates: {{ proxySelectedDates }}</p>
+            </div>
+        `,
         setup(props, { emit }) {
             const state = reactive({
                 proxySelectedDates: useProxyValue('selectedDates', props, emit),
@@ -87,8 +87,8 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-        <p-datetime-picker />
-`,
+                <p-datetime-picker />
+            `,
         })}
     </Story>
 </Canvas>
@@ -103,21 +103,21 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-<table style="border-collapse: separate; border-spacing: 16px;">
-    <tr>
-        <td><p-datetime-picker invalid :selected-dates.sync="selectedDates" /></td>
-        <td><p-datetime-picker invalid style-type="text" :selected-dates.sync="selectedDates" /></td>
-    </tr>
-    <tr>
-        <td><p-datetime-picker invalid data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
-        <td><p-datetime-picker invalid data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
-    </tr>
-    <tr>
-        <td><p-datetime-picker invalid data-type="time" /></td>
-        <td><p-datetime-picker invalid data-type="time" style-type="text" /></td>
-    </tr>
-</table>
-`,
+                <table style="border-collapse: separate; border-spacing: 16px;">
+                <tr>
+                    <td><p-datetime-picker invalid :selected-dates.sync="selectedDates" /></td>
+                    <td><p-datetime-picker invalid style-type="text" :selected-dates.sync="selectedDates" /></td>
+                </tr>
+                <tr>
+                    <td><p-datetime-picker invalid data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+                    <td><p-datetime-picker invalid data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+                </tr>
+                <tr>
+                    <td><p-datetime-picker invalid data-type="time" /></td>
+                    <td><p-datetime-picker invalid data-type="time" style-type="text" /></td>
+                </tr>
+                </table>
+            `,
             setup() {
                 const state = reactive({
                     selectedDates: ['2021-10-01T00:00:00+09:00']
@@ -140,8 +140,8 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-        <p-datetime-picker data-type="yearToTime" />
-`,
+                <p-datetime-picker data-type="yearToTime" />
+            `,
         }}
     </Story>
 </Canvas>
@@ -157,40 +157,40 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker, PSelectDropdown },
             i18n: I18nConnector.i18n,
             template: `
-<div>
-    <p class="py-2">Select dataType.</p>
-    <p-select-dropdown v-model="selectedDataType" :items="menu"/>
-    <p class="py-2">Min Date = Today</p>
-    <p-datetime-picker v-model="start" :min-date="now" :data-type="selectedDataType" />
-    <p class="py-2">Max Date = Today</p>
-    <p-datetime-picker v-model="end" :max-date="now" :data-type="selectedDataType" />
-</div>
-`,
-    setup() {
-        const state = reactive({
-            menu: [
-                { name: 'yearToDate', label: 'yearToDate' },
-                { name: 'yearToMonth', label: 'yearToMonth' },
-            ],
-            selectedDataType: 'yearToDate',
-            start: [],
-            end: [],
-            now: computed(() => {
-                if (state.selectedDataType === 'yearToDate') {
-                    return dayjs.utc().format('YYYY-MM-DD')
+                <div>
+                <p class="py-2">Select dataType.</p>
+                <p-select-dropdown :selected="selectedDataType" :menu="menu"/>
+                <p class="py-2">Min Date = Today</p>
+                <p-datetime-picker v-model="start" :min-date="now" :data-type="selectedDataType" />
+                <p class="py-2">Max Date = Today</p>
+                <p-datetime-picker v-model="end" :max-date="now" :data-type="selectedDataType" />
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    menu: [
+                        { name: 'yearToDate', label: 'yearToDate' },
+                        { name: 'yearToMonth', label: 'yearToMonth' },
+                    ],
+                    selectedDataType: 'yearToDate',
+                    start: [],
+                    end: [],
+                    now: computed(() => {
+                        if (state.selectedDataType === 'yearToDate') {
+                            return dayjs.utc().format('YYYY-MM-DD')
+                        }
+                        return dayjs.utc().format('YYYY-MM')
+                    }),
+                })
+                watch(() => state.selectedDataType, () => {
+                    state.start = []
+                    state.end = []
+                })
+                return {
+                    ...toRefs(state)
                 }
-                return dayjs.utc().format('YYYY-MM')
-            }),
-        })
-        watch(() => state.selectedDataType, () => {
-            state.start = []
-            state.end = []
-        })
-        return {
-            ...toRefs(state)
-        }
-    }
-}}
+            }
+        }}
     </Story>
 </Canvas>
 
@@ -205,8 +205,8 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-        <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
-`,
+                <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
+            `,
             setup() {
                 const state = reactive({
                     selectedDates: ['2021-11-01T00:00:00Z', '2021-11-02T09:49:30Z'],
@@ -230,8 +230,8 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-        <p-datetime-picker select-mode="multiple" />
-`,
+                <p-datetime-picker select-mode="multiple" />
+            `,
         }}
     </Story>
 </Canvas>
@@ -247,11 +247,11 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-<div>
-    <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
-    <p class="pt-2">{{ selectedDates }}</p>
-</div>
-`,
+                <div>
+                <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
+                <p class="pt-2">{{ selectedDates }}</p>
+                </div>
+            `,
             setup() {
                 const state = reactive({
                     selectedDates: [
@@ -278,11 +278,11 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-<div>
-    <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
-    <p class="pt-2">{{ selectedDates }}</p>
-</div>
-`,
+                <div>
+                <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
+                <p class="pt-2">{{ selectedDates }}</p>
+                </div>
+            `,
             setup() {
                 const state = reactive({
                     selectedDates: [],
@@ -305,11 +305,11 @@ Please refer to the table below. <br/>
             components: { PDatetimePicker },
             i18n: I18nConnector.i18n,
             template: `
-<div>
-    <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />
-    <p class="pt-2">{{ selectedDates }}</p>
-</div>
-`,
+                <div>
+                <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />
+                <p class="pt-2">{{ selectedDates }}</p>
+                </div>
+            `,
             setup() {
                 const state = reactive({
                     selectedDates: [],

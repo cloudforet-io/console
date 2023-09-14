@@ -37,7 +37,8 @@
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :items="pageMenu"
+                                       :selected="pageSize"
+                                       :menu="pageMenu"
                                        @select="onChangePageSize"
                     >
                         {{ proxyState.pageSize }}
@@ -47,8 +48,8 @@
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :items="sortByOptions"
-                                       :sort-by="sortBy"
+                                       :selected="selectedSortBy"
+                                       :menu="sortByOptions"
                                        @select="onChangeSortBy"
                     >
                         {{ selectedSortBy }}
