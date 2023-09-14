@@ -6,6 +6,8 @@ import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { i18n } from '@/translations';
 
 
@@ -61,6 +63,15 @@ const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit)
     return (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((usdCost / totalBudgetLimit) * 100)}%`
         : `${Math.round((usdCost / monthlyLimit) * 100)}%`;
 };
+const getConvertedConsoleFilters = (budgetFilter: Record<string, string[]>): ConsoleFilter[] => {
+    const consoleFilters: ConsoleFilter[] = [];
+    Object.entries(budgetFilter).forEach(([k, v]) => {
+        if (v.length) {
+            consoleFilters.push({ k, v, o: '=' });
+        }
+    });
+    return consoleFilters;
+};
 
 const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, providers: Providers, budgetTarget: BudgetTarget) => {
     const costTypeFilters = {
@@ -84,10 +95,10 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: {
-                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                granularity: primitiveToQueryString(GRANULARITY.DAILY),
                 group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
                 period: objectToQueryString(period),
-                filters: objectToQueryString({ ...costTypeFilters, ...targetFilters }),
+                filters: objectToQueryString(getConvertedConsoleFilters({ ...costTypeFilters, ...targetFilters })),
             },
         };
         return {
