@@ -38,7 +38,7 @@ watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, is
 
 const getCurrencyFromDataSource = (dataSourceId: string) => {
     const dataSourceItem:DataSourceItems = allReferenceStore.getters.costDataSource[dataSourceId];
-    const currency = dataSourceItem.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
+    const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
     return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
 };
 
@@ -67,7 +67,7 @@ const fetchDataSource = async () => {
 
 (async () => {
     await fetchDataSource();
-    setForm('selectedDataSource', state.dataSourceItems[0]?.name);
+    if (state.dataSourceItems.length) setForm('selectedDataSource', state.dataSourceItems[0]?.name);
 })();
 
 </script>
@@ -85,19 +85,17 @@ const fetchDataSource = async () => {
                            @update:selected="setForm('selectedDataSource', $event)"
         >
             <template #default="{ item }">
-                <!--TODO: Currency should be changed to real data.-->
                 <div class="selected-input">
-                    <p-lazy-img :src="item.imageUrl"
+                    <p-lazy-img :src="item?.imageUrl"
                                 class="left-icon"
                                 width="1rem"
                                 height="1rem"
-                    /><span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item.name) }})</span>
+                    /><span>{{ item?.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item?.name) }})</span>
                 </div>
             </template>
             <template #menu-item--format="{item}">
                 <div class="menu-item">
-                    <!--TODO: Currency should be changed to real data.-->
-                    <span>{{ item.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item.name) }})</span>
+                    <span>{{ item?.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item?.name) }})</span>
                 </div>
             </template>
         </p-select-dropdown>
