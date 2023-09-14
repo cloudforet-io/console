@@ -6,6 +6,7 @@ import {
 
 import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -25,20 +26,16 @@ import { indigo, red, gray } from '@/styles/colors';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
-interface SubData {
-    date: string;
-    value: number;
-}
+
 interface Data {
-    spent: SubData[];
-    budget: SubData[];
-    _total_spent: number;
-    _total_budget: number;
+    date: string;
+    spent: number;
+    budget: number;
     budget_count: number;
 }
 
@@ -46,6 +43,7 @@ interface ChartData {
     date: string;
     spent: number;
     budget: number;
+    budget_count: number;
 }
 
 const props = defineProps<WidgetProps>();
@@ -64,60 +62,48 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as null|Data[],
-    chartData: computed<ChartData[]>(() => {
-        const data = state.data?.[0];
-        if (!data) return [];
-        return getRefinedXYChartData(state.data, {
-            arrayDataKey: ['spent', 'budget'],
-            categoryKey: 'date',
-            valueKey: 'value',
-            useDataKeyAsRefinedValue: true,
-        });
-    }),
+    chartData: computed<ChartData[]>(() => cloneDeep(state.data ?? [])),
     //
     noData: computed<boolean>(() => !state.data?.length),
-    recentSpentData: computed<SubData|undefined>(() => {
-        if (!state.data?.length) return undefined;
-        const recent = state.data?.[0].spent[state.data[0].spent.length - 1];
-        if (recent.date === widgetState.dateRange.end) return recent;
-        return {
-            date: widgetState.dateRange.end,
-            value: 0,
-        };
+    recentSpentData: computed<number>(() => {
+        if (!state.data?.length) return 0;
+        const recent = state.data[state.data.length - 1];
+        if (recent.date === widgetState.dateRange.end) return recent.spent;
+        return 0;
     }),
-    recentBudgetData: computed<SubData|undefined>(() => {
-        if (!state.data?.length) return undefined;
-        const recent = state.data[0].budget[state.data[0].budget.length - 1];
-        if (recent.date === widgetState.dateRange.end) return recent;
-        return {
-            date: widgetState.dateRange.end,
-            value: 0,
-        };
+    recentBudgetData: computed<number>(() => {
+        if (!state.data?.length) return 0;
+        const recent = state.data[state.data.length - 1];
+        if (recent.date === widgetState.dateRange.end) return recent.budget;
+        return 0;
     }),
 });
 
 const displayState = reactive({
     recentSpent: computed<number>(() => {
         if (!state.recentSpentData) return 0;
-        return state.recentSpentData.value;
+        return state.recentSpentData;
     }),
     recentBudget: computed<number>(() => {
         if (!state.recentBudgetData) return 0;
-        return state.recentBudgetData.value;
+        return state.recentBudgetData;
     }),
     recentBudgetLeft: computed<number>(() => {
         if (!state.recentSpentData || !state.recentBudgetData) return 0;
-        return state.recentBudgetData.value - state.recentSpentData.value;
+        return state.recentBudgetData - state.recentSpentData;
     }),
     isSpentOverBudget: computed<boolean>(() => {
         if (!state.recentSpentData || !state.recentBudgetData) return false;
-        return state.recentSpentData.value > state.recentBudgetData.value;
+        return state.recentSpentData > state.recentBudgetData;
     }),
     recentSpentRate: computed<number>(() => {
         if (!state.recentSpentData || !state.recentBudgetData) return 0;
-        return (state.recentSpentData.value / state.recentBudgetData.value) * 100;
+        return (state.recentSpentData / state.recentBudgetData) * 100;
     }),
-    budgetCount: computed<number>(() => state.data?.[0]?.budget_count ?? 0),
+    budgetCount: computed<number>(() => {
+        if (!state.data?.length) return 0;
+        return state.data[state.data.length - 1].budget_count ?? 0;
+    }),
     currencySymbol: computed<CurrencySymbol>(() => (widgetState.currency ? CURRENCY_SYMBOL[widgetState.currency] : CURRENCY_SYMBOL.USD)),
 });
 
@@ -151,6 +137,7 @@ const fetchData = async (): Promise<Data[]> => {
                         operator: 'count',
                     },
                 },
+                sort: [{ key: 'date', desc: false }],
                 ...apiQueryHelper.data,
             },
         });
