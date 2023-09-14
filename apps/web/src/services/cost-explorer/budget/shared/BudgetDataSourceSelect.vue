@@ -44,10 +44,6 @@ const getCurrencyFromDataSource = (dataSourceId: string) => {
 
 const fetchDataSource = async () => {
     try {
-        await Promise.allSettled([
-            allReferenceStore.load('plugin'),
-            allReferenceStore.load('costDataSource'),
-        ]);
         const dataSourceMap:CostDataSourceReferenceMap = await allReferenceStore.getters.costDataSource;
         const pluginList:PluginReferenceMap = await allReferenceStore.getters.plugin;
 
@@ -66,6 +62,10 @@ const fetchDataSource = async () => {
 };
 
 (async () => {
+    await Promise.allSettled([
+        allReferenceStore.load('plugin'),
+        allReferenceStore.load('costDataSource'),
+    ]);
     await fetchDataSource();
     if (state.dataSourceItems.length) setForm('selectedDataSource', state.dataSourceItems[0]?.name);
 })();
