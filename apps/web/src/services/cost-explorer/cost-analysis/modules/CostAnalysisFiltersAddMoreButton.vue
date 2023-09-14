@@ -74,7 +74,7 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
     if (_enabledFiltersProperties?.length) {
         state.selectedItems = state.menuItems.filter((d) => _enabledFiltersProperties.includes(d.name));
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
