@@ -124,6 +124,7 @@ const state = reactive({
     }),
     selectedPeriod: 'last6Month',
     customRangeModalVisible: false,
+    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
 });
 
 /* Util */
@@ -206,6 +207,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
     <div class="cost-analysis-period-select-dropdown">
         <p-select-dropdown :items="state.periodMenuItems"
                            :selected="state.selectedPeriod"
+                           :invalid="state.isPeriodInvalid"
                            @select="handleSelectPeriod"
         />
         <custom-date-range-modal :visible.sync="state.customRangeModalVisible"
