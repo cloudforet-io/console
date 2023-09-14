@@ -86,7 +86,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
 const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void;
     (e: 'update:search-text', searchText: string): void;
     (e: 'update:selected', selected: SelectDropdownMenuItem[]): void;
-    (e: 'select', item: SelectDropdownMenuItem, isSelected: boolean): void;
+    (e: 'select', item: SelectDropdownMenuItem|number|string, isSelected: boolean): void;
     (e: 'delete-tag', item: SelectDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
@@ -179,8 +179,12 @@ const handleClickDropdownButton = () => {
     else showMenu();
 };
 const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boolean) => {
-    if (!props.multiSelectable) hideMenu();
-    emit('select', item, isSelected);
+    if (!props.multiSelectable) {
+        hideMenu();
+        emit('select', item.name || '', isSelected);
+    } else {
+        emit('select', item, isSelected);
+    }
 };
 const handleClickShowMore = async () => {
     if (!props.disableHandler) {
