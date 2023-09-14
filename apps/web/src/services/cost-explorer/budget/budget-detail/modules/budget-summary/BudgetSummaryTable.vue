@@ -82,8 +82,8 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
     else if (budgetTarget.projectId) targetFilters = { project_id: [budgetTarget.projectId] };
     return accumulatedBudgetData.map((d) => {
         const period = {
-            start: dayjs.utc(d.date).startOf('month').format('YYYY-MM-DD'),
-            end: dayjs.utc(d.date).endOf('month').format('YYYY-MM-DD'),
+            start: dayjs.utc(d.date).format('YYYY-MM'),
+            end: dayjs.utc(d.date).format('YYYY-MM'),
         };
         const ratio = getBudgetRatio(budgetTimeUnit, d.cost, totalBudgetLimit, d.limit);
         // const ratio = (budgetTimeUnit === BUDGET_TIME_UNIT.TOTAL) ? `${Math.round((d.cost / totalBudgetLimit) * 100)}%`
@@ -128,7 +128,7 @@ const getEnrichedBudgetUsageData = (
 };
 
 const state = reactive({
-    budgetUsageData: computed<BudgetUsageModel|null>(() => budgetPageState.budgetUsageData),
+    budgetUsageData: computed<BudgetUsageModel[]|null>(() => budgetPageState.budgetUsageData),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     budgetTimeUnit: computed<BudgetTimeUnit>(() => state.budgetData?.time_unit),
     budgetPeriod: computed<Period>(() => ({
