@@ -71,7 +71,7 @@ watch(() => props.visible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :header-title="$t('Apply Custom Range')"
+    <p-button-modal :header-title="$t('DASHBOARDS.DETAIL.CUSTOM_DATE_MODAL_TITLE')"
                     centered
                     size="sm"
                     fade
@@ -83,7 +83,7 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <p-field-group class="period-select"
-                           :label="$t('Month')"
+                           :label="$t('DASHBOARDS.DETAIL.CUSTOM_DATE_MODAL_MONTH')"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
@@ -97,7 +97,7 @@ watch(() => props.visible, (visible) => {
             </p-field-group>
         </template>
         <template #confirm-button>
-            {{ $t('Apply') }}
+            {{ $t('DASHBOARDS.DETAIL.APPLY') }}
         </template>
     </p-button-modal>
 </template>
