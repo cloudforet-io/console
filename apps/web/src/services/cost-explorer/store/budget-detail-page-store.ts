@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { Currency } from '@/store/modules/settings/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { BudgetUsageModel, BudgetNotifications, BudgetModel } from '@/services/cost-explorer/budget/model';
@@ -13,6 +15,9 @@ export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
         budgetData: null as BudgetModel|null,
         budgetUsageData: null as BudgetUsageModel|null,
     }),
+    getters: {
+        currency: (): Currency => 'USD', // TODO: change logic after data source is ready
+    },
     actions: {
         async getBudgetData(budgetId: string): Promise<void> {
             this.loading = true;
