@@ -215,18 +215,21 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
+    const showUsageQuantity = costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE);
 
     const _results: CostAnalyzeRawData[] = cloneDeep(results);
     const refinedTableData: CostAnalyzeRawData[] = [];
+    const today = dayjs.utc();
     _results.forEach((d) => {
         let _costSum = cloneDeep(d.cost_sum);
         let _usageQuantitySum = cloneDeep(d?.usage_quantity_sum);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (now.isAfter(today, timeUnit)) break;
             if (!find(_costSum, { date: now.format(dateFormat) })) {
                 _costSum?.push({ date: now.format(dateFormat), value: 0 });
             }
-            if (!find(_usageQuantitySum, { date: now.format(dateFormat) })) {
+            if (showUsageQuantity && !find(_usageQuantitySum, { date: now.format(dateFormat) })) {
                 _usageQuantitySum?.push({ date: now.format(dateFormat), value: null });
             }
             now = now.add(1, timeUnit);
