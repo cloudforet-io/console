@@ -215,18 +215,21 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
+    const showUsageQuantity = costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE);
 
     const _results: CostAnalyzeRawData[] = cloneDeep(results);
     const refinedTableData: CostAnalyzeRawData[] = [];
+    const today = dayjs.utc();
     _results.forEach((d) => {
         let _costSum = cloneDeep(d.cost_sum);
         let _usageQuantitySum = cloneDeep(d?.usage_quantity_sum);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (now.isAfter(today, timeUnit)) break;
             if (!find(_costSum, { date: now.format(dateFormat) })) {
                 _costSum?.push({ date: now.format(dateFormat), value: 0 });
             }
-            if (!find(_usageQuantitySum, { date: now.format(dateFormat) })) {
+            if (showUsageQuantity && !find(_usageQuantitySum, { date: now.format(dateFormat) })) {
                 _usageQuantitySum?.push({ date: now.format(dateFormat), value: null });
             }
             now = now.add(1, timeUnit);
@@ -252,8 +255,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageStore.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        let dateFormat = 'YYYY-MM-DD';
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+        let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({

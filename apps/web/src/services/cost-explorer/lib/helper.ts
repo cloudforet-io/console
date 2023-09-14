@@ -13,14 +13,22 @@ export const getTimeUnitByGranularity = (granularity: Granularity): TimeUnit => 
     if (granularity === GRANULARITY.MONTHLY) return 'month';
     return 'day';
 };
+export const getPeriodByGranularity = (granularity: Granularity, period: Period): Period => {
+    if (granularity === GRANULARITY.DAILY) {
+        return {
+            start: dayjs.utc(period.start).startOf('month').format('YYYY-MM-DD'),
+            end: dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD'),
+        };
+    }
+    return period;
+};
 
 /* data table field */
 const getDataTableDateFields = (granularity: Granularity, period: Period): DataTableFieldType[] => {
     const dateFields: DataTableFieldType[] = [];
-    const start = dayjs.utc(period.start);
-    const end = dayjs.utc(period.end);
 
     const timeUnit = getTimeUnitByGranularity(granularity);
+    const _period = getPeriodByGranularity(granularity, period);
 
     let labelDateFormat = 'M/D';
     if (timeUnit === 'month') {
@@ -29,9 +37,11 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
         labelDateFormat = 'YYYY';
     }
 
-    let now = start;
+    const today = dayjs.utc();
+    let now = dayjs.utc(_period.start);
     let index = 0;
-    while (now.isSameOrBefore(end, timeUnit)) {
+    while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
+        if (now.isAfter(today, timeUnit)) break;
         dateFields.push({
             name: `cost_sum.${index}.value`,
             label: now.locale('en').format(labelDateFormat),
