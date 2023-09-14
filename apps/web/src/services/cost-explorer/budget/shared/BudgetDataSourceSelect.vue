@@ -48,10 +48,10 @@ const fetchDataSource = async () => {
             allReferenceStore.load('plugin'),
             allReferenceStore.load('costDataSource'),
         ]);
-        const dataSourceList:CostDataSourceReferenceMap = await allReferenceStore.getters.costDataSource;
+        const dataSourceMap:CostDataSourceReferenceMap = await allReferenceStore.getters.costDataSource;
         const pluginList:PluginReferenceMap = await allReferenceStore.getters.plugin;
 
-        const dataSourceItems: MenuItem[] = Object.entries(dataSourceList).map(([key, dataSource]) => ({
+        const dataSourceItems: MenuItem[] = Object.entries(dataSourceMap).map(([key, dataSource]) => ({
             name: key,
             label: dataSource.label,
             imageUrl: pluginList[dataSource.data.plugin_info.plugin_id]?.icon ? pluginList[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
