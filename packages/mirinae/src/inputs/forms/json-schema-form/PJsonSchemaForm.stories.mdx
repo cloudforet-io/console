@@ -200,7 +200,9 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
                 />
                 <div>
                     <p-select-dropdown class="mb-4"
-                                       :selected="language" :menu="languages" />
+                                       :selected="language"
+                                       :menu="languages"
+                    />
                     <p-text-editor :code="JSON.stringify(schema, null, 2)"
                                    mode="readOnly"
                                    folded

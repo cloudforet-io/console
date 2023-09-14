@@ -202,7 +202,6 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
-    console.log(selected);
     state.proxySelectedItem = selected;
 };
 const updateSearchText = debounce(async (searchText: string) => {
