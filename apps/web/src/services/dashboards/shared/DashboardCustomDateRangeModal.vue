@@ -8,6 +8,11 @@ import dayjs from 'dayjs';
 
 import type { Period } from '@/services/cost-explorer/type';
 
+interface DateOption {
+    minDate?: string;
+    maxDate?: string;
+}
+
 const props = withDefaults(defineProps<{
     visible: boolean;
     selectedDateRange?: Period;
@@ -25,6 +30,11 @@ const state = reactive({
     dateType: 'yearToMonth',
     invalid: computed(() => !state.selectedDates.length),
     selectedDates: [] as string[],
+    dateLimitSetting: computed<DateOption>(() => {
+        const minDate = dayjs.utc().subtract(3, 'year').format('YYYY-MM-DD');
+        const maxDate = dayjs.utc().format('YYYY-MM-DD');
+        return { minDate, maxDate };
+    }),
 });
 
 const handleUpdateVisible = (visible: boolean) => {
@@ -79,6 +89,8 @@ watch(() => props.visible, (visible) => {
                                    :data-type="state.dateType"
                                    :selected-dates="state.selectedDates"
                                    :invalid="state.invalid"
+                                   :min-date="state.dateLimitSetting.minDate"
+                                   :max-date="state.dateLimitSetting.maxDate"
                                    @update:selected-dates="handleUpdateSelectedDates"
                 />
             </p-field-group>
