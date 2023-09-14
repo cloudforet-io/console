@@ -13,8 +13,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
-import BudgetCostTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
 import type { CostTypes, BudgetModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
@@ -121,12 +119,6 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
                class="summary-content cost-type"
             >
                 <span class="cost-type-content">{{ state.processedCostTypeValue }}</span>
-                <budget-cost-type-popover
-                    :cost-type-key="state.costTypeKey"
-                    :cost-type-value="state.processedCostTypeValue"
-                >
-                    <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
-                </budget-cost-type-popover>
             </p>
         </p-pane-layout>
     </section>
