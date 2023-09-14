@@ -1352,11 +1352,14 @@
 			}
 		},
 		"DETAIL": {
+			"APPLY": "",
 			"AUTO": "自動",
 			"CLONE": "複製",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
+			"CUSTOM_DATE_MODAL_MONTH": "",
+			"CUSTOM_DATE_MODAL_TITLE": "",
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"EXPORT": "エクスポート",

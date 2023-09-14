@@ -1,42 +1,21 @@
 <template>
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
-            style-type="transparent"
             :items="monthMenuItems"
             :selected="selectedMonthMenuIndex"
             index-mode
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <div>
-                <span>{{ selectedMonthLabel }}</span>
-                <p-badge
-                    v-if="selectedMonthBadge"
-                    style-type="indigo100"
-                    badge-type="subtle"
-                    class="ml-1"
-                >
-                    {{ selectedMonthBadge }}
-                </p-badge>
-            </div>
+            <span>{{ selectedMonthLabel }}</span>
             <template #menu-item--format="{ item }">
-                <div>
-                    <span>{{ item.label }}</span>
-                    <p-badge
-                        v-if="item.badge"
-                        style-type="indigo100"
-                        badge-type="subtle"
-                        class="ml-1"
-                    >
-                        {{ item.badge }}
-                    </p-badge>
-                </div>
+                <span>{{ item.label }}</span>
             </template>
         </p-select-dropdown>
-        <custom-date-range-modal :visible.sync="customRangeModalVisible"
-                                 granularity="MONTHLY"
-                                 :selected-date-range="dateRange"
-                                 @confirm="handleCustomRangeModalConfirm"
+        <dashboard-custom-date-range-modal :visible.sync="customRangeModalVisible"
+                                           granularity="MONTHLY"
+                                           :selected-date-range="dateRange"
+                                           @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
@@ -47,7 +26,7 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
@@ -57,13 +36,12 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
+import DashboardCustomDateRangeModal from '@/services/dashboards/shared/DashboardCustomDateRangeModal.vue';
 
 export default defineComponent({
     name: 'DashboardDateDropdown',
     components: {
-        CustomDateRangeModal,
-        PBadge,
+        DashboardCustomDateRangeModal,
         PSelectDropdown,
     },
     props: {
@@ -91,7 +69,6 @@ export default defineComponent({
                     type: 'item',
                     name: 'current',
                     label: i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
-                    badge: i18n.t('DASHBOARDS.DETAIL.AUTO'),
                 },
                 ...state.getMonthMenuItem,
                 { type: 'divider' },
@@ -101,9 +78,12 @@ export default defineComponent({
                     label: i18n.t('DASHBOARDS.DETAIL.CUSTOM'),
                 },
             ])),
-            selectedMonthLabel: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.label),
-            selectedMonthBadge: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.badge),
-            selectedMonthName: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.name),
+            selectedMonthLabel: computed(() => {
+                if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom') {
+                    return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM-DD')).format('MMMM YYYY');
+                }
+                return state.monthMenuItems[state.selectedMonthMenuIndex]?.label;
+            }),
             selectedDateRange: {},
             selectedMonthMenuIndex: 0,
             customRangeModalVisible: false,
