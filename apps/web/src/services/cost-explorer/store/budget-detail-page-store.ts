@@ -16,14 +16,14 @@ const allReferenceStore = useAllReferenceStore();
 export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
     state: () => ({
         loading: true,
-        dataSourceId: undefined as string|undefined,
         budgetData: null as BudgetModel|null,
         budgetUsageData: null as BudgetUsageModel|null,
     }),
     getters: {
         currency: (state): Currency => {
-            if (state.dataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[state.dataSourceId];
+            const dataSourceId = state.budgetData?.data_source_id;
+            if (dataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[dataSourceId];
                 return targetDataSource?.data?.plugin_info?.metadata?.currency ?? CURRENCY.USD;
             }
             return CURRENCY.USD;
