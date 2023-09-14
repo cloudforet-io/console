@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SUMMARY') }}
             </div>
         </template>
-        <budget-summary-chart v-if="!props.budgetLoading" />
+        <budget-summary-chart :loading="props.budgetLoading" />
         <budget-summary-table v-if="!props.budgetLoading" />
     </p-card>
 </template>
