@@ -56,7 +56,7 @@ type Providers = BudgetModel['provider_filter']['providers'];
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
-const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
+const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, GRANULARITY.MONTHLY, period);
 
 const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit) => {
     if (totalBudgetLimit === 0 || monthlyLimit === 0) return '-';

@@ -18,6 +18,7 @@ import {
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import type { XYChartData } from '@/services/cost-explorer/cost-analysis/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 
@@ -38,10 +39,10 @@ const state = reactive({
     limitProperty: computed(() => ((budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
     chartData: computed<XYChartData[]>(() => {
         if (props.loading || !budgetPageState.budgetUsageData?.length) return [];
-        const accumulatedData = getStackedChartData(budgetPageState.budgetUsageData, {
+        const accumulatedData = getStackedChartData(budgetPageState.budgetUsageData, GRANULARITY.MONTHLY, {
             start: budgetPageState.budgetData?.start,
             end: budgetPageState.budgetData?.end,
-        }, 'month');
+        });
         if (budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) {
             accumulatedData.forEach((data) => {
                 data.total_limit = budgetPageState.budgetData?.limit;
