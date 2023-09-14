@@ -4,6 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PButtonModal, PFieldGroup, PDatetimePicker, useProxyValue,
 } from '@spaceone/design-system';
+import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 
 import type { Period } from '@/services/cost-explorer/type';
@@ -27,7 +28,7 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dateType: 'yearToMonth',
+    dateType: DATA_TYPE.yearToDate,
     invalid: computed(() => !state.selectedDates.length),
     selectedDates: [] as string[],
     dateLimitSetting: computed<DateOption>(() => {
