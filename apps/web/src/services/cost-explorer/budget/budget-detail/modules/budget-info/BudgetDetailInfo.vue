@@ -31,9 +31,9 @@ const state = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    processedProviderValue: computed(() => {
+    processedProviderValue: computed<string>(() => {
         const providerList = budgetPageState.budgetData?.provider_filter?.providers ?? [];
-        if (!budgetPageState.budgetData || !providerList.length) return [];
+        if (!budgetPageState.budgetData || !providerList.length) return '';
         return changeToLabelList(providerList);
     }),
     buttonRef: null as HTMLElement | null,
