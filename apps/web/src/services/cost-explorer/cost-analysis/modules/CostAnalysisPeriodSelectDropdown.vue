@@ -61,8 +61,8 @@ const state = reactive({
                 name: start.format('YYYY-MM'),
                 label: i18nDayjs.value(start).format('MMMM, YYYY'),
                 period: {
-                    start: start.format('YYYY-MM-DD'),
-                    end: end.format('YYYY-MM-DD'),
+                    start: start.format('YYYY-MM'),
+                    end: end.format('YYYY-MM'),
                 },
             };
         }))]),
