@@ -188,11 +188,10 @@ export default {
         };
 
         const saveCurrentStateToStore = () => {
-            let _dashboardTemplate;
+            let _dashboardTemplate: DashboardModel;
             if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
                 _dashboardTemplate = {
                     ...dashboardTemplate.value,
-                    dashboard_id: undefined,
                     project_id: dashboardProject.value?.id ?? '',
                     name: '',
                     viewers: state.dashboardViewerType,
@@ -200,7 +199,6 @@ export default {
             } else {
                 _dashboardTemplate = {
                     ...dashboardTemplate.value,
-                    dashboard_id: undefined,
                     name: '',
                     viewers: state.dashboardViewerType,
                 };

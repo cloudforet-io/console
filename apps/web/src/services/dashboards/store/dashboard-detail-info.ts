@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import {
     cloneDeep, isEmpty, isEqual,
 } from 'lodash';
-import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,10 +10,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
 
 import type {
-    DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
+    DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
@@ -50,25 +48,6 @@ export interface DashboardDetailInfoStoreState {
     // validation
     isNameValid?: boolean;
     widgetValidMap: WidgetValidMap;
-}
-type DashboardDetailInfoStoreGetters = _GettersTree<{
-    isProjectDashboard: boolean;
-    dashboardViewer: DashboardViewer;
-    isWidgetLayoutValid: boolean;
-    dashboardCurrency: Currency;
-}> & _GettersTree<DashboardDetailInfoStoreState>;
-interface DashboardDetailInfoStoreActions {
-    resetDashboardData: any;
-    setOriginDashboardName: any;
-    revertDashboardData: any;
-    setDashboardInfo: any;
-    getDashboardInfo: any;
-    toggleWidgetSize: any;
-    updateWidgetInfo: any;
-    deleteWidget: any;
-    resetVariables: any;
-    updateWidgetValidation: any;
-    convertDashboardInfoByChangedVariableSchema: any;
 }
 const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
@@ -109,8 +88,8 @@ const refineProjectDashboardVariables = (variables: DashboardVariables, projectI
     return _variables;
 };
 
-export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailInfoStoreState, DashboardDetailInfoStoreGetters, DashboardDetailInfoStoreActions>('dashboard-detail-info', {
-    state: () => ({
+export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', {
+    state: (): DashboardDetailInfoStoreState => ({
         dashboardInfo: null as DashboardModel|null,
         loadingDashboard: false,
         dashboardId: '',
@@ -163,6 +142,7 @@ export const useDashboardDetailInfoStore = defineStore<string, DashboardDetailIn
             if (this.dashboardInfo) this.dashboardInfo.name = name;
         },
         revertDashboardData() {
+            if (!this.dashboardInfo) return;
             this.setDashboardInfo(this.dashboardInfo);
         },
         setDashboardInfo(dashboardInfo?: DashboardModel) {
