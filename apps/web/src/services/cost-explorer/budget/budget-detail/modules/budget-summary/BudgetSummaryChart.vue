@@ -15,7 +15,6 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 
-import type { BudgetModel, BudgetUsageModel } from '@/services/cost-explorer/budget/model';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import { getStackedChartData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import type { XYChartData } from '@/services/cost-explorer/cost-analysis/type';
@@ -36,22 +35,20 @@ const budgetPageState = budgetPageStore.$state;
 const chartContext = ref<HTMLElement | null>(null);
 const state = reactive({
     chart: null as null | XYChart,
-    limitProperty: computed(() => ((state.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
+    limitProperty: computed(() => ((budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
     chartData: computed<XYChartData[]>(() => {
-        if (props.loading) return [];
-        const accumulatedData = getStackedChartData(state.budgetUsageData, {
-            start: state.budgetData?.start,
-            end: state.budgetData?.end,
+        if (props.loading || !budgetPageState.budgetUsageData?.length) return [];
+        const accumulatedData = getStackedChartData(budgetPageState.budgetUsageData, {
+            start: budgetPageState.budgetData?.start,
+            end: budgetPageState.budgetData?.end,
         }, 'month');
-        if (state.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) {
+        if (budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL) {
             accumulatedData.forEach((data) => {
-                data.total_limit = state.budgetData?.limit;
+                data.total_limit = budgetPageState.budgetData?.limit;
             });
         }
         return accumulatedData;
     }),
-    budgetUsageData: computed<BudgetUsageModel|null>(() => budgetPageState.budgetUsageData),
-    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
 });
 
 const makeMonthlyPlanningLineSeries = (chart: XYChart) => {
@@ -119,7 +116,7 @@ const drawChart = () => {
 
     // set tooltip
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSingleTooltipText(chart, tooltip, budgetPageStore.currency);
+    chartHelper.setXYSingleTooltipText(chart, tooltip, budgetPageState.budgetData?.currency);
     columnSeries.set('tooltip', tooltip);
 
     // set budget line series

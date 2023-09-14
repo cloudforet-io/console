@@ -2,33 +2,17 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { BudgetUsageModel, BudgetNotifications, BudgetModel } from '@/services/cost-explorer/budget/model';
 
 
-const allReferenceStore = useAllReferenceStore();
-
 export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
     state: () => ({
         loading: true,
         budgetData: null as BudgetModel|null,
-        budgetUsageData: null as BudgetUsageModel|null,
+        budgetUsageData: null as BudgetUsageModel[]|null,
     }),
-    getters: {
-        currency: (state): Currency => {
-            const dataSourceId = state.budgetData?.data_source_id;
-            if (dataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[dataSourceId];
-                return targetDataSource?.data?.plugin_info?.metadata?.currency ?? CURRENCY.USD;
-            }
-            return CURRENCY.USD;
-        },
-    },
     actions: {
         async getBudgetData(budgetId: string): Promise<void> {
             this.loading = true;
