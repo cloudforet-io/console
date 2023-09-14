@@ -8,7 +8,7 @@ import type {
     ChartData, Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type {
     Period, Granularity, GroupBy, CostAnalyzeResponse,
 } from '@/services/cost-explorer/type';
@@ -123,7 +123,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  */
 export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
     const chartData: XYChartData[] = [];
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
 
     let _groupBy: string | undefined = groupBy;

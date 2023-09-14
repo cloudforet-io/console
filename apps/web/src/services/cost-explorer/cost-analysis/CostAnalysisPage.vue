@@ -12,6 +12,7 @@ import {
     queryStringToString,
 } from '@/lib/router-query-string';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
@@ -33,7 +34,6 @@ const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQu
     granularity: queryStringToString(urlQuery.granularity) as Granularity,
     group_by: queryStringToArray(urlQuery.group_by),
     period: queryStringToObject(urlQuery.period),
-    relative_period: queryStringToObject(urlQuery.relative_period),
     filters: queryStringToObject(urlQuery.filters),
 });
 
@@ -45,7 +45,7 @@ onUnmounted(() => {
 watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
     if (selectedQuerySet) {
         await costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
-    } else if (route.params.costQuerySetId === 'dynamic') {
+    } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
         const currentQuery = SpaceRouter.router.currentRoute.query;
         const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
         await costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
