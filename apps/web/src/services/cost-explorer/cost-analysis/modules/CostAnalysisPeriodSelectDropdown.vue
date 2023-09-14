@@ -54,7 +54,7 @@ const state = reactive({
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
             relativePeriod: { unit: 'month', value: 1, include_today: false },
         },
-        ...(range(2, 12).map((i) => {
+        ...(range(12).map((i) => {
             const start = today.subtract(i, 'month').startOf('month');
             const end = today.subtract(i, 'month').endOf('month');
             return {
