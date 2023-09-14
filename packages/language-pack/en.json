@@ -1352,11 +1352,14 @@
 			}
 		},
 		"DETAIL": {
+			"APPLY": "Apply",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
 			"CUSTOMIZE": "Customize",
+			"CUSTOM_DATE_MODAL_MONTH": "Month",
+			"CUSTOM_DATE_MODAL_TITLE": "Apply Custom Range",
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"EXPORT": "Export",

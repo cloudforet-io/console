@@ -1352,11 +1352,14 @@
 			}
 		},
 		"DETAIL": {
+			"APPLY": "",
 			"AUTO": "자동",
 			"CLONE": "복제",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
 			"CUSTOMIZE": "편집",
+			"CUSTOM_DATE_MODAL_MONTH": "",
+			"CUSTOM_DATE_MODAL_TITLE": "",
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
 			"EXPORT": "파일 저장",
