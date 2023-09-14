@@ -98,7 +98,7 @@ const protocolFormatter = (val) => state.protocols[val]?.name || val;
             {{ protocolFormatter(value) }}
         </template>
         <template #col-data-format="{ index, item }">
-            <p v-if="item.secret_id.length > 0">
+            <p v-if="item.secret_id">
                 <!-- masking secret data -->
                 data: *******
             </p>

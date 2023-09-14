@@ -82,6 +82,9 @@ const handleThresholdInput = (idx, threshold?: string) => {
     else if (numberThreshold < 0) isValid = false;
     else isValid = !(state.notifications[idx]?.unit === BUDGET_NOTIFICATIONS_UNIT.PERCENT && numberThreshold > 100);
     state.thresholdValidations.splice(idx, 1, isValid);
+    const notifications = [...state.notifications];
+    notifications[idx].threshold = threshold;
+    state.notifications = notifications;
 };
 
 const setBudgetAlert = async () => {
@@ -97,6 +100,17 @@ const setBudgetAlert = async () => {
     } catch (e) {
         ErrorHandler.handleError(e);
     }
+};
+const handleUpdateNotificationType = (idx, type) => {
+    const notifications = [...state.notifications];
+    notifications[idx].notification_type = type;
+    state.notifications = notifications;
+};
+
+const handleUpdateUnit = (idx, unit) => {
+    const notifications = [...state.notifications];
+    notifications[idx].unit = unit;
+    state.notifications = notifications;
 };
 
 const handleConfirm = async () => {
@@ -152,13 +166,14 @@ const handleConfirm = async () => {
                     <div :key="`condition-${idx}`"
                          class="condition-input-wrapper"
                     >
-                        <p-select-dropdown v-model="condition.unit"
+                        <p-select-dropdown :selected="condition.unit"
                                            class="condition"
                                            :items="state.units"
                                            use-fixed-menu-style
+                                           @update:selected="handleUpdateUnit(idx, $event)"
                         />
                         <span class="align-middle">&gt;</span>
-                        <p-text-input v-model="condition.threshold"
+                        <p-text-input :value="condition.threshold"
                                       class="condition"
                                       type="number"
                                       :max="condition.unit === BUDGET_NOTIFICATIONS_UNIT.PERCENT ? 100 : undefined"
@@ -174,10 +189,11 @@ const handleConfirm = async () => {
                                 >%</span>
                             </template>
                         </p-text-input>
-                        <p-select-dropdown v-model="condition.notification_type"
+                        <p-select-dropdown :selected="condition.notification_type"
                                            class="condition"
                                            :items="state.types"
                                            use-fixed-menu-style
+                                           @update:selected="handleUpdateNotificationType(idx, $event)"
                         >
                             <span :class="{'text-alert': condition.notification_type === BUDGET_NOTIFICATIONS_TYPE.CRITICAL}">
                                 {{ state.types.find(d => d.name === condition.notification_type).label }}
