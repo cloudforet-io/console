@@ -51,6 +51,7 @@ interface SelectDropdownProps {
     showSelectHeader?: boolean;
     showSelectMarker?: boolean;
     menuPosition?: ContextMenuPosition;
+    indexMode?: boolean;
 
     /* others */
     handler?: AutocompleteHandler;
@@ -74,6 +75,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     loading: false,
     searchText: '',
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
+    indexMode: false,
     /* others */
     handler: undefined,
     pageSize: undefined,
@@ -97,6 +99,7 @@ const state = reactive({
     proxySelectedItem: useProxyValue<SelectDropdownMenuItem[]|string|number>('selected', props, emit),
     selectedItems: computed<SelectDropdownMenuItem[]>(() => {
         if (!state.proxySelectedItem) return [];
+        if (props.indexMode) return props.menu[state.proxySelectedItem ?? ''] || null;
         if (Array.isArray(state.proxySelectedItem)) return state.proxySelectedItem;
         return props.menu.filter((m) => m.name === state.proxySelectedItem);
     }),
@@ -202,7 +205,11 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
-    state.proxySelectedItem = selected;
+    if (props.multiSelectable) {
+        state.proxySelectedItem = selected;
+    } else {
+        state.proxySelectedItem = selected[0]?.name;
+    }
 };
 const updateSearchText = debounce(async (searchText: string) => {
     state.proxySearchText = searchText;

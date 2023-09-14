@@ -283,6 +283,24 @@ const extraArgTypes: ArgTypes = {
             options: [...Object.values(CONTEXT_MENU_POSITION)],
         },
     },
+    indexMode: {
+        name: 'indexMode',
+        type: { name: 'boolean' },
+        description: 'Whether to `selected` props works with item\'s index or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     handler: {
         name: 'handler',
         type: { name: 'function' },
