@@ -28,15 +28,15 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { CostType, BudgetModel } from '@/services/cost-explorer/budget/model';
 
-type CostTypes = BudgetModel['cost_types'];
+type ProviderFilter = BudgetModel['provider_filter'];
 type BudgetCostType = 'all'| CostType;
 
 interface Props {
-    costTypes?: CostTypes;
+    costTypes?: ProviderFilter;
     disableValidation?: boolean;
 }
 
-type BudgetCostTypes = Record<BudgetCostType, TranslateResult>;
+type BudgetProviderFilter = Record<BudgetCostType, TranslateResult>;
 interface DistinctResult {
     results?: {name: string; key: string}[];
     total_count?: number;
@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
     disableValidation: false,
 });
 
-const emit = defineEmits<{(e: 'update', costTypeInfo: CostTypes|undefined, isValid: boolean): void; }>();
+const emit = defineEmits<{(e: 'update', providerFilter: ProviderFilter|undefined, isValid: boolean): void; }>();
 
 const {
     forms: {
@@ -75,20 +75,19 @@ const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-    costTypeItems: computed<BudgetCostTypes>(() => ({
+    costTypeItems: computed<BudgetProviderFilter>(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
     })),
     resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
     visibleResourceMenu: false,
-    costTypeInfo: computed<CostTypes|undefined>(() => {
-        if (selectedCostType.value === 'all') return undefined;
-
-        const resources = selectedResources.value.map((d) => d.name as string);
-        if (resources.length === 0) return undefined;
-
-        return { [selectedCostType.value as CostType]: resources };
+    costTypeInfo: computed<ProviderFilter|undefined>(() => {
+        const providers = selectedResources.value.map((d) => d.name as string);
+        return {
+            state: selectedCostType.value === 'all' ? 'DISABLED' : 'ENABLED',
+            providers,
+        };
     }),
 });
 

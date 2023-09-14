@@ -3,6 +3,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
@@ -22,6 +23,7 @@ import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/shared/budg
 import BudgetFormBaseInfo from '@/services/cost-explorer/budget/shared/budget-form/BudgetFormBaseInfo.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
+const router = useRouter();
 
 const state = reactive({
     baseInfo: {} as BudgetBaseInfo,
@@ -43,7 +45,7 @@ const createBudget = async () => {
         });
 
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-        SpaceRouter.router.push({
+        router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
     } catch (e) {
