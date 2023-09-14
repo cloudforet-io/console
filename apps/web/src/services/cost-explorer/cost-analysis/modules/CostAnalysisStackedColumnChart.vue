@@ -75,7 +75,7 @@ const drawChart = () => {
     // get stacked chart data of daily chart
     let _chartData = cloneDeep(props.chartData);
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
-        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.period ?? {}, timeUnit);
+        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     }
 
     props.legends.forEach((legend) => {

@@ -62,8 +62,7 @@ const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
-        let dateFormat = 'YYYY-MM-DD';
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
+        let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
