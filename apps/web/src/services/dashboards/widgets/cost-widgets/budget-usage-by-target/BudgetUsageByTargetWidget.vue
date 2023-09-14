@@ -93,12 +93,10 @@ const fetchData = async (): Promise<Data> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
-        const groupBy = widgetState.groupBy ?? '';
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: widgetState.granularity,
-                group_by: [groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                group_by: [COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -112,7 +110,6 @@ const fetchData = async (): Promise<Data> => {
                     },
                 },
                 select: {
-                    [groupBy]: groupBy,
                     [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
                     [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
                     total_spent: 'total_spent',
