@@ -11,7 +11,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { BudgetNotifications } from '@/services/cost-explorer/budget/model';
+import type { BudgetNotification } from '@/services/cost-explorer/budget/model';
 import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/cost-explorer/budget/model';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
@@ -33,7 +33,7 @@ const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    notifications: (budgetPageState.budgetData?.notifications ?? []) as BudgetNotifications[],
+    notifications: (budgetPageState.budgetData?.notifications ?? []) as BudgetNotification[],
     units: computed(() => ([
         {
             name: BUDGET_NOTIFICATIONS_UNIT.ACTUAL_COST,
@@ -86,7 +86,7 @@ const handleThresholdInput = (idx, threshold?: string) => {
 
 const setBudgetAlert = async () => {
     try {
-        state.notifications = state.notifications.map((notification:BudgetNotifications) => ({
+        state.notifications = state.notifications.map((notification:BudgetNotification) => ({
             ...notification,
             threshold: Number(notification.threshold),
         }));

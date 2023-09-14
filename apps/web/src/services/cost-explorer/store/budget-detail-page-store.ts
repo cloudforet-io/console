@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { BudgetUsageModel, BudgetNotifications, BudgetModel } from '@/services/cost-explorer/budget/model';
+import type { BudgetUsageModel, BudgetNotification, BudgetModel } from '@/services/cost-explorer/budget/model';
 
 
 export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
@@ -36,7 +36,7 @@ export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
                 ErrorHandler.handleRequestError(e, '');
             }
         },
-        async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetNotifications[] }): Promise<void> {
+        async updateBudgetNotifications(params: { budgetId: string; notifications: BudgetNotification[] }): Promise<void> {
             try {
                 this.budgetData = await SpaceConnector.clientV2.costAnalysis.budget.setNotification({
                     notifications: params.notifications,
