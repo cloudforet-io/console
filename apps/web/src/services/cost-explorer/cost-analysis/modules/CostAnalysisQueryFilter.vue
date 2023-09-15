@@ -66,6 +66,8 @@ const state = reactive({
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
+    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
+    invalidPeriodMessage: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
 });
 
 const {
@@ -185,6 +187,11 @@ const handleClickFilter = () => {
                 </template>
             </div>
         </div>
+        <div v-if="state.isPeriodInvalid"
+             class="invalid-text"
+        >
+            {{ state.invalidPeriodMessage }}
+        </div>
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
                                         :request-type="REQUEST_TYPE.SAVE"
@@ -242,6 +249,10 @@ const handleClickFilter = () => {
         .filters-popper {
             width: 100%;
         }
+    }
+    .invalid-text {
+        @apply text-red-400 text-label-md;
+        margin-top: 0.5rem;
     }
 }
 </style>

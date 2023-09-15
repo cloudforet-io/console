@@ -545,6 +545,7 @@
 					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
 				},
 				"HIDE_ALL": "전체 숨김",
+				"INVALID_PERIOD_TEXT": "",
 				"KEEP_MY_SETTING": "위의 설정을 내 설정사항으로 유지",
 				"LABEL_ADDITIONAL_FIELD": "추가 필드",
 				"LABEL_COST_ANALYSIS_NAME": "비용 분석 이름 ",
