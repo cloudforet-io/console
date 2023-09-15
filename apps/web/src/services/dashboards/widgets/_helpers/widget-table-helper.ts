@@ -5,7 +5,7 @@ import { sortArrayInObjectArray } from '@cloudforet/core-lib';
 
 import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
 
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
@@ -26,7 +26,7 @@ export const getWidgetTableDateFields = (
     const start = dayjs.utc(dateRange.start);
     const end = dayjs.utc(dateRange.end);
 
-    const timeUnit = getTimeUnitByPeriod(granularity, start, end);
+    const timeUnit = getTimeUnitByGranularity(granularity);
     let labelDateFormat = 'M/D';
     if (timeUnit === 'month') {
         labelDateFormat = 'MMM';
@@ -59,32 +59,38 @@ interface RawData {
  * @example (after) [{ date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }, { date: '2023-01' }]
  */
 export const getRefinedDateTableData = <Data extends RawData = RawData>(
-    results: Data[],
+    targetData: Data[],
     dateRange: DateRange,
-    fieldKey = 'cost_sum',
+    fieldKey:string|string[] = 'cost_sum',
+    dateKey = 'date',
+    additionalData = {},
 ): Data[] => {
-    if (!results?.length) return [];
-    return results.map((result) => {
-        const fieldData = result[fieldKey];
-        if (!Array.isArray(fieldData)) return result;
-        return {
-            ...result,
-            [fieldKey]: fillEmptyDateToFieldData<Data>(fieldData, dateRange),
-        };
+    if (!targetData?.length) return [];
+    const fieldKeys = typeof fieldKey === 'string' ? [fieldKey] : fieldKey;
+    return targetData.map((result) => {
+        const refined: any = { ...result };
+        fieldKeys.forEach((key) => {
+            const fieldData = result[key];
+            if (!Array.isArray(fieldData)) return;
+            refined[key] = fillEmptyDateToObjectArray(fieldData, dateRange, dateKey, additionalData);
+        });
+        return refined;
     });
 };
-const fillEmptyDateToFieldData = <Data extends RawData = RawData>(fieldData: Data[], dateRange: DateRange): Data[] => {
+export const fillEmptyDateToObjectArray = <Data extends RawData = RawData>(fieldData: Data[], dateRange: DateRange, dateKey: string, additionalData = {},
+): Data[] => {
     const _fieldData = cloneDeep(fieldData);
-    let now = dayjs.utc(dateRange.start).clone();
-    while (now.isSameOrBefore(dayjs.utc(dateRange.end), 'month')) {
-        const _date = now.format('YYYY-MM');
+    let start = dayjs.utc(dateRange.start).clone();
+    while (start.isSameOrBefore(dayjs.utc(dateRange.end), 'month')) {
+        const _date = start.format('YYYY-MM');
         if (!_fieldData.find((d) => d.date === _date)) {
-            _fieldData.push({ date: _date } as RawData as Data);
+            _fieldData.push({ ...additionalData, [dateKey]: _date } as RawData as Data);
         }
-        now = now.add(1, 'month');
+        start = start.add(1, 'month');
     }
-    return sortBy(_fieldData, 'date');
+    return sortBy(_fieldData, dateKey);
 };
+
 
 // TODO: remove this after refactoring
 export const sortTableData = <Data extends RawData = RawData>(

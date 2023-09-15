@@ -73,11 +73,12 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         },
         renderer: xRenderer,
         dateFormats: {
-            day: 'M/dd',
+            day: 'M/d',
             month: 'MMM',
             year: 'yyyy',
         },
         periodChangeDateFormats: {
+            day: 'M/d',
             month: 'MMM',
         },
         ...dateAxisSettings,
@@ -282,7 +283,7 @@ export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     let strokeColor;
     let fieldName;
     chart.series.each((series) => {
-        strokeColor = series.get('stroke')?.toString();
+        strokeColor = series.get('stroke')?.toString() ?? series.get('fill')?.toString();
         fieldName = series.get('valueYField') || '';
     });
     tooltip.label.setAll({

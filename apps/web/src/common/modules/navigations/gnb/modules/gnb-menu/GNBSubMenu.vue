@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { PI, PTooltip } from '@spaceone/design-system';
 import {
-    ref, useSlots,
+    ref,
 } from 'vue';
 import type { RouteLocationNormalized } from 'vue-router';
-
 
 import type { HighlightTagType } from '@/store/modules/display/type';
 
@@ -31,8 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
     higlightTag: undefined,
 });
 const emit = defineEmits<{(e: 'navigate'): void}>();
-const slots = useSlots();
-
 const labelRef = ref<HTMLElement|null>(null);
 
 const isEllipsisActive = () => {
@@ -49,43 +46,44 @@ const handleClickAnchor = (navigateFn, event: Event) => {
 </script>
 
 <template>
-    <p-tooltip v-if="show"
-               :contents="isEllipsisActive() ? label : undefined"
+    <p-tooltip v-if="props.show"
+               :contents="isEllipsisActive() ? props.label : undefined"
                position="bottom"
     >
-        <router-link v-slot="{ href: toHref, navigate }"
+        <router-link class="gnb-sub-menu"
                      :to="href ? {} : to"
-                     :href="href"
                      custom
         >
-            <span class="gnb-sub-menu">
-                <a class="gnb-sub-contents"
-                   :href="href ? href : toHref"
-                   :target="href ? '_blank' : undefined"
-                   @click.stop="handleClickAnchor(navigate, $event)"
-                >
-                    <div class="contents-left"
-                         :class="{ 'is-exist-extra-mark': slots['extra-mark'] }"
+            <template #default="{href: toHref, navigate}">
+                <span>
+                    <a class="gnb-sub-contents"
+                       :href="href ? href : toHref"
+                       :target="href ? '_blank' : undefined"
+                       @click.stop="handleClickAnchor(navigate, $event)"
                     >
-                        <p-i v-if="isDraggable"
-                             name="ic_drag-handle"
-                             width="1rem"
-                             height="1rem"
-                             class="drag-icon"
-                        />
-                        <div ref="labelRef"
-                             class="label"
+                        <div class="contents-left"
+                             :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
                         >
-                            {{ label }}
+                            <p-i v-if="props.isDraggable"
+                                 name="ic_drag-handle"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="drag-icon"
+                            />
+                            <div ref="labelRef"
+                                 class="label"
+                            >
+                                {{ label }}
+                            </div>
+                            <beta-mark v-if="props.higlightTag === 'beta'" />
+                            <new-mark v-else-if="props.higlightTag === 'new'" />
                         </div>
-                        <beta-mark v-if="higlightTag === 'beta'" />
-                        <new-mark v-else-if="higlightTag === 'new'" />
-                    </div>
-                    <div class="contents-right">
-                        <slot name="extra-mark" />
-                    </div>
-                </a>
-            </span>
+                        <div class="contents-right">
+                            <slot name="extra-mark" />
+                        </div>
+                    </a>
+                </span>
+            </template>
         </router-link>
     </p-tooltip>
 </template>

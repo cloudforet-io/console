@@ -1,4 +1,7 @@
 <script setup lang="ts">
+
+import { onClickOutside } from '@vueuse/core';
+import { groupBy, reduce } from 'lodash';
 import {
     computed,
     reactive,
@@ -7,9 +10,6 @@ import {
     ref,
     useSlots,
 } from 'vue';
-
-import { onClickOutside } from '@vueuse/core';
-import { groupBy, reduce } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useProxyValue } from '@/hooks';
@@ -177,7 +177,7 @@ const handlePressDownKey = () => {
                     {{
                         state.selectedItem ?
                             (state.selectedItem.label || state.selectedItem.name || '') :
-                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
+                            (placeholder || t('COMPONENT.SELECT_DROPDOWN.SELECT'))
                     }}
                 </slot>
             </span>

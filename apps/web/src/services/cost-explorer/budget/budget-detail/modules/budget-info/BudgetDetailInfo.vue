@@ -1,67 +1,43 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+
 import { PPaneLayout, PLink } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { computed, reactive } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
-import BudgetCostTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { CostTypes } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
+const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
 
-const getKeyOfCostType = (costType: CostTypes): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: CostTypes, costTypeKey: string) => costType[costTypeKey];
+const allReferenceStore = useAllReferenceStore();
 
-const costTypeMap = {
-    region_code: 'Region',
-    service_account_id: 'Service Account',
-    provider: 'Provider',
-    product: 'Product',
-};
-
-interface Props {
-    currency: Currency;
-    currencyRates: CurrencyRates;
-}
-
-withDefaults(defineProps<Props>(), {
-    currency: CURRENCY.USD,
-    currencyRates: () => ({}) as CurrencyRates,
-});
-const store = useStore();
-const { t } = useI18n();
-
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    costTypeKey: computed(() => {
-        if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
-        return getKeyOfCostType(budgetPageState.budgetData.cost_types);
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
+    processedProviderValue: computed<string>(() => {
+        if (!budgetPageState.budgetData) return '';
+        const providerFilter = budgetPageState.budgetData?.provider_filter;
+        if (providerFilter?.state === 'DISABLED') return 'All';
+        return changeToLabelList(providerFilter?.providers ?? []);
     }),
-    costTypeValue: computed(() => {
-        if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return [];
-        return getValueOfCostType(budgetPageState.budgetData.cost_types, state.costTypeKey);
-    }),
-    processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
     buttonRef: null as HTMLElement | null,
-    balloonVisible: false,
 });
 
 const getTargetLabel = (projects: ProjectReferenceMap) => {
@@ -73,11 +49,11 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
+        allReferenceStore.load('project'),
+        allReferenceStore.load('projectGroup'),
+        allReferenceStore.load('plugin'),
     ]);
 })();
-
 </script>
 
 <template>
@@ -91,18 +67,18 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <div v-if="!budgetPageState.loading"
                  class="flex justify-between"
             >
-                <p v-if="budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                <p v-if="state.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
                    class="summary-content"
                 >
-                    <b>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <p v-else
                    class="summary-content"
                 >
-                    <b>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content"
-                                              :budget-data="budgetPageState.budgetData"
+                                              :budget-data="state.budgetData"
                 >
                     <span class="view-all">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
@@ -113,33 +89,23 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
             <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                <p-link v-if="state.budgetData?.project_group_id || state.budgetData?.project_id"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         :to="referenceRouter(
-                            (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
-                            { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                            (state.budgetData?.project_id || state.budgetData?.project_group_id) ?? '',
+                            { resource_type: state.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ getTargetLabel(projects) }}
+                    {{ getTargetLabel(state.projects) }}
                 </p-link>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
-            <span class="summary-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!budgetPageState.loading"
-                      class="text-gray-900 font-normal"
-                >{{ costTypeMap[costTypeKey] }}</span>
-            </span>
+            <span class="summary-title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PROVIDER') }}</span>
             <p v-if="!budgetPageState.loading"
                class="summary-content cost-type"
             >
-                <span class="cost-type-content">{{ processedCostTypeValue }}</span>
-                <budget-cost-type-popover
-                    :cost-type-key="costTypeKey"
-                    :cost-type-value="processedCostTypeValue"
-                >
-                    <span class="view-all">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
-                </budget-cost-type-popover>
+                <span class="cost-type-content">{{ state.processedProviderValue }}</span>
             </p>
         </p-pane-layout>
     </section>

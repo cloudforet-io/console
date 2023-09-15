@@ -22,7 +22,7 @@ declare module 'vue-router' {
     import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
     interface RouteLabelFormatter {
-        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string;
+        (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string|string[];
     }
     interface RouteTranslationIdFormatter {
         (route: _RouteLocationBase | RouteLocationNormalizedLoaded): string|string[];

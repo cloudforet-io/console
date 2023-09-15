@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -7,10 +8,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButtonModal, PI, PLink, PToolboxTable,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PDivider,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
+import { cloneDeep, find, sortBy } from 'lodash';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { LocationQueryRaw } from 'vue-router';
@@ -24,19 +26,18 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { getRefinedChartTableData } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import { getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getDataTableCostFields, getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { CostAnalyzeResponse } from '@/services/cost-explorer/type';
+import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/type';
 
 
 type CostAnalyzeRawData = {
@@ -45,7 +46,13 @@ type CostAnalyzeRawData = {
         date: string;
         value: number
     }>;
+    usage_quantity_sum?: Array<{
+        date: string;
+        value: number|null;
+    }>;
+    usage_unit?: string;
     _total_cost_sum?: number;
+    _total_usage_quantity_sum?: number;
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -56,7 +63,7 @@ const store = useStore();
 
 const state = reactive({
     component: computed(() => PToolboxTable),
-    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period?.start), dayjs.utc(costAnalysisPageState.period?.end))),
+    timeUnit: computed(() => getTimeUnitByGranularity(costAnalysisPageState.granularity)),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) return 'YYYY';
@@ -79,6 +86,8 @@ const state = reactive({
         [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
     })),
     visibleExcelNotiModal: false,
+    isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE)),
+
 });
 const tableState = reactive({
     loading: true,
@@ -106,7 +115,7 @@ const tableState = reactive({
             };
         }
         return {
-            name: d.replace('.', '_'), // tags.Name -> tags_Name
+            name: d.split('.')[1], // tags.Name -> Name
             label: d.split('.')[1], // tags.Name -> Name
             sortable: false,
         };
@@ -114,6 +123,8 @@ const tableState = reactive({
     costFields: [] as DataTableFieldType[],
     fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
     items: [] as CostAnalyzeRawData[],
+    thisPage: 1,
+    pageSize: 15,
     more: false,
 });
 
@@ -202,19 +213,57 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     return '';
 };
 
+const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
+    const timeUnit = getTimeUnitByGranularity(granularity);
+    const dateFormat = DATE_FORMAT[timeUnit];
+    const showUsageQuantity = costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE);
+
+    const _results: CostAnalyzeRawData[] = cloneDeep(results);
+    const refinedTableData: CostAnalyzeRawData[] = [];
+    const today = dayjs.utc();
+    _results.forEach((d) => {
+        let _costSum = cloneDeep(d.cost_sum);
+        let _usageQuantitySum = cloneDeep(d?.usage_quantity_sum);
+        let now = dayjs.utc(period.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (now.isAfter(today, timeUnit)) break;
+            if (!find(_costSum, { date: now.format(dateFormat) })) {
+                _costSum?.push({ date: now.format(dateFormat), value: 0 });
+            }
+            if (showUsageQuantity && !find(_usageQuantitySum, { date: now.format(dateFormat) })) {
+                _usageQuantitySum?.push({ date: now.format(dateFormat), value: null });
+            }
+            now = now.add(1, timeUnit);
+        }
+        _costSum = sortBy(_costSum, ['date']);
+        _usageQuantitySum = sortBy(_usageQuantitySum, ['date']);
+        refinedTableData.push({
+            ...d,
+            cost_sum: _costSum,
+            ...(state.isIncludedUsageTypeInGroupBy && { usage_quantity_sum: _usageQuantitySum }),
+        });
+    });
+    return refinedTableData;
+};
+
+
 /* api */
 const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
-        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        analyzeApiQueryHelper
+            .setFilters(costAnalysisPageStore.consoleFilters)
+            .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
+        let dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
+        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
-                group_by: costAnalysisPageState.groupBy,
+                group_by: groupBy,
                 start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
                 end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
                 fields: {
@@ -222,9 +271,15 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
                         key: 'cost',
                         operator: 'sum',
                     },
+                    ...(state.isIncludedUsageTypeInGroupBy && {
+                        usage_quantity_sum: {
+                            key: 'usage_quantity',
+                            operator: 'sum',
+                        },
+                    }),
                 },
-                field_group: ['date'],
                 sort: [{ key: '_total_cost_sum', desc: true }],
+                field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },
         });
@@ -238,11 +293,21 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
     }
 };
 
+const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
+    const dateIndex = Number(fieldName.split('.')[1]);
+    const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
+    if (!usageQuantity) return '--';
+    if (item.usage_unit === 'Bytes') {
+        return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
+    }
+    return numberFormatter(usageQuantity);
+};
+
 /* event */
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
-    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
 const handleExcelDownload = async () => {
@@ -273,6 +338,11 @@ const handleExcelDownload = async () => {
 const handleExport = async () => {
     await handleExcelDownload();
 };
+const handleUpdateThisPage = async () => {
+    const { results, more } = await listCostAnalysisTableData();
+    tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    tableState.more = more;
+};
 
 watch(
     [
@@ -280,10 +350,12 @@ watch(
         () => costAnalysisPageStore.selectedDataSourceId,
         () => costAnalysisPageStore.selectedQueryId,
     ],
-    async () => {
+    async ([, selectedDataSourceId]) => {
+        if (!selectedDataSourceId) return;
+        tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
-            tableState.items = getRefinedChartTableData<CostAnalyzeRawData>(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+            tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more;
             tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
         }
@@ -304,78 +376,101 @@ watch(
 </script>
 
 <template>
-    <p-toolbox-table class="cost-analysis-data-table"
-                     :loading="tableState.loading"
-                     :fields="tableState.fields"
-                     :items="tableState.items"
-                     :searchable="false"
-                     row-height-fixed
-                     exportable
-                     @change="handleChange"
-                     @refresh="handleChange()"
-                     @export="handleExport"
-    >
-        <template #th-format="{field}">
-            {{ field.label }}
-            <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
-        </template>
-        <template #col-format="{field, value, item}">
-            <span v-if="tableState.loading" />
-            <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
-                Unknown
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROJECT">
-                {{ state.projects[value] ? state.projects[value].label : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                {{ state.providers[value] ? state.providers[value].name : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.REGION">
-                {{ state.regions[value] ? state.regions[value].name : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
-                {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
-            </span>
-            <span v-else-if="field.name === 'totalCost'">
-                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
-            </span>
-            <span v-else-if="typeof value !== 'string'"
-                  class="text-center"
-            >
-                <p-link :to="value ? getLink(item, field.name) : undefined"
-                        class="!align-middle"
+    <fragment>
+        <p-toolbox-table v-model:page-size="tableState.pageSize"
+                         class="cost-analysis-data-table"
+                         :loading="tableState.loading"
+                         :fields="tableState.fields"
+                         :items="tableState.items"
+                         :searchable="false"
+                         row-height-fixed
+                         exportable
+                         @change="handleChange"
+                         @refresh="handleChange()"
+                         @export="handleExport"
+        >
+            <template #pagination-area>
+                <p-text-pagination v-model:this-page="tableState.thisPage"
+                                   :disable-next-page="!tableState.more || tableState.loading"
+                                   @update:this-page="handleUpdateThisPage"
                 >
-                    <template v-if="getIsRaised(item, field.name)">
-                        <span class="cell-text raised">{{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}</span>
-                        <p-i name="ic_arrow-up-bold-alt"
-                             width="0.75rem"
-                             height="0.75rem"
-                        />
+                    <template #default>
+                        <span class="this-page">{{ tableState.thisPage }}</span>
+                        <span v-if="tableState.more"> / ...</span>
                     </template>
-                    <template v-else>
-                        {{ currencyMoneyFormatter(value, state.currency, state.currencyRates, true) }}
-                    </template>
-                </p-link>
-            </span>
-        </template>
-    </p-toolbox-table>
-    <p-button-modal v-model:visible="state.visibleExcelNotiModal"
-                    hide-header
-                    size="sm"
-                    @confirm="handleExcelDownload"
-    >
-        <template #body>
-            <p class="mt-4">
-                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED') }}
-            </p>
-        </template>
-        <template #confirm-button>
-            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DOWNLOAD') }}
-        </template>
-    </p-button-modal>
+                </p-text-pagination>
+            </template>
+            <template #th-format="{field}">
+                {{ field.label }}
+                <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
+            </template>
+            <template #col-format="{field, value, item}">
+                <span v-if="tableState.loading" />
+                <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
+                    Unknown
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
+                    {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROJECT">
+                    {{ state.projects[value] ? state.projects[value].label : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROVIDER">
+                    {{ state.providers[value] ? state.providers[value].name : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.REGION">
+                    {{ state.regions[value] ? state.regions[value].name : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
+                    {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
+                </span>
+                <span v-else-if="field.name === 'totalCost'">
+                    {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
+                </span>
+                <span v-else-if="typeof value !== 'string'"
+                      class="text-center"
+                >
+                    <p-link :to="value ? getLink(item, field.name) : undefined"
+                            class="!align-middle"
+                    >
+                        <template v-if="getIsRaised(item, field.name)">
+                            <span class="cell-text raised">{{ numberFormatter(value) }}</span>
+                            <p-i name="ic_arrow-up-bold-alt"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                            />
+                        </template>
+                        <template v-else>
+                            <span class="usage-wrapper">
+                                {{ numberFormatter(value) }}
+                                <p-divider v-if="state.isIncludedUsageTypeInGroupBy"
+                                           vertical
+                                           class="divider"
+                                />
+                                <span v-if="state.isIncludedUsageTypeInGroupBy">
+                                    {{ getUsageQuantity(item, field.name) }}
+                                </span>
+                            </span>
+                        </template>
+                    </p-link>
+                </span>
+            </template>
+        </p-toolbox-table>
+        <p-button-modal v-model:visible="state.visibleExcelNotiModal"
+                        hide-header
+                        size="sm"
+                        @confirm="handleExcelDownload"
+        >
+            <template #body>
+                <p class="mt-4">
+                    {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED') }}
+                </p>
+            </template>
+            <template #confirm-button>
+                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DOWNLOAD') }}
+            </template>
+        </p-button-modal>
+    </fragment>
 </template>
 
 <style lang="postcss" scoped>
@@ -388,6 +483,15 @@ watch(
     .cell-text {
         &.raised {
             @apply text-alert;
+        }
+    }
+    .usage-wrapper {
+        display: inline-flex;
+        align-items: center;
+        .divider {
+            @apply text-gray-200 inline-block;
+            height: 1rem;
+            margin: 0 0.25rem;
         }
     }
 }

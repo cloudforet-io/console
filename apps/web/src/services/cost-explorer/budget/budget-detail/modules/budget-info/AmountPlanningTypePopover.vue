@@ -1,28 +1,17 @@
-<script lang="ts" setup>
-
+<script setup lang="ts">
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { computed, reactive } from 'vue';
-import { useStore } from 'vuex';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 
 interface Props {
-    budgetData: BudgetModel;
+    budgetData: Partial<BudgetModel>;
 }
-
-withDefaults(defineProps<Props>(), {
-    budgetData: () => ({}) as BudgetModel,
-});
-
-const store = useStore();
-
-const state = reactive({
-    currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
+const props = withDefaults(defineProps<Props>(), {
+    budgetData: () => ({}),
 });
 const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 
@@ -34,16 +23,16 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
     >
         <slot />
         <template #content>
-            <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+            <div v-if="props.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
                  class="total-wrapper"
             >
                 <p class="total-data">
-                    {{ currencyMoneyFormatter(budgetData.limit, state.currency, state.currencyRates, false, 1000000000) }}
+                    {{ currencyMoneyFormatter(props.budgetData.limit, props.budgetData?.currency, undefined, false, 1000000000) }}
                 </p>
             </div>
             <template v-else>
                 <div class="monthly-wrapper">
-                    <p v-for="{ date, limit } in budgetData.planned_limits"
+                    <p v-for="{ date, limit } in props.budgetData?.planned_limits"
                        :key="date"
                        class="monthly-data"
                     >
@@ -52,7 +41,7 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                                 {{ dateFormatter(date) }}
                             </span>
                             <br>
-                            <span>{{ currencyMoneyFormatter(limit, state.currency, state.currencyRates, false, 1000000000) }}</span>
+                            <span>{{ currencyMoneyFormatter(limit, props.budgetData?.currency, undefined, false, 1000000000) }}</span>
                         </span>
                     </p>
                 </div>

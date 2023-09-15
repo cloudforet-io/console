@@ -426,6 +426,7 @@
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
 					"ORIGINAL_DATA": "Original Data",
 					"PERIOD": "Period",
+					"PROVIDER": "Provider",
 					"SET": "Set",
 					"SET_NOTIFICATION_CHANNEL": "Set Notifications Channel",
 					"TARGET": "Target",
@@ -489,9 +490,12 @@
 					"CREATE": "Create",
 					"CREATE_BUDGET": "Create Budget",
 					"CREATE_BULK_BUDGET": "Create Bulk Budget",
+					"DATA_SOURCE": "Data Source",
 					"DESC": "Desc",
+					"NO_BUDGET": "No Budget",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
+					"PROVIDER": "Provider",
 					"SINGLE_BUDGET": "Single Budget",
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total",
@@ -541,6 +545,7 @@
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
 				},
 				"HIDE_ALL": "Hide all",
+				"INVALID_PERIOD_TEXT": "No data found for previously selected period",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
 				"LABEL_COST_ANALYSIS_NAME": "Cost Analysis Name",
@@ -565,6 +570,7 @@
 					"LAST_12_MONTHS": "Last 12 Months",
 					"LAST_14_DAYS": "Last 14 Days",
 					"LAST_3_MONTHS": "Last 3 Months",
+					"LAST_3_YEARS": "Last 3 Years",
 					"LAST_6_MONTHS": "Last 6 Months",
 					"LAST_7_DAYS": "Last 7 Days",
 					"LAST_MONTH": "Last Month",
@@ -581,7 +587,8 @@
 				"RELOCATE_DASHBOARD_NOTI_LEARN_MORE": "Learn more",
 				"RELOCATE_DASHBOARD_NOTI_TITLE": "Looking for your cost dashboards?",
 				"RELOCATE_MODAL_CONFIRM_TEXT": "Got it",
-				"RELOCATE_MODAL_DESCRIPTION": "We have integrated the previous Cost Explorer's Dashboard feature into a brand new standalone service called \"Dashboards\". Therefore, the old dashboards are no longer supported. Go to \"Dashboards\" menu and explore expanded widget options, advanced variables with much better visuals.",
+				"RELOCATE_MODAL_DESCRIPTION_FIRST": "We have integrated the previous Cost Explorer's Dashboard feature into a brand new standalone service called \"Dashboards\".",
+				"RELOCATE_MODAL_DESCRIPTION_SECOND": "Therefore, the old dashboards are no longer supported. Go to \"Dashboards\" menu and explore expanded widget options, advanced variables with much better visuals.",
 				"RELOCATE_MODAL_DISMISS_TEXT": "Don't show me again",
 				"RELOCATE_MODAL_TITLE": "We are thrilled to introduce a significant enhancement to your cost dashboard!",
 				"SAVE": "Save",
@@ -1312,7 +1319,7 @@
 				"DESCRIPTION_ACCOUNT": "The account IDs assigned by AWS during account creation",
 				"DESCRIPTION_ASSET_ACCOUNT": "The account IDs assigned by AWS during account creation",
 				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "List of compliance frameworks for cloud security and regulatory compliance",
-				"DESCRIPTION_DATA_SOURCE": "This is cost data source",
+				"DESCRIPTION_DATA_SOURCE": "A central source of data and information in the cloud environment, comprising data from cloud providers like AWS, Google, Azure, as well as data from specific companies and services, including integrated billing data.",
 				"DESCRIPTION_GROUP_BY": "It’s used to group data together and see overall trends or patterns based on a specific option",
 				"DESCRIPTION_PRODUCT": "The cloud computing products and services provided by each cloud provider",
 				"DESCRIPTION_PROJECT": "The collections of cloud resources and services that are grouped together for a specific purpose",
@@ -1346,11 +1353,14 @@
 			}
 		},
 		"DETAIL": {
+			"APPLY": "Apply",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
 			"CUSTOMIZE": "Customize",
+			"CUSTOM_DATE_MODAL_MONTH": "Month",
+			"CUSTOM_DATE_MODAL_TITLE": "Apply Custom Range",
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"EXPORT": "Export",
@@ -1439,12 +1449,12 @@
 				"DESC": "Displays the top 200 highest budget usage during the selected period."
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"AVAILABLE": "available",
-				"BUDGETS": "Budgets",
+				"BUDGETED": "{count} budgeted",
+				"BUDGET_USAGE_IN": "budget usage in {period}",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
-				"EXCEEDED": "exceeded",
-				"TOTAL_BUDGET": "Total budget",
-				"TOTAL_BUDGET_USAGE_IN": "Total budget usage in {period}"
+				"EXCEED": "{value} exceed",
+				"LEFT": "{value} left",
+				"OUT_OF": "out of {value}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "
@@ -1499,7 +1509,8 @@
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "List of non-inherited options:",
 			"MONTHLY_COST": {
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
-				"TOTAL_SPENT_IN": "Total spent in {period}"
+				"PREVIOUS_MONTH": "Previous month",
+				"SELECTED_MONTH": "Selected month "
 			},
 			"NO_DATA": "No Data",
 			"PROJECT_ACTIVITY_SUMMARY": {
@@ -2269,7 +2280,7 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_JOB": "No Job",
+			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
 		"SERVER": {

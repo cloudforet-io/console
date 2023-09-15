@@ -1,40 +1,62 @@
 <script setup lang="ts">
-import {
-    reactive,
-} from 'vue';
-
-import {
-    PFilterableDropdown,
-} from '@spaceone/design-system';
-import type {
-    AutocompleteHandler, FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PFilterableDropdown,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type {
+    AutocompleteHandler, FilterableDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import {
+    computed, reactive,
+} from 'vue';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CostAnalysisFiltersAddMoreButton
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersAddMoreButton.vue';
+import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 
+const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
 
+const storeState = reactive({
+    projects: computed(() => allReferenceStore.getters.project),
+    projectGroups: computed(() => allReferenceStore.getters.projectGroup),
+    providers: computed(() => allReferenceStore.getters.provider),
+    serviceAccounts: computed(() => allReferenceStore.getters.serviceAccount),
+});
 const state = reactive({
     loading: true,
-    selectedItems: {} as Record<string, FilterableDropdownMenuItem[]>,
+    enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
+    selectedFilterableItemsMap: computed<Record<string, FilterableDropdownMenuItem[]>>(() => {
+        const _selectedItems = {} as Record<string, FilterableDropdownMenuItem[]>;
+        Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
+            _selectedItems[groupBy] = getRefinedMenuItems(groupBy, items.map((d) => ({ name: d, label: d })));
+        });
+        return _selectedItems;
+    }),
 });
 
 const resourceApiQueryHelper = new ApiQueryHelper();
 const fetchDistinct = getCancellableFetcher(SpaceConnector.client.addOns.autocomplete.distinct);
-const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|void> => {
+const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     resourceApiQueryHelper.setFilters([
         { k: 'data_source_id', v: costAnalysisPageStore.selectedDataSourceId ?? '', o: '=' },
     ]);
     try {
+        let resourceType = 'cost_analysis.Cost';
+        if (distinctKey === GROUP_BY.PROJECT_GROUP) resourceType = 'identity.ProjectGroup';
+        else if (distinctKey === GROUP_BY.PROJECT) resourceType = 'identity.Project';
         const { status, response } = await fetchDistinct({
-            resource_type: 'cost_analysis.Cost',
+            resource_type: resourceType,
             distinct_key: distinctKey,
             search: inputText,
             options: {
@@ -42,7 +64,7 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
             },
             ...resourceApiQueryHelper.data,
         });
-        if (status) return response.results;
+        if (status) return response?.results;
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -56,26 +78,64 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (value: stri
     const results = await getResources(value, groupBy);
     state.loading = false;
 
-    return { results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [] };
+    const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
+    return { results: refinedMenuItems };
 };
-
-const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
-    state.selectedItems[groupBy] = selectedItems;
-    costAnalysisPageStore.$patch((_state) => {
-        _state.filters[groupBy] = selectedItems.map((d) => d.name as string);
-        _state.filters = { ..._state.filters };
+const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
+    if (!results) return [];
+    return results.map((d) => {
+        if (groupBy === GROUP_BY.PROJECT) {
+            return { name: d.name, label: storeState.projects[d.name].label };
+        } if (groupBy === GROUP_BY.PROJECT_GROUP) {
+            return { name: d.name, label: storeState.projectGroups[d.name].label };
+        } if (groupBy === GROUP_BY.PROVIDER) {
+            return { name: d.name, label: storeState.providers[d.name].label };
+        } if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+            return { name: d.name, label: storeState.serviceAccounts[d.name].label };
+        }
+        return { name: d.name, label: d.label };
     });
 };
+
+const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
+    costAnalysisPageStore.$patch((_state) => {
+        _state.filters = {
+            ..._state.filters,
+            [groupBy]: selectedItems.map((d) => d.name as string),
+        };
+    });
+};
+const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
+    if (all) {
+        costAnalysisPageStore.$patch((_state) => {
+            _state.filters = {};
+        });
+    } else if (disabledFilter) {
+        costAnalysisPageStore.$patch((_state) => {
+            delete _state.filters?.[disabledFilter];
+            _state.filters = { ..._state.filters };
+        });
+    }
+};
+
+(async () => {
+    await Promise.allSettled([
+        allReferenceStore.load('project'),
+        allReferenceStore.load('projectGroup'),
+        allReferenceStore.load('provider'),
+        allReferenceStore.load('serviceAccount'),
+    ]);
+})();
 </script>
 
 <template>
     <div class="cost-analysis-filters-popper">
         <p-filterable-dropdown
-            v-for="groupBy in costAnalysisPageStore.defaultGroupByItems"
+            v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}`"
             :group-by="groupBy.name"
             :handler="menuHandler(groupBy.name)"
-            :selected="state.selectedItems[groupBy.name] ?? []"
+            :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
             :loading="state.loading"
             multi-selectable
             style-type="rounded"
@@ -83,7 +143,11 @@ const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdown
             show-select-marker
             selection-highlight
             :selection-label="groupBy.label"
-            @update:selected="handleUpdateSelected(groupBy.name, $event)"
+            :show-delete-all-button="false"
+            @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
+        />
+        <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
+                                               @disable-all-filters="handleDisabledFilters(true, $event)"
         />
     </div>
 </template>
@@ -96,8 +160,11 @@ const handleUpdateSelected = (groupBy: string, selectedItems: FilterableDropdown
         width: auto;
         max-width: 22.5rem;
         padding: 0.25rem;
+        .dropdown-button {
+            height: 1.5rem;
+        }
         .dropdown-context-menu {
-            min-width: 10rem;
+            min-width: 12rem;
         }
     }
 }

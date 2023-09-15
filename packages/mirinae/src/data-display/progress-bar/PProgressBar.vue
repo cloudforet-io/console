@@ -2,7 +2,7 @@
     <div class="progress-bar"
          :class="size"
     >
-        <label v-if="label || slots.label"
+        <label v-if="props.label || slots.label"
                class="label"
         >
             <slot name="label">
@@ -11,6 +11,7 @@
         </label>
         <div ref="backgroundBar"
              class="background-bar"
+             :style="{ props.height }"
         />
         <transition appear
                     @before-appear="beforeEnter"
@@ -59,6 +60,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    height: {
+        type: String,
+        default: undefined,
+    },
 });
 
 const slots = useSlots();
@@ -71,6 +76,13 @@ const state = reactive({
         background: props.gradient ? linearGradientProperty
             : (props.color ?? defaultTrackerBarColor),
         transition: props.disableAnimation ? undefined : 'width 0.5s linear',
+    })),
+    progressBarStyle: computed(() => ({
+        background: props.gradient ? linearGradientProperty
+            : (props.color ?? defaultTrackerBarColor),
+        transition: props.disableAnimation ? undefined : 'width 0.5s linear',
+        height: props.height,
+        marginTop: props.height ? `-${props.height}` : undefined,
     })),
 });
 

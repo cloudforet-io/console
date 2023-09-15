@@ -25,6 +25,11 @@
                        @refresh="handleRefresh"
                        @click-settings="handleClickSettings"
             >
+                <template v-if="slots['pagination-area']"
+                          #pagination-area
+                >
+                    <slot name="pagination-area" />
+                </template>
                 <template v-if="slots['toolbox-left']"
                           #left-area
                 >

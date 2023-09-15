@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover,
@@ -25,11 +24,10 @@ import type { Granularity } from '@/services/cost-explorer/type';
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
 
+const { t } = useI18n();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
-
-const { t } = useI18n();
 
 const filtersPopperRef = ref<any|null>(null);
 const contextMenuRef = ref<any|null>(null);
@@ -62,8 +60,12 @@ const state = reactive({
             label: `${t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
-    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId as string)),
+    selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
+    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
     filtersPopoverVisible: false,
+    granularity: undefined as Granularity|undefined,
+    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
+    invalidPeriodMessage: computed(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
 });
 
 const {
@@ -82,6 +84,7 @@ onClickOutside(contextMenuRef, hideContextMenu);
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
     costAnalysisPageStore.$patch({ granularity });
+    state.granularity = granularity;
 };
 const handleSaveQuerySet = async () => {
     try {
@@ -90,11 +93,12 @@ const handleSaveQuerySet = async () => {
             options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
+                relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
-                filters: costAnalysisPageState.filters,
+                filters: costAnalysisPageStore.consoleFilters,
+                metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
-        await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -126,7 +130,7 @@ const handleClickFilter = () => {
                                    :selected="costAnalysisPageState.granularity"
                                    @select="handleSelectGranularity"
                 />
-                <cost-analysis-period-select-dropdown />
+                <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
                 <p-popover :is-visible="state.filtersPopoverVisible"
                            ignore-outside-click
                            trigger="click"
@@ -180,6 +184,11 @@ const handleClickFilter = () => {
                     </p-button>
                 </template>
             </div>
+        </div>
+        <div v-if="state.isPeriodInvalid"
+             class="invalid-text"
+        >
+            {{ state.invalidPeriodMessage }}
         </div>
         <cost-analysis-query-form-modal v-model:visible="state.queryFormModalVisible"
                                         :header-title="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
@@ -238,6 +247,10 @@ const handleClickFilter = () => {
         .filters-popper {
             width: 100%;
         }
+    }
+    .invalid-text {
+        @apply text-red-400 text-label-md;
+        margin-top: 0.5rem;
     }
 }
 </style>

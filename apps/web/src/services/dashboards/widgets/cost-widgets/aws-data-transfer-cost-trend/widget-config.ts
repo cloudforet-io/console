@@ -2,9 +2,10 @@ import { defineAsyncComponent } from 'vue';
 
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_REFERENCE_SCHEMA } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyName,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -26,26 +27,58 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     options: {
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: COST_GROUP_BY.TYPE,
+        cost_group_by: COST_GROUP_BY.USAGE_TYPE,
         legend_options: {
             enabled: true,
-            show_at: 'chart',
+            show_at: 'table',
         },
         selector_options: {
             enabled: true,
             type: 'cost-usage',
         },
+        pagination_options: {
+            enabled: true,
+            page_size: 5,
+        },
+    },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'service_account',
+            'region',
+        ),
     },
     options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'cost_account')],
-        fixed_properties: ['cost_group_by'],
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'cost_product',
+            'project',
+            'service_account',
+            'region',
+        )],
+        fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
-                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
+                [getWidgetFilterSchemaPropertyName('cost_product')]: {
+                    ...COST_REFERENCE_SCHEMA.cost_product,
+                    default: ['AWSDataTransfer'],
+                },
+                ...getWidgetFilterOptionsSchema(
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
             },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account')],
+            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+                'cost_product',
+                'project',
+                'service_account',
+                'project_group',
+                'region',
+            )],
         },
     },
 };

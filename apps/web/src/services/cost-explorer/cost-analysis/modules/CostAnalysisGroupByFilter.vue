@@ -2,7 +2,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import {
-    PSelectButton, PButton, PFilterableDropdown, PBadge,
+    PSelectButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -14,11 +14,8 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray } from '@/styles/colors';
-
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-
 
 
 interface GroupBySelectButtonItem {
@@ -37,7 +34,6 @@ const state = reactive({
         return { name: d, label: d.split('.')[1] };
     })),
     selectedTagsMenu: [] as SelectDropdownMenu[],
-    tagsDropdownVisible: false,
 });
 
 /* fetcher */
@@ -66,6 +62,12 @@ const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
     return { results: results ? results.map((d) => ({ name: `tags.${d.key}`, label: d.name })) : [] };
 };
 const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
+const setSelectedTagsMenu = (groupBy?: string[]) => {
+    if (!groupBy) return;
+    state.selectedTagsMenu = groupBy
+        .filter((d) => d.startsWith('tags.'))
+        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+};
 
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
@@ -77,15 +79,13 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = [addedGroupByName, ..._state.groupBy];
+            _state.chartGroupBy = addedGroupByName;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
             _state.groupBy = selectedItems.map((d) => d.name);
         });
     }
-};
-const handleClickTagsButton = () => {
-    state.tagsDropdownVisible = !state.tagsDropdownVisible;
 };
 const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: boolean) => {
     if (isSelected) {
@@ -95,7 +95,8 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: b
             return;
         }
         costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.concat(selectedItem.name as string);
+            _state.groupBy = [selectedItem.name as string, ..._state.groupBy];
+            _state.chartGroupBy = selectedItem.name;
         });
     } else {
         costAnalysisPageStore.$patch((_state) => {
@@ -110,10 +111,7 @@ const handleClearTagsGroupBy = () => {
 };
 
 watch(() => costAnalysisPageState.groupBy, (groupBy) => {
-    if (!groupBy) return;
-    state.selectedTagsMenu = groupBy
-        .filter((d) => d.startsWith('tags.'))
-        .map((d) => ({ name: d, label: d.split('.')[1] })) ?? [];
+    setSelectedTagsMenu(groupBy);
 });
 </script>
 
@@ -133,29 +131,13 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-button :style-type="state.selectedTagsMenu.length ? 'highlight' : 'tertiary'"
-                      size="sm"
-                      :icon-right="state.tagsDropdownVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
-                      @click="handleClickTagsButton"
-            >
-                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TAGS') }}
-                <template v-if="state.selectedTagsMenu.length">
-                    <span>:</span>
-                    <span class="selected-text">{{ state.selectedTagsMenu[0].label }}</span>
-                </template>
-                <p-badge v-if="state.selectedTagsMenu.length > 1"
-                         badge-type="solid"
-                         background-color="white"
-                         :text-color="gray[900]"
-                         class="count-badge"
-                >
-                    +{{ state.selectedTagsMenu.length - 1 }}
-                </p-badge>
-            </p-button>
-            <p-filterable-dropdown v-model:selected="state.selectedTagsMenu"
-                                   v-model:visible-menu="state.tagsDropdownVisible"
-                                   :handler="tagsMenuHandler"
+            <p-filterable-dropdown :handler="tagsMenuHandler"
+                                   v-model:selected="state.selectedTagsMenu"
+                                   selection-label="Tags"
+                                   appearance-type="badge"
+                                   :show-delete-all-button="false"
                                    multi-selectable
+                                   selection-highlight
                                    show-select-marker
                                    @select="handleSelectTagsGroupBy"
                                    @clear-selection="handleClearTagsGroupBy"
@@ -178,24 +160,23 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     }
     .tags-button-wrapper {
         position: relative;
-        min-width: 8rem;
+        padding-right: 3.5rem;
 
         /* custom design-system component - p-filterable-dropdown */
         :deep(.p-filterable-dropdown) {
             .dropdown-button {
-                display: none;
+                height: 1.25rem;
+                min-height: 1.5rem;
+                .placeholder {
+                    font-size: 0.75rem;
+                }
+            }
+            .selection-wrapper {
+                font-size: 0.75rem;
             }
             .p-context-menu {
                 min-width: 9rem;
             }
-        }
-        .selected-text {
-            padding-left: 0.12rem;
-            font-weight: normal;
-        }
-        .count-badge {
-            margin-left: 0.12rem;
-            font-weight: normal;
         }
     }
 }

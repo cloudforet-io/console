@@ -1,6 +1,8 @@
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
+export const DYNAMIC_COST_QUERY_SET_PARAMS = 'dynamic';
+
 export const MANAGED_COST_QUERY_SET_IDS = {
     MONTHLY_PROJECT: 'Monthly cost by project',
     MONTHLY_SERVICE_ACCOUNT: 'Monthly cost by service account',
@@ -13,7 +15,6 @@ export const managedCostQuerySetIdList: string[] = [
     MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
 ];
 
-
 export const managedCostQuerySets: CostQuerySetModel[] = [
     {
         cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
@@ -24,7 +25,12 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: false,
+                include_today: true,
+            },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
             },
         },
     },
@@ -37,7 +43,12 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: false,
+                include_today: true,
+            },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
             },
         },
     },
@@ -50,7 +61,12 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
             relative_period: {
                 unit: 'month',
                 value: 5,
-                exclude_today: false,
+                include_today: true,
+            },
+            metadata: {
+                filters_schema: {
+                    enabled_properties: Object.values(GROUP_BY),
+                },
             },
         },
     },

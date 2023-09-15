@@ -10,29 +10,26 @@ import { PDataLoader, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
 import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
 } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
 interface Data extends CloudServiceStatsModel {
@@ -61,16 +58,22 @@ const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
 const { t } = useI18n();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
-    chart: null as null|ReturnType<typeof createPieChart>,
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
+        end: dayjs.utc(widgetState.settings?.date_range?.start).format(DATE_FORMAT),
     })),
+});
+const state = reactive({
+    loading: true,
+    data: null as Data[]|null,
+    noData: computed(() => !state.data?.length),
     outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
         status: status.label,
         value: state.checkCount?.[status.name],
@@ -80,7 +83,7 @@ const state = reactive({
         },
     }))),
     innerChartData: computed<InnerChartData[]>(() => {
-        const failCheckDataList = state.data?.filter((d) => d.date === state.dateRange.end && d.key === 'fail_check_count') ?? [];
+        const failCheckDataList = state.data?.filter((d) => d.date === widgetState.dateRange.end && d.key === 'fail_check_count') ?? [];
         const innerChartData: InnerChartData[] = [];
         SEVERITY_STATUS_MAP_VALUES.forEach((severity) => {
             const targetSeverityData = failCheckDataList.find((d) => d.severity === severity.name);
@@ -107,30 +110,27 @@ const state = reactive({
         });
         return text;
     }),
-    prevComplianceCount: computed<number|undefined>(() => {
-        if (!state.data) return undefined;
-        const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
+    prevComplianceCount: computed<number>(() => {
+        if (!state.data) return 0;
+        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const targetDataList = state.data.filter((d) => d.date === prevMonth && d.key === 'compliance_count');
         return sum(targetDataList.map((d) => d.value));
     }),
-    complianceCount: computed<number|undefined>(() => {
-        if (!state.data) return undefined;
-        const targetDataList = state.data.filter((d) => d.date === state.dateRange.end && d.key === 'compliance_count');
+    complianceCount: computed<number>(() => {
+        if (!state.data) return 0;
+        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end && d.key === 'compliance_count');
         return sum(targetDataList.map((d) => d.value));
     }),
     complianceCountComparingMessage: computed<string|undefined>(() => {
-        if (state.complianceCount === undefined
-            || state.prevComplianceCount === undefined
-            || state.complianceCount === state.prevComplianceCount
-        ) return undefined;
+        if (state.complianceCount === state.prevComplianceCount) return undefined;
         if (state.prevComplianceCount < state.complianceCount) {
             return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH');
         }
         return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.LESS_THAN_PREV_MONTH');
     }),
-    checkCount: computed(() => {
-        if (!state.data) return undefined;
-        const targetDataList = state.data.filter((d) => d.date === state.dateRange.end);
+    checkCount: computed<Record<string, number>>(() => {
+        if (!state.data) return {} as Record<string, number>;
+        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
         const passCheckCount = sum(targetDataList.filter((d) => d.key === 'pass_check_count').map((d) => d.value));
         const failCheckCount = sum(targetDataList.filter((d) => d.key === 'fail_check_count').map((d) => d.value));
         return {
@@ -140,7 +140,7 @@ const state = reactive({
     }),
     score: computed<number|undefined>(() => {
         if (!state.data) return undefined;
-        const targetDataList = state.data.filter((d) => d.date === state.dateRange.end);
+        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
         const passScore = sum(targetDataList.filter((d) => d.key === 'pass_score').map((d) => d.value)) ?? 0;
         const failScore = sum(targetDataList.filter((d) => d.key === 'fail_score').map((d) => d.value)) ?? 0;
         const totalScore = passScore + failScore;
@@ -149,15 +149,13 @@ const state = reactive({
     }),
 });
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
-
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
             .addFilter({
                 k: 'key',
@@ -170,12 +168,12 @@ const fetchData = async (): Promise<Data[]> => {
                 ],
                 o: '',
             });
-        const prevMonth = dayjs.utc(state.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
+        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,
-                end: state.dateRange.end,
+                end: widgetState.dateRange.end,
                 group_by: ['key', 'unit', 'additional_info.severity'],
                 fields: {
                     value: {
@@ -186,11 +184,14 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            return response.results;
+        }
+        return state.data;
     } catch (e: any) {
         ErrorHandler.handleError(e);
+        return [];
     }
-    return [];
 };
 
 /* Util */
@@ -246,7 +247,9 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     innerSeries.slices.template.set('tooltip', innerTooltip);
     innerSeries.data.setAll(innerChartData);
 
-    chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+    if (!state.noData) {
+        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+    }
 };
 
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
@@ -286,9 +289,9 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    state,
-    redrawChart,
-    redrawOnLanguageChange: true,
+    emit,
+    widgetState,
+    onLanguageUpdate: redrawChart,
 });
 
 defineExpose<WidgetExpose<Data[]>>({
@@ -301,7 +304,7 @@ defineExpose<WidgetExpose<Data[]>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="compliance-check-status"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="compliance-check-status">
             <div class="data-container">
@@ -320,7 +323,7 @@ defineExpose<WidgetExpose<Data[]>>({
                             {{ t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
                         </p>
                         <p class="value">
-                            {{ state.complianceCount === undefined ? '--' : commaFormatter(state.complianceCount) }}
+                            {{ commaFormatter(state.complianceCount) }}
                         </p>
                         <div v-if="state.complianceCountComparingMessage"
                              class="diff-wrapper"
@@ -336,8 +339,8 @@ defineExpose<WidgetExpose<Data[]>>({
                 <div class="chart-wrapper">
                     <p-data-loader class="chart-loader"
                                    :loading="state.loading"
+                                   :data="state.data"
                                    loader-type="skeleton"
-                                   disable-empty-case
                                    :loader-backdrop-opacity="1"
                                    show-data-from-scratch
                     >
@@ -357,7 +360,7 @@ defineExpose<WidgetExpose<Data[]>>({
                                 <span class="text">{{ status.label }}</span>
                             </div>
                             <p class="value">
-                                {{ state.checkCount === undefined ? '--' : commaFormatter(state.checkCount[status.name]) }}
+                                {{ commaFormatter(state.checkCount[status.name] ?? 0) }}
                             </p>
                         </div>
                     </div>
@@ -375,6 +378,7 @@ defineExpose<WidgetExpose<Data[]>>({
             justify-content: space-between;
             margin: 0;
             padding-bottom: 2rem;
+            min-height: 7.375rem;
             .left-wrapper, .right-wrapper {
                 flex: 1 1 auto;
                 position: relative;

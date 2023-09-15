@@ -3,7 +3,10 @@ import { defineAsyncComponent } from 'vue';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
@@ -28,8 +31,23 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
             page_size: 5,
         },
     },
+    inherit_options: {
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'provider',
+            'asset_compliance_type',
+            'region',
+            'asset_account',
+        ),
+    },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'asset_compliance_type', 'region', 'asset_account')],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'project',
+            'provider',
+            'asset_compliance_type',
+            'region',
+            'asset_account',
+        )],
         fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',

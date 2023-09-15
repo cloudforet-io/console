@@ -22,6 +22,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
@@ -40,19 +41,18 @@ import {
     getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 
@@ -84,8 +84,11 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         return { start, end };
     }),
     widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: widgetState.options.cost_data_source,
+            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+        },
         query: {
             granularity: primitiveToQueryString(widgetState.granularity),
             group_by: arrayToQueryString([widgetState.groupBy]),
@@ -98,7 +101,15 @@ const state = reactive({
     loading: true,
     data: null as Response | null,
     chart: null as null | XYChart,
-    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, widgetState.groupBy)),
+    chartData: computed<XYChartData[]>(() => {
+        const data = getRefinedXYChartData(state.data?.results, {
+            groupBy: widgetState.groupBy,
+            arrayDataKey: 'cost_sum',
+            categoryKey: DATE_FIELD_NAME,
+            valueKey: 'value',
+        });
+        return data;
+    }),
     tableFields: computed<Field[]>(() => {
         if (!widgetState.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'cost' });
@@ -188,7 +199,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
     // create tooltip
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency, props.currencyRates);
+    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency);
 
     // set series
     state.legends.forEach((legend) => {
@@ -315,7 +326,6 @@ defineExpose<WidgetExpose<Response>>({
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends="state.legends"
                                :color-set="colorSet"

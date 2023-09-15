@@ -4,12 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { range } from 'lodash';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
-import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 
@@ -18,45 +16,42 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { indigo, red, yellow } from '@/styles/colors';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props-deprecated';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle-deprecated';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state-deprecated';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
 type Data = BudgetDataModel['results'];
-const DATE_FORMAT = 'YYYY-MM';
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
 const { t } = useI18n();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<RouteLocationRaw>(() => ({
+        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+        params: {},
+        query: {
+            filters: budgetQueryHelper.setFilters(widgetState.budgetConsoleFilters).rawQueryStrings,
+        },
+    })),
+});
+
 const state = reactive({
-    ...toRefs(useWidgetState<Data>(props)),
+    loading: true,
+    data: undefined as Data | undefined,
     legends: computed<Omit<Legend, 'name'>[]>(() => ([
         { label: t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
         { label: '70-90%', color: indigo[500] },
         { label: '< 70%', color: indigo[100] },
     ])),
-    dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
-        query: {
-            filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
 });
-
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Util */
 const getTooltipText = (rowIdx: number, colIdx: number): string => {
@@ -86,13 +81,14 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<BudgetDataModel>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data> => {
     try {
-        apiQueryHelper.setFilters(state.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, 'name'],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                // granularity: widgetState.granularity,
+                group_by: [widgetState.groupBy, 'name'],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
                     total_spent: {
                         key: 'cost',
@@ -145,15 +141,12 @@ const refreshWidget = async (): Promise<Data> => {
     return state.data;
 };
 
-const handleRefresh = () => {
-    refreshWidget();
-};
-
 useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 
 defineExpose<WidgetExpose<Data>>({
@@ -165,7 +158,7 @@ defineExpose<WidgetExpose<Data>>({
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-status-widget"
-                  @refresh="handleRefresh"
+                  v-on="widgetFrameEventHandlers"
     >
         <p-data-loader :loading="state.loading"
                        class="chart-wrapper"

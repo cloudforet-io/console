@@ -1,5 +1,5 @@
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -11,22 +11,11 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             name: REFERENCE_TYPE_INFO.cost_data_source.name,
             variable_type: 'MANAGED',
             use: true,
-            selection_type: 'SINGLE',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.cost_data_source.type,
-            },
-        },
-        [REFERENCE_TYPE_INFO.project.type]: {
-            name: REFERENCE_TYPE_INFO.project.name,
-            variable_type: 'MANAGED',
-            use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT',
             options: {
                 type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.project.type,
+                reference_key: REFERENCE_TYPE_INFO.cost_data_source.type,
             },
         },
         // Provider is deprecated
@@ -64,8 +53,20 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             },
         },
         // Variable for Cost Dashboard
-        [COST_REFERENCE_TYPE_INFO.cost_product.type]: {
-            name: COST_REFERENCE_TYPE_INFO.cost_product.name,
+        [COST_VARIABLE_TYPE_INFO.cost_data_source.type]: {
+            name: REFERENCE_TYPE_INFO.cost_data_source.name,
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'SINGLE',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
+            options: {
+                type: 'SEARCH_RESOURCE',
+                resource_type: 'cost_analysis.DataSource',
+            },
+            required: true,
+        },
+        [COST_VARIABLE_TYPE_INFO.cost_product.type]: {
+            name: COST_VARIABLE_TYPE_INFO.cost_product.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
@@ -73,24 +74,12 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'cost_analysis.Cost',
-                resource_key: COST_REFERENCE_TYPE_INFO.cost_product.key,
-            },
-        },
-        [COST_REFERENCE_TYPE_INFO.cost_account.type]: {
-            name: COST_REFERENCE_TYPE_INFO.cost_account.name,
-            variable_type: 'MANAGED',
-            use: false,
-            selection_type: 'MULTI',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ACCOUNT',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'cost_analysis.Cost',
-                resource_key: COST_REFERENCE_TYPE_INFO.cost_account.key,
+                resource_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
             },
         },
         // Variable for Asset
-        [ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type]: {
-            name: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.name,
+        [ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type]: {
+            name: ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
@@ -98,11 +87,11 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudServiceType',
-                resource_key: ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.key,
+                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.key,
             },
         },
-        [ASSET_REFERENCE_TYPE_INFO.asset_account.type]: {
-            name: ASSET_REFERENCE_TYPE_INFO.asset_account.name,
+        [ASSET_VARIABLE_TYPE_INFO.asset_account.type]: {
+            name: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
@@ -110,20 +99,19 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudService',
-                resource_key: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
+                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
             },
         },
     },
     order: [
-        REFERENCE_TYPE_INFO.cost_data_source.type,
+        COST_VARIABLE_TYPE_INFO.cost_data_source.type,
         REFERENCE_TYPE_INFO.project.type,
         // REFERENCE_TYPE_INFO.provider.type,
         REFERENCE_TYPE_INFO.service_account.type,
         REFERENCE_TYPE_INFO.region.type,
-        COST_REFERENCE_TYPE_INFO.cost_product.type,
-        COST_REFERENCE_TYPE_INFO.cost_account.type,
-        ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type,
-        ASSET_REFERENCE_TYPE_INFO.asset_account.type,
+        COST_VARIABLE_TYPE_INFO.cost_product.type,
+        ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
+        ASSET_VARIABLE_TYPE_INFO.asset_account.type,
     ],
 };
 

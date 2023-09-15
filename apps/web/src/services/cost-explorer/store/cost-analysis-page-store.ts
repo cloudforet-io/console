@@ -1,8 +1,10 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -12,7 +14,7 @@ import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import type {
-    CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy, Period,
+    CostQuerySetModel, Granularity, GroupBy, Period,
 } from '@/services/cost-explorer/type';
 
 
@@ -23,6 +25,7 @@ interface CostAnalysisPageState {
     period?: Period;
     relativePeriod?: RelativePeriod;
     filters?: Record<string, string[]> // {provider: ['aws', 'gcp'], product: ['AmazonEC2']}
+    enabledFiltersProperties?: string[];
 }
 
 interface GroupByItem {
@@ -51,12 +54,20 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         period: undefined,
         relativePeriod: undefined,
         filters: {},
+        enabledFiltersProperties: undefined,
     }),
     getters: {
         selectedQueryId: () => costQuerySetState.selectedQuerySetId,
         costQueryList: () => costQuerySetState.costQuerySetList,
         selectedQuerySet: () => costQuerySetStore.selectedQuerySet,
         selectedDataSourceId: () => costQuerySetState.selectedDataSourceId,
+        currency: (): Currency => {
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId];
+                return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
+            }
+            return 'USD';
+        },
         defaultGroupByItems: () => {
             let additionalInfoGroupBy: GroupByItem[] = [];
             if (costQuerySetState.selectedDataSourceId) {
@@ -74,13 +85,28 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         consoleFilters: (state): ConsoleFilter[] => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
-                results.push({
-                    k: category,
-                    v: filterItems,
-                    o: '=',
-                });
+                if (filterItems.length) {
+                    results.push({
+                        k: category,
+                        v: filterItems,
+                        o: '=',
+                    });
+                }
             });
             return results;
+        },
+        dataSourceImageUrl: () => {
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId];
+                return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
+            }
+            return '';
+        },
+        isPeriodInvalid: (state) => {
+            if (state.granularity === GRANULARITY.DAILY) {
+                return dayjs.utc().diff(state.period?.start, 'year') > 1;
+            }
+            return dayjs.utc().diff(state.period?.start, 'year') > 3;
         },
     },
     actions: {
@@ -91,8 +117,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.period = undefined;
             this.relativePeriod = undefined;
             this.filters = {};
+            this.enabledFiltersProperties = undefined;
         },
-        async setQueryOptions(options?: CostQuerySetOption) {
+        async setQueryOptions(options?: CostQuerySetModel['options']) {
             if (!options) {
                 await this.initState();
                 return;
@@ -105,19 +132,28 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
 
             if (options.relative_period) {
                 this.relativePeriod = options.relative_period;
-                this.period = convertRelativePeriodToPeriod(options.relative_period);
+                this.period = convertRelativePeriodToPeriod({
+                    relativePeriod: options.relative_period,
+                    granularity: options.granularity,
+                });
             } else if (options.period) {
                 this.period = { start: options.period.start, end: options.period.end };
             }
             this.filters = getRefinedFilters(options.filters);
+            if (options.metadata?.filters_schema?.enabled_properties?.length) {
+                this.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+            } else {
+                this.enabledFiltersProperties = Object.keys(GROUP_BY_ITEM_MAP);
+            }
         },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
-            const options: CostQuerySetOption = {
+            const options: CostQuerySetModel['options'] = {
                 granularity: this.granularity,
                 period: this.period,
                 relative_period: this.relativePeriod,
                 group_by: this.groupBy,
                 filters: this.consoleFilters,
+                metadata: { filters_schema: { enabled_properties: this.enabledFiltersProperties ?? [] } },
             };
             let createdData;
             try {
