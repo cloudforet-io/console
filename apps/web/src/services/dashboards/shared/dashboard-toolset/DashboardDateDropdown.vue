@@ -2,12 +2,16 @@
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
             :menu="monthMenuItems"
+            :selection-label="$t('DASHBOARDS.DETAIL.PERIOD')"
+            style-type="rounded"
             :selected="selectedMonthMenuIndex"
             index-mode
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <span>{{ selectedMonthLabel }}</span>
+            <template #dropdown-button>
+                <span>{{ selectedMonthLabel }}</span>
+            </template>
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
             </template>
