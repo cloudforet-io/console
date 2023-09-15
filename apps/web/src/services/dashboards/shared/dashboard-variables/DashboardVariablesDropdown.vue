@@ -23,7 +23,7 @@
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty.disabled"
+                <button v-if="!state.variableProperty.disabled && !state.variableProperty.required"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
@@ -53,7 +53,7 @@
                         :selected="state.selected"
                         :multi-selectable="variableProperty.selection_type === 'MULTI'"
                         show-select-marker
-                        :show-clear-selection="variableProperty.selection_type === 'MULTI'"
+                        :show-clear-selection="variableProperty.selection_type === 'MULTI' && !variableProperty.required"
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"
