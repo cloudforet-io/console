@@ -28,10 +28,19 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
+import type { BudgetUsageAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 
-type Data = BudgetDataModel;
+interface Data {
+    budget_id: string,
+    name?: string;
+    project_id?: string;
+    project_group_id?: string;
+    total_spent?: number;
+    total_budget?: number;
+    budget_usage?: number;
+}
+type Response = BudgetUsageAnalyzeResponse<Data>;
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
@@ -51,7 +60,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 });
 const state = reactive({
     loading: true,
-    data: undefined as Data | undefined,
+    data: undefined as Response | undefined,
     tableFields: computed<Field[]>(() => [
         { label: 'Budget', name: 'name' },
         { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
@@ -84,14 +93,15 @@ const targetTextFormatter = (value: string): string => {
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
+                granularity: widgetState.granularity,
                 group_by: ['budget_id', 'name', COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
@@ -134,13 +144,13 @@ const fetchData = async (): Promise<Data> => {
     return { results: [], more: false };
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (_thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<Response> => {
     await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
@@ -170,7 +180,7 @@ useWidgetLifecycle({
     widgetState,
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<Response>>({
     initWidget,
     refreshWidget,
 });
