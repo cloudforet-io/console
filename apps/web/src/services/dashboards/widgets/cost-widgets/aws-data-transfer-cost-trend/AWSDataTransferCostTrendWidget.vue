@@ -45,11 +45,11 @@ import {
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 
@@ -355,7 +355,7 @@ defineExpose<WidgetExpose<FullData>>({
                                :color-set="colorSet"
                                :show-legend="state.showLegendsOnTable"
                                @toggle-legend="handleToggleLegend"
-                               @update:thisPage="handleUpdateThisPage"
+                               @update:this-page="handleUpdateThisPage"
             />
         </div>
     </widget-frame>

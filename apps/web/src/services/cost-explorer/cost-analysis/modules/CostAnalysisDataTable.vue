@@ -19,8 +19,8 @@ import type { LocationQueryRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
@@ -392,7 +392,7 @@ watch(
             <template #pagination-area>
                 <p-text-pagination v-model:this-page="tableState.thisPage"
                                    :disable-next-page="!tableState.more || tableState.loading"
-                                   @update:thisPage="handleUpdateThisPage"
+                                   @update:this-page="handleUpdateThisPage"
                 >
                     <template #default>
                         <span class="this-page">{{ tableState.thisPage }}</span>
