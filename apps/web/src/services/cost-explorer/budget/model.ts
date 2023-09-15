@@ -19,17 +19,17 @@ export const BUDGET_NOTIFICATIONS_UNIT = {
     PERCENT: 'PERCENT',
     ACTUAL_COST: 'ACTUAL_COST',
 } as const;
-type BudgetNotificationsUnit = typeof BUDGET_NOTIFICATIONS_UNIT[keyof typeof BUDGET_NOTIFICATIONS_UNIT];
+type BudgetNotificationUnit = typeof BUDGET_NOTIFICATIONS_UNIT[keyof typeof BUDGET_NOTIFICATIONS_UNIT];
 export const BUDGET_NOTIFICATIONS_TYPE = {
     CRITICAL: 'CRITICAL',
     WARNING: 'WARNING',
 } as const;
-type BudgetNotificationsType = typeof BUDGET_NOTIFICATIONS_TYPE[keyof typeof BUDGET_NOTIFICATIONS_TYPE];
+type BudgetNotificationType = typeof BUDGET_NOTIFICATIONS_TYPE[keyof typeof BUDGET_NOTIFICATIONS_TYPE];
 
-export interface BudgetNotifications {
+export interface BudgetNotification {
     threshold: number;
-    unit: BudgetNotificationsUnit;
-    notification_type: BudgetNotificationsType;
+    unit: BudgetNotificationUnit;
+    notification_type: BudgetNotificationType;
 }
 
 
@@ -50,7 +50,7 @@ export interface BudgetModel {
     time_unit: BudgetTimeUnit;
     start: string;
     end: string;
-    notifications: BudgetNotifications[];
+    notifications: BudgetNotification[];
     tags: Tags;
     data_source_id: string;
     created_at: string;
