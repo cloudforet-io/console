@@ -14,14 +14,14 @@ interface Reference {
     reference_key?: string; // 'service_account_id' (auto-complete/resource api, must not given) // 'project_id' (auto-complete/distinct api, must given)
 }
 export interface JsonSchema {
-    type: 'object'|'array'|'string'|'number'|'integer'|'boolean';
+    type?: string;
     properties?: Record<string, JsonSchema>;
     required?: string[];
     default?: any;
     examples?: any[];
     format?: string;
     maxItems?: number;
-    enum?: string[];
+    enum?: Array<string|null>;
     items?: JsonSchema|JsonSchema[];
     title?: string;
     order?: string[];

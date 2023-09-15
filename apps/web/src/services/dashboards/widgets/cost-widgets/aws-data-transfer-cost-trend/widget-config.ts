@@ -3,7 +3,7 @@ import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/wi
 import { COST_REFERENCE_SCHEMA } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 import {
     getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyName,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -41,6 +41,14 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 5,
         },
+    },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'service_account',
+            'region',
+        ),
     },
     options_schema: {
         default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
