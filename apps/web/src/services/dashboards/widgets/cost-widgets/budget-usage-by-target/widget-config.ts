@@ -25,7 +25,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
         cost_group_by: 'budget_id',
     },
     inherit_options: {
