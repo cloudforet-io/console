@@ -7,7 +7,6 @@
             <template #default>
                 <p-select-dropdown :selected="proxyNotificationLevel"
                                    :menu="LEVEL_LIST"
-                                   class="relative"
                                    @select="onChangeLevel"
                 />
             </template>

@@ -143,7 +143,6 @@ watch(() => state.groupByMenuItems, (after) => {
 <style lang="postcss" scoped>
 .cost-analysis-chart-legends {
     .group-by-select-dropdown {
-        @apply relative;
         width: 100%;
         margin-bottom: 0.5rem;
     }

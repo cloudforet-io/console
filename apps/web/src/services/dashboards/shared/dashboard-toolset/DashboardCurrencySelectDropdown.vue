@@ -82,9 +82,6 @@ const handleSelectCurrency = (currency: DashboardCurrency) => {
 </script>
 
 <style lang="postcss" scoped>
-.currency-select-dropdown {
-    @apply relative;
-}
 .p-badge {
     margin-left: 0.25rem;
 }

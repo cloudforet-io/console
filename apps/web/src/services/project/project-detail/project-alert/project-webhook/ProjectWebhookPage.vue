@@ -39,7 +39,6 @@
                     :menu="dropdown"
                     :disabled="!hasManagePermission || !isSelectedItem"
                     :placeholder="$t('PROJECT.DETAIL.WEBHOOK_ACTION')"
-                    class="relative"
                     @select="onSelectDropdown"
                 />
             </template>

@@ -117,7 +117,6 @@ export default defineComponent({
 
     @screen tablet {
         .select-tablet {
-            @apply relative;
             display: block;
         }
         .select-desktop {
