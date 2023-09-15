@@ -1,3 +1,5 @@
+<!-- This component is only visible in specific plugins. e.g.) Prowler -->
+
 <template>
     <div class="multiple-provider-form">
         <p-field-title class="title">
@@ -21,7 +23,7 @@
         <!-- NOTE: screen mobile size-->
         <div class="dropdown-container">
             <p-select-dropdown :selected="state.selectedProvider"
-                               :items="state.providerList"
+                               :menu="state.providerList"
                                class="select-dropdown"
                                @update:selected="handleChangeProvider"
             >

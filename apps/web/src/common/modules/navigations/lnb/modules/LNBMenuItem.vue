@@ -89,7 +89,7 @@ const handleSelect = (id: string, selected: string) => {
                  class="select-options-wrapper"
             >
                 <p-select-dropdown class="select-options-dropdown"
-                                   :items="item.selectOptions.items"
+                                   :menu="item.selectOptions.items"
                                    :selected="item.selectOptions.defaultSelected"
                                    @update:selected="handleSelect(item.id, $event)"
                 />

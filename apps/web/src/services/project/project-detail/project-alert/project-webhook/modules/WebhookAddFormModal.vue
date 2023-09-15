@@ -213,9 +213,6 @@ export default {
         height: 9.0625rem;
     }
 }
-.p-select-dropdown {
-    min-width: 11rem;
-}
 
 @screen mobile {
     .webhook-add-modal {

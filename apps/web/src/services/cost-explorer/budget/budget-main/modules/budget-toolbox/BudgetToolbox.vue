@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
@@ -32,7 +32,7 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import type { Period } from '@/services/cost-explorer/type';
 
 
-type I18nSelectDropdownMenu = SelectDropdownMenu | {
+type I18nSelectDropdownMenu = SelectDropdownMenuItem | {
     label: string | TranslateResult;
 };
 
@@ -216,7 +216,8 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             <template #left-area>
                 <div class="left-area">
                     <p-select-dropdown
-                        :items="state.sortKeyList"
+                        class="sort-key-select-dropdown"
+                        :menu="state.sortKeyList"
                         :selected.sync="state.selectedSortKey"
                     />
                     <p-button class="sort-box"
@@ -270,6 +271,9 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     .left-area {
         @apply flex flex-wrap gap-4;
+        .sort-key-select-dropdown {
+            @apply relative;
+        }
     }
 }
 </style>

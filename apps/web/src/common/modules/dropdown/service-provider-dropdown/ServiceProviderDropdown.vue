@@ -1,7 +1,7 @@
 <template>
     <p-select-dropdown class="service-provider-dropdown"
                        :selected="cloudServicePageState.selectedProvider"
-                       :items="contextMenuItems"
+                       :menu="contextMenuItems"
                        @select="handleSelect"
     >
         <span v-if="selectedProviderItem"

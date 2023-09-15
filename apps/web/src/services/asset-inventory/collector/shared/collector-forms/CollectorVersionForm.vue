@@ -15,7 +15,7 @@
             </p-field-title>
         </div>
         <p-select-dropdown :selected="collectorFormState.version"
-                           :items="state.versionItems"
+                           :menu="state.versionItems"
                            :disabled="collectorFormState.autoUpgrade"
                            class="w-full"
                            @update:selected="handleChangeVersion"

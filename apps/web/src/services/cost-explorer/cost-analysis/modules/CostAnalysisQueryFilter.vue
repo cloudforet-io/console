@@ -128,7 +128,7 @@ const handleClickFilter = () => {
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
             <div class="left-part">
-                <p-select-dropdown :items="state.granularityItems"
+                <p-select-dropdown :menu="state.granularityItems"
                                    :selected="costAnalysisPageState.granularity"
                                    @select="handleSelectGranularity"
                 />

@@ -1,5 +1,5 @@
 import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type {
     ComponentName, JsonSchema, JsonSchemaFormProps, TextInputType,
 } from '@/inputs/forms/json-schema-form/type';
@@ -164,7 +164,7 @@ export const getInputTypeBySchemaProperty = (schemaProperty: JsonSchema): TextIn
 
 export const getInputPlaceholderBySchemaProperty = (schemaProperty: JsonSchema) => schemaProperty.examples?.[0] ?? '';
 
-export const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): SelectDropdownMenu[]|undefined => {
+export const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): SelectDropdownMenuItem[]|undefined => {
     if (schemaProperty.reference) return undefined;
     // get menu items from menuItems
     if (Array.isArray(schemaProperty.menuItems) && schemaProperty.menuItems.length) {
