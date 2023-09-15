@@ -9,8 +9,6 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep, isEqual } from 'lodash';
 
-import { store } from '@/store';
-
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -50,7 +48,6 @@ const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     hasManagePermission: useManagePermissionState(),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     component: null as AsyncComponent|null,
     initiated: false,
@@ -194,7 +191,6 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
-                               :currency-rates="state.currencyRates"
                                :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"

@@ -6,7 +6,6 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
-import type { CurrencyRates } from '@/store/modules/settings/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
@@ -225,7 +224,6 @@ export interface WidgetProps {
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
-    currencyRates?: CurrencyRates;
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
@@ -244,7 +242,6 @@ export interface NewWidgetProps {
     errorMode?: boolean;
     disableViewMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
-    currencyRates?: CurrencyRates;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     settings?: DashboardSettings;
     variablesSchema?: DashboardVariablesSchema;
