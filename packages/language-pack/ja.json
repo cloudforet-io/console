@@ -1367,6 +1367,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
 			},
+			"PERIOD": "期間",
 			"PERIOD_CUSTOM": "カスタム",
 			"PERIOD_LAST_14_DAYS": "過去14日間",
 			"PERIOD_LAST_3_MONTHS": "過去3ヶ月間",

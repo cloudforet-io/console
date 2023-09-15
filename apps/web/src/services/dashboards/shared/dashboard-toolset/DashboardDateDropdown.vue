@@ -2,6 +2,8 @@
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
             :menu="monthMenuItems"
+            :selection-label="$t('DASHBOARDS.DETAIL.PERIOD')"
+            style-type="rounded"
             :selected="selectedMonthMenuIndex"
             index-mode
             menu-position="right"

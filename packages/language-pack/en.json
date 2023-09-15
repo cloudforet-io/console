@@ -1367,6 +1367,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "Applied Filters"
 			},
+			"PERIOD": "Period",
 			"PERIOD_CUSTOM": "Custom",
 			"PERIOD_LAST_14_DAYS": "Last 14 days",
 			"PERIOD_LAST_3_MONTHS": "Last 3 months",

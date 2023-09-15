@@ -1367,6 +1367,7 @@
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
 			},
+			"PERIOD": "기간",
 			"PERIOD_CUSTOM": "기간 선택",
 			"PERIOD_LAST_14_DAYS": "최근 2주일",
 			"PERIOD_LAST_3_MONTHS": "지난 3개월",
