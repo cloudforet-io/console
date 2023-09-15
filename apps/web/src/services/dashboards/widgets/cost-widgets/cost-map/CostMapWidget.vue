@@ -122,7 +122,7 @@ const drawChart = (chartData: TreemapChartData[]) => {
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
+    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });

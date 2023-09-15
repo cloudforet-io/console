@@ -152,7 +152,7 @@ const drawChart = (chartData: MapChartData[]) => {
         });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         return chartHelper.createBullet({
@@ -249,7 +249,6 @@ defineExpose<WidgetExpose<FullData>>({
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends="state.legends"
                                :this-page="thisPage"

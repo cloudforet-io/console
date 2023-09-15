@@ -164,7 +164,7 @@ const drawChart = (chartData: ChartData[]) => {
 
     if (chartData.some((d) => d.cost_sum && d.cost_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(series, tooltip, widgetState.currency);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(chartData);
     } else {
@@ -265,7 +265,6 @@ defineExpose<WidgetExpose<FullData>>({
                                :items="state.data ? state.data.results: []"
                                :legends.sync="state.legends"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more: false"
                                :color-set="colorSet"

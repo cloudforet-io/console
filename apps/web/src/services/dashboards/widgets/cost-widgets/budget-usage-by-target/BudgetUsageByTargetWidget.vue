@@ -195,7 +195,6 @@ defineExpose<WidgetExpose<Response>>({
                            :fields="state.tableFields"
                            :items="state.tableItems"
                            :currency="widgetState.currency"
-                           :currency-rates="props.currencyRates"
                            @update:thisPage="handleUpdateThisPage"
         >
             <template #col-target="{value}">
