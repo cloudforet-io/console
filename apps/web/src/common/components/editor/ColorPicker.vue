@@ -1,10 +1,7 @@
 <template>
     <div class="color-picker-wrapper">
-        <p-i name="ic_text-color"
-             color="inherit"
-        />
         <p-select-dropdown class="color-picker"
-                           style-type="icon-button"
+                           style-type="transparent"
                            :menu="textColorItems"
                            index-mode
         >
@@ -33,6 +30,11 @@
                         </span>
                     </div>
                 </div>
+            </template>
+            <template #dropdown-button>
+                <p-i name="ic_text-color"
+                     color="inherit"
+                />
             </template>
         </p-select-dropdown>
     </div>
@@ -94,6 +96,7 @@ export default defineComponent<Props>({
     @apply flex items-center;
 
     .color-picker {
+        min-width: unset;
         .color-picker-menu {
             padding: 0.625rem;
         }

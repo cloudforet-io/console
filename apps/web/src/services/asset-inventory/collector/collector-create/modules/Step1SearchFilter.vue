@@ -58,8 +58,10 @@
                                    class="select-dropdown"
                                    @update:selected="handleChangeProvider"
                 >
-                    <template #default="{ item }">
-                        <span class="content-menu-placeholder">
+                    <template #dropdown-button="item">
+                        <span v-if="item"
+                              class="content-menu-placeholder"
+                        >
                             <p-lazy-img v-if="item.name !== 'all'"
                                         width="1rem"
                                         height="1rem"
@@ -87,7 +89,7 @@
                                    :menu="state.repositoryList"
                                    class="select-dropdown"
                 >
-                    <template #default="{ item }">
+                    <template #dropdown-button="item">
                         <div class="content-menu-placeholder">
                             <span>{{ item.label }}</span>
                         </div>
@@ -197,7 +199,7 @@ watch(() => state.selectedRepository, (repository) => {
     }
 
     .content-menu-placeholder {
-        @apply inline-flex items-center text-label-md;
+        @apply inline-flex items-center;
         line-height: 1.5;
         margin-left: 0.25rem;
         width: 100%;

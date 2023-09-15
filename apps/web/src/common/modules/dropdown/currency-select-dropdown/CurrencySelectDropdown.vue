@@ -6,7 +6,7 @@
                        @select="handleSelectCurrency"
     >
         <template v-if="defaultCurrencyMode"
-                  #default="{ item }"
+                  #dropdown-button="item"
         >
             <span>
                 <span>{{ item.label }}</span>
