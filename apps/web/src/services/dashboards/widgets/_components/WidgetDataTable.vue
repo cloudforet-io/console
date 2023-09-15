@@ -13,7 +13,7 @@ import { throttle } from 'lodash';
 import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
 import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/settings/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -38,7 +38,6 @@ interface Props {
     showLegendIndex?: boolean;
     legends?: Legend[];
     currency?: Currency;
-    currencyRates?: CurrencyRates;
     disablePagination?: boolean;
     widgetKey?: string;
     size?: TableSize;
@@ -55,7 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
     thisPage: 1,
     legends: () => [],
     currency: CURRENCY.USD,
-    currencyRates: () => ({}) as CurrencyRates,
     widgetKey: '',
     size: TABLE_SIZE.sm,
     allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
@@ -118,7 +116,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
         }
         return formattedValue;
     } if (textOptions?.type === 'cost') {
-        return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+        return currencyMoneyFormatter(value, props.currency);
     } if (textOptions?.type === 'number') {
         return numberFormatter(value);
     } if (textOptions?.type === 'percent') {
