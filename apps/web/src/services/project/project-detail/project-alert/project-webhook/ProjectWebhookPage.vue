@@ -36,12 +36,12 @@
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-button>
                 <p-select-dropdown
-                    :items="dropdown"
+                    :menu="dropdown"
                     :disabled="!hasManagePermission || !isSelectedItem"
+                    :placeholder="$t('PROJECT.DETAIL.WEBHOOK_ACTION')"
+                    class="relative"
                     @select="onSelectDropdown"
-                >
-                    {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-plugin_info.plugin_id-format="{value}">
                 <div class="col-type">

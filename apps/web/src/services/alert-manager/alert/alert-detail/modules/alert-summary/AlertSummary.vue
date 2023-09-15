@@ -4,7 +4,7 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
             <template v-if="alertState !== ALERT_STATE.ERROR">
                 <p-select-dropdown
-                    :items="alertStateList"
+                    :menu="alertStateList"
                     :selected="alertState"
                     :disabled="manageDisabled"
                     class="state-dropdown"
@@ -26,7 +26,7 @@
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown :items="alertUrgencyList"
+            <p-select-dropdown :menu="alertUrgencyList"
                                :selected="alertUrgency"
                                :disabled="alertState === ALERT_STATE.ERROR || manageDisabled"
                                class="state-dropdown"

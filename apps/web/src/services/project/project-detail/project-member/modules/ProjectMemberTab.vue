@@ -28,12 +28,12 @@
                 >
                     {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
                 </p-button>
-                <p-select-dropdown :items="dropdownMenu"
+                <p-select-dropdown :menu="dropdownMenu"
                                    :disabled="manageDisabled"
+                                   :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
+                                   class="relative"
                                    @select="handleSelectDropdown"
-                >
-                    {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-resource_id-format="{ value }">
                 {{ storeState.users[value] ? storeState.users[value].name : value }}

@@ -1,5 +1,5 @@
 import type { AutocompleteHandler, FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
 
@@ -27,7 +27,7 @@ export interface JsonSchema {
     order?: string[];
     disabled?: boolean;
     json?: boolean;
-    menuItems?: SelectDropdownMenu[];
+    menuItems?: SelectDropdownMenuItem[];
     reference?: Reference;
 }
 

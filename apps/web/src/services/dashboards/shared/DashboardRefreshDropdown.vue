@@ -9,7 +9,7 @@
                        @click="handleRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
-                           :items="intervalOptionItems"
+                           :menu="intervalOptionItems"
                            :selected="dashboardDetailState.settings.refresh_interval_option"
                            :read-only="loading"
                            :class="{ loading }"
@@ -172,6 +172,7 @@ export default defineComponent<Props>({
 
     /* custom design-system component - p-icon-button */
     :deep(.left-icon-button) {
+        min-height: 2.125rem;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0;
