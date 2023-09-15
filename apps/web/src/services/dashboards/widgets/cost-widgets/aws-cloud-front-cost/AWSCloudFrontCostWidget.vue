@@ -7,6 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
@@ -35,6 +36,7 @@ import type {
     UsageType, WidgetEmit, WidgetExpose, WidgetProps,
     SelectorType,
 } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getRefinedXYChartData,
@@ -87,23 +89,26 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString({
-                ...getWidgetLocationFilters(widgetState.options.filters),
-                provider: ['aws'],
-                product: ['AmazonCloudFront'],
-            }),
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        const _period = {
+            start: end.subtract(5, 'month').format('YYYY-MM'),
+            end: end.format('YYYY-MM'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                group_by: arrayToQueryString([widgetState.groupBy, COST_GROUP_BY.USAGE_TYPE]),
+                period: objectToQueryString(_period),
+                filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 
 const { colorSet } = useWidgetColorSet({

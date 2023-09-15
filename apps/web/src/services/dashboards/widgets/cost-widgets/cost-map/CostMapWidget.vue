@@ -23,7 +23,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNe
 import type {
     WidgetExpose, WidgetProps, WidgetEmit, CostGroupBy,
 } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -38,9 +38,9 @@ import {
 } from './costmap-chart-data-helper';
 import { setThemeColorsToTreemapData } from './costmap-draw-chart-helper';
 
+
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
-
 
 
 const props = defineProps<WidgetProps>();
@@ -57,10 +57,10 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
+            granularity: primitiveToQueryString(GRANULARITY.DAILY),
             group_by: arrayToQueryString([widgetState.groupBy]),
             period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
@@ -100,7 +100,7 @@ const fetchData = async (): Promise<AnalyzeRawData[]|null> => {
             },
         });
         if (status === 'succeed') return response.results;
-        return state.data;
+        return [];
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];

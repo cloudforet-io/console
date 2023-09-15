@@ -28,7 +28,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -59,10 +59,10 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
+            granularity: primitiveToQueryString(GRANULARITY.DAILY),
             group_by: arrayToQueryString([widgetState.groupBy]),
             period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });

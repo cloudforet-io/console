@@ -27,7 +27,7 @@ const costMapWidgetConfig: WidgetConfig = {
     sizes: ['md', 'full'],
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
     },
     inherit_options: {
         ...getWidgetInheritOptions('cost_data_source'),

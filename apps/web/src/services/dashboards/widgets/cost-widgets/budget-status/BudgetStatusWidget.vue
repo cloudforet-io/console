@@ -35,13 +35,16 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
-        query: {
-            filters: budgetQueryHelper.setFilters(widgetState.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const dataSourceId = widgetState.options.cost_data_source;
+        return {
+            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+            params: {},
+            query: {
+                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
+            },
+        };
+    }),
 });
 
 const state = reactive({

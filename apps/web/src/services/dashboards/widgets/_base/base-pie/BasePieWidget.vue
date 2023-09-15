@@ -8,7 +8,6 @@ import type { Location } from 'vue-router/types/router';
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -26,11 +25,10 @@ import { gray } from '@/styles/colors';
 
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
@@ -69,10 +67,6 @@ const { colorSet } = useWidgetColorSet({
 });
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        start: widgetState.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM'),
-        end: widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
-    })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
@@ -80,10 +74,10 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
+            granularity: primitiveToQueryString(GRANULARITY.DAILY),
             group_by: arrayToQueryString([widgetState.groupBy]),
             period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
@@ -128,6 +122,7 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
                 group_by: [widgetState.groupBy],
@@ -146,10 +141,11 @@ const fetchData = async (): Promise<FullData> => {
         if (status === 'succeed') {
             return response;
         }
+        return { results: [], more: false };
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { results: [], more: false };
     }
-    return { results: [], more: false };
 };
 
 const drawChart = (chartData: ChartData[]) => {
