@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { reactive, toRef } from 'vue';
+import { toRef } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { useProxyValue } from '@/hooks';
 import {
     useSelectDropdownButtonDisplay,
 } from '@/inputs/dropdown/select-dropdown/composables/select-dropdown-button-display';
@@ -52,10 +51,6 @@ const emit = defineEmits<{(e: 'update:selectedItems', selected: SelectDropdownMe
     (e: 'enter-key'): void;
 }>();
 
-const state = reactive({
-    proxySelectedItems: useProxyValue<SelectDropdownMenuItem[]|string|number>('selectedItems', props, emit),
-});
-
 /* dropdown button display */
 const {
     displayValueOnDropdownButton,
@@ -63,12 +58,12 @@ const {
     displayBadgeValueOnDropdownButton,
 } = useSelectDropdownButtonDisplay({
     multiSelectable: toRef(props, 'multiSelectable'),
-    selected: toRef(state, 'proxySelectedItems'),
+    selected: toRef(props, 'selectedItems'),
     appearanceType: toRef(props, 'appearanceType'),
 });
 
 const handleClickDeleteAll = () => {
-    if (state.proxySelectedItems) {
+    if (props.selectedItems) {
         emit('click-delete');
     }
 };
@@ -85,9 +80,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         disabled: props.disabled,
         readonly: props.readonly,
         opened: props.isVisibleMenu,
-        selected: state.proxySelectedItem,
+        selected: props.selectedItems,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && state.proxySelectedItem,
+        'selection-highlight': props.selectionHighlight && props.selectedItems,
     }"
     >
         <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -145,7 +140,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                         <div v-else-if="showTagsOnDropdownButton"
                              class="tags-wrapper"
                         >
-                            <p-tag v-for="(item, idx) in state.proxySelectedItems"
+                            <p-tag v-for="(item, idx) in props.selectedItems"
                                    :key="item.name"
                                    class="selected-tag"
                                    @delete="handleTagDelete(item, idx)"
@@ -157,7 +152,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 </div>
             </slot>
             <div class="extra-button-wrapper">
-                <span v-if="props.showDeleteAllButton && state.proxySelectedItems.length > 0"
+                <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
                       class="delete-all-button"
                       @click.stop="handleClickDeleteAll"
                 >
