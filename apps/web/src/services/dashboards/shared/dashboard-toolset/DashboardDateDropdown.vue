@@ -3,11 +3,11 @@
         <p-select-dropdown
             :menu="monthMenuItems"
             :selected="selectedMonthMenuIndex"
+            :placeholder="selectedMonthLabel"
             index-mode
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <span>{{ selectedMonthLabel }}</span>
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
             </template>

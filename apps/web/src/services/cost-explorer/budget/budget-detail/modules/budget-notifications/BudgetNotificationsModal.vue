@@ -195,9 +195,11 @@ const handleConfirm = async () => {
                                            use-fixed-menu-style
                                            @update:selected="handleUpdateNotificationType(idx, $event)"
                         >
-                            <span :class="{'text-alert': condition.notification_type === BUDGET_NOTIFICATIONS_TYPE.CRITICAL}">
-                                {{ state.types.find(d => d.name === condition.notification_type).label }}
-                            </span>
+                            <template #dropdown-button>
+                                <span :class="{'text-alert': condition.notification_type === BUDGET_NOTIFICATIONS_TYPE.CRITICAL}">
+                                    {{ state.types.find(d => d.name === condition.notification_type).label }}
+                                </span>
+                            </template>
                         </p-select-dropdown>
                         <p-icon-button name="ic_delete"
                                        class="delete-button"
