@@ -81,7 +81,6 @@ export interface BaseWidgetConfig {
     widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
-    // labels?: string[];
 
     description?: {
         translation_id?: string;
@@ -94,7 +93,7 @@ export interface BaseWidgetConfig {
         inherit_count?: number;
     };
     sizes: WidgetSize[];
-    // options?: WidgetOptions;
+    inherit_options?: InheritOptions;
     options_schema?: WidgetOptionsSchema;
 }
 
@@ -152,12 +151,7 @@ export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSch
 export interface BaseWidgetOptionsSchema<T extends string> {
     default_properties?: T[];
     fixed_properties?: T[];
-    schema: {
-        type: 'object',
-        properties: Partial<Record<T, JsonSchema['properties']>>;
-        required?: T[];
-        order?: T[];
-    };
+    schema: JsonSchema;
 }
 export type WidgetOptionsSchema =
      | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
@@ -197,12 +191,12 @@ export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
     widget_key: string; // widget unique key. used for layout key binding.
-    title: string; // widget title
-    widget_options: WidgetOptions;
-    size: WidgetSize;
+    title?: string; // widget title
+    widget_options?: WidgetOptions;
+    size?: WidgetSize;
     version: string; // widget config version
-    inherit_options: InheritOptions; // inherit information for the widget option
-    schema_properties: string[]; // schema properties that are shown on widget form. updated when use add more options.
+    inherit_options?: InheritOptions; // inherit information for the widget option
+    schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
 }
 export type InheritOptions = Record<string, {
     enabled?: boolean;

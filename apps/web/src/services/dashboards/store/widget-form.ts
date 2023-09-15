@@ -74,7 +74,7 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
             this.widgetOptions = _widgetOptions;
             this.inheritOptions = _inheritOptions;
         },
-        initWidgetForm(widgetKey: string) {
+        initWidgetForm(widgetKey: string): DashboardLayoutWidgetInfo|undefined {
             const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
             this.widgetInfo = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
             if (this.widgetInfo) {

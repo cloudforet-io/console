@@ -3,7 +3,10 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_REFERENCE_SCHEMA } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyName, getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyName,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -42,13 +45,26 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
             page_size: 5,
         },
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'service_account',
+            'region',
+        ),
+    },
     options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'region')],
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'cost_product',
+            'project',
+            'service_account',
+            'region',
+        )],
         fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
+                ...getWidgetOptionsSchema('cost_group_by'),
                 [getWidgetFilterSchemaPropertyName('cost_product')]: {
                     ...COST_REFERENCE_SCHEMA.cost_product,
                     default: ['AmazonCloudFront'],

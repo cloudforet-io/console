@@ -1,7 +1,10 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions,
+    getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -25,6 +28,16 @@ const costMapWidgetConfig: WidgetConfig = {
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
         granularity: GRANULARITY.YEARLY,
+    },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        ),
     },
     options_schema: {
         default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
