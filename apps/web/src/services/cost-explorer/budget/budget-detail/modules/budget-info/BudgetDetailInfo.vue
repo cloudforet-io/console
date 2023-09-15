@@ -32,9 +32,10 @@ const state = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     processedProviderValue: computed<string>(() => {
-        const providerList = budgetPageState.budgetData?.provider_filter?.providers ?? [];
-        if (!budgetPageState.budgetData || !providerList.length) return '';
-        return changeToLabelList(providerList);
+        if (!budgetPageState.budgetData) return '';
+        const providerFilter = budgetPageState.budgetData?.provider_filter;
+        if (providerFilter?.state === 'DISABLED') return 'All';
+        return changeToLabelList(providerFilter?.providers ?? []);
     }),
     buttonRef: null as HTMLElement | null,
 });
