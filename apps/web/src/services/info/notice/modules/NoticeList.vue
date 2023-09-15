@@ -10,7 +10,6 @@
                     <p-select-dropdown v-if="domainName !== 'root'"
                                        :menu="dropdownItems"
                                        :selected="selectedPostType"
-                                       class="relative"
                                        @update:selected="handleSearchPostTypeChange"
                     />
                 </template>

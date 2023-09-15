@@ -271,9 +271,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     .left-area {
         @apply flex flex-wrap gap-4;
-        .sort-key-select-dropdown {
-            @apply relative;
-        }
     }
 }
 </style>

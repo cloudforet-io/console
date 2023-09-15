@@ -401,7 +401,6 @@ export default {
         display: inherit;
     }
     .dropdown-btn {
-        @apply relative;
         margin-left: 1rem;
     }
     .table-desc {
