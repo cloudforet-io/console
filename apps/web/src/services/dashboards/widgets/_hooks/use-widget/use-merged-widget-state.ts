@@ -96,7 +96,7 @@ const getRefinedWidgetOptions = (
     const mergedOptions = getMergedWidgetOptions(widgetConfig, optionsData);
     if (!mergedInheritOptions || !dashboardVariables) return mergedOptions;
 
-    const parentOptions: Partial<WidgetOptions> = convertInheritOptionsToWidgetFiltersMap(mergedInheritOptions, dashboardVariables, optionsErrorMap);
+    const parentOptions: Partial<WidgetOptions> = getRefinedParentOptions(mergedInheritOptions, dashboardVariables, optionsErrorMap);
     const refined = merge({}, mergedOptions, parentOptions);
     return refined;
 };
@@ -113,7 +113,7 @@ const getMergedWidgetInheritOptions = (widgetConfig?: WidgetConfig, inheritOptio
     return mergedInheritOptions;
 };
 
-const convertInheritOptionsToWidgetFiltersMap = (
+const getRefinedParentOptions = (
     inheritOptions: InheritOptions,
     dashboardVariables: DashboardVariables,
     optionsErrorMap?: InheritOptionsErrorMap,

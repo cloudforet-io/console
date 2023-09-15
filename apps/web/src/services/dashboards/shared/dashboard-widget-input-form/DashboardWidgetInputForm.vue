@@ -143,7 +143,11 @@ const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMen
     if (Array.isArray(selectedItem)) return !!selectedItem.length;
     return selectedItem && !isEmpty(selectedItem);
 };
-const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || widgetFormState.inheritOptions?.[propertyName].prohibited;
+const isInheritDisabled = (propertyName: string): boolean => {
+    const inputDisabled = !!state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled;
+    const nonInheritable = !!state.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
+    return inputDisabled || nonInheritable;
+};
 
 
 const handleReturnToInitialSettings = () => {
