@@ -14,7 +14,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     CloudServiceStatsModel, ComplianceStatus, Severity,
 } from '@/services/dashboards/widgets/_configs/asset-config';
