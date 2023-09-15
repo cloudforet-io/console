@@ -152,11 +152,6 @@ const queryState = reactive({
                 end: queryState.settings.date_range.end,
             });
         }
-        if (queryState.settings.currency.enabled) {
-            result.currency = objectToQueryString({
-                value: queryState.settings.currency.value,
-            });
-        }
         if (queryState.settings.refresh_interval_option) {
             result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
         }
@@ -225,7 +220,6 @@ const init = async () => {
     const useQueryValue = {
         variables: queryStringToObject(currentQuery.variables),
         dateRange: queryStringToObject(currentQuery.dateRange),
-        currency: queryStringToObject(currentQuery.currency),
         refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
     };
 
@@ -241,17 +235,6 @@ const init = async () => {
                 date_range: {
                     enabled: true,
                     ...useQueryValue.dateRange,
-                },
-            };
-        });
-    }
-    if (useQueryValue.currency) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                currency: {
-                    enabled: true,
-                    ...useQueryValue.currency,
                 },
             };
         });

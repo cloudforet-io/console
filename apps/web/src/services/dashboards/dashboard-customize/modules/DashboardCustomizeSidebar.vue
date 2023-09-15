@@ -17,18 +17,6 @@
                         </template>
                     </p-field-title>
                 </div>
-                <div class="selector-wrapper">
-                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
-                                   font-weight="regular"
-                    >
-                        <template #left>
-                            <p-toggle-button :value="state.enableCurrency"
-                                             class="toggle-button"
-                                             @change-toggle="handleChangeCurrencyToggle"
-                            />
-                        </template>
-                    </p-field-title>
-                </div>
                 <p-divider class="divider" />
                 <p-button style-type="tertiary"
                           size="lg"
@@ -136,7 +124,6 @@ const state = reactive({
         return _configMap;
     }),
     enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
-    enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
     addWidgetModalVisible: false,
 });
 
@@ -144,11 +131,6 @@ const state = reactive({
 const handleChangeDateRangeToggle = () => {
     dashboardDetailStore.$patch((_state) => {
         _state.settings.date_range.enabled = !_state.settings.date_range.enabled;
-    });
-};
-const handleChangeCurrencyToggle = () => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings.currency.enabled = !_state.settings.currency.enabled;
     });
 };
 const handleClickAddWidget = () => {

@@ -6,10 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
-import { CURRENCY } from '@/store/modules/settings/config';
-
 import type {
     DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
@@ -55,10 +51,6 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
             start: undefined,
             end: undefined,
             enabled: false,
-        },
-        currency: {
-            enabled: false,
-            value: CURRENCY.USD,
         },
         refresh_interval_option: DEFAULT_REFRESH_INTERVAL,
     },
@@ -118,10 +110,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         },
         dashboardViewer: (state) => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE,
         isWidgetLayoutValid: (state) => Object.values(state.widgetValidMap).every((d) => d === true),
-        dashboardCurrency: (state) => {
-            if (state.settings.currency.value === 'DEFAULT') return store.state.settings.currency;
-            return state.settings.currency.value;
-        },
     },
     actions: {
         resetDashboardData() {
@@ -160,10 +148,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                     enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
                     start: _dashboardInfo.settings?.date_range?.start,
                     end: _dashboardInfo.settings?.date_range?.end,
-                },
-                currency: {
-                    enabled: _dashboardInfo.settings?.currency?.enabled ?? false,
-                    value: _dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
                 },
                 refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
             };

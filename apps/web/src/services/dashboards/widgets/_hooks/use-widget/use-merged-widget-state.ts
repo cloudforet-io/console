@@ -5,8 +5,6 @@ import {
 
 import { merge } from 'lodash';
 
-import { CURRENCY } from '@/store/modules/settings/config';
-
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions,
@@ -64,16 +62,11 @@ export function useMergedWidgetState(
         settings: computed<DashboardSettings|undefined>(() => {
             if (!optionState.dashboardSettings) return undefined;
             const dateRange = optionState.dashboardSettings.date_range;
-            const currency = optionState.dashboardSettings.currency;
             return {
                 date_range: dateRange ? {
                     enabled: dateRange.enabled ?? false,
                     start: dateRange.start,
                     end: dateRange.end,
-                } : { enabled: false },
-                currency: currency ? {
-                    enabled: currency.enabled ?? false,
-                    value: currency.value ?? CURRENCY.USD,
                 } : { enabled: false },
                 refresh_interval_option: optionState.dashboardSettings.refresh_interval_option ?? 'off',
             };
