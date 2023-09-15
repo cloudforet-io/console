@@ -16,9 +16,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -76,18 +73,13 @@ const state = reactive({
     })) ?? []),
 });
 
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-});
-
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Util */
 const targetTextFormatter = (value: string): string => {
     const isProjectGroup = value.startsWith('pg-');
-    if (isProjectGroup) return storeState.projectGroups[value].label;
-    return storeState.projects[value].label;
+    if (isProjectGroup) return props.allReferenceTypeInfo.projectGroup.referenceMap[value].label ?? value;
+    return props.allReferenceTypeInfo.project.referenceMap[value]?.label ?? value;
 };
 
 /* Api */
