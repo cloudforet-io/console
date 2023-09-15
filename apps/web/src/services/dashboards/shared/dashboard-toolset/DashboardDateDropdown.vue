@@ -9,7 +9,9 @@
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <span>{{ selectedMonthLabel }}</span>
+            <template #dropdown-button>
+                <span>{{ selectedMonthLabel }}</span>
+            </template>
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
             </template>
