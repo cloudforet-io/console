@@ -1,11 +1,56 @@
+<script setup lang="ts">
+import {
+    computed,
+    reactive,
+} from 'vue';
+
+import { PSelectDropdown, PBadge } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
+const DEFAULT_CURRENCY = CURRENCY.USD;
+
+interface Props {
+    defaultCurrencyMode: boolean,
+    currency: Currency,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    defaultCurrencyMode: false,
+    currency: undefined,
+});
+
+const emit = defineEmits<{(e: 'update:currency', currency: Currency): void}>();
+
+const state = reactive({
+    currency: computed(() => props.currency || store.state.settings.currency || DEFAULT_CURRENCY),
+    currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
+        type: 'item',
+        name: currency,
+        label: `${CURRENCY_SYMBOL[currency]}${currency}`,
+        badge: currency === DEFAULT_CURRENCY ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
+    }))),
+});
+
+const handleSelectCurrency = (currency: Currency) => {
+    store.commit('settings/setCurrency', currency);
+    emit('update:currency', currency);
+};
+</script>
+
 <template>
-    <p-select-dropdown :menu="currencyItems"
-                       :selected="currency"
+    <p-select-dropdown :menu="state.currencyItems"
+                       :selected="state.currency"
                        style-type="transparent"
                        class="currency-select-dropdown"
                        @select="handleSelectCurrency"
     >
-        <template v-if="defaultCurrencyMode"
+        <template v-if="props.defaultCurrencyMode"
                   #dropdown-button="item"
         >
             <span>
@@ -19,7 +64,7 @@
                 </p-badge>
             </span>
         </template>
-        <template v-if="defaultCurrencyMode"
+        <template v-if="props.defaultCurrencyMode"
                   #menu-item--format="{ item }"
         >
             <span>
@@ -35,63 +80,6 @@
         </template>
     </p-select-dropdown>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    reactive, toRefs,
-} from 'vue';
-
-import { PSelectDropdown, PBadge } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
-
-export default {
-    name: 'CurrencySelectDropdown',
-    components: {
-        PSelectDropdown,
-        PBadge,
-    },
-    props: {
-        defaultCurrencyMode: {
-            type: Boolean,
-            default: false,
-        },
-        currency: {
-            type: String as PropType<Currency>,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }) {
-        const DEFAULT_CURRENCY = CURRENCY.USD;
-        const state = reactive({
-            currency: computed(() => props.currency || store.state.settings.currency || DEFAULT_CURRENCY),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.settings.currencyRates).map((currency) => ({
-                type: 'item',
-                name: currency,
-                label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-                badge: currency === DEFAULT_CURRENCY ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
-            }))),
-        });
-
-        const handleSelectCurrency = (currency: Currency) => {
-            store.commit('settings/setCurrency', currency);
-            emit('update:currency', currency);
-        };
-
-        return {
-            ...toRefs(state),
-            handleSelectCurrency,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .p-badge {
