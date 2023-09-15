@@ -106,8 +106,8 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
             filterItems.forEach((d) => {
                 const value = Array.isArray(d.v) ? d.v : [d.v];
                 results.push({
-                    k: `cost_types.${d.k}`,
-                    v: [null, ...value],
+                    k: d.k,
+                    v: value,
                     o: d.o,
                 });
             });
