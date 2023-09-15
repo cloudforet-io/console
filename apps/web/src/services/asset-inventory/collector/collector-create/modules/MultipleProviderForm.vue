@@ -1,3 +1,5 @@
+<!-- This component is only visible in specific plugins. e.g.) Prowler -->
+
 <template>
     <div class="multiple-provider-form">
         <p-field-title class="title">
