@@ -30,7 +30,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
-import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
@@ -84,19 +84,26 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        const _period = {
+            start: end.subtract(5, 'month').format('YYYY-MM'),
+            end: end.format('YYYY-MM'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                group_by: arrayToQueryString([widgetState.groupBy]),
+                period: objectToQueryString(_period),
+                filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 const state = reactive({
     loading: true,

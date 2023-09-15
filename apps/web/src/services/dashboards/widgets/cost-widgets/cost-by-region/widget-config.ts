@@ -25,7 +25,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
         cost_group_by: COST_GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
