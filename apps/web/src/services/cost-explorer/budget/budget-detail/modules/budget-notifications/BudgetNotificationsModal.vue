@@ -164,9 +164,9 @@ const handleConfirm = async () => {
                     <div :key="`condition-${idx}`"
                          class="condition-input-wrapper"
                     >
-                        <p-select-dropdown v-model="condition.unit"
+                        <p-select-dropdown :selected.sync="condition.unit"
                                            class="condition"
-                                           :items="state.units"
+                                           :menu="state.units"
                                            use-fixed-menu-style
                         />
                         <span class="align-middle">&gt;</span>
@@ -186,9 +186,9 @@ const handleConfirm = async () => {
                                 >%</span>
                             </template>
                         </p-text-input>
-                        <p-select-dropdown v-model="condition.notification_type"
+                        <p-select-dropdown :selected.sync="condition.notification_type"
                                            class="condition"
-                                           :items="state.types"
+                                           :menu="state.types"
                                            use-fixed-menu-style
                         >
                             <span :class="{'text-alert': condition.notification_type === NOTIFICATION_TYPE.CRITICAL}">

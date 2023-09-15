@@ -409,7 +409,6 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                     @apply truncate;
                 }
                 .selection-wrapper {
-                    @apply relative;
                     width: 100%;
                 }
                 .selected-item-text {
