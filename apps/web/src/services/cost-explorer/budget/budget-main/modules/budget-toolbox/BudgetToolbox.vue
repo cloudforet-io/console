@@ -157,7 +157,7 @@ watch(() => props.filters, (filters) => {
     if (filters !== queryTagsHelper.filters.value) {
         queryTagsHelper.setFilters(filters);
     }
-});
+}, { immediate: true });
 watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
 (async () => {
