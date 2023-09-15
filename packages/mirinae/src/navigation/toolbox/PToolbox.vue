@@ -344,6 +344,7 @@ export default defineComponent<ToolboxProps>({
             display: flex;
         }
         .dropdown-list {
+            min-width: 6.5rem;
             .p-dropdown-btn {
                 min-width: 6rem;
             }

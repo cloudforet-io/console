@@ -45,7 +45,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /* event emits */
-const emit = defineEmits<{(e: 'click-delete', item?: SelectDropdownMenuItem, idx?: number): void;
+const emit = defineEmits<{(e: 'update:selectedItems', selected: SelectDropdownMenuItem[]|string|number): void;
+    (e: 'click-delete', item?: SelectDropdownMenuItem, idx?: number): void;
     (e: 'click-dropdown-button'): void;
     (e: 'enter-key'): void;
 }>();
@@ -62,7 +63,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItems.length) {
+    if (props.selectedItems) {
         emit('click-delete');
     }
 };
@@ -79,9 +80,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         disabled: props.disabled,
         readonly: props.readonly,
         opened: props.isVisibleMenu,
-        selected: props.selectedItems.length > 0,
+        selected: props.selectedItems,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
+        'selection-highlight': props.selectionHighlight && props.selectedItems,
     }"
     >
         <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -108,44 +109,48 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                   class="show-alert-dot"
             />
             <slot name="input-left-area" />
-            <div class="selection-display-wrapper">
-                <span v-if="displayValueOnDropdownButton === undefined"
-                      class="placeholder"
-                >
-                    {{ props.selectionLabel
-                        ? props.selectionLabel
-                        : props.placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}
-                </span>
-                <span v-else
-                      class="selection-wrapper"
-                >
-                    <b v-if="props.selectionLabel">
-                        {{ props.selectionLabel }}:
-                    </b>
-                    <span v-if="displayValueOnDropdownButton"
-                          class="selected-item"
+            <slot name="item"
+                  v-bind="{...props}"
+            >
+                <div class="selection-display-wrapper">
+                    <span v-if="displayValueOnDropdownButton === undefined"
+                          class="placeholder"
                     >
-                        <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
-                        <p-badge v-if="displayBadgeValueOnDropdownButton"
-                                 :style-type="props.disabled ? 'gray200' : 'blue200'"
-                                 :badge-type="props.disabled ? 'solid' : 'subtle'"
-                        >
-                            {{ displayBadgeValueOnDropdownButton }}
-                        </p-badge>
+                        {{ props.selectionLabel
+                            ? props.selectionLabel
+                            : props.placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}
                     </span>
-                    <div v-else-if="showTagsOnDropdownButton"
-                         class="tags-wrapper"
+                    <span v-else
+                          class="selection-wrapper"
                     >
-                        <p-tag v-for="(item, idx) in props.selectedItems"
-                               :key="item.name"
-                               class="selected-tag"
-                               @delete="handleTagDelete(item, idx)"
+                        <b v-if="props.selectionLabel">
+                            {{ props.selectionLabel }}:
+                        </b>
+                        <span v-if="displayValueOnDropdownButton"
+                              class="selected-item"
                         >
-                            {{ item.label || item.name }}
-                        </p-tag>
-                    </div>
-                </span>
-            </div>
+                            <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
+                            <p-badge v-if="displayBadgeValueOnDropdownButton"
+                                     :style-type="props.disabled ? 'gray200' : 'blue200'"
+                                     :badge-type="props.disabled ? 'solid' : 'subtle'"
+                            >
+                                {{ displayBadgeValueOnDropdownButton }}
+                            </p-badge>
+                        </span>
+                        <div v-else-if="showTagsOnDropdownButton"
+                             class="tags-wrapper"
+                        >
+                            <p-tag v-for="(item, idx) in props.selectedItems"
+                                   :key="item.name"
+                                   class="selected-tag"
+                                   @delete="handleTagDelete(item, idx)"
+                            >
+                                {{ item.label || item.name }}
+                            </p-tag>
+                        </div>
+                    </span>
+                </div>
+            </slot>
             <div class="extra-button-wrapper">
                 <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
                       class="delete-all-button"
@@ -398,10 +403,20 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     &.is-fixed-width {
         .dropdown-button {
             .selection-display-wrapper {
+                @apply truncate;
                 flex: 1;
-                width: calc(100% - 3rem);
                 .placeholder, .selected-item-text {
                     @apply truncate;
+                }
+                .selection-wrapper {
+                    @apply relative;
+                    width: 100%;
+                }
+                .selected-item-text {
+                    @apply absolute;
+                    top: 25%;
+                    left: 0.5rem;
+                    width: calc(100% - 2.5rem);
                 }
             }
         }
