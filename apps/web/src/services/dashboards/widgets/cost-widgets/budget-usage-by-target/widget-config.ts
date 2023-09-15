@@ -31,7 +31,6 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     inherit_options: {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
-            'provider',
             'project',
             'region',
             'cost_product',
@@ -41,7 +40,6 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         default_properties: [
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
-                'provider',
                 'project',
                 'region',
                 'cost_product',
@@ -53,7 +51,6 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
             properties: {
                 ...getWidgetOptionsSchema('cost_data_source'),
                 ...getWidgetFilterOptionsSchema(
-                    'provider',
                     'project',
                     'service_account',
                     'cost_product',
@@ -63,7 +60,6 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
             order: [
                 'cost_data_source',
                 ...getWidgetFilterSchemaPropertyNames(
-                    'provider',
                     'project',
                     'service_account',
                     'cost_product',
