@@ -104,13 +104,16 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             return '';
         },
         isPeriodInvalid: (state) => {
+            const now = dayjs().utc();
             const checkPeriod = (limit:number):{isStartInvalid:boolean, isEndInvalid:boolean} => {
-                const isStartInvalid = dayjs.utc().diff(state.period?.start, 'month') >= limit;
-                const isEndInvalid = dayjs.utc().diff(state.period?.end, 'month') >= limit;
+                const isStartInvalid = now.diff(state.period?.start, 'month') >= limit;
+                const isEndInvalid = now.diff(state.period?.end, 'month') >= limit;
                 return { isStartInvalid, isEndInvalid };
             };
+            const DAILY_LIMIT_MONTH = 12;
+            const OTHER_LIMIT_MONTH = 36;
             const isGranularityDaily = state.granularity === GRANULARITY.DAILY;
-            const { isStartInvalid, isEndInvalid } = checkPeriod(isGranularityDaily ? 12 : 36);
+            const { isStartInvalid, isEndInvalid } = checkPeriod(isGranularityDaily ? DAILY_LIMIT_MONTH : OTHER_LIMIT_MONTH);
             return isStartInvalid || isEndInvalid;
         },
     },
