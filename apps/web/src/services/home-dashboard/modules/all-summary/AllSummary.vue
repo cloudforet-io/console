@@ -75,6 +75,7 @@
                                           :count="count[activeTab]"
                                           :selected-date-type="selectedDateType"
                                           :storage-suffix="storageBoxSuffix"
+                                          :data-source-id="dataSourceId"
                 />
             </div>
         </p-balloon-tab>
@@ -101,6 +102,9 @@ import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import config from '@/lib/config';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -153,6 +157,7 @@ export default {
         },
     },
     setup(props) {
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
             chart: null as any,
             chartRef: null as HTMLElement | null,
@@ -203,6 +208,13 @@ export default {
                     label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
                 },
             ]),
+            //
+            // HACK: this is temp code for data_source_id parameter in analyze API
+            dataSourceId: computed(() => {
+                const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
+                const dataSourceKeys: string[] = Object.keys(dataSourceMap);
+                return dataSourceKeys.length > 0 ? dataSourceKeys[1] : '';
+            }),
         });
         const chartState = reactive({
             loading: true,
@@ -389,16 +401,23 @@ export default {
         /* Api */
         const getBillingCount = async () => {
             try {
-                const { results } = await SpaceConnector.client.statistics.topic.billingSummary({
+                const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
                     ...props.extraParams,
-                    granularity: 'MONTHLY',
-                    start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
-                    end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
+                    data_source_id: state.dataSourceId,
+                    query: {
+                        granularity: GRANULARITY.MONTHLY,
+                        start: dayjs.utc().format('YYYY-MM'),
+                        end: dayjs.utc().format('YYYY-MM'),
+                        fields: {
+                            cost_sum: {
+                                key: 'cost',
+                                operator: 'sum',
+                            },
+                        },
+                    },
                 });
-                if (results.length > 0) {
-                    const count = results[0].billing_data[0].cost;
-                    state.count[DATA_TYPE.BILLING] = commaFormatter(numberFormatter(count));
-                }
+                const costSum = results[0]?.cost_sum ?? 0;
+                state.count[DATA_TYPE.BILLING] = commaFormatter(numberFormatter(costSum));
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -428,22 +447,24 @@ export default {
         };
         const getTrend = async (type) => {
             try {
-                let data;
+                let data = [];
                 if (type === DATA_TYPE.BILLING) {
-                    const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
                         ...props.extraParams,
-                        granularity: state.selectedDateType,
-                        start: state.period.start,
-                        end: state.period.end,
+                        data_source_id: state.dataSourceId,
+                        query: {
+                            granularity: state.selectedDateType,
+                            start: state.period.start,
+                            end: state.period.end,
+                            fields: {
+                                total: {
+                                    key: 'cost',
+                                    operator: 'sum',
+                                },
+                            },
+                        },
                     });
-                    if (res.results.length > 0) {
-                        data = res.results[0].billing_data.map((d) => ({
-                            date: d.date,
-                            total: d.cost,
-                        }));
-                    } else {
-                        data = [];
-                    }
+                    if (results.length) data = results;
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                         ...props.extraParams,
@@ -471,7 +492,7 @@ export default {
             state.loading = true;
             await Promise.all([
                 getCount(),
-                getBillingCount(),
+                allReferenceStore.load('costDataSource'),
             ]);
             state.loading = false;
         };
@@ -498,6 +519,9 @@ export default {
             await getTrend(state.activeTab);
             drawChart(state.chartRef);
         }, { immediate: false });
+        watch(() => state.dataSourceId, (dataSourceId) => {
+            if (dataSourceId) getBillingCount();
+        }, { immediate: true });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
