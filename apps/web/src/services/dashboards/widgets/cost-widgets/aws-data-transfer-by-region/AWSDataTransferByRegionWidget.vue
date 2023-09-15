@@ -29,7 +29,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNe
 import type {
     WidgetExpose, WidgetProps, SelectorType, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
@@ -80,13 +80,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed(() => {
-        const { end } = widgetState.settings?.date_range ?? {};
-        return {
-            start: end,
-            end,
-        };
-    }),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
@@ -94,14 +87,10 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
+            granularity: primitiveToQueryString(GRANULARITY.DAILY),
+            group_by: arrayToQueryString([COST_GROUP_BY.REGION, COST_GROUP_BY.USAGE_TYPE]),
             period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString({
-                ...getWidgetLocationFilters(widgetState.options.filters),
-                provider: ['aws'],
-                product: ['AWSDataTransfer'],
-            }),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
