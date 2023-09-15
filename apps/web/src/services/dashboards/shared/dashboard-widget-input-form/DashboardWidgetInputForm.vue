@@ -10,7 +10,7 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    cloneDeep, isEmpty, isEqual, union, xor,
+    isEmpty, isEqual, xor,
 } from 'lodash';
 
 import { getDefaultWidgetFormData } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
@@ -22,19 +22,17 @@ import {
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
+import { getInitialFormData } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/form-data-helper';
 import {
     getReferenceHandler,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/reference-handler-helper';
 import {
-    getRefinedWidgetInheritOptions,
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
-    DashboardLayoutWidgetInfo, WidgetConfig,
-    WidgetFiltersMap,
-    WidgetOptionsSchema,
+    WidgetConfig,
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -145,42 +143,12 @@ const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMen
     if (Array.isArray(selectedItem)) return !!selectedItem.length;
     return selectedItem && !isEmpty(selectedItem);
 };
-const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || state.fixedProperties.includes(propertyName);
+const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || widgetFormState.inheritOptions?.[propertyName].prohibited;
 
-const getFormDataFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
-    const { widget_options, inherit_options } = widgetInfo;
-    const widgetOptions = widget_options ?? {};
-    const inheritOptions = inherit_options ?? {};
-    const formData = {};
-
-    // set schema keywords
-    Object.entries(widgetOptions).forEach(([optionKey, optionValue]) => {
-        if (optionKey === 'filters') {
-            Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
-                if (Array.isArray(value)) {
-                    formData[`filters.${key}`] = value.map((filter) => filter.v).flat();
-                }
-            });
-        } else {
-            formData[optionKey] = cloneDeep(optionValue);
-        }
-    });
-
-    // override if inherit is enabled
-    Object.entries(inheritOptions).forEach(([optionKey, optionValue]) => {
-        if (optionValue?.enabled) formData[optionKey] = optionValue?.variable_info?.key;
-    });
-    return formData;
-};
-const getSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
-    if (!widgetInfo.schema_properties) {
-        return getRefinedSchemaProperties(state.widgetConfig?.options_schema ?? {});
-    }
-    return widgetInfo.schema_properties ?? [];
-};
 
 const handleReturnToInitialSettings = () => {
-    initStatesByWidgetConfig(props.widgetConfigId as string, true);
+    if (!widgetFormState.widgetInfo) return;
+    state.schemaFormData = getInitialFormData(widgetFormState.widgetInfo, dashboardDetailState.variablesSchema);
 };
 
 /* inherit */
@@ -203,32 +171,6 @@ const handleChangeInheritToggle = (propertyName: string, value) => {
     state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
 };
 
-/* schema refining helpers */
-const getRefinedSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
-    const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
-    const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
-    const allProperties = union(fixedProperties, defaultProperties);
-
-    const fixedIdxMap: Record<string, number> = {};
-    fixedProperties.forEach((name, idx) => { fixedIdxMap[name] = idx; });
-    const defaultIdxMap = {};
-    defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
-
-    return allProperties.sort((a, b) => {
-        if (fixedIdxMap[a] !== undefined) {
-            // if both are fixed, follow required index order
-            if (fixedIdxMap[b] !== undefined) return fixedIdxMap[a] > fixedIdxMap[b] ? 1 : -1;
-            // otherwise, fixed item comes before
-            return -1;
-        }
-        // if one is default and one is fixed, fixed one comes before
-        if (fixedIdxMap[b] !== undefined) return 1;
-
-        // if both are default, follow default index order
-        return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
-    });
-};
-
 /* states settings */
 const resetStates = () => {
     // reset widget form store states
@@ -247,72 +189,7 @@ const resetStates = () => {
     state.schemaFormData = {};
     resetTitle();
 };
-const initStatesByWidgetConfig = (widgetConfigId: string, forceInit = false) => {
-    state.schemaFormData = {};
-    const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
-    // init widget form store states
-    widgetFormStore.$patch((_state) => {
-        _state.widgetConfigId = widgetConfigId;
-        _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
-        _state.inheritOptions = {};
-    });
-    if (!props.widgetKey || forceInit) {
-        let _inheritOptions = widgetFormState.inheritOptions;
-        // set default value to fixed properties
-        widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
-            state.schemaFormData[propertyName] = state.widgetConfig?.options?.[propertyName];
-        });
-        // set default value to default properties
-        widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
-            const filterProperty = propertyName.replace('filters.', '');
-            if (dashboardDetailState.variablesSchema.properties[filterProperty]?.use) {
-                state.schemaFormData[propertyName] = filterProperty;
-            }
-            _inheritOptions = {
-                ..._inheritOptions,
-                [propertyName]: { enabled: true },
-            };
-        });
-        widgetFormStore.$patch((_state) => {
-            _state.inheritOptions = _inheritOptions;
-        });
-    }
-    // init states
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        widgetOptionsSchema,
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        widgetFormState.schemaProperties ?? [],
-        dashboardDetailState.projectId,
-    );
-};
-const setStatesForEditMode = (widgetKey: string) => {
-    const widgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
 
-    // set widget form store states
-    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey);
-    if (!widgetInfo) return;
-
-    // init title
-    updateTitle(widgetInfo.title);
-    // init widget form store states
-    widgetFormStore.$patch((_state) => {
-        _state.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
-        _state.schemaProperties = getSchemaPropertiesFromWidgetInfo(widgetInfo);
-    });
-    // init options schema
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        widgetOptionsSchema,
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        widgetFormState.schemaProperties ?? [],
-        dashboardDetailState.projectId,
-    );
-    // init form data
-    state.schemaFormData = getFormDataFromWidgetInfo(widgetInfo);
-};
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
     // do nothing if still loading
     if (loading) return;
@@ -323,11 +200,24 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
         return;
     }
 
-    // initiate states by widget config
-    initStatesByWidgetConfig(widgetConfigId);
+    // init widgetInfo - refined widget info
+    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, dashboardDetailState.projectId);
 
-    // set states if widget key exists. this is for updating widget case.
-    if (widgetKey) setStatesForEditMode(widgetKey);
+    // init title
+    updateTitle(widgetInfo.title);
+
+    // init schema
+    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+        referenceStoreState,
+        state.widgetConfig?.options_schema ?? {},
+        dashboardDetailState.variablesSchema,
+        widgetFormState.inheritOptions ?? {},
+        widgetFormState.schemaProperties ?? [],
+        dashboardDetailState.projectId,
+    );
+
+    // initiate form data
+    state.schemaFormData = getInitialFormData(widgetInfo, dashboardDetailState.variablesSchema);
 
     // set focus on text input
     if (widgetConfigId) {

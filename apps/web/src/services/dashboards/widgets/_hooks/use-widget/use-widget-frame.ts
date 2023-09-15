@@ -31,7 +31,7 @@ export const useWidgetFrame = (
         return widgetState.widgetConfig.sizes[0];
     });
     const nonInheritOptionsTooltipText = computed<string | undefined>(() => {
-        const nonInheritOptions = getNonInheritedWidgetOptions(props.inheritOptions);
+        const nonInheritOptions = getNonInheritedWidgetOptions(widgetState.inheritOptions);
         if (!nonInheritOptions.length) return undefined;
 
         // TODO: widget option name must be changed to readable name.

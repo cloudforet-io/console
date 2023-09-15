@@ -60,7 +60,7 @@ const updateDashboardWidgetStore = () => {
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
 
     // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey);
+    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
 };
 
 /* Api */
@@ -94,7 +94,7 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    widgetFormStore.initWidgetForm(props.widgetKey);
+    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
     state.proxyVisible = false;
     emit('refresh');
 };
