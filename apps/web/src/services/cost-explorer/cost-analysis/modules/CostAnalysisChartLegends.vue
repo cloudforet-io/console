@@ -101,7 +101,7 @@ watch(() => state.groupByMenuItems, (after) => {
 
 <template>
     <div class="cost-analysis-chart-legends">
-        <p-select-dropdown :items="state.groupByMenuItems"
+        <p-select-dropdown :menu="state.groupByMenuItems"
                            :selected="costAnalysisPageState.chartGroupBy"
                            :disabled="!costAnalysisPageState.groupBy.length"
                            class="group-by-select-dropdown"
@@ -143,6 +143,7 @@ watch(() => state.groupByMenuItems, (after) => {
 <style lang="postcss" scoped>
 .cost-analysis-chart-legends {
     .group-by-select-dropdown {
+        @apply relative;
         width: 100%;
         margin-bottom: 0.5rem;
     }

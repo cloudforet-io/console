@@ -21,7 +21,7 @@
                        required
         >
             <p-select-dropdown class="selection-type-dropdown"
-                               :items="selectionMenu"
+                               :menu="selectionMenu"
                                :selected.sync="selectionType"
             />
         </p-field-group>
@@ -235,7 +235,7 @@ const {
     .selection-type-field {
         @apply w-1/3;
         .selection-type-dropdown {
-            @apply w-full;
+            @apply relative w-full;
         }
     }
 
