@@ -39,7 +39,7 @@
         <div class="text-align-wrapper">
             <p-select-dropdown :selected="selectedTextAlign"
                                class="menu-dropdown"
-                               style-type="icon-button"
+                               style-type="transparent"
                                :menu="textAlignItems"
                                @select="handleTextAlignSelect"
             >
@@ -47,7 +47,7 @@
                     <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
                     {{ item.label }}
                 </template>
-                <template #button-item>
+                <template #dropdown-button>
                     <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
                          color="inherit"
                     />
@@ -323,6 +323,7 @@ export default defineComponent<Props>({
     }
 
     .menu-dropdown {
+        min-width: unset;
         &.text-style {
             min-width: 7.5rem;
         }

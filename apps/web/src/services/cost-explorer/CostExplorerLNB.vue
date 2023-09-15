@@ -255,7 +255,7 @@ onMounted(() => {
                                    is-fixed-width
                                    @update:selected="handleSelectDataSource"
                 >
-                    <template #default="{ item }">
+                    <template #dropdown-button="item">
                         <div class="selected-wrapper">
                             <p-lazy-img v-if="item && item.imageUrl"
                                         class="left-icon"
@@ -290,7 +290,8 @@ onMounted(() => {
     }
     .select-options-dropdown {
         .selected-wrapper {
-            @apply flex items-center w-full;
+            @apply flex items-center;
+            width: calc(100% - 1.8rem);
             .left-icon {
                 margin-right: 0.25rem;
                 flex-shrink: 0;

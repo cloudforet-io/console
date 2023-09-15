@@ -10,9 +10,11 @@
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
-                    <span :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">
-                        {{ alertStateList.find(d => d.name === alertState).label }}
-                    </span>
+                    <template #dropdown-button>
+                        <span :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">
+                            {{ alertStateList.find(d => d.name === alertState).label }}
+                        </span>
+                    </template>
                 </p-select-dropdown>
             </template>
             <template v-else>
@@ -32,20 +34,24 @@
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >
-                <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
-                     name="ic_error-filled"
-                     width="1em"
-                     height="1em"
-                     class="mr-2"
-                     :color="red[400]"
-                />
-                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
-                     name="ic_warning-filled"
-                     width="1em"
-                     height="1em"
-                     class="mr-2"
-                />
-                <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
+                <template #dropdown-button>
+                    <span class="selected-urgency">
+                        <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
+                             name="ic_error-filled"
+                             width="1em"
+                             height="1em"
+                             class="mr-2"
+                             :color="red[400]"
+                        />
+                        <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
+                             name="ic_warning-filled"
+                             width="1em"
+                             height="1em"
+                             class="mr-2"
+                        />
+                        <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
+                    </span>
+                </template>
             </p-select-dropdown>
         </p>
         <p class="content-wrapper">
@@ -211,6 +217,10 @@ export default {
     padding-bottom: 1.5rem;
     .state-dropdown {
         width: 9rem;
+        .text-alert, .selected-urgency {
+            @apply flex items-center;
+            flex: 1;
+        }
     }
 
     @screen mobile {
