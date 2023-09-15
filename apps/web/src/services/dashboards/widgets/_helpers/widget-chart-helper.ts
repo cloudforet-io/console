@@ -39,6 +39,7 @@ export const getRefinedXYChartData = <T extends RawData = RawData, S extends Rec
 ): S[] => {
     if (!rawData?.length) return [];
 
+
     const {
         groupBy, allReferenceTypeInfo, categoryKey, isHorizontal,
     } = options;
@@ -83,20 +84,26 @@ const mergeRefinedHorizontalXYChartData = <S = RawData>(chartData: S[], data: Ra
     const {
         groupBy, arrayDataKey, categoryKey, valueKey,
     } = options;
+    if (!groupBy) {
+        console.error(Error('groupBy is required for horizontal chart.'));
+        return [];
+    }
     const arrayDataKeys = typeof arrayDataKey === 'string' ? [arrayDataKey] : arrayDataKey;
-    let mergedChartData = chartData;
+    const mergedChartData = chartData;
     arrayDataKeys.forEach((arrDataKey) => { // [{date: '2022-11', value: 34}, ...]
         const arrayData = data[arrDataKey];
-        const refinedList: S[] = arrayData?.map((valueSet) => {
-            const result = {
+        if (!arrayData) return;
+
+        let refinedChartItem = {} as S;
+        arrayData.forEach((valueSet) => {
+            refinedChartItem = {
+                ...refinedChartItem,
                 [valueSet[categoryKey] as string]: valueSet[valueKey],
+                [groupBy]: groupByLabel,
             };
-            if (groupBy) {
-                result[groupBy] = groupByLabel;
-            }
-            return result;
-        }) ?? [];
-        mergedChartData = mergeByKey(mergedChartData, refinedList, categoryKey) as S[];
+        });
+
+        mergedChartData.push(refinedChartItem);
     });
     return mergedChartData;
 };

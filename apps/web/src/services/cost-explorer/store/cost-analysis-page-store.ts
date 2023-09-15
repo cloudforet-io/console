@@ -136,6 +136,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.filters = getRefinedFilters(options.filters);
             if (options.metadata?.filters_schema?.enabled_properties?.length) {
                 this.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+            } else {
+                this.enabledFiltersProperties = Object.keys(GROUP_BY_ITEM_MAP);
             }
         },
         async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {

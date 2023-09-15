@@ -64,11 +64,12 @@ export interface BudgetUsageModel {
     name: string;
     date: string;
     cost: number;
-    usage: number;
     limit: number;
-    cost_types?: Partial<Record<CostType, string[]>>;
+    currency: Currency;
+    provider_filter?: ProviderFilter;
     project_id?: string;
     project_group_id?: string;
     data_source_id: string;
+    domain_id: string;
     updated_at: string;
 }

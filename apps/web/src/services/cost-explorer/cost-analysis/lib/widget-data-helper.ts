@@ -1,4 +1,3 @@
-import type { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
@@ -8,7 +7,7 @@ import type {
     ChartData, Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getPeriodByGranularity, getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type {
     Period, Granularity, GroupBy, CostAnalyzeResponse,
 } from '@/services/cost-explorer/type';
@@ -123,7 +122,8 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  */
 export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
     const chartData: XYChartData[] = [];
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const timeUnit = getTimeUnitByGranularity(granularity);
+    const _period = getPeriodByGranularity(granularity, period);
     const dateFormat = DATE_FORMAT[timeUnit];
 
     let _groupBy: string | undefined = groupBy;
@@ -131,8 +131,8 @@ export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<
         _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
     }
 
-    let now = dayjs.utc(period.start).clone();
-    while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+    let now = dayjs.utc(_period.start).clone();
+    while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
         const _date = now.format(dateFormat);
         const chartDataByDate: XYChartData = { date: _date };
         rawData.results.forEach((d) => {
@@ -159,19 +159,25 @@ export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<
  *       => [{ date: '2021-01-01', cost: 10, limit: 100 }, { date: '2021-02-01', cost: 20, limit: 100 }, { date: '2021-03-01', cost: 30, limit: 200 }]
  * @usage CostAnalysisDynamicWidget
  */
-export const getStackedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
+export const getStackedChartData = (chartData: XYChartData[], granularity: Granularity, period: Period): XYChartData[] => {
+    const timeUnit = getTimeUnitByGranularity(granularity);
+    const _period = getPeriodByGranularity(granularity, period);
+
     const accumulatedChartData = [] as XYChartData[];
-    let now = dayjs.utc(period.start).clone();
+    let now = dayjs.utc(_period.start).clone();
+    const today = dayjs.utc();
     let accumulatedData: Record<string, number> = {};
-    while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+    while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
         let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
-        // eslint-disable-next-line no-loop-func
-        const existData = chartData.find((d) => now.isSame(dayjs.utc(d.date), timeUnit));
-        accumulatedData = _mergePrevChartDataAndCurrChartData(accumulatedData, existData);
-        eachChartData = {
-            ...eachChartData,
-            ...accumulatedData,
-        };
+        if (!now.isAfter(today, timeUnit)) {
+            // eslint-disable-next-line no-loop-func
+            const existData = chartData.find((d) => now.isSame(dayjs.utc(d.date), timeUnit));
+            accumulatedData = _mergePrevChartDataAndCurrChartData(accumulatedData, existData);
+            eachChartData = {
+                ...eachChartData,
+                ...accumulatedData,
+            };
+        }
         accumulatedChartData.push(eachChartData);
         now = now.add(1, timeUnit);
     }

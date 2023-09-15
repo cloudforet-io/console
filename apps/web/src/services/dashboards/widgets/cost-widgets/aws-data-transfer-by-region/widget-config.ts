@@ -43,7 +43,11 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     options_schema: {
         default_properties: [
             'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'cost_account'),
+            ...getWidgetFilterSchemaPropertyNames(
+                'cost_product',
+                'project',
+                'service_account',
+            ),
         ],
         fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
@@ -54,11 +58,22 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
                     ...COST_REFERENCE_SCHEMA.cost_product,
                     default: ['AWSDataTransfer'],
                 },
-                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
+                ...getWidgetFilterOptionsSchema(
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
             },
             order: [
                 'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'project_group', 'region', 'cost_account'),
+                ...getWidgetFilterSchemaPropertyNames(
+                    'cost_product',
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
             ],
         },
     },

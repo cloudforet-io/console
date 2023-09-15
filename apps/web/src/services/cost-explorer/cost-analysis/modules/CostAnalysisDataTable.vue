@@ -37,7 +37,7 @@ import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-d
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
-import { getDataTableCostFields, getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
+import { getDataTableCostFields, getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/type';
 
@@ -62,7 +62,7 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
     component: computed(() => PToolboxTable),
-    timeUnit: computed(() => getTimeUnitByPeriod(costAnalysisPageState.granularity, dayjs.utc(costAnalysisPageState.period?.start), dayjs.utc(costAnalysisPageState.period?.end))),
+    timeUnit: computed(() => getTimeUnitByGranularity(costAnalysisPageState.granularity)),
     dateFormat: computed(() => {
         if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) return 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) return 'YYYY';
@@ -213,20 +213,23 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
 };
 
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
+    const timeUnit = getTimeUnitByGranularity(granularity);
     const dateFormat = DATE_FORMAT[timeUnit];
+    const showUsageQuantity = costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE);
 
     const _results: CostAnalyzeRawData[] = cloneDeep(results);
     const refinedTableData: CostAnalyzeRawData[] = [];
+    const today = dayjs.utc();
     _results.forEach((d) => {
         let _costSum = cloneDeep(d.cost_sum);
         let _usageQuantitySum = cloneDeep(d?.usage_quantity_sum);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
+            if (now.isAfter(today, timeUnit)) break;
             if (!find(_costSum, { date: now.format(dateFormat) })) {
                 _costSum?.push({ date: now.format(dateFormat), value: 0 });
             }
-            if (!find(_usageQuantitySum, { date: now.format(dateFormat) })) {
+            if (showUsageQuantity && !find(_usageQuantitySum, { date: now.format(dateFormat) })) {
                 _usageQuantitySum?.push({ date: now.format(dateFormat), value: null });
             }
             now = now.add(1, timeUnit);
@@ -252,7 +255,8 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageStore.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+        let dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
@@ -273,6 +277,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
                         },
                     }),
                 },
+                sort: [{ key: '_total_cost_sum', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },

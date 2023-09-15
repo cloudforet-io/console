@@ -57,10 +57,7 @@ const drawChart = () => {
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, {
-        min: dayjs.utc(costAnalysisPageState.period?.start).valueOf(),
-        max: dayjs.utc(costAnalysisPageState.period?.end).add(1, timeUnit).valueOf(),
-    });
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;
@@ -78,7 +75,7 @@ const drawChart = () => {
     // get stacked chart data of daily chart
     let _chartData = cloneDeep(props.chartData);
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
-        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.period ?? {}, timeUnit);
+        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     }
 
     props.legends.forEach((legend) => {

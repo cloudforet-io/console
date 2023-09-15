@@ -66,7 +66,7 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
             },
             ...resourceApiQueryHelper.data,
         });
-        if (status) return response.results;
+        if (status) return response?.results;
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);

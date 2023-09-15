@@ -16,9 +16,9 @@ import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetC
 import BudgetDataSourceSelect from '@/services/cost-explorer/budget/shared/BudgetDataSourceSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 
-export type BudgetBaseInfo = Pick<BudgetModel, 'name'|'cost_types'|'project_group_id'|'project_id'>;
+export type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;
 
-type CostTypes = BudgetModel['cost_types'];
+type ProviderFilter = BudgetModel['provider_filter'];
 
 const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllvalid: boolean): void; }>();
 
@@ -39,7 +39,8 @@ const {
 const state = reactive({
     target: undefined as string|undefined,
     isTargetValid: false,
-    costTypes: undefined as CostTypes|undefined,
+    providerFilter: undefined as ProviderFilter|undefined,
+    dataSourceId: undefined as string|undefined,
     isCostTypesValid: false,
     budgetInfo: computed<BudgetBaseInfo>(() => {
         const isProjectGroup = state.target?.startsWith('pg-');
@@ -47,7 +48,8 @@ const state = reactive({
         const budgetInfo: BudgetBaseInfo = {
             name: name.value,
             [isProjectGroup ? 'project_group_id' : 'project_id']: state.target,
-            cost_types: state.costTypes,
+            provider_filter: state.providerFilter,
+            data_source_id: state.dataSourceId,
         };
 
         return budgetInfo;
@@ -55,13 +57,16 @@ const state = reactive({
     isAllValid: computed<boolean>(() => isNameValid.value && state.isCostTypesValid && state.isTargetValid),
 });
 
+const handleUpdateDataSource = (dataSourceId: string) => {
+    state.dataSourceId = dataSourceId;
+};
 const handleUpdateTarget = (target: string|undefined, isValid: boolean) => {
     state.target = target;
     state.isTargetValid = isValid;
 };
 
-const handleUpdateCostTypes = (costTypes: CostTypes|undefined, isValid: boolean) => {
-    state.costTypes = costTypes;
+const handleUpdateProviderFilter = (providerFilter: ProviderFilter|undefined, isValid: boolean) => {
+    state.providerFilter = providerFilter;
     state.isCostTypesValid = isValid;
 };
 
@@ -88,11 +93,11 @@ watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid
                               @update:value="setForm('name', $event)"
                 />
             </p-field-group>
-            <budget-data-source-select @update="handleUpdateTarget" />
+            <budget-data-source-select @update="handleUpdateDataSource" />
 
             <budget-target-select @update="handleUpdateTarget" />
 
-            <budget-cost-type-select @update="handleUpdateCostTypes" />
+            <budget-cost-type-select @update="handleUpdateProviderFilter" />
         </div>
     </p-pane-layout>
 </template>
