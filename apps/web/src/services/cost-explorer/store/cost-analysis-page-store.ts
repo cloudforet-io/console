@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -101,6 +102,12 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                 return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }
             return '';
+        },
+        isPeriodInvalid: (state) => {
+            if (state.granularity === GRANULARITY.DAILY) {
+                return dayjs.utc().diff(state.period?.start, 'year') > 1;
+            }
+            return dayjs.utc().diff(state.period?.start, 'year') > 3;
         },
     },
     actions: {

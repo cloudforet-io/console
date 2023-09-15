@@ -545,6 +545,7 @@
 					"UP_TO_LAST_12_MONTHS": "最長12ヶ月(期間内)設定可能"
 				},
 				"HIDE_ALL": "すべて隠す",
+				"INVALID_PERIOD_TEXT": "",
 				"KEEP_MY_SETTING": "上記の設定をマイ設定として保持",
 				"LABEL_ADDITIONAL_FIELD": "追加フィールド",
 				"LABEL_COST_ANALYSIS_NAME": "コスト分析の名前",
