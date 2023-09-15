@@ -2,7 +2,10 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const costByRegionWidgetConfig: WidgetConfig = {
@@ -33,6 +36,16 @@ const costByRegionWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 10,
         },
+    },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        ),
     },
     options_schema: {
         default_properties: [

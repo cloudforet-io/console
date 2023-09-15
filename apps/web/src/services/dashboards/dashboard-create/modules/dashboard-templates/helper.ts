@@ -11,7 +11,6 @@ import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/dashboard-create/m
 import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { getWidgetDefaultInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 export const getDefaultWidgetFormData = (widgetId: string): Record<string, string> => {
@@ -32,32 +31,16 @@ export const getDefaultWidgetFormData = (widgetId: string): Record<string, strin
     return schemaFormData;
 };
 
-type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<DashboardLayoutWidgetInfo>];
+type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
     ([widgetId, customInfo]) => {
         try {
             const widgetConfig = getWidgetConfig(widgetId);
-            const widgetConfigTitle = widgetConfig.title ?? widgetConfig.widget_config_id;
-            const title = customInfo?.title ? (customInfo?.title ?? widgetConfigTitle) : widgetConfigTitle;
-            const widgetOptions = () => {
-                const defaultOptions = cloneDeep(widgetConfig.options);
-                const customOptions = customInfo?.widget_options;
-                if (customOptions && defaultOptions) {
-                    Object.keys(customOptions).forEach((key) => {
-                        defaultOptions[key] = customOptions[key];
-                    });
-                }
-                return defaultOptions;
-            };
             const widgetInfo: DashboardLayoutWidgetInfo = {
                 widget_key: uuidv4(),
                 widget_name: widgetConfig.widget_config_id,
-                title,
-                widget_options: widgetOptions() ?? {},
-                size: widgetConfig.sizes[0],
                 version: '1',
-                inherit_options: getWidgetDefaultInheritOptions(widgetConfig),
-                schema_properties: widgetConfig.options_schema?.default_properties ?? [],
+                ...customInfo,
             };
             return widgetInfo;
         } catch (e) {

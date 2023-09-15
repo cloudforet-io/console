@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRef, toRefs,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -27,14 +27,14 @@ import type {
 import {
     GRANULARITY,
 } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetBaseState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
+import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 import {
-    useWidgetBaseState,
-} from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-base-state';
+    useMergedWidgetState,
+} from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 import type { ChartType } from '@/services/dashboards/widgets/type';
 
 
-export interface WidgetState extends WidgetBaseState {
+export interface WidgetState extends MergedWidgetState {
     granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
     groupBy: ComputedRef<CostGroupBy | AssetGroupBy | undefined>;
@@ -46,10 +46,17 @@ export interface WidgetState extends WidgetBaseState {
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
 }
 export function useWidgetState(props: WidgetProps) {
-    const state = useWidgetBaseState(props);
+    const state = useMergedWidgetState({
+        inheritOptions: toRef(props, 'inheritOptions'),
+        widgetOptions: toRef(props, 'options'),
+        widgetName: toRef(props, 'widgetConfigId'),
+        dashboardSettings: toRef(props, 'dashboardSettings'),
+        dashboardVariablesSchema: toRef(props, 'dashboardVariablesSchema'),
+        dashboardVariables: toRef(props, 'dashboardVariables'),
+    });
 
     return reactive<WidgetState>({
-        ...toRefs(state) as WidgetBaseState,
+        ...toRefs(state) as MergedWidgetState,
         granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         groupBy: computed(() => {
