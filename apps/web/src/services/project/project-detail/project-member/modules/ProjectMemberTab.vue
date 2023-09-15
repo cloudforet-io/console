@@ -31,7 +31,6 @@
                 <p-select-dropdown :menu="dropdownMenu"
                                    :disabled="manageDisabled"
                                    :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
-                                   class="relative"
                                    @select="handleSelectDropdown"
                 />
             </template>

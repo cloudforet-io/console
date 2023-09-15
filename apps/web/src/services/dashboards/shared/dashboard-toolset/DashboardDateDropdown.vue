@@ -161,7 +161,7 @@ export default defineComponent({
 </script>
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {
-    @apply relative flex items-center justify-center;
+    @apply flex items-center justify-center;
     min-height: 2rem;
 }
 </style>
