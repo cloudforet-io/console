@@ -25,7 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, red, gray } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getRefinedDateTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
