@@ -10,61 +10,109 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    CostAnalyzeDataModel, XYChartData, Legend, PieChartData,
+    Legend,
 } from '@/services/dashboards/widgets/type';
 
 
-const mergeByKey = (arrA, arrB, key) => {
-    const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
-    return values(merged);
-};
+interface RawData<S extends Record<string, any> = Record<string, any>> {
+    [key: string]: any | S[];
+}
+
+interface RefineOptions {
+    groupBy?: string; // if given, set the value to the groupBy property. { [groupBy]: valueData }
+    allReferenceTypeInfo?: AllReferenceTypeInfo; // if both this and groupBy are given, get groupBy label and set the value to the label property. { [groupByLabel]: valueData }
+    arrayDataKey: string|string[]; // = 'cost_sum' or ['cost_sum', 'budget_sum']
+    categoryKey: string; // merge by this key.  = 'date' pr ['date', 'Usage Type Details']
+    valueKey: string // 'value'
+    useDataKeyAsRefinedValue?: boolean; // only works for vertical chart.
+    isHorizontal?: boolean;
+    additionalIncludeKeys?: string[]; // it will be included in the result. it is the keys of the target array data.
+}
 /**
  * @name getRefinedXYChartData
  * @description Convert raw data to XYDateChart data.
  * @example [{ date: '2021-11', aws: 100, azure: 300 }, { date: '2021-09', aws: 300, azure: 100 }]
  */
-export const getRefinedXYChartData = (
-    rawData: CostAnalyzeDataModel['results'],
-    groupBy?: CostGroupBy,
-    categoryKey = 'date',
-    valueKey = 'cost_sum',
-    isHorizontal = false,
-    allReferenceTypeInfo?: AllReferenceTypeInfo,
-): XYChartData[] => {
-    if (!rawData) return [];
+export const getRefinedXYChartData = <T extends RawData = RawData, S extends Record<string, any> = Record<string, any>>(
+    rawData: T[],
+    options: RefineOptions,
+): S[] => {
+    if (!rawData?.length) return [];
 
-    let chartData: XYChartData[] = [];
+
+    const {
+        groupBy, allReferenceTypeInfo, categoryKey, isHorizontal,
+    } = options;
+
+    let chartData: S[] = [];
     rawData.forEach((data) => {
-        let groupByName;
-        if (groupBy) {
-            const referenceMap = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === groupBy)?.referenceMap;
-            groupByName = referenceMap ? referenceMap[data[groupBy]]?.label : data[groupBy]; // AmazonCloudFront
-        } else {
-            groupByName = 'value';
-        }
-        if (!groupByName) groupByName = `no_${groupBy}`;
-        const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
-        const refinedList: Record<string, any>[] = valueList.map((valueSet) => {
-            if (isHorizontal && !!groupBy) {
-                return {
-                    [groupBy]: groupByName,
-                    [valueSet[categoryKey]]: valueSet.value,
-                };
-            }
-            return {
-                [categoryKey]: valueSet[categoryKey],
-                [groupByName]: valueSet.value,
-            };
-        });
-        if (isHorizontal) {
-            chartData.push(Object.assign({}, ...refinedList));
-        } else {
-            chartData = mergeByKey(chartData, refinedList, categoryKey) as XYChartData[];
-        }
+        const groupByLabel = groupBy ? getGroupByLabel<T>(data, groupBy, allReferenceTypeInfo) : undefined;
+        chartData = isHorizontal
+            ? mergeRefinedHorizontalXYChartData(chartData, data, options, groupByLabel)
+            : mergeRefinedXYChartData(chartData, data, options, groupByLabel);
     });
     return sortBy(chartData, categoryKey);
 };
+const mergeRefinedXYChartData = <S = RawData>(chartData: S[], data: RawData, options: RefineOptions, groupByLabel: string|undefined): S[] => {
+    const {
+        arrayDataKey, categoryKey, valueKey, useDataKeyAsRefinedValue, additionalIncludeKeys,
+    } = options;
+    const arrayDataKeys = typeof arrayDataKey === 'string' ? [arrayDataKey] : arrayDataKey;
+    let mergedChartData = chartData;
+    arrayDataKeys.forEach((arrDataKey, i) => { // [{date: '2022-11', value: 34}, ...]
+        const arrayData = data[arrDataKey];
+        const valueSetKey = useDataKeyAsRefinedValue ? arrayDataKeys[i] : groupByLabel ?? valueKey;
+        const refinedList: S[] = arrayData?.map((valueSet) => {
+            const refined = {
+                [valueSetKey]: valueSet[valueKey],
+                [categoryKey]: valueSet[categoryKey],
+            };
+            additionalIncludeKeys?.forEach((key) => {
+                refined[key] = valueSet[key];
+            });
+            return refined;
+        }) ?? [];
+        mergedChartData = mergeByKey(mergedChartData, refinedList, categoryKey) as S[];
+    });
+    return mergedChartData;
+};
+const mergeByKey = <S = RawData>(arrA: S[], arrB: S[], key: string): S[] => {
+    const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
+    return values(merged) as S[];
+};
+const mergeRefinedHorizontalXYChartData = <S = RawData>(chartData: S[], data: RawData, options: RefineOptions, groupByLabel: string|undefined): S[] => {
+    const {
+        groupBy, arrayDataKey, categoryKey, valueKey,
+    } = options;
+    if (!groupBy) {
+        console.error(Error('groupBy is required for horizontal chart.'));
+        return [];
+    }
+    const arrayDataKeys = typeof arrayDataKey === 'string' ? [arrayDataKey] : arrayDataKey;
+    const mergedChartData = chartData;
+    arrayDataKeys.forEach((arrDataKey) => { // [{date: '2022-11', value: 34}, ...]
+        const arrayData = data[arrDataKey];
+        if (!arrayData) return;
 
+        let refinedChartItem = {} as S;
+        arrayData.forEach((valueSet) => {
+            refinedChartItem = {
+                ...refinedChartItem,
+                [valueSet[categoryKey] as string]: valueSet[valueKey],
+                [groupBy]: groupByLabel,
+            };
+        });
+
+        mergedChartData.push(refinedChartItem);
+    });
+    return mergedChartData;
+};
+const getGroupByLabel = <T extends Record<string, any>>(data: T, groupBy: string, allReferenceTypeInfo?: AllReferenceTypeInfo): string => {
+    const referenceMap = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === groupBy)?.referenceMap;
+    const resourceValue = data[groupBy];
+    if (resourceValue) return referenceMap?.[resourceValue]?.label ?? resourceValue; // AmazonCloudFront
+    return `no_${groupBy}`;
+};
 
 /**
  * @name getXYChartLegends
@@ -72,7 +120,7 @@ export const getRefinedXYChartData = (
  */
 export const getXYChartLegends = <T = Record<string, any>>(
     rawData?: T[],
-    groupBy?: CostGroupBy,
+    groupBy?: string,
     allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
@@ -103,7 +151,7 @@ export const getXYChartLegends = <T = Record<string, any>>(
     return legends;
 };
 
-export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: CostGroupBy): Legend[] => {
+export const getPieChartLegends = (rawData: RawData[], groupBy?: string): Legend[] => {
     if (!rawData || !groupBy) return [];
     return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
 };
@@ -117,20 +165,24 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
     };
 };
 
+
+type AppendedData<T> = T & {
+    [groupBy: string]: string | any;
+};
 /**
  * @name getRefinedPieChartData
  * @description Convert raw data to XYDateChart data.
  * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
  * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
  */
-export const getRefinedPieChartData = (
-    rawData: CostAnalyzeDataModel['results'],
+export const getRefinedPieChartData = <T extends RawData = RawData>(
+    rawData: T[],
     groupBy: CostGroupBy,
     allReferenceTypeInfo: AllReferenceTypeInfo,
-): PieChartData[] => {
+): AppendedData<T>[] => {
     if (!rawData || !groupBy) return [];
 
-    const chartData: PieChartData[] = [];
+    const chartData: AppendedData<T>[] = [];
     rawData.forEach((d) => {
         let _name = d[groupBy];
         const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
@@ -143,7 +195,7 @@ export const getRefinedPieChartData = (
         chartData.push({
             ...d,
             [groupBy]: _name,
-        } as PieChartData);
+        } as AppendedData<T>);
     });
     return chartData;
 };

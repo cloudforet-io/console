@@ -1,19 +1,16 @@
 <script lang="ts" setup>
-import { isEqual } from 'lodash';
 import {
     onUnmounted, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import {
-    arrayToQueryString,
-    objectToQueryString,
-    primitiveToQueryString,
     queryStringToArray,
     queryStringToObject,
     queryStringToString,
 } from '@/lib/router-query-string';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import CostAnalysisChart from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisDataTable from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisDataTable.vue';
 import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
@@ -22,14 +19,10 @@ import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modu
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
-    CostQuerySetModel, CostQuerySetOption, Granularity,
+    CostQuerySetModel, Granularity,
 } from '@/services/cost-explorer/type';
 
 
-interface Props {
-    costQuerySetId?: string;
-}
-const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
 
@@ -37,88 +30,29 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 /* util */
-const setQueryOptions = (options?: CostQuerySetOption) => {
-    if (options) costAnalysisPageStore.setQueryOptions(options);
-    else costAnalysisPageStore.initState();
-};
-
-const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
+const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
     granularity: queryStringToString(urlQuery.granularity) as Granularity,
     group_by: queryStringToArray(urlQuery.group_by),
-    period: queryStringToObject(urlQuery.period) ?? {},
+    period: queryStringToObject(urlQuery.period),
     filters: queryStringToObject(urlQuery.filters),
 });
 
-const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageStore.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
-
-let unregisterStoreWatch;
-const registerStoreWatch = (currentQuery) => {
-    unregisterStoreWatch = watch(() => costAnalysisPageState, () => {
-        if (props.costQuerySetId) return;
-
-        const newQuery: CostAnalysisPageUrlQuery = {
-            granularity: primitiveToQueryString(costAnalysisPageState.granularity),
-            group_by: arrayToQueryString(costAnalysisPageState.groupBy),
-            period: objectToQueryString(costAnalysisPageState.period),
-            filters: objectToQueryString(costAnalysisPageStore.filters),
-        };
-
-
-        if (!isEqual(newQuery, currentQuery)) {
-            router.replace({ query: newQuery }).catch((e) => {
-                if (e.name !== 'NavigationDuplicated') console.error(e);
-            });
-        }
-    }, { immediate: false });
-};
-
 onUnmounted(() => {
-    if (unregisterStoreWatch) {
-        unregisterStoreWatch();
-    }
     costAnalysisPageStore.$dispose();
     costAnalysisPageStore.$reset();
 });
 
-watch(() => route.params, async (after, before) => {
-    const costQuerySetId = after.costQuerySetId as string;
-
-    if (costQuerySetId === before?.costQuerySetId) return;
-
-    if (costQuerySetId) {
-        const { options } = getQueryWithKey(costQuerySetId);
-        await costAnalysisPageStore.setQueryOptions(options);
-        costAnalysisPageStore.selectQueryId(costQuerySetId);
+watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
+    if (selectedQuerySet) {
+        await costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
+    } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
+        const currentQuery = SpaceRouter.router.currentRoute.query;
+        const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
+        await costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
     } else {
         await costAnalysisPageStore.setQueryOptions();
-        costAnalysisPageStore.selectQueryId(undefined);
     }
 }, { immediate: true });
-
-/* Page Init */
-(async () => {
-    const currentQuery = router.currentRoute.value.query;
-
-    // init states
-    if (props.costQuerySetId) {
-        const { name, options } = getQueryWithKey(props.costQuerySetId);
-        if (name) {
-            setQueryOptions(options);
-            costAnalysisPageStore.selectQueryId(props.costQuerySetId);
-        } else {
-            costAnalysisPageStore.selectQueryId(undefined);
-        }
-    } else if (Object.keys(currentQuery).length) {
-        const options = getQueryOptionsFromUrlQuery(currentQuery);
-        setQueryOptions(options);
-    } else {
-        await costAnalysisPageStore.initState();
-    }
-
-    // register store watch
-    registerStoreWatch(currentQuery);
-})();
-
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { palette } from '@/styles/colors';
 
@@ -25,15 +25,20 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
 
 interface UseWidgetColorSetOptions {
     theme: Ref<WidgetTheme | undefined>;
-    dataSize: Ref<number>;
+    dataSize: Ref<number> | number;
 }
 export const useWidgetColorSet = ({
     theme, dataSize,
-}: UseWidgetColorSetOptions) => ({
-    colorSet: computed<string[]>(() => {
-        if (!theme?.value) return [];
-        if (!dataSize.value) return [];
-        const colorSetType: WidgetColorSetType = dataSize.value > 9 ? 'massive' : 'basic';
-        return getColorSet(theme.value, colorSetType);
-    }),
-});
+}: UseWidgetColorSetOptions) => {
+    const state = reactive({
+        dataSize,
+    });
+    return {
+        colorSet: computed<string[]>(() => {
+            if (!theme?.value) return [];
+            if (!state.dataSize) return [];
+            const colorSetType: WidgetColorSetType = state.dataSize > 9 ? 'massive' : 'basic';
+            return getColorSet(theme.value, colorSetType);
+        }),
+    };
+};

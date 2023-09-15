@@ -22,27 +22,38 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-import type { Legend, CostAnalyzeDataModel, PieChartData } from '@/services/dashboards/widgets/type';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-type Data = CostAnalyzeDataModel;
+interface Data {
+    cost_sum?: Array<{
+        [field_group: string]: any;
+        value: number
+    }>
+    _total_cost_sum?: number;
+}
+type FullData = CostAnalyzeResponse<Data>;
+interface ChartData extends Data {
+    [groupBy: string]: string | any;
+}
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -61,8 +72,11 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         end: widgetState.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM'),
     })),
     widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: widgetState.options.cost_data_source,
+            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+        },
         query: {
             granularity: primitiveToQueryString(widgetState.granularity),
             group_by: arrayToQueryString([widgetState.groupBy]),
@@ -76,10 +90,10 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 const state = reactive({
     loading: true,
-    data: null as Data|null,
+    data: null as FullData|null,
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
-    chartData: computed<PieChartData[]>(() => {
+    chartData: computed<ChartData[]>(() => {
         if (!state.data?.results?.length) return [];
         return getRefinedPieChartData(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
     }),
@@ -106,8 +120,8 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeDataModel>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchData = async (): Promise<FullData> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
@@ -127,14 +141,16 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            return response;
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
     return { results: [], more: false };
 };
 
-const drawChart = (chartData: PieChartData[]) => {
+const drawChart = (chartData: ChartData[]) => {
     let chart;
     if (widgetState.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
     else chart = chartHelper.createPieChart();
@@ -168,7 +184,7 @@ const drawChart = (chartData: PieChartData[]) => {
     state.series = series;
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
@@ -178,7 +194,7 @@ const initWidget = async (data?: Data): Promise<Data> => {
     return state.data;
 };
 
-const refreshWidget = async (_thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
@@ -216,7 +232,7 @@ useWidgetLifecycle({
     },
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });

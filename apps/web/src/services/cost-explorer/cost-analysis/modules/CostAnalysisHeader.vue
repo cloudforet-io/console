@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PIconButton, PHeading,
+    PIconButton, PHeading, PLazyImg,
 } from '@spaceone/design-system';
 import {
     computed, reactive,
@@ -10,10 +10,14 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
@@ -31,6 +35,8 @@ const router = useRouter();
 const state = reactive({
     defaultTitle: computed<string>(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
+    dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
+    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
     itemIdForDeleteQuery: '',
     currency: computed(() => store.state.settings.currency),
     currencySymbol: computed(() => store.getters['settings/currencySymbol']),
@@ -62,8 +68,6 @@ const handleDeleteQueryConfirm = async () => {
         showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
         if (costAnalysisPageStore.selectedQueryId === state.itemIdForDeleteQuery) {
             await router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
-            await costAnalysisPageStore.setQueryOptions();
-            costAnalysisPageStore.selectQueryId(undefined);
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
@@ -75,15 +79,27 @@ const handleDeleteQueryConfirm = async () => {
     <div class="cost-analysis-header">
         <section class="title-section">
             <p-heading :title="costAnalysisPageStore.selectedQueryId ? state.title : state.defaultTitle">
+                <template #title-left-extra>
+                    <p-lazy-img :src="state.dataSourceImage"
+                                width="2rem"
+                                height="2rem"
+                    />
+                </template>
                 <template #title-right-extra>
                     <div v-if="costAnalysisPageStore.selectedQueryId"
                          class="title-right-extra"
                     >
-                        <p-icon-button name="ic_delete"
-                                       @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
+                        <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
+                                         :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
+                                         scale="0.8"
                         />
-                        <p-icon-button name="ic_edit-text"
+                        <p-icon-button v-if="!state.isManagedCostQuerySet"
+                                       name="ic_edit-text"
                                        @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
+                        />
+                        <p-icon-button v-if="!state.isManagedCostQuerySet"
+                                       name="ic_delete"
+                                       @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                     </div>
                     <div class="title-right-extra currency-wrapper">

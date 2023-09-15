@@ -12,36 +12,36 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
 
+import type { ReferenceMap } from '@/store/modules/reference/type';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
+import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 
-
 interface Data extends CloudServiceStatsModel {
-    [groupBy: string]: string | any;
+    [groupBy: string]: string | null | any;
     value: { key: string, value: number }[];
 }
 interface ChartData {
-    [key: string]: number;
+    [key: string]: string | number;
     fail_finding_count: number;
     pass_finding_count: number;
 }
 
-const DATE_FORMAT = 'YYYY-MM';
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -49,8 +49,9 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    dateRange: computed(() => ({
+        start: dayjs(widgetState.settings?.date_range?.start).format('YYYY-MM-DD'),
+        end: dayjs(widgetState.settings?.date_range?.end).format('YYYY-MM'),
     })),
 });
 
@@ -62,12 +63,16 @@ const state = reactive({
     groupByKey: computed<string|undefined>(() => {
         // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
         // ex. additional_info.service -> service
-        if (!state.groupBy) return undefined;
-        const dotIndex = state.groupBy.indexOf('.');
+        if (!widgetState.groupBy) return undefined;
+        const dotIndex = widgetState.groupBy.indexOf('.');
         if (dotIndex !== -1) {
-            return state.groupBy.slice(dotIndex + 1);
+            return widgetState.groupBy.slice(dotIndex + 1);
         }
-        return state.groupBy;
+        return widgetState.groupBy;
+    }),
+    groupByReferenceMap: computed<ReferenceMap>(() => {
+        if (!state.groupByKey || !props.allReferenceTypeInfo) return {};
+        return Object.values(props.allReferenceTypeInfo).find((info) => info.key === state.groupByKey)?.referenceMap ?? {};
     }),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
@@ -80,7 +85,8 @@ const state = reactive({
             { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
         ];
     }),
-    chartData: computed(() => refineChartData(state.data)),
+    noData: computed(() => !state.data?.length),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, state.groupByReferenceMap)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
@@ -90,6 +96,8 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
+        state.loading = true;
+
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
@@ -117,63 +125,85 @@ const fetchData = async (): Promise<Data[]> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            state.loading = false;
+            return response.results;
+        }
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.loading = false;
+        return [];
     }
-    return [];
 };
 
 /* Util */
-const refineChartData = (data: Data[]): ChartData[] => {
-    if (!data?.length) return [];
+const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMap: ReferenceMap): ChartData[] => {
+    if (!data?.length || !groupByKey) return [];
+
     const refinedChartData: ChartData[] = [];
-    const referenceMap = Object.values(props.allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
     data.forEach((d) => {
         const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
         const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
-        const rawValue = d[state.groupByKey];
-        let refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
-        if (state.groupBy === ASSET_GROUP_BY.REGION) refinedValue = referenceMap?.[rawValue]?.name ?? rawValue;
+
+        const rawValue = d[groupByKey];
+        let refinedValue: string|null|undefined;
+
+        // google_cloud -> Google Cloud
+        if (groupByKey === ASSET_GROUP_BY.REGION) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
+        else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
+
         refinedChartData.push({
-            [state.groupByKey]: refinedValue ?? `no_${state.groupByKey}`,
+            [groupByKey]: refinedValue ?? `no_${groupByKey}`,
             fail_finding_count,
             pass_finding_count,
         });
     });
     return refinedChartData;
 };
-const drawChart = (chartData) => {
-    if (!state.groupByKey || !state.legends) return;
+const drawChart = (chartData: ChartData[]) => {
+    if (!state.groupByKey) {
+        console.error(new Error('groupByKey is undefined'));
+        return;
+    }
+
+    // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupByKey);
     yAxis.data.setAll(cloneDeep(chartData));
 
-    const legend = chartHelper.createLegend({
+    // create legends
+    const legends = chartHelper.createLegend({
         nameField: 'name',
         clickTarget: 'none',
     });
-    chart.children.push(legend);
 
-    state.legends.forEach((_legend) => {
+    // add legends to chart
+    chart.children.push(legends);
+
+    // set series for each legend
+    state.legends.forEach((legend: Legend) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: _legend.label,
-            valueXField: _legend.name,
+            name: legend.label as string,
+            valueXField: legend.name,
             categoryYField: state.groupByKey,
             xAxis,
             yAxis,
             baseAxis: yAxis,
             stacked: true,
-            fill: _legend.color,
-            stroke: _legend.color,
+            fill: chartHelper.color(legend.color as string),
+            stroke: chartHelper.color(legend.color as string),
+            opacity: state.noData ? 0 : 1,
         };
+
+        // create series
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
-        series.columns.template.setAll({
-            height: 20,
-        });
+
+        // add bullets to series
+        series.bullets.clear();
         series.bullets.push(() => {
             const label = chartHelper.createLabel({
-                text: `{${_legend.name}}`,
+                text: `{${legend.name}}`,
                 populateText: true,
                 textAlign: 'end',
                 centerY: percent(50),
@@ -186,6 +216,11 @@ const drawChart = (chartData) => {
                 dynamic: true,
             });
         });
+
+        // set series style
+        series.columns.template.setAll({
+            height: 20,
+        });
         series.columns.template.onPrivate(('width'), (width, target) => {
             array.each(target?.dataItem?.bullets ?? [], (bullet) => {
                 if ((width !== undefined) && width < 30) {
@@ -193,33 +228,42 @@ const drawChart = (chartData) => {
                 }
             });
         });
+
+        // set tooltip if showPassFindings is true
         if (state.showPassFindings) {
             const tooltip = chartHelper.createTooltip();
             setXYSharedTooltipTextWithRate(chart, tooltip);
             series.set('tooltip', tooltip);
         }
+
+        // add series to chart
         chart.series.push(series);
-        series.data.setAll(cloneDeep(chartData));
+
+        // set data to series
+        const data: ChartData[] = state.noData ? [
+            { fail_finding_count: 90, pass_finding_count: 0 },
+        ] : cloneDeep(chartData);
+        series.data.setAll(data);
     });
-    legend.data.setAll(chart.series.values);
+
+
+
+    // set series values to legends data
+    legends.data.setAll(chart.series.values);
 };
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
-    state.loading = true;
     state.data = data ?? await fetchData();
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 const refreshWidget = async (_thisPage = 1): Promise<Data[]> => {
-    await nextTick();
-    state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 
@@ -255,10 +299,12 @@ defineExpose<WidgetExpose<Data[]>>({
                                loader-type="skeleton"
                                :loader-backdrop-opacity="1"
                                show-data-from-scratch
+                               disable-empty-case
                 >
                     <div ref="chartContext"
                          class="chart"
                     />
+                    <widget-chart-no-data-overlay v-if="state.noData && !state.loading" />
                 </p-data-loader>
             </div>
             <div class="table-pagination-wrapper">
@@ -275,6 +321,8 @@ defineExpose<WidgetExpose<Data[]>>({
         </div>
     </widget-frame>
 </template>
+
+
 <style lang="postcss" scoped>
 .count-of-findings-widget {
     &.full {

@@ -61,30 +61,31 @@ const handleRouteToDashboard = () => {
                     <div class="main-content-wrapper">
                         <div class="update-badge">
                             <p class="text">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FEATURE_UDATED') }}
+                                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FEATURE_UDATED') }}
                             </p>
                         </div>
                         <div class="title">
-                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_TITLE') }}</p>
+                            <p>{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_TITLE') }}</p>
                         </div>
                         <div class="description">
-                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION') }}</p>
+                            <p>{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION_FIRST') }}</p>
+                            <p>{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DESCRIPTION_SECOND') }}</p>
                         </div>
                         <p-button style-type="tertiary"
                                   icon-right="ic_arrow-right-up"
                                   @click="handleRouteToDashboard"
                         >
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL') }}
+                            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL') }}
                         </p-button>
                         <p-divider class="divider" />
                         <div class="footer">
                             <p-button style-type="tertiary"
                                       @click="handleReject"
                             >
-                                {{ $t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DISMISS_TEXT") }}
+                                {{ t("BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_DISMISS_TEXT") }}
                             </p-button>
                             <p-button @click="handleClose">
-                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_CONFIRM_TEXT') }}
+                                {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_MODAL_CONFIRM_TEXT') }}
                             </p-button>
                         </div>
                     </div>
@@ -129,7 +130,7 @@ const handleRouteToDashboard = () => {
                 margin-bottom: 1rem;
             }
             .description {
-                @apply text-label-lg text-gray-900;
+                @apply text-label-md text-gray-900 flex flex-col gap-2;
                 margin-bottom: 1rem;
             }
 

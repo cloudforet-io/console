@@ -1,48 +1,27 @@
 <template>
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
-            style-type="transparent"
             :items="state.monthMenuItems"
             :selected="state.selectedMonthMenuIndex"
             index-mode
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <div>
-                <span>{{ state.selectedMonthLabel }}</span>
-                <p-badge
-                    v-if="state.selectedMonthBadge"
-                    style-type="indigo100"
-                    badge-type="subtle"
-                    class="ml-1"
-                >
-                    {{ state.selectedMonthBadge }}
-                </p-badge>
-            </div>
+            <span>{{ state.selectedMonthLabel }}</span>
             <template #menu-item--format="{ item }">
-                <div>
-                    <span>{{ item.label }}</span>
-                    <p-badge
-                        v-if="item.badge"
-                        style-type="indigo100"
-                        badge-type="subtle"
-                        class="ml-1"
-                    >
-                        {{ item.badge }}
-                    </p-badge>
-                </div>
+                <span>{{ item.label }}</span>
             </template>
         </p-select-dropdown>
-        <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
-                                 granularity="MONTHLY"
-                                 :selected-date-range="dateRange"
-                                 @confirm="handleCustomRangeModalConfirm"
+        <dashboard-custom-date-range-modal v-model:visible="state.customRangeModalVisible"
+                                           granularity="MONTHLY"
+                                           :selected-date-range="props.dateRange"
+                                           @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
@@ -54,7 +33,7 @@ import { useI18n } from 'vue-i18n';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
+import DashboardCustomDateRangeModal from '@/services/dashboards/shared/DashboardCustomDateRangeModal.vue';
 
 interface Props {
     dateRange?: DateRange;
@@ -82,7 +61,6 @@ const state = reactive({
             type: 'item',
             name: 'current',
             label: t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
-            badge: t('DASHBOARDS.DETAIL.AUTO'),
         },
         ...state.getMonthMenuItem,
         { type: 'divider' },
@@ -92,9 +70,12 @@ const state = reactive({
             label: t('DASHBOARDS.DETAIL.CUSTOM'),
         },
     ])),
-    selectedMonthLabel: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.label),
-    selectedMonthBadge: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.badge),
-    selectedMonthName: computed(() => state.monthMenuItems[state.selectedMonthMenuIndex]?.name),
+    selectedMonthLabel: computed(() => {
+        if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom') {
+            return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM-DD')).format('MMMM YYYY');
+        }
+        return state.monthMenuItems[state.selectedMonthMenuIndex]?.label;
+    }),
     selectedDateRange: {},
     selectedMonthMenuIndex: 0,
     customRangeModalVisible: false,

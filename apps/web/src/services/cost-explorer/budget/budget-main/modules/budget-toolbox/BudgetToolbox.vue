@@ -1,47 +1,39 @@
 <script setup lang="ts">
+import { getPageStart, getThisPage } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
-    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
+    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
-import {
-    computed, defineEmits, defineProps, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import BudgetToolboxUsageRange
-    from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
-import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
 
-export interface Pagination {
-    pageStart: number;
-    pageLimit: number;
-}
+
 
 type I18nSelectDropdownMenu = SelectDropdownMenu | {
     label: string;
 };
 
-type Sort = BudgetUsageAnalyzeRequestParam['sort'];
-
 interface Props {
     filters: ConsoleFilter[];
-    totalCount: number;
+    more?: boolean;
 }
 
 const store = useStore();
@@ -49,13 +41,11 @@ const { t } = useI18n();
 
 const props = withDefaults(defineProps<Props>(), {
     filters: () => [],
-    totalCount: 0,
 });
 const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
-    (e: 'update-range', range: BudgetUsageRange): void;
-    (e: 'update-pagination', pagination: Pagination): void;
+    (e: 'update-pagination', pageStart: number, pageLimit: number): void;
     (e: 'update-period', period: Period): void;
-    (e: 'update-sort', sort: Sort): void;
+    (e: 'update-sort', sort: Query['sort']): void;
     (e: 'refresh'): void;
     (e: 'export'): void;
 }>();
@@ -74,25 +64,19 @@ const handlerState = reactive({
         items: [
             { name: 'budget_id', label: 'Budget ID' },
             { name: 'name', label: 'Name' },
+            { name: 'data_source_id', label: 'Data Source' },
             { name: 'project_id', label: 'Project', valueSet: storeState.projects },
             { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
             { name: 'time_unit', label: 'Time Unit' },
-            { name: 'cost_types.provider', label: '[Cost Type] Provider' },
-            { name: 'cost_types.service_account_id', label: '[Cost Type] Service Account', valueSet: storeState.serviceAccounts },
-            { name: 'cost_types.region_code', label: '[Cost Type] Region' },
-            { name: 'cost_types.product', label: '[Cost Type] Product' },
         ],
     }]),
     valueHandlerMap: {
         budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
         name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
+        data_source_id: makeReferenceValueHandler('cost_analysis.DataSource'),
         project_id: makeReferenceValueHandler('identity.Project'),
         project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
         time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
-        'cost_types.provider': makeReferenceValueHandler('identity.Provider'),
-        'cost_types.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
-        'cost_types.region_code': makeReferenceValueHandler('inventory.Region'),
-        'cost_types.product': makeDistinctValueHandler('cost_analysis.Budget', 'cost_types.product'),
     } as ValueHandlerMap,
 });
 
@@ -109,30 +93,26 @@ const state = reactive({
     ]),
     pageStart: 1,
     pageLimit: 24,
+    thisPage: computed(() => getThisPage(state.pageStart, state.pageLimit)),
     // query
-    range: {} as BudgetUsageRange,
-    pagination: computed<Pagination>(() => ({
-        pageStart: state.pageStart,
-        pageLimit: state.pageLimit,
-    })),
     period: computed<Period>(() => {
         const period: Period = {};
 
         if (state.selectedPeriod[0] === 'thisMonth') {
             period.start = dayjs.utc().format('YYYY-MM');
-            period.end = dayjs.utc().format('YYYY-MM-DD');
+            period.end = dayjs.utc().format('YYYY-MM');
         }
 
         return period;
     }),
     sortKeyList: computed<I18nSelectDropdownMenu[]>(() => ([
-        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'usage' },
-        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'cost' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.USAGE', { symbol: '%' }), name: 'budget_usage' },
+        { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_USED', { symbol: '$' }), name: 'total_spent' },
         { label: t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGET_NAME'), name: 'name' },
     ])),
     sortDesc: true,
-    selectedSortKey: 'usage',
-    sort: computed<Sort>(() => ({
+    selectedSortKey: 'budget_usage',
+    sort: computed<Query['sort']>(() => ({
         key: state.selectedSortKey,
         desc: state.sortDesc,
     })),
@@ -140,17 +120,16 @@ const state = reactive({
 });
 
 /* Handlers */
-const handleUpdateUsageRange = (range: BudgetUsageRange) => {
-    state.range = range;
-};
-
 const handleSelectStatus = (selected: string[]) => {
     state.selectedPeriod = selected;
 };
 
 const handleChangeToolbox = async (options: ToolboxOptions) => {
     if (options.queryTags !== undefined) queryTagsHelper.setQueryTags(options.queryTags);
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.pageLimit !== undefined) {
+        state.pageLimit = options.pageLimit;
+        state.pageStart = 1;
+    }
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
 
@@ -158,12 +137,13 @@ const handleSortType = () => {
     state.sortDesc = !state.sortDesc;
 };
 
+const handleUpdateThisPage = (thisPage: number) => {
+    state.pageStart = getPageStart(thisPage, state.pageLimit);
+};
+
 /* Watchers */
-watch(() => state.range, (range) => {
-    emit('update-range', range);
-});
-watch(() => state.pagination, (pagination) => {
-    emit('update-pagination', pagination);
+watch([() => state.pageStart, () => state.pageLimit], ([pageStart, pageLimit]) => {
+    emit('update-pagination', pageStart, pageLimit);
 });
 watch(() => state.period, (period) => {
     emit('update-period', period);
@@ -192,8 +172,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 <template>
     <div class="budget-toolbox">
         <div class="top">
-            <budget-toolbox-usage-range @update="handleUpdateUsageRange" />
-            <p-divider :vertical="true" />
             <div class="period-box">
                 <span class="label">{{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in state.periodList"
@@ -215,7 +193,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                    filters-visible
                    :page-size-options="pageSizeOptions"
                    :page-size="state.pageLimit"
-                   :total-count="props.totalCount"
                    :query-tags="state.queryTags"
                    :key-item-sets="handlerState.keyItemSets"
                    :value-handler-map="handlerState.valueHandlerMap"
@@ -223,6 +200,17 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                    @refresh="emit('refresh')"
                    @export="emit('export')"
         >
+            <template #pagination-area>
+                <p-text-pagination :this-page="state.thisPage"
+                                   :disable-next-page="!props.more"
+                                   @update:thisPage="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ state.thisPage }}</span>
+                        <span v-if="props.more"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </template>
             <template #left-area>
                 <div class="left-area">
                     <p-select-dropdown
@@ -254,7 +242,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             }
         }
         .period-box {
-            @apply relative inline-flex gap-4 items-center pl-4;
+            @apply relative inline-flex gap-4 items-center;
             height: 1.25rem;
             font-size: 0.875rem;
 

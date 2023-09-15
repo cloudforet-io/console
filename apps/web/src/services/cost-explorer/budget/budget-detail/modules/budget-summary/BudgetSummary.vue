@@ -28,7 +28,7 @@ const { t } = useI18n();
                 {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SUMMARY') }}
             </div>
         </template>
-        <budget-summary-chart v-if="!budgetLoading" />
-        <budget-summary-table v-if="!budgetLoading" />
+        <budget-summary-chart :loading="props.budgetLoading" />
+        <budget-summary-table v-if="!props.budgetLoading" />
     </p-card>
 </template>

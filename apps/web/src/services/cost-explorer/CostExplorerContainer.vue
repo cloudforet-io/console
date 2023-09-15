@@ -3,7 +3,8 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { onUnmounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute } from 'vue-router/composables';
+
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -46,17 +47,16 @@ watch(() => route.params, async (params) => {
     }
 
     /*
-    * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
-    * */
+            * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
+            * */
     if (params.dataSourceId && params.costQuerySetId) {
         costQuerySetStore.$patch({
-            selectedDataSourceId: params.dataSourceId as string,
-            selectedQuerySetId: params.costQuerySetId as string,
+            selectedDataSourceId: params.dataSourceId,
+            selectedQuerySetId: params.costQuerySetId,
         });
     }
     await costQuerySetStore.listCostQuerySets();
 }, { immediate: true });
-
 </script>
 
 <template>

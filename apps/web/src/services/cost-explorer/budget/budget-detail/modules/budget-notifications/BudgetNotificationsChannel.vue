@@ -1,5 +1,4 @@
-<script lang="ts" setup>
-
+<script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PBadge, PDataTable } from '@spaceone/design-system';
@@ -13,7 +12,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
 import type { ChannelItem } from '@/services/administration/iam/user/type';
-
 
 const getBadgeColor = (level: string) => {
     switch (level) {
@@ -36,9 +34,12 @@ interface Props {
     projectId?: string;
 }
 
-const props = defineProps<Props>();
-const store = useStore();
+const props = withDefaults(defineProps<Props>(), {
+    projectId: undefined,
+});
+
 const { t } = useI18n();
+const store = useStore();
 
 const state = reactive({
     loading: false,
@@ -62,7 +63,7 @@ apiQueryHelper
 const listNotificationsChannel = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.client.notification.projectChannel.list({
+        const { results } = await SpaceConnector.clientV2.notification.projectChannel.list({
             query: apiQueryHelper.data,
         });
         state.items = results;
@@ -85,7 +86,6 @@ const protocolFormatter = (val) => state.protocols[val]?.name || val;
 })();
 
 </script>
-
 <template>
     <p-data-table
         :items="state.items"
@@ -98,7 +98,7 @@ const protocolFormatter = (val) => state.protocols[val]?.name || val;
             {{ protocolFormatter(value) }}
         </template>
         <template #col-data-format="{ index, item }">
-            <p v-if="item.secret_id.length > 0">
+            <p v-if="item.secret_id">
                 <!-- masking secret data -->
                 data: *******
             </p>

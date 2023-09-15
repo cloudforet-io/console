@@ -63,6 +63,24 @@ const getArgTypes = (category: string, info: [string, string][]) => {
 export const getContextMenuArgTypes = (): ArgTypes => {
     const contextMenuItemArgTypes = getContextMenuItemArgTypes();
     return {
+        title: {
+            name: 'title',
+            type: { name: 'string' },
+            description: 'Context menu title',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: undefined,
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
         menu: {
             name: 'menu',
             type: { name: 'array' },

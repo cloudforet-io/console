@@ -13,8 +13,8 @@ import {
 import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,10 +24,10 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
@@ -37,7 +37,6 @@ type Data = BudgetDataModel;
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-
 const store = useStore();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
@@ -49,6 +48,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         },
     })),
 });
+
 const state = reactive({
     loading: true,
     data: undefined as Data | undefined,
@@ -93,12 +93,10 @@ const fetchData = async (): Promise<Data> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
-        const groupBy = widgetState.groupBy ?? '';
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: widgetState.granularity,
-                group_by: [groupBy, COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                group_by: [COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -112,7 +110,6 @@ const fetchData = async (): Promise<Data> => {
                     },
                 },
                 select: {
-                    [groupBy]: groupBy,
                     [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
                     [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
                     total_spent: 'total_spent',

@@ -107,12 +107,12 @@ onClickOutside(containerRef, handleClickOutside);
                   @keydown.enter="handleMenu"
             >
                 <span>{{ label }}</span>
-                <span v-if="highlightTag"
+                <span v-if="props.highlightTag"
                       class="mark"
                 >
-                    <new-mark v-if="highlightTag === 'new'" />
-                    <update-mark v-else-if="highlightTag === 'update'" />
-                    <beta-mark v-else-if="highlightTag === 'beta'" />
+                    <new-mark v-if="props.highlightTag === 'new'" />
+                    <update-mark v-else-if="props.highlightTag === 'update'" />
+                    <beta-mark v-else-if="props.highlightTag === 'beta'" />
                 </span>
                 <p-i v-if="state.isMenuWithAdditionalMenu"
                      class="arrow-button"

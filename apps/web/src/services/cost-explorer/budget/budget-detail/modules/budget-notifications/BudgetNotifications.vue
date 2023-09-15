@@ -1,5 +1,4 @@
-<script lang="ts" setup>
-
+<script setup lang="ts">
 import { commaFormatter } from '@cloudforet/core-lib';
 import {
     PLink, PBadge, PButton, PCard, PIconButton, PSpinner,
@@ -18,19 +17,20 @@ import BudgetNotificationsChannel
 import BudgetNotificationsModal
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
 import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/cost-explorer/budget/model';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 interface Props {
-    manageDisabled: boolean;
+    manageDisabled?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
 });
+
 const { t } = useI18n();
 
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
@@ -92,7 +92,7 @@ const handleBudgetNotifications = () => {
                     <span class="title">{{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
                     <p-icon-button v-if="state.hasBudgetAlert"
                                    name="ic_delete"
-                                   :disabled="manageDisabled"
+                                   :disabled="props.manageDisabled"
                                    @click="handleDelete"
                     />
                 </section>
@@ -125,7 +125,7 @@ const handleBudgetNotifications = () => {
                             </ul>
                             <p-button style-type="tertiary"
                                       icon-left="ic_settings-filled"
-                                      :disabled="manageDisabled || !state.budgetTargetId"
+                                      :disabled="props.manageDisabled || !state.budgetTargetId"
                                       @click="handleSetNotifications"
                             >
                                 {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET') }}
@@ -160,7 +160,7 @@ const handleBudgetNotifications = () => {
                             </p>
                             <p-button style-type="tertiary"
                                       icon-left="ic_settings-filled"
-                                      :disabled="manageDisabled || !state.budgetTargetId"
+                                      :disabled="props.manageDisabled || !state.budgetTargetId"
                                       @click="handleSetNotifications"
                             >
                                 {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_SET') }}

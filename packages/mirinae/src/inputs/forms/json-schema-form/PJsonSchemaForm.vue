@@ -239,7 +239,7 @@ const state = reactive({
                     multiInputMode: getMultiInputMode(schemaProperty),
                     useAutoComplete: getUseAutoComplete(schemaProperty),
                     appearanceType: getAppearanceType(schemaProperty),
-                    referenceHandler: getReferenceHandler(schemaProperty, props as JsonSchemaFormProps),
+                    referenceHandler: getReferenceHandler(k, schemaProperty, props),
                 };
                 return refined;
             }).sort((a, b) => {

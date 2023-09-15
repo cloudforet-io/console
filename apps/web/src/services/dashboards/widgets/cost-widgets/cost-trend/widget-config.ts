@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -24,9 +24,25 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             show_at: 'table',
         },
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'provider',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        ),
+    },
     options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
-        fixed_properties: ['cost_data_source', 'cost_group_by'],
+        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            'provider',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        )],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
@@ -36,12 +52,9 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
                     'project',
                     'service_account',
                     'project_group',
-                    'cost_category',
-                    'cost_resource_group',
                     'cost_product',
                     'region',
-                    'cost_type',
-                    'cost_account',
+                    'cost_usage_type',
                 ),
             },
             order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
@@ -49,12 +62,9 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
                 'project',
                 'service_account',
                 'project_group',
-                'cost_category',
-                'cost_resource_group',
                 'cost_product',
                 'region',
-                'cost_type',
-                'cost_account',
+                'cost_usage_type',
             )],
         },
     },

@@ -2,9 +2,14 @@ import { defineAsyncComponent } from 'vue';
 
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_REFERENCE_SCHEMA } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 import {
     getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyName,
     getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
@@ -22,7 +27,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
         cost_group_by: COST_GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
@@ -38,12 +43,48 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             page_size: 5,
         },
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'service_account',
+        ),
+    },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'cost_account'),
+        default_properties: [
+            'cost_data_source',
+            ...getWidgetFilterSchemaPropertyNames(
+                'cost_product',
+                'project',
+                'service_account',
+            ),
+        ],
+        fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
-            order: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account'),
+            properties: {
+                ...getWidgetOptionsSchema('cost_data_source'),
+                [getWidgetFilterSchemaPropertyName('cost_product')]: {
+                    ...COST_REFERENCE_SCHEMA.cost_product,
+                    default: ['AWSDataTransfer'],
+                },
+                ...getWidgetFilterOptionsSchema(
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
+            },
+            order: [
+                'cost_data_source',
+                ...getWidgetFilterSchemaPropertyNames(
+                    'cost_product',
+                    'project',
+                    'service_account',
+                    'project_group',
+                    'region',
+                ),
+            ],
         },
     },
 };

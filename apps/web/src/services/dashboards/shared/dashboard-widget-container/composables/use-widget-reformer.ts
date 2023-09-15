@@ -52,7 +52,7 @@ export const useWidgetReformer = ({
             const themes = getWidgetThemes(widgetInfoList, state.widgetConfigMap);
 
             // get sizes
-            const sizes = widgetInfoList.map((widget) => widget.size);
+            const sizes = widgetInfoList.map((widget) => widget.size ?? state.widgetConfigMap[widget.widget_key]?.sizes[0]);
 
             // get widths
             const widths = flattenDeep(widgetWidthAssigner(sizes, containerWidth.value));

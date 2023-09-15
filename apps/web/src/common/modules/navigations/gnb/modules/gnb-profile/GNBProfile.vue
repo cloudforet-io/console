@@ -197,7 +197,7 @@ onClickOutside(languageInfoMenuRef, handleClickOutsideLanguageMenu);
                 <!--                     class="info-menu currency"-->
                 <!--                     @click.stop="handleCurrencyDropdownClick"-->
                 <!--                >-->
-                <!--                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>-->
+                <!--                    <span class="label">{{ t('COMMON.GNB.ACCOUNT.LABEL_CURRENCY') }}</span>-->
                 <!--                    <div class="value">-->
                 <!--                        <span>{{ state.currency }}</span>-->
                 <!--                        <div v-if="state.currencyMenuVisible"-->

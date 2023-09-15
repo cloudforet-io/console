@@ -6,11 +6,11 @@ import { computed, ref } from 'vue';
 import type { SelectorOptions, SelectorType } from '@/services/dashboards/widgets/_configs/config';
 
 interface UseCostWidgetFrameHeaderDropdownOptions {
-    selectorOptions: Ref<SelectorOptions>;
+    selectorOptions: Ref<SelectorOptions|undefined>;
 }
 export const useCostWidgetFrameHeaderDropdown = ({ selectorOptions }: UseCostWidgetFrameHeaderDropdownOptions) => {
     const selectorItems = computed<MenuItem[]>(() => {
-        if (!selectorOptions.value.enabled) return [];
+        if (!selectorOptions.value?.enabled) return [];
         if (selectorOptions.value.type === 'cost-usage') {
             if (!selectedSelectorType.value) selectedSelectorType.value = 'cost';
             return [

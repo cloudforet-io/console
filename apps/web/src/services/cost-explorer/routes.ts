@@ -8,7 +8,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { MANAGED_COST_QUERY_SET_IDS, managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import { DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_IDS, managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
@@ -56,8 +56,8 @@ const costExplorerRoutes: RouteRecordRaw = {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     meta: {
                         lnbVisible: true,
-                        label: ({ params }) => (params.costQuerySetId === DYNAMIC_QUERY_SET_ID ? undefined : params.costQuerySetId),
-                        copiable: ({ params }) => ![...managedCostQuerySetIdList, DYNAMIC_QUERY_SET_ID].includes(params.costQuerySetId),
+                        label: ({ params }) => (params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS ? undefined : params.costQuerySetId),
+                        copiable: ({ params }) => ![...managedCostQuerySetIdList, DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
                     },
                     props: true,
                     component: CostAnalysisPage as any,

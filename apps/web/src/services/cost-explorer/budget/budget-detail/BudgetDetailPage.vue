@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { PHeading, PIconButton } from '@spaceone/design-system';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
@@ -15,18 +15,19 @@ import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
-
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 interface Props {
-    budgetId?: string;
+    budgetId: string;
 }
+const props = withDefaults(defineProps<Props>(), {
+    budgetId: '',
+});
 
-const props = defineProps<Props>();
 const store = useStore();
 const router = useRouter();
 
-const budgetPageStore = useBudgetPageStore();
+const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
@@ -56,8 +57,8 @@ const handleConfirmDelete = () => {
     state.loading = true;
     try {
         await Promise.allSettled([
-            budgetPageStore.getBudgetData(props.budgetId || ''),
-            budgetPageStore.getBudgetUsageData(props.budgetId || ''),
+            budgetPageStore.getBudgetData(props.budgetId),
+            budgetPageStore.getBudgetUsageData(props.budgetId),
         ]);
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -73,7 +74,7 @@ const handleConfirmDelete = () => {
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!state.loading"
                        :title="state.loading ? '' : budgetPageState.budgetData?.name"
-                       @click-back-button="router.go(-1)"
+                       @click-back-button="$router.go(-1)"
             >
                 <template v-if="!state.loading"
                           #title-right-extra
@@ -93,6 +94,8 @@ const handleConfirmDelete = () => {
                                 :currency-rates="state.currencyRates"
             />
             <budget-summary :budget-loading="state.loading"
+                            :currency="state.currency"
+                            :currency-rates="state.currencyRates"
                             class="summary"
             />
             <budget-notifications class="alert"
@@ -107,6 +110,7 @@ const handleConfirmDelete = () => {
         />
     </div>
 </template>
+
 
 <style lang="postcss" scoped>
 .content {

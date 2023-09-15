@@ -13,14 +13,24 @@ export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
-export type CostFiltersMap = Record<string, ConsoleFilter[]>;
 
-export interface CostQuerySetOption {
+interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
     period?: Period;
     relative_period?: RelativePeriod;
     filters?: ConsoleFilter[];
+    metadata?: {
+        filters_schema?: {
+            enabled_properties?: string[];
+        }
+    }
+}
+
+export interface CostQuerySetOptionForPeriod {
+    granularity: Granularity;
+    period?: Period;
+    relativePeriod: RelativePeriod;
 }
 
 export interface CostQuerySetModel {

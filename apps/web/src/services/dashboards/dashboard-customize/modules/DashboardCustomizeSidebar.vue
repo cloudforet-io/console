@@ -51,7 +51,7 @@
                                      width="1rem"
                                      height="1rem"
                                 /></span>
-                            <span class="text">{{ element.title }}</span>
+                            <span class="text">{{ element.title ?? state.widgetConfigMap[element.widget_key]?.title }}</span>
                             <span v-if="dashboardDetailState.widgetValidMap[element.widget_key] === false"
                                   class="error-icon-wrapper"
                             >
@@ -107,7 +107,8 @@ import { red } from '@/styles/colors';
 
 import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
   loading?: boolean;
@@ -125,7 +126,14 @@ const store = useStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const state = reactive({
-    widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
+    widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
+    widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
+        const _configMap: Record<string, WidgetConfig> = {};
+        state.widgetInfoList.forEach((d) => {
+            _configMap[d.widget_key] = getWidgetConfig(d.widget_name);
+        });
+        return _configMap;
+    }),
     enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
     enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
     addWidgetModalVisible: false,

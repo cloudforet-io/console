@@ -7,15 +7,13 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import {
     computed, onMounted, reactive,
 } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
-
-import { store } from '@/store';
+import { useRouter } from 'vue-router/composables';
+import { useStore } from 'vuex';
 
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
@@ -39,7 +37,6 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
-
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
 const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
 const SHOW_MORE_MENU_ID = 'show-more';
@@ -50,10 +47,11 @@ const allReferenceStore = useAllReferenceStore();
 
 const router = useRouter();
 const { t } = useI18n();
+const store = useStore();
 
 const state = reactive({
     loading: true,
-    header: computed<string>(() => t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
+    header: computed<string>(() => t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
     menuSet: computed<LNBMenu[]>(() => [
         ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
         ...filterLNBMenuByPermission([
@@ -162,9 +160,15 @@ const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
     return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
 };
 
-const getCurrenctCurrency = (dataSourceKey: string): string => dataSourceState.dataSourceMap[dataSourceKey].data.plugin_info.metadata.currency;
+const getCurrentCurrencySet = (dataSourceKey: string): string => {
+    const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
 
-const getCurrencySymbol = (currency: string): string => CURRENCY_SYMBOL[currency];
+    const currentCurrency: string = dataSourceState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency;
+    const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
+    const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
+
+    return result || defaultCurrencySet;
+};
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
     const pagePermission = store.getters['user/pagePermissionMap'];
@@ -264,7 +268,7 @@ onMounted(() => {
                         <div class="menu-item">
                             <span>{{ item.label }}</span>
                             <span class="selected-item-postfix">
-                                ({{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrencySymbol(getCurrenctCurrency(item.name)) }}{{ getCurrenctCurrency(item.name) }})
+                                ({{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
                             </span>
                         </div>
                     </template>
