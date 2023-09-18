@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PHeading, PIconButton } from '@spaceone/design-system';
-
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -33,7 +31,6 @@ const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
     loading: true,
-    currency: computed(() => store.state.settings.currency),
     hasManagePermission: useManagePermissionState(),
 });
 
@@ -89,11 +86,8 @@ const handleConfirmDelete = () => {
             </p-heading>
         </section>
         <section class="content">
-            <budget-detail-info class="summary"
-                                :currency="state.currency"
-            />
+            <budget-detail-info class="summary" />
             <budget-summary :budget-loading="state.loading"
-                            :currency="state.currency"
                             class="summary"
             />
             <budget-notifications class="alert"
