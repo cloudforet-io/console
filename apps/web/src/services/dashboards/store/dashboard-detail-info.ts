@@ -34,6 +34,7 @@ export interface DashboardDetailInfoStoreState {
     settings: DashboardSettings;
     variables: DashboardVariables;
     variablesSchema: DashboardVariablesSchema;
+    variablesInitMap: Record<string, boolean>;
     labels: string[];
     // widget info states
     dashboardWidgetInfoList: DashboardLayoutWidgetInfo[];
@@ -93,6 +94,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             properties: {},
             order: [],
         },
+        variablesInitMap: {},
         labels: [],
         // widget info states
         dashboardWidgetInfoList: [],
@@ -110,6 +112,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         },
         dashboardViewer: (state) => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE,
         isWidgetLayoutValid: (state) => Object.values(state.widgetValidMap).every((d) => d === true),
+        isAllVariablesInitialized: (state) => {
+            if (!state.dashboardInfo) return false;
+            return Object.values(state.variablesInitMap).every((d) => d === true);
+        },
     },
     actions: {
         resetDashboardData() {
@@ -120,6 +126,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             this.settings = DASHBOARD_DEFAULT.settings;
             this.variables = {};
             this.variablesSchema = { properties: {}, order: [] };
+            this.variablesInitMap = {};
             this.labels = [];
             //
             this.isNameValid = undefined;
@@ -161,8 +168,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
                 _variables = refineProjectDashboardVariables(_variables, this.projectId);
             }
+            const _variablesInitMap = {};
+            Object.entries(_variablesSchema.properties).forEach(([propertyName, property]) => {
+                if (property.use) _variablesInitMap[propertyName] = false;
+            });
             this.variablesSchema = _variablesSchema;
             this.variables = _variables;
+            this.variablesInitMap = _variablesInitMap;
 
             this.labels = _dashboardInfo.labels;
             this.dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
@@ -232,20 +244,26 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 if (!_originVariablesSchema?.properties[property]) return;
                 _variableSchema.properties[property].use = _originVariablesSchema?.properties[property].use;
             });
+
             if (this.projectId) _variableSchema = refineProjectDashboardVariablesSchema(_variableSchema);
             this.variablesSchema = _variableSchema;
 
-            // reset variables
+            // reset variables and variables init map
             let _variables = cloneDeep(this.variables);
+            const _variablesInitMap = {};
             _originVariablesSchema.order.forEach((property) => {
                 // CASE: existing variable is deleted.
                 if (!this.variablesSchema.properties[property]) return;
                 if (isEqual(this.variablesSchema.properties[property], _originVariablesSchema?.properties[property])) {
                     _variables[property] = _originVariables[property];
+                    _variablesInitMap[property] = true;
+                } else {
+                    _variablesInitMap[property] = false;
                 }
             });
             if (this.projectId) _variables = refineProjectDashboardVariables(_variables, this.projectId);
             this.variables = _variables;
+            this.variablesInitMap = _variablesInitMap;
         },
         updateWidgetValidation(isValid: boolean, widgetKey: string) {
             this.widgetValidMap[widgetKey] = isValid;

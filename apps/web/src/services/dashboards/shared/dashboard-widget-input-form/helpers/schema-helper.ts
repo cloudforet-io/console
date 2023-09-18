@@ -13,12 +13,11 @@ import type {
     InheritOptions,
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
-    DashboardLayoutWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 
 type ReferenceStoreState = ReturnType<typeof useReferenceStore>['referenceStoreState'];
 
-const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], referenceStoreState: ReferenceStoreState): JsonSchema['properties'] => {
+const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSchema, referenceStoreState: ReferenceStoreState): JsonSchema => {
     const referenceType = propertyName.replace('filters.', '');
 
     // use reference store data if exists
@@ -42,11 +41,11 @@ const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSche
 
     return propertySchema;
 };
-const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], referenceStoreState: ReferenceStoreState): JsonSchema['properties'] => {
+const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema, referenceStoreState: ReferenceStoreState): JsonSchema => {
     if (propertyName.startsWith('filters.')) return refineFilterOptionSchema(propertyName, propertySchema, referenceStoreState);
     return propertySchema;
 };
-const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema): JsonSchema['properties'] => {
+const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema, variablesSchema: DashboardVariablesSchema): JsonSchema => {
     const availableVariables = Object.entries(variablesSchema.properties)
         .filter(([, d]) => {
             if (!d.use) return false;
@@ -67,12 +66,12 @@ const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['propert
 
 export const getWidgetOptionSchema = (
     propertyName: string,
-    propertySchema: JsonSchema['properties'],
+    propertySchema: JsonSchema,
     variablesSchema: DashboardVariablesSchema,
     referenceStoreState: ReferenceStoreState,
     isInherit: boolean,
     projectId?: string,
-): JsonSchema['properties'] | undefined => {
+): JsonSchema | undefined => {
     const _referenceType = propertyName.replace('filters.', '');
     const _isProjectDashboard = projectId && _referenceType === REFERENCE_TYPE_INFO.project.type;
     if (isInherit) { // inherit case
@@ -98,10 +97,11 @@ export const getRefinedWidgetOptionsSchema = (
     inheritOptions: InheritOptions,
     schemaProperties: string[],
     projectId?: string,
-): WidgetOptionsSchema['schema'] => {
+): JsonSchema => {
     const schema = widgetOptionsSchema?.schema;
 
-    const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
+    // init schema
+    const refinedJsonSchema: JsonSchema = {
         type: 'object',
         properties: {},
         required: [] as WidgetOptionsSchemaProperty[],
@@ -116,23 +116,11 @@ export const getRefinedWidgetOptionsSchema = (
         const isInherit = !!inheritOptions[propertyName]?.enabled;
         const refinedWidgetOptionsSchema = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
         if (refinedWidgetOptionsSchema) {
-            refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
+            if (refinedJsonSchema.properties) refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
             refinedJsonSchema.required?.push(propertyName);
         }
     });
 
     return refinedJsonSchema;
-};
-export const getRefinedWidgetInheritOptions = (widgetInfo: DashboardLayoutWidgetInfo, projectId?: string): InheritOptions => {
-    let inheritOptions = widgetInfo.inherit_options ?? {};
-    if (projectId) {
-        inheritOptions = {
-            ...inheritOptions,
-            [`filters.${REFERENCE_TYPE_INFO.project.type}`]: {
-                enabled: true,
-            },
-        };
-    }
-    return inheritOptions;
 };
 

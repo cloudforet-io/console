@@ -43,6 +43,7 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
             'cost_product',
         )],
         fixed_properties: ['cost_data_source', 'cost_group_by'],
+        non_inheritable_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {

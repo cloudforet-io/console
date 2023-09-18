@@ -206,7 +206,7 @@ const handleDeleteModalConfirm = () => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <template v-if="!dashboardDetailState.loadingDashboard">
+        <template v-if="!dashboardDetailState.loadingDashboard && dashboardDetailStore.isAllVariablesInitialized">
             <template v-for="(widget) in reformedWidgetInfoList">
                 <component :is="widget.component"
                            :id="widget.widget_key"

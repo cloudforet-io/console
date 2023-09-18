@@ -52,13 +52,13 @@ export const useWidgetLifecycle = ({
     });
 
     watch(() => props.dashboardVariables, (after, before) => {
-        if (props.errorMode || !props.inheritOptions || props.disableRefreshOnVariableChange) return;
-        const _isRefreshable = checkRefreshableByDashboardVariables(props.inheritOptions, after, before);
+        if (props.errorMode || !widgetState.inheritOptions || props.disableRefreshOnVariableChange) return;
+        const _isRefreshable = checkRefreshableByDashboardVariables(widgetState.inheritOptions, after, before);
         if (_isRefreshable) refreshWidgetAndEmitEvent();
     }, { deep: true });
 
     watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.editMode || !props.inheritOptions || !props.schemaProperties || !props.options
+        if (!props.editMode || !widgetState.inheritOptions || !props.schemaProperties || !widgetState.options
             || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
 
         const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
@@ -66,9 +66,9 @@ export const useWidgetLifecycle = ({
             previousVariablesSchema: before,
             widgetConfig: widgetState.widgetConfig,
             widgetInfo: {
-                inherit_options: props.inheritOptions,
+                inherit_options: widgetState.inheritOptions,
                 schema_properties: props.schemaProperties,
-                widget_options: props.options,
+                widget_options: widgetState.options,
             },
         });
 

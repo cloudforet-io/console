@@ -1,10 +1,17 @@
 import { cloneDeep, flattenDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import type {
+    DashboardLayoutWidgetInfo,
+    InheritOptions,
+    WidgetOptions,
+} from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { useMergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 
 /* Description
     * This store is used to get/manage 'a' widget data.
@@ -19,21 +26,23 @@ interface WidgetFormState {
     isValid: boolean;
     inheritOptions?: InheritOptions;
     widgetOptions?: WidgetOptions;
-    widgetInfo?: DashboardLayoutWidgetInfo;
+    widgetInfo?: PartialDashboardLayoutWidgetInfo;
     schemaProperties?: string[];
     // view modal
     widgetKey?: string;
 }
-interface WidgetFormActions {
-    setFormData: (formData: any) => void;
-    initWidgetForm: (widgetKey: string) => DashboardLayoutWidgetInfo|undefined;
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetInfo {
+    widget_key?: string;
 }
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
-export const useWidgetFormStore = defineStore<string, WidgetFormState, any, WidgetFormActions>('widget-form', {
-    state: () => ({
+export const useWidgetFormStore = defineStore('widget-form', {
+    state: (): WidgetFormState => ({
         widgetConfigId: undefined,
         widgetTitle: undefined,
         isValid: false,
@@ -74,17 +83,47 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
             this.widgetOptions = _widgetOptions;
             this.inheritOptions = _inheritOptions;
         },
-        initWidgetForm(widgetKey: string): DashboardLayoutWidgetInfo|undefined {
+        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string, projectId?: string): PartialDashboardLayoutWidgetInfo {
             const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
-            this.widgetInfo = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
-            if (this.widgetInfo) {
-                this.widgetConfigId = this.widgetInfo.widget_name;
-                this.widgetTitle = this.widgetInfo.title;
-                this.widgetOptions = this.widgetInfo.widget_options;
-                this.inheritOptions = this.widgetInfo.inherit_options;
-                this.schemaProperties = this.widgetInfo.schema_properties;
-            }
+            const widgetInfo: DashboardLayoutWidgetInfo|undefined = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
+
+            const mergedWidgetState = useMergedWidgetState({
+                inheritOptions: widgetInfo?.inherit_options,
+                widgetOptions: widgetInfo?.widget_options,
+                widgetName: widgetConfigId,
+                dashboardSettings: dashboardDetailState.settings,
+                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
+                dashboardVariables: dashboardDetailState.variables,
+            });
+
+            // refine inheritOptions
+            const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
+
+            // set states
+            this.widgetInfo = {
+                ...(widgetInfo ?? {}),
+                widget_key: widgetKey,
+                widget_name: widgetConfigId,
+                version: widgetInfo?.version ?? '1',
+                title: mergedWidgetState.title,
+                inherit_options: refinedInheritOptions,
+                widget_options: mergedWidgetState.options,
+                schema_properties: mergedWidgetState.schemaProperties,
+            };
+            this.widgetConfigId = widgetConfigId;
+            this.widgetTitle = mergedWidgetState.title;
+            this.widgetOptions = mergedWidgetState.options;
+            this.inheritOptions = refinedInheritOptions;
+            this.schemaProperties = mergedWidgetState.schemaProperties;
+
             return this.widgetInfo;
         },
+    },
+});
+
+const getProjectCaseInheritOptions = (inheritOptions: InheritOptions): InheritOptions => ({
+    ...inheritOptions,
+    [`filters.${REFERENCE_TYPE_INFO.project.type}`]: {
+        enabled: true,
     },
 });
