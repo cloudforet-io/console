@@ -6,41 +6,56 @@ import dayjs from 'dayjs';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/model';
 import type { Granularity } from '@/services/cost-explorer/type';
+
+type ProviderFilter = BudgetModel['provider_filter'];
 
 interface Props {
     projectId?: string;
     projectGroupId?: string;
-    costTypes?: CostTypes;
+    providerFilter?: ProviderFilter;
+    dataSourceId?: string;
     timeUnit: BudgetTimeUnit;
 }
 
-interface BudgetListParams extends Query {
-    start: string;
-    end: string;
-    granularity: Granularity;
+interface BudgetListParams {
+    data_source_id: string;
+    query: {
+        start: string;
+        end: string;
+        granularity: Granularity;
+        sort: { key: string; desc: boolean }[];
+        fields: {
+            cost_sum: {
+                key: string;
+                operator: string;
+            };
+        };
+    }
 }
+const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
     projectGroupId: undefined,
-    costTypes: undefined,
+    providerFilter: undefined,
+    dataSourceId: undefined,
     timeUnit: BUDGET_TIME_UNIT.TOTAL,
 });
 
 
-const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3).setSort('date', true);
+const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3);
 
 const { i18nDayjs } = useI18nDayjs();
 
@@ -58,41 +73,56 @@ const state = reactive({
         const data = state.last3MonthsBudgets[i];
         return {
             month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
-            cost: data ? data.cost : 0,
+            cost: data ? data.cost_sum : 0,
         };
     })),
-    showList: computed(() => props.projectId || props.projectGroupId),
+    showList: computed(() => (props.projectId || props.projectGroupId) && props.dataSourceId),
     // api request params
     budgetListParams: computed(() => {
         let filters: ConsoleFilter[] = [];
 
         if (props.projectId) filters.push({ k: 'project_id', v: props.projectId, o: '=' });
-        if (props.costTypes) filters = filters.concat(getConvertedFilter(props.costTypes));
+        if (props.providerFilter) filters = filters.concat(getConvertedFilter(props.providerFilter));
         recentBudgetApiQueryHelper.setFilters(filters);
 
         const today = dayjs.utc();
         const params: BudgetListParams = {
-            start: today.subtract(3, 'month').startOf('month').format('YYYY-MM-DD'),
-            end: today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
-            granularity: 'MONTHLY',
-            ...recentBudgetApiQueryHelper.data,
+            data_source_id: props.dataSourceId ?? '',
+            query: {
+                start: today.subtract(3, 'month').startOf('month').format('YYYY-MM'),
+                end: today.subtract(1, 'month').endOf('month').format('YYYY-MM'),
+                granularity: 'MONTHLY',
+                fields: {
+                    cost_sum: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+                ...recentBudgetApiQueryHelper.data,
+                sort: [{ key: 'date', desc: true }],
+            },
+
         };
 
         return params;
     }),
+    currency: computed<Currency>(() => {
+        if (props.dataSourceId) {
+            const targetDataSource = allReferenceStore.getters.costDataSource[props.dataSourceId];
+            return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
+        }
+        return 'USD';
+    }),
 });
 
 /* Util */
-const getConvertedFilter = (costTypes: CostTypes): ConsoleFilter[] => {
+const getConvertedFilter = (providerFilter: ProviderFilter): ConsoleFilter[] => {
     const results: ConsoleFilter[] = [];
-    Object.entries(costTypes).forEach(([type, values]) => {
-        if (values?.length) {
-            results.push({
-                k: type,
-                v: values,
-                o: '=',
-            });
-        }
+    if (providerFilter.state === 'DISABLED') return results;
+    results.push({
+        k: 'provider',
+        v: providerFilter.providers,
+        o: '=',
     });
     return results;
 };
@@ -100,27 +130,21 @@ const getConvertedFilter = (costTypes: CostTypes): ConsoleFilter[] => {
 /* Api */
 const getRecentBudgets = async () => {
     try {
-        // TODO: Change to clientV2 after the cost analysis API is updated.
-        const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
-        // TODO: Remove conversion process after the cost analysis API is updated.
-        const converted = results.map((result: any) => ({
-            ...result,
-            cost: result.usd_cost,
-        }));
-        state.last3MonthsBudgets = converted.sort((a, b) => {
-            if (dayjs(a.date).isAfter(dayjs(b.date))) return -1;
-            if (dayjs(a.date).isBefore(dayjs(b.date))) return 1;
-            return 0;
-        });
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze(state.budgetListParams);
+        state.last3MonthsBudgets = results;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.last3MonthsBudgets = [];
     }
 };
 
-watch(() => state.budgetListParams, () => {
+watch([() => props.projectId, () => props.dataSourceId, () => props.projectGroupId], () => {
     if (state.showList) getRecentBudgets();
 }, { immediate: true });
+
+(async () => {
+    await allReferenceStore.load('costDataSource');
+})();
 
 </script>
 
@@ -133,7 +157,7 @@ watch(() => state.budgetListParams, () => {
               :key="index"
               class="data"
         >
-            {{ month }}: {{ currencyMoneyFormatter(cost, CURRENCY.USD) }}
+            {{ month }}: {{ currencyMoneyFormatter(cost, state.currency) }}
         </span>
     </div>
 </template>
