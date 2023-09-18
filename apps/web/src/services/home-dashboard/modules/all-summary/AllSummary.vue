@@ -10,7 +10,9 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
-import { forEach, orderBy, range } from 'lodash';
+import {
+    cloneDeep, forEach, orderBy, range,
+} from 'lodash';
 
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -161,15 +163,10 @@ const drawChart = () => {
         cornerRadiusTL: 3,
         cornerRadiusTR: 3,
     });
-    // if (state.activeTab === DATA_TYPE.BILLING) {
-    //     valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
-    // } else {
-    //     valueAxis.min = 0;
-    // }
 
     // set data processor
-    let dateFormat = 'YYYY-MM-DD';
-    if (state.selectedDateType === 'MONTHLY') dateFormat = 'YYYY-MM';
+    let dateFormat = 'yyyy-MM-dd';
+    if (state.selectedDateType === 'MONTHLY') dateFormat = 'yyyy-MM';
     columnSeries.data.processor = chartHelper.createDataProcessor({
         dateFormat,
         dateFields: ['date'],
@@ -195,7 +192,7 @@ const drawChart = () => {
     });
 
     // set series to chart and set data
-    columnSeries.data.setAll(chartState.data);
+    columnSeries.data.setAll(cloneDeep(chartState.data));
     chart.series.push(columnSeries);
 
     state.chart = chart;
@@ -253,17 +250,10 @@ const setChartData = (data) => {
             bulletColor = primary1;
         }
 
-        const date = dayjs(d.date);
-        let dateLabel;
-        if (dateType === 'MONTHLY' && (date.format('M') === '1' || date.format('M') === '12')) {
-            dateLabel = date.format('MMM, YY');
-        } else {
-            const labelFormat = dateType === 'MONTHLY' ? 'MMM' : 'MM/DD';
-            dateLabel = date.format(labelFormat);
-        }
+        const date = dayjs.utc(d.date).format(dateFormat);
 
         return {
-            date: dateLabel,
+            date,
             count: d.count,
             fillOpacity,
             bulletColor,
