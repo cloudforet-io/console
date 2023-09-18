@@ -42,7 +42,6 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-    currency: computed(() => store.state.settings.currency),
 });
 const state = reactive({
     linkLocation: computed<Location>(() => ({

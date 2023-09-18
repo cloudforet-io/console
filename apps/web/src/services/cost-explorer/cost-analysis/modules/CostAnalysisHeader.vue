@@ -8,13 +8,14 @@ import {
     PIconButton, PHeading, PLazyImg,
 } from '@spaceone/design-system';
 
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -38,8 +39,6 @@ const state = reactive({
     dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
     isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
     itemIdForDeleteQuery: '',
-    currency: computed(() => store.state.settings.currency),
-    currencySymbol: computed(() => store.getters['settings/currencySymbol']),
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
@@ -104,7 +103,7 @@ const handleDeleteQueryConfirm = async () => {
                     </div>
                     <div class="title-right-extra currency-wrapper">
                         <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
-                        <span>{{ state.currencySymbol }}{{ state.currency }}</span>
+                        <span>{{ CURRENCY_SYMBOL.USD }}{{ CURRENCY.USD }}</span>
                     </div>
                 </template>
             </p-heading>

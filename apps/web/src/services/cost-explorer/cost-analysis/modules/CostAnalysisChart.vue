@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    reactive, watch,
 } from 'vue';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
@@ -10,8 +10,6 @@ import { debounce } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -49,7 +47,6 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    currency: computed(() => store.state.settings.currency),
     loading: true,
     legends: [] as Legend[],
     chartData: [] as XYChartData[],

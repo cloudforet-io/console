@@ -26,6 +26,7 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -75,7 +76,6 @@ const state = reactive({
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     //
-    currency: computed(() => store.state.settings.currency),
     groupByStoreMap: computed(() => ({
         [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
         [GROUP_BY.PROJECT]: state.projects,
@@ -99,7 +99,7 @@ const tableState = reactive({
         if (d.name.startsWith('cost')) {
             field.type = 'currency';
             field.options = {
-                currency: state.currency,
+                currency: CURRENCY.USD,
             };
         }
         return field;
