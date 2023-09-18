@@ -3,12 +3,13 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { merge } from 'lodash';
+import { merge, union } from 'lodash';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions,
     InheritOptions,
+    WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -21,6 +22,8 @@ export interface MergedWidgetState {
     options: ComputedRef<WidgetOptions>;
     settings: ComputedRef<DashboardSettings|undefined>;
     inheritOptions: ComputedRef<InheritOptions>;
+    title: ComputedRef<string>;
+    schemaProperties: ComputedRef<string[]>;
 }
 interface UseMergedWidgetStateOptions {
     inheritOptions: InheritOptions|undefined|Ref<InheritOptions|undefined>; // inherit information from the dashboard widget layout info.
@@ -29,10 +32,12 @@ interface UseMergedWidgetStateOptions {
     dashboardSettings: DashboardSettings|undefined|Ref<DashboardSettings|undefined>; // dashboard settings
     dashboardVariablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
     dashboardVariables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
+    title?: string|Ref<string>; // widget title from the dashboard widget layout info.
+    schemaProperties?: string[]|Ref<string[]>; // widget schema properties from the dashboard widget layout info.
 }
 export function useMergedWidgetState(
     {
-        inheritOptions, widgetOptions, widgetName, dashboardSettings, dashboardVariablesSchema, dashboardVariables,
+        inheritOptions, widgetOptions, widgetName, dashboardSettings, dashboardVariablesSchema, dashboardVariables, title, schemaProperties,
     }: UseMergedWidgetStateOptions,
 ) {
     const optionState = reactive({
@@ -42,6 +47,8 @@ export function useMergedWidgetState(
         dashboardSettings,
         dashboardVariablesSchema,
         dashboardVariables,
+        title,
+        schemaProperties,
     });
     const optionsErrorMap = computed(() => getWidgetInheritOptionsErrorMap(
         optionState.inheritOptions,
@@ -71,6 +78,8 @@ export function useMergedWidgetState(
                 refresh_interval_option: optionState.dashboardSettings.refresh_interval_option ?? 'off',
             };
         }),
+        title: computed<string>(() => optionState.title ?? state.widgetConfig.title ?? ''),
+        schemaProperties: computed<string[]>(() => optionState.schemaProperties ?? getRefinedSchemaProperties(state.widgetConfig)),
     }) as UnwrapRef<MergedWidgetState>;
 
     return state;
@@ -87,7 +96,7 @@ const getRefinedWidgetOptions = (
     const mergedOptions = getMergedWidgetOptions(widgetConfig, optionsData);
     if (!mergedInheritOptions || !dashboardVariables) return mergedOptions;
 
-    const parentOptions: Partial<WidgetOptions> = convertInheritOptionsToWidgetFiltersMap(mergedInheritOptions, dashboardVariables, optionsErrorMap);
+    const parentOptions: Partial<WidgetOptions> = getRefinedParentOptions(mergedInheritOptions, dashboardVariables, optionsErrorMap);
     const refined = merge({}, mergedOptions, parentOptions);
     return refined;
 };
@@ -104,7 +113,7 @@ const getMergedWidgetInheritOptions = (widgetConfig?: WidgetConfig, inheritOptio
     return mergedInheritOptions;
 };
 
-const convertInheritOptionsToWidgetFiltersMap = (
+const getRefinedParentOptions = (
     inheritOptions: InheritOptions,
     dashboardVariables: DashboardVariables,
     optionsErrorMap?: InheritOptionsErrorMap,
@@ -133,4 +142,31 @@ const convertInheritOptionsToWidgetFiltersMap = (
         }
     });
     return result;
+};
+
+
+const getRefinedSchemaProperties = (widgetConfig: WidgetConfig): string[] => {
+    const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
+    const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
+    const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
+    const allProperties = union(fixedProperties, defaultProperties);
+
+    const fixedIdxMap: Record<string, number> = {};
+    fixedProperties.forEach((name, idx) => { fixedIdxMap[name] = idx; });
+    const defaultIdxMap = {};
+    defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
+
+    return allProperties.sort((a, b) => {
+        if (fixedIdxMap[a] !== undefined) {
+            // if both are fixed, follow required index order
+            if (fixedIdxMap[b] !== undefined) return fixedIdxMap[a] > fixedIdxMap[b] ? 1 : -1;
+            // otherwise, fixed item comes before
+            return -1;
+        }
+        // if one is default and one is fixed, fixed one comes before
+        if (fixedIdxMap[b] !== undefined) return 1;
+
+        // if both are default, follow default index order
+        return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
+    });
 };

@@ -109,7 +109,7 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
-        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
+        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string, widgetFormState.widgetConfigId as string);
         await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
         state.widgetRef?.initWidget();
         state.initiated = true;
