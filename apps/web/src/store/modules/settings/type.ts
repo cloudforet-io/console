@@ -8,8 +8,6 @@ export type CurrencyRates = {
 };
 
 export interface SettingsState {
-    currencyRates: CurrencyRates;
-    currencyUpdateTime: number|undefined;
     currency: Currency;
     gnbNotificationLastReadTime: string;
 }
