@@ -75,7 +75,8 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DAY_COUNT, MONTH_COUNT } from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
@@ -119,6 +120,10 @@ export default {
             type: String,
             default: 'TB',
         },
+        dataSourceId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const state = reactive({
@@ -146,7 +151,11 @@ export default {
                 period.end = dayjs.utc().format('YYYY-MM');
             }
             const location: any = {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                params: {
+                    dataSourceId: props.dataSourceId,
+                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+                },
                 query: {
                     granularity: primitiveToQueryString(props.selectedDateType),
                     group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
@@ -154,7 +163,7 @@ export default {
                 },
             };
             if (!disableFilter) {
-                location.query.filters = objectToQueryString({ product: [serviceCode] });
+                location.query.filters = objectToQueryString([{ k: 'product', v: [serviceCode], o: '=' }]);
             }
             return location;
         };
@@ -171,7 +180,7 @@ export default {
         };
         const getServiceLocation = (data): Location => {
             if (props.activeTab === DATA_TYPE.BILLING) {
-                return getBillingServiceLocation(data.service_code, false);
+                return getBillingServiceLocation(data.product, false);
             }
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
@@ -246,20 +255,29 @@ export default {
         const getBillingSummaryInfo = async () => {
             try {
                 state.loading = true;
-                const { results } = await SpaceConnector.client.statistics.topic.billingSummary({
+                const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
                     ...props.extraParams,
-                    granularity: 'MONTHLY',
-                    aggregation: 'inventory.CloudServiceType',
-                    start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
-                    end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
+                    data_source_id: props.dataSourceId,
+                    query: {
+                        granularity: GRANULARITY.MONTHLY,
+                        group_by: [GROUP_BY.PRODUCT, GROUP_BY.PROVIDER],
+                        start: dayjs.utc().format('YYYY-MM'),
+                        end: dayjs.utc().format('YYYY-MM'),
+                        fields: {
+                            cost_sum: {
+                                key: 'cost',
+                                operator: 'sum',
+                            },
+                        },
+                    },
                 });
                 const summaryData: SummaryData[] = [];
                 results.forEach((d) => {
-                    if (numberFormatter(d.billing_data[0].cost) !== 0) {
+                    if (numberFormatter(d.cost_sum) !== 0) {
                         summaryData.push({
                             provider: d.provider,
-                            type: d.cloud_service_group || d.service_code,
-                            count: numberFormatter(d.billing_data[0].cost),
+                            type: d.product,
+                            count: numberFormatter(d.cost_sum),
                             to: getServiceLocation(d),
                         });
                     }
