@@ -132,7 +132,7 @@ const dataSourceState = reactive({
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
-            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon,
+            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon ? dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
         }));
         return dataSourceMenuItemList;
     }),
