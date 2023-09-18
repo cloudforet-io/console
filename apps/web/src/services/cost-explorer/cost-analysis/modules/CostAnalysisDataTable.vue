@@ -26,7 +26,6 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-import { CURRENCY } from '@/store/modules/settings/config';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -99,7 +98,7 @@ const tableState = reactive({
         if (d.name.startsWith('cost')) {
             field.type = 'currency';
             field.options = {
-                currency: CURRENCY.USD,
+                currency: costAnalysisPageStore.currency,
             };
         }
         return field;
@@ -325,6 +324,7 @@ const handleExcelDownload = async () => {
             },
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
+            version: 'v2',
         });
     } catch (e) {
         ErrorHandler.handleError(e);
