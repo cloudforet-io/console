@@ -78,7 +78,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { DAY_COUNT, MONTH_COUNT } from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 
 interface SummaryData {
@@ -87,6 +86,9 @@ interface SummaryData {
     count: number | string;
     to: string | Location;
 }
+
+const DAY_COUNT = 14;
+const MONTH_COUNT = 12;
 
 export default {
     name: 'AllSummaryDataSummary',
