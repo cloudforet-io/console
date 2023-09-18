@@ -15,7 +15,7 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -103,7 +103,7 @@ const handleDeleteQueryConfirm = async () => {
                     </div>
                     <div class="title-right-extra currency-wrapper">
                         <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
-                        <span>{{ CURRENCY_SYMBOL.USD }}{{ CURRENCY.USD }}</span>
+                        <span>{{ CURRENCY_SYMBOL[costAnalysisPageStore.currency] }}{{ costAnalysisPageStore.currency }}</span>
                     </div>
                 </template>
             </p-heading>
