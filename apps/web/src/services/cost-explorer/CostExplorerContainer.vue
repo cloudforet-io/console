@@ -3,7 +3,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { onUnmounted, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute } from 'vue-router';
 
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';

@@ -6,6 +6,7 @@ import {
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -29,6 +30,7 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const state = reactive({
     showGNB: computed(() => route.matched[0]?.name === 'root'),

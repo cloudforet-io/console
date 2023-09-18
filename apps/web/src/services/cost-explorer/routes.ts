@@ -1,6 +1,6 @@
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { RouteRecordRaw } from 'vue-router';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
@@ -18,7 +18,7 @@ const BudgetMainPage = () => import('@/services/cost-explorer/budget/budget-main
 const BudgetCreatePage = () => import('@/services/cost-explorer/budget/budget-create/BudgetCreatePage.vue');
 const BudgetBulkCreatePage = () => import('@/services/cost-explorer/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
-const DYNAMIC_QUERY_SET_ID = 'dynamic';
+// const DYNAMIC_QUERY_SET_ID = 'dynamic';
 
 const costExplorerRoutes: RouteRecordRaw = {
     path: 'cost-explorer',
@@ -50,6 +50,7 @@ const costExplorerRoutes: RouteRecordRaw = {
                             });
                         }
                     },
+                    component: { template: '<router-view />' },
                 },
                 {
                     path: ':dataSourceId/:costQuerySetId',
