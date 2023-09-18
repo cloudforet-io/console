@@ -4,7 +4,6 @@ import * as mutations from './mutations';
 import type { SettingsState } from './type';
 
 const state: SettingsState = {
-    currencyUpdateTime: undefined,
     currency: 'USD',
     gnbNotificationLastReadTime: '',
 };

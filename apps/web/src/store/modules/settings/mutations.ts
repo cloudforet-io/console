@@ -4,7 +4,6 @@ import type { SettingsState } from './type';
 
 export const initUserSettings = (state: SettingsState, item: SettingsState): void => {
     state.currency = CURRENCY.USD;
-    state.currencyUpdateTime = item.currencyUpdateTime;
     state.gnbNotificationLastReadTime = item.gnbNotificationLastReadTime;
 };
 
