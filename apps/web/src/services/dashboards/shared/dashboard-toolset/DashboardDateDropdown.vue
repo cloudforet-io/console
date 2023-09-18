@@ -10,7 +10,7 @@
             @select="handleSelectMonthMenuItem"
         >
             <template #dropdown-button>
-                <span>{{ selectedMonthLabel }}</span>
+                <span class="flex-grow">{{ selectedMonthLabel }}</span>
             </template>
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
