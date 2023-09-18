@@ -7,7 +7,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import {
     computed, onMounted, reactive,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
