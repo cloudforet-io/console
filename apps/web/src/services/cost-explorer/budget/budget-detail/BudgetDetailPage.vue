@@ -34,7 +34,6 @@ const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
     currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     hasManagePermission: useManagePermissionState(),
 });
 
@@ -92,11 +91,9 @@ const handleConfirmDelete = () => {
         <section class="content">
             <budget-detail-info class="summary"
                                 :currency="state.currency"
-                                :currency-rates="state.currencyRates"
             />
             <budget-summary :budget-loading="state.loading"
                             :currency="state.currency"
-                            :currency-rates="state.currencyRates"
                             class="summary"
             />
             <budget-notifications class="alert"

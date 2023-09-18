@@ -76,7 +76,6 @@ const state = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     //
     currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     groupByStoreMap: computed(() => ({
         [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
         [GROUP_BY.PROJECT]: state.projects,
@@ -101,7 +100,6 @@ const tableState = reactive({
             field.type = 'currency';
             field.options = {
                 currency: state.currency,
-                currencyRates: state.currencyRates,
             };
         }
         return field;
