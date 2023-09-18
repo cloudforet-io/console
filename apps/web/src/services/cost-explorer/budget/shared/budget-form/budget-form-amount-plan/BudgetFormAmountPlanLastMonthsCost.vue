@@ -139,7 +139,6 @@ const getRecentBudgets = async () => {
 };
 
 watch([() => props.projectId, () => props.dataSourceId, () => props.projectGroupId], () => {
-    console.log('showList', state.showList);
     if (state.showList) getRecentBudgets();
 }, { immediate: true });
 
