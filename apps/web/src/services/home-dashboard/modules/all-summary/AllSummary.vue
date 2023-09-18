@@ -184,11 +184,11 @@ const drawChart = () => {
             fill: chartHelper.color(primary),
             textAlign: 'center',
             centerX: chartHelper.percent(50),
-            centerY: chartHelper.percent(50),
+            centerY: chartHelper.percent(80),
         });
         return chartHelper.createBullet({
             locationX: 0.5,
-            locationY: 1.1,
+            locationY: 1,
             sprite: label,
             dynamic: true,
         });
