@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 
 import dayjs from 'dayjs';
@@ -9,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import { store } from '@/store';
+import { CURRENCY } from '@/store/modules/settings/config';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -63,7 +62,6 @@ const state = reactive({
         };
     })),
     showList: computed(() => props.projectId || props.projectGroupId),
-    currency: computed(() => store.state.settings.currency),
     // api request params
     budgetListParams: computed(() => {
         let filters: ConsoleFilter[] = [];
@@ -135,7 +133,7 @@ watch(() => state.budgetListParams, () => {
               :key="index"
               class="data"
         >
-            {{ month }}: {{ currencyMoneyFormatter(cost, state.currency) }}
+            {{ month }}: {{ currencyMoneyFormatter(cost, CURRENCY.USD) }}
         </span>
     </div>
 </template>
