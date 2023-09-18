@@ -5,7 +5,7 @@ import {
 
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 
-import type { BudgetModel, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/model';
+import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
@@ -30,7 +30,8 @@ export interface BudgetAmountPlanInfo {
 interface Props {
     projectId?: string;
     projectGroupId?: string;
-    costTypes?: CostTypes;
+    providerFilter?: BudgetModel['provider_filter'];
+    dataSourceId?: string;
 }
 
 const props = defineProps<Props>();
@@ -116,7 +117,8 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
                 <template #last-3-months>
                     <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
                                                               :project-group-id="props.projectGroupId"
-                                                              :cost-types="props.costTypes"
+                                                              :provider-filter="props.providerFilter"
+                                                              :data-source-id="props.dataSourceId"
                                                               :time-unit="state.timeUnit"
                     />
                 </template>
@@ -128,7 +130,8 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
                 <template #last-3-months>
                     <budget-form-amount-plan-last-months-cost :project-id="props.projectId"
                                                               :project-group-id="props.projectGroupId"
-                                                              :cost-types="props.costTypes"
+                                                              :provider-filter="props.providerFilter"
+                                                              :data-source-id="props.dataSourceId"
                                                               :time-unit="state.timeUnit"
                     />
                 </template>
