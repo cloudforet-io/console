@@ -492,7 +492,6 @@ export default {
             state.loading = true;
             await Promise.all([
                 getCount(),
-                allReferenceStore.load('costDataSource'),
             ]);
             state.loading = false;
         };
