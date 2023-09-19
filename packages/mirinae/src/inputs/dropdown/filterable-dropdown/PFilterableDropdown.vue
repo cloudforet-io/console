@@ -272,7 +272,7 @@ watch(() => props.disabled, (disabled) => {
                     >
                         <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                         <p-badge v-if="displayBadgeValueOnDropdownButton"
-                                 :style-type="disabled ? 'gray200' : 'blue200'"
+                                 :style-type="disabled ? 'gray200' : 'blue300'"
                                  :badge-type="disabled ? 'solid' : 'subtle'"
                         >
                             {{ displayBadgeValueOnDropdownButton }}
@@ -370,6 +370,10 @@ watch(() => props.disabled, (disabled) => {
             .selection-wrapper {
                 @apply flex flex-grow items-center text-label-md text-gray-800;
                 gap: 0.25rem;
+                .selected-item {
+                    @apply flex items-center;
+                    gap: 0.25rem;
+                }
                 .selected-item-text {
                     @apply font-medium;
                 }
@@ -411,7 +415,8 @@ watch(() => props.disabled, (disabled) => {
 
     &.rounded {
         .dropdown-button {
-            @apply border-gray-200 rounded-xl;
+            @apply border-gray-200;
+            border-radius: 0.75rem;
         }
         &.selected:not(.disabled, .readonly, .invalid, .selection-highlight) {
             .dropdown-button {

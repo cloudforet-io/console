@@ -180,7 +180,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 .dropdown-button-component {
     /* style type - default */
     .dropdown-button {
-        @apply flex items-center bg-white text-label-md font-normal border rounded-md border-gray-300 cursor-pointer;
+        @apply flex items-center bg-white text-label-md font-normal border rounded border-gray-300 cursor-pointer;
         width: 100%;
         min-height: 2rem;
         gap: 0.25rem;
@@ -266,7 +266,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
     /* style type */
     &.rounded {
         .dropdown-button {
-            @apply border-gray-200 rounded-xl;
+            @apply border-gray-200;
+            border-radius: 0.75rem;
         }
         &.selected:not(.disabled, .readonly, .invalid, .selection-highlight) {
             .dropdown-button {
