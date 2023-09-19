@@ -90,7 +90,7 @@ const displayState = reactive({
     }),
     recentBudgetLeft: computed<number>(() => {
         if (!state.recentSpentData || !state.recentBudgetData) return 0;
-        return state.recentBudgetData - state.recentSpentData;
+        return Math.abs(state.recentBudgetData - state.recentSpentData);
     }),
     isSpentOverBudget: computed<boolean>(() => {
         if (!state.recentSpentData || !state.recentBudgetData) return false;
