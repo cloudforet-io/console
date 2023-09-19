@@ -32,7 +32,7 @@ interface UseMergedWidgetStateOptions {
     dashboardSettings: DashboardSettings|undefined|Ref<DashboardSettings|undefined>; // dashboard settings
     dashboardVariablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
     dashboardVariables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
-    title?: string|Ref<string>; // widget title from the dashboard widget layout info.
+    title?: string|Ref<string|undefined>; // widget title from the dashboard widget layout info.
     schemaProperties?: string[]|Ref<string[]>; // widget schema properties from the dashboard widget layout info.
 }
 export function useMergedWidgetState(
@@ -78,7 +78,7 @@ export function useMergedWidgetState(
                 refresh_interval_option: optionState.dashboardSettings.refresh_interval_option ?? 'off',
             };
         }),
-        title: computed<string>(() => optionState.title ?? state.widgetConfig.title ?? ''),
+        title: computed<string>(() => optionState.title ?? state.widgetConfig?.title ?? ''),
         schemaProperties: computed<string[]>(() => optionState.schemaProperties ?? getRefinedSchemaProperties(state.widgetConfig)),
     }) as UnwrapRef<MergedWidgetState>;
 
@@ -145,7 +145,7 @@ const getRefinedParentOptions = (
 };
 
 
-const getRefinedSchemaProperties = (widgetConfig: WidgetConfig): string[] => {
+const getRefinedSchemaProperties = (widgetConfig?: WidgetConfig): string[] => {
     const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
     const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
     const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
