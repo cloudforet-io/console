@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import type { Series } from '@amcharts/amcharts5';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { sortArrayInObjectArray } from '@cloudforet/core-lib';
@@ -13,7 +12,6 @@ import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -29,7 +27,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
-import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
@@ -48,11 +46,11 @@ import {
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 
@@ -83,19 +81,26 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        const _period = {
+            start: end.subtract(5, 'month').format('YYYY-MM'),
+            end: end.format('YYYY-MM'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                group_by: arrayToQueryString([widgetState.groupBy]),
+                period: objectToQueryString(_period),
+                filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 const state = reactive({
     loading: true,

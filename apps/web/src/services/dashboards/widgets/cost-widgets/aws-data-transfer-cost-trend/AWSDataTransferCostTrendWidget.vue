@@ -11,7 +11,6 @@ import { cloneDeep, sortBy } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -30,13 +29,14 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNe
 import type {
     WidgetProps, WidgetExpose, SelectorType, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_GROUP_BY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
     getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     getReferenceTypeOfGroupBy,
     getRefinedDateTableData,
@@ -83,19 +83,26 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString({ ...widgetState.options.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        const _period = {
+            start: end.subtract(5, 'month').format('YYYY-MM'),
+            end: end.format('YYYY-MM'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(widgetState.granularity),
+                group_by: arrayToQueryString([widgetState.groupBy, COST_GROUP_BY.USAGE_TYPE]),
+                period: objectToQueryString(_period),
+                filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 
 const state = reactive({

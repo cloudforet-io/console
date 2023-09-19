@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { byteFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -8,11 +7,11 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -34,6 +33,7 @@ import type {
     UsageType, WidgetEmit, WidgetExpose, WidgetProps,
     SelectorType,
 } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getRefinedXYChartData,
@@ -46,11 +46,11 @@ import {
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 const USAGE_SOURCE_UNIT = 'GB';
@@ -84,23 +84,26 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString({
-                ...getWidgetLocationFilters(widgetState.options.filters),
-                provider: ['aws'],
-                product: ['AmazonCloudFront'],
-            }),
-        },
-    })),
+    widgetLocation: computed<Location>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        const _period = {
+            start: end.subtract(5, 'month').format('YYYY-MM'),
+            end: end.format('YYYY-MM'),
+        };
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                group_by: arrayToQueryString([widgetState.groupBy, COST_GROUP_BY.USAGE_TYPE]),
+                period: objectToQueryString(_period),
+                filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 
 const { colorSet } = useWidgetColorSet({
