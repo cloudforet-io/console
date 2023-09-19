@@ -11,7 +11,7 @@
         </label>
         <div ref="backgroundBar"
              class="background-bar"
-             :style="{ props.height }"
+             :style="{ height: props.height }"
         />
         <transition appear
                     @before-appear="beforeEnter"
@@ -72,11 +72,6 @@ const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startCo
 const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
 
 const state = reactive({
-    progressBarStyle: computed(() => ({
-        background: props.gradient ? linearGradientProperty
-            : (props.color ?? defaultTrackerBarColor),
-        transition: props.disableAnimation ? undefined : 'width 0.5s linear',
-    })),
     progressBarStyle: computed(() => ({
         background: props.gradient ? linearGradientProperty
             : (props.color ?? defaultTrackerBarColor),
