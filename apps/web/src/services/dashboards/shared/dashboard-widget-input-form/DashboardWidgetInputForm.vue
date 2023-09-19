@@ -36,6 +36,7 @@ import type {
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetFilterSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type {
     InheritOptionsErrorMap,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -59,7 +60,13 @@ const state = reactive({
     widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
     widgetOptionsJsonSchema: {} as JsonSchema,
     schemaFormData: {},
-    fixedProperties: computed<string[]>(() => state.widgetConfig.options_schema?.fixed_properties ?? []),
+    fixedProperties: computed<string[]>(() => {
+        const fixedProperties = state.widgetConfig?.options_schema?.fixed_properties ?? [];
+        if (dashboardDetailState.projectId) {
+            fixedProperties.push(getWidgetFilterSchemaPropertyName('project'));
+        }
+        return fixedProperties;
+    }),
     inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
         .filter(([, inheritOption]) => !!inheritOption.enabled)
         .map(([propertyName]) => propertyName)),
