@@ -151,7 +151,7 @@ const handleLinkClick = () => {
         <div class="text-align-wrapper">
             <p-select-dropdown :selected="state.selectedTextAlign"
                                class="menu-dropdown"
-                               style-type="icon-button"
+                               style-type="transparent"
                                :menu="state.textAlignItems"
                                @select="handleTextAlignSelect"
             >
@@ -159,7 +159,7 @@ const handleLinkClick = () => {
                     <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
                     {{ item.label }}
                 </template>
-                <template #button-item>
+                <template #dropdown-button>
                     <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
                          color="inherit"
                     />
@@ -296,6 +296,7 @@ const handleLinkClick = () => {
     }
 
     .menu-dropdown {
+        min-width: unset;
         &.text-style {
             min-width: 7.5rem;
         }

@@ -33,11 +33,8 @@ const handleColorClick = async (color: string) => {
 
 <template>
     <div class="color-picker-wrapper">
-        <p-i name="ic_text-color"
-             color="inherit"
-        />
         <p-select-dropdown class="color-picker"
-                           style-type="icon-button"
+                           style-type="transparent"
                            :menu="state.textColorItems"
                            index-mode
         >
@@ -67,6 +64,11 @@ const handleColorClick = async (color: string) => {
                     </div>
                 </div>
             </template>
+            <template #dropdown-button>
+                <p-i name="ic_text-color"
+                     color="inherit"
+                />
+            </template>
         </p-select-dropdown>
     </div>
 </template>
@@ -76,6 +78,7 @@ const handleColorClick = async (color: string) => {
     @apply flex items-center;
 
     .color-picker {
+        min-width: unset;
         .color-picker-menu {
             padding: 0.625rem;
         }

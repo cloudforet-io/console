@@ -109,8 +109,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                   class="show-alert-dot"
             />
             <slot name="input-left-area" />
-            <slot name="item"
-                  v-bind="{...props}"
+            <slot name="button"
+                  v-bind="props.selectedItems"
             >
                 <div class="selection-display-wrapper">
                     <span v-if="displayValueOnDropdownButton === undefined"
@@ -180,15 +180,15 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 .dropdown-button-component {
     /* style type - default */
     .dropdown-button {
-        @apply flex items-center bg-white font-normal border rounded-md border-gray-300 cursor-pointer;
+        @apply flex items-center bg-white text-label-md font-normal border rounded-md border-gray-300 cursor-pointer;
         width: 100%;
         min-height: 2rem;
         gap: 0.25rem;
+        padding-left: 0.5rem;
         .selection-display-wrapper {
             @apply flex flex-grow flex-shrink items-center text-label-md;
             width: 100%;
             min-height: 2rem;
-            padding-left: 0.5rem;
             .placeholder {
                 @apply text-gray-500;
             }

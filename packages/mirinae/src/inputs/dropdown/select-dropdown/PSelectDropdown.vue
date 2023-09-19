@@ -113,9 +113,9 @@ const state = reactive({
         if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
         return res;
     }, {})),
-    buttonSlots: computed(() => reduce(slots, (res, d, name) => {
-        if (name.startsWith('button-') || name === 'button-default') {
-            res[`${name.substring(7)}`] = d;
+    dropdownSlots: computed(() => reduce(slots, (res, d, name) => {
+        if (name.startsWith('dropdown-') || name === 'dropdown-default') {
+            res[`${name.substring(9)}`] = d;
         }
         return res;
     }, {})),
@@ -272,11 +272,11 @@ watch(() => props.disabled, (disabled) => {
                          @click-delete="handleClickDelete"
                          @click-dropdown-button="handleClickDropdownButton"
         >
-            <template v-for="(_, slot) of state.buttonSlots"
+            <template v-for="(_, slot) of state.dropdownSlots"
                       #[slot]="scope"
             >
-                <slot :name="`button-${slot}`"
-                      v-bind="scope"
+                <slot :name="`dropdown-${slot}`"
+                      v-bind="scope[0]"
                 />
             </template>
         </dropdown-button>

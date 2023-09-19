@@ -51,7 +51,7 @@ const handleSelectCurrency = (currency: Currency) => {
                        @select="handleSelectCurrency"
     >
         <template v-if="props.defaultCurrencyMode"
-                  #default="{ item }"
+                  #dropdown-button="item"
         >
             <span>
                 <span>{{ item.label }}</span>

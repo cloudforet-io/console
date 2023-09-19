@@ -6,7 +6,7 @@
                        class="currency-select-dropdown"
                        @select="handleSelectCurrency"
     >
-        <template #default="{ item }">
+        <template #dropdown-button="item">
             <span>
                 <span>{{ item.label }}</span>
                 <p-badge v-if="item.badge"
