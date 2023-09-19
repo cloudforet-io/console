@@ -210,6 +210,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
     // init title
     updateTitle(widgetInfo.title);
 
+
     // init schema
     state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
