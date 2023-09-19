@@ -8,9 +8,9 @@ import {
     onMounted, onUnmounted, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import { red } from '@/styles/colors';
 
@@ -26,6 +26,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const store = useStore();
+const { t } = useI18n();
+
 const emit = defineEmits<{(e: string, value: string): void,
     (e: 'save'): void,
     (e: 'cancel'): void,
