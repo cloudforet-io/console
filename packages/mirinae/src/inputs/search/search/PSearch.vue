@@ -7,21 +7,21 @@
              class="input-container"
              :class="{ focused, invalid, disabled }"
         >
-            <p-i v-if="!disableIcon && !focused && !value && !readonly"
+            <p-i v-if="!disableIcon && !focused && !proxyValue && !readonly"
                  class="left-icon"
                  name="ic_search"
                  color="inherit"
             />
             <slot name="left"
-                  v-bind="{ value, placeholder: placeholderText }"
+                  v-bind="{ value: proxyValue, placeholder: placeholderText }"
             />
             <span class="input-wrapper">
                 <slot name="default"
-                      v-bind="{ value, placeholder: placeholderText }"
+                      v-bind="{ value: proxyValue, placeholder: placeholderText }"
                 >
                     <input ref="inputRef"
                            v-bind="$attrs"
-                           :value="value"
+                           :value="proxyValue"
                            :placeholder="placeholderText"
                            :disabled="disabled"
                            :readonly="readonly"
@@ -30,10 +30,10 @@
                 </slot>
             </span>
             <slot name="right"
-                  v-bind="{ value, placeholder: placeholderText }"
+                  v-bind="{ value: proxyValue, placeholder: placeholderText }"
             >
                 <div class="right">
-                    <span v-if="value"
+                    <span v-if="proxyValue"
                           class="delete-btn"
                           @click="handleDelete"
                     >
@@ -239,7 +239,7 @@ export default defineComponent<SearchProps>({
         const inputListeners = {
             ...listeners,
             input(e) {
-                emit('update:value', e.target.value);
+                state.proxyValue = e.target.value;
                 showMenu();
                 filterMenu(e.target.value);
                 makeByPassListeners(listeners, 'input', e.target.value, e);
@@ -278,8 +278,8 @@ export default defineComponent<SearchProps>({
         };
         const handleDelete = () => {
             if (props.disabled) return;
-            emit('delete', props.value);
-            emit('update:value', '');
+            state.proxyValue = '';
+            emit('delete', state.proxyValue);
         };
 
         watch(() => props.isFocused, (isFocused) => {
