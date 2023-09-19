@@ -123,7 +123,6 @@ const administrationRoutes: RouteConfig = {
         //                     path: 'add',
         //                     name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER.ADD._NAME,
         //                     // song-lang  => Add Provider
-        //                     meta: { lnbVisible: false, translationId: 'Add Provider' }, // TODO: access level 확인 필요
         //                     props: true,
         //                     component: ProviderAddPage,
         //                 },

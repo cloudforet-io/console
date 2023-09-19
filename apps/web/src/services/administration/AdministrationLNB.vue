@@ -47,7 +47,8 @@ export default defineComponent({
                         type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
                     },
                 ], store.getters['user/pagePermissionList']),
-                // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
+                // TODO: provider 부분
+                //  이 1.10.2 스프린트에서 제외되어 주석 처리
                 // { type: 'divider' },
                 // ...filterLNBMenuByPermission([
                 //     {
