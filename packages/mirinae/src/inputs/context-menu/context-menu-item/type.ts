@@ -1,4 +1,4 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 
@@ -7,7 +7,7 @@ export interface ContextMenuItemProps {
     name?: string | number;
     label?: number | string;
     link?: string;
-    to?: RouteLocation;
+    to?: RouteLocationRaw;
     disabled?: boolean;
     selected?: boolean;
     selectMarker?: SelectMarker;

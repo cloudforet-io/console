@@ -4,7 +4,7 @@ import { onClickOutside } from '@vueuse/core';
 import {
     computed, reactive, ref,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { useRouter, useRoute } from 'vue-router';
 
 import type { DisplayMenu, HighlightTagType } from '@/store/modules/display/type';
@@ -28,7 +28,7 @@ interface SubMenu extends DisplayMenu {
     href?: string;
 }
 
-type RawRouteLocation = RouteLocation | string;
+type RawRouteLocation = RouteLocationRaw | string;
 
 interface Props {
     show: boolean;

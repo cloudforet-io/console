@@ -1,3 +1,42 @@
+<script setup lang="ts">
+import { reactive } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+
+import PI from '@/foundation/icons/PI.vue';
+import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
+
+interface Route {
+    name: string;
+    path?: string;
+    to?: RouteLocationRaw;
+}
+
+interface Props {
+    routes: Route[];
+    copiable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    routes: () => [],
+    copiable: false,
+});
+const emit = defineEmits(['click']);
+
+const state = reactive({
+    isShown: false,
+});
+const getLocation = (route: Route): RouteLocationRaw => {
+    if (route.to) return route.to;
+    if (route.path) return { path: route.path } as RouteLocationRaw;
+    return {} as RouteLocationRaw;
+};
+const showHidden = () => { state.isShown = true; };
+const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
+const handleClick = (route: Route, index: number) => {
+    emit('click', route, index);
+};
+</script>
+
 <template>
     <div class="p-breadcrumbs">
         <span v-for="(route, idx) in routes"
@@ -70,46 +109,6 @@
         </span>
     </div>
 </template>
-
-<script setup lang="ts">
-import { reactive } from 'vue';
-import type { RouteLocation } from 'vue-router';
-
-import PI from '@/foundation/icons/PI.vue';
-import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-
-interface Route {
-    name: string;
-    path?: string;
-    to?: RouteLocation;
-}
-
-interface Props {
-    routes: Route[];
-    copiable?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    routes: () => [],
-    copiable: false,
-});
-const emit = defineEmits(['click']);
-
-const state = reactive({
-    isShown: false,
-});
-const getLocation = (route: Route): RouteLocation => {
-    if (route.to) return route.to;
-    if (route.path) return { path: route.path } as RouteLocation;
-    return {} as RouteLocation;
-};
-const showHidden = () => { state.isShown = true; };
-const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
-const handleClick = (route: Route, index: number) => {
-    emit('click', route, index);
-};
-
-</script>
 
 <style lang="postcss">
 .p-breadcrumbs {

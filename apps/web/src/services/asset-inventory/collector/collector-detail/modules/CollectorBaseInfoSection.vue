@@ -60,7 +60,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -86,7 +86,7 @@ import CollectorTagForm from '@/services/asset-inventory/collector/shared/collec
 import CollectorVersionForm from '@/services/asset-inventory/collector/shared/collector-forms/CollectorVersionForm.vue';
 
 const props = defineProps<{
-    historyLink: RouteLocation
+    historyLink: RouteLocationRaw
 }>();
 
 const collectorFormStore = useCollectorFormStore();

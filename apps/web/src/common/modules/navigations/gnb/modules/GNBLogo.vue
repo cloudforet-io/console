@@ -3,12 +3,12 @@ import {
     computed,
     reactive,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import config from '@/lib/config';
 
 interface Props {
-    to: RouteLocation;
+    to: RouteLocationRaw;
 }
 
 defineProps<Props>();

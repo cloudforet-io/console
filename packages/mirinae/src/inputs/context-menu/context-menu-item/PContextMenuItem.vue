@@ -62,7 +62,7 @@
 import {
     computed, reactive, useAttrs, useSlots,
 } from 'vue';
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
@@ -73,7 +73,7 @@ interface Props {
     name: string;
     label?: string;
     link: string;
-    to?: RouteLocation;
+    to?: RouteLocationRaw;
     disabled: boolean;
     selected: boolean;
     selectMarker?: SelectMarker;
