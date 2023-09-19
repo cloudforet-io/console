@@ -1,9 +1,7 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { COST_REFERENCE_SCHEMA } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyName,
     getWidgetFilterSchemaPropertyNames,
     getWidgetInheritOptions,
     getWidgetInheritOptionsForFilter,
@@ -43,6 +41,9 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 5,
         },
+        filters: {
+            cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+        },
     },
     inherit_options: {
         ...getWidgetInheritOptions('cost_data_source'),
@@ -65,11 +66,8 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             type: 'object',
             properties: {
                 ...getWidgetOptionsSchema('cost_data_source'),
-                [getWidgetFilterSchemaPropertyName('cost_product')]: {
-                    ...COST_REFERENCE_SCHEMA.cost_product,
-                    default: ['AWSDataTransfer'],
-                },
                 ...getWidgetFilterOptionsSchema(
+                    'cost_product',
                     'project',
                     'service_account',
                     'project_group',
