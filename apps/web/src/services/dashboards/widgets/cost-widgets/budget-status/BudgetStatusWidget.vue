@@ -9,6 +9,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -22,7 +23,6 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
 
-
 type Data = BudgetDataModel['results'];
 
 const budgetQueryHelper = new QueryHelper();
@@ -32,7 +32,7 @@ const emit = defineEmits<WidgetEmit>();
 const { t } = useI18n();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
+    widgetLocation: computed<RouteLocationRaw>(() => {
         const dataSourceId = widgetState.options.cost_data_source;
         return {
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,

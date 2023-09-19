@@ -9,6 +9,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -38,7 +39,6 @@ import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widg
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
-
 
 const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
@@ -77,7 +77,7 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: widgetState.options.cost_data_source,

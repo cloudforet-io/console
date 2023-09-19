@@ -12,6 +12,7 @@ import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -84,7 +85,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
+    widgetLocation: computed<RouteLocationRaw>(() => {
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),

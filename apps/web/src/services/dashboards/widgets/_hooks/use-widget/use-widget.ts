@@ -23,7 +23,7 @@ interface AdditionalState {
 /**
  * @example
  const { widgetState, widgetFrameProps } = useWidget(props, {
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
     })),
     dateRange: computed<DateRange>(() => {

@@ -10,6 +10,7 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -64,7 +65,7 @@ const { colorSet } = useWidgetColorSet({
 });
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: widgetState.options.cost_data_source,

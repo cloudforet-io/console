@@ -8,6 +8,7 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -34,7 +35,6 @@ import {
 } from './costmap-chart-data-helper';
 import { setThemeColorsToTreemapData } from './costmap-draw-chart-helper';
 
-
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
 
@@ -46,7 +46,7 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
+    widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: widgetState.options.cost_data_source,

@@ -10,6 +10,7 @@ import {
 import {
     computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -37,7 +38,7 @@ const emit = defineEmits<WidgetEmit>();
 const store = useStore();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
+    widgetLocation: computed<RouteLocationRaw>(() => {
         const dataSourceId = widgetState.options.cost_data_source;
         return {
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,

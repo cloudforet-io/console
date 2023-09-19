@@ -12,6 +12,7 @@ import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
@@ -53,7 +54,6 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
-
 interface Data {
     cost_sum: { date: string; value: number }[];
     _total_cost_sum: number;
@@ -81,7 +81,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<Location>(() => {
+    widgetLocation: computed<RouteLocationRaw>(() => {
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),
