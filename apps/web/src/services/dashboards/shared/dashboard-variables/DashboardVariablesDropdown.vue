@@ -39,16 +39,16 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any|null,
     searchText: '',
-    variableProperty: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
-    variableName: computed(() => state.variableProperty?.name),
+    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
+    variableName: computed<string|undefined>(() => state.variableProperty?.name),
     selected: computed<MenuItem[]>(() => {
         // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
         const arrayOfSelectedOptions = flattenDeep([dashboardDetailState.variables[props.propertyName] ?? []]);
 
-        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
+        if (state.variableProperty?.options?.type === 'REFERENCE_RESOURCE') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
-        if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+        if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
             if (state.searchResourceOptions.length) {
                 return arrayOfSelectedOptions.map((d) => ({
                     name: d,
@@ -64,19 +64,19 @@ const state = reactive({
     options: computed<MenuItem[]>(() => {
         let result;
 
-        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
+        if (state.variableProperty?.options?.type === 'REFERENCE_RESOURCE') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
-        } else if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+        } else if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
             result = state.searchResourceOptions.map((d) => ({ name: d.key, label: d.name }));
-        } else if (state.variableProperty.options?.type === 'ENUM') {
-            result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
+        } else if (state.variableProperty?.options?.type === 'ENUM') {
+            result = state.variableProperty?.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
         return result ?? [];
     }),
     autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
-        const api = state.variableProperty.options?.resource_key
+        const api = state.variableProperty?.options?.resource_key
             ? SpaceConnector.client.addOns.autocomplete.distinct
             : SpaceConnector.client.addOns.autocomplete.resource;
         return getCancellableFetcher(api);
@@ -126,7 +126,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete variables[props.propertyName];
-    } else if (state.variableProperty.selection_type === 'SINGLE') {
+    } else if (state.variableProperty?.selection_type === 'SINGLE') {
         variables[props.propertyName] = reconvertedSelected[0];
     } else {
         variables[props.propertyName] = reconvertedSelected;
@@ -143,13 +143,13 @@ const handleUpdateSearchText = debounce((text: string) => {
 
 const filtersHelper = new QueryHelper();
 
-const getFilters = (variableProperty: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
+const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
     filtersHelper.setFilters([]);
 
     // NOTE: Some variables(asset) require specific API filters.
-    if (variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
+    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
         filtersHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
-    } else if (variableProperty.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
+    } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
         filtersHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
     }
 
@@ -159,7 +159,7 @@ const getFilters = (variableProperty: DashboardVariableSchemaProperty): QueryHel
 };
 const loadSearchResourceOptions = async () => {
     try {
-        const options = state.variableProperty.options as SearchResourceOptions|undefined;
+        const options = state.variableProperty?.options as SearchResourceOptions|undefined;
         if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
         const { status, response } = await state.autocompleteApi({
             resource_type: options.resource_type ?? 'cost_analysis.Cost',
@@ -178,8 +178,8 @@ const loadSearchResourceOptions = async () => {
 
 const initVariable = () => {
     const variable = dashboardDetailState.variables[props.propertyName];
-    if (state.variableProperty.required && !variable) {
-        if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+    if (state.variableProperty?.required && !variable) {
+        if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
             const firstOption = state.searchResourceOptions[0];
             if (firstOption) changeVariables([{ name: firstOption.key, label: firstOption.name }]);
         }
@@ -218,7 +218,7 @@ const {
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                :disabled="state.variableProperty.disabled || props.disabled"
+                :disabled="state.variableProperty?.disabled || props.disabled"
                 @click="toggleMenu"
         >
             <span class="variable-contents">
@@ -235,7 +235,7 @@ const {
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty.disabled && !state.variableProperty.required"
+                <button v-if="!state.variableProperty?.disabled && !state.variableProperty?.required"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
@@ -263,9 +263,9 @@ const {
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
                         :selected="state.selected"
-                        :multi-selectable="variableProperty.selection_type === 'MULTI'"
+                        :multi-selectable="variableProperty?.selection_type === 'MULTI'"
                         show-select-marker
-                        :show-clear-selection="variableProperty.selection_type === 'MULTI' && !variableProperty.required"
+                        :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.required"
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"
