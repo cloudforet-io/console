@@ -96,18 +96,22 @@ const handleDeleteQueryConfirm = async () => {
                 </template>
                 <template #title-right-extra>
                     <div v-if="costAnalysisPageStore.selectedQueryId"
-                         class="title-right-extra"
+                         class="title-right-extra icon-wrapper"
                     >
-                        <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
-                                         :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
-                                         scale="0.8"
-                        />
+                        <div class="favorite-button-wrapper">
+                            <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
+                                             :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
+                                             scale="0.8"
+                            />
+                        </div>
                         <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_edit-text"
+                                       size="md"
                                        @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                         <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_delete"
+                                       size="md"
                                        @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                     </div>
@@ -151,6 +155,14 @@ const handleDeleteQueryConfirm = async () => {
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
         margin-bottom: -0.25rem;
+        &.icon-wrapper {
+            gap: 0.5rem;
+            .favorite-button-wrapper {
+                @apply flex items-center justify-center;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+        }
         &.currency-wrapper {
             @apply justify-end text-gray-800;
             font-size: 0.875rem;
