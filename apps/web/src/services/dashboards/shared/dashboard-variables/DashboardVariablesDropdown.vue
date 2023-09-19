@@ -177,7 +177,8 @@ const loadSearchResourceOptions = async () => {
 };
 
 const initVariable = () => {
-    if (state.variableProperty.required) {
+    const variable = dashboardDetailState.variables[props.propertyName];
+    if (state.variableProperty.required && !variable) {
         if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
             const firstOption = state.searchResourceOptions[0];
             if (firstOption) changeVariables([{ name: firstOption.key, label: firstOption.name }]);
