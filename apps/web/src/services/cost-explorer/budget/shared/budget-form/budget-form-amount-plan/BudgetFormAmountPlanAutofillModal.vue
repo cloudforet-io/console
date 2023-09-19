@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
@@ -10,12 +9,14 @@ import { useI18n } from 'vue-i18n';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { AutofillOptions } from '@/services/cost-explorer/budget/type';
+export interface AutofillOptions {
+    start?: number;
+    growth?: number;
+}
 
 interface Props {
     visible?: boolean;
 }
-
 
 const props = defineProps<Props>();
 

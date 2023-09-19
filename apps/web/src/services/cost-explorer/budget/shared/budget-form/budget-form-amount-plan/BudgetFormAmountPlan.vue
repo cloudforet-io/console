@@ -9,6 +9,9 @@ import { useI18n } from 'vue-i18n';
 import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
+import type {
+    MonthAmountInputMap,
+} from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanMonthly
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 import BudgetFormAmountPlanTotal
@@ -17,8 +20,15 @@ import BudgetFormAmountPlanUnitSelect
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetPeriodSelect
     from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
-import type { BudgetAmountPlanInfo, MonthAmountInputMap } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
+
+export interface BudgetAmountPlanInfo {
+    limit?: BudgetModel['limit'];
+    planned_limits?: BudgetModel['planned_limits'];
+    time_unit: BudgetModel['time_unit'];
+    start: BudgetModel['start'];
+    end: BudgetModel['end'];
+}
 
 interface Props {
     projectId?: string;

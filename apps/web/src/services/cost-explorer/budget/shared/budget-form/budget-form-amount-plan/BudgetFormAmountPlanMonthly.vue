@@ -10,11 +10,13 @@ import { useI18n } from 'vue-i18n';
 
 import BudgetFormAmountPlanAutofillModal
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
+import type { AutofillOptions } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
 import type { MonthAmountInput } from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
 import BudgetFormAmountPlanMonthInput
     from '@/services/cost-explorer/budget/shared/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
-import type { AutofillOptions, MonthAmountInputMap } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
+
+export type MonthAmountInputMap = Record<string, MonthAmountInput>;
 
 interface Props {
     period: Period;
