@@ -115,7 +115,7 @@ watch(() => state.proxyVisible, (visible) => {
         fade
         backdrop
         :visible.sync="state.proxyVisible"
-        :disabled="!state.isAllValid"
+        :disabled="!state.isAllValid || !formState.queryName"
         @confirm="handleFormConfirm"
     >
         <template #body>
