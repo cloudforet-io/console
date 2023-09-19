@@ -39,6 +39,7 @@ class Config {
             if (import.meta.env?.VITE_VERCEL_EDGE_CONFIG) {
                 const edgeConfigClient = createClient(import.meta.env.VITE_VERCEL_EDGE_CONFIG);
                 const edgeConfig = await edgeConfigClient.getAll();
+                console.debug('edgeConfig', edgeConfig);
                 this.config = { ...this.config, ...edgeConfig };
             }
         }
