@@ -2,8 +2,9 @@
     <div ref="containerRef"
          class="create-collector-step-1"
     >
-        <p-search v-model="state.searchValue"
+        <p-search :value.sync="state.searchValue"
                   @search="handleSearch"
+                  @delete="handleDeleteSearchValue"
         />
         <div class="contents-container">
             <step1-search-filter @selectRepository="handleChangeRepository" />
@@ -106,6 +107,7 @@ const state = reactive({
     selectedRepository: '',
     currentPage: 1,
     totalCount: 0,
+    initialLoad: true,
 });
 
 
@@ -147,10 +149,10 @@ const loadMorePlugin = async () => {
     connectObserver();
 };
 
-const handleSearch = async (value) => {
+const handleSearch = async () => {
     disconnectObserver();
-    state.searchValue = value;
     state.pluginList = await getPlugins();
+    state.initialLoad = false;
     connectObserver();
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
@@ -159,6 +161,12 @@ const handleClickNextStep = (item: RepositoryPluginModel) => {
 };
 const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
+};
+
+const handleDeleteSearchValue = () => {
+    state.searchValue = '';
+    if (state.initialLoad) return;
+    handleSearch();
 };
 
 const pluginListContainerRef = ref<HTMLElement|null>(null);
@@ -171,6 +179,7 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
     disconnectObserver();
     state.currentPage = 1;
     state.pluginList = await getPlugins();
+    state.initialLoad = true;
     connectObserver();
 }, { immediate: true });
 
@@ -178,6 +187,7 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 onMounted(() => {
     collectorFormStore.$reset();
 });
+
 </script>
 
 <style lang="postcss" scoped>
